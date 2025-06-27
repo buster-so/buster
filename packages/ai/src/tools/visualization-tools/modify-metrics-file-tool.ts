@@ -9,7 +9,11 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
-import { addMetricVersionToHistory, getLatestVersionNumber, validateMetricYml } from './version-history-helpers';
+import {
+  addMetricVersionToHistory,
+  getLatestVersionNumber,
+  validateMetricYml,
+} from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 
 // TypeScript types matching Rust DataMetadata structure
@@ -253,7 +257,11 @@ interface SqlValidationResult {
 }
 
 // Replace the basic SQL validation with comprehensive validation
-async function validateSql(sqlQuery: string, dataSourceId: string, workflowId: string): Promise<SqlValidationResult> {
+async function validateSql(
+  sqlQuery: string,
+  dataSourceId: string,
+  workflowId: string
+): Promise<SqlValidationResult> {
   try {
     if (!sqlQuery.trim()) {
       return { success: false, error: 'SQL query cannot be empty' };
@@ -404,8 +412,6 @@ async function validateSql(sqlQuery: string, dataSourceId: string, workflowId: s
   }
 }
 
-
-
 // Process a metric file update with complete new YAML content
 async function processMetricFileUpdate(
   existingFile: typeof metricFiles.$inferSelect,
@@ -436,12 +442,62 @@ async function processMetricFileUpdate(
 
     const newMetricYml = metricYml;
 
-  // Check if SQL has changed to avoid unnecessary validation
-  const existingContent = existingFile.content as MetricYml | null;
-  const sqlChanged = existingContent?.sql !== newMetricYml.sql;
+    // Check if SQL has changed to avoid unnecessary validation
+    const existingContent = existingFile.content as MetricYml | null;
+    const sqlChanged = existingContent?.sql !== newMetricYml.sql;
 
-  // If SQL hasn't changed, we can skip validation
-  if (!sqlChanged && existingFile.dataMetadata) {
+    // If SQL hasn't changed, we can skip validation
+    if (!sqlChanged && existingFile.dataMetadata) {
+      modificationResults.push({
+        file_id: existingFile.id,
+        file_name: newMetricYml.name,
+        success: true,
+        modification_type: 'content',
+        timestamp,
+        duration,
+      });
+
+      return {
+        success: true,
+        updatedFile: {
+          ...existingFile,
+          content: newMetricYml,
+          name: newMetricYml.name,
+          updatedAt: new Date().toISOString(),
+          // Keep existing metadata since SQL hasn't changed
+        },
+        metricYml: newMetricYml,
+        modificationResults,
+        validationMessage: 'SQL unchanged, validation skipped',
+        validationResults: [],
+        validatedDatasetIds: [],
+      };
+    }
+
+    // Validate SQL if it has changed or if metadata is missing
+    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId);
+    if (!sqlValidation.success) {
+      const error = `SQL validation failed: ${sqlValidation.error}`;
+      modificationResults.push({
+        file_id: existingFile.id,
+        file_name: newMetricYml.name,
+        success: false,
+        error,
+        modification_type: 'sql_validation',
+        timestamp,
+        duration,
+      });
+      return {
+        success: false,
+        modificationResults,
+        validationMessage: '',
+        validationResults: [],
+        validatedDatasetIds: [],
+        error,
+      };
+    }
+
+    // Track successful update
     modificationResults.push({
       file_id: existingFile.id,
       file_name: newMetricYml.name,
@@ -458,66 +514,16 @@ async function processMetricFileUpdate(
         content: newMetricYml,
         name: newMetricYml.name,
         updatedAt: new Date().toISOString(),
-        // Keep existing metadata since SQL hasn't changed
+        dataMetadata: sqlValidation.results ? createDataMetadata(sqlValidation.results) : null,
       },
       metricYml: newMetricYml,
       modificationResults,
-      validationMessage: 'SQL unchanged, validation skipped',
-      validationResults: [],
+      validationMessage: sqlChanged
+        ? sqlValidation.message || 'SQL validation completed'
+        : 'Metadata missing, validation completed',
+      validationResults: sqlValidation.results || [],
       validatedDatasetIds: [],
     };
-  }
-
-  // Validate SQL if it has changed or if metadata is missing
-  const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId);
-  if (!sqlValidation.success) {
-    const error = `SQL validation failed: ${sqlValidation.error}`;
-    modificationResults.push({
-      file_id: existingFile.id,
-      file_name: newMetricYml.name,
-      success: false,
-      error,
-      modification_type: 'sql_validation',
-      timestamp,
-      duration,
-    });
-    return {
-      success: false,
-      modificationResults,
-      validationMessage: '',
-      validationResults: [],
-      validatedDatasetIds: [],
-      error,
-    };
-  }
-
-  // Track successful update
-  modificationResults.push({
-    file_id: existingFile.id,
-    file_name: newMetricYml.name,
-    success: true,
-    modification_type: 'content',
-    timestamp,
-    duration,
-  });
-
-  return {
-    success: true,
-    updatedFile: {
-      ...existingFile,
-      content: newMetricYml,
-      name: newMetricYml.name,
-      updatedAt: new Date().toISOString(),
-      dataMetadata: sqlValidation.results ? createDataMetadata(sqlValidation.results) : null,
-    },
-    metricYml: newMetricYml,
-    modificationResults,
-    validationMessage: sqlChanged
-      ? sqlValidation.message || 'SQL validation completed'
-      : 'Metadata missing, validation completed',
-    validationResults: sqlValidation.results || [],
-    validatedDatasetIds: [],
-  };
   } catch (error) {
     let errorMessage = 'Unknown error';
 
@@ -783,7 +789,9 @@ const inputSchema = z.object({
     .array(
       z.object({
         id: z.string().describe('The UUID of the metric file to modify'),
-        yml_content: z.string().describe('The complete YAML content for the metric, replacing the entire existing file'),
+        yml_content: z
+          .string()
+          .describe('The complete YAML content for the metric, replacing the entire existing file'),
       })
     )
     .min(1, 'At least one file must be provided'),
@@ -1396,10 +1404,6 @@ definitions:
                   - columnId
                   - useValue
                 description: Configuration for a derived metric sub-header
-          metricValueLabel:
-            oneOf:
-              - type: string
-                description: Custom label to display with the metric value
         required:
           - selectedChartType
           - metricColumnId
