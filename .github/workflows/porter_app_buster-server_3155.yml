@@ -2,6 +2,8 @@
     push:
         branches:
             - mastra-braintrust
+        paths:
+            - apps/server/**
 name: Deploy to buster-server
 jobs:
     porter-deploy:

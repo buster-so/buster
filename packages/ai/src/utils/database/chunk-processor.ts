@@ -1110,6 +1110,23 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
         break;
       }
+
+      case 'createTodoList':
+      case 'create_todo_item': {
+        // Update todos as they stream
+        const todos = getOptimisticValue<string>(parseResult.extractedValues, 'todos', '');
+        if (todos && entry.type === 'files') {
+          const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
+          if (fileIds && fileIds.length > 0) {
+            const fileId = fileIds[0];
+            if (fileId && entry.files[fileId]?.file) {
+              // Update the text content with the streaming todos
+              entry.files[fileId].file.text = todos;
+            }
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -1302,6 +1319,32 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           } as ReasoningEntry;
         }
         break;
+
+      case 'createTodoList':
+      case 'create_todo_item': {
+        // Create a file entry for todos to enable streaming
+        const fileId = `todo-${Date.now()}-${Math.random().toString(36).substr(2, 11)}`;
+        return {
+          id: toolCallId,
+          type: 'files',
+          title: 'TODO List',
+          status: 'loading',
+          secondary_title: undefined,
+          file_ids: [fileId],
+          files: {
+            [fileId]: {
+              id: fileId,
+              file_type: 'agent-action',
+              file_name: 'todos',
+              version_number: 1,
+              status: 'loading',
+              file: {
+                text: '', // Will be populated during streaming
+              },
+            },
+          },
+        } as ReasoningEntry;
+      }
 
       default: {
         // For other tools, create a generic text entry
