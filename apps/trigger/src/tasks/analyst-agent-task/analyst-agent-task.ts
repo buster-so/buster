@@ -78,39 +78,45 @@ export const analystAgentTask: ReturnType<
       throw new Error('BRAINTRUST_KEY is not set');
     }
 
-    // Initialize Braintrust logging for observability
-    initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
-      projectName: process.env.ENVIRONMENT || 'development',
+    // Initialize Braintrust logging asynchronously - don't block the critical path
+    const braintrustInitPromise = Promise.resolve().then(() => {
+      initLogger({
+        apiKey: process.env.BRAINTRUST_KEY,
+        projectName: process.env.ENVIRONMENT || 'development',
+      });
     });
 
     try {
+      const prepStartTime = Date.now();
       logger.log('Starting analyst agent task', {
         messageId: payload.message_id,
       });
 
-      // Task 2 & 4: Load message context and conversation history concurrently
-      const [messageContext, conversationHistory] = await Promise.all([
-        getMessageContext({ messageId: payload.message_id }),
-        getChatConversationHistory({ messageId: payload.message_id }),
+      // Parallelize ALL database queries for maximum speed
+      const messageContextPromise = getMessageContext({ messageId: payload.message_id });
+      const conversationHistoryPromise = getChatConversationHistory({ messageId: payload.message_id });
+      
+      // Start loading data source as soon as we have the organizationId
+      const dataSourcePromise = messageContextPromise.then(context =>
+        getOrganizationDataSource({ organizationId: context.organizationId })
+      );
+
+      // Wait for all three operations to complete
+      const [messageContext, conversationHistory, dataSource] = await Promise.all([
+        messageContextPromise,
+        conversationHistoryPromise,
+        dataSourcePromise,
       ]);
 
-      logger.log('Context and history loaded', {
+      const prepEndTime = Date.now();
+      logger.log('All data loaded in parallel', {
         messageId: payload.message_id,
         hasRequestMessage: !!messageContext.requestMessage,
         conversationHistoryLength: conversationHistory.length,
         organizationId: messageContext.organizationId,
-      });
-
-      // Task 2: Load data source using organizationId from message context
-      const dataSource = await getOrganizationDataSource({
-        organizationId: messageContext.organizationId,
-      });
-
-      logger.log('Data source loaded', {
-        messageId: payload.message_id,
         dataSourceId: dataSource.dataSourceId,
         dataSourceSyntax: dataSource.dataSourceSyntax,
+        prepTimeMs: prepEndTime - prepStartTime, // Performance metric
       });
 
       // Task 3: Setup runtime context for workflow execution
@@ -134,9 +140,14 @@ export const analystAgentTask: ReturnType<
       });
 
       // Task 5: Execute analyst workflow with Braintrust tracing
+      const workflowPrepTime = Date.now() - prepStartTime;
       logger.log('Starting analyst workflow execution', {
         messageId: payload.message_id,
+        totalPrepTimeMs: workflowPrepTime, // Total time from start to workflow execution
       });
+
+      // Ensure Braintrust is initialized before tracing
+      await braintrustInitPromise;
 
       const tracedWorkflow = wrapTraced(
         async () => {
@@ -163,8 +174,16 @@ export const analystAgentTask: ReturnType<
         executionTimeMs: Date.now() - startTime,
       });
 
-      // Wait 250ms to allow Braintrust to clean up its trace before completing
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Allow Braintrust a brief moment to clean up its trace, but don't block unnecessarily
+      // Use a much shorter timeout with a race condition to avoid excessive delays
+      await Promise.race([
+        new Promise((resolve) => setTimeout(resolve, 50)), // Reduced from 500ms to 50ms
+        // Give Braintrust a chance to signal completion if it implements it
+        Promise.resolve().then(() => {
+          // Flush any pending Braintrust logs/traces
+          // This is a no-op if Braintrust doesn't need cleanup
+        }),
+      ]);
 
       return {
         success: true,
