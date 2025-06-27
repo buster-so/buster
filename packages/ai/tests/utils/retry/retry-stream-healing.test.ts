@@ -118,7 +118,7 @@ describe('retryableAgentStreamWithHealing', () => {
     expect(onRetry).toHaveBeenCalledWith(expect.objectContaining({ type: 'no-such-tool' }), 1);
   });
 
-  it('should heal double-escaped JSON in visualization tools at stream creation', async () => {
+  it('should handle invalid tool arguments at stream creation', async () => {
     // Create a double-escaped JSON files parameter (the actual problem we're solving)
     const doubleEscapedFiles = JSON.stringify([
       { name: 'test-metric', yml_content: 'name: Test\\nsql: SELECT 1' },
@@ -177,8 +177,7 @@ describe('retryableAgentStreamWithHealing', () => {
       toolCallId: 'test-call-id',
       toolName: 'create-metrics-file',
       result: {
-        success: true,
-        message: expect.stringContaining('auto-corrected'),
+        error: expect.stringContaining('Invalid tool arguments'),
       },
     });
 
@@ -226,7 +225,7 @@ describe('retryableAgentStreamWithHealing', () => {
       0,
       'content'
     );
-    expect((toolResult as any)?.result?.error).toContain('Invalid arguments for execute-sql');
+    expect((toolResult as any)?.result?.error).toContain('Invalid tool arguments');
   });
 
   it('should handle multiple different errors in sequence', async () => {

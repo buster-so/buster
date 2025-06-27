@@ -1404,7 +1404,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
         case 'respondWithoutAnalysis':
         case 'respond-without-analysis':
-          message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '') || '';
+          message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
           break;
 
         default:
@@ -1449,7 +1449,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       case 'respondWithoutAnalysis':
       case 'respond-without-analysis':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '') || '';
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
         break;
     }
 

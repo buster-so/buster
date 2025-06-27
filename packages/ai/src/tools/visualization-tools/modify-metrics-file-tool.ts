@@ -1,15 +1,15 @@
-import { DataSource } from '@buster/data-source';
-import type { Credentials } from '@buster/data-source';
+import type { DataSource } from '@buster/data-source';
 import { db } from '@buster/database';
 import { metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
-import { eq, inArray, sql } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
+import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
-import { addMetricVersionToHistory, getLatestVersionNumber } from './version-history-helpers';
+import { addMetricVersionToHistory, getLatestVersionNumber, validateMetricYml } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 
 // TypeScript types matching Rust DataMetadata structure
@@ -162,7 +162,7 @@ function createDataMetadata(results: Record<string, unknown>[]): DataMetadata {
 function ensureTimeFrameQuoted(ymlContent: string): string {
   // Regex to match timeFrame field with its value
   // Captures: timeFrame + whitespace + : + whitespace + value (until end of line)
-  const timeFrameRegex = /(time_frame\s*:\s*)([^\r\n]+)/g;
+  const timeFrameRegex = /(timeFrame\s*:\s*)([^\r\n]+)/g;
 
   return ymlContent.replace(timeFrameRegex, (match, prefix, value) => {
     // Trim whitespace from the value
@@ -225,134 +225,35 @@ interface ModificationResult {
   duration: number;
 }
 
-// Comprehensive YAML schema validation (reusing from create tool)
-const columnLabelFormatSchema = z.object({
-  columnType: z.enum(['number', 'string', 'date']),
-  style: z.enum(['currency', 'percent', 'number', 'date', 'string']),
-  multiplier: z.number().optional(),
-  displayName: z.string().optional(),
-  numberSeparatorStyle: z.string().nullable().optional(),
-  minimumFractionDigits: z.number().optional(),
-  maximumFractionDigits: z.number().optional(),
-  prefix: z.string().optional(),
-  suffix: z.string().optional(),
-  replaceMissingDataWith: z.number().nullable().optional(),
-  compactNumbers: z.boolean().optional(),
-  currency: z.string().optional(),
-  dateFormat: z.string().optional(),
-  useRelativeTime: z.boolean().optional(),
-  isUtc: z.boolean().optional(),
-  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional(),
-});
+// Zod schema for validating result metadata from DataSource
+const resultMetadataSchema = z
+  .object({
+    totalRowCount: z.number().optional(),
+    limited: z.boolean().optional(),
+    maxRows: z.number().optional(),
+  })
+  .optional();
 
-const baseChartConfigSchema = z.object({
-  selectedChartType: z.enum(['bar', 'line', 'scatter', 'pie', 'combo', 'metric', 'table']),
-  columnLabelFormats: z.record(columnLabelFormatSchema),
-  columnSettings: z.record(z.any()).optional(),
-  colors: z.array(z.string()).optional(),
-  showLegend: z.boolean().optional(),
-  gridLines: z.boolean().optional(),
-  showLegendHeadline: z.union([z.boolean(), z.string()]).optional(),
-  goalLines: z.array(z.any()).optional(),
-  trendlines: z.array(z.any()).optional(),
-  disableTooltip: z.boolean().optional(),
-  xAxisConfig: z
-    .object({
-      xAxisTimeInterval: z.enum(['day', 'week', 'month', 'quarter', 'year', 'null']),
-      xAxisShowAxisLabel: z.boolean().optional(),
-      xAxisShowAxisTitle: z.boolean().optional(),
-      xAxisAxisTitle: z.string().nullable().optional(),
-      xAxisLabelRotation: z.enum(['0', '45', '90', 'auto']).optional(),
-      xAxisDataZoom: z.boolean().optional(),
-    })
-    .optional(),
-  yAxisConfig: z
-    .object({
-      yAxisShowAxisLabel: z.boolean().optional(),
-      yAxisShowAxisTitle: z.boolean().optional(),
-      yAxisAxisTitle: z.string().nullable().optional(),
-      yAxisStartAxisAtZero: z.boolean().nullable().optional(),
-      yAxisScaleType: z.enum(['log', 'linear']).optional(),
-    })
-    .optional(),
-  y2AxisConfig: z
-    .object({
-      y2AxisShowAxisLabel: z.boolean().optional(),
-      y2AxisShowAxisTitle: z.boolean().optional(),
-      y2AxisAxisTitle: z.string().nullable().optional(),
-      y2AxisStartAxisAtZero: z.boolean().nullable().optional(),
-      y2AxisScaleType: z.enum(['log', 'linear']).optional(),
-    })
-    .optional(),
-  categoryAxisStyleConfig: z
-    .object({
-      colorColumnId: z.string().optional(),
-      groupByColumnId: z.string().optional(),
-    })
-    .optional(),
-});
+type ResultMetadata = z.infer<typeof resultMetadataSchema>;
 
-const tableChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('table'),
-  tableColumnOrder: z.array(z.string()).optional(),
-});
-
-const metricChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('metric'),
-  metricColumnId: z.string(),
-});
-
-const barChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('bar'),
-});
-
-const lineChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('line'),
-});
-
-const scatterChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('scatter'),
-});
-
-const pieChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('pie'),
-});
-
-const comboChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('combo'),
-});
-
-const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
-  tableChartConfigSchema,
-  metricChartConfigSchema,
-  barChartConfigSchema,
-  lineChartConfigSchema,
-  scatterChartConfigSchema,
-  pieChartConfigSchema,
-  comboChartConfigSchema,
-]);
-
-const metricYmlSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1).optional(),
-  time_frame: z.string().min(1),
-  sql: z.string().min(1),
-  chart_config: chartConfigSchema,
-});
-
-// Remove duplicate type definition since imported from types
-// type MetricYml = z.infer<typeof metricYmlSchema>;
+interface QueryMetadata {
+  rowCount: number;
+  totalRowCount: number;
+  executionTime: number;
+  limited: boolean;
+  maxRows?: number;
+}
 
 interface SqlValidationResult {
   success: boolean;
   message?: string;
   results?: Record<string, unknown>[];
-  metadata?: Record<string, unknown>;
+  metadata?: QueryMetadata;
   error?: string;
 }
 
 // Replace the basic SQL validation with comprehensive validation
-async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlValidationResult> {
+async function validateSql(sqlQuery: string, dataSourceId: string, workflowId: string): Promise<SqlValidationResult> {
   try {
     if (!sqlQuery.trim()) {
       return { success: false, error: 'SQL query cannot be empty' };
@@ -367,20 +268,12 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
       return { success: false, error: 'SQL query must contain FROM clause' };
     }
 
-    // Get data source credentials from vault
+    // Get data source from workflow manager (reuses existing connections)
+    const manager = getWorkflowDataSourceManager(workflowId);
     let dataSource: DataSource;
+
     try {
-      const credentials = await getDataSourceCredentials(dataSourceId);
-      dataSource = new DataSource({
-        dataSources: [
-          {
-            name: `datasource-${dataSourceId}`,
-            type: credentials.type,
-            credentials: credentials,
-          },
-        ],
-        defaultDataSource: `datasource-${dataSourceId}`,
-      });
+      dataSource = await manager.getDataSource(dataSourceId);
     } catch (_error) {
       return {
         success: false,
@@ -388,113 +281,121 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
       };
     }
 
-    try {
-      // Retry configuration for SQL validation
-      const MAX_RETRIES = 3;
-      const TIMEOUT_MS = 30000; // 30 seconds per attempt
-      const RETRY_DELAYS = [1000, 3000, 6000]; // 1s, 3s, 6s
+    // Retry configuration for SQL validation
+    const MAX_RETRIES = 3;
+    const TIMEOUT_MS = 30000; // 30 seconds per attempt
+    const RETRY_DELAYS = [1000, 3000, 6000]; // 1s, 3s, 6s
 
-      // Attempt execution with retries
-      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-        try {
-          // Execute the SQL query using the DataSource with timeout for validation
-          const result = await dataSource.execute({
-            sql: sqlQuery,
-            options: {
-              timeout: TIMEOUT_MS,
-            },
-          });
+    // Attempt execution with retries
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        // Execute the SQL query using the DataSource with row limit and timeout for validation
+        const result = await dataSource.execute({
+          sql: sqlQuery,
+          options: {
+            maxRows: 1000, // Limit to 1000 rows for validation to protect memory
+            timeout: TIMEOUT_MS,
+          },
+        });
 
-          if (result.success) {
-            const allResults = result.rows || [];
-            // Truncate results to 25 records for validation
-            const results = allResults.slice(0, 25);
+        if (result.success) {
+          const allResults = result.rows || [];
+          // Truncate results to 25 records for display in validation
+          const results = allResults.slice(0, 25);
 
-            const metadata = {
-              columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
-              rowCount: results.length,
-              totalRowCount: allResults.length, // Track original count
-              executionTime: 100, // We don't have actual execution time from DataSource
-            };
+          // Validate metadata with Zod schema for runtime safety
+          const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
+          const parsedMetadata: ResultMetadata = validatedMetadata.success
+            ? validatedMetadata.data
+            : undefined;
 
-            const message =
-              allResults.length === 0
-                ? 'Query executed successfully but returned no records'
-                : `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25 of ${allResults.length} total)` : ''}`;
-
-            return {
-              success: true,
-              message,
-              results,
-              metadata,
-            };
-          }
-
-          // Check if error is timeout-related
-          const errorMessage = result.error?.message || 'Query execution failed';
-          const isTimeout =
-            errorMessage.toLowerCase().includes('timeout') ||
-            errorMessage.toLowerCase().includes('timed out');
-
-          if (isTimeout && attempt < MAX_RETRIES) {
-            // Wait before retry
-            const delay = RETRY_DELAYS[attempt] || 6000;
-            console.warn(
-              `[modify-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
-              {
-                sqlPreview: `${sqlQuery.substring(0, 100)}...`,
-                attempt: attempt + 1,
-                nextDelay: delay,
-              }
-            );
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            continue; // Retry
-          }
-
-          // Not a timeout or no more retries
-          return {
-            success: false,
-            error: errorMessage,
+          const metadata: QueryMetadata = {
+            rowCount: results.length,
+            totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
+            executionTime: result.executionTime || 100,
+            limited: parsedMetadata?.limited ?? false,
+            maxRows: parsedMetadata?.maxRows ?? 5000,
           };
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'SQL validation failed';
-          const isTimeout =
-            errorMessage.toLowerCase().includes('timeout') ||
-            errorMessage.toLowerCase().includes('timed out');
 
-          if (isTimeout && attempt < MAX_RETRIES) {
-            // Wait before retry
-            const delay = RETRY_DELAYS[attempt] || 6000;
-            console.warn(
-              `[modify-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
-              {
-                sqlPreview: `${sqlQuery.substring(0, 100)}...`,
-                attempt: attempt + 1,
-                nextDelay: delay,
-                error: errorMessage,
-              }
-            );
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            continue; // Retry
+          let message: string;
+          if (allResults.length === 0) {
+            message = 'Query executed successfully but returned no records';
+          } else if (result.metadata?.limited) {
+            message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
+          } else {
+            message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
           }
 
-          // Not a timeout or no more retries
           return {
-            success: false,
-            error: errorMessage,
+            success: true,
+            message,
+            results,
+            metadata,
           };
         }
-      }
 
-      // Should not reach here, but just in case
-      return {
-        success: false,
-        error: 'Max retries exceeded for SQL validation',
-      };
-    } finally {
-      // Always close the data source connection
-      await dataSource.close();
+        // Check if error is timeout-related
+        const errorMessage = result.error?.message || 'Query execution failed';
+        const isTimeout =
+          errorMessage.toLowerCase().includes('timeout') ||
+          errorMessage.toLowerCase().includes('timed out');
+
+        if (isTimeout && attempt < MAX_RETRIES) {
+          // Wait before retry
+          const delay = RETRY_DELAYS[attempt] || 6000;
+          console.warn(
+            `[modify-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+            {
+              sqlPreview: `${sqlQuery.substring(0, 100)}...`,
+              attempt: attempt + 1,
+              nextDelay: delay,
+            }
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue; // Retry
+        }
+
+        // Not a timeout or no more retries
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'SQL validation failed';
+        const isTimeout =
+          errorMessage.toLowerCase().includes('timeout') ||
+          errorMessage.toLowerCase().includes('timed out');
+
+        if (isTimeout && attempt < MAX_RETRIES) {
+          // Wait before retry
+          const delay = RETRY_DELAYS[attempt] || 6000;
+          console.warn(
+            `[modify-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+            {
+              sqlPreview: `${sqlQuery.substring(0, 100)}...`,
+              attempt: attempt + 1,
+              nextDelay: delay,
+              error: errorMessage,
+            }
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue; // Retry
+        }
+
+        // Not a timeout or no more retries
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      }
     }
+
+    // Should not reach here, but just in case
+    return {
+      success: false,
+      error: 'Max retries exceeded for SQL validation',
+    };
+    // Note: We don't close the data source here anymore - it's managed by the workflow manager
   } catch (error) {
     return {
       success: false,
@@ -503,86 +404,14 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
   }
 }
 
-async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
-  try {
-    // Query the vault to get the credentials
-    const secretResult = await db.execute(
-      sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
-    );
 
-    if (!secretResult || secretResult.length === 0) {
-      return Promise.reject(
-        new Error(
-          'Unable to access your data source credentials. Please ensure the data source is properly configured.'
-        )
-      );
-    }
-
-    const secretString = secretResult[0]?.decrypted_secret as string;
-    if (!secretString) {
-      return Promise.reject(
-        new Error(
-          'The data source credentials appear to be invalid. Please reconfigure your data source.'
-        )
-      );
-    }
-
-    // Parse the credentials JSON
-    const credentials = JSON.parse(secretString) as Credentials;
-    return credentials;
-  } catch (error) {
-    console.error('Error getting data source credentials:', error);
-    return Promise.reject(
-      new Error(
-        'Unable to retrieve data source credentials. Please contact support if this issue persists.'
-      )
-    );
-  }
-}
-
-// Parse and validate YAML content
-function parseAndValidateYaml(ymlContent: string): {
-  success: boolean;
-  error?: string;
-  data?: MetricYml;
-} {
-  try {
-    // Ensure timeFrame values are properly quoted before parsing
-    const fixedYmlContent = ensureTimeFrameQuoted(ymlContent);
-
-    const parsedYml = yaml.parse(fixedYmlContent);
-    const validationResult = metricYmlSchema.safeParse(parsedYml);
-
-    if (!validationResult.success) {
-      return {
-        success: false,
-        error: `Invalid YAML structure: ${validationResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
-      };
-    }
-
-    // Transform the validated data to match MetricYml type (camelCase)
-    const transformedData: MetricYml = {
-      name: validationResult.data.name,
-      description: validationResult.data.description,
-      timeFrame: validationResult.data.time_frame, // Transform snake_case to camelCase
-      sql: validationResult.data.sql,
-      chartConfig: validationResult.data.chart_config, // Transform snake_case to camelCase
-    };
-
-    return { success: true, data: transformedData };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'YAML parsing failed',
-    };
-  }
-}
 
 // Process a metric file update with complete new YAML content
 async function processMetricFileUpdate(
   existingFile: typeof metricFiles.$inferSelect,
   ymlContent: string,
   dataSourceId: string,
+  workflowId: string,
   duration: number
 ): Promise<{
   success: boolean;
@@ -597,40 +426,15 @@ async function processMetricFileUpdate(
   const modificationResults: ModificationResult[] = [];
   const timestamp = new Date().toISOString();
 
-  // Parse and validate new YAML content
-  const yamlValidation = parseAndValidateYaml(ymlContent);
-  if (!yamlValidation.success) {
-    const error = `Failed to validate YAML: ${yamlValidation.error}`;
-    modificationResults.push({
-      file_id: existingFile.id,
-      file_name: existingFile.name,
-      success: false,
-      error,
-      modification_type: 'validation',
-      timestamp,
-      duration,
-    });
-    return {
-      success: false,
-      modificationResults,
-      validationMessage: '',
-      validationResults: [],
-      validatedDatasetIds: [],
-      error,
-    };
-  }
+  try {
+    // Ensure timeFrame values are properly quoted before parsing
+    const fixedYmlContent = ensureTimeFrameQuoted(ymlContent);
 
-  const newMetricYml = yamlValidation.data;
-  if (!newMetricYml) {
-    return {
-      success: false,
-      modificationResults,
-      validationMessage: '',
-      validationResults: [],
-      validatedDatasetIds: [],
-      error: 'Failed to parse metric YAML',
-    };
-  }
+    // Parse and validate YAML
+    const parsedYml = yaml.parse(fixedYmlContent);
+    const metricYml = validateMetricYml(parsedYml);
+
+    const newMetricYml = metricYml;
 
   // Check if SQL has changed to avoid unnecessary validation
   const existingContent = existingFile.content as MetricYml | null;
@@ -665,7 +469,7 @@ async function processMetricFileUpdate(
   }
 
   // Validate SQL if it has changed or if metadata is missing
-  const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId);
+  const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId);
   if (!sqlValidation.success) {
     const error = `SQL validation failed: ${sqlValidation.error}`;
     modificationResults.push({
@@ -714,6 +518,45 @@ async function processMetricFileUpdate(
     validationResults: sqlValidation.results || [],
     validatedDatasetIds: [],
   };
+  } catch (error) {
+    let errorMessage = 'Unknown error';
+
+    if (error instanceof z.ZodError) {
+      // Return the actual Zod validation errors for better debugging
+      const issues = error.issues
+        .map((issue) => {
+          const path = issue.path.length > 0 ? ` at path '${issue.path.join('.')}'` : '';
+          return `${issue.message}${path}`;
+        })
+        .join('; ');
+      errorMessage = `The metric configuration is invalid: ${issues}`;
+    } else if (error instanceof Error) {
+      if (error.message.includes('YAMLParseError')) {
+        errorMessage = 'The YAML format is incorrect. Please check the syntax and indentation.';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
+    const errorMessage2 = errorMessage;
+    modificationResults.push({
+      file_id: existingFile.id,
+      file_name: existingFile.name,
+      success: false,
+      error: errorMessage2,
+      modification_type: 'validation',
+      timestamp,
+      duration,
+    });
+    return {
+      success: false,
+      modificationResults,
+      validationMessage: '',
+      validationResults: [],
+      validatedDatasetIds: [],
+      error: errorMessage2,
+    };
+  }
 }
 
 // Main modify metrics function
@@ -728,6 +571,12 @@ const modifyMetricFiles = wrapTraced(
     const dataSourceId = runtimeContext.get('dataSourceId');
     const userId = runtimeContext.get('userId');
     const organizationId = runtimeContext.get('organizationId');
+    const workflowStartTime = runtimeContext?.get('workflowStartTime') as number | undefined;
+
+    // Generate a unique workflow ID using start time and data source
+    const workflowId = workflowStartTime
+      ? `workflow-${workflowStartTime}-${dataSourceId}`
+      : `workflow-${Date.now()}-${dataSourceId}`;
 
     if (!dataSourceId) {
       return {
@@ -793,6 +642,7 @@ const modifyMetricFiles = wrapTraced(
             existingFile,
             fileUpdate.yml_content,
             dataSourceId,
+            workflowId,
             Date.now() - startTime
           );
 
@@ -932,9 +782,8 @@ const inputSchema = z.object({
   files: z
     .array(
       z.object({
-        id: z.string().uuid('Must be a valid UUID'),
-        name: z.string().min(1, 'Name cannot be empty'),
-        yml_content: z.string().min(1, 'YAML content cannot be empty'),
+        id: z.string().describe('The UUID of the metric file to modify'),
+        yml_content: z.string().describe('The complete YAML content for the metric, replacing the entire existing file'),
       })
     )
     .min(1, 'At least one file must be provided'),
@@ -966,8 +815,649 @@ const outputSchema = z.object({
 // Export the tool
 export const modifyMetrics = createTool({
   id: 'modify-metrics-file',
+  description: `Updates existing metric configuration files with new YAML content. Provide the complete YAML content for each metric, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple metrics simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each metric, you need its UUID and the complete updated YAML content. **Prefer modifying metrics in bulk using this tool rather than one by one.**
+
+Only utilize the required/default fields unless the user specifically requests that optional fields be added.
+
+## COMPLETE METRIC YAML SCHEMA SPECIFICATION
+
+\`\`\`
+# METRIC CONFIGURATION - YML STRUCTURE
+# -------------------------------------
+# REQUIRED Top-Level Fields: \`name\`, \`description\`, \`timeFrame\`, \`sql\`, \`chartConfig\`
+#
+# --- FIELD DETAILS & RULES --- 
+# \`name\`: Human-readable title (e.g., Total Sales). 
+#   - RULE: CANNOT contain underscores (\`_\`). Use spaces instead.   
+# \`description\`: Detailed explanation of the metric. 
+# \`timeFrame\`: Human-readable time period covered by the query, similar to a filter in a BI tool. MUST BE A VALID STRING. 
+#   - If doing 2024 as an example, you must do "2024" can't parse as a number.
+#   - For queries with fixed date filters, use specific date ranges, e.g., "January 1, 2020 - December 31, 2020", "2024", "Q2 2024", "June 1, 2025".
+#   - For queries with relative date filters or no date filter, use relative terms, e.g., "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", "Last 12 Months", "Year to Date", "All time", etc.
+#   - For comparisons, use "Comparison - [Period 1] vs [Period 2]", with each period formatted according to whether it is fixed or relative, e.g., "Comparison - Last 30 days vs Previous 30 days" or "Comparison - June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025".
+#   Rules:
+#     - Must accurately reflect the date/time filter used in the \`sql\` field. Do not misrepresent the time range.
+#     - Use full month names for dates, e.g., "January", not "Jan".
+#     - Follow general quoting rules. CANNOT contain ':'.
+#   Note: Respond only with the time period, without explanation or additional copy.
+# \`sql\`: The SQL query for the metric.
+#   - RULE: MUST use the pipe \`|\` block scalar style to preserve formatting and newlines.
+#   - NOTE: Remember to use fully qualified names: DATABASE_NAME.SCHEMA_NAME.TABLE_NAME for tables and table_alias.column for columns. This applies to all table and column references, including those within Common Table Expressions (CTEs) and when selecting from CTEs.
+#   - Example:
+#     sql: |
+#       SELECT ... 
+# \`chartConfig\`: Visualization settings.
+#   - RULE: Must contain \`selectedChartType\` (bar, line, scatter, pie, combo, metric, table).
+#   - RULE: Must contain \`columnLabelFormats\` defining format for ALL columns in the SQL result.
+#   - RULE: Must contain ONE chart-specific config block based on \`selectedChartType\`:
+#     - \`barAndLineAxis\` (for type: bar, line)
+#     - \`scatterAxis\` (for type: scatter)
+#     - \`pieChartAxis\` (for type: pie)
+#     - \`comboChartAxis\` (for type: combo)
+#     - \`metricColumnId\` (for type: metric)
+#     - \`tableConfig\` (for type: table) - [Optional, if needed beyond basic columns]
+#
+# --- GENERAL YAML RULES ---
+# 1. Use standard YAML syntax (indentation, colons for key-value, \`-\` for arrays).
+# 2. Quoting: Generally avoid quotes for simple strings. Use double quotes (\`"..."\`) ONLY if a string contains special characters (like :, {, }, [, ], ,, &, *, #, ?, |, -, <, >, =, !, %, @, \`) or needs to preserve leading/trailing whitespace. 
+# 3. Metric name, timeframe, or description CANNOT contain \`:\`
+# -------------------------------------
+
+# --- FORMAL SCHEMA --- (Used for validation, reflects rules above)
+type: object
+name: Metric Configuration Schema
+description: Metric definition with SQL query and visualization settings
+
+properties:
+  # NAME
+  name:
+    required: true
+    type: string
+    description: Human-readable title (e.g., Total Sales). NO underscores. Follow quoting rules. Should not contain \`:\`
+
+  # DESCRIPTION
   description:
-    'Updates existing metric configuration files with new YAML content. Provide the complete YAML content for each metric, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple metrics simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each metric, you need its UUID and the complete updated YAML content. Prefer modifying metrics in bulk using this tool rather than one by one.',
+    required: true
+    type: string
+    description: |
+      A natural language description of the metric, essentially rephrasing the 'name' field as a question or statement. 
+      Example: If name is "Total Sales", description could be "What are the total sales?".
+      RULE: Should NOT describe the chart type, axes, or any visualization aspects.
+      RULE: Follow general quoting rules. 
+      RULE: Should not contain ':'.
+
+  # TIME FRAME
+  timeFrame:
+    required: true
+    type: string
+    description: |
+      Human-readable time period covered by the SQL query, similar to a filter in a BI tool.
+      RULE: Must accurately reflect the date/time filter used in the \`sql\` field. Do not misrepresent the time range.
+      Examples:
+      - Fixed Dates: "January 1, 2020 - December 31, 2020", "2024", "Q2 2024", "June 1, 2025"
+      - Relative Dates: "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", "Last 12 Months", "Year to Date", "All time"
+      - Comparisons: Use the format "Comparison: [Period 1] vs [Period 2]". Examples:
+        - "Comparison: Last 30 days vs Previous 30 days"
+        - "Comparison: June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025"
+      RULE: Use full month names for dates, e.g., "January", not "Jan".
+      RULE: Follow general quoting rules. CANNOT contain ':'.
+
+  # SQL QUERY
+  sql:
+    required: true
+    type: string
+    description: |
+      SQL query using YAML pipe syntax (|).
+      The SQL query should be formatted with proper indentation using the YAML pipe (|) syntax.
+      This ensures the multi-line SQL is properly parsed while preserving whitespace and newlines.
+      IMPORTANT: Remember to use fully qualified names: DATABASE_NAME.SCHEMA_NAME.TABLE_NAME for tables and table_alias.column for columns. This rule is critical for all table and column references, including those within Common Table Expressions (CTEs) and when selecting from CTEs.
+      Example:
+        sql: |
+          SELECT column1, column2
+          FROM my_table
+          WHERE condition;
+
+  # CHART CONFIGURATION
+  chartConfig:
+    required: true
+    description: Visualization settings (must include selectedChartType, columnLabelFormats, and ONE chart-specific block)
+    allOf: # Base requirements for ALL chart types
+      - \$ref: '#/definitions/base_chart_config'
+    oneOf: # Specific block required based on type 
+      - \$ref: #/definitions/bar_line_chart_config
+      - \$ref: #/definitions/scatter_chart_config
+      - \$ref: #/definitions/pie_chart_config
+      - \$ref: #/definitions/combo_chart_config
+      - \$ref: #/definitions/metric_chart_config
+      - \$ref: #/definitions/table_chart_config
+
+required:
+  - name
+  - timeFrame
+  - sql
+  - chartConfig
+
+definitions:
+  # BASE CHART CONFIG (common parts used by ALL chart types)
+  base_chart_config:
+    type: object
+    properties:
+      selectedChartType:
+        type: string
+        description: Chart type (bar, line, scatter, pie, combo, metric, table)
+        enum: [bar, line, scatter, pie, combo, metric, table]
+      columnLabelFormats:
+        type: object
+        description: REQUIRED formatting for ALL columns returned by the SQL query.
+        additionalProperties:
+          \$ref: #/definitions/column_label_format
+      # Optional base properties below
+      columnSettings:
+        type: object
+        description: |-
+          Visual settings applied per column. 
+          Keys MUST be LOWERCASE column names from the SQL query results. 
+          Example: \`total_sales: { showDataLabels: true }\`
+        additionalProperties:
+          \$ref: #/definitions/column_settings
+      colors:
+        type: array
+        items:
+          type: string
+        description: |
+          Default color palette. 
+          RULE: Hex color codes (e.g., #FF0000) MUST be enclosed in quotes (e.g., "#FF0000" or '#FF0000') because '#' signifies a comment otherwise. Double quotes are preferred for consistency.
+          Use this parameter when the user asks about customizing chart colors, unless specified otherwise.
+      showLegend:
+        type: boolean
+      gridLines:
+        type: boolean
+      showLegendHeadline:
+        oneOf:
+          - type: boolean
+          - type: string
+      goalLines:
+        type: array
+        items:
+          \$ref: #/definitions/goal_line
+      trendlines:
+        type: array
+        items:
+          \$ref: #/definitions/trendline
+      disableTooltip:
+        type: boolean
+      # Axis Configurations
+      # RULE: By default, only add \`xAxisConfig\` and ONLY set its \`xAxisTimeInterval\` property 
+      #       when visualizing date/time data on the X-axis (e.g., line, bar, combo charts). 
+      #       Do NOT add other \`xAxisConfig\` properties, \`yAxisConfig\`, or \`y2AxisConfig\` 
+      #       unless the user explicitly asks for specific axis modifications.
+      xAxisConfig:
+        description: Controls X-axis properties. For date/time axes, MUST contain \`xAxisTimeInterval\` (day, week, month, quarter, year). Other properties control label visibility, title, rotation, and zoom. Only add when needed (dates) or requested by user.
+        \$ref: '#/definitions/x_axis_config'
+      yAxisConfig:
+        description: Controls Y-axis properties. Only add if the user explicitly requests Y-axis modifications (e.g., hiding labels, changing title). Properties control label visibility, title, rotation, and zoom.
+        \$ref: '#/definitions/y_axis_config'
+      y2AxisConfig:
+        description: Controls secondary Y-axis (Y2) properties, primarily for combo charts. Only add if the user explicitly requests Y2-axis modifications. Properties control label visibility, title, rotation, and zoom.
+        \$ref: '#/definitions/y2_axis_config'
+      categoryAxisStyleConfig:
+        description: Optional style configuration for the category axis (color/grouping).
+        \$ref: '#/definitions/category_axis_style_config'
+    required:
+      - selectedChartType
+      - columnLabelFormats
+
+  # AXIS CONFIGURATIONS
+  x_axis_config:
+    type: object
+    properties:
+      xAxisTimeInterval:
+        type: string
+        enum: [day, week, month, quarter, year, 'null']
+        description: REQUIRED time interval for grouping date/time values on the X-axis (e.g., for line/combo charts). MUST be set if the X-axis represents time. Default: null.
+      xAxisShowAxisLabel:
+        type: boolean
+        description: Show X-axis labels. Default: true.
+      xAxisShowAxisTitle:
+        type: boolean
+        description: Show X-axis title. Default: true.
+      xAxisAxisTitle:
+        type: [string, 'null']
+        description: X-axis title. Default: null (auto-generates from column names).
+      xAxisLabelRotation:
+        type: string # Representing numbers or 'auto'
+        enum: ["0", "45", "90", auto]
+        description: Label rotation. Default: auto.
+      xAxisDataZoom:
+        type: boolean
+        description: Enable data zoom on X-axis. Default: false (User only).
+    additionalProperties: false
+    required:
+      - xAxisTimeInterval
+
+  y_axis_config:
+    type: object
+    properties:
+      yAxisShowAxisLabel:
+        type: boolean
+        description: Show Y-axis labels. Default: true.
+      yAxisShowAxisTitle:
+        type: boolean
+        description: Show Y-axis title. Default: true.
+      yAxisAxisTitle:
+        type: [string, 'null']
+        description: Y-axis title. Default: null (uses first plotted column name).
+      yAxisStartAxisAtZero:
+        type: [boolean, 'null']
+        description: Start Y-axis at zero. Default: true.
+      yAxisScaleType:
+        type: string
+        enum: [log, linear]
+        description: Scale type for Y-axis. Default: linear.
+    additionalProperties: false
+
+  y2_axis_config:
+    type: object
+    description: Secondary Y-axis configuration (for combo charts).
+    properties:
+      y2AxisShowAxisLabel:
+        type: boolean
+        description: Show Y2-axis labels. Default: true.
+      y2AxisShowAxisTitle:
+        type: boolean
+        description: Show Y2-axis title. Default: true.
+      y2AxisAxisTitle:
+        type: [string, 'null']
+        description: Y2-axis title. Default: null (uses first plotted column name).
+      y2AxisStartAxisAtZero:
+        type: [boolean, 'null']
+        description: Start Y2-axis at zero. Default: true.
+      y2AxisScaleType:
+        type: string
+        enum: [log, linear]
+        description: Scale type for Y2-axis. Default: linear.
+    additionalProperties: false
+
+  category_axis_style_config:
+    type: object
+    description: Style configuration for the category axis (color/grouping).
+    properties:
+      categoryAxisTitle:
+        type: [string, 'null']
+        description: Title for the category axis.
+    additionalProperties: false
+
+  # COLUMN FORMATTING
+  column_label_format:
+    type: object
+    properties:
+      columnType:
+        type: string
+        description: number, string, date
+        enum: [number, string, date]
+      style:
+        type: string
+        enum:
+          - currency # Note: The "$" sign is automatically prepended.
+          - percent # Note: "%" sign is appended. For percentage values: 
+            # - If the value comes directly from a database column, use multiplier: 1
+            # - If the value is calculated in your SQL query and not already multiplied by 100, use multiplier: 100
+          - number
+          - date # Note: For date columns, consider setting xAxisTimeInterval in xAxisConfig to control date grouping (day, week, month, quarter, year)
+          - string
+      multiplier:
+        type: number
+        description: Value to multiply the number by before display. Default value is 1. For percentages, the multiplier depends on how the data is sourced: if the value comes directly from a database column, use multiplier: 1; if the value is calculated in your SQL query and not already multiplied by 100, use multiplier: 100.
+      displayName:
+        type: string
+        description: Custom display name for the column
+      numberSeparatorStyle:
+        type: string
+        description: Style for number separators. Your option is ',' or a null value.  Not null wrapped in quotes, a null value.
+      minimumFractionDigits:
+        type: integer
+        description: Minimum number of fraction digits to display
+      maximumFractionDigits:
+        type: integer
+        description: Maximum number of fraction digits to display
+      prefix:
+        type: string
+      suffix:
+        type: string
+      replaceMissingDataWith:
+        type: number
+        description: Value to display when data is missing, needs to be set to 0. Should only be set on number columns. All others should be set to null.
+      compactNumbers:
+        type: boolean
+        description: Whether to display numbers in compact form (e.g., 1K, 1M)
+      currency:
+        type: string
+        description: Currency code for currency formatting (e.g., USD, EUR)
+      dateFormat:
+        type: string
+        description: |
+          Format string for date display (must be compatible with Day.js format strings). 
+          RULE: Choose format based on xAxisTimeInterval:
+            - year: 'YYYY' (e.g., 2025)
+            - quarter: '[Q]Q YYYY' (e.g., Q1 2025)
+            - month: 'MMM YYYY' (e.g., Jan 2025) or 'MMMM' (e.g., January) if context is clear.
+            - week/day: 'MMM D, YYYY' (e.g., Jan 25, 2025) or 'MMM D' (e.g., Jan 25) if context is clear.
+      useRelativeTime:
+        type: boolean
+        description: Whether to display dates as relative time (e.g., 2 days ago)
+      isUtc:
+        type: boolean
+        description: Whether to interpret dates as UTC
+      convertNumberTo:
+        type: string
+        description: Optional. Convert numeric values to time units or date parts.  This is a necessity for time series data when numbers are passed instead of the date.
+        enum:
+          - day_of_week
+          - month_of_year
+          - quarter
+
+    required:
+      - columnType
+      - style
+      - replaceMissingDataWith
+      - numberSeparatorStyle
+
+  # COLUMN VISUAL SETTINGS
+  column_settings:
+    type: object
+    description: Optional visual settings per LOWERCASE column name.
+    properties:
+      showDataLabels:
+        type: boolean
+      columnVisualization:
+        type: string
+        enum:
+          - bar
+          - line
+          - dot
+      lineWidth:
+        type: number
+      lineStyle:
+        type: string
+        enum:
+          - area
+          - line
+      lineType:
+        type: string
+        enum:
+          - normal
+          - smooth
+          - step
+
+  # CHART-SPECIFIC CONFIGURATIONS
+  bar_line_chart_config:
+    allOf:
+      - \$ref: #/definitions/base_chart_config
+      - type: object
+        properties:
+          selectedChartType:
+            enum:
+              - bar
+              - line
+          barAndLineAxis:
+            type: object
+            properties:
+              x:
+                type: array
+                items:
+                  type: string
+              y:
+                type: array
+                items:
+                  type: string
+                description: LOWERCASE column name from SQL for X-axis.
+              category:
+                type: array
+                items:
+                  type: string
+                description: LOWERCASE column name from SQL for category grouping.
+            required:
+              - x
+              - y
+          barLayout:
+            type: string
+            enum:
+              - horizontal
+              - vertical
+          barGroupType:
+            type: string
+            enum:
+              - stack
+              - group
+              - percentage-stack
+        required:
+          - selectedChartType
+          - barAndLineAxis
+
+  scatter_chart_config:
+    allOf:
+      - \$ref: #/definitions/base_chart_config
+      - type: object
+        properties:
+          selectedChartType:
+            enum:
+              - scatter
+          scatterAxis:
+            type: object
+            properties:
+              x:
+                type: array
+                items:
+                  type: string
+              y:
+                type: array
+                items:
+                  type: string
+              category:
+                type: array
+                items:
+                  type: string
+              size:
+                type: array
+                items:
+                  type: string
+            required:
+              - x
+              - y
+        required:
+          - selectedChartType
+          - scatterAxis
+
+  pie_chart_config:
+    allOf:
+      - \$ref: #/definitions/base_chart_config
+      - type: object
+        properties:
+          selectedChartType:
+            enum:
+              - pie
+          pieChartAxis:
+            type: object
+            properties:
+              x:
+                type: array
+                items:
+                  type: string
+              y:
+                type: array
+                items:
+                  type: string
+            required:
+              - x
+              - y
+        required:
+          - selectedChartType
+          - pieChartAxis
+
+  combo_chart_config:
+    allOf:
+      - \$ref: #/definitions/base_chart_config
+      - type: object
+        properties:
+          selectedChartType:
+            enum:
+              - combo
+          comboChartAxis:
+            type: object
+            properties:
+              x:
+                type: array
+                items:
+                  type: string
+              y:
+                type: array
+                items:
+                  type: string
+            required:
+              - x
+              - y
+        required:
+          - selectedChartType
+          - comboChartAxis
+
+  metric_chart_config:
+    allOf:
+      - \$ref: #/definitions/base_chart_config
+      - type: object
+        properties:
+          selectedChartType:
+            enum:
+              - metric
+          metricColumnId:
+            type: string
+            description: LOWERCASE column name from SQL for the main metric value.
+          metricValueAggregate:
+            type: string
+            enum:
+              - sum
+              - average
+              - median
+              - max
+              - min
+              - count
+              - first
+            description: Aggregate function for metric value
+          metricHeader:
+            oneOf:
+              - type: string
+                description: Simple string title for the metric header
+              - type: object
+                properties:
+                  columnId:
+                    type: string
+                    description: Which column to use for the header
+                  useValue:
+                    type: boolean
+                    description: Whether to display the key or the value in the chart
+                  aggregate:
+                    type: string
+                    enum:
+                      - sum
+                      - average
+                      - median
+                      - max
+                      - min
+                      - count
+                      - first
+                    description: Optional aggregation method, defaults to sum
+                required:
+                  - columnId
+                  - useValue
+                description: Configuration for a derived metric header
+          metricSubHeader:
+            oneOf:
+              - type: string
+                description: Simple string title for the metric sub-header
+              - type: object
+                properties:
+                  columnId:
+                    type: string
+                    description: Which column to use for the sub-header
+                  useValue:
+                    type: boolean
+                    description: Whether to display the key or the value in the chart
+                  aggregate:
+                    type: string
+                    enum:
+                      - sum
+                      - average
+                      - median
+                      - max
+                      - min
+                      - count
+                      - first
+                    description: Optional aggregation method, defaults to sum
+                required:
+                  - columnId
+                  - useValue
+                description: Configuration for a derived metric sub-header
+          metricValueLabel:
+            oneOf:
+              - type: string
+                description: Custom label to display with the metric value
+        required:
+          - selectedChartType
+          - metricColumnId
+
+  table_chart_config:
+    allOf:
+      - \$ref: #/definitions/base_chart_config
+      - type: object
+        properties:
+          selectedChartType:
+            enum:
+              - table
+          tableColumnOrder:
+            type: array
+            items:
+              type: string
+        required:
+          - selectedChartType
+          # No additional required fields for table chart
+
+  # HELPER OBJECTS
+  goal_line:
+    type: object
+    properties:
+      show:
+        type: boolean
+      value:
+        type: number
+      goalLineLabel:
+        type: string
+
+  trendline:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - average
+          - linear_regression
+          - min
+          - max
+          - median
+      columnId:
+        type: string
+    required:
+      - type
+      - columnId
+\`\`\`
+
+**CRITICAL:** This is the complete schema specification. Follow it exactly - every property, enum value, and requirement listed above must be respected. Pay special attention to:
+
+1. **Required properties** for each chart type
+2. **Enum values** for each field (e.g., selectedChartType, columnType, style)
+3. **Column name casing** (must be lowercase in axis configurations)
+4. **Complete columnLabelFormats** for every SQL result column
+5. **Proper YAML syntax** with pipe (|) for SQL blocks
+6. **Chart-specific axis configurations** (barAndLineAxis, scatterAxis, etc.)
+7. **Date formatting rules** that match xAxisTimeInterval settings`,
   inputSchema,
   outputSchema,
   execute: async ({ context, runtimeContext }) => {
