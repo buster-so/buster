@@ -605,7 +605,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
 
         // Update the specific reasoning entry for this tool call
-        this.updateReasoningEntryStatus(chunk.toolCallId, status, incrementalTime);
+        this.updateReasoningEntryStatus(chunk.toolCallId, status, incrementalTime, chunk.toolName);
       }
 
       // Clear the tool call from tracking
@@ -749,7 +749,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private updateReasoningEntryStatus(
     toolCallId: string,
     status: 'loading' | 'completed' | 'failed',
-    timing?: number
+    timing?: number,
+    toolName?: string
   ): void {
     const entry = this.state.reasoningHistory.find(
       (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
@@ -761,24 +762,18 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         entry.status = status;
       }
 
-      // Update file statuses if this is a file-type entry
-      if (hasFiles(entry)) {
+      // For file creation tools, DON'T update individual file statuses here
+      // The updateFileIdsAndStatusFromToolResult method will handle per-file statuses
+      // based on the actual tool result (which files succeeded vs failed)
+      
+      // Only update file statuses for non-file-creation tools (like executeSql)
+      if (hasFiles(entry) && toolName && !this.isFileCreationTool(toolName)) {
         for (const fileId in entry.files) {
           const file = entry.files[fileId];
           if (file && typeof file === 'object') {
             // Ensure file status property exists and is updated
             const fileObj = file as { status?: string; [key: string]: unknown };
             fileObj.status = status;
-
-            // Log for debugging when marking files as failed
-            if (status === 'failed') {
-              console.warn(`Marking file ${fileId} as failed in reasoning entry ${toolCallId}`, {
-                fileId,
-                toolCallId,
-                fileName: fileObj.file_name || 'unknown',
-                entryStatus: entry.status,
-              });
-            }
           }
         }
       }
@@ -1644,58 +1639,95 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         files: Record<string, unknown>;
       };
 
-      // Create mapping from dummy IDs to actual IDs based on array position
-      const idMapping = new Map<string, string>();
       const dummyIds = typedEntry.file_ids || [];
-      const actualIds = fileResults.map((result: { id: string }) => result.id);
 
-      // Map dummy IDs to actual IDs by position
-      for (let i = 0; i < Math.min(dummyIds.length, actualIds.length); i++) {
-        const dummyId = dummyIds[i];
-        const actualId = actualIds[i];
-        if (dummyId && actualId) {
-          idMapping.set(dummyId, actualId);
-        }
-      }
+      // Extract successful files and failed files from the result
+      const successfulFiles: Array<{ id: string; name: string }> = [];
+      const failedFilesByName = new Map<string, string>(); // name -> error
 
-      // Update file_ids array with actual IDs
-      typedEntry.file_ids = actualIds;
-
-      // Update files object - move from dummy ID keys to actual ID keys and set individual statuses
-      const updatedFiles: Record<string, unknown> = {};
-      for (let i = 0; i < fileResults.length; i++) {
-        const fileResult = fileResults[i];
-        const dummyId = dummyIds[i];
-
-        // Skip if fileResult is undefined
-        if (!fileResult) {
-          continue;
-        }
-
-        const actualId = fileResult.id;
-
-        if (dummyId && actualId) {
-          const fileData = typedEntry.files[dummyId];
-          if (fileData && typeof fileData === 'object') {
-            // Update the file data with actual ID and individual status
-            const typedFileData = fileData as {
-              id?: string;
-              status?: string;
-              error?: string;
-              [key: string]: unknown;
-            };
-            typedFileData.id = actualId;
-            typedFileData.status = fileResult.status;
-
-            // Add error information if file failed
-            if (fileResult.status === 'failed' && fileResult.error) {
-              typedFileData.error = fileResult.error;
+      if (toolResult && typeof toolResult === 'object') {
+        // Extract successful files
+        if ('files' in toolResult && Array.isArray(toolResult.files)) {
+          const files = toolResult.files as unknown[];
+          for (const file of files) {
+            if (file && typeof file === 'object' && 'id' in file && 'name' in file) {
+              const fileObj = file as { id: unknown; name: unknown };
+              if (typeof fileObj.id === 'string' && typeof fileObj.name === 'string') {
+                successfulFiles.push({ id: fileObj.id, name: fileObj.name });
+              }
             }
+          }
+        }
 
-            updatedFiles[actualId] = fileData;
+        // Extract failed files
+        if ('failed_files' in toolResult && Array.isArray(toolResult.failed_files)) {
+          const failedFiles = toolResult.failed_files as unknown[];
+          for (const failedFile of failedFiles) {
+            if (failedFile && typeof failedFile === 'object' && 'name' in failedFile) {
+              const failed = failedFile as { name: unknown; error?: unknown };
+              if (typeof failed.name === 'string') {
+                const error = typeof failed.error === 'string' ? failed.error : 'Unknown error';
+                failedFilesByName.set(failed.name, error);
+              }
+            }
           }
         }
       }
+
+      // Map dummy IDs to actual IDs or mark as failed
+      const updatedFiles: Record<string, unknown> = {};
+      const updatedFileIds: string[] = [];
+
+      // Process each dummy ID and match by file name
+      for (const dummyId of dummyIds) {
+        if (!dummyId) continue;
+
+        const fileData = typedEntry.files[dummyId];
+        if (!fileData || typeof fileData !== 'object') continue;
+
+        const typedFileData = fileData as {
+          id?: string;
+          status?: string;
+          error?: string;
+          file_name?: string;
+          [key: string]: unknown;
+        };
+
+        const fileName = typedFileData.file_name;
+
+        if (!fileName) {
+          // If no file name, keep the dummy ID and mark as unknown
+          updatedFiles[dummyId] = fileData;
+          updatedFileIds.push(dummyId);
+          continue;
+        }
+
+        // Check if this file succeeded
+        const successfulFile = successfulFiles.find((f) => f.name === fileName);
+        if (successfulFile) {
+          // Update with actual ID and mark as completed
+          typedFileData.id = successfulFile.id;
+          typedFileData.status = 'completed';
+
+          updatedFiles[successfulFile.id] = fileData;
+          updatedFileIds.push(successfulFile.id);
+        } else if (failedFilesByName.has(fileName)) {
+          // This file failed, keep dummy ID and mark as failed
+          typedFileData.id = dummyId;
+          typedFileData.status = 'failed';
+          typedFileData.error = failedFilesByName.get(fileName) || 'Unknown error';
+
+          updatedFiles[dummyId] = fileData;
+          updatedFileIds.push(dummyId);
+        } else {
+          // Unknown status, keep as is
+          updatedFiles[dummyId] = fileData;
+          updatedFileIds.push(dummyId);
+        }
+      }
+
+      // Update the entry with the new file IDs and files
+      typedEntry.file_ids = updatedFileIds;
       typedEntry.files = updatedFiles;
     } catch (error) {
       console.error('Error updating file IDs and status from tool result:', {

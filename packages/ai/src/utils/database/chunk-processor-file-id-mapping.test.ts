@@ -7,6 +7,7 @@ type ChunkProcessorWithPrivateMethods = {
   isFileCreationTool(toolName: string): boolean;
   extractFileIdsFromToolResult(toolResult: unknown): string[];
   updateFileIdsFromToolResult(toolCallId: string, toolResult: unknown): void;
+  updateFileIdsAndStatusFromToolResult(toolCallId: string, toolResult: unknown): void;
   getState(): {
     reasoningHistory: unknown[];
     timing: { startTime?: number };
@@ -20,6 +21,7 @@ interface FileObject {
   file_name: string;
   version_number?: number;
   status?: string;
+  error?: string;
   file?: {
     text?: string;
     modified?: number[][];
@@ -367,6 +369,86 @@ describe('ChunkProcessor File ID Mapping', () => {
           toolResult
         );
       }).not.toThrow();
+    });
+
+    test('should handle mixed successful and failed files correctly', () => {
+      const reasoningEntry: ChatMessageReasoningMessage = {
+        id: 'tool-call-123',
+        type: 'files',
+        title: 'Creating metrics...',
+        status: 'loading',
+        secondary_title: undefined,
+        file_ids: ['dummy-id-1', 'dummy-id-2', 'dummy-id-3'],
+        files: {
+          'dummy-id-1': {
+            id: 'dummy-id-1',
+            file_name: 'Successful File 1',
+            file_type: 'metric',
+            version_number: 1,
+            status: 'loading',
+            file: { text: 'name: Successful File 1\n...' },
+          },
+          'dummy-id-2': {
+            id: 'dummy-id-2',
+            file_name: 'Failed File',
+            file_type: 'metric',
+            version_number: 1,
+            status: 'loading',
+            file: { text: 'name: Failed File\n...' },
+          },
+          'dummy-id-3': {
+            id: 'dummy-id-3',
+            file_name: 'Successful File 2',
+            file_type: 'metric',
+            version_number: 1,
+            status: 'loading',
+            file: { text: 'name: Successful File 2\n...' },
+          },
+        },
+      };
+
+      const state = chunkProcessor.getState();
+      state.reasoningHistory.push(reasoningEntry);
+
+      // Tool result with 2 successful files and 1 failed file
+      const toolResult = {
+        files: [
+          { id: 'actual-id-1', name: 'Successful File 1' },
+          { id: 'actual-id-3', name: 'Successful File 2' },
+        ],
+        failed_files: [{ name: 'Failed File', error: 'SQL validation failed' }],
+      };
+
+      (chunkProcessor as unknown as ChunkProcessorWithPrivateMethods).updateFileIdsAndStatusFromToolResult(
+        'tool-call-123',
+        toolResult
+      );
+
+      const updatedEntry = state.reasoningHistory[0] as ChatMessageReasoningMessage & {
+        file_ids: string[];
+        files: Record<string, FileObject>;
+      };
+
+      // Check that file_ids contains both actual IDs and dummy ID for failed file
+      expect(updatedEntry.file_ids).toHaveLength(3);
+      expect(updatedEntry.file_ids[0]).toBe('actual-id-1');
+      expect(updatedEntry.file_ids[1]).toBe('dummy-id-2'); // Failed file keeps dummy ID
+      expect(updatedEntry.file_ids[2]).toBe('actual-id-3');
+
+      // Check successful files have actual IDs
+      expect(updatedEntry.files['actual-id-1']).toBeDefined();
+      expect(updatedEntry.files['actual-id-1']?.status).toBe('completed');
+      expect(updatedEntry.files['actual-id-3']).toBeDefined();
+      expect(updatedEntry.files['actual-id-3']?.status).toBe('completed');
+
+      // Check failed file keeps dummy ID and has failed status
+      expect(updatedEntry.files['dummy-id-2']).toBeDefined();
+      expect(updatedEntry.files['dummy-id-2']?.status).toBe('failed');
+      expect(updatedEntry.files['dummy-id-2']?.error).toBe('SQL validation failed');
+
+      // Check that old successful dummy IDs are removed
+      expect(updatedEntry.files['dummy-id-1']).toBeUndefined();
+      expect(updatedEntry.files['dummy-id-3']).toBeUndefined();
     });
 
     test('should preserve file data structure during ID mapping', () => {
