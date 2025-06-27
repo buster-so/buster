@@ -6,6 +6,7 @@ name: Deploy to mastra-braintrust-api
 jobs:
     porter-deploy:
         runs-on: blacksmith-16vcpu-ubuntu-2204
+        environment: staging
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
