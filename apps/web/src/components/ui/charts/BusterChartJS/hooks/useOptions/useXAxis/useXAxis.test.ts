@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 import type { ColumnSettings, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { useXAxis } from './useXAxis';
 
 describe('useXAxis', () => {
@@ -31,7 +30,7 @@ describe('useXAxis', () => {
       x: ['category_column'],
       y: ['numeric_column']
     } as ChartEncodes,
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     xAxisLabelRotation: 'auto' as const,
     xAxisShowAxisLabel: true,
     gridLines: true,
@@ -41,13 +40,13 @@ describe('useXAxis', () => {
     barGroupType: 'group' as const,
     columnSettings: {},
     xAxisTimeInterval: undefined
-  };
+  } as const;
 
   it('should return undefined for pie charts', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Pie
-    };
+      selectedChartType: 'pie'
+    } as const;
 
     const { result } = renderHook(() => useXAxis(props));
     expect(result.current).toBeUndefined();
@@ -56,12 +55,12 @@ describe('useXAxis', () => {
   it('should set time scale for line charts with date x-axis', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       selectedAxis: {
         x: ['date_column'],
         y: ['numeric_column']
       } as ChartEncodes
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(props));
     expect(result.current?.type).toBe('time');
@@ -88,8 +87,8 @@ describe('useXAxis', () => {
   it('should handle grid display for scatter charts', () => {
     const scatterProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Scatter
-    };
+      selectedChartType: 'scatter'
+    } as const;
 
     const { result } = renderHook(() => useXAxis(scatterProps));
     expect(result.current?.grid?.display).toBe(true);
@@ -105,13 +104,13 @@ describe('useXAxis', () => {
   it('should handle custom time intervals', () => {
     const timeIntervalProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       selectedAxis: {
         x: ['date_column'],
         y: ['numeric_column']
       } as ChartEncodes,
       xAxisTimeInterval: 'month' as const
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(timeIntervalProps));
     expect(result.current?.type).toBe('time');
@@ -167,12 +166,12 @@ describe('useXAxis', () => {
   it('should apply correct time scale settings for date columns', () => {
     const dateAxisProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       selectedAxis: {
         x: ['date_column'],
         y: ['numeric_column']
       } as ChartEncodes
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(dateAxisProps));
     expect(result.current?.type).toBe('time');
@@ -209,12 +208,12 @@ describe('useXAxis', () => {
   it('should configure scatter plot with numeric x-axis correctly', () => {
     const scatterProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Scatter,
+      selectedChartType: 'scatter',
       selectedAxis: {
         x: ['numeric_column'],
         y: ['numeric_column']
       } as ChartEncodes
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(scatterProps));
     expect(result.current?.type).toBe('linear');
@@ -235,13 +234,13 @@ describe('useXAxis', () => {
   it('should handle line chart with grouped data', () => {
     const lineGroupProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       lineGroupType: 'stack' as const,
       selectedAxis: {
         x: ['date_column'],
         y: ['numeric_column']
       } as ChartEncodes
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(lineGroupProps));
     expect(result.current?.type).toBe('time');
@@ -261,13 +260,13 @@ describe('useXAxis', () => {
   it('should handle custom time interval with quarter setting', () => {
     const quarterIntervalProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       selectedAxis: {
         x: ['date_column'],
         y: ['numeric_column']
       } as ChartEncodes,
       xAxisTimeInterval: 'quarter' as const
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(quarterIntervalProps));
     expect(result.current?.type).toBe('time');
@@ -297,12 +296,12 @@ describe('useXAxis', () => {
     // For scatter chart
     const scatterProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Scatter,
+      selectedChartType: 'scatter',
       selectedAxis: {
         x: ['numeric_column'],
         y: ['numeric_column']
       } as ChartEncodes
-    };
+    } as const;
 
     const { result: scatterResult } = renderHook(() => useXAxis(scatterProps));
     expect(scatterResult.current).toBeDefined();
@@ -324,8 +323,8 @@ describe('useXAxis', () => {
     // For unsupported chart type (pie)
     const pieProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Pie
-    };
+      selectedChartType: 'pie'
+    } as const;
 
     const { result: pieResult } = renderHook(() => useXAxis(pieProps));
     expect(pieResult.current).toBeUndefined();
@@ -335,12 +334,12 @@ describe('useXAxis', () => {
     // Specifically test the firstXColumnLabelFormat logic for scatter charts
     const scatterProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Scatter,
+      selectedChartType: 'scatter',
       selectedAxis: {
         x: ['numeric_column'],
         y: ['numeric_column']
       } as ChartEncodes
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(scatterProps));
 
@@ -377,7 +376,7 @@ describe('useXAxis', () => {
     // Test with custom date format
     const customDateFormatProps = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       selectedAxis: {
         x: ['date_column'],
         y: ['numeric_column']
@@ -389,7 +388,7 @@ describe('useXAxis', () => {
           dateFormat: 'YYYY-MM-DD'
         }
       }
-    };
+    } as const;
 
     const { result } = renderHook(() => useXAxis(customDateFormatProps));
     expect(result.current).toBeDefined();

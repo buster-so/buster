@@ -53,7 +53,7 @@ type Story = StoryObj<typeof BusterChart>;
 
 export const Default: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: generateBarChartData(),
     barAndLineAxis: {
       x: ['category'],
@@ -94,7 +94,7 @@ export const Default: Story = {
 
 export const MultipleYAxis: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: generateBarChartData(),
     barAndLineAxis: {
       x: ['category'],
@@ -137,7 +137,7 @@ export const MultipleYAxis: Story = {
 
 export const WithCategory: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: [
       {
         region: 'North',
@@ -197,7 +197,7 @@ export const WithCategory: Story = {
 
 export const WithCategoryAndMultipleYAxis: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: Array.from({ length: 4 }, (_, index) => ({
       region: generateRegion(index),
       product: generateProductName(index),
@@ -241,7 +241,7 @@ export const WithCategoryAndMultipleYAxis: Story = {
 
 export const DateXAxis: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: Array.from({ length: 7 }, (_, index) => {
       const date = new Date('2024-01-01');
       date.setDate(date.getDate() - index);
@@ -286,7 +286,7 @@ export const DateXAxis: Story = {
 
 export const HorizontalBar: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: generateBarChartData(4),
     barAndLineAxis: {
       x: ['category'],
@@ -327,7 +327,7 @@ export const HorizontalBar: Story = {
 
 export const WithDataLabels: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: generateBarChartData(4),
     barAndLineAxis: {
       x: ['category'],
@@ -377,7 +377,7 @@ export const WithDataLabels: Story = {
 
 export const WithDataLabelsAndStackTotal: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: generateBarChartData(4),
     barAndLineAxis: {
       x: ['category'],
@@ -469,7 +469,7 @@ export const WithDataLabelAndPercentageStackedBar: Story = {
 export const LargeDataset: Story = {
   args: {
     className: 'resize overflow-auto min-w-[250px] h-[400px]',
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: Array.from({ length: 25 }, (_, index) => ({
       category: generateProductName(index),
       sales: generateNumber(25000, 5000, index),
@@ -507,7 +507,7 @@ export const LargeDataset: Story = {
 
 export const LargeDatasetWithDualYAxis: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: Array.from({ length: 25 }, (_, index) => ({
       category: generateProductName(index),
       sales: generateNumber(25000, 5000, index),
@@ -620,7 +620,7 @@ export const WithDatesInXAxisAndSorting: Story = {
 
 export const HorizontalBarWithGoalLine: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: [
       { category: 'Cat 1', sales: 4000, units: 1000, returns: 100 },
       { category: 'Cat 2', sales: 10000, units: 1000, returns: 100 },
@@ -674,7 +674,7 @@ export const HorizontalBarWithGoalLine: Story = {
 
 export const GroupedBar: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: ['Electronics', 'Clothing', 'Home', 'Books'].flatMap((category, index) => {
       const states = ['Utah', 'Arizona', 'Idaho', 'Wyoming'];
       return states.map((state, index2) => {
@@ -734,7 +734,7 @@ export const GroupedBar: Story = {
 
 export const PercentageStackedBar: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: ['Electronics', 'Clothing', 'Home', 'Books'].flatMap((category, index) => {
       const states = ['Utah', 'Arizona', 'Idaho', 'Wyoming'];
       return states.map((state, index2) => {
@@ -802,7 +802,7 @@ export const PercentageStackedBar: Story = {
 export const ExtraLargeDataset: Story = {
   args: {
     className: 'resize overflow-auto min-w-[250px] h-[400px]',
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: Array.from({ length: 500 }, (_, index) => ({
       category: generateProductName(index),
       sales: generateNumber(25000, 5000, index),
@@ -842,7 +842,7 @@ export const ExtraLargeDataset: Story = {
 export const ExtraLargeDatasetWithCategory: Story = {
   args: {
     className: 'resize overflow-auto min-w-[250px] h-[400px]',
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: Array.from({ length: 5000 }, (_, index) => ({
       product: generateProductName(index),
       sales: generateNumber(25000, 5000, index),
@@ -886,7 +886,7 @@ export const ExtraLargeDatasetWithCategory: Story = {
 
 export const ManyUnPlottedTooltipItems: Story = {
   args: {
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     data: Array.from({ length: 12 }, (_, index) => ({
       category: generateProductName(index),
       sales: generateNumber(25000, 5000, index),

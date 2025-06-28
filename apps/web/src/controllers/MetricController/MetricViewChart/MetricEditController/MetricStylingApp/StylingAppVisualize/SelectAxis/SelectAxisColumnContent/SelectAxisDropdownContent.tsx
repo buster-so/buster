@@ -151,12 +151,12 @@ const ColumnSettingComponent: React.FC<{
     showDataLabelsAsPercentage
   } = columnSetting;
   const { displayName } = columnLabelFormat;
-  const isBarChart = selectedChartType === ChartType.Bar;
-  const isLineChart = selectedChartType === ChartType.Line;
-  const isScatterChart = selectedChartType === ChartType.Scatter;
-  const isComboChart = selectedChartType === ChartType.Combo;
-  const isPieChart = selectedChartType === ChartType.Pie;
-  const isMetricChart = selectedChartType === ChartType.Metric;
+  const isBarChart = selectedChartType === 'bar';
+  const isLineChart = selectedChartType === 'line';
+  const isScatterChart = selectedChartType === 'scatter';
+  const isComboChart = selectedChartType === 'combo';
+  const isPieChart = selectedChartType === 'pie';
+  const isMetricChart = selectedChartType === 'metric';
   const isYAxisZone =
     zoneId === SelectAxisContainerId.YAxis || zoneId === SelectAxisContainerId.Y2Axis;
   const isAvailableZone = zoneId === SelectAxisContainerId.Available;
@@ -165,15 +165,15 @@ const ColumnSettingComponent: React.FC<{
   const isSizeZone = zoneId === SelectAxisContainerId.SizeAxis;
   const isBarVisualization = columnVisualization === 'bar';
   const isLineVisualization = columnVisualization === 'line';
-  const isTableChart = selectedChartType === ChartType.Table;
+  const isTableChart = selectedChartType === 'table';
   const isTablePieChart = isTableChart || isPieChart;
   const isTableMetricPieChart = isTablePieChart || isMetricChart;
 
   const isPercentStacked = useMemo(() => {
-    if (selectedChartType === ChartType.Bar) {
+    if (selectedChartType === 'bar') {
       return barGroupType === 'percentage-stack';
     }
-    if (selectedChartType === ChartType.Line) {
+    if (selectedChartType === 'line') {
       return lineGroupType === 'percentage-stack';
     }
     return false;
@@ -303,9 +303,9 @@ const LabelSettings: React.FC<{
     replaceMissingDataWith
   } = columnLabelFormat;
 
-  const isPieChart = selectedChartType === ChartType.Pie;
-  const isScatterChart = selectedChartType === ChartType.Scatter;
-  const isMetricChart = selectedChartType === ChartType.Metric;
+  const isPieChart = selectedChartType === 'pie';
+  const isScatterChart = selectedChartType === 'scatter';
+  const isMetricChart = selectedChartType === 'metric';
   const isPercentage = style === 'percent';
   const isCurrency = style === 'currency';
   const isDate = style === 'date';

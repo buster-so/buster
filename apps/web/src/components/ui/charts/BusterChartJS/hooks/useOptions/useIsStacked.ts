@@ -12,13 +12,13 @@ export const useIsStacked = ({
 }): boolean => {
   return useMemo(() => {
     if (
-      selectedChartType === ChartType.Line &&
+      selectedChartType === 'line' &&
       (lineGroupType === 'percentage-stack' || lineGroupType === 'stack')
     ) {
       return true;
     }
     if (
-      selectedChartType === ChartType.Bar &&
+      selectedChartType === 'bar' &&
       (barGroupType === 'percentage-stack' || barGroupType === 'stack')
     ) {
       return true;

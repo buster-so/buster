@@ -1,22 +1,84 @@
-export type ColumnSettings = {
-  showDataLabels?: boolean; //OPTIONAL: default is false
-  showDataLabelsAsPercentage?: boolean; //OPTIONAL: default is false
-  columnVisualization?: 'bar' | 'line' | 'dot'; //OPTIONAL: default is null. These can be applied to any number column. If this is set to null, then the yAxisColumnVisualization will be inherited from the chart level.
-} & LineColumnSettings &
-  BarColumnSettings &
-  DotColumnSettings;
+import { z } from 'zod/v4';
 
-type LineColumnSettings = {
-  lineWidth?: number; //OPTIONAL: default is 2. This will only apply if the columnVisualization is set to 'line'.
-  lineStyle?: 'area' | 'line'; //OPTIONAL: default is area. This will only apply if the columnVisualization is set to 'line' and it is a combo chart.
-  lineType?: 'normal' | 'smooth' | 'step'; //OPTIONAL: default is normal. This will only apply if the columnVisualization is set to 'line'.
-  lineSymbolSize?: number; //OPTIONAL: default is 0. The range is 0-10. If a user requests this, we recommend setting it at 2px to start. This will only apply if the columnVisualization is set to 'line'. The UI calls this "Dots on Line".
-};
+export const LineColumnSettingsSchema = z.object({
+  // OPTIONAL: default is 2. This will only apply if the columnVisualization is set to 'line'.
+  lineWidth: z
+    .number()
+    .min(1, 'Line width must be at least 1')
+    .max(20, 'Line width must be at most 20')
+    .default(2)
+    .optional(),
+  // OPTIONAL: default is area. This will only apply if the columnVisualization is set to 'line' and it is a combo chart.
+  lineStyle: z.enum(['area', 'line']).default('line').optional(),
+  // OPTIONAL: default is normal. This will only apply if the columnVisualization is set to 'line'.
+  lineType: z.enum(['normal', 'smooth', 'step']).default('normal').optional(),
+  // OPTIONAL: default is 0. The range is 0-10. If a user requests this, we recommend setting it at 2px to start. This will only apply if the columnVisualization is set to 'line'. The UI calls this "Dots on Line".
+  lineSymbolSize: z
+    .number()
+    .min(0, 'Line symbol size must be at least 0')
+    .max(10, 'Line symbol size must be at most 10')
+    .default(0)
+    .optional()
+});
 
-export type BarColumnSettings = {
-  barRoundness?: number; //OPTIONAL: default is 8. This will only apply if the columnVisualization is set to 'bar'. The value represents the roundness of the bar. 0 is square, 50 is circular.
-};
+export const BarColumnSettingsSchema = z.object({
+  // OPTIONAL: default is 8. This will only apply if the columnVisualization is set to 'bar'. The value represents the roundness of the bar. 0 is square, 50 is circular.
+  barRoundness: z
+    .number()
+    .min(0, 'Bar roundness must be at least 0')
+    .max(50, 'Bar roundness must be at most 50')
+    .default(8)
+    .optional()
+});
 
-export type DotColumnSettings = {
-  lineSymbolSize?: number; //OPTIONAL: default is 10. This will only apply if the columnVisualization is set to 'dot'. This represents the size range of the dots in pixels.
-};
+export const DotColumnSettingsSchema = z.object({
+  // OPTIONAL: default is 10. This will only apply if the columnVisualization is set to 'dot'. This represents the size range of the dots in pixels.
+  lineSymbolSize: z
+    .number()
+    .min(1, 'Dot symbol size must be at least 1')
+    .max(50, 'Dot symbol size must be at most 50')
+    .default(10)
+    .optional()
+});
+
+export const ColumnSettingsSchema = z.object({
+  // OPTIONAL: default is false
+  showDataLabels: z.boolean().default(false).optional(),
+  // OPTIONAL: default is false
+  showDataLabelsAsPercentage: z.boolean().default(false).optional(),
+  // OPTIONAL: default is null. These can be applied to any number column. If this is set to null, then the yAxisColumnVisualization will be inherited from the chart level.
+  columnVisualization: z.enum(['bar', 'line', 'dot']).default('bar').optional(),
+  // LineColumnSettings properties
+  // OPTIONAL: default is 2. This will only apply if the columnVisualization is set to 'line'.
+  lineWidth: z
+    .number()
+    .min(1, 'Line width must be at least 1')
+    .max(20, 'Line width must be at most 20')
+    .default(2)
+    .optional(),
+  // OPTIONAL: default is area. This will only apply if the columnVisualization is set to 'line' and it is a combo chart.
+  lineStyle: z.enum(['area', 'line']).default('line').optional(),
+  // OPTIONAL: default is normal. This will only apply if the columnVisualization is set to 'line'.
+  lineType: z.enum(['normal', 'smooth', 'step']).default('normal').optional(),
+  // OPTIONAL: default varies by visualization type - 0 for 'line' (Dots on Line), 10 for 'dot' (dot size in pixels)
+  lineSymbolSize: z
+    .number()
+    .min(0, 'Symbol size must be at least 0')
+    .max(50, 'Symbol size must be at most 50')
+    .default(0)
+    .optional(),
+  // BarColumnSettings properties
+  // OPTIONAL: default is 8. This will only apply if the columnVisualization is set to 'bar'. The value represents the roundness of the bar. 0 is square, 50 is circular.
+  barRoundness: z
+    .number()
+    .min(0, 'Bar roundness must be at least 0')
+    .max(50, 'Bar roundness must be at most 50')
+    .default(8)
+    .optional()
+});
+
+// Export inferred types
+export type LineColumnSettings = z.infer<typeof LineColumnSettingsSchema>;
+export type BarColumnSettings = z.infer<typeof BarColumnSettingsSchema>;
+export type DotColumnSettings = z.infer<typeof DotColumnSettingsSchema>;
+export type ColumnSettings = z.infer<typeof ColumnSettingsSchema>;

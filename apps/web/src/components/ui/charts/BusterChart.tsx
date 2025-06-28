@@ -52,15 +52,15 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
     columnSettings = DEFAULT_CHART_CONFIG.columnSettings,
     ...props
   }) => {
-    const isTable = selectedChartType === ChartType.Table;
+    const isTable = selectedChartType === 'table';
     const showNoData = !loading && (isEmpty(data) || data === null);
     const selectedAxis: ChartEncodes | undefined = useMemo(() => {
       const { pieChartAxis, comboChartAxis, scatterAxis, barAndLineAxis } = props;
-      if (selectedChartType === ChartType.Pie) return pieChartAxis;
-      if (selectedChartType === ChartType.Combo) return comboChartAxis;
-      if (selectedChartType === ChartType.Scatter) return scatterAxis;
-      if (selectedChartType === ChartType.Bar) return barAndLineAxis;
-      if (selectedChartType === ChartType.Line) return barAndLineAxis;
+      if (selectedChartType === 'pie') return pieChartAxis;
+      if (selectedChartType === 'combo') return comboChartAxis;
+      if (selectedChartType === 'scatter') return scatterAxis;
+      if (selectedChartType === 'bar') return barAndLineAxis;
+      if (selectedChartType === 'line') return barAndLineAxis;
     }, [
       selectedChartType,
       props.pieChartAxis,
@@ -87,7 +87,7 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
 
     const SwitchComponent = useMemoizedFn(() => {
       //chartjs need the parent to be mounted to render the chart. It is intermitent when it throws when the parent is not mounted.
-      // if (!isMounted && selectedChartType !== ChartType.Table) return null;
+      // if (!isMounted && selectedChartType !== 'table') return null;
 
       if (loading || error) {
         return <PreparingYourRequestLoader error={error} />;
@@ -112,14 +112,14 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
             columnLabelFormats={columnLabelFormats}
             readOnly={readOnly}
             data={data}
-            type={ChartType.Table}
+            type={'table'}
             onMounted={onChartMounted}
             onInitialAnimationEnd={onInitialAnimationEndPreflight}
           />
         );
       }
 
-      if (selectedChartType === ChartType.Metric) {
+      if (selectedChartType === 'metric') {
         return (
           <BusterMetricChart
             data={data}

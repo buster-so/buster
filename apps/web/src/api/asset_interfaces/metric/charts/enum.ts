@@ -1,16 +1,14 @@
-export enum ChartType {
-  Line = 'line',
-  Bar = 'bar',
-  Scatter = 'scatter',
-  Pie = 'pie',
-  Metric = 'metric',
-  Table = 'table',
-  Combo = 'combo'
-}
+import { z } from 'zod/v4';
 
-export type ChartTypePlottable =
-  | ChartType.Line
-  | ChartType.Bar
-  | ChartType.Scatter
-  | ChartType.Pie
-  | ChartType.Combo;
+export const ChartTypeSchema = z
+  .enum(['line', 'bar', 'scatter', 'pie', 'metric', 'table', 'combo'])
+  .default('table');
+
+export type ChartType = z.infer<typeof ChartTypeSchema>;
+
+export const ChartTypePlottableSchema = z.enum(['line', 'bar', 'scatter', 'pie', 'combo']);
+export type ChartTypePlottable = z.infer<typeof ChartTypePlottableSchema>;
+
+export const SimplifiedColumnTypeSchema = z.enum(['number', 'text', 'date']).default('text');
+
+export type SimplifiedColumnType = z.infer<typeof SimplifiedColumnTypeSchema>;

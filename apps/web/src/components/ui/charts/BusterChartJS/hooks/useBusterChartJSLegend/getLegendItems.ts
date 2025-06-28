@@ -21,8 +21,8 @@ export const getLegendItems = ({
   selectedChartType: ChartType;
 }): BusterChartLegendItem[] => {
   const isComboChart = selectedChartType === 'combo';
-  const globalType: ChartType = (chartRef.current?.config.type as ChartType) || ChartType.Bar;
-  const isPieChart = globalType === ChartType.Pie;
+  const globalType: ChartType = (chartRef.current?.config.type as ChartType) || 'bar';
+  const isPieChart = globalType === 'pie';
   const data = chartRef.current?.data;
 
   if (!data) return [];
@@ -68,8 +68,8 @@ const getType = (
   const key = dataset.yAxisKey;
   const columnLabelFormat = columnSettings[key];
   const columnVisualization = columnLabelFormat?.columnVisualization;
-  if (columnVisualization === 'dot') return ChartType.Scatter;
-  if (columnVisualization === 'line') return ChartType.Line;
+  if (columnVisualization === 'dot') return 'scatter';
+  if (columnVisualization === 'line') return 'line';
 
-  return ChartType.Bar;
+  return 'bar';
 };

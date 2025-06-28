@@ -44,7 +44,7 @@ export const StylingAppVisualize: React.FC<
     selectedAxis
   } = props;
 
-  const isMetricChart = selectedChartType === ChartType.Metric;
+  const isMetricChart = selectedChartType === 'metric';
 
   return (
     <div className={'flex h-full w-full flex-col space-y-3'}>

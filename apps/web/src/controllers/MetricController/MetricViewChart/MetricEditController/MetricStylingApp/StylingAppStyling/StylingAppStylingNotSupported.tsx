@@ -6,10 +6,10 @@ import { Text } from '@/components/ui/typography';
 export const StylingAppStylingNotSupported = React.memo(
   ({ selectedChartType }: { selectedChartType: IBusterMetricChartConfig['selectedChartType'] }) => {
     const title = useMemo(() => {
-      if (selectedChartType === ChartType.Table) {
+      if (selectedChartType === 'table') {
         return 'Styling for tables charts is coming soon';
       }
-      if (selectedChartType === ChartType.Metric) {
+      if (selectedChartType === 'metric') {
         return 'Styling for metric charts is coming soon';
       }
       return '';

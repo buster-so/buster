@@ -11,7 +11,7 @@ export function aggregateAndCreateDatasets<
     x: (keyof T)[];
     y: (keyof T)[];
     y2?: (keyof T)[];
-    size?: [] | [string] | undefined;
+    size?: [string] | string[] | undefined;
     tooltip?: (keyof T)[] | null;
     category?: (keyof T)[];
   },

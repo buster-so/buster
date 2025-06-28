@@ -292,7 +292,7 @@ export function modifyDatasets({
   const result: DatasetOptionsWithTicks = cloneDeep(datasets);
 
   // Pie chart handling
-  if (selectedChartType === ChartType.Pie) {
+  if (selectedChartType === 'pie') {
     let modifiedDatasets = cloneDeep(datasets.datasets);
 
     // Apply minimum threshold if needed
@@ -313,15 +313,15 @@ export function modifyDatasets({
 
   // Percentage-stack for bar or line
   if (
-    (selectedChartType === ChartType.Bar && barGroupType === 'percentage-stack') ||
-    (selectedChartType === ChartType.Line && lineGroupType === 'percentage-stack')
+    (selectedChartType === 'bar' && barGroupType === 'percentage-stack') ||
+    (selectedChartType === 'line' && lineGroupType === 'percentage-stack')
   ) {
     result.datasets = applyPercentageStack(datasets.datasets);
     return result;
   }
 
   // Bar sorting
-  if (selectedChartType === ChartType.Bar && barSortBy && barSortBy.some((o) => o !== 'none')) {
+  if (selectedChartType === 'bar' && barSortBy && barSortBy.some((o) => o !== 'none')) {
     const sortKey = barSortBy.find((o) => o !== 'none');
     if (sortKey) {
       const sortResult = sortBar(datasets.datasets, sortKey, result.ticks);

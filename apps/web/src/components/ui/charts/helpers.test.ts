@@ -6,7 +6,7 @@ describe('doesChartHaveValidAxis', () => {
   it('should return true when isTable is true regardless of other parameters', () => {
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         selectedAxis: undefined,
         isTable: true
       })
@@ -16,7 +16,7 @@ describe('doesChartHaveValidAxis', () => {
   it('should return true for Metric chart type regardless of axes', () => {
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Metric,
+        selectedChartType: 'metric',
         selectedAxis: {} as ChartEncodes,
         isTable: false
       })
@@ -26,7 +26,7 @@ describe('doesChartHaveValidAxis', () => {
   it('should return true for Table chart type regardless of axes', () => {
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Table,
+        selectedChartType: 'table',
         selectedAxis: {} as ChartEncodes,
         isTable: false
       })
@@ -37,7 +37,7 @@ describe('doesChartHaveValidAxis', () => {
     const emptyAxis: ChartEncodes = { x: [], y: [] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         selectedAxis: emptyAxis,
         isTable: false
       })
@@ -48,7 +48,7 @@ describe('doesChartHaveValidAxis', () => {
     const axisWithEmptyX: ChartEncodes = { x: [], y: ['value'] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         selectedAxis: axisWithEmptyX,
         isTable: false
       })
@@ -59,7 +59,7 @@ describe('doesChartHaveValidAxis', () => {
     const axisWithEmptyY: ChartEncodes = { x: ['time'], y: [] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         selectedAxis: axisWithEmptyY,
         isTable: false
       })
@@ -70,7 +70,7 @@ describe('doesChartHaveValidAxis', () => {
     const validAxis: ChartEncodes = { x: ['time'], y: ['value'] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         selectedAxis: validAxis,
         isTable: false
       })
@@ -81,7 +81,7 @@ describe('doesChartHaveValidAxis', () => {
     const validAxis: ChartEncodes = { x: ['category'], y: ['count'] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Bar,
+        selectedChartType: 'bar',
         selectedAxis: validAxis,
         isTable: false
       })
@@ -92,7 +92,7 @@ describe('doesChartHaveValidAxis', () => {
     const validAxis: ChartEncodes = { x: ['width'], y: ['height'] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Scatter,
+        selectedChartType: 'scatter',
         selectedAxis: validAxis,
         isTable: false
       })
@@ -103,7 +103,7 @@ describe('doesChartHaveValidAxis', () => {
     const validAxis: ChartEncodes = { x: ['label'], y: ['value'] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Pie,
+        selectedChartType: 'pie',
         selectedAxis: validAxis,
         isTable: false
       })
@@ -114,7 +114,7 @@ describe('doesChartHaveValidAxis', () => {
     const validAxis: ChartEncodes = { x: ['date'], y: ['value1', 'value2'] };
     expect(
       doesChartHaveValidAxis({
-        selectedChartType: ChartType.Combo,
+        selectedChartType: 'combo',
         selectedAxis: validAxis,
         isTable: false
       })

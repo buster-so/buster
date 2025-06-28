@@ -14,7 +14,7 @@ const meta = {
     item: {
       color: '#1677ff',
       inactive: false,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Sample Legend',
       id: '1',
       serieName: 'series1',
@@ -51,7 +51,7 @@ export const Basic: Story = {
     item: {
       color: '#1677ff',
       inactive: false,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Basic Legend',
       id: '1',
       serieName: 'series1',
@@ -67,7 +67,7 @@ export const Inactive: Story = {
     item: {
       color: '#0066FF',
       inactive: true,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Inactive Legend',
       id: '2',
       serieName: 'series2',
@@ -83,7 +83,7 @@ export const BarType: Story = {
     item: {
       color: '#52c41a',
       inactive: false,
-      type: ChartType.Bar,
+      type: 'bar',
       formattedName: 'Bar Legend',
       id: '3',
       serieName: 'series3',
@@ -99,7 +99,7 @@ export const ScatterType: Story = {
     item: {
       color: '#722ed1',
       inactive: false,
-      type: ChartType.Scatter,
+      type: 'scatter',
       formattedName: 'Scatter Legend',
       id: '4',
       serieName: 'series4',
@@ -115,7 +115,7 @@ export const WithHeadline: Story = {
     item: {
       color: '#f5222d',
       inactive: false,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Revenue',
       id: '5',
       serieName: 'series5',
@@ -135,7 +135,7 @@ export const WithAverageHeadline: Story = {
     item: {
       color: '#fa8c16',
       inactive: false,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Monthly Sales',
       id: '6',
       serieName: 'series6',
@@ -155,7 +155,7 @@ export const WithFocusEvent: Story = {
     item: {
       color: '#eb2f96',
       inactive: false,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Interactive Legend',
       id: '7',
       serieName: 'series7',

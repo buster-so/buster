@@ -8,7 +8,7 @@ describe('LegendItem', () => {
   const mockItem: BusterChartLegendItem = {
     formattedName: 'Test Item',
     color: '#FF0000',
-    type: ChartType.Line,
+    type: 'line',
     inactive: false,
     data: [],
     id: 'test-1',

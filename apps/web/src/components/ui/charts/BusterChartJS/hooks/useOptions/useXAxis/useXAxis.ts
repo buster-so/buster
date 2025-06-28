@@ -52,10 +52,10 @@ export const useXAxis = ({
   columnSettings: BusterChartProps['columnSettings'];
   xAxisTimeInterval: BusterChartProps['xAxisTimeInterval'];
 }): DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined => {
-  const isScatterChart = selectedChartType === ChartType.Scatter;
-  const isPieChart = selectedChartType === ChartType.Pie;
-  const isLineChart = selectedChartType === ChartType.Line;
-  const isComboChart = selectedChartType === ChartType.Combo;
+  const isScatterChart = selectedChartType === 'scatter';
+  const isPieChart = selectedChartType === 'pie';
+  const isLineChart = selectedChartType === 'line';
+  const isComboChart = selectedChartType === 'combo';
   const useGrid = isScatterChart;
 
   const isSupportedType = useMemo(() => {

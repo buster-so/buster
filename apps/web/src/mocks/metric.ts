@@ -9,14 +9,7 @@ import {
 import { ShareRole, VerificationStatus } from '@/api/asset_interfaces/share';
 
 // Utility functions for predictable mock data generation
-const CHART_TYPES = [
-  ChartType.Bar,
-  ChartType.Table,
-  ChartType.Line,
-  ChartType.Pie,
-  ChartType.Scatter,
-  ChartType.Metric
-];
+const CHART_TYPES = ['bar', 'table', 'line', 'pie', 'scatter', 'metric'];
 
 const PRODUCT_NAMES = [
   'Premium Widget',

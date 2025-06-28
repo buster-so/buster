@@ -14,7 +14,7 @@ const meta = {
     color: { control: 'color' },
     type: {
       control: 'select',
-      options: [ChartType.Line, ChartType.Bar, ChartType.Scatter]
+      options: ['line', 'bar', 'scatter']
     },
     inactive: { control: 'boolean' },
     size: {
@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 export const Bar: Story = {
   args: {
     color: '#1677ff',
-    type: ChartType.Bar,
+    type: 'bar',
     inactive: false,
     size: 'default'
   }
@@ -39,7 +39,7 @@ export const Bar: Story = {
 export const Line: Story = {
   args: {
     color: '#1677ff',
-    type: ChartType.Line,
+    type: 'line',
     inactive: false,
     size: 'default'
   }
@@ -48,7 +48,7 @@ export const Line: Story = {
 export const Scatter: Story = {
   args: {
     color: '#1677ff',
-    type: ChartType.Scatter,
+    type: 'scatter',
     inactive: false,
     size: 'default'
   }
@@ -57,7 +57,7 @@ export const Scatter: Story = {
 export const Small: Story = {
   args: {
     color: '#1677ff',
-    type: ChartType.Bar,
+    type: 'bar',
     inactive: false,
     size: 'sm'
   }
@@ -66,7 +66,7 @@ export const Small: Story = {
 export const Inactive: Story = {
   args: {
     color: '#1677ff',
-    type: ChartType.Bar,
+    type: 'bar',
     inactive: true,
     size: 'default'
   }
@@ -75,7 +75,7 @@ export const Inactive: Story = {
 export const WithFocus: Story = {
   args: {
     color: '#1677ff',
-    type: ChartType.Bar,
+    type: 'bar',
     inactive: false,
     size: 'default',
     onFocusItem: fn

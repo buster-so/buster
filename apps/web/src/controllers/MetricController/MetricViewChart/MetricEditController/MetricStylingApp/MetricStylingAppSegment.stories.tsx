@@ -51,7 +51,7 @@ const handleSetSegment = fn();
 
 export const Default: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     className: ''
   }
 };
@@ -60,7 +60,7 @@ export const WithTableChart: Story = {
   args: {
     segment: MetricStylingAppSegments.VISUALIZE,
     setSegment: handleSetSegment,
-    selectedChartType: ChartType.Table,
+    selectedChartType: 'table',
     className: ''
   },
   parameters: {
@@ -76,7 +76,7 @@ export const WithMetricChart: Story = {
   args: {
     segment: MetricStylingAppSegments.VISUALIZE,
     setSegment: handleSetSegment,
-    selectedChartType: ChartType.Metric,
+    selectedChartType: 'metric',
     className: ''
   },
   parameters: {

@@ -166,7 +166,7 @@ describe('getChangesFromDefaultChartConfig', () => {
     // Assert on a non-typed partial chart_config to avoid TypeScript errors
     // @ts-expect-error - We're testing runtime behavior, TypeScript doesn't need to validate this test data
     metric.chart_config = {
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       showLegend: true,
       xAxisShowAxisLabel: false,
       colors: ['#FF0000', '#00FF00', '#0000FF'] // Custom colors
@@ -175,7 +175,7 @@ describe('getChangesFromDefaultChartConfig', () => {
     const result = getChangesFromDefaultChartConfig(metric);
 
     expect(result).toEqual({
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       showLegend: true,
       xAxisShowAxisLabel: false,
       colors: ['#FF0000', '#00FF00', '#0000FF']

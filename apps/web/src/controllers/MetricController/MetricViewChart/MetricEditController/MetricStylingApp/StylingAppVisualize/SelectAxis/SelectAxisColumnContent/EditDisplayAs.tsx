@@ -43,8 +43,8 @@ export const EditDisplayAs: React.FC<{
   selectedChartType: IBusterMetricChartConfig['selectedChartType'];
 }> = React.memo(({ columnVisualization, onUpdateColumnSettingConfig, selectedChartType }) => {
   const selectedOption = useMemo(() => {
-    if (selectedChartType === ChartType.Bar) return 'bar';
-    if (selectedChartType === ChartType.Line) return 'line';
+    if (selectedChartType === 'bar') return 'bar';
+    if (selectedChartType === 'line') return 'line';
     return options.find((option) => option.value === columnVisualization)?.value || 'bar';
   }, [columnVisualization]);
 

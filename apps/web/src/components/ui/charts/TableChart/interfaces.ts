@@ -1,7 +1,7 @@
 import type { BusterChartConfigProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 
 export type BusterTableChartConfig = {
-  type: ChartType.Table;
+  type: 'table';
   tableColumnOrder?: BusterChartConfigProps['tableColumnOrder'];
   tableColumnWidths?: BusterChartConfigProps['tableColumnWidths'];
   tableHeaderBackgroundColor?: string | null;

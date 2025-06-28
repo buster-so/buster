@@ -57,7 +57,7 @@ export const MetricViewChart: React.FC<{
     const { onUpdateMetricName } = useUpdateMetricChart({ metricId });
     const { name, description, time_frame, evaluation_score, evaluation_summary } = metric || {};
 
-    const isTable = metric?.chart_config.selectedChartType === ChartType.Table;
+    const isTable = metric?.chart_config.selectedChartType === 'table';
     const { isReadOnly, isVersionHistoryMode, isViewingOldVersion } = useIsMetricReadOnly({
       metricId,
       readOnly: readOnlyProp

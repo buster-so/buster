@@ -1,9 +1,8 @@
 import type { Chart } from 'chart.js';
 import { describe, expect, it } from 'vitest';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts/columnInterfaces';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric/interfaces';
+import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric/charts/enum';
 import { getLegendItems } from './getLegendItems';
 
 describe('getLegendItems', () => {
@@ -29,7 +28,7 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors,
       inactiveDatasets: {},
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: defaultColumnSettings
     });
@@ -40,7 +39,7 @@ describe('getLegendItems', () => {
   it('should handle pie chart data correctly', () => {
     const mockChartRef = {
       current: {
-        config: { type: ChartType.Pie },
+        config: { type: 'pie' },
         data: {
           labels: ['Category 1', 'Category 2'],
           datasets: [
@@ -58,7 +57,7 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors,
       inactiveDatasets: {},
-      selectedChartType: ChartType.Pie,
+      selectedChartType: 'pie',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: defaultColumnSettings
     });
@@ -67,7 +66,7 @@ describe('getLegendItems', () => {
     expect(result[0]).toEqual({
       color: mockColors[0],
       inactive: undefined,
-      type: ChartType.Pie,
+      type: 'pie',
       serieName: 'Dataset 1',
       formattedName: 'Category 1',
       id: 'Category 1',
@@ -79,7 +78,7 @@ describe('getLegendItems', () => {
   it('should handle combo chart data correctly', () => {
     const mockChartRef = {
       current: {
-        config: { type: ChartType.Bar },
+        config: { type: 'bar' },
         data: {
           datasets: [
             {
@@ -105,7 +104,7 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors,
       inactiveDatasets: {},
-      selectedChartType: ChartType.Combo,
+      selectedChartType: 'combo',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: defaultColumnSettings
     });
@@ -114,19 +113,19 @@ describe('getLegendItems', () => {
     expect(result[0]).toEqual({
       color: mockColors[0],
       inactive: undefined,
-      type: ChartType.Bar,
+      type: 'bar',
       formattedName: 'Bar Data',
       id: 'Bar Data',
       data: [10, 20],
       yAxisKey: 'value'
     });
-    expect(result[1].type).toBe(ChartType.Line);
+    expect(result[1].type).toBe('line');
   });
 
   it('should handle scatter plot visualization in combo charts', () => {
     const mockChartRef = {
       current: {
-        config: { type: ChartType.Bar },
+        config: { type: 'bar' },
         data: {
           datasets: [
             {
@@ -150,19 +149,19 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors,
       inactiveDatasets: {},
-      selectedChartType: ChartType.Combo,
+      selectedChartType: 'combo',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: customColumnSettings
     });
 
     expect(result).toHaveLength(1);
-    expect(result[0].type).toBe(ChartType.Scatter);
+    expect(result[0].type).toBe('scatter');
   });
 
   it('should mark datasets as inactive based on inactiveDatasets prop', () => {
     const mockChartRef = {
       current: {
-        config: { type: ChartType.Bar },
+        config: { type: 'bar' },
         data: {
           datasets: [
             {
@@ -188,7 +187,7 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors,
       inactiveDatasets: { 'Inactive Dataset': true },
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: defaultColumnSettings
     });
@@ -203,7 +202,7 @@ describe('getLegendItems', () => {
   it('should handle multiple datasets in pie charts with proper formatting', () => {
     const mockChartRef = {
       current: {
-        config: { type: ChartType.Pie },
+        config: { type: 'pie' },
         data: {
           labels: ['Category A', 'Category B'],
           datasets: [
@@ -226,7 +225,7 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors,
       inactiveDatasets: {},
-      selectedChartType: ChartType.Pie,
+      selectedChartType: 'pie',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: defaultColumnSettings
     });
@@ -236,7 +235,7 @@ describe('getLegendItems', () => {
     expect(result[0]).toEqual({
       color: mockColors[0],
       inactive: undefined,
-      type: ChartType.Pie,
+      type: 'pie',
       serieName: 'Dataset 1',
       formattedName: 'Category A | Dataset 1',
       id: 'Category A',
@@ -246,7 +245,7 @@ describe('getLegendItems', () => {
     expect(result[1]).toEqual({
       color: mockColors[1],
       inactive: undefined,
-      type: ChartType.Pie,
+      type: 'pie',
       serieName: 'Dataset 1',
       formattedName: 'Category B | Dataset 1',
       id: 'Category B',
@@ -261,7 +260,7 @@ describe('getLegendItems', () => {
   it('should cycle through colors for datasets exceeding color array length', () => {
     const mockChartRef = {
       current: {
-        config: { type: ChartType.Bar },
+        config: { type: 'bar' },
         data: {
           datasets: Array.from({ length: 5 }, (_, i) => ({
             label: `Dataset ${i + 1}`,
@@ -278,7 +277,7 @@ describe('getLegendItems', () => {
       chartRef: mockChartRef,
       colors: mockColors, // Only 3 colors defined
       inactiveDatasets: {},
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       columnLabelFormats: defaultColumnLabelFormats,
       columnSettings: defaultColumnSettings
     });

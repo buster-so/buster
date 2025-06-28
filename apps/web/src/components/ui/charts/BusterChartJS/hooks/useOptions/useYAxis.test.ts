@@ -15,7 +15,7 @@ describe('useYAxis', () => {
       y: ['value1'],
       x: ['date']
     } as ChartEncodes,
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     columnMetadata: undefined,
     barGroupType: 'group' as const,
     lineGroupType: null,
@@ -30,7 +30,7 @@ describe('useYAxis', () => {
   it('should return undefined for pie charts', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Pie
+      selectedChartType: 'pie'
     };
 
     const { result } = renderHook(() => useYAxis(props));
@@ -119,7 +119,7 @@ describe('useYAxis', () => {
   it('should handle line chart percentage stack mode', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       lineGroupType: 'percentage-stack' as const
     };
 

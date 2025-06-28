@@ -18,7 +18,7 @@ type Story = StoryObj<typeof BusterChart>;
 
 export const Default: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     barAndLineAxis: {
       x: ['date'],
@@ -53,7 +53,7 @@ export const Default: Story = {
 
 export const AutoDateFormat_TimeIntervalTest_MonthWithForcedUnit_ManyMonths: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     xAxisTimeInterval: 'month',
     data: Array.from({ length: 99 }, (_, i) => ({
       date: dayjs('2024-01-01').add(i, 'month').toISOString(),
@@ -109,7 +109,7 @@ export const AutoDateFormat_TimeIntervalTest_UnevenMonthsAutoUnit_ManyMonths: St
 
 export const AutoDateFormat_TimeIntervalTest_MonthWithForcedUnit: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     xAxisTimeInterval: 'month',
     data: Array.from({ length: 12 }, (_, i) => ({
       date: dayjs('2024-01-01').add(i, 'month').toISOString(),
@@ -165,7 +165,7 @@ export const AutoDateFormat_TimeIntervalTest_UnevenMonthsAutoUnit: Story = {
 
 export const AutoDateFormat_TimeIntervalTest_Days_WithForcedUnit: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     xAxisTimeInterval: 'day',
     data: Array.from({ length: 31 }, (_, i) => ({
       date: dayjs('2024-01-01').add(i, 'day').toISOString(),
@@ -418,7 +418,7 @@ export const XAxisTimeIntervalWithMismatchingData_Months: Story = {
 // Simple X and Y axis with numeric values
 export const NumericXY: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { score: 10, value: 100 },
       { score: 20, value: 200 },
@@ -447,7 +447,7 @@ export const NumericXY: Story = {
 
 export const NumericXYThatCorrespondToAMonth: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       month: i + 1,
       sales: addNoise(i * 15 + 55, 10)
@@ -473,7 +473,7 @@ export const NumericXYThatCorrespondToAMonth: Story = {
 // X axis with categorical data and Y axis with numeric values
 export const CategoricalXNumericY: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { category: 'A', value: 100 },
       { category: 'B', value: 200 },
@@ -503,7 +503,7 @@ export const CategoricalXNumericY: Story = {
 // Multi-year date range
 export const MultiYearDate: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { date: new Date('2020-01-01'), value: 100 },
       { date: new Date('2021-01-01'), value: 150 },
@@ -534,7 +534,7 @@ export const MultiYearDate: Story = {
 // Multiple Y axes with date X axis
 export const MultipleYAxes: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       {
         date: new Date('2024-01-01'),
@@ -589,7 +589,7 @@ export const MultipleYAxes: Story = {
 // Unevenly spaced dates
 export const UnevenlySpacedDates: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { date: new Date('2024-01-05').toISOString(), value: 120 },
       { date: new Date('2024-01-28').toISOString(), value: 145 },
@@ -635,7 +635,7 @@ export const UnevenlySpacedDates: Story = {
 // Closely spaced dates
 export const CloselySpacedDates: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { date: new Date('2024-01-01').toISOString(), value: 120 },
       { date: new Date('2024-01-03').toISOString(), value: 145 },
@@ -673,7 +673,7 @@ export const CloselySpacedDates: Story = {
 // X, Y, and Category axes combined
 export const WithCategory: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { month: new Date('2024-01-01').toISOString(), sales: 1200, region: 'North' },
       { month: new Date('2024-02-01').toISOString(), sales: 1400, region: 'North' },
@@ -716,7 +716,7 @@ export const WithCategory: Story = {
 // Multiple Y axes with Category
 export const MultipleYAxesWithCategory: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       {
         date: new Date('2024-01-01').toISOString(),
@@ -807,7 +807,7 @@ export const MultipleYAxesWithCategory: Story = {
 // Numeric month X axis
 export const NumericMonthX: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { month: 1, sales: 1000, customers: 150 },
       { month: 2, sales: 1200, customers: 180 },
@@ -853,7 +853,7 @@ export const NumericMonthX: Story = {
 
 export const PercentageStackedLineSingle: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     lineGroupType: 'percentage-stack',
     barAndLineAxis: {
@@ -886,7 +886,7 @@ export const PercentageStackedLineSingle: Story = {
 
 export const PercentageStackedLineMultiple: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     lineGroupType: 'percentage-stack',
     barAndLineAxis: {
@@ -919,7 +919,7 @@ export const PercentageStackedLineMultiple: Story = {
 
 export const PercentageStackedLineSingleWithDataLabels: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     lineGroupType: 'percentage-stack',
     barAndLineAxis: {
@@ -957,7 +957,7 @@ export const PercentageStackedLineSingleWithDataLabels: Story = {
 
 export const StackedAreaLineMultipleWithDataLabels: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     lineGroupType: 'stack',
     barAndLineAxis: {
@@ -1006,7 +1006,7 @@ export const StackedAreaLineMultipleWithDataLabels: Story = {
 
 export const StackedAreaLineSingleWithDataLabels: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     lineGroupType: 'stack',
     barAndLineAxis: {
@@ -1044,7 +1044,7 @@ export const StackedAreaLineSingleWithDataLabels: Story = {
 
 export const PercentageStackedLineMultipleWithDataLabels: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(),
     lineGroupType: 'percentage-stack',
     barAndLineAxis: {
@@ -1093,7 +1093,7 @@ export const PercentageStackedLineMultipleWithDataLabels: Story = {
 
 export const HasMixedNullAndNumberValuesSingleLineWithMissingDataZero: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       date: new Date(2024, 0, i + 1).toISOString(),
       revenue: i === 5 ? null : i * 100
@@ -1129,7 +1129,7 @@ export const HasMixedNullAndNumberValuesSingleLineWithMissingDataZero: Story = {
 
 export const HasMixedNullAndNumberValuesSingleLineWithMissingDataNull: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       date: new Date(2024, 0, i + 1).toISOString(),
       revenue: i === 5 ? null : i * 100
@@ -1165,7 +1165,7 @@ export const HasMixedNullAndNumberValuesSingleLineWithMissingDataNull: Story = {
 
 export const HasMixedNullAndNumberValuesSingleMultiLine: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       date: new Date(2024, 0, i + 1).toISOString(),
       revenue: i % 5 === 0 ? null : i * 100,
@@ -1210,7 +1210,7 @@ export const HasMixedNullAndNumberValuesSingleMultiLine: Story = {
 
 export const HasNullValuesWithCategoryMultiLine: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 3 }).flatMap((_, productIndex) => {
       const category = ['Product A', 'Product B', 'Product C'][productIndex];
       return Array.from({ length: 12 }, (_, i) => ({
@@ -1252,7 +1252,7 @@ export const HasNullValuesWithCategoryMultiLine: Story = {
 
 export const WithTrendline_MaxMinAverageMedian: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       date: new Date(2024, 0, i + 1).toISOString(),
       revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
@@ -1314,7 +1314,7 @@ export const WithTrendline_MaxMinAverageMedian: Story = {
 
 export const WithTrendline_DateXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       date: new Date(2024, 0, i + 1).toISOString(),
       revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
@@ -1352,7 +1352,7 @@ export const WithTrendline_DateXAxisLinearRegression: Story = {
 
 export const WithTrendline_NumericalXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       index: i + 1,
       revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
@@ -1389,7 +1389,7 @@ export const WithTrendline_NumericalXAxisLinearRegression: Story = {
 
 export const WithTrendline_StringXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 12 }, (_, i) => ({
       index: `Product ${i + 1}`,
       revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
@@ -1426,7 +1426,7 @@ export const WithTrendline_StringXAxisLinearRegression: Story = {
 
 export const WithTrendline_DateXAxisExponentialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Add random noise between -200 and 200
       const noise = Math.round((Math.random() - 0.5) * 400);
@@ -1475,7 +1475,7 @@ export const WithTrendline_DateXAxisExponentialRegression: Story = {
 
 export const WithTrendline_NumericalXAxisExponentialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Add random noise between -200 and 200
       const noise = Math.round((Math.random() - 0.5) * 400);
@@ -1523,7 +1523,7 @@ export const WithTrendline_NumericalXAxisExponentialRegression: Story = {
 
 export const WithTrendline_StringXAxisExponentialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Add random noise between -200 and 200
       const noise = Math.round((Math.random() - 0.5) * 400);
@@ -1571,7 +1571,7 @@ export const WithTrendline_StringXAxisExponentialRegression: Story = {
 
 export const WithTrendline_DateXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Add random noise between -200 and 200
       const noise = Math.round((Math.random() - 0.5) * 400);
@@ -1620,7 +1620,7 @@ export const WithTrendline_DateXAxisLogarithmicRegression: Story = {
 
 export const WithTrendline_NumericalXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Add random noise between -200 and 200
       const noise = Math.round((Math.random() - 0.5) * 400);
@@ -1668,7 +1668,7 @@ export const WithTrendline_NumericalXAxisLogarithmicRegression: Story = {
 
 export const WithTrendline_StringXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Add random noise between -200 and 200
       const noise = Math.round((Math.random() - 0.5) * 400);
@@ -1716,7 +1716,7 @@ export const WithTrendline_StringXAxisLogarithmicRegression: Story = {
 
 export const ExponentialDecreaseWithTrendline: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: [
       { date: dayjs('2024-01-01').add(1, 'day').toISOString(), value: 10000 },
       { date: dayjs('2024-01-02').add(2, 'day').toISOString(), value: 7500 },
@@ -1763,7 +1763,7 @@ export const ExponentialDecreaseWithTrendline: Story = {
 
 export const WithTrendline_DateXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -1812,7 +1812,7 @@ export const WithTrendline_DateXAxisPolynomialRegression: Story = {
 
 export const WithTrendline_NumericalXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -1860,7 +1860,7 @@ export const WithTrendline_NumericalXAxisPolynomialRegression: Story = {
 
 export const WithTrendline_StringXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -1908,7 +1908,7 @@ export const WithTrendline_StringXAxisPolynomialRegression: Story = {
 
 export const With2ThousandPoints: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(655),
     barAndLineAxis: {
       x: ['date'],
@@ -1927,7 +1927,7 @@ export const With2ThousandPoints: Story = {
 
 export const With5ThousandPoints: Story = {
   args: {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     data: generateLineChartData(1650),
     barAndLineAxis: {
       x: ['date'],

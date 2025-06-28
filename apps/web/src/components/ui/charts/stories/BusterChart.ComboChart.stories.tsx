@@ -64,7 +64,7 @@ type Story = StoryObj<typeof BusterChart>;
 
 export const DualAxisCombo: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
       x: ['date'],
@@ -116,7 +116,7 @@ export const DualAxisCombo: Story = {
 
 export const RevenueAndOrders: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
       x: ['date'],
@@ -168,7 +168,7 @@ export const RevenueAndOrders: Story = {
 
 export const DualLineChart: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
       x: ['date'],
@@ -222,7 +222,7 @@ export const DualLineChart: Story = {
 
 export const DualBarChart: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
       x: ['date'],
@@ -272,7 +272,7 @@ export const DualBarChart: Story = {
 
 export const CompactView: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(5),
     comboChartAxis: {
       x: ['date'],
@@ -324,7 +324,7 @@ export const CompactView: Story = {
 
 export const NoLegendNoGrid: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
       x: ['date'],
@@ -376,7 +376,7 @@ export const NoLegendNoGrid: Story = {
 
 export const LargeDataset: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateComboChartData(30),
     comboChartAxis: {
       x: ['date'],
@@ -428,7 +428,7 @@ export const LargeDataset: Story = {
 
 export const MultipleY2Axes: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     data: generateProductMetricsData(),
     comboChartAxis: {
       x: ['category'],
@@ -496,7 +496,7 @@ export const MultipleY2Axes: Story = {
 
 export const ProblematicData: Story = {
   args: {
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     columnLabelFormats: {
       quarter_date: {
         columnType: 'date',

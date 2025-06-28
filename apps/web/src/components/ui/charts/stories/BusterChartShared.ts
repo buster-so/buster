@@ -21,7 +21,7 @@ export const sharedMeta: Partial<Meta<typeof BusterChart>> = {
     selectedChartType: {
       control: 'select',
       description: 'The type of chart to display.',
-      defaultValue: ChartType.Table,
+      defaultValue: 'table',
       options: Object.values(ChartType)
     },
     xAxisTimeInterval: {

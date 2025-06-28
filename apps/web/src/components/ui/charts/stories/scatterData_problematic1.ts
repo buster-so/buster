@@ -9017,7 +9017,7 @@ export const scatterDataProblematic1 = {
 };
 
 export const scatterConfig_problematic1 = {
-  selectedChartType: ChartType.Scatter,
+  selectedChartType: 'scatter',
   columnLabelFormats: {
     merchant: {
       columnType: 'string' as const,

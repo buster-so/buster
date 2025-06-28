@@ -29,7 +29,7 @@ const defaultLegendItems: BusterChartLegendItem[] = [
   {
     color: '#1677FF',
     inactive: false,
-    type: ChartType.Line,
+    type: 'line',
     formattedName: 'Revenue',
     id: 'revenue',
     serieName: 'revenue',
@@ -39,7 +39,7 @@ const defaultLegendItems: BusterChartLegendItem[] = [
   {
     color: '#52C41A',
     inactive: false,
-    type: ChartType.Line,
+    type: 'line',
     formattedName: 'Profit',
     id: 'profit',
     serieName: 'profit',
@@ -49,7 +49,7 @@ const defaultLegendItems: BusterChartLegendItem[] = [
   {
     color: '#F5222D',
     inactive: false,
-    type: ChartType.Bar,
+    type: 'bar',
     formattedName: 'Orders',
     id: 'orders',
     serieName: 'orders',
@@ -109,7 +109,7 @@ export const WithOverflow: Story = {
       {
         color: '#722ED1',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Customers',
         id: 'customers',
         serieName: 'customers',
@@ -119,7 +119,7 @@ export const WithOverflow: Story = {
       {
         color: '#13C2C2',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Average Order Value',
         id: 'aov',
         serieName: 'aov',
@@ -129,7 +129,7 @@ export const WithOverflow: Story = {
       {
         color: '#FA8C16',
         inactive: false,
-        type: ChartType.Bar,
+        type: 'bar',
         formattedName: 'Returns',
         id: 'returns',
         serieName: 'returns',

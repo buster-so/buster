@@ -27,7 +27,7 @@ type Story = StoryObj<typeof BusterChart>;
 
 export const Default: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: generateScatterChartData(50),
     scatterAxis: {
       x: ['x'],
@@ -227,7 +227,7 @@ export const WithSize: Story = {
 
 export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -332,7 +332,7 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression_CategoryAxi
 
 export const ScatterWithTrendline_DateXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -393,7 +393,7 @@ export const ScatterWithTrendline_DateXAxisPolynomialRegression_CategoryAxis: St
 
 export const ScatterWithTrendline_NumericalXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -453,7 +453,7 @@ export const ScatterWithTrendline_NumericalXAxisLinearRegression_CategoryAxis: S
 
 export const ScatterWithTrendline_DateXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -514,7 +514,7 @@ export const ScatterWithTrendline_DateXAxisLinearRegression_CategoryAxis: Story 
 
 export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -574,7 +574,7 @@ export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression_CategoryAx
 
 export const ScatterWithTrendline_DateXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -644,7 +644,7 @@ export const ProblematicDataset: Story = {
       y: ['attach_rate'],
       category: ['merchant']
     },
-    selectedChartType: ChartType.Scatter
+    selectedChartType: 'scatter'
   }
 };
 
@@ -660,7 +660,7 @@ export const ProblematicDataset2: Story = {
 
 export const ProblematicDatasetWithLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     columnLabelFormats: {
       total_cost: {
         columnType: 'number',

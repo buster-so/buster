@@ -29,7 +29,7 @@ describe('createDefaultChartConfig', () => {
         '#31FCB4',
         '#E83562'
       ],
-      selectedChartType: ChartType.Table,
+      selectedChartType: 'table',
       yAxisShowAxisLabel: true,
       yAxisShowAxisTitle: true,
       yAxisAxisTitle: null,

@@ -7,7 +7,7 @@ import { useBusterChartLegend } from './useBusterChartLegend';
 
 describe('useBusterChartLegend', () => {
   const defaultProps = {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     showLegendProp: true,
     loading: false,
     lineGroupType: 'percentage-stack' as const,
@@ -33,7 +33,7 @@ describe('useBusterChartLegend', () => {
   it('should not render legend for metric chart type', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Metric
+      selectedChartType: 'metric'
     };
 
     const { result } = renderHook(() => useBusterChartLegend(props));
@@ -53,7 +53,7 @@ describe('useBusterChartLegend', () => {
   it('should detect percentage stack type for bar chart', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       barGroupType: 'percentage-stack' as const
     };
 
@@ -77,7 +77,7 @@ describe('useBusterChartLegend', () => {
       {
         color: '#000',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         data: [1, 2, 3],
         formattedName: 'Test Series',
         id: 'test-1',

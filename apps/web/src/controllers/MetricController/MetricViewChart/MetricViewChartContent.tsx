@@ -28,7 +28,7 @@ export const MetricViewChartContent: React.FC<MetricViewChartContentProps> = Rea
     readOnly
   }) => {
     const columnMetadata = dataMetadata?.column_metadata;
-    const isTable = chartConfig?.selectedChartType === ChartType.Table;
+    const isTable = chartConfig?.selectedChartType === 'table';
 
     const cardClassName = useMemo(() => {
       if (isTable || !fetchedData) return '';

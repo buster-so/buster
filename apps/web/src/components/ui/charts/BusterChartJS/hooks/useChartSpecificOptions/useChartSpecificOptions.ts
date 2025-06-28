@@ -36,13 +36,13 @@ const chartTypeOptionsHandler: Record<
   ChartType,
   (props: ChartSpecificOptionsProps) => ChartProps<ChartJSChartType>['options']
 > = {
-  [ChartType.Pie]: pieOptionsHandler,
-  [ChartType.Line]: defaultHandler,
-  [ChartType.Scatter]: defaultHandler,
-  [ChartType.Bar]: barOptionsHandler,
-  [ChartType.Combo]: defaultHandler,
-  [ChartType.Metric]: defaultHandler,
-  [ChartType.Table]: defaultHandler
+  ['pie']: pieOptionsHandler,
+  ['line']: defaultHandler,
+  ['scatter']: defaultHandler,
+  ['bar']: barOptionsHandler,
+  ['combo']: defaultHandler,
+  ['metric']: defaultHandler,
+  ['table']: defaultHandler
 };
 
 //********** PLUGINS ************ */
@@ -55,11 +55,11 @@ const chartTypePluginsHandler: Record<
   ChartType,
   (props: ChartSpecificOptionsProps) => DeepPartial<PluginChartOptions<ChartJSChartType>>['plugins']
 > = {
-  [ChartType.Pie]: piePluginsHandler,
-  [ChartType.Line]: defaultPluginsHandler,
-  [ChartType.Scatter]: defaultPluginsHandler,
-  [ChartType.Bar]: barPluginsHandler,
-  [ChartType.Combo]: defaultPluginsHandler,
-  [ChartType.Metric]: defaultPluginsHandler,
-  [ChartType.Table]: defaultPluginsHandler
+  ['pie']: piePluginsHandler,
+  ['line']: defaultPluginsHandler,
+  ['scatter']: defaultPluginsHandler,
+  ['bar']: barPluginsHandler,
+  ['combo']: defaultPluginsHandler,
+  ['metric']: defaultPluginsHandler,
+  ['table']: defaultPluginsHandler
 };

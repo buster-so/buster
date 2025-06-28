@@ -1,5 +1,5 @@
-import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
-import type { ChartJSOrUndefined } from '@/components/ui/charts/BusterChartJS/core/types';
+import type { Chart, ChartType, DefaultDataPoint } from 'chart.js';
+import type { ColumnMetaData } from '../interfaces';
 import type { BusterChartConfigProps } from './chartConfigProps';
 
 export type BusterChartProps = {
@@ -16,3 +16,9 @@ export type BusterChartProps = {
   onInitialAnimationEnd?: () => void;
   onChartMounted?: (chart?: ChartJSOrUndefined) => void;
 } & BusterChartConfigProps;
+
+type ChartJSOrUndefined<
+  TType extends ChartType = ChartType,
+  TData = DefaultDataPoint<TType>,
+  TLabel = unknown
+> = Chart<TType, TData, TLabel> | undefined;

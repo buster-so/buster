@@ -15,7 +15,7 @@ describe('useY2Axis', () => {
       y: ['metric1'],
       y2: ['metric2']
     } as ComboChartAxis,
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     y2AxisAxisTitle: 'Test Y2 Axis',
     y2AxisShowAxisTitle: true,
     y2AxisShowAxisLabel: true,
@@ -26,7 +26,7 @@ describe('useY2Axis', () => {
   it('should return undefined display when chart type is not Combo', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Line
+      selectedChartType: 'line'
     };
 
     const { result } = renderHook(() => useY2Axis(props));
