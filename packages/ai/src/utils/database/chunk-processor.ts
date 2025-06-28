@@ -4,6 +4,12 @@ import type {
   ChatMessageResponseMessage,
 } from '@buster/server-shared/chats';
 import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
+import type { ExtractedFile } from '../file-selection';
+import {
+  createFileResponseMessages,
+  extractFilesFromReasoning,
+  selectFilesForResponse,
+} from '../file-selection';
 import { normalizeEscapedText } from '../streaming/escape-normalizer';
 import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
 import { extractResponseMessages } from './format-llm-messages-as-reasoning';
@@ -83,13 +89,18 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private lastSaveTime = 0;
   private readonly SAVE_THROTTLE_MS = 0; // Increased throttle for better batching
   private fileMessagesAdded = false; // Track if file messages have been added
-  private deferDoneToolResponse = false; // Track if we should defer doneTool response
   private pendingSave: Promise<void> | null = null; // Track ongoing save operations
-  private pendingDoneToolEntry: ResponseEntry | null = null; // Store deferred doneTool entry
-  private doneToolResponseId: string | null = null; // Track ID of temporarily added doneTool response
   private saveQueue = Promise.resolve(); // Queue for non-blocking saves
   private queuedSaveCount = 0;
   private readonly MAX_QUEUED_SAVES = 3;
+  private deferDoneToolResponse = false; // Whether to defer doneTool response handling
+  private pendingDoneToolEntry: ResponseEntry | null = null; // Track pending doneTool entry
+
+  // Reactive file selection state
+  private currentFileSelection: {
+    files: ExtractedFile[];
+    version: number;
+  } = { files: [], version: 0 };
 
   constructor(
     messageId: string | null,
@@ -245,17 +256,27 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         extractedValues,
       };
 
-      if (chunk.toolName === 'doneTool' && this.deferDoneToolResponse) {
-        // Store as pending instead of adding to response history
+      if (chunk.toolName === 'doneTool') {
+        // Update file selection and insert files immediately
+        this.updateFileSelection();
+        this.insertCurrentFileSelection();
+
+        // Create and add doneTool response
         const responseEntry = this.createResponseEntry(
           chunk.toolCallId,
           chunk.toolName,
           parseResult
         );
         if (responseEntry) {
-          this.pendingDoneToolEntry = responseEntry;
+          // Check if this response entry already exists (avoid duplicates)
+          const existingEntry = this.state.responseHistory.find(
+            (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+          );
+
+          if (!existingEntry) {
+            this.state.responseHistory.push(responseEntry);
+          }
         }
-        // IMPORTANT: Do not add to responseHistory when deferring
       } else {
         const responseEntry = this.createResponseEntry(
           chunk.toolCallId,
@@ -352,14 +373,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
     // Create initial entries for both response and reasoning tools
     if (this.isResponseTool(chunk.toolName)) {
-      // Check if this is doneTool and we have completed files
-      if (chunk.toolName === 'doneTool' && this.hasCompletedFiles()) {
-        // Mark that we should defer this response
-        this.deferDoneToolResponse = true;
-        this.doneToolResponseId = chunk.toolCallId;
+      // Check if this is doneTool - immediately insert current file selection
+      if (chunk.toolName === 'doneTool') {
+        // Update file selection one more time to ensure we have the latest
+        this.updateFileSelection();
 
-        // Create response entry and add it to response history for streaming
-        // It will be reordered later when file messages are added
+        // Insert current file selection into response messages immediately
+        this.insertCurrentFileSelection();
+
+        // Create response entry for doneTool
         const parseResult = {
           parsed: {},
           isComplete: false,
@@ -372,7 +394,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         );
         if (responseEntry) {
           this.state.responseHistory.push(responseEntry);
-          this.pendingDoneToolEntry = responseEntry;
         }
       } else {
         // Create initial empty response entry that will be updated by deltas
@@ -1404,7 +1425,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
         case 'respondWithoutAnalysis':
         case 'respond-without-analysis':
-          message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+          message =
+            getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
           break;
 
         default:
@@ -1449,7 +1471,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       case 'respondWithoutAnalysis':
       case 'respond-without-analysis':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+        message =
+          getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
         break;
     }
 
@@ -1514,34 +1537,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    */
   getResponseHistory(): ResponseEntry[] {
     return this.state.responseHistory;
-  }
-
-  /**
-   * Add response messages to the history
-   * Used to add file response messages after done tool is called
-   */
-  async addResponseMessages(messages: ResponseEntry[]): Promise<void> {
-    // Add new messages, avoiding duplicates by ID
-    const existingIds = new Set(
-      this.state.responseHistory
-        .filter(
-          (r): r is ResponseEntry & { id: string } =>
-            r !== null && typeof r === 'object' && 'id' in r
-        )
-        .map((r) => r.id)
-    );
-
-    const newMessages = messages.filter((msg) => msg && 'id' in msg && !existingIds.has(msg.id));
-
-    if (newMessages.length > 0) {
-      // Insert at the beginning instead of the end
-      this.state.responseHistory.unshift(...newMessages);
-
-      // Mark that file messages have been added
-      this.fileMessagesAdded = true;
-      // Force an immediate save to persist the new messages
-      await this.saveToDatabase();
-    }
   }
 
   /**
@@ -1788,6 +1783,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Update the entry with the new file IDs and files
       typedEntry.file_ids = updatedFileIds;
       typedEntry.files = updatedFiles;
+
+      // After updating file statuses, re-evaluate file selection
+      this.updateFileSelection();
     } catch (error) {
       console.error('Error updating file IDs and status from tool result:', {
         toolCallId,
@@ -1904,6 +1902,42 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   }
 
   /**
+   * Update the current file selection based on reasoning history
+   * Re-evaluates which files should be shown based on priority logic
+   */
+  private updateFileSelection(): void {
+    const allFiles = extractFilesFromReasoning(this.state.reasoningHistory);
+    const selectedFiles = selectFilesForResponse(allFiles);
+
+    // Only update if selection changed
+    if (JSON.stringify(selectedFiles) !== JSON.stringify(this.currentFileSelection.files)) {
+      this.currentFileSelection = {
+        files: selectedFiles,
+        version: this.currentFileSelection.version + 1,
+      };
+      console.info('File selection updated:', {
+        version: this.currentFileSelection.version,
+        filesCount: selectedFiles.length,
+        fileTypes: selectedFiles.map((f) => `${f.fileType}: ${f.fileName}`),
+      });
+    }
+  }
+
+  /**
+   * Get the current file selection
+   */
+  getCurrentFileSelection(): { files: ExtractedFile[]; version: number } {
+    return this.currentFileSelection;
+  }
+
+  /**
+   * Get total number of files created (completed files only)
+   */
+  getTotalFilesCreated(): number {
+    return extractFilesFromReasoning(this.state.reasoningHistory).length;
+  }
+
+  /**
    * Check if there are completed files in the reasoning history
    */
   private hasCompletedFiles(): boolean {
@@ -1919,43 +1953,21 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   }
 
   /**
-   * Add file messages and deferred doneTool response together
+   * Insert current file selection into response messages immediately
+   * Called when doneTool is detected to ensure files are in response before streaming
    */
-  async addFileAndDoneToolResponses(fileMessages: ResponseEntry[]): Promise<void> {
-    // If we have a deferred doneTool response, we need to reorder
-    if (this.deferDoneToolResponse && this.doneToolResponseId) {
-      // Find and remove the doneTool response from its current position
-      const doneToolIndex = this.state.responseHistory.findIndex(
-        (r) => r && typeof r === 'object' && 'id' in r && r.id === this.doneToolResponseId
-      );
+  private insertCurrentFileSelection(): void {
+    if (this.currentFileSelection.files.length > 0 && !this.fileMessagesAdded) {
+      const fileResponseMessages = createFileResponseMessages(this.currentFileSelection.files);
 
-      let doneToolEntry: ResponseEntry | null = null;
-      if (doneToolIndex !== -1) {
-        // Remove the doneTool entry temporarily
-        [doneToolEntry] = this.state.responseHistory.splice(doneToolIndex, 1) as [
-          ResponseEntry,
-          ...ResponseEntry[],
-        ];
-      }
+      // Add file messages to the beginning of response history
+      this.state.responseHistory.unshift(...fileResponseMessages);
+      this.fileMessagesAdded = true;
 
-      // Add file messages first
-      this.state.responseHistory.unshift(...fileMessages);
-
-      // Now add the doneTool response at the end
-      if (doneToolEntry) {
-        this.state.responseHistory.push(doneToolEntry);
-      }
-    } else {
-      // No reordering needed, just add file messages
-      this.state.responseHistory.unshift(...fileMessages);
+      console.info('Inserted file selection into response messages:', {
+        fileCount: fileResponseMessages.length,
+        fileTypes: this.currentFileSelection.files.map((f) => `${f.fileType}: ${f.fileName}`),
+      });
     }
-
-    // Clear the defer flag and save
-    this.deferDoneToolResponse = false;
-    this.fileMessagesAdded = true;
-    this.pendingDoneToolEntry = null;
-    this.doneToolResponseId = null;
-
-    await this.saveToDatabase();
   }
 }

@@ -11,6 +11,8 @@ import type {
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { hasFailureIndicators, hasFileFailureIndicators } from '../utils/database/types';
+import type { ExtractedFile } from '../utils/file-selection';
+import { createFileResponseMessages } from '../utils/file-selection';
 import {
   MessageHistorySchema,
   ReasoningHistorySchema,
@@ -24,15 +26,6 @@ import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = ThinkAndPrepOutputSchema;
-
-// File tracking types
-interface ExtractedFile {
-  id: string;
-  fileType: 'metric' | 'dashboard';
-  fileName: string;
-  status: 'completed' | 'failed' | 'loading';
-  ymlContent?: string;
-}
 
 // Analyst-specific metadata schema
 const AnalystMetadataSchema = z.object({
@@ -100,107 +93,6 @@ function transformHistoryForChunkProcessor(
   };
 }
 
-/**
- * Extract successfully created/modified files from reasoning history
- * Enhanced with multiple safety checks to prevent failed files from being included
- */
-function extractFilesFromReasoning(
-  reasoningHistory: ChatMessageReasoningMessage[]
-): ExtractedFile[] {
-  const files: ExtractedFile[] = [];
-
-  for (const entry of reasoningHistory) {
-    // Multi-layer safety checks:
-    // 1. Must be a files entry with completed status
-    // 2. Must not have any failure indicators (additional safety net)
-    // 3. Individual files must have completed status
-    if (
-      entry.type === 'files' &&
-      entry.status === 'completed' &&
-      entry.files &&
-      !hasFailureIndicators(entry)
-    ) {
-      for (const fileId of entry.file_ids || []) {
-        const file = entry.files[fileId];
-
-        // Enhanced file validation:
-        // - File must exist and have completed status
-        // - File must not have error indicators
-        // - File must have required properties (file_type, file_name)
-        if (
-          file &&
-          file.status === 'completed' &&
-          file.file_type &&
-          file.file_name &&
-          !hasFileFailureIndicators(file)
-        ) {
-          files.push({
-            id: fileId,
-            fileType: file.file_type as 'metric' | 'dashboard',
-            fileName: file.file_name,
-            status: 'completed',
-            ymlContent: file.file?.text || '',
-          });
-        } else {
-          // Log why file was rejected for debugging
-          console.warn(`Rejecting file for response: ${fileId}`, {
-            fileId,
-            fileName: file?.file_name || 'unknown',
-            fileStatus: file?.status || 'unknown',
-            hasFile: !!file,
-            hasFileType: !!file?.file_type,
-            hasFileName: !!file?.file_name,
-            hasFailureIndicators: file ? hasFileFailureIndicators(file) : false,
-            entryId: entry.id,
-          });
-        }
-      }
-    }
-  }
-
-  return files;
-}
-
-/**
- * Apply intelligent selection logic for files to return
- * Priority: dashboards > multiple metrics > single metric
- */
-function selectFilesForResponse(files: ExtractedFile[]): ExtractedFile[] {
-  // Separate dashboards and metrics
-  const dashboards = files.filter((f) => f.fileType === 'dashboard');
-  const metrics = files.filter((f) => f.fileType === 'metric');
-
-  // Apply priority logic
-  if (dashboards.length > 0) {
-    return dashboards; // Return all dashboards
-  }
-  if (metrics.length > 0) {
-    return metrics; // Return all metrics
-  }
-
-  return []; // No files to return
-}
-
-/**
- * Create file response messages for selected files
- */
-function createFileResponseMessages(files: ExtractedFile[]): ChatMessageResponseMessage[] {
-  return files.map((file) => ({
-    id: file.id, // Use the actual file ID instead of generating a new UUID
-    type: 'file' as const,
-    file_type: file.fileType,
-    file_name: file.fileName,
-    version_number: 1,
-    filter_version_id: null,
-    metadata: [
-      {
-        status: 'completed' as const,
-        message: `${file.fileType === 'dashboard' ? 'Dashboard' : 'Metric'} created successfully`,
-        timestamp: Date.now(),
-      },
-    ],
-  }));
-}
 
 /**
  * Create a unique key for a message to detect duplicates
@@ -349,23 +241,6 @@ const analystExecution = async ({
   const messageId = runtimeContext.get('messageId') as string | null;
   let completeConversationHistory: CoreMessage[] = [];
 
-  // Track file processing state for parallelization
-  const fileProcessingState: {
-    promise: Promise<{
-      fileResponseMessages: ChatMessageResponseMessage[];
-      filesMetadata: { filesCreated: number; filesReturned: number };
-    }> | null;
-    started: boolean;
-    result: {
-      fileResponseMessages: ChatMessageResponseMessage[];
-      filesMetadata: { filesCreated: number; filesReturned: number };
-    } | null;
-  } = {
-    promise: null,
-    started: false,
-    result: null,
-  };
-
   // Initialize chunk processor with histories from previous step
   // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
   const { reasoningHistory: transformedReasoning, responseHistory: transformedResponse } =
@@ -428,46 +303,6 @@ const analystExecution = async ({
               chunkProcessor,
               abortController,
               finishingToolNames: ['doneTool'],
-              onFinishingTool: () => {
-                if (
-                  chunkProcessor.getFinishingToolName() === 'doneTool' &&
-                  !fileProcessingState.started
-                ) {
-                  fileProcessingState.started = true;
-
-                  // Start file processing immediately in parallel
-                  fileProcessingState.promise = (async () => {
-                    try {
-                      const reasoningHistory = chunkProcessor.getReasoningHistory();
-                      const allFiles = extractFilesFromReasoning(reasoningHistory);
-                      const selectedFiles = selectFilesForResponse(allFiles);
-                      const fileResponseMessages = createFileResponseMessages(selectedFiles);
-
-                      const result = {
-                        fileResponseMessages,
-                        filesMetadata: {
-                          filesCreated: allFiles.length,
-                          filesReturned: selectedFiles.length,
-                        },
-                      };
-
-                      // Cache the result
-                      fileProcessingState.result = result;
-                      return result;
-                    } catch (error) {
-                      console.error('Error processing files in parallel:', error);
-                      // Return empty result on error
-                      return {
-                        fileResponseMessages: [],
-                        filesMetadata: {
-                          filesCreated: 0,
-                          filesReturned: 0,
-                        },
-                      };
-                    }
-                  })();
-                }
-              },
             }),
           },
           retryConfig: {
@@ -560,50 +395,11 @@ const analystExecution = async ({
     // Get final conversation history from chunk processor
     completeConversationHistory = chunkProcessor.getAccumulatedMessages();
 
-    // Check if done tool was called and extract files for response
-    let enhancedResponseHistory = chunkProcessor.getResponseHistory();
-    let filesMetadata = {};
-
-    if (chunkProcessor.hasFinishingTool() && chunkProcessor.getFinishingToolName() === 'doneTool') {
-      // Use the parallel processing result if available
-      let fileResult: {
-        fileResponseMessages: ChatMessageResponseMessage[];
-        filesMetadata: { filesCreated: number; filesReturned: number };
-      };
-
-      if (fileProcessingState.result) {
-        // Already completed - use cached result
-        fileResult = fileProcessingState.result;
-      } else if (fileProcessingState.promise) {
-        // Still processing - wait for completion
-        fileResult = await fileProcessingState.promise;
-      } else {
-        // Fallback: process files now if not started (shouldn't happen normally)
-        console.warn('File processing was not started in parallel, processing now');
-        const reasoningHistory = chunkProcessor.getReasoningHistory();
-        const allFiles = extractFilesFromReasoning(reasoningHistory);
-        const selectedFiles = selectFilesForResponse(allFiles);
-        const fileResponseMessages = createFileResponseMessages(selectedFiles);
-
-        fileResult = {
-          fileResponseMessages,
-          filesMetadata: {
-            filesCreated: allFiles.length,
-            filesReturned: selectedFiles.length,
-          },
-        };
-      }
-
-      // Only this final database operation needs to be awaited
-      await chunkProcessor.addFileAndDoneToolResponses(fileResult.fileResponseMessages);
-
-      // Get the updated response history including our new file messages and doneTool response
-      enhancedResponseHistory = chunkProcessor.getResponseHistory();
-
-      filesMetadata = fileResult.filesMetadata;
-    }
-
-    // No need for a final save - addFileAndDoneToolResponses already handles it
+    // Get files metadata for the response
+    const filesMetadata = {
+      filesCreated: chunkProcessor.getTotalFilesCreated(),
+      filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
+    };
 
     return {
       conversationHistory: completeConversationHistory,
@@ -612,7 +408,7 @@ const analystExecution = async ({
       reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
         typeof ReasoningHistorySchema
       >,
-      responseHistory: enhancedResponseHistory as z.infer<typeof ResponseHistorySchema>,
+      responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
       metadata: {
         ...inputData.metadata,
         ...filesMetadata,
@@ -622,50 +418,12 @@ const analystExecution = async ({
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream
-
-      // Check if done tool was called and extract files for response even in abort case
-      let enhancedResponseHistory = chunkProcessor.getResponseHistory();
-      let filesMetadata = {};
-
-      if (
-        chunkProcessor.hasFinishingTool() &&
-        chunkProcessor.getFinishingToolName() === 'doneTool'
-      ) {
-        // Use the parallel processing result if available
-        let fileResult: {
-          fileResponseMessages: ChatMessageResponseMessage[];
-          filesMetadata: { filesCreated: number; filesReturned: number };
-        };
-
-        if (fileProcessingState.result) {
-          // Already completed - use cached result
-          fileResult = fileProcessingState.result;
-        } else if (fileProcessingState.promise) {
-          // Still processing - wait for completion
-          fileResult = await fileProcessingState.promise;
-        } else {
-          // Fallback: process files now if not started
-          const allFiles = extractFilesFromReasoning(chunkProcessor.getReasoningHistory());
-          const selectedFiles = selectFilesForResponse(allFiles);
-          const fileResponseMessages = createFileResponseMessages(selectedFiles);
-
-          fileResult = {
-            fileResponseMessages,
-            filesMetadata: {
-              filesCreated: allFiles.length,
-              filesReturned: selectedFiles.length,
-            },
-          };
-        }
-
-        // Use the new method to add file messages and doneTool response together
-        await chunkProcessor.addFileAndDoneToolResponses(fileResult.fileResponseMessages);
-
-        // Get the updated response history including our new file messages and doneTool response
-        enhancedResponseHistory = chunkProcessor.getResponseHistory();
-
-        filesMetadata = fileResult.filesMetadata;
-      }
+      
+      // Get files metadata for the response
+      const filesMetadata = {
+        filesCreated: chunkProcessor.getTotalFilesCreated(),
+        filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
+      };
 
       return {
         conversationHistory: completeConversationHistory,
@@ -674,7 +432,7 @@ const analystExecution = async ({
         reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
           typeof ReasoningHistorySchema
         >,
-        responseHistory: enhancedResponseHistory as z.infer<typeof ResponseHistorySchema>,
+        responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
         metadata: {
           ...inputData.metadata,
           ...filesMetadata,
