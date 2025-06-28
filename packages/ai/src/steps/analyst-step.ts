@@ -93,7 +93,6 @@ function transformHistoryForChunkProcessor(
   };
 }
 
-
 /**
  * Create a unique key for a message to detect duplicates
  * Optimized to avoid expensive JSON.stringify operations
@@ -418,7 +417,7 @@ const analystExecution = async ({
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream
-      
+
       // Get files metadata for the response
       const filesMetadata = {
         filesCreated: chunkProcessor.getTotalFilesCreated(),
@@ -432,7 +431,9 @@ const analystExecution = async ({
         reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
           typeof ReasoningHistorySchema
         >,
-        responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
+        responseHistory: chunkProcessor.getResponseHistory() as z.infer<
+          typeof ResponseHistorySchema
+        >,
         metadata: {
           ...inputData.metadata,
           ...filesMetadata,

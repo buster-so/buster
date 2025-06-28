@@ -6,7 +6,7 @@ const MessageRoleSchema = z.enum(['user', 'assistant']);
 // Chat user message schema
 const ChatUserMessageSchema = z
   .object({
-    request: z.string(),
+    request: z.string().nullable(),
     sender_id: z.string(),
     sender_name: z.string(),
     sender_avatar: z.string().nullable().optional(),
@@ -67,7 +67,7 @@ const ReasoningFileSchema = z.object({
   id: z.string(),
   file_type: ReasoningFileTypeSchema,
   file_name: z.string(),
-  version_number: z.number(),
+  version_number: z.number().optional(),
   status: StatusSchema,
   file: z.object({
     text: z.string().optional(),

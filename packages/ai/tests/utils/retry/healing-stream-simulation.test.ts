@@ -16,7 +16,7 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
   it('SIMULATION: Agent recovers from tool error mid-stream', async () => {
     const streamEvents: string[] = [];
     let onErrorCallback: ((error: unknown) => unknown) | undefined;
-    
+
     // Create a mock agent that simulates real streaming behavior
     const mockAgent: MastraAgent = {
       name: 'streaming-test-agent',
@@ -26,38 +26,41 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
       },
       stream: vi.fn().mockImplementation(async (messages, options) => {
         onErrorCallback = options?.onError;
-        
+
         // Return a mock stream that simulates the AI SDK behavior
         return {
           fullStream: {
             async *[Symbol.asyncIterator]() {
               // 1. Agent starts with text
               streamEvents.push('STREAM: Starting analysis...');
-              yield { type: 'text-delta', textDelta: 'I\'ll analyze your data. Let me use a tool...' };
-              
+              yield {
+                type: 'text-delta',
+                textDelta: "I'll analyze your data. Let me use a tool...",
+              };
+
               // 2. Agent attempts to call a non-existent tool
               streamEvents.push('STREAM: Tool call attempted');
-              yield { 
+              yield {
                 type: 'tool-call',
                 toolCallId: 'call_123',
                 toolName: 'non-existent-analytics-tool',
-                args: { data: 'analyze this' }
+                args: { data: 'analyze this' },
               };
-              
+
               // 3. Simulate the AI SDK detecting the tool doesn't exist
               const toolError = new NoSuchToolError({
                 toolName: 'non-existent-analytics-tool',
                 availableTools: ['valid-tool-1', 'valid-tool-2'],
               });
               (toolError as any).toolCallId = 'call_123';
-              
+
               streamEvents.push('ERROR: NoSuchToolError occurred');
-              
+
               // 4. Call onError to get healing response
               if (onErrorCallback) {
                 const healingResponse = onErrorCallback(toolError);
                 streamEvents.push(`HEALING: ${JSON.stringify(healingResponse)}`);
-                
+
                 // 5. Inject the healing response as a tool result
                 yield {
                   type: 'tool-result',
@@ -66,33 +69,36 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
                   result: healingResponse,
                 };
               }
-              
+
               // 6. Agent continues after seeing the error
               streamEvents.push('STREAM: Agent continuing after healing');
-              yield { type: 'text-delta', textDelta: '\n\nI apologize for the error. Let me use a different approach...' };
-              
+              yield {
+                type: 'text-delta',
+                textDelta: '\n\nI apologize for the error. Let me use a different approach...',
+              };
+
               // 7. Agent now uses a valid tool
               streamEvents.push('STREAM: Using valid tool');
               yield {
                 type: 'tool-call',
                 toolCallId: 'call_456',
                 toolName: 'valid-tool-1',
-                args: { data: 'analyze this' }
+                args: { data: 'analyze this' },
               };
-              
+
               // 8. Valid tool executes successfully
               yield {
                 type: 'tool-result',
                 toolCallId: 'call_456',
                 toolName: 'valid-tool-1',
-                result: { success: true, data: 'Analysis complete' }
+                result: { success: true, data: 'Analysis complete' },
               };
-              
+
               // 9. Agent completes
               streamEvents.push('STREAM: Completed successfully');
               yield { type: 'text-delta', textDelta: '\n\nAnalysis complete!' };
-            }
-          }
+            },
+          },
         };
       }),
     } as any;
@@ -123,8 +129,8 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
               executionLog.errorMessages.push(toolResult.result.error as string);
             }
           }
-        }
-      }
+        },
+      },
     });
 
     // Process the stream and track what happens
@@ -132,7 +138,7 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
     for await (const chunk of result.stream.fullStream) {
       chunks.push(chunk);
       executionLog.chunksProcessed++;
-      
+
       if (chunk.type === 'tool-call') {
         executionLog.toolCallsSeen.push(chunk.toolName);
       }
@@ -144,64 +150,74 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
     expect(executionLog.chunksProcessed).toBeGreaterThan(5);
     expect(executionLog.toolCallsSeen).toContain('non-existent-analytics-tool');
     expect(executionLog.toolCallsSeen).toContain('valid-tool-1');
-    expect(executionLog.errorMessages[0]).toContain('Tool "non-existent-analytics-tool" is not available');
+    expect(executionLog.errorMessages[0]).toContain(
+      'Tool "non-existent-analytics-tool" is not available'
+    );
     expect(executionLog.errorMessages[0]).toContain('valid-tool-1');
 
     // Log the full execution flow
     console.log('\n🎬 STREAMING EXECUTION FLOW:');
-    streamEvents.forEach(event => console.log(`   ${event}`));
-    
+    streamEvents.forEach((event) => console.log(`   ${event}`));
+
     console.log('\n📊 EXECUTION SUMMARY:');
     console.log(`   - Healing attempts: ${executionLog.healingAttempts}`);
     console.log(`   - Chunks processed: ${executionLog.chunksProcessed}`);
     console.log(`   - Tool calls seen: ${executionLog.toolCallsSeen.join(', ')}`);
     console.log(`   - Error healed: YES`);
     console.log(`   - Stream completed: YES`);
-    
+
     console.log('\n✅ STREAMING HEALING SIMULATION SUCCESSFUL!');
   });
 
   it('SIMULATION: Real-world scenario with think-and-prep agent', async () => {
     // Simulate the exact scenario: think-and-prep tries to create metrics
     let healingMessage = '';
-    
+
     const mockThinkPrepAgent: MastraAgent = {
       name: 'think-and-prep',
       tools: {
-        'sequentialThinking': {} as any,
-        'executeSql': {} as any,
-        'respondWithoutAnalysis': {} as any,
-        'submitThoughts': {} as any,
+        sequentialThinking: {} as any,
+        executeSql: {} as any,
+        respondWithoutAnalysis: {} as any,
+        submitThoughts: {} as any,
       },
       stream: vi.fn().mockImplementation(async (messages, options) => {
         const onError = options?.onError;
-        
+
         return {
           fullStream: {
             async *[Symbol.asyncIterator]() {
               // Think-and-prep agent mistakenly tries to create a metrics file
-              yield { type: 'text-delta', textDelta: 'I need to create a metrics file for this analysis...' };
-              
+              yield {
+                type: 'text-delta',
+                textDelta: 'I need to create a metrics file for this analysis...',
+              };
+
               // Attempts to call create-metrics-file (which it doesn't have!)
               yield {
                 type: 'tool-call',
                 toolCallId: 'think_prep_bad_call',
                 toolName: 'create-metrics-file',
-                args: { files: [] }
+                args: { files: [] },
               };
-              
+
               // Error occurs
               const error = new NoSuchToolError({
                 toolName: 'create-metrics-file',
-                availableTools: ['sequentialThinking', 'executeSql', 'respondWithoutAnalysis', 'submitThoughts'],
+                availableTools: [
+                  'sequentialThinking',
+                  'executeSql',
+                  'respondWithoutAnalysis',
+                  'submitThoughts',
+                ],
               });
               (error as any).toolCallId = 'think_prep_bad_call';
-              
+
               // Get healing response
               if (onError) {
                 const healing = onError(error);
                 healingMessage = (healing as any).error;
-                
+
                 yield {
                   type: 'tool-result',
                   toolCallId: 'think_prep_bad_call',
@@ -209,19 +225,19 @@ describe('Healing During Streaming - Real Scenario Simulation', () => {
                   result: healing,
                 };
               }
-              
+
               // Agent corrects itself
               yield { type: 'text-delta', textDelta: '\n\nI should use submitThoughts instead...' };
-              
+
               // Uses correct tool
               yield {
                 type: 'tool-call',
                 toolCallId: 'correct_call',
                 toolName: 'submitThoughts',
-                args: { thoughts: 'Analysis plan...' }
+                args: { thoughts: 'Analysis plan...' },
               };
-            }
-          }
+            },
+          },
         };
       }),
     } as any;

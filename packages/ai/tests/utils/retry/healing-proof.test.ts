@@ -19,7 +19,7 @@ describe('Definitive Healing Proof', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Analyze my data'
+        content: 'Analyze my data',
       },
       {
         role: 'assistant',
@@ -29,15 +29,17 @@ describe('Definitive Healing Proof', () => {
             toolCallId: 'proof_call_123',
             toolName: 'create-metrics-file', // 100% GUARANTEED TO FAIL - NOT IN AGENT'S TOOLS
             args: {
-              files: [{
-                file_name: 'test.yml',
-                datasource: 'test',
-                collections: []
-              }]
-            }
-          }
-        ]
-      }
+              files: [
+                {
+                  file_name: 'test.yml',
+                  datasource: 'test',
+                  collections: [],
+                },
+              ],
+            },
+          },
+        ],
+      },
     ];
 
     // Step 2: Track healing behavior
@@ -59,54 +61,69 @@ describe('Definitive Healing Proof', () => {
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
-    
+
     // Create a mock agent to capture onError behavior
     const mockAgent = {
       ...thinkAndPrepAgent,
       stream: vi.fn().mockImplementation(async (messages, options) => {
         // Capture the onError callback
         const onError = options?.onError;
-        
+
         return {
           fullStream: {
             async *[Symbol.asyncIterator]() {
               // Yield initial content
               yield { type: 'text-delta', text: 'Processing...' };
-              
+
               // Simulate the tool error when processing the bad tool call
-              if (messages.some(m => m.role === 'assistant' && 
-                  Array.isArray(m.content) && 
-                  m.content.some((c: any) => c.type === 'tool-call' && c.toolName === 'create-metrics-file'))) {
-                
+              if (
+                messages.some(
+                  (m) =>
+                    m.role === 'assistant' &&
+                    Array.isArray(m.content) &&
+                    m.content.some(
+                      (c: any) => c.type === 'tool-call' && c.toolName === 'create-metrics-file'
+                    )
+                )
+              ) {
                 // Create the error
                 const toolError = new NoSuchToolError({
                   toolName: 'create-metrics-file',
-                  availableTools: ['sequentialThinking', 'executeSql', 'respondWithoutAnalysis', 'submitThoughts'],
+                  availableTools: [
+                    'sequentialThinking',
+                    'executeSql',
+                    'respondWithoutAnalysis',
+                    'submitThoughts',
+                  ],
                 });
                 (toolError as any).toolCallId = 'proof_call_123';
-                
+
                 // Call onError and capture the healing response
                 if (onError) {
                   healingLog.onErrorCalled = true;
                   healingLog.healingResponse = onError(toolError);
                   healingLog.errorsCaught++;
-                  
+
                   // Analyze the healing response
                   if (healingLog.healingResponse && 'error' in healingLog.healingResponse) {
                     const errorMessage = healingLog.healingResponse.error;
                     healingLog.healingMessagesReturned++;
-                    
+
                     if (errorMessage.includes('Tool "create-metrics-file" is not available')) {
                       healingLog.availableToolsListed = true;
                     }
-                    
+
                     // Check that correct tools are listed
-                    if (errorMessage.includes('sequentialThinking')) healingLog.correctToolsMentioned.push('sequentialThinking');
-                    if (errorMessage.includes('executeSql')) healingLog.correctToolsMentioned.push('executeSql');
-                    if (errorMessage.includes('respondWithoutAnalysis')) healingLog.correctToolsMentioned.push('respondWithoutAnalysis');
-                    if (errorMessage.includes('submitThoughts')) healingLog.correctToolsMentioned.push('submitThoughts');
+                    if (errorMessage.includes('sequentialThinking'))
+                      healingLog.correctToolsMentioned.push('sequentialThinking');
+                    if (errorMessage.includes('executeSql'))
+                      healingLog.correctToolsMentioned.push('executeSql');
+                    if (errorMessage.includes('respondWithoutAnalysis'))
+                      healingLog.correctToolsMentioned.push('respondWithoutAnalysis');
+                    if (errorMessage.includes('submitThoughts'))
+                      healingLog.correctToolsMentioned.push('submitThoughts');
                   }
-                  
+
                   // Yield the healing as a tool result
                   yield {
                     type: 'tool-result',
@@ -116,14 +133,14 @@ describe('Definitive Healing Proof', () => {
                   };
                 }
               }
-              
+
               // Continue after healing
               yield { type: 'text-delta', text: 'Continuing after healing...' };
               healingLog.streamCompleted = true;
-            }
-          }
+            },
+          },
         };
-      })
+      }),
     };
 
     const result = await retryableAgentStreamWithHealing({
@@ -138,8 +155,8 @@ describe('Definitive Healing Proof', () => {
         onRetry: (error, attempt) => {
           // This is only called for stream creation retries, not in-stream healing
           console.log('Stream creation retry:', error.type, attempt);
-        }
-      }
+        },
+      },
     });
 
     // Step 4: Verify stream was created successfully
@@ -158,11 +175,13 @@ describe('Definitive Healing Proof', () => {
       // If we get here, healing failed
       throw new Error(`Stream failed after healing: ${error}`);
     }
-    
+
     // Check healing log after stream is consumed
     expect(healingLog.onErrorCalled).toBe(true);
     expect(healingLog.healingResponse).toBeDefined();
-    expect(healingLog.healingResponse.error).toContain('Tool "create-metrics-file" is not available');
+    expect(healingLog.healingResponse.error).toContain(
+      'Tool "create-metrics-file" is not available'
+    );
 
     // Step 6: FINAL VERIFICATION - All healing behaviors occurred
     expect(healingLog.errorsCaught).toBe(1);
@@ -184,8 +203,8 @@ describe('Definitive Healing Proof', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Test invalid args'
-      }
+        content: 'Test invalid args',
+      },
     ];
 
     let onErrorCalled = false;
@@ -204,21 +223,21 @@ describe('Definitive Healing Proof', () => {
       stream: vi.fn().mockImplementation(async (messages, options) => {
         // Verify onError is passed
         expect(options.onError).toBeDefined();
-        
+
         // Simulate invalid args error
         const invalidArgsError = new Error('Invalid tool arguments');
         invalidArgsError.name = 'AI_InvalidToolArgumentsError';
         (invalidArgsError as any).toolCallId = 'test-call';
         (invalidArgsError as any).toolName = 'executeSql';
-        
+
         const healingResponse = options.onError(invalidArgsError);
         if (healingResponse && typeof healingResponse === 'object' && 'error' in healingResponse) {
           onErrorCalled = true;
           errorDetails = healingResponse.error as string;
         }
-        
+
         return { fullStream: { async *[Symbol.asyncIterator]() {} } };
-      })
+      }),
     };
 
     const result = await retryableAgentStreamWithHealing({
@@ -241,8 +260,8 @@ describe('Definitive Healing Proof', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Process data'
-      }
+        content: 'Process data',
+      },
     ];
 
     const healingAttempts: any[] = [];
@@ -260,7 +279,7 @@ describe('Definitive Healing Proof', () => {
       ...thinkAndPrepAgent,
       stream: vi.fn().mockImplementation(async (messages, options) => {
         const onError = options.onError;
-        
+
         return {
           fullStream: {
             async *[Symbol.asyncIterator]() {
@@ -270,39 +289,39 @@ describe('Definitive Healing Proof', () => {
                 availableTools: ['sequentialThinking', 'executeSql'],
               });
               (error1 as any).toolCallId = 'call1';
-              
+
               const healing1 = onError(error1);
               if (healing1) {
                 onErrorCallCount++;
                 healingAttempts.push({
                   attempt: onErrorCallCount,
                   type: 'no-such-tool',
-                  toolName: 'bad-tool-1'
+                  toolName: 'bad-tool-1',
                 });
               }
-              
+
               yield { type: 'text-delta', text: 'After first healing...' };
-              
+
               // Second error
               const error2 = new NoSuchToolError({
                 toolName: 'bad-tool-2',
                 availableTools: ['sequentialThinking', 'executeSql'],
               });
               (error2 as any).toolCallId = 'call2';
-              
+
               const healing2 = onError(error2);
               if (healing2) {
                 onErrorCallCount++;
                 healingAttempts.push({
                   attempt: onErrorCallCount,
                   type: 'no-such-tool',
-                  toolName: 'bad-tool-2'
+                  toolName: 'bad-tool-2',
                 });
               }
-            }
-          }
+            },
+          },
         };
-      })
+      }),
     };
 
     const result = await retryableAgentStreamWithHealing({
@@ -317,8 +336,8 @@ describe('Definitive Healing Proof', () => {
         onRetry: (error, attempt) => {
           // This tracks the healing callbacks
           console.log('Healing callback:', error.type, attempt);
-        }
-      }
+        },
+      },
     });
 
     // Process the stream to trigger the errors
@@ -330,7 +349,7 @@ describe('Definitive Healing Proof', () => {
     expect(healingAttempts.length).toBeGreaterThanOrEqual(2);
     expect(healingAttempts[0].type).toBe('no-such-tool');
     expect(healingAttempts[1].type).toBe('no-such-tool');
-    
+
     console.log('✅ Multiple healing proven:', healingAttempts);
   });
 });

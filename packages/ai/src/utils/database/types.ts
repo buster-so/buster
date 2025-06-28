@@ -155,12 +155,12 @@ export function isErrorResult(result: unknown): boolean {
   // Object-based error detection
   if (result && typeof result === 'object') {
     const resultObj = result as Record<string, unknown>;
-    
+
     // Check for explicit error fields
     if (resultObj.error || resultObj.success === false || resultObj.status === 'error') {
       return true;
     }
-    
+
     // Check for error message in 'message' field
     if (typeof resultObj.message === 'string') {
       const lowerMessage = resultObj.message.toLowerCase();
@@ -172,7 +172,7 @@ export function isErrorResult(result: unknown): boolean {
         return true;
       }
     }
-    
+
     // Check for failed_files array (indicates file creation failures)
     if ('failed_files' in resultObj && Array.isArray(resultObj.failed_files)) {
       const failedFiles = resultObj.failed_files as unknown[];
@@ -180,7 +180,7 @@ export function isErrorResult(result: unknown): boolean {
         return true;
       }
     }
-    
+
     // Check for empty files array when expecting files (common pattern for file creation tools)
     if ('files' in resultObj && Array.isArray(resultObj.files)) {
       const files = resultObj.files as unknown[];

@@ -59,13 +59,13 @@ describe('ChunkProcessor', () => {
       },
     } as TextStreamPart<ToolSet>);
 
-    // Process respondWithoutAnalysis with response
+    // Process respondWithoutAnalysis with final_response
     await processor.processChunk({
       type: 'tool-call',
       toolCallId: 'respond-1',
       toolName: 'respondWithoutAnalysis',
       args: {
-        response: 'I cannot analyze this type of data.',
+        final_response: 'I cannot analyze this type of data.',
       },
     } as TextStreamPart<ToolSet>);
 

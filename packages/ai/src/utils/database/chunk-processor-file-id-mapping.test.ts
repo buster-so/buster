@@ -419,10 +419,9 @@ describe('ChunkProcessor File ID Mapping', () => {
         failed_files: [{ name: 'Failed File', error: 'SQL validation failed' }],
       };
 
-      (chunkProcessor as unknown as ChunkProcessorWithPrivateMethods).updateFileIdsAndStatusFromToolResult(
-        'tool-call-123',
-        toolResult
-      );
+      (
+        chunkProcessor as unknown as ChunkProcessorWithPrivateMethods
+      ).updateFileIdsAndStatusFromToolResult('tool-call-123', toolResult);
 
       const updatedEntry = state.reasoningHistory[0] as ChatMessageReasoningMessage & {
         file_ids: string[];

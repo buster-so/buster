@@ -94,10 +94,12 @@ export const analystAgentTask: ReturnType<
 
       // Parallelize ALL database queries for maximum speed
       const messageContextPromise = getMessageContext({ messageId: payload.message_id });
-      const conversationHistoryPromise = getChatConversationHistory({ messageId: payload.message_id });
-      
+      const conversationHistoryPromise = getChatConversationHistory({
+        messageId: payload.message_id,
+      });
+
       // Start loading data source as soon as we have the organizationId
-      const dataSourcePromise = messageContextPromise.then(context =>
+      const dataSourcePromise = messageContextPromise.then((context) =>
         getOrganizationDataSource({ organizationId: context.organizationId })
       );
 

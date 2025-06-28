@@ -10,8 +10,9 @@ describe('Real-world healing scenario', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Create a dashboard and metrics for analyzing monthly sales trends. Include revenue by product category.'
-      }
+        content:
+          'Create a dashboard and metrics for analyzing monthly sales trends. Include revenue by product category.',
+      },
     ];
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
@@ -49,8 +50,8 @@ describe('Real-world healing scenario', () => {
             errorType: error.type,
             toolName: error.originalError?.toolName || 'unknown',
           });
-        }
-      }
+        },
+      },
     });
 
     // Process the stream and track what happens
@@ -59,9 +60,11 @@ describe('Real-world healing scenario', () => {
         healingLog.toolsCalled.push(chunk.toolName);
         console.log('Tool called:', chunk.toolName);
       }
-      
-      if (chunk.type === 'tool-call' && 
-          (chunk.toolName === 'submitThoughts' || chunk.toolName === 'respondWithoutAnalysis')) {
+
+      if (
+        chunk.type === 'tool-call' &&
+        (chunk.toolName === 'submitThoughts' || chunk.toolName === 'respondWithoutAnalysis')
+      ) {
         healingLog.finishedSuccessfully = true;
         healingLog.finalTool = chunk.toolName;
       }
@@ -73,7 +76,7 @@ describe('Real-world healing scenario', () => {
     console.log('   Healing attempts:', healingLog.attempts.length);
     console.log('   Finished successfully:', healingLog.finishedSuccessfully);
     console.log('   Final tool:', healingLog.finalTool);
-    
+
     // The agent should eventually succeed
     expect(healingLog.finishedSuccessfully).toBe(true);
     expect(['submitThoughts', 'respondWithoutAnalysis']).toContain(healingLog.finalTool);
@@ -84,8 +87,9 @@ describe('Real-world healing scenario', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'I need you to create metrics and a dashboard for tracking customer satisfaction scores'
-      }
+        content:
+          'I need you to create metrics and a dashboard for tracking customer satisfaction scores',
+      },
     ];
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
@@ -125,7 +129,7 @@ describe('Real-world healing scenario', () => {
     console.log('   All tools called:', toolUsage.allTools);
     console.log('   Unique tools:', Array.from(toolUsage.uniqueTools));
     console.log('   Available tools:', Object.keys(thinkAndPrepAgent.tools));
-    
+
     // The agent should only use its available tools
     for (const tool of toolUsage.uniqueTools) {
       expect(Object.keys(thinkAndPrepAgent.tools)).toContain(tool);

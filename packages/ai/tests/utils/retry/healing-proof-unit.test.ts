@@ -12,7 +12,7 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
     // Create a mock agent that will capture the onError callback
     let capturedOnError: ((error: unknown) => unknown) | undefined;
     let simulatedToolError: NoSuchToolError | undefined;
-    
+
     const mockAgent: MastraAgent = {
       name: 'test-agent',
       description: 'Test agent',
@@ -24,22 +24,22 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
       stream: vi.fn().mockImplementation(async (messages, options) => {
         // Capture the onError callback from options
         capturedOnError = options?.onError;
-        
+
         // Create a mock stream that will trigger the error
         const mockStream = {
           fullStream: {
             async *[Symbol.asyncIterator]() {
               // Yield some initial chunks
               yield { type: 'text-delta', text: 'Starting...' };
-              
+
               // Now simulate a tool error occurring during streaming
               if (capturedOnError && simulatedToolError) {
                 const healingResponse = capturedOnError(simulatedToolError);
-                
+
                 // The healing response should be returned to the LLM
                 expect(healingResponse).toBeDefined();
                 expect(healingResponse).toHaveProperty('error');
-                
+
                 // Yield the healing response as if it were a tool result
                 yield {
                   type: 'tool-result',
@@ -48,20 +48,18 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
                   result: healingResponse,
                 };
               }
-              
+
               // Continue with more chunks after healing
               yield { type: 'text-delta', text: 'Continuing after healing...' };
-            }
-          }
+            },
+          },
         };
-        
+
         return mockStream as any;
       }),
     } as any;
 
-    const messages: CoreMessage[] = [
-      { role: 'user', content: 'Test message' }
-    ];
+    const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     // Create the tool error we'll simulate
     simulatedToolError = new NoSuchToolError({
@@ -90,8 +88,8 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
               healingMessage = toolResult.result.error as string;
             }
           }
-        }
-      }
+        },
+      },
     });
 
     // Verify the stream was created
@@ -103,10 +101,11 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
 
     // Test the onError callback directly
     const errorResponse = capturedOnError!(simulatedToolError);
-    
+
     // THIS IS THE PROOF: The error response is returned to heal the agent
     expect(errorResponse).toEqual({
-      error: 'Tool "non-existent-tool" is not available. Available tools: valid-tool, another-tool. Please use one of the available tools instead.'
+      error:
+        'Tool "non-existent-tool" is not available. Available tools: valid-tool, another-tool. Please use one of the available tools instead.',
     });
 
     // Verify healing was tracked
@@ -133,8 +132,10 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
       messages: [{ role: 'user', content: 'Test' }],
       options: {
         runtimeContext: {} as any,
-        onError: (cb) => { capturedOnError = cb; }
-      }
+        onError: (cb) => {
+          capturedOnError = cb;
+        },
+      },
     });
 
     // Get the onError from the mock call
@@ -162,8 +163,8 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
     (invalidArgsError as any).cause = {
       errors: [
         { path: ['field1'], message: 'Required' },
-        { path: ['field2'], message: 'Must be number' }
-      ]
+        { path: ['field2'], message: 'Must be number' },
+      ],
     };
 
     const response2 = capturedOnError!(invalidArgsError);
@@ -193,8 +194,10 @@ describe('Healing Mechanism Unit Test - Definitive Proof', () => {
       options: { runtimeContext: {} as any },
       retryConfig: {
         maxRetries: 2,
-        onRetry: () => { healingAttempts++; }
-      }
+        onRetry: () => {
+          healingAttempts++;
+        },
+      },
     });
 
     const capturedOnError = vi.mocked(mockAgent.stream).mock.calls[0][1]?.onError;

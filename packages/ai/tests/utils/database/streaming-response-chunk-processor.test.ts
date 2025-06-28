@@ -108,7 +108,7 @@ describe('ChunkProcessor - Response Message Streaming', () => {
         type: 'tool-call-delta',
         toolCallId,
         toolName: 'respondWithoutAnalysis',
-        argsTextDelta: '{"response": "Based on',
+        argsTextDelta: '{"final_response": "Based on',
       } as TextStreamPart<never>);
 
       let responseHistory = processor.getResponseHistory();
@@ -161,7 +161,7 @@ describe('ChunkProcessor - Response Message Streaming', () => {
         toolCallId,
         toolName: 'respondWithoutAnalysis',
         args: {
-          response: 'Quick response',
+          final_response: 'Quick response',
         },
       } as TextStreamPart<never>);
 
@@ -200,7 +200,7 @@ describe('ChunkProcessor - Response Message Streaming', () => {
       expect(processor.getReasoningHistory()).toHaveLength(1);
       expect(processor.getReasoningHistory()[0]).toMatchObject({
         type: 'text',
-        title: 'Thinking...',
+        title: 'Thinking it through...',
         message: 'Let me analyze this...',
       });
 

@@ -116,7 +116,7 @@ export function buildChatWithMessages(
       created_at: msg.createdAt,
       updated_at: msg.updatedAt,
       request_message: {
-        request: msg.requestMessage || '',
+        request: msg.requestMessage,
         sender_id: msg.createdBy,
         sender_name: userName,
         sender_avatar: userAvatar,

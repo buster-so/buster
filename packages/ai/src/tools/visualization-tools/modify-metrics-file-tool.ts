@@ -789,6 +789,7 @@ const inputSchema = z.object({
     .array(
       z.object({
         id: z.string().describe('The UUID of the metric file to modify'),
+        name: z.string().describe('The name of the metric file to modify'),
         yml_content: z
           .string()
           .describe('The complete YAML content for the metric, replacing the entire existing file'),

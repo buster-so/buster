@@ -19,9 +19,8 @@ const formatDuration = (durationMs: number): string => {
   }
 
   const minutes = Math.floor(seconds / 60);
-  
-  return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
 
+  return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
 };
 
 // Analyst-specific metadata schema

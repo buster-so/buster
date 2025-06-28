@@ -13,16 +13,16 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Create a dashboard showing monthly sales trends'
+        content: 'Create a dashboard showing monthly sales trends',
       },
       {
         role: 'assistant',
         content: [
           {
             type: 'text',
-            text: "I'll create a dashboard for your monthly sales trends. Let me start by creating the metrics file."
-          }
-        ]
+            text: "I'll create a dashboard for your monthly sales trends. Let me start by creating the metrics file.",
+          },
+        ],
       },
       {
         role: 'assistant',
@@ -32,18 +32,22 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
             toolCallId: 'call_thinkprep_123',
             toolName: 'create-metrics-file', // THIS TOOL DOESN'T EXIST IN THINK-AND-PREP!
             args: {
-              files: [{
-                file_name: 'sales_metrics.yml',
-                datasource: 'sales_db',
-                collections: [{
-                  name: 'monthly_sales',
-                  sql: 'SELECT * FROM sales'
-                }]
-              }]
-            }
-          }
-        ]
-      }
+              files: [
+                {
+                  file_name: 'sales_metrics.yml',
+                  datasource: 'sales_db',
+                  collections: [
+                    {
+                      name: 'monthly_sales',
+                      sql: 'SELECT * FROM sales',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      },
     ];
 
     let healingOccurred = false;
@@ -69,7 +73,7 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
           console.log(`Think-and-Prep healing attempt ${attempt}:`, error.type);
           healingOccurred = true;
           healedError = error;
-          
+
           // Verify the error message mentions available tools
           if (error.healingMessage.role === 'tool' && Array.isArray(error.healingMessage.content)) {
             const toolResult = error.healingMessage.content[0];
@@ -81,8 +85,8 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
               expect(toolResult.result.error).not.toContain('create-metrics-file');
             }
           }
-        }
-      }
+        },
+      },
     });
 
     expect(result.stream).toBeDefined();
@@ -95,7 +99,7 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Analyze sales data and create visualizations'
+        content: 'Analyze sales data and create visualizations',
       },
       {
         role: 'assistant',
@@ -104,10 +108,10 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
             type: 'tool-call',
             toolCallId: 'call_1',
             toolName: 'create-dashboards-file', // Not available!
-            args: { files: [] }
-          }
-        ]
-      }
+            args: { files: [] },
+          },
+        ],
+      },
     ];
 
     const healingAttempts: any[] = [];
@@ -133,10 +137,10 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
           healingAttempts.push({
             attempt,
             errorType: error.type,
-            toolName: error.originalError?.toolName || 'unknown'
+            toolName: error.originalError?.toolName || 'unknown',
           });
-        }
-      }
+        },
+      },
     });
 
     expect(result.stream).toBeDefined();
@@ -150,7 +154,7 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'Think about how to analyze sales data'
+        content: 'Think about how to analyze sales data',
       },
       {
         role: 'assistant',
@@ -160,11 +164,11 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
             toolCallId: 'call_valid_1',
             toolName: 'sequentialThinking', // This tool exists!
             args: {
-              thought: "I need to understand the sales data structure first"
-            }
-          }
-        ]
-      }
+              thought: 'I need to understand the sales data structure first',
+            },
+          },
+        ],
+      },
     ];
 
     let healingOccurred = false;
@@ -188,8 +192,8 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
         maxRetries: 3,
         onRetry: () => {
           healingOccurred = true;
-        }
-      }
+        },
+      },
     });
 
     expect(result.stream).toBeDefined();
@@ -206,10 +210,10 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
             type: 'tool-call',
             toolCallId: 'call_test',
             toolName: 'modify-metrics-file',
-            args: {}
-          }
-        ]
-      }
+            args: {},
+          },
+        ],
+      },
     ];
 
     let capturedErrorMessage = '';
@@ -238,12 +242,12 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
               capturedErrorMessage = toolResult.result.error as string;
             }
           }
-        }
-      }
+        },
+      },
     });
 
     expect(result.stream).toBeDefined();
-    
+
     // Verify the error message lists the correct available tools
     expect(capturedErrorMessage).toContain('Tool "modify-metrics-file" is not available');
     expect(capturedErrorMessage).toContain('Available tools:');
@@ -251,7 +255,7 @@ describe('Think-and-Prep Agent - Tool Error Healing Integration', () => {
     expect(capturedErrorMessage).toContain('executeSql');
     expect(capturedErrorMessage).toContain('respondWithoutAnalysis');
     expect(capturedErrorMessage).toContain('submitThoughts');
-    
+
     // Verify it does NOT list visualization tools
     expect(capturedErrorMessage).not.toContain('create-metrics-file');
     expect(capturedErrorMessage).not.toContain('create-dashboards-file');
@@ -265,12 +269,13 @@ describe('Think-and-Prep Real Scenario', () => {
     const messages: CoreMessage[] = [
       {
         role: 'user',
-        content: 'I need you to create a sales dashboard with revenue trends, top products, and customer segments'
+        content:
+          'I need you to create a sales dashboard with revenue trends, top products, and customer segments',
       },
       // The agent might naturally try to create files here
     ];
 
-    let healingMessages: string[] = [];
+    const healingMessages: string[] = [];
     let finalToolUsed: string | undefined;
 
     const result = await retryableAgentStreamWithHealing({
@@ -298,8 +303,8 @@ describe('Think-and-Prep Real Scenario', () => {
               healingMessages.push(`Attempt ${attempt}: ${toolResult.result.error}`);
             }
           }
-        }
-      }
+        },
+      },
     });
 
     // Process the stream to see what tool it eventually uses
@@ -311,10 +316,15 @@ describe('Think-and-Prep Real Scenario', () => {
     }
 
     expect(result.stream).toBeDefined();
-    
+
     // The agent should eventually use one of its available tools
     if (finalToolUsed) {
-      expect(['sequentialThinking', 'executeSql', 'respondWithoutAnalysis', 'submitThoughts']).toContain(finalToolUsed);
+      expect([
+        'sequentialThinking',
+        'executeSql',
+        'respondWithoutAnalysis',
+        'submitThoughts',
+      ]).toContain(finalToolUsed);
     }
 
     // Log healing attempts for debugging

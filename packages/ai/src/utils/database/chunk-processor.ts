@@ -966,7 +966,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                   id: fileId,
                   file_type: 'metric',
                   file_name: (file as { name?: string }).name || '',
-                  version_number: 1,
+                  version_number: undefined, // Temporary value - will be updated from tool result
                   status: 'loading',
                   file: {
                     text: (file as { yml_content?: string }).yml_content || '',
@@ -1015,7 +1015,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                   id: fileId,
                   file_type: 'dashboard',
                   file_name: (file as { name?: string }).name || '',
-                  version_number: 1,
+                  version_number: undefined, // Temporary value - will be updated from tool result
                   status: 'loading',
                   file: {
                     text: (file as { yml_content?: string }).yml_content || '',
@@ -1114,7 +1114,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                   id: fileId,
                   file_type: 'metric',
                   file_name: (file as { name?: string }).name || '',
-                  version_number: 1,
+                  version_number: undefined, // Temporary value - will be updated from tool result
                   status: 'loading',
                   file: {
                     text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
@@ -1164,7 +1164,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                   id: fileId,
                   file_type: 'dashboard',
                   file_name: (file as { name?: string }).name || '',
-                  version_number: 1,
+                  version_number: undefined, // Temporary value - will be updated from tool result
                   status: 'loading',
                   file: {
                     text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
@@ -1696,9 +1696,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       }
 
       // Count successful and failed queries
-      const successCount = results.filter(r => r.status === 'success').length;
-      const failedCount = results.filter(r => r.status === 'error').length;
-      
+      const successCount = results.filter((r) => r.status === 'success').length;
+      const failedCount = results.filter((r) => r.status === 'error').length;
       // Build the title with success/failure counts
       let title = '';
       if (failedCount > 0) {
@@ -1804,7 +1803,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       const dummyIds = typedEntry.file_ids || [];
 
       // Extract successful files and failed files from the result
-      const successfulFiles: Array<{ id: string; name: string }> = [];
+      const successfulFiles: Array<{ id: string; name: string; version?: number }> = [];
       const failedFilesByName = new Map<string, string>(); // name -> error
 
       if (toolResult && typeof toolResult === 'object') {
@@ -1813,9 +1812,24 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           const files = toolResult.files as unknown[];
           for (const file of files) {
             if (file && typeof file === 'object' && 'id' in file && 'name' in file) {
-              const fileObj = file as { id: unknown; name: unknown };
+              const fileObj = file as {
+                id: unknown;
+                name: unknown;
+                version?: unknown;
+                version_number?: unknown;
+              };
               if (typeof fileObj.id === 'string' && typeof fileObj.name === 'string') {
-                successfulFiles.push({ id: fileObj.id, name: fileObj.name });
+                const fileInfo: { id: string; name: string; version?: number } = {
+                  id: fileObj.id,
+                  name: fileObj.name,
+                };
+                // Extract version if present - check both 'version' and 'version_number' fields
+                if (typeof fileObj.version === 'number') {
+                  fileInfo.version = fileObj.version;
+                } else if (typeof fileObj.version_number === 'number') {
+                  fileInfo.version = fileObj.version_number;
+                }
+                successfulFiles.push(fileInfo);
               }
             }
           }
@@ -1840,11 +1854,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       const updatedFiles: Record<string, unknown> = {};
       const updatedFileIds: string[] = [];
 
-      // Process each dummy ID and match by file name
-      for (const dummyId of dummyIds) {
-        if (!dummyId) continue;
+      // Process each file ID (could be dummy ID for create operations or actual ID for modify operations)
+      for (const fileId of dummyIds) {
+        if (!fileId) continue;
 
-        const fileData = typedEntry.files[dummyId];
+        const fileData = typedEntry.files[fileId];
         if (!fileData || typeof fileData !== 'object') continue;
 
         const typedFileData = fileData as {
@@ -1852,39 +1866,78 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           status?: string;
           error?: string;
           file_name?: string;
+          version_number?: number | undefined;
           [key: string]: unknown;
         };
 
         const fileName = typedFileData.file_name;
 
         if (!fileName) {
-          // If no file name, keep the dummy ID and mark as unknown
-          updatedFiles[dummyId] = fileData;
-          updatedFileIds.push(dummyId);
+          // If no file name, keep the ID and mark as unknown
+          updatedFiles[fileId] = fileData;
+          updatedFileIds.push(fileId);
           continue;
         }
 
-        // Check if this file succeeded
-        const successfulFile = successfulFiles.find((f) => f.name === fileName);
+        // For modify operations, also check by ID (since they use actual file IDs)
+        const successfulFile = successfulFiles.find((f) => f.name === fileName || f.id === fileId);
+
         if (successfulFile) {
           // Update with actual ID and mark as completed
           typedFileData.id = successfulFile.id;
           typedFileData.status = 'completed';
 
+          // Set version number from tool result or default to 1 for create operations
+          const toolName = this.state.toolCallsInProgress.get(toolCallId)?.toolName;
+          if (successfulFile.version !== undefined) {
+            typedFileData.version_number = successfulFile.version;
+          } else if (
+            toolName &&
+            [
+              'createMetrics',
+              'create-metrics-file',
+              'createDashboards',
+              'create-dashboards-file',
+            ].includes(toolName)
+          ) {
+            // For create operations, default to version 1 on success
+            typedFileData.version_number = 1;
+          } else if (
+            toolName &&
+            [
+              'modifyMetrics',
+              'modify-metrics-file',
+              'modifyDashboards',
+              'modify-dashboards-file',
+            ].includes(toolName)
+          ) {
+            // For modify operations, if no version in result but file was successful,
+            // ensure we have a version number (should never be undefined for completed files)
+            if (typedFileData.version_number === undefined) {
+              // Default to 1 if no version information is available
+              // In practice, the backend should always provide version for modify operations
+              typedFileData.version_number = 1;
+              console.warn(
+                `No version number provided for successful modify operation on file: ${fileName}`,
+                { toolName, fileId: successfulFile.id }
+              );
+            }
+          }
+
           updatedFiles[successfulFile.id] = fileData;
           updatedFileIds.push(successfulFile.id);
         } else if (failedFilesByName.has(fileName)) {
-          // This file failed, keep dummy ID and mark as failed
-          typedFileData.id = dummyId;
+          // This file failed, keep the ID and mark as failed
+          typedFileData.id = fileId;
           typedFileData.status = 'failed';
           typedFileData.error = failedFilesByName.get(fileName) || 'Unknown error';
 
-          updatedFiles[dummyId] = fileData;
-          updatedFileIds.push(dummyId);
+          updatedFiles[fileId] = fileData;
+          updatedFileIds.push(fileId);
         } else {
           // Unknown status, keep as is
-          updatedFiles[dummyId] = fileData;
-          updatedFileIds.push(dummyId);
+          updatedFiles[fileId] = fileData;
+          updatedFileIds.push(fileId);
         }
       }
 

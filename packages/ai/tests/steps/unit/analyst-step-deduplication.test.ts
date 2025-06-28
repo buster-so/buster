@@ -26,23 +26,25 @@ function createMessageKey(msg: CoreMessage): string {
     if (toolCallIds) {
       return `assistant:tools:${toolCallIds}`;
     }
-    
-    const textContent = msg.content.find((c): c is { type: 'text'; text: string } => 
-      typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c
+
+    const textContent = msg.content.find(
+      (c): c is { type: 'text'; text: string } =>
+        typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c
     );
     if (textContent?.text) {
       return `assistant:text:${textContent.text.substring(0, 100)}`;
     }
   }
-  
+
   if (msg.role === 'tool' && Array.isArray(msg.content)) {
     const toolResultIds = msg.content
-      .filter((c): c is { type: 'tool-result'; toolCallId: string } =>
-        typeof c === 'object' && 
-        c !== null && 
-        'type' in c && 
-        c.type === 'tool-result' && 
-        'toolCallId' in c
+      .filter(
+        (c): c is { type: 'tool-result'; toolCallId: string } =>
+          typeof c === 'object' &&
+          c !== null &&
+          'type' in c &&
+          c.type === 'tool-result' &&
+          'toolCallId' in c
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
@@ -52,24 +54,26 @@ function createMessageKey(msg: CoreMessage): string {
       return `tool:results:${toolResultIds}`;
     }
   }
-  
+
   if (msg.role === 'user') {
-    const text = typeof msg.content === 'string' 
-      ? msg.content 
-      : Array.isArray(msg.content) && msg.content[0] && 
-        typeof msg.content[0] === 'object' && 
-        'text' in msg.content[0]
-        ? (msg.content[0] as { text?: string }).text || ''
-        : '';
-    
+    const text =
+      typeof msg.content === 'string'
+        ? msg.content
+        : Array.isArray(msg.content) &&
+            msg.content[0] &&
+            typeof msg.content[0] === 'object' &&
+            'text' in msg.content[0]
+          ? (msg.content[0] as { text?: string }).text || ''
+          : '';
+
     let hash = 0;
     for (let i = 0; i < Math.min(text.length, 200); i++) {
-      hash = ((hash << 5) - hash) + text.charCodeAt(i);
+      hash = (hash << 5) - hash + text.charCodeAt(i);
       hash = hash & hash;
     }
     return `user:${hash}`;
   }
-  
+
   return `${msg.role}:${Date.now()}`;
 }
 
@@ -93,17 +97,21 @@ describe('Message Deduplication Performance', () => {
     const largeYamlContent = 'a'.repeat(10000); // 10KB of content
     const message: CoreMessage = {
       role: 'assistant',
-      content: [{
-        type: 'tool-call',
-        toolCallId: 'call_123',
-        toolName: 'createMetrics',
-        args: {
-          files: [{
-            name: 'revenue.yml',
-            yml_content: largeYamlContent
-          }]
-        }
-      }]
+      content: [
+        {
+          type: 'tool-call',
+          toolCallId: 'call_123',
+          toolName: 'createMetrics',
+          args: {
+            files: [
+              {
+                name: 'revenue.yml',
+                yml_content: largeYamlContent,
+              },
+            ],
+          },
+        },
+      ],
     };
 
     const start = performance.now();
@@ -118,31 +126,37 @@ describe('Message Deduplication Performance', () => {
     const messages: CoreMessage[] = [
       {
         role: 'assistant',
-        content: [{
-          type: 'tool-call',
-          toolCallId: 'call_123',
-          toolName: 'createMetrics',
-          args: { files: [] }
-        }]
+        content: [
+          {
+            type: 'tool-call',
+            toolCallId: 'call_123',
+            toolName: 'createMetrics',
+            args: { files: [] },
+          },
+        ],
       },
       {
         role: 'assistant',
-        content: [{
-          type: 'tool-call',
-          toolCallId: 'call_123',
-          toolName: 'createMetrics',
-          args: { files: [] }
-        }]
+        content: [
+          {
+            type: 'tool-call',
+            toolCallId: 'call_123',
+            toolName: 'createMetrics',
+            args: { files: [] },
+          },
+        ],
       },
       {
         role: 'assistant',
-        content: [{
-          type: 'tool-call',
-          toolCallId: 'call_456',
-          toolName: 'createDashboards',
-          args: { files: [] }
-        }]
-      }
+        content: [
+          {
+            type: 'tool-call',
+            toolCallId: 'call_456',
+            toolName: 'createDashboards',
+            args: { files: [] },
+          },
+        ],
+      },
     ];
 
     const deduplicated = deduplicateMessages(messages);
@@ -155,22 +169,26 @@ describe('Message Deduplication Performance', () => {
     const messages: CoreMessage[] = [
       {
         role: 'tool',
-        content: [{
-          type: 'tool-result',
-          toolCallId: 'call_123',
-          toolName: 'createMetrics',
-          result: { success: true }
-        }]
+        content: [
+          {
+            type: 'tool-result',
+            toolCallId: 'call_123',
+            toolName: 'createMetrics',
+            result: { success: true },
+          },
+        ],
       },
       {
         role: 'tool',
-        content: [{
-          type: 'tool-result',
-          toolCallId: 'call_123',
-          toolName: 'createMetrics',
-          result: { success: true }
-        }]
-      }
+        content: [
+          {
+            type: 'tool-result',
+            toolCallId: 'call_123',
+            toolName: 'createMetrics',
+            result: { success: true },
+          },
+        ],
+      },
     ];
 
     const deduplicated = deduplicateMessages(messages);
@@ -182,7 +200,7 @@ describe('Message Deduplication Performance', () => {
     const messages: CoreMessage[] = [
       { role: 'user', content: longUserMessage },
       { role: 'user', content: longUserMessage },
-      { role: 'user', content: 'Different message' }
+      { role: 'user', content: 'Different message' },
     ];
 
     const start = performance.now();
@@ -197,25 +215,31 @@ describe('Message Deduplication Performance', () => {
     const messages: CoreMessage[] = [
       {
         role: 'assistant',
-        content: [{
-          type: 'text',
-          text: 'This is a response with some analysis about the data...'
-        }]
+        content: [
+          {
+            type: 'text',
+            text: 'This is a response with some analysis about the data...',
+          },
+        ],
       },
       {
         role: 'assistant',
-        content: [{
-          type: 'text',
-          text: 'This is a response with some analysis about the data...'
-        }]
+        content: [
+          {
+            type: 'text',
+            text: 'This is a response with some analysis about the data...',
+          },
+        ],
       },
       {
         role: 'assistant',
-        content: [{
-          type: 'text',
-          text: 'This is a different response...'
-        }]
-      }
+        content: [
+          {
+            type: 'text',
+            text: 'This is a different response...',
+          },
+        ],
+      },
     ];
 
     const deduplicated = deduplicateMessages(messages);
@@ -224,33 +248,37 @@ describe('Message Deduplication Performance', () => {
 
   it('should process large message arrays efficiently', () => {
     const messages: CoreMessage[] = [];
-    
+
     // Create 1000 messages with various duplicates
     for (let i = 0; i < 1000; i++) {
       if (i % 3 === 0) {
         messages.push({
           role: 'user',
-          content: `Question ${Math.floor(i / 10)}`
+          content: `Question ${Math.floor(i / 10)}`,
         });
       } else if (i % 3 === 1) {
         messages.push({
           role: 'assistant',
-          content: [{
-            type: 'tool-call',
-            toolCallId: `call_${Math.floor(i / 5)}`,
-            toolName: 'createMetrics',
-            args: { files: [] }
-          }]
+          content: [
+            {
+              type: 'tool-call',
+              toolCallId: `call_${Math.floor(i / 5)}`,
+              toolName: 'createMetrics',
+              args: { files: [] },
+            },
+          ],
         });
       } else {
         messages.push({
           role: 'tool',
-          content: [{
-            type: 'tool-result',
-            toolCallId: `call_${Math.floor(i / 5)}`,
-            toolName: 'createMetrics',
-            result: { success: true }
-          }]
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: `call_${Math.floor(i / 5)}`,
+              toolName: 'createMetrics',
+              result: { success: true },
+            },
+          ],
         });
       }
     }
@@ -273,9 +301,9 @@ describe('Message Deduplication Performance', () => {
             type: 'tool-call',
             toolCallId: 'call_789',
             toolName: 'executeSql',
-            args: { sql: 'SELECT * FROM users' }
-          }
-        ]
+            args: { sql: 'SELECT * FROM users' },
+          },
+        ],
       },
       {
         role: 'assistant',
@@ -285,10 +313,10 @@ describe('Message Deduplication Performance', () => {
             type: 'tool-call',
             toolCallId: 'call_789',
             toolName: 'executeSql',
-            args: { sql: 'SELECT * FROM users' }
-          }
-        ]
-      }
+            args: { sql: 'SELECT * FROM users' },
+          },
+        ],
+      },
     ];
 
     const deduplicated = deduplicateMessages(messages);

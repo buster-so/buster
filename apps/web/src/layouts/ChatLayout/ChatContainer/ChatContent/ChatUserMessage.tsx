@@ -35,9 +35,9 @@ export const ChatUserMessage: React.FC<{
     //I do not know why this is needed, but it is...
     if (e?.clipboardData) {
       e.preventDefault();
-      e.clipboardData.setData('text/plain', request);
+      e.clipboardData.setData('text/plain', request || '');
     } else {
-      navigator.clipboard.writeText(request);
+      navigator.clipboard.writeText(request || '');
     }
     openSuccessMessage('Copied to clipboard');
   });
@@ -127,7 +127,7 @@ const EditMessage: React.FC<{
   messageId: string;
   chatId: string;
 }> = React.memo(({ requestMessage, onSetIsEditing, messageId, chatId }) => {
-  const [prompt, setPrompt] = useState(requestMessage.request);
+  const [prompt, setPrompt] = useState(requestMessage.request || '');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const onReplaceMessageInChat = useBusterNewChatContextSelector((x) => x.onReplaceMessageInChat);
 
@@ -135,7 +135,7 @@ const EditMessage: React.FC<{
     onReplaceMessageInChat({
       chatId,
       messageId,
-      prompt
+      prompt: prompt || ''
     });
     onSetIsEditing(false);
   });
