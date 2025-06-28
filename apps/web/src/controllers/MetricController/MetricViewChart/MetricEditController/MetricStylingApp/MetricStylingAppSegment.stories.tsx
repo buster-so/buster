@@ -24,7 +24,7 @@ const meta: Meta<typeof MetricStylingAppSegment> = {
     },
     selectedChartType: {
       control: 'select',
-      options: Object.values(ChartType),
+      options: ['line', 'bar', 'scatter', 'pie', 'table', 'combo', 'metric'],
       description: 'The type of chart currently selected'
     },
     className: {

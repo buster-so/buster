@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react';
-import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
+import { ChartType, ChartTypeSchema } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { DEFAULT_CHART_CONFIG } from '../../../../api/asset_interfaces/metric/defaults';
 import { BusterChart } from '../BusterChart';
 
@@ -22,7 +22,7 @@ export const sharedMeta: Partial<Meta<typeof BusterChart>> = {
       control: 'select',
       description: 'The type of chart to display.',
       defaultValue: 'table',
-      options: Object.values(ChartType)
+      options: ['line', 'bar', 'scatter', 'pie', 'table', 'combo', 'metric']
     },
     xAxisTimeInterval: {
       control: 'select',
