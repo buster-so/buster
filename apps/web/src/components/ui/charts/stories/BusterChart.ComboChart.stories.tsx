@@ -493,3 +493,577 @@ export const MultipleY2Axes: Story = {
     className: 'w-[600px] h-[400px]'
   }
 };
+
+export const ProblematicData: Story = {
+  args: {
+    selectedChartType: ChartType.Combo,
+    columnLabelFormats: {
+      quarter_date: {
+        columnType: 'date',
+        style: 'date',
+        numberSeparatorStyle: null,
+        replaceMissingDataWith: null,
+        dateFormat: '[Q]Q YYYY'
+      },
+      discount_percentage: {
+        columnType: 'number',
+        style: 'percent',
+        numberSeparatorStyle: ',',
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+        multiplier: 1,
+        replaceMissingDataWith: 0
+      },
+      orders_with_discount: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ',',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        replaceMissingDataWith: 0
+      },
+      metric_discountimpact: {
+        columnType: 'number',
+        style: 'currency',
+        numberSeparatorStyle: ',',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        replaceMissingDataWith: 0
+      }
+    },
+    columnSettings: {
+      orders_with_discount: {
+        columnVisualization: 'line'
+      },
+      metric_discountimpact: {
+        columnVisualization: 'bar'
+      }
+    },
+    comboChartAxis: {
+      x: ['quarter_date'],
+      y: ['metric_discountimpact', 'orders_with_discount']
+    },
+    columnMetadata: [
+      {
+        name: 'quarter_date',
+        min_value: '2024-07-01T00:00:00.000Z',
+        max_value: '2024-07-01T00:00:00.000Z',
+        unique_values: 25,
+        simple_type: 'date',
+        type: 'timestamp'
+      },
+      {
+        name: 'metric_discountimpact',
+        min_value: '1653.212913',
+        max_value: '6048.739098',
+        unique_values: 3,
+        simple_type: 'number',
+        type: 'varchar'
+      },
+      {
+        name: 'discount_percentage',
+        min_value: '12.52582055274268390000',
+        max_value: '6.58349064266693910000',
+        unique_values: 3,
+        simple_type: 'number',
+        type: 'varchar'
+      },
+      {
+        name: 'orders_with_discount',
+        min_value: '2041-01-01T00:00:00.000Z',
+        max_value: '2041-01-01T00:00:00.000Z',
+        unique_values: 3,
+        simple_type: 'date',
+        type: 'timestamp'
+      }
+    ],
+    data: [
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 41
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 20
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 6.5834906426669395,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 4.967794772304576,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 6048.739098,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 1653.212913,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-07-01T00:00:00Z',
+        metric_discountimpact: 2670.398499,
+        discount_percentage: 12.525820552742683,
+        orders_with_discount: 14
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 26
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 35
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 27.991876058496533,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 19.991085064273747,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 2546.479147,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 7383.92633,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2024-10-01T00:00:00Z',
+        metric_discountimpact: 14031.083896,
+        discount_percentage: 5.950496717114561,
+        orders_with_discount: 56
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 0,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 0,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 49
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 0,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 12939.203262,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 0
+      },
+      {
+        quarter_date: '2025-01-01T00:00:00Z',
+        metric_discountimpact: 0,
+        discount_percentage: 24.612962860152674,
+        orders_with_discount: 0
+      }
+    ]
+  }
+};

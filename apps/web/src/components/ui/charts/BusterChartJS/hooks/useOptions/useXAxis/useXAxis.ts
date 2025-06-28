@@ -3,12 +3,16 @@ import { Chart as ChartJS } from 'chart.js';
 import isDate from 'lodash/isDate';
 import { useMemo } from 'react';
 import type { DeepPartial } from 'utility-types';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import {
+  DEFAULT_COLUMN_LABEL_FORMAT,
+  DEFAULT_COLUMN_SETTINGS
+} from '@/api/asset_interfaces/metric';
 import {
   type BusterChartConfigProps,
   type BusterChartProps,
   type ChartEncodes,
   ChartType,
+  type ColumnSettings,
   type ComboChartAxis,
   type IColumnLabelFormat,
   type XAxisConfig
@@ -67,6 +71,15 @@ export const useXAxis = ({
     }, {});
   }, [selectedAxis.x, columnLabelFormats, isSupportedType]);
 
+  const yAxisColumnSettings = useMemo(() => {
+    if (!isSupportedType || !columnSettings) return {};
+
+    return selectedAxis.y.reduce<Record<string, ColumnSettings>>((acc, x) => {
+      acc[x] = columnSettings[x] || DEFAULT_COLUMN_SETTINGS;
+      return acc;
+    }, {});
+  }, [selectedAxis.y, columnSettings]);
+
   const firstXColumnLabelFormat = useMemo(() => {
     if (isScatterChart) {
       return {
@@ -90,8 +103,11 @@ export const useXAxis = ({
   const type: DeepPartial<ScaleChartOptions<'bar'>['scales']['x']['type']> = useMemo(() => {
     const xAxisKeys = Object.keys(xAxisColumnFormats);
     const xAxisKeysLength = xAxisKeys.length;
+    const hasBarChart = Object.values(yAxisColumnSettings).some(
+      (y) => y.columnVisualization === 'bar'
+    );
 
-    if (xAxisKeysLength === 1) {
+    if (xAxisKeysLength === 1 && !hasBarChart) {
       const xIsDate = firstXColumnLabelFormat.columnType === 'date';
 
       if ((isLineChart || isScatterChart) && xIsDate) {
