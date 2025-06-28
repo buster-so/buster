@@ -95,6 +95,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private readonly MAX_QUEUED_SAVES = 3;
   private deferDoneToolResponse = false; // Whether to defer doneTool response handling
   private pendingDoneToolEntry: ResponseEntry | null = null; // Track pending doneTool entry
+  private sqlExecutionStartTimes = new Map<string, number>(); // Track SQL execution start times
 
   // Reactive file selection state
   private currentFileSelection: {
@@ -339,6 +340,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       this.state.hasFinishingTool = true;
       this.state.finishedToolName = chunk.toolName;
     }
+
+    // Track SQL execution start time
+    if (['executeSql', 'execute-sql'].includes(chunk.toolName)) {
+      this.sqlExecutionStartTimes.set(chunk.toolCallId, Date.now());
+    }
   }
 
   private handleToolCallStart(chunk: TextStreamPart<T>) {
@@ -418,10 +424,10 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       // File-based tools get special handling - create empty entry that will be populated
       const fileToolTitles: Record<string, string> = {
-        createMetrics: 'Creating metrics...',
-        'create-metrics-file': 'Creating metrics...',
-        createDashboards: 'Creating dashboards...',
-        'create-dashboards-file': 'Creating dashboards...',
+        createMetrics: 'Building new metrics...',
+        'create-metrics-file': 'Building new metrics...',
+        createDashboards: 'Building new dashboards...',
+        'create-dashboards-file': 'Building new dashboards...',
         modifyMetrics: 'Modifying metrics...',
         'modify-metrics-file': 'Modifying metrics...',
         modifyDashboards: 'Modifying dashboards...',
@@ -796,6 +802,58 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Type-safe update of status
       if (hasStatus(entry)) {
         entry.status = status;
+      }
+
+      // Update title based on completion status
+      if ('title' in entry && toolName && (status === 'completed' || status === 'failed')) {
+        const typedEntry = entry as ReasoningEntry & { title: string };
+
+        switch (toolName) {
+          case 'sequentialThinking':
+          case 'sequential-thinking':
+            typedEntry.title = 'Thought for a few seconds';
+            break;
+
+          case 'createTodoList':
+          case 'create_todo_item':
+            typedEntry.title = 'Broke down your request';
+            break;
+
+          case 'executeSql':
+          case 'execute-sql':
+            // Count the number of queries
+            if (entry.type === 'files' && entry.files) {
+              const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids || [];
+              if (fileIds.length > 0) {
+                const fileId = fileIds[0];
+                if (fileId) {
+                  const file = entry.files[fileId];
+                  if (file && typeof file === 'object' && 'file' in file) {
+                    const fileObj = file as { file?: { text?: string } };
+                    const text = fileObj.file?.text || '';
+                    // Count lines that start with "  - " (YAML list items)
+                    const queryCount = (text.match(/^ {2}- /gm) || []).length;
+                    if (queryCount > 0) {
+                      typedEntry.title = `Generated ${queryCount} validation ${queryCount === 1 ? 'query' : 'queries'}`;
+                    }
+                  }
+                }
+              }
+            }
+            break;
+
+          case 'createMetrics':
+          case 'create-metrics-file':
+          case 'createDashboards':
+          case 'create-dashboards-file':
+          case 'modifyMetrics':
+          case 'modify-metrics-file':
+          case 'modifyDashboards':
+          case 'modify-dashboards-file':
+            // These are handled in updateFileIdsAndStatusFromToolResult
+            // which has access to the actual success/failure counts
+            break;
+        }
       }
 
       // For file creation tools, DON'T update individual file statuses here
@@ -1178,7 +1236,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           return {
             id: toolCallId,
             type: 'text',
-            title: 'Thinking...',
+            title: 'Thinking it through...',
             status: 'loading',
             message: normalizeEscapedText(args.thought),
             message_chunk: undefined,
@@ -1195,7 +1253,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           return {
             id: toolCallId,
             type: 'files',
-            title: 'Creating metrics...',
+            title: 'Building new metrics...',
             status: 'loading',
             secondary_title: undefined,
             file_ids: [],
@@ -1254,7 +1312,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             files[fileId] = {
               id: fileId,
               file_type: 'agent-action',
-              file_name: 'SQL Statements',
+              file_name: 'Validation Queries',
               version_number: 1,
               status: 'loading',
               file: {
@@ -1265,7 +1323,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             return {
               id: toolCallId,
               type: 'files',
-              title: 'Executing SQL',
+              title: 'Generating validation queries...',
               status: 'loading',
               secondary_title: undefined,
               file_ids: [fileId],
@@ -1283,7 +1341,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           return {
             id: toolCallId,
             type: 'files',
-            title: 'Creating dashboards...',
+            title: 'Building new dashboards...',
             status: 'loading',
             secondary_title: undefined,
             file_ids: [],
@@ -1348,7 +1406,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         return {
           id: toolCallId,
           type: 'files',
-          title: 'TODO List',
+          title: 'Breaking down your request...',
           status: 'loading',
           secondary_title: undefined,
           file_ids: [fileId],
@@ -1356,7 +1414,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             [fileId]: {
               id: fileId,
               file_type: 'agent-action',
-              file_name: 'todos',
+              file_name: 'TODO list',
               version_number: 1,
               status: 'loading',
               file: {
@@ -1572,7 +1630,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       }
 
       const file = entry.files[fileId];
-      if (!file?.file) {
+      if (!file || typeof file !== 'object') {
         return;
       }
 
@@ -1617,9 +1675,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         return;
       }
 
-      // Format results as YAML and append to existing content
-      const currentContent = file.file.text || '';
-      let resultsYaml = '\n\nresults:';
+      // Create results as YAML
+      let resultsYaml = 'results:';
 
       for (const result of results) {
         resultsYaml += `\n  - status: ${result.status}`;
@@ -1638,8 +1695,59 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
       }
 
-      // Update the file content
-      file.file.text = currentContent + resultsYaml;
+      // Count successful and failed queries
+      const successCount = results.filter(r => r.status === 'success').length;
+      const failedCount = results.filter(r => r.status === 'error').length;
+      
+      // Build the title with success/failure counts
+      let title = '';
+      if (failedCount > 0) {
+        title = `Ran ${successCount} validation ${successCount === 1 ? 'query' : 'queries'}, ${failedCount} failed`;
+      } else {
+        title = `Ran ${results.length} validation ${results.length === 1 ? 'query' : 'queries'}`;
+      }
+
+      // Calculate execution time
+      let secondaryTitle: string | undefined;
+      const startTime = this.sqlExecutionStartTimes.get(toolCallId);
+      if (startTime) {
+        const executionTime = Date.now() - startTime;
+        const seconds = executionTime / 1000;
+        if (seconds >= 60) {
+          const minutes = Math.round(seconds / 60);
+          secondaryTitle = `${minutes}m`;
+        } else {
+          secondaryTitle = `${seconds.toFixed(1)}s`;
+        }
+        // Clean up the start time
+        this.sqlExecutionStartTimes.delete(toolCallId);
+      }
+
+      // Create a new reasoning entry for the results
+      const resultsFileId = crypto.randomUUID();
+      const resultsEntry: ReasoningEntry = {
+        id: `${toolCallId}-results`,
+        type: 'files',
+        title,
+        status: 'completed',
+        secondary_title: secondaryTitle,
+        file_ids: [resultsFileId],
+        files: {
+          [resultsFileId]: {
+            id: resultsFileId,
+            file_type: 'agent-action',
+            file_name: 'Query Results',
+            version_number: 1,
+            status: 'completed',
+            file: {
+              text: resultsYaml,
+            },
+          },
+        },
+      } as ReasoningEntry;
+
+      // Add the new reasoning entry for results
+      this.state.reasoningHistory.push(resultsEntry);
     } catch (error) {
       console.error('Error updating SQL file with results:', {
         toolCallId,
@@ -1783,6 +1891,64 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Update the entry with the new file IDs and files
       typedEntry.file_ids = updatedFileIds;
       typedEntry.files = updatedFiles;
+
+      // Update title based on success/failure counts
+      if ('title' in entry) {
+        const successCount = successfulFiles.length;
+        const failedCount = failedFilesByName.size;
+        const toolName = this.state.toolCallsInProgress.get(toolCallId)?.toolName;
+
+        if (toolName) {
+          let newTitle = '';
+          let entityName = '';
+
+          switch (toolName) {
+            case 'createMetrics':
+            case 'create-metrics-file':
+              entityName = successCount === 1 ? 'metric' : 'metrics';
+              if (failedCount > 0) {
+                newTitle = `Created ${successCount} ${entityName}, ${failedCount} failed`;
+              } else {
+                newTitle = `Created ${successCount} ${entityName}`;
+              }
+              break;
+
+            case 'createDashboards':
+            case 'create-dashboards-file':
+              entityName = successCount === 1 ? 'dashboard' : 'dashboards';
+              if (failedCount > 0) {
+                newTitle = `Created ${successCount} ${entityName}, ${failedCount} failed`;
+              } else {
+                newTitle = `Created ${successCount} ${entityName}`;
+              }
+              break;
+
+            case 'modifyMetrics':
+            case 'modify-metrics-file':
+              entityName = successCount === 1 ? 'metric' : 'metrics';
+              if (failedCount > 0) {
+                newTitle = `Modified ${successCount} ${entityName}, ${failedCount} failed`;
+              } else {
+                newTitle = `Modified ${successCount} ${entityName}`;
+              }
+              break;
+
+            case 'modifyDashboards':
+            case 'modify-dashboards-file':
+              entityName = successCount === 1 ? 'dashboard' : 'dashboards';
+              if (failedCount > 0) {
+                newTitle = `Modified ${successCount} ${entityName}, ${failedCount} failed`;
+              } else {
+                newTitle = `Modified ${successCount} ${entityName}`;
+              }
+              break;
+          }
+
+          if (newTitle) {
+            (entry as ReasoningEntry & { title: string }).title = newTitle;
+          }
+        }
+      }
 
       // After updating file statuses, re-evaluate file selection
       this.updateFileSelection();
