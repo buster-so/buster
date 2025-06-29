@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import type { BusterChartLegendItem } from './interfaces';
 import { useBusterChartLegend } from './useBusterChartLegend';
+import type { ChartEncodes } from '@/api/asset_interfaces';
 
 describe('useBusterChartLegend', () => {
   const defaultProps = {
@@ -16,8 +17,8 @@ describe('useBusterChartLegend', () => {
       x: ['timestamp'],
       y: ['value1', 'value2'],
       y2: ['value3']
-    }
-  };
+    } as ChartEncodes
+  } as Parameters<typeof useBusterChartLegend>[0];
 
   it('should initialize with default values', () => {
     const { result } = renderHook(() => useBusterChartLegend(defaultProps));
@@ -34,7 +35,7 @@ describe('useBusterChartLegend', () => {
     const props = {
       ...defaultProps,
       selectedChartType: 'metric'
-    };
+    } as Parameters<typeof useBusterChartLegend>[0];
 
     const { result } = renderHook(() => useBusterChartLegend(props));
     expect(result.current.renderLegend).toBe(false);
@@ -55,7 +56,7 @@ describe('useBusterChartLegend', () => {
       ...defaultProps,
       selectedChartType: 'bar',
       barGroupType: 'percentage-stack' as const
-    };
+    } as Parameters<typeof useBusterChartLegend>[0];
 
     const { result } = renderHook(() => useBusterChartLegend(props));
     expect(result.current.isStackPercentage).toBe(true);
@@ -107,8 +108,8 @@ describe('useBusterChartLegend', () => {
       selectedAxis: {
         ...defaultProps.selectedAxis,
         y: ['newValue1', 'newValue2']
-      }
-    };
+      } as ChartEncodes
+    } as Parameters<typeof useBusterChartLegend>[0];
 
     rerender(newProps);
 

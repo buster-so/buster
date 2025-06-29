@@ -6,7 +6,7 @@ import type { LoopTrendline } from './EditTrendline';
 interface TrendlineAggregateAllCategoriesProps {
   trend: LoopTrendline;
   onUpdateExistingTrendline: (trend: LoopTrendline) => void;
-  categoryEncodes: string[] | undefined;
+  categoryEncodes: string[] | null | undefined;
 }
 
 export const TrendlineAggregateAllCategories: React.FC<TrendlineAggregateAllCategoriesProps> =

@@ -102,8 +102,8 @@ export const WithDynamicHeaders: Story = {
   args: {
     data: [{ count: 42, category: 'Active Users', date: '2024-03-15' }],
     metricColumnId: 'count',
-    metricHeader: { columnId: 'category', useValue: true },
-    metricSubHeader: { columnId: 'date', useValue: true },
+    metricHeader: { columnId: 'category', useValue: true, aggregate: 'sum' },
+    metricSubHeader: { columnId: 'date', useValue: true, aggregate: 'sum' },
     columnLabelFormats: {
       count: {
         columnType: 'number',

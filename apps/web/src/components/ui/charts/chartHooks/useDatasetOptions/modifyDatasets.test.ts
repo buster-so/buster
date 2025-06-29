@@ -61,7 +61,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -76,7 +76,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -93,7 +93,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -126,7 +126,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -144,7 +144,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -164,7 +164,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -208,7 +208,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -250,7 +250,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -267,7 +267,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -292,7 +292,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -316,7 +316,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -433,7 +433,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -488,7 +488,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -609,7 +609,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -712,7 +712,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -809,7 +809,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -923,7 +923,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1038,7 +1038,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1116,7 +1116,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1188,7 +1188,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1270,7 +1270,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: 'value',
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1294,7 +1294,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: 'key',
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1319,7 +1319,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: null,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1347,7 +1347,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: 'value',
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'pie'
     });
 
@@ -1396,7 +1396,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1426,7 +1426,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1517,7 +1517,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1589,7 +1589,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1649,7 +1649,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1713,7 +1713,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc', 'desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1779,7 +1779,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1816,7 +1816,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['none', 'desc'], // First one is 'none', should use 'desc'
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1845,7 +1845,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc', 'none'], // First one is 'desc', should use that
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1897,7 +1897,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -1962,7 +1962,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -2015,7 +2015,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -2050,7 +2050,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 
@@ -2087,7 +2087,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
+      lineGroupType: null,
       selectedChartType: 'bar'
     });
 

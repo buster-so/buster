@@ -103,14 +103,14 @@ export const useXAxis = ({
   const type: DeepPartial<ScaleChartOptions<'bar'>['scales']['x']['type']> = useMemo(() => {
     const xAxisKeys = Object.keys(xAxisColumnFormats);
     const xAxisKeysLength = xAxisKeys.length;
-    const hasBarChart = Object.values(yAxisColumnSettings).some(
-      (y) => y.columnVisualization === 'bar'
-    );
 
-    if (xAxisKeysLength === 1 && !hasBarChart) {
+    if (xAxisKeysLength === 1) {
       const xIsDate = firstXColumnLabelFormat.columnType === 'date';
+      const comboChartAndhasBarChart =
+        isComboChart &&
+        Object.values(yAxisColumnSettings).some((y) => y.columnVisualization === 'bar');
 
-      if ((isLineChart || isScatterChart) && xIsDate) {
+      if ((isLineChart || isScatterChart) && xIsDate && !comboChartAndhasBarChart) {
         return 'time';
       }
 

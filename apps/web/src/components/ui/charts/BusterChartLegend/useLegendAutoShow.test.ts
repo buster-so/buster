@@ -8,10 +8,10 @@ type ChartType = BusterChartProps['selectedChartType'];
 describe('useLegendAutoShow', () => {
   const defaultProps = {
     selectedChartType: 'line' as ChartType,
-    showLegendProp: undefined,
+    showLegendProp: null,
     categoryAxisColumnNames: undefined,
     allYAxisColumnNames: [] as string[]
-  };
+  } as Parameters<typeof useLegendAutoShow>[0];
 
   it('should return false for unsupported chart types', () => {
     const { result } = renderHook(() =>

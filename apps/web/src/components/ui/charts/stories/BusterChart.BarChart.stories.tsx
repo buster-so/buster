@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import type { BarAndLineAxis } from '@/api/asset_interfaces/metric';
+import {
+  DEFAULT_COLUMN_SETTINGS,
+  type BarAndLineAxis,
+  type Trendline
+} from '@/api/asset_interfaces/metric';
 import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { generateBarChartData } from '../../../../mocks/chart/chartMocks';
@@ -58,7 +62,8 @@ export const Default: Story = {
     barAndLineAxis: {
       x: ['category'],
       y: ['sales', 'units', 'returns'],
-      category: []
+      category: [],
+      tooltip: null
     },
     columnLabelFormats: {
       category: {
@@ -99,7 +104,8 @@ export const MultipleYAxis: Story = {
     barAndLineAxis: {
       x: ['category'],
       y: ['sales', 'units'],
-      category: []
+      category: [],
+      tooltip: null
     } satisfies BarAndLineAxis,
     columnLabelFormats: {
       category: {
@@ -336,10 +342,12 @@ export const WithDataLabels: Story = {
     },
     columnSettings: {
       sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true,
         showDataLabelsAsPercentage: false
       },
       units: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true,
         showDataLabelsAsPercentage: false
       }
@@ -388,10 +396,12 @@ export const WithDataLabelsAndStackTotal: Story = {
     barShowTotalAtTop: true,
     columnSettings: {
       sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true,
         showDataLabelsAsPercentage: false
       },
       units: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true,
         showDataLabelsAsPercentage: false
       }
@@ -439,10 +449,12 @@ export const WithDataLabelAsPercentageInStackedBar: Story = {
     columnSettings: {
       ...WithDataLabelsAndStackTotal.args!.columnSettings,
       units: {
+        ...DEFAULT_COLUMN_SETTINGS,
         ...WithDataLabelsAndStackTotal.args!.columnSettings!.units,
         showDataLabelsAsPercentage: true
       },
       sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
         ...WithDataLabelsAndStackTotal.args!.columnSettings!.sales,
         showDataLabelsAsPercentage: false
       }
@@ -759,12 +771,15 @@ export const PercentageStackedBar: Story = {
     barGroupType: 'percentage-stack',
     columnSettings: {
       sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true
       },
       units: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true
       },
       returns: {
+        ...DEFAULT_COLUMN_SETTINGS,
         showDataLabels: true
       }
     },
@@ -902,19 +917,23 @@ export const ManyUnPlottedTooltipItems: Story = {
     },
     columnSettings: {
       sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       customerRating: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 6,
         lineWidth: 2
       },
       stockLevel: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
       },
       returnRate: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
@@ -1077,7 +1096,7 @@ export const WithTrendlines: Story = {
         trendlineLabel: 'Testing Max',
         trendLineColor: 'red',
         columnId: 'sales'
-      },
+      } as Trendline,
       {
         type: 'min',
         show: true,
@@ -1085,7 +1104,7 @@ export const WithTrendlines: Story = {
         trendlineLabel: 'Testing Min',
         trendLineColor: 'blue',
         columnId: 'sales'
-      },
+      } as Trendline,
       {
         type: 'average',
         show: true,
@@ -1093,7 +1112,7 @@ export const WithTrendlines: Story = {
         trendlineLabel: 'Testing Average',
         trendLineColor: 'green',
         columnId: 'sales'
-      },
+      } as Trendline,
       {
         type: 'median',
         show: true,
@@ -1101,7 +1120,7 @@ export const WithTrendlines: Story = {
         trendlineLabel: 'Testing Median',
         trendLineColor: 'yellow',
         columnId: 'sales'
-      }
+      } as Trendline
     ]
   }
 };

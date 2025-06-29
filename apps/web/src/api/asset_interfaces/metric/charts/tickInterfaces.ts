@@ -5,15 +5,15 @@ import { z } from 'zod/v4';
  */
 export const YAxisConfigSchema = z.object({
   // Whether to show the axis label. Defaults to true.
-  yAxisShowAxisLabel: z.boolean().default(true).optional(),
+  yAxisShowAxisLabel: z.boolean().default(true),
   // Whether to show the axis title. Defaults to true.
-  yAxisShowAxisTitle: z.boolean().default(true).optional(),
+  yAxisShowAxisTitle: z.boolean().default(true),
   // The title of the Y-axis. @default null - Uses the name of the first column plotted on the Y-axis
-  yAxisAxisTitle: z.nullable(z.string()).default(null).optional(),
+  yAxisAxisTitle: z.nullable(z.string()).default(null),
   // Whether to start the axis at zero. Defaults to null.
-  yAxisStartAxisAtZero: z.nullable(z.boolean()).default(null).optional(),
+  yAxisStartAxisAtZero: z.nullable(z.boolean()).default(null),
   // The scale type for the Y-axis. @default "linear"
-  yAxisScaleType: z.enum(['log', 'linear']).default('linear').optional()
+  yAxisScaleType: z.enum(['log', 'linear']).default('linear')
 });
 
 //The y2 (or right axis) Y-axis is used for secondary Y-axes in a combo chart.
@@ -22,15 +22,15 @@ export const YAxisConfigSchema = z.object({
  */
 export const Y2AxisConfigSchema = z.object({
   // Whether to show the axis label. Defaults to true.
-  y2AxisShowAxisLabel: z.boolean().default(true).optional(),
+  y2AxisShowAxisLabel: z.boolean().default(true),
   // Whether to show the axis title. Defaults to true.
-  y2AxisShowAxisTitle: z.boolean().default(true).optional(),
+  y2AxisShowAxisTitle: z.boolean().default(true),
   // The title of the secondary Y-axis. @default null - Uses the name of the first column plotted on the Y2-axis
-  y2AxisAxisTitle: z.nullable(z.string()).default(null).optional(),
+  y2AxisAxisTitle: z.nullable(z.string()).default(null),
   // Whether to start the axis at zero. Defaults to true.
-  y2AxisStartAxisAtZero: z.boolean().default(true).optional(),
+  y2AxisStartAxisAtZero: z.boolean().default(true),
   // The scale type for the secondary Y-axis. @default "linear"
-  y2AxisScaleType: z.enum(['log', 'linear']).default('linear').optional()
+  y2AxisScaleType: z.enum(['log', 'linear']).default('linear')
 });
 
 /**
@@ -38,23 +38,19 @@ export const Y2AxisConfigSchema = z.object({
  */
 export const XAxisConfigSchema = z.object({
   // The time interval for the X-axis. Only applies to combo and line charts. @default null
-  xAxisTimeInterval: z
-    .nullable(z.enum(['day', 'week', 'month', 'quarter', 'year']))
-    .default(null)
-    .optional(),
+  xAxisTimeInterval: z.nullable(z.enum(['day', 'week', 'month', 'quarter', 'year'])).default(null),
   // Whether to show the axis label. Defaults to true.
-  xAxisShowAxisLabel: z.boolean().default(true).optional(),
+  xAxisShowAxisLabel: z.boolean().default(true),
   // Whether to show the axis title. Defaults to true.
-  xAxisShowAxisTitle: z.boolean().default(true).optional(),
+  xAxisShowAxisTitle: z.boolean().default(true),
   // The title of the X-axis. @default null - Uses a concatenation of all X columns applied to the axis
-  xAxisAxisTitle: z.nullable(z.string()).default(null).optional(),
+  xAxisAxisTitle: z.nullable(z.string()).default(null),
   // The rotation angle for the X-axis labels. @default "auto"
   xAxisLabelRotation: z
     .union([z.literal(0), z.literal(45), z.literal(90), z.literal('auto')])
-    .default('auto')
-    .optional(),
+    .default('auto'),
   // Whether to enable data zooming on the X-axis. Should only be set to true by the user. @default false
-  xAxisDataZoom: z.boolean().default(false).optional()
+  xAxisDataZoom: z.boolean().default(false)
 });
 
 //The category axis works differently than the other axes. It is used to color and group the data.
@@ -64,7 +60,7 @@ export const XAxisConfigSchema = z.object({
  */
 export const CategoryAxisStyleConfigSchema = z.object({
   // The title of the category axis. @default null
-  categoryAxisTitle: z.nullable(z.string()).default(null).optional()
+  categoryAxisTitle: z.nullable(z.string()).default(null)
 });
 
 // Export inferred types

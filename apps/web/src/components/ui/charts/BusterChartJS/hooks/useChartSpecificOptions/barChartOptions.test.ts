@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { barOptionsHandler, barPluginsHandler } from './barChartOptions';
 import type { ChartSpecificOptionsProps } from './interfaces';
+import type { ColumnSettings } from '@/api/asset_interfaces';
 
 type BarGroupType = 'stack' | 'group' | 'percentage-stack' | null;
 
@@ -45,10 +46,10 @@ describe('barPluginsHandler', () => {
     const mockProps = {
       ...baseMockProps,
       columnSettings: {
-        column1: { showDataLabelsAsPercentage: true },
-        column2: { showDataLabelsAsPercentage: false }
-      }
-    };
+        column1: { showDataLabelsAsPercentage: true } as ColumnSettings,
+        column2: { showDataLabelsAsPercentage: false } as ColumnSettings
+      } as ChartSpecificOptionsProps['columnSettings']
+    } as Parameters<typeof barPluginsHandler>[0];
 
     const result = barPluginsHandler(mockProps);
     expect(result).toEqual({
@@ -76,9 +77,9 @@ describe('barPluginsHandler', () => {
     const mockProps = {
       ...baseMockProps,
       columnSettings: {
-        column1: { showDataLabelsAsPercentage: false }
-      }
-    };
+        column1: { showDataLabelsAsPercentage: false } as ColumnSettings
+      } as ChartSpecificOptionsProps['columnSettings']
+    } as Parameters<typeof barPluginsHandler>[0];
 
     const result = barPluginsHandler(mockProps);
     expect(result).toEqual({

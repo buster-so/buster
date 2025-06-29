@@ -7,7 +7,7 @@ import { getLegendItems } from './getLegendItems';
 
 describe('getLegendItems', () => {
   const mockColors = ['#FF0000', '#00FF00', '#0000FF'];
-  const defaultColumnSettings: Record<string, ColumnSettings> = {
+  const defaultColumnSettings: Record<string, Partial<ColumnSettings>> = {
     value: { columnVisualization: 'bar' },
     value2: { columnVisualization: 'line' }
   };
@@ -30,7 +30,7 @@ describe('getLegendItems', () => {
       inactiveDatasets: {},
       selectedChartType: 'bar',
       columnLabelFormats: defaultColumnLabelFormats,
-      columnSettings: defaultColumnSettings
+      columnSettings: defaultColumnSettings as Record<string, ColumnSettings>
     });
 
     expect(result).toEqual([]);
@@ -59,7 +59,7 @@ describe('getLegendItems', () => {
       inactiveDatasets: {},
       selectedChartType: 'pie',
       columnLabelFormats: defaultColumnLabelFormats,
-      columnSettings: defaultColumnSettings
+      columnSettings: defaultColumnSettings as Record<string, ColumnSettings>
     });
 
     expect(result).toHaveLength(2);
@@ -106,7 +106,7 @@ describe('getLegendItems', () => {
       inactiveDatasets: {},
       selectedChartType: 'combo',
       columnLabelFormats: defaultColumnLabelFormats,
-      columnSettings: defaultColumnSettings
+      columnSettings: defaultColumnSettings as Record<string, ColumnSettings>
     });
 
     expect(result).toHaveLength(2);
@@ -142,7 +142,7 @@ describe('getLegendItems', () => {
 
     const customColumnSettings: Record<string, ColumnSettings> = {
       ...defaultColumnSettings,
-      value3: { columnVisualization: 'dot' }
+      value3: { columnVisualization: 'dot' } as ColumnSettings
     };
 
     const result = getLegendItems({
@@ -189,7 +189,7 @@ describe('getLegendItems', () => {
       inactiveDatasets: { 'Inactive Dataset': true },
       selectedChartType: 'bar',
       columnLabelFormats: defaultColumnLabelFormats,
-      columnSettings: defaultColumnSettings
+      columnSettings: defaultColumnSettings as Record<string, ColumnSettings>
     });
 
     expect(result).toHaveLength(2);
@@ -227,7 +227,7 @@ describe('getLegendItems', () => {
       inactiveDatasets: {},
       selectedChartType: 'pie',
       columnLabelFormats: defaultColumnLabelFormats,
-      columnSettings: defaultColumnSettings
+      columnSettings: defaultColumnSettings as Record<string, ColumnSettings>
     });
 
     expect(result).toHaveLength(4);
@@ -279,7 +279,7 @@ describe('getLegendItems', () => {
       inactiveDatasets: {},
       selectedChartType: 'bar',
       columnLabelFormats: defaultColumnLabelFormats,
-      columnSettings: defaultColumnSettings
+      columnSettings: defaultColumnSettings as Record<string, ColumnSettings>
     });
 
     expect(result).toHaveLength(5);

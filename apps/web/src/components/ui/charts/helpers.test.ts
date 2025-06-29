@@ -34,7 +34,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return false for Line chart when x and y axes are empty', () => {
-    const emptyAxis: ChartEncodes = { x: [], y: [] };
+    const emptyAxis: ChartEncodes = { x: [] as string[], y: [] as string[] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'line',
@@ -45,7 +45,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return false for Line chart when x axis is empty', () => {
-    const axisWithEmptyX: ChartEncodes = { x: [], y: ['value'] };
+    const axisWithEmptyX: ChartEncodes = { x: [] as string[], y: ['value'] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'line',
@@ -56,7 +56,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return false for Line chart when y axis is empty', () => {
-    const axisWithEmptyY: ChartEncodes = { x: ['time'], y: [] };
+    const axisWithEmptyY: ChartEncodes = { x: ['time'], y: [] as string[] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'line',
@@ -67,7 +67,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return true for Line chart when both x and y axes have values', () => {
-    const validAxis: ChartEncodes = { x: ['time'], y: ['value'] };
+    const validAxis: ChartEncodes = { x: ['time'], y: ['value'] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'line',
@@ -78,7 +78,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return true for Bar chart when both x and y axes have values', () => {
-    const validAxis: ChartEncodes = { x: ['category'], y: ['count'] };
+    const validAxis: ChartEncodes = { x: ['category'], y: ['count'] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'bar',
@@ -89,7 +89,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return true for Scatter chart when both x and y axes have values', () => {
-    const validAxis: ChartEncodes = { x: ['width'], y: ['height'] };
+    const validAxis: ChartEncodes = { x: ['width'], y: ['height'] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'scatter',
@@ -100,7 +100,7 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return true for Pie chart when both x and y axes have values', () => {
-    const validAxis: ChartEncodes = { x: ['label'], y: ['value'] };
+    const validAxis: ChartEncodes = { x: ['label'], y: ['value'] } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'pie',
@@ -111,7 +111,11 @@ describe('doesChartHaveValidAxis', () => {
   });
 
   it('should return true for Combo chart when both x and y axes have values', () => {
-    const validAxis: ChartEncodes = { x: ['date'], y: ['value1', 'value2'] };
+    const validAxis: ChartEncodes = {
+      x: ['date'],
+      y: ['value1', 'value2'],
+      category: []
+    } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({
         selectedChartType: 'combo',

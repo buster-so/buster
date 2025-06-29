@@ -76,16 +76,21 @@ const createMockChartConfig = (id: string): IBusterMetricChartConfig => {
     },
     pieChartAxis: {
       x: ['product'],
-      y: ['sales']
+      y: ['sales'],
+      tooltip: null
     },
     scatterAxis: {
       x: ['date'],
-      y: ['sales']
+      y: ['sales'],
+      category: [],
+      size: [],
+      tooltip: null
     },
     metricColumnId: 'sales',
     metricHeader: {
       columnId: 'sales',
-      useValue: false
+      useValue: false,
+      aggregate: 'sum'
     }
   };
 };

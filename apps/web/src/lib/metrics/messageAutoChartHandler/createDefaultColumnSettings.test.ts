@@ -57,7 +57,7 @@ describe('createDefaultColumnSettings', () => {
         showDataLabels: true,
         columnVisualization: 'line',
         lineType: 'smooth'
-      }
+      } as ColumnSettings
     };
 
     const result = createDefaultColumnSettings(existingColumnSettings, columnsMetaData);

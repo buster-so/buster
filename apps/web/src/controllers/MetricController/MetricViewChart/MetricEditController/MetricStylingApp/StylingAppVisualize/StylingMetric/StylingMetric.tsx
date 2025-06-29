@@ -176,7 +176,8 @@ const HeaderMetricStyling: React.FC<{
       const key = type === 'header' ? 'metricHeader' : 'metricSubHeader';
       const newConfig: DerivedMetricTitle = {
         columnId: config.metricColumnId,
-        useValue: true
+        useValue: true,
+        aggregate: 'sum'
       };
       if (config.metricValueAggregate) {
         newConfig.aggregate = config.metricValueAggregate;
@@ -190,7 +191,8 @@ const HeaderMetricStyling: React.FC<{
       const key = type === 'header' ? 'metricHeader' : 'metricSubHeader';
       const newConfig: DerivedMetricTitle = {
         columnId: (header as DerivedMetricTitle)?.columnId,
-        useValue: true
+        useValue: true,
+        aggregate: 'sum'
       };
       if (aggregate) {
         newConfig.aggregate = aggregate;

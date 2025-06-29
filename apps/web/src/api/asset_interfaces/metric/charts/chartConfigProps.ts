@@ -23,25 +23,22 @@ export const BusterChartConfigPropsSchema = z.object({
   selectedChartType: ChartTypeSchema,
   // COLUMN SETTINGS
   // OPTIONAL because the defaults will be determined by the UI
-  columnSettings: z.record(z.string(), z.optional(ColumnSettingsSchema)).default({}).optional(),
-  columnLabelFormats: z
-    .record(z.string(), z.optional(IColumnLabelFormatSchema))
-    .default({})
-    .optional(),
+  columnSettings: z.record(z.string(), z.optional(ColumnSettingsSchema)).default({}),
+  columnLabelFormats: z.record(z.string(), z.optional(IColumnLabelFormatSchema)).default({}),
   // OPTIONAL: default is the buster color palette
-  colors: z.array(z.string()).default(DEFAULT_CHART_THEME).optional(),
+  colors: z.array(z.string()).default(DEFAULT_CHART_THEME),
   // OPTIONAL: default is null and will be true if there are multiple Y axes or if a category axis is used
-  showLegend: z.nullable(z.boolean()).default(null).optional(),
+  showLegend: z.nullable(z.boolean()).default(null),
   // OPTIONAL: default: true
-  gridLines: z.boolean().default(true).optional(),
+  gridLines: z.boolean().default(true),
   // OPTIONAL
-  showLegendHeadline: ShowLegendHeadlineSchema.optional(),
+  showLegendHeadline: ShowLegendHeadlineSchema,
   // OPTIONAL: default is no goal lines
-  goalLines: z.array(GoalLineSchema).default([]).optional(),
+  goalLines: z.array(GoalLineSchema).default([]),
   // OPTIONAL: default is no trendlines
-  trendlines: z.array(TrendlineSchema).default([]).optional(),
+  trendlines: z.array(TrendlineSchema).default([]),
   // OPTIONAL: default is false
-  disableTooltip: z.boolean().default(false).optional(),
+  disableTooltip: z.boolean().default(false),
   // Spread the shape properties from all schemas
   ...YAxisConfigSchema.shape,
   ...XAxisConfigSchema.shape,

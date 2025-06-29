@@ -29,7 +29,11 @@ describe('pieOptionsHandler', () => {
       pieInnerLabelAggregate: 'sum',
       pieLabelPosition: 'inside',
       pieDisplayLabelAs: 'number',
-      selectedAxis: { y: ['value'], x: ['category'] },
+      selectedAxis: {
+        y: ['value'],
+        x: ['category'],
+        category: []
+      } as ChartSpecificOptionsProps['selectedAxis'],
       columnLabelFormats: {},
       barShowTotalAtTop: false,
       columnSettings: {},
@@ -52,7 +56,11 @@ describe('piePluginsHandler', () => {
       pieInnerLabelAggregate: 'sum',
       pieLabelPosition: 'inside',
       pieDisplayLabelAs: 'number',
-      selectedAxis: { y: ['value'], x: ['category'] },
+      selectedAxis: {
+        y: ['value'],
+        x: ['category'],
+        category: []
+      } as ChartSpecificOptionsProps['selectedAxis'],
       columnLabelFormats: {
         value: { columnType: 'number', style: 'number' }
       },
@@ -82,7 +90,11 @@ describe('piePluginsHandler', () => {
       pieInnerLabelAggregate: 'sum',
       pieLabelPosition: 'inside',
       pieDisplayLabelAs: 'number',
-      selectedAxis: { y: ['value'], x: ['category'] },
+      selectedAxis: {
+        y: ['value'],
+        x: ['category'],
+        category: []
+      } as ChartSpecificOptionsProps['selectedAxis'],
       columnLabelFormats: {
         value: { columnType: 'number', style: 'number' }
       },

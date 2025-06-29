@@ -4,6 +4,7 @@ import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric
 import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import type { BusterChart } from '../BusterChart';
 import { sharedMeta } from './BusterChartShared';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces';
 
 interface ComboChartDataPoint {
   date: string;
@@ -70,13 +71,16 @@ export const DualAxisCombo: Story = {
       x: ['date'],
       y: ['revenue'],
       y2: ['averageOrderValue'],
-      tooltip: ['revenue', 'averageOrderValue']
+      tooltip: ['revenue', 'averageOrderValue'],
+      category: []
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       averageOrderValue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
@@ -122,13 +126,16 @@ export const RevenueAndOrders: Story = {
       x: ['date'],
       y: ['revenue'],
       y2: ['orders'],
-      tooltip: ['revenue', 'orders']
+      tooltip: ['revenue', 'orders'],
+      category: []
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       orders: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 6,
         lineWidth: 3
@@ -171,6 +178,7 @@ export const DualLineChart: Story = {
     selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
+      category: [],
       x: ['date'],
       y: ['revenue'],
       y2: ['averageOrderValue'],
@@ -178,11 +186,13 @@ export const DualLineChart: Story = {
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 6,
         lineWidth: 2
       },
       averageOrderValue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
@@ -225,6 +235,7 @@ export const DualBarChart: Story = {
     selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
+      category: [],
       x: ['date'],
       y: ['revenue'],
       y2: ['orders'],
@@ -232,9 +243,11 @@ export const DualBarChart: Story = {
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       orders: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       }
     },
@@ -275,6 +288,7 @@ export const CompactView: Story = {
     selectedChartType: 'combo',
     data: generateComboChartData(5),
     comboChartAxis: {
+      category: [],
       x: ['date'],
       y: ['revenue'],
       y2: ['averageOrderValue'],
@@ -282,9 +296,11 @@ export const CompactView: Story = {
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       averageOrderValue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
@@ -327,6 +343,7 @@ export const NoLegendNoGrid: Story = {
     selectedChartType: 'combo',
     data: generateComboChartData(),
     comboChartAxis: {
+      category: [],
       x: ['date'],
       y: ['revenue'],
       y2: ['averageOrderValue'],
@@ -334,9 +351,11 @@ export const NoLegendNoGrid: Story = {
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       averageOrderValue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
@@ -379,6 +398,7 @@ export const LargeDataset: Story = {
     selectedChartType: 'combo',
     data: generateComboChartData(30),
     comboChartAxis: {
+      category: [],
       x: ['date'],
       y: ['revenue'],
       y2: ['averageOrderValue'],
@@ -386,9 +406,11 @@ export const LargeDataset: Story = {
     },
     columnSettings: {
       revenue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       averageOrderValue: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 3,
         lineWidth: 1.5
@@ -431,6 +453,7 @@ export const MultipleY2Axes: Story = {
     selectedChartType: 'combo',
     data: generateProductMetricsData(),
     comboChartAxis: {
+      category: [],
       x: ['category'],
       y: ['sales'],
       y2: ['stockLevel'], // 'returnRate', 'customerRating'
@@ -438,19 +461,23 @@ export const MultipleY2Axes: Story = {
     },
     columnSettings: {
       sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       },
       customerRating: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 6,
         lineWidth: 2
       },
       stockLevel: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
       },
       returnRate: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line',
         lineSymbolSize: 4,
         lineWidth: 2
@@ -533,15 +560,19 @@ export const ProblematicData: Story = {
     },
     columnSettings: {
       orders_with_discount: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'line'
       },
       metric_discountimpact: {
+        ...DEFAULT_COLUMN_SETTINGS,
         columnVisualization: 'bar'
       }
     },
     comboChartAxis: {
+      category: [],
       x: ['quarter_date'],
-      y: ['metric_discountimpact', 'orders_with_discount']
+      y: ['metric_discountimpact', 'orders_with_discount'],
+      y2: []
     },
     columnMetadata: [
       {

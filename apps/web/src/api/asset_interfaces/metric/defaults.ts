@@ -40,6 +40,7 @@ export const DEFAULT_CHART_CONFIG: IBusterMetricChartConfig = {
   scatterAxis: {
     x: [],
     y: [],
+    category: [],
     size: [],
     tooltip: null
   },
@@ -47,6 +48,7 @@ export const DEFAULT_CHART_CONFIG: IBusterMetricChartConfig = {
     x: [],
     y: [],
     y2: [],
+    category: [],
     tooltip: null
   },
   pieChartAxis: {

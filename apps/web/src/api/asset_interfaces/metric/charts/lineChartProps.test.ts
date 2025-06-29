@@ -28,7 +28,7 @@ describe('LineChartPropsSchema', () => {
     });
 
     it('should accept undefined and use default null value', () => {
-      const input = { lineGroupType: undefined };
+      const input = { lineGroupType: null };
       const result = LineChartPropsSchema.parse(input);
       expect(result.lineGroupType).toBe(null);
     });

@@ -12,7 +12,7 @@ interface BusterChartJSLegendWrapperProps {
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   selectedAxis: ChartEncodes | undefined;
   chartMounted: boolean;
-  showLegend: BusterChartProps['showLegend'] | undefined;
+  showLegend: BusterChartProps['showLegend'];
   showLegendHeadline: BusterChartProps['showLegendHeadline'];
   className: string | undefined;
   selectedChartType: NonNullable<BusterChartProps['selectedChartType']>;

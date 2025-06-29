@@ -192,7 +192,7 @@ const EditTrendlineItem: React.FC<{
   columnLabelFormats: IBusterMetricChartConfig['columnLabelFormats'];
   yAxisEncodes: string[];
   xAxisEncodes: string[];
-  categoryEncodes: string[] | undefined;
+  categoryEncodes: string[] | null | undefined;
   colors: string[];
   selectedChartType: IBusterMetricChartConfig['selectedChartType'];
   onUpdateExistingTrendline: (trend: LoopTrendline) => void;
@@ -253,7 +253,7 @@ const TrendlineItemContent: React.FC<{
   yAxisEncodes: string[];
   xAxisEncodes: string[];
   colors: string[];
-  categoryEncodes: string[] | undefined;
+  categoryEncodes: string[] | null | undefined;
   columnLabelFormats: IBusterMetricChartConfig['columnLabelFormats'];
   selectedChartType: IBusterMetricChartConfig['selectedChartType'];
   onUpdateExistingTrendline: (trend: LoopTrendline) => void;

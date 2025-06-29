@@ -5,6 +5,7 @@ import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { addNoise, generateLineChartData } from '../../../../mocks/chart/chartMocks';
 import type { BusterChart } from '../BusterChart';
 import { sharedMeta } from './BusterChartShared';
+import type { ColumnSettings, Trendline } from '@/api/asset_interfaces';
 
 type LineChartData = ReturnType<typeof generateLineChartData>;
 
@@ -614,7 +615,7 @@ export const UnevenlySpacedDates: Story = {
     columnSettings: {
       value: {
         lineSymbolSize: 5
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -652,7 +653,7 @@ export const CloselySpacedDates: Story = {
     columnSettings: {
       value: {
         lineSymbolSize: 5
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -931,7 +932,7 @@ export const PercentageStackedLineSingleWithDataLabels: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -969,13 +970,13 @@ export const StackedAreaLineMultipleWithDataLabels: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      },
+      } as ColumnSettings,
       profit: {
         showDataLabels: true
-      },
+      } as ColumnSettings,
       customers: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1018,7 +1019,7 @@ export const StackedAreaLineSingleWithDataLabels: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1056,13 +1057,13 @@ export const PercentageStackedLineMultipleWithDataLabels: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      },
+      } as ColumnSettings,
       profit: {
         showDataLabels: true
-      },
+      } as ColumnSettings,
       customers: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1107,7 +1108,7 @@ export const HasMixedNullAndNumberValuesSingleLineWithMissingDataZero: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1143,7 +1144,7 @@ export const HasMixedNullAndNumberValuesSingleLineWithMissingDataNull: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1181,10 +1182,10 @@ export const HasMixedNullAndNumberValuesSingleMultiLine: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      },
+      } as ColumnSettings,
       profit: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1228,7 +1229,7 @@ export const HasNullValuesWithCategoryMultiLine: Story = {
     columnSettings: {
       revenue: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       date: {
@@ -1296,7 +1297,7 @@ export const WithTrendline_MaxMinAverageMedian: Story = {
         trendLineColor: 'yellow',
         columnId: 'revenue'
       }
-    ],
+    ] as Trendline[],
     columnLabelFormats: {
       date: {
         columnType: 'date',
@@ -1333,7 +1334,7 @@ export const WithTrendline_DateXAxisLinearRegression: Story = {
         trendlineLabel: 'Testing Linear Regression',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
+      } as Trendline
     ],
     columnLabelFormats: {
       date: {
@@ -1372,7 +1373,7 @@ export const WithTrendline_NumericalXAxisLinearRegression: Story = {
         trendLineColor: 'red',
         columnId: 'revenue'
       }
-    ],
+    ] as Trendline[],
     columnLabelFormats: {
       index: {
         columnType: 'number',
@@ -1408,7 +1409,7 @@ export const WithTrendline_StringXAxisLinearRegression: Story = {
         trendlineLabel: 'Testing Linear Regression',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
+      } as Trendline
     ],
     columnLabelFormats: {
       index: {
@@ -1457,7 +1458,7 @@ export const WithTrendline_DateXAxisExponentialRegression: Story = {
         trendLineColor: 'red',
         columnId: 'revenue'
       }
-    ],
+    ] as Trendline[],
     columnLabelFormats: {
       date: {
         columnType: 'date',
@@ -1506,7 +1507,7 @@ export const WithTrendline_NumericalXAxisExponentialRegression: Story = {
         trendLineColor: 'red',
         columnId: 'revenue'
       }
-    ],
+    ] as Trendline[],
     columnLabelFormats: {
       index: {
         columnType: 'number',
@@ -1553,8 +1554,8 @@ export const WithTrendline_StringXAxisExponentialRegression: Story = {
         trendlineLabel: 'Exponential Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
-    ],
+      } as Trendline
+    ] as Trendline[],
     columnLabelFormats: {
       index: {
         columnType: 'text',
@@ -1601,8 +1602,8 @@ export const WithTrendline_DateXAxisLogarithmicRegression: Story = {
         trendlineLabel: 'Logarithmic Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
-    ],
+      } as Trendline
+    ] as Trendline[],
     columnLabelFormats: {
       date: {
         columnType: 'date',
@@ -1650,8 +1651,8 @@ export const WithTrendline_NumericalXAxisLogarithmicRegression: Story = {
         trendlineLabel: 'Logarithmic Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
-    ],
+      } as Trendline
+    ] as Trendline[],
     columnLabelFormats: {
       index: {
         columnType: 'number',
@@ -1698,8 +1699,8 @@ export const WithTrendline_StringXAxisLogarithmicRegression: Story = {
         trendlineLabel: 'Logarithmic Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
-    ],
+      } as Trendline
+    ] as Trendline[],
     columnLabelFormats: {
       index: {
         columnType: 'text',
@@ -1756,7 +1757,7 @@ export const ExponentialDecreaseWithTrendline: Story = {
         show: true,
         showTrendlineLabel: true,
         trendlineLabel: 'Exponential Trend'
-      }
+      } as Trendline
     ]
   }
 };
@@ -1793,8 +1794,8 @@ export const WithTrendline_DateXAxisPolynomialRegression: Story = {
         trendlineLabel: 'Polynomial Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
-    ],
+      } as Trendline
+    ] as Trendline[],
     columnLabelFormats: {
       date: {
         columnType: 'date',
@@ -1842,7 +1843,7 @@ export const WithTrendline_NumericalXAxisPolynomialRegression: Story = {
         trendlineLabel: 'Polynomial Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
+      } as Trendline
     ],
     columnLabelFormats: {
       index: {
@@ -1890,8 +1891,8 @@ export const WithTrendline_StringXAxisPolynomialRegression: Story = {
         trendlineLabel: 'Polynomial Growth Pattern',
         trendLineColor: 'red',
         columnId: 'revenue'
-      }
-    ],
+      } as Trendline
+    ] as Trendline[],
     columnLabelFormats: {
       index: {
         columnType: 'text',

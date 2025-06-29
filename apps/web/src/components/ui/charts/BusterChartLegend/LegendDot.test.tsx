@@ -8,7 +8,7 @@ describe('LegendItemDot', () => {
     color: '#FF0000',
     inactive: false,
     type: 'bar'
-  };
+  } as Parameters<typeof LegendItemDot>[0];
 
   it('renders with default props', () => {
     render(<LegendItemDot {...defaultProps} />);

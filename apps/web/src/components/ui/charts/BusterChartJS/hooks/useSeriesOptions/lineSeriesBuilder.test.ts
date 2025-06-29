@@ -119,7 +119,7 @@ describe('lineSeriesBuilder', () => {
         } as IColumnLabelFormat
       } as ColumnLabelFormatMap,
       xAxisKeys: ['category'] as ChartEncodes['x'],
-      lineGroupType: undefined,
+      lineGroupType: null,
       index: 0,
       trendlines: [],
       dataset: {
@@ -143,7 +143,7 @@ describe('lineSeriesBuilder', () => {
           ]
         ]
       } as DatasetOption
-    };
+    } as Parameters<typeof lineBuilder>[0];
 
     it('should build a basic line series correctly', () => {
       const result = lineBuilder(baseProps);

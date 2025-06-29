@@ -3,7 +3,10 @@ import '../../../ChartJSTheme';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { ColumnSettings, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import {
+  DEFAULT_COLUMN_LABEL_FORMAT,
+  DEFAULT_COLUMN_SETTINGS
+} from '@/api/asset_interfaces/metric';
 import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 import { useXAxis } from './useXAxis';
 
@@ -39,8 +42,8 @@ describe('useXAxis', () => {
     lineGroupType: null,
     barGroupType: 'group' as const,
     columnSettings: {},
-    xAxisTimeInterval: undefined
-  } as const;
+    xAxisTimeInterval: null
+  } as Parameters<typeof useXAxis>[0];
 
   it('should return undefined for pie charts', () => {
     const props = {
@@ -183,9 +186,11 @@ describe('useXAxis', () => {
       ...defaultProps,
       columnSettings: {
         category_column: {
+          ...DEFAULT_COLUMN_SETTINGS,
           aggregation: 'sum',
           format: 'number',
-          precision: 2
+          precision: 2,
+          showDataLabels: true
         } as ColumnSettings
       }
     };
@@ -277,8 +282,8 @@ describe('useXAxis', () => {
     const noTitleProps = {
       ...defaultProps,
       xAxisShowAxisTitle: false,
-      xAxisAxisTitle: undefined
-    };
+      xAxisAxisTitle: null
+    } as Parameters<typeof useXAxis>[0];
 
     const { result } = renderHook(() => useXAxis(noTitleProps));
     expect(result.current?.title?.display).toBe(false);
@@ -388,7 +393,7 @@ describe('useXAxis', () => {
           dateFormat: 'YYYY-MM-DD'
         }
       }
-    } as const;
+    } as Parameters<typeof useXAxis>[0];
 
     const { result } = renderHook(() => useXAxis(customDateFormatProps));
     expect(result.current).toBeDefined();
@@ -405,7 +410,7 @@ describe('useXAxis', () => {
           dateFormat: 'auto'
         }
       }
-    };
+    } as Parameters<typeof useXAxis>[0];
 
     const { result: autoResult } = renderHook(() => useXAxis(autoDateFormatProps));
     expect(autoResult.current).toBeDefined();

@@ -15,7 +15,7 @@ describe('useGoalLines', () => {
     columnLabelFormats: {},
     yAxisKeys: ['metric1'],
     y2AxisKeys: undefined,
-    lineGroupType: undefined as BusterChartConfigProps['lineGroupType'],
+    lineGroupType: null as BusterChartConfigProps['lineGroupType'],
     barLayout: 'vertical' as BusterChartConfigProps['barLayout'],
     barGroupType: 'group' as BusterChartConfigProps['barGroupType']
   };
