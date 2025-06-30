@@ -2,7 +2,6 @@ import { getUserOrganizationId } from '@buster/database';
 import { HTTPException } from 'hono/http-exception';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SlackError, SlackHandler } from './handler';
-import { createSlackOAuthService } from './services/slack-oauth-service';
 
 // Mock dependencies
 const mockSlackOAuthService = {

@@ -5,7 +5,6 @@ import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import slackRoutes from './index';
-import * as slackHelpers from './services/slack-helpers';
 import { cleanupTestOrgAndUser, createTestOrgAndUser } from './test-helpers';
 
 // Skip tests if required environment variables are not set

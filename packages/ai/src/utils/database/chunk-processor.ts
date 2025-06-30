@@ -103,13 +103,28 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     version: number;
   } = { files: [], version: 0 };
 
+  // Dashboard context from database
+  private dashboardContext: Array<{
+    id: string;
+    name: string;
+    versionNumber: number;
+    metricIds: string[];
+  }> = [];
+
   constructor(
     messageId: string | null,
     initialMessages: CoreMessage[] = [],
     initialReasoningHistory: ReasoningEntry[] = [],
-    initialResponseHistory: ResponseEntry[] = []
+    initialResponseHistory: ResponseEntry[] = [],
+    dashboardContext?: Array<{
+      id: string;
+      name: string;
+      versionNumber: number;
+      metricIds: string[];
+    }>
   ) {
     this.messageId = messageId;
+    this.dashboardContext = dashboardContext || [];
     this.state = {
       accumulatedMessages: [...initialMessages],
       currentAssistantMessage: null,
@@ -2148,7 +2163,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    */
   private updateFileSelection(): void {
     const allFiles = extractFilesFromReasoning(this.state.reasoningHistory);
-    const selectedFiles = selectFilesForResponse(allFiles);
+    const selectedFiles = selectFilesForResponse(allFiles, this.dashboardContext);
 
     // Only update if selection changed
     if (JSON.stringify(selectedFiles) !== JSON.stringify(this.currentFileSelection.files)) {

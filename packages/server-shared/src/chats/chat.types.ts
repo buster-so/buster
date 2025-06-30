@@ -51,9 +51,6 @@ export const ChatCreateRequestSchema = z
     path: ['asset_type'],
   });
 
-// Updated response schema to return full chat object
-export const ChatCreateResponseSchema = ChatWithMessagesSchema;
-
 // Handler request schema (internal - without legacy fields)
 export const ChatCreateHandlerRequestSchema = z.object({
   prompt: z.string().optional(),
@@ -68,5 +65,4 @@ export type AssetPermissionRole = z.infer<typeof AssetPermissionRoleSchema>;
 export type BusterShareIndividual = z.infer<typeof BusterShareIndividualSchema>;
 export type ChatWithMessages = z.infer<typeof ChatWithMessagesSchema>;
 export type ChatCreateRequest = z.infer<typeof ChatCreateRequestSchema>;
-export type ChatCreateResponse = z.infer<typeof ChatCreateResponseSchema>;
 export type ChatCreateHandlerRequest = z.infer<typeof ChatCreateHandlerRequestSchema>;

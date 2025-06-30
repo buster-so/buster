@@ -1,9 +1,9 @@
 import { asc, chats, db, eq, messages, usersToOrganizations } from '@buster/database';
 import {
   ChatCreateRequestSchema,
-  ChatCreateResponseSchema,
   ChatError,
   type ChatWithMessages,
+  ChatWithMessagesSchema,
 } from '@buster/server-shared/chats';
 import {
   cleanupTestChats,
@@ -117,7 +117,7 @@ describe('Chat Handler Integration Tests', () => {
         };
 
         const response = await createChatHandler(handlerRequest, user);
-        const validatedResponse = ChatCreateResponseSchema.parse(response);
+        const validatedResponse = ChatWithMessagesSchema.parse(response);
 
         return c.json(validatedResponse);
       } catch (error) {
