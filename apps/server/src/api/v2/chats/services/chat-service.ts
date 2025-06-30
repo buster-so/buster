@@ -23,7 +23,7 @@ export async function initializeChat(
       return handleExistingChat(request.chat_id, messageId, request.prompt, user);
     }
 
-    const title = request.prompt || 'New Chat';
+    const title = '';
     return handleNewChat({
       title,
       messageId,

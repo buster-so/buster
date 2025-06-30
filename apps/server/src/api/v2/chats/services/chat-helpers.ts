@@ -134,11 +134,14 @@ export function buildChatWithMessages(
     messageMap[msg.id] = chatMessage;
   }
 
+  // Ensure message_ids array has no duplicates
+  const uniqueMessageIds = [...new Set(messageIds)];
+
   return {
     id: chat.id,
     title: chat.title,
     is_favorited: isFavorited,
-    message_ids: messageIds,
+    message_ids: uniqueMessageIds,
     messages: messageMap,
     created_at: chat.createdAt,
     updated_at: chat.updatedAt,
@@ -335,12 +338,14 @@ export async function handleAssetChat(
         id: msg.id,
         created_at: msg.createdAt,
         updated_at: msg.updatedAt,
-        request_message: {
-          request: msg.requestMessage || '',
-          sender_id: msg.createdBy,
-          sender_name: chat.created_by_name,
-          sender_avatar: chat.created_by_avatar || undefined,
-        },
+        request_message: msg.requestMessage
+          ? {
+              request: msg.requestMessage,
+              sender_id: msg.createdBy,
+              sender_name: chat.created_by_name,
+              sender_avatar: chat.created_by_avatar || undefined,
+            }
+          : null,
         response_messages: {},
         response_message_ids: [],
         reasoning_message_ids: [],
@@ -350,7 +355,10 @@ export async function handleAssetChat(
         is_completed: false,
       };
 
-      chat.message_ids.push(msg.id);
+      // Only add message ID if it doesn't already exist
+      if (!chat.message_ids.includes(msg.id)) {
+        chat.message_ids.push(msg.id);
+      }
       chat.messages[msg.id] = chatMessage;
     }
 
