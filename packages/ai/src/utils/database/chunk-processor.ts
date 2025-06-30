@@ -1121,12 +1121,22 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
                   },
                 };
-              } else if (fileIdAtIndex && hasContent) {
-                // Update existing file content if it has changed
+              } else if (fileIdAtIndex) {
+                // Update existing file with new data as it streams in
                 const fileId = fileIdAtIndex;
                 const existingFile = existingFiles[fileId];
-                if (existingFile?.file) {
-                  existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
+                if (existingFile) {
+                  // Update name if it has changed (handles partial name streaming)
+                  if (hasName) {
+                    const newName = (file as { name?: string }).name || '';
+                    if (newName && newName !== existingFile.file_name) {
+                      existingFile.file_name = newName;
+                    }
+                  }
+                  // Update content if it has changed
+                  if (hasContent && existingFile.file) {
+                    existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
+                  }
                 }
               }
             }
@@ -1171,12 +1181,22 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
                   },
                 };
-              } else if (fileIdAtIndex && hasContent) {
-                // Update existing file content if it has changed
+              } else if (fileIdAtIndex) {
+                // Update existing file with new data as it streams in
                 const fileId = fileIdAtIndex;
                 const existingFile = existingFiles[fileId];
-                if (existingFile?.file) {
-                  existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
+                if (existingFile) {
+                  // Update name if it has changed (handles partial name streaming)
+                  if (hasName) {
+                    const newName = (file as { name?: string }).name || '';
+                    if (newName && newName !== existingFile.file_name) {
+                      existingFile.file_name = newName;
+                    }
+                  }
+                  // Update content if it has changed
+                  if (hasContent && existingFile.file) {
+                    existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
+                  }
                 }
               }
             }
