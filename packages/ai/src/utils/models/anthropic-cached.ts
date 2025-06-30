@@ -1,14 +1,14 @@
+import http from 'node:http';
+import https from 'node:https';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { wrapAISDKModel } from 'braintrust';
-import https from 'node:https';
-import http from 'node:http';
 
 // Create shared agents with connection pooling for better performance
 const httpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000, // Send keep-alive packets every 30 seconds
   maxSockets: 10, // Maximum concurrent connections
-  timeout: 120000, // 120 second timeout
+  timeout: 20000, // 20 second timeout
 });
 
 const httpAgent = new http.Agent({

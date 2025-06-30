@@ -29,6 +29,11 @@ const MarkMessageCompleteOutputSchema = z.object({
       filesReturned: z.number().optional(),
     })
     .optional(),
+  selectedFile: z.object({
+    fileId: z.string().uuid().optional(),
+    fileType: z.string().optional(),
+    versionNumber: z.number().optional(),
+  }).optional(),
   // Completion metadata from mark-message-complete step
   messageId: z.string(),
   completedAt: z.string(),

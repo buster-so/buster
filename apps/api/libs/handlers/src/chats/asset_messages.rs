@@ -176,36 +176,37 @@ pub async fn generate_asset_messages(
     let mut all_files = vec![asset_data];
     all_files.extend(additional_files);
 
-    // Create the tool response content
-    let tool_response_content = json!({
+    // Create the tool response result
+    let tool_response_result = json!({
         "message": message_text,
         "duration": 928, // Example duration
         "files": all_files
-    })
-    .to_string();
+    });
 
-    // Create the Assistant message with tool call
+    // Create the Assistant message with tool call using new content array format
     let assistant_message = serde_json::json!({
-        "name": "buster_super_agent",
         "role": "assistant",
-        "tool_calls": [
+        "content": [
             {
-                "id": tool_call_id,
-                "type": "function",
-                "function": {
-                    "name": "import_assets",
-                    "arguments": "{}"
-                }
+                "args": {},
+                "type": "tool-call",
+                "toolName": "import_assets",
+                "toolCallId": tool_call_id
             }
         ]
     });
 
-    // Create the Tool response message
+    // Create the Tool response message using new content array format
     let tool_message = serde_json::json!({
-        "name": "import_assets",
         "role": "tool",
-        "content": tool_response_content,
-        "tool_call_id": tool_call_id
+        "content": [
+            {
+                "type": "tool-result",
+                "result": tool_response_result,
+                "toolName": "import_assets",
+                "toolCallId": tool_call_id
+            }
+        ]
     });
 
     // Combine into raw_llm_messages
