@@ -34,6 +34,7 @@ export const ChatHeaderTitle: React.FC<{
           placeholder="New chat"
           level={5}
           id={CHAT_HEADER_TITLE_ID}
+          disabled={!isCompletedStream}
           onChange={(value) =>
             value && value !== chatTitle && updateChat({ id: chatId, title: value })
           }>

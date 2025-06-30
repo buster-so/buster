@@ -21,7 +21,6 @@ export const ChatContainerHeaderDropdown: React.FC<{
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
   const { mutate: deleteChat, isPending: isDeleting } = useDeleteChat();
   const { mutateAsync: duplicateChat, isPending: isDuplicating } = useDuplicateChat();
-  const currentMessageId = useChatIndividualContextSelector((state) => state.currentMessageId);
   const selectedFileId = useChatIndividualContextSelector((state) => state.selectedFileId);
   const selectedFileType = useChatIndividualContextSelector((state) => state.selectedFileType);
   const { data: chatTitle } = useGetChat(
