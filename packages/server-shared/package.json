@@ -6,6 +6,7 @@
   "private": false,
   "scripts": {
     "build": "tsc --build",
+    "dev": "tsc --watch",
     "lint": "biome check",
     "typecheck": "tsc --noEmit"
   },

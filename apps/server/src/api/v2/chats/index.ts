@@ -1,8 +1,8 @@
 import {
   ChatCreateRequestSchema,
-  type ChatCreateResponse,
-  ChatCreateResponseSchema,
   ChatError,
+  type ChatWithMessages,
+  ChatWithMessagesSchema,
 } from '@buster/server-shared/chats';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
@@ -20,10 +20,20 @@ const app = new Hono()
     const request = c.req.valid('json');
     const user = c.get('busterUser');
 
-    const response = await createChatHandler(request, user);
+    const response: ChatWithMessages = await createChatHandler(request, user);
 
-    const validatedResponse: ChatCreateResponse = ChatCreateResponseSchema.parse(response);
-    return c.json(validatedResponse);
+    const validatedResponse = ChatWithMessagesSchema.safeParse(response);
+
+    console.log('success???', validatedResponse.success);
+
+    if (validatedResponse.success) {
+      return c.json(validatedResponse.data);
+    }
+
+    return c.json(
+      { ...validatedResponse.error, response, validatedResponse: validatedResponse.data },
+      400
+    );
   })
   .patch(
     '/:chat_id',

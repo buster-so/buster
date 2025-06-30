@@ -2,9 +2,9 @@ import { getUserOrganizationId } from '@buster/database';
 import type { User } from '@buster/database';
 import {
   type ChatCreateHandlerRequest,
-  type ChatCreateResponse,
   ChatError,
   ChatErrorCode,
+  type ChatWithMessages,
 } from '@buster/server-shared/chats';
 import { tasks } from '@trigger.dev/sdk/v3';
 import { handleAssetChat } from './services/chat-helpers';
@@ -26,7 +26,7 @@ import { initializeChat } from './services/chat-service';
 export async function createChatHandler(
   request: ChatCreateHandlerRequest,
   user: User
-): Promise<ChatCreateResponse> {
+): Promise<ChatWithMessages> {
   const startTime = Date.now();
 
   try {
@@ -60,7 +60,7 @@ export async function createChatHandler(
     const { chatId, messageId, chat } = await initializeChat(request, user, organizationId);
 
     // Handle asset-based chat if needed
-    let finalChat = chat;
+    let finalChat: ChatWithMessages = chat;
     if (request.asset_id && request.asset_type && !request.prompt) {
       finalChat = await handleAssetChat(
         chatId,
