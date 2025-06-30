@@ -4,6 +4,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getSupabaseUserContext } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
+  console.log('hello world');
+  
   // Parse the request body to get minutesUntilExpiration
   const body = await request.json().catch(() => ({}));
   const preemptiveRefreshMinutes = (body.preemptiveRefreshMinutes || 5) as number;
