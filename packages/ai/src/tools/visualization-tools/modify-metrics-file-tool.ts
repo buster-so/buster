@@ -15,6 +15,7 @@ import {
   validateMetricYml,
 } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
+import { trackFileAssociations } from './file-tracking-helper';
 
 // TypeScript types matching Rust DataMetadata structure
 enum SimpleType {
@@ -574,10 +575,11 @@ const modifyMetricFiles = wrapTraced(
     const startTime = Date.now();
 
     // Get runtime context values
-    const dataSourceId = runtimeContext.get('dataSourceId');
-    const userId = runtimeContext.get('userId');
-    const organizationId = runtimeContext.get('organizationId');
+    const dataSourceId = runtimeContext?.get('dataSourceId') as string;
+    const userId = runtimeContext?.get('userId') as string;
+    const organizationId = runtimeContext?.get('organizationId') as string;
     const workflowStartTime = runtimeContext?.get('workflowStartTime') as number | undefined;
+    const messageId = runtimeContext?.get('messageId') as string | undefined;
 
     // Generate a unique workflow ID using start time and data source
     const workflowId = workflowStartTime
@@ -756,6 +758,17 @@ Please attempt to modify the metric again. This error could be due to:
         files: [],
         failed_files: [],
       };
+    }
+
+    // Track file associations if messageId is available
+    if (messageId && files.length > 0) {
+      await trackFileAssociations({
+        messageId,
+        files: files.map(file => ({
+          id: file.id,
+          version: file.version_number,
+        })),
+      });
     }
 
     // Generate result message
@@ -1466,7 +1479,10 @@ definitions:
   inputSchema,
   outputSchema,
   execute: async ({ context, runtimeContext }) => {
-    return await modifyMetricFiles(context as UpdateFilesParams, runtimeContext);
+    return await modifyMetricFiles(
+      context as UpdateFilesParams,
+      runtimeContext as RuntimeContext<AnalystRuntimeContext>
+    );
   },
 });
 

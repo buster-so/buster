@@ -12,8 +12,10 @@ import { wrapTraced } from 'braintrust';
 import { inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { createInitialDashboardVersionHistory } from './version-history-helpers';
 import type { DashboardYml } from './version-history-types';
+import { trackFileAssociations } from './file-tracking-helper';
 
 // Core interfaces matching Rust structs exactly
 interface DashboardFileParams {
@@ -280,13 +282,14 @@ async function processDashboardFile(file: DashboardFileParams): Promise<{
 const createDashboardFiles = wrapTraced(
   async (
     params: CreateDashboardFilesParams,
-    runtimeContext: RuntimeContext<{ userId: string; organizationId: string }>
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<CreateDashboardFilesOutput> => {
     const startTime = Date.now();
 
     // Get runtime context values
     const userId = runtimeContext?.get('userId') as string;
     const organizationId = runtimeContext?.get('organizationId') as string;
+    const messageId = runtimeContext?.get('messageId') as string | undefined;
 
     if (!userId) {
       return {
@@ -463,6 +466,17 @@ const createDashboardFiles = wrapTraced(
           });
         }
       }
+    }
+
+    // Track file associations if messageId is available
+    if (messageId && files.length > 0) {
+      await trackFileAssociations({
+        messageId,
+        files: files.map(file => ({
+          id: file.id,
+          version: file.version_number,
+        })),
+      });
     }
 
     const duration = Date.now() - startTime;
@@ -675,7 +689,10 @@ rows:
     ),
   }),
   execute: async ({ context, runtimeContext }) => {
-    return await createDashboardFiles(context as CreateDashboardFilesParams, runtimeContext);
+    return await createDashboardFiles(
+      context as CreateDashboardFilesParams,
+      runtimeContext as RuntimeContext<AnalystRuntimeContext>
+    );
   },
 });
 
