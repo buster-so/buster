@@ -9,6 +9,7 @@ use futures::FutureExt;
 use once_cell::sync::OnceCell;
 use sqlx::postgres::{PgPool as SqlxPool, PgPoolOptions};
 use std::env;
+use std::sync::Arc;
 use std::time::Duration;
 
 pub type PgPool = DieselPool<AsyncPgConnection>;
@@ -80,42 +81,47 @@ pub async fn establish_diesel_connection() -> Result<PgPool> {
         .parse()
         .expect("DATABASE_POOL_SIZE must be a valid usize");
 
-    if db_url.contains("sslmode=verify-full") {
-        let db_url = db_url.replace("sslmode=verify-full", "");
-        let mut config = ManagerConfig::default();
-        config.custom_setup = Box::new(establish_secure_connection);
+    let ssl_mode = extract_ssl_mode(&db_url);
+    
+    let (manager, needs_custom_setup) = match ssl_mode {
+        Some("require") => {
+            let clean_url = remove_ssl_params(&db_url);
+            let mut config = ManagerConfig::default();
+            config.custom_setup = Box::new(establish_ssl_connection_no_verify);
+            (
+                AsyncDieselConnectionManager::<AsyncPgConnection>::new_with_config(clean_url, config),
+                true
+            )
+        },
+        Some("verify-ca") | Some("verify-full") => {
+            let clean_url = remove_ssl_params(&db_url);
+            let mut config = ManagerConfig::default();
+            config.custom_setup = Box::new(establish_secure_connection);
+            (
+                AsyncDieselConnectionManager::<AsyncPgConnection>::new_with_config(clean_url, config),
+                true
+            )
+        },
+        _ => {
+            (
+                AsyncDieselConnectionManager::<AsyncPgConnection>::new(db_url),
+                false
+            )
+        }
+    };
 
-        let manager = AsyncDieselConnectionManager::<AsyncPgConnection>::new_with_config(
-            db_url.clone(),
-            config,
-        );
-        PgPool::builder()
-            .max_size(max_pool_size as u32)
-            .min_idle(Some(5))
-            .max_lifetime(Some(Duration::from_secs(60 * 60 * 24)))
-            .idle_timeout(Some(Duration::from_secs(60 * 2)))
-            .test_on_check_out(true)
-            .build(manager)
-            .await
-            .map_err(|e| {
-                tracing::error!("Failed to establish diesel connection: {}", e);
-                anyhow!("Failed to establish diesel connection: {}", e)
-            })
-    } else {
-        let manager = AsyncDieselConnectionManager::<AsyncPgConnection>::new(db_url);
-        PgPool::builder()
-            .max_size(max_pool_size as u32)
-            .min_idle(Some(5))
-            .max_lifetime(Some(Duration::from_secs(60 * 60 * 24)))
-            .idle_timeout(Some(Duration::from_secs(60 * 2)))
-            .test_on_check_out(true)
-            .build(manager)
-            .await
-            .map_err(|e| {
-                tracing::error!("Failed to establish diesel connection: {}", e);
-                anyhow!("Failed to establish diesel connection: {}", e)
-            })
-    }
+    PgPool::builder()
+        .max_size(max_pool_size as u32)
+        .min_idle(Some(5))
+        .max_lifetime(Some(Duration::from_secs(60 * 60 * 24)))
+        .idle_timeout(Some(Duration::from_secs(60 * 2)))
+        .test_on_check_out(true)
+        .build(manager)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to establish diesel connection: {}", e);
+            anyhow!("Failed to establish diesel connection: {}", e)
+        })
 }
 
 pub async fn establish_sqlx_connection() -> Result<SqlxPool> {
@@ -126,6 +132,8 @@ pub async fn establish_sqlx_connection() -> Result<SqlxPool> {
         .parse()
         .expect("SQLX_POOL_SIZE must be a valid u32");
 
+    // SQLx natively supports sslmode in the connection string
+    // No special handling needed - it will respect sslmode=require, sslmode=prefer, etc.
     PgPoolOptions::new()
         .max_connections(max_pool_size)
         .min_connections(5)
@@ -157,6 +165,102 @@ fn root_certs() -> rustls::RootCertStore {
     let certs = rustls_native_certs::load_native_certs().expect("Certs not loadable!");
     roots.add_parsable_certificates(certs);
     roots
+}
+
+fn establish_ssl_connection_no_verify(config: &str) -> BoxFuture<ConnectionResult<AsyncPgConnection>> {
+    let fut = async {
+        // Create a custom TLS config that accepts any certificate
+        let mut rustls_config = rustls::ClientConfig::builder()
+            .dangerous()
+            .with_custom_certificate_verifier(Arc::new(NoVerifier))
+            .with_no_client_auth();
+        
+        let tls = tokio_postgres_rustls::MakeRustlsConnect::new(rustls_config);
+        let (client, conn) = tokio_postgres::connect(config, tls)
+            .await
+            .map_err(|e| ConnectionError::BadConnection(e.to_string()))?;
+
+        AsyncPgConnection::try_from_client_and_connection(client, conn).await
+    };
+    fut.boxed()
+}
+
+fn extract_ssl_mode(url: &str) -> Option<&str> {
+    url.split('?')
+        .nth(1)?
+        .split('&')
+        .find_map(|param| {
+            let mut parts = param.split('=');
+            match (parts.next(), parts.next()) {
+                (Some("sslmode"), Some(mode)) => Some(mode),
+                _ => None,
+            }
+        })
+}
+
+fn remove_ssl_params(url: &str) -> String {
+    if let Some((base, params)) = url.split_once('?') {
+        let filtered_params: Vec<&str> = params
+            .split('&')
+            .filter(|param| !param.starts_with("sslmode="))
+            .collect();
+        
+        if filtered_params.is_empty() {
+            base.to_string()
+        } else {
+            format!("{base}?{}", filtered_params.join("&"))
+        }
+    } else {
+        url.to_string()
+    }
+}
+
+#[derive(Debug)]
+struct NoVerifier;
+
+impl rustls::client::danger::ServerCertVerifier for NoVerifier {
+    fn verify_server_cert(
+        &self,
+        _end_entity: &rustls::pki_types::CertificateDer<'_>,
+        _intermediates: &[rustls::pki_types::CertificateDer<'_>],
+        _server_name: &rustls::pki_types::ServerName<'_>,
+        _ocsp_response: &[u8],
+        _now: rustls::pki_types::UnixTime,
+    ) -> Result<rustls::client::danger::ServerCertVerified, rustls::Error> {
+        Ok(rustls::client::danger::ServerCertVerified::assertion())
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        _message: &[u8],
+        _cert: &rustls::pki_types::CertificateDer<'_>,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
+        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        _message: &[u8],
+        _cert: &rustls::pki_types::CertificateDer<'_>,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
+        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<rustls::SignatureScheme> {
+        vec![
+            rustls::SignatureScheme::RSA_PKCS1_SHA256,
+            rustls::SignatureScheme::RSA_PKCS1_SHA384,
+            rustls::SignatureScheme::RSA_PKCS1_SHA512,
+            rustls::SignatureScheme::ECDSA_NISTP256_SHA256,
+            rustls::SignatureScheme::ECDSA_NISTP384_SHA384,
+            rustls::SignatureScheme::RSA_PSS_SHA256,
+            rustls::SignatureScheme::RSA_PSS_SHA384,
+            rustls::SignatureScheme::RSA_PSS_SHA512,
+            rustls::SignatureScheme::ED25519,
+        ]
+    }
 }
 
 pub async fn create_redis_pool() -> Result<RedisPool> {
