@@ -134,11 +134,14 @@ export function buildChatWithMessages(
     messageMap[msg.id] = chatMessage;
   }
 
+  // Ensure message_ids array has no duplicates
+  const uniqueMessageIds = [...new Set(messageIds)];
+
   return {
     id: chat.id,
     title: chat.title,
     is_favorited: isFavorited,
-    message_ids: messageIds,
+    message_ids: uniqueMessageIds,
     messages: messageMap,
     created_at: chat.createdAt,
     updated_at: chat.updatedAt,
@@ -350,7 +353,10 @@ export async function handleAssetChat(
         is_completed: false,
       };
 
-      chat.message_ids.push(msg.id);
+      // Only add message ID if it doesn't already exist
+      if (!chat.message_ids.includes(msg.id)) {
+        chat.message_ids.push(msg.id);
+      }
       chat.messages[msg.id] = chatMessage;
     }
 
