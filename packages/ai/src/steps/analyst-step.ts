@@ -44,6 +44,13 @@ const outputSchema = z.object({
   reasoningHistory: ReasoningHistorySchema, // Add reasoning history
   responseHistory: ResponseHistorySchema, // Add response history
   metadata: AnalystMetadataSchema.optional(),
+  selectedFile: z
+    .object({
+      fileId: z.string().uuid().optional(),
+      fileType: z.string().optional(),
+      versionNumber: z.number().optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -233,6 +240,7 @@ const analystExecution = async ({
       reasoningHistory: inputData.reasoningHistory || [],
       responseHistory: inputData.responseHistory || [],
       metadata: inputData.metadata,
+      selectedFile: undefined, // No file selection if think-and-prep finished early
     };
   }
 
@@ -400,6 +408,17 @@ const analystExecution = async ({
       filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
     };
 
+    // Extract selected file information
+    const fileSelection = chunkProcessor.getCurrentFileSelection();
+    const firstFile = fileSelection.files[0];
+    const selectedFile = firstFile
+      ? {
+          fileId: firstFile.id,
+          fileType: firstFile.fileType,
+          versionNumber: firstFile.versionNumber,
+        }
+      : undefined;
+
     return {
       conversationHistory: completeConversationHistory,
       finished: true,
@@ -412,6 +431,7 @@ const analystExecution = async ({
         ...inputData.metadata,
         ...filesMetadata,
       },
+      selectedFile,
     };
   } catch (error) {
     // Handle abort errors gracefully
@@ -423,6 +443,17 @@ const analystExecution = async ({
         filesCreated: chunkProcessor.getTotalFilesCreated(),
         filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
       };
+
+      // Extract selected file information
+      const fileSelection = chunkProcessor.getCurrentFileSelection();
+      const firstFile = fileSelection.files[0];
+      const selectedFile = firstFile
+        ? {
+            fileId: firstFile.id,
+            fileType: firstFile.fileType,
+            versionNumber: firstFile.versionNumber,
+          }
+        : undefined;
 
       return {
         conversationHistory: completeConversationHistory,
@@ -438,6 +469,7 @@ const analystExecution = async ({
           ...inputData.metadata,
           ...filesMetadata,
         },
+        selectedFile,
       };
     }
 

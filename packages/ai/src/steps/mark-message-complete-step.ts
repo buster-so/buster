@@ -1,4 +1,4 @@
-import { updateMessage } from '@buster/database';
+import { updateMessage, updateChat } from '@buster/database';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
@@ -41,6 +41,11 @@ const inputSchema = z.object({
   reasoningHistory: ReasoningHistorySchema,
   responseHistory: ResponseHistorySchema,
   metadata: AnalystMetadataSchema.optional(),
+  selectedFile: z.object({
+    fileId: z.string().uuid().optional(),
+    fileType: z.string().optional(),
+    versionNumber: z.number().optional(),
+  }).optional(),
 });
 
 // Output schema passes through analyst data plus completion info
@@ -52,6 +57,11 @@ const outputSchema = z.object({
   reasoningHistory: ReasoningHistorySchema,
   responseHistory: ResponseHistorySchema,
   metadata: AnalystMetadataSchema.optional(),
+  selectedFile: z.object({
+    fileId: z.string().uuid().optional(),
+    fileType: z.string().optional(),
+    versionNumber: z.number().optional(),
+  }).optional(),
   // Completion metadata
   messageId: z.string().describe('The message ID that was marked complete'),
   completedAt: z.string().describe('ISO timestamp when the message was marked complete'),
@@ -93,6 +103,18 @@ const markMessageCompleteExecution = async ({
       isCompleted: true,
       finalReasoningMessage,
     });
+
+    // Update chat with most recent file information if available
+    if (inputData.selectedFile?.fileId) {
+      const chatId = runtimeContext.get('chatId');
+      if (chatId) {
+        await updateChat(chatId, {
+          mostRecentFileId: inputData.selectedFile.fileId,
+          mostRecentFileType: inputData.selectedFile.fileType,
+          mostRecentVersionNumber: inputData.selectedFile.versionNumber,
+        });
+      }
+    }
 
     return {
       ...inputData, // Pass through all analyst data
