@@ -299,18 +299,20 @@ const todoStepExecution = async ({
     let todosString = '';
 
     // Extract todos from the file entry in reasoning history
+    // Look for any file entry with a todo-related file name
     for (const entry of reasoningHistory) {
-      if (entry.type === 'files' && entry.title === 'TODO List' && entry.files) {
-        // Get the first (and only) file
-        const fileIds = Object.keys(entry.files);
-        const firstFileId = fileIds[0];
-        if (firstFileId) {
-          const file = entry.files[firstFileId];
-          if (file?.file?.text) {
-            todosString = file.file.text;
-            break;
+      if (entry.type === 'files' && entry.files) {
+        // Check each file in the entry
+        for (const [fileId, file] of Object.entries(entry.files)) {
+          // Check if this is a todo file by looking at the file name or ID
+          if (file?.file_name === 'todos' || fileId.startsWith('todo-')) {
+            if (file?.file?.text) {
+              todosString = file.file.text;
+              break;
+            }
           }
         }
+        if (todosString) break;
       }
     }
 
@@ -329,18 +331,20 @@ const todoStepExecution = async ({
       let todosString = '';
 
       // Extract todos from the file entry in reasoning history
+      // Look for any file entry with a todo-related file name
       for (const entry of reasoningHistory) {
-        if (entry.type === 'files' && entry.title === 'TODO List' && entry.files) {
-          // Get the first (and only) file
-          const fileIds = Object.keys(entry.files);
-          const firstFileId = fileIds[0];
-          if (firstFileId) {
-            const file = entry.files[firstFileId];
-            if (file?.file?.text) {
-              todosString = file.file.text;
-              break;
+        if (entry.type === 'files' && entry.files) {
+          // Check each file in the entry
+          for (const [fileId, file] of Object.entries(entry.files)) {
+            // Check if this is a todo file by looking at the file name or ID
+            if (file?.file_name === 'todos' || fileId.startsWith('todo-')) {
+              if (file?.file?.text) {
+                todosString = file.file.text;
+                break;
+              }
             }
           }
+          if (todosString) break;
         }
       }
 
