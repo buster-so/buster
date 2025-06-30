@@ -87,8 +87,13 @@ function createDataMetadata(results: Record<string, unknown>[]): DataMetadata {
         columnType = ColumnType.Timestamp;
         simpleType = SimpleType.Date;
       } else if (typeof firstValue === 'string') {
-        // Check if it looks like a date
-        if (!Number.isNaN(Date.parse(firstValue))) {
+        // Check if it's a numeric string first
+        if (!Number.isNaN(Number(firstValue))) {
+          columnType = Number.isInteger(Number(firstValue)) ? ColumnType.Int4 : ColumnType.Float8;
+          simpleType = SimpleType.Number;
+        } else if (!Number.isNaN(Date.parse(firstValue)) && 
+                   // Additional check to avoid parsing simple numbers as dates
+                   (firstValue.includes('-') || firstValue.includes('/') || firstValue.includes(':'))) {
           columnType = ColumnType.Timestamp;
           simpleType = SimpleType.Date;
         } else {
@@ -104,7 +109,13 @@ function createDataMetadata(results: Record<string, unknown>[]): DataMetadata {
 
     if (values.length > 0) {
       if (simpleType === SimpleType.Number) {
-        const numValues = values.filter((v) => typeof v === 'number') as number[];
+        const numValues = values
+          .map((v) => {
+            if (typeof v === 'number') return v;
+            if (typeof v === 'string' && !Number.isNaN(Number(v))) return Number(v);
+            return null;
+          })
+          .filter((v) => v !== null) as number[];
         if (numValues.length > 0) {
           minValue = Math.min(...numValues);
           maxValue = Math.max(...numValues);
