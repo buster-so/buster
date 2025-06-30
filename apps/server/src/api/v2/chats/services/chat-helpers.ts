@@ -111,16 +111,20 @@ export function buildChatWithMessages(
     const responseMessageIds = Object.keys(responseMessages);
     const reasoningMessageIds = Object.keys(reasoningMessages);
 
+    const requestMessage = msg.requestMessage
+      ? {
+          request: msg.requestMessage,
+          sender_id: msg.createdBy,
+          sender_name: userName,
+          sender_avatar: userAvatar,
+        }
+      : null;
+
     const chatMessage: ChatMessage = {
       id: msg.id,
       created_at: msg.createdAt,
       updated_at: msg.updatedAt,
-      request_message: {
-        request: msg.requestMessage,
-        sender_id: msg.createdBy,
-        sender_name: userName,
-        sender_avatar: userAvatar,
-      },
+      request_message: requestMessage,
       response_messages: responseMessages,
       response_message_ids: responseMessageIds,
       reasoning_message_ids: reasoningMessageIds,
