@@ -338,12 +338,14 @@ export async function handleAssetChat(
         id: msg.id,
         created_at: msg.createdAt,
         updated_at: msg.updatedAt,
-        request_message: {
-          request: msg.requestMessage || '',
-          sender_id: msg.createdBy,
-          sender_name: chat.created_by_name,
-          sender_avatar: chat.created_by_avatar || undefined,
-        },
+        request_message: msg.requestMessage
+          ? {
+              request: msg.requestMessage,
+              sender_id: msg.createdBy,
+              sender_name: chat.created_by_name,
+              sender_avatar: chat.created_by_avatar || undefined,
+            }
+          : null,
         response_messages: {},
         response_message_ids: [],
         reasoning_message_ids: [],
