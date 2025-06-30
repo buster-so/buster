@@ -41,58 +41,58 @@ const chartTypeMethod: Record<
     hasAreaStyle?: boolean;
   }
 > = {
-  [ChartIconType.TABLE]: () => ({ selectedChartType: ChartType.Table }),
-  [ChartIconType.PIE]: () => ({ selectedChartType: ChartType.Pie }),
+  [ChartIconType.TABLE]: () => ({ selectedChartType: 'table' }),
+  [ChartIconType.PIE]: () => ({ selectedChartType: 'pie' }),
   [ChartIconType.COLUMN]: () => ({
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     barLayout: 'vertical',
     barGroupType: 'group'
   }),
   [ChartIconType.STACKED_COLUMN]: () => ({
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     barLayout: 'vertical',
     barGroupType: 'stack'
   }),
   [ChartIconType.RELATIVE_STACKED_COLUMN]: () => ({
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     barLayout: 'vertical',
     barGroupType: 'percentage-stack'
   }),
   [ChartIconType.BAR]: () => ({
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     barLayout: 'horizontal',
     barGroupType: 'group'
   }),
   [ChartIconType.STACKED_BAR]: () => ({
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     barGroupType: 'stack',
     barLayout: 'horizontal'
   }),
   [ChartIconType.RELATIVE_STACKED_BAR]: () => ({
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     barGroupType: 'percentage-stack',
     barLayout: 'horizontal'
   }),
   [ChartIconType.LINE]: () => ({
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     hasAreaStyle: false,
     lineGroupType: null
   }),
   [ChartIconType.AREA]: () => ({
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     hasAreaStyle: true,
     lineGroupType: null
   }),
   [ChartIconType.RELATIVE_AREA]: () => ({
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     hasAreaStyle: true,
     lineGroupType: 'percentage-stack'
   }),
-  [ChartIconType.SCATTER]: () => ({ selectedChartType: ChartType.Scatter }),
-  [ChartIconType.COMBO]: () => ({ selectedChartType: ChartType.Combo }),
+  [ChartIconType.SCATTER]: () => ({ selectedChartType: 'scatter' }),
+  [ChartIconType.COMBO]: () => ({ selectedChartType: 'combo' }),
 
   [ChartIconType.METRIC]: () => ({
-    selectedChartType: ChartType.Metric
+    selectedChartType: 'metric'
   })
 };
 
@@ -136,7 +136,7 @@ export const selectedChartTypeMethod = (
   const hasAreaStyle = !!fullRes.hasAreaStyle;
   const resOmitted = omit(fullRes, 'hasAreaStyle');
 
-  if (resOmitted.selectedChartType === ChartType.Line) {
+  if (resOmitted.selectedChartType === 'line') {
     const newColumnSettings: IBusterMetricChartConfig['columnSettings'] = Object.fromEntries(
       Object.entries(columnSettings).map(([key, value]) => [
         key,

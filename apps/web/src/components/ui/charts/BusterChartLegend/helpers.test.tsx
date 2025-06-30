@@ -62,7 +62,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#000',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 1',
         id: '1',
         data: [],
@@ -71,7 +71,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#fff',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 2',
         id: '2',
         data: [],
@@ -92,7 +92,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#000',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 1',
         id: '1',
         data: [],
@@ -101,7 +101,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#fff',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 2',
         id: '2',
         data: [],
@@ -110,7 +110,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#ccc',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 3',
         id: '3',
         data: [],
@@ -132,7 +132,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#000',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 1',
         id: '1',
         data: [],
@@ -141,7 +141,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#fff',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 2',
         id: '2',
         data: [],
@@ -161,7 +161,7 @@ describe('computeHiddenShowItems', () => {
       {
         color: '#000',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         formattedName: 'Item 1',
         id: '1',
         data: [],

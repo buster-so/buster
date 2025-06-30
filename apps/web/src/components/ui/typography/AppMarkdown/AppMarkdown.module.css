@@ -69,5 +69,5 @@
 }
 
 .container strong {
-  @apply font-semibold;
+  font-weight: 600;
 }

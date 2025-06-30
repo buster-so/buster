@@ -27,11 +27,12 @@ type Story = StoryObj<typeof BusterChart>;
 
 export const Default: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: generateScatterChartData(50),
     scatterAxis: {
       x: ['x'],
       y: ['y'],
+      tooltip: null,
       size: [],
       category: []
     },
@@ -71,6 +72,7 @@ export const WithCategory: Story = {
       x: ['x'],
       y: ['y'],
       size: [],
+      tooltip: null,
       category: ['category']
     }
   }
@@ -142,6 +144,7 @@ export const LargeDatasetWithCategory: Story = {
       x: ['x'],
       y: ['y'],
       size: [],
+      tooltip: null,
       category: ['category']
     }
   },
@@ -210,6 +213,8 @@ export const WithSize: Story = {
     scatterAxis: {
       x: ['x'],
       y: ['y'],
+      tooltip: null,
+      category: [],
       size: ['size']
     },
     columnMetadata: [
@@ -227,7 +232,7 @@ export const WithSize: Story = {
 
 export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -247,6 +252,8 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
     scatterAxis: {
       x: ['index'],
       y: ['revenue'],
+      tooltip: null,
+      size: [],
       category: []
     },
     className: 'w-[800px] h-[400px]',
@@ -260,7 +267,11 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
         columnId: 'revenue',
         aggregateAllCategories: true,
         lineStyle: 'dotted',
-        trendlineLabelPositionOffset: 0.15
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID'
       },
       {
         type: 'max',
@@ -269,7 +280,13 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
         trendlineLabel: 'correct!',
         trendLineColor: 'inherit',
         columnId: 'revenue',
-        aggregateAllCategories: true
+        aggregateAllCategories: true,
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID'
       },
       {
         type: 'max',
@@ -278,7 +295,13 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
         trendlineLabel: null,
         trendLineColor: 'inherit',
         columnId: 'revenue',
-        aggregateAllCategories: false
+        aggregateAllCategories: false,
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID'
       },
       {
         type: 'min',
@@ -286,7 +309,14 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: null,
         trendLineColor: 'inherit',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       },
       {
         type: 'median',
@@ -294,7 +324,14 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: null,
         trendLineColor: 'inherit',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       },
       {
         type: 'average',
@@ -302,7 +339,14 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: null,
         trendLineColor: 'inherit',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     columnLabelFormats: {
@@ -325,14 +369,16 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression_CategoryAxi
     scatterAxis: {
       x: ['index'],
       y: ['revenue'],
-      category: ['category']
+      category: ['category'],
+      tooltip: null,
+      size: []
     }
   }
 };
 
 export const ScatterWithTrendline_DateXAxisPolynomialRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -352,7 +398,9 @@ export const ScatterWithTrendline_DateXAxisPolynomialRegression: Story = {
     scatterAxis: {
       x: ['date'],
       y: ['revenue'],
-      category: []
+      category: [],
+      tooltip: null,
+      size: []
     },
     className: 'w-[800px] h-[400px]',
     trendlines: [
@@ -362,7 +410,14 @@ export const ScatterWithTrendline_DateXAxisPolynomialRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: 'Polynomial Growth Pattern',
         trendLineColor: 'red',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     columnLabelFormats: {
@@ -386,14 +441,16 @@ export const ScatterWithTrendline_DateXAxisPolynomialRegression_CategoryAxis: St
     scatterAxis: {
       x: ['date'],
       y: ['revenue'],
-      category: ['category']
+      category: ['category'],
+      tooltip: null,
+      size: []
     }
   }
 };
 
 export const ScatterWithTrendline_NumericalXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -413,7 +470,9 @@ export const ScatterWithTrendline_NumericalXAxisLinearRegression: Story = {
     scatterAxis: {
       x: ['index'],
       y: ['revenue'],
-      category: []
+      category: [],
+      tooltip: null,
+      size: []
     },
     className: 'w-[800px] h-[400px]',
     trendlines: [
@@ -423,7 +482,14 @@ export const ScatterWithTrendline_NumericalXAxisLinearRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: 'Linear Growth Pattern',
         trendLineColor: 'red',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     columnLabelFormats: {
@@ -446,14 +512,16 @@ export const ScatterWithTrendline_NumericalXAxisLinearRegression_CategoryAxis: S
     scatterAxis: {
       x: ['index'],
       y: ['revenue'],
-      category: ['category']
+      category: ['category'],
+      tooltip: null,
+      size: []
     }
   }
 };
 
 export const ScatterWithTrendline_DateXAxisLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -473,7 +541,9 @@ export const ScatterWithTrendline_DateXAxisLinearRegression: Story = {
     scatterAxis: {
       x: ['date'],
       y: ['revenue'],
-      category: []
+      category: [],
+      tooltip: null,
+      size: []
     },
     className: 'w-[800px] h-[400px]',
     trendlines: [
@@ -483,7 +553,14 @@ export const ScatterWithTrendline_DateXAxisLinearRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: 'Linear Growth Pattern',
         trendLineColor: 'red',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     columnLabelFormats: {
@@ -507,14 +584,16 @@ export const ScatterWithTrendline_DateXAxisLinearRegression_CategoryAxis: Story 
     scatterAxis: {
       x: ['date'],
       y: ['revenue'],
-      category: ['category']
+      category: ['category'],
+      tooltip: null,
+      size: []
     }
   }
 };
 
 export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -534,7 +613,9 @@ export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression: Story = {
     scatterAxis: {
       x: ['index'],
       y: ['revenue'],
-      category: []
+      category: [],
+      tooltip: null,
+      size: []
     },
     className: 'w-[800px] h-[400px]',
     trendlines: [
@@ -544,7 +625,14 @@ export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: 'Logarithmic Growth Pattern',
         trendLineColor: 'red',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     columnLabelFormats: {
@@ -567,14 +655,16 @@ export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression_CategoryAx
     scatterAxis: {
       x: ['index'],
       y: ['revenue'],
-      category: ['category']
+      category: ['category'],
+      tooltip: null,
+      size: []
     }
   }
 };
 
 export const ScatterWithTrendline_DateXAxisLogarithmicRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     data: Array.from({ length: 30 }, (_, i) => {
       // Generate polynomial-like data with random noise
       const x = i / 5; // Scale x to make the curve more visible
@@ -594,7 +684,9 @@ export const ScatterWithTrendline_DateXAxisLogarithmicRegression: Story = {
     scatterAxis: {
       x: ['date'],
       y: ['revenue'],
-      category: []
+      category: [],
+      tooltip: null,
+      size: []
     },
     className: 'w-[800px] h-[400px]',
     trendlines: [
@@ -604,7 +696,14 @@ export const ScatterWithTrendline_DateXAxisLogarithmicRegression: Story = {
         showTrendlineLabel: true,
         trendlineLabel: 'Logarithmic Growth Pattern',
         trendLineColor: 'red',
-        columnId: 'revenue'
+        columnId: 'revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     columnLabelFormats: {
@@ -628,7 +727,9 @@ export const ScatterWithTrendline_DateXAxisLogarithmicRegression_CategoryAxis: S
     scatterAxis: {
       x: ['date'],
       y: ['revenue'],
-      category: ['category']
+      category: ['category'],
+      tooltip: null,
+      size: []
     }
   }
 };
@@ -644,7 +745,7 @@ export const ProblematicDataset: Story = {
       y: ['attach_rate'],
       category: ['merchant']
     },
-    selectedChartType: ChartType.Scatter
+    selectedChartType: 'scatter'
   }
 };
 
@@ -660,7 +761,7 @@ export const ProblematicDataset2: Story = {
 
 export const ProblematicDatasetWithLinearRegression: Story = {
   args: {
-    selectedChartType: ChartType.Scatter,
+    selectedChartType: 'scatter',
     columnLabelFormats: {
       total_cost: {
         columnType: 'number',
@@ -739,7 +840,14 @@ export const ProblematicDatasetWithLinearRegression: Story = {
         type: 'linear_regression',
         columnId: 'total_revenue',
         trendLineColor: '#FF0000',
-        trendlineLabel: null
+        trendlineLabel: null,
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false
       }
     ],
     disableTooltip: false,
@@ -757,6 +865,8 @@ export const ProblematicDatasetWithLinearRegression: Story = {
     scatterAxis: {
       x: ['total_cost'],
       y: ['total_revenue'],
+      category: [],
+      tooltip: null,
       size: []
     },
     scatterDotSize: [3, 15],
@@ -1856,7 +1966,15 @@ export const ProblematicDatasetWithLogarithmicRegression_DateXAxis: Story = {
         show: true,
         showTrendlineLabel: true,
         trendlineLabel: 'Logarithmic Regression',
-        columnId: 'total_revenue'
+        columnId: 'total_revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false,
+        trendLineColor: 'red'
       }
     ]
   }
@@ -1871,7 +1989,15 @@ export const ProblematicDatasetWithPolynomialRegression_DateXAxis: Story = {
         show: true,
         showTrendlineLabel: true,
         trendlineLabel: 'Polynomial Regression',
-        columnId: 'total_revenue'
+        columnId: 'total_revenue',
+        trendlineLabelPositionOffset: 15,
+        projection: false,
+        lineStyle: 'solid',
+        offset: 0,
+        polynomialOrder: 2,
+        id: 'DEFAULT_ID',
+        aggregateAllCategories: false,
+        trendLineColor: 'red'
       }
     ]
   }

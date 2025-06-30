@@ -95,7 +95,7 @@ const StylingPopover: React.FC<{
             hideTitle
             columnLabelFormat={columnLabelFormat}
             id={metricColumnId}
-            selectedChartType={ChartType.Metric}
+            selectedChartType={'metric'}
             //Not applicable to metric chart but required by the component... need to think if this is best approach
             columnSetting={DEFAULT_COLUMN_SETTINGS}
             zoneId={SelectAxisContainerId.YAxis}

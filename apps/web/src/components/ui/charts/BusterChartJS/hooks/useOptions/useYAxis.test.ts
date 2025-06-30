@@ -13,25 +13,27 @@ describe('useYAxis', () => {
     },
     selectedAxis: {
       y: ['value1'],
-      x: ['date']
+      x: ['date'],
+      category: []
     } as ChartEncodes,
-    selectedChartType: ChartType.Bar,
+    selectedChartType: 'bar',
     columnMetadata: undefined,
     barGroupType: 'group' as const,
     lineGroupType: null,
-    yAxisAxisTitle: undefined,
+    yAxisAxisTitle: null,
     yAxisShowAxisTitle: true,
     yAxisShowAxisLabel: true,
     yAxisStartAxisAtZero: true,
     yAxisScaleType: 'linear' as const,
-    gridLines: true
-  };
+    gridLines: true,
+    columnSettings: {}
+  } as Parameters<typeof useYAxis>[0];
 
   it('should return undefined for pie charts', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Pie
-    };
+      selectedChartType: 'pie'
+    } as Parameters<typeof useYAxis>[0];
 
     const { result } = renderHook(() => useYAxis(props));
     expect(result.current).toBeUndefined();
@@ -119,9 +121,9 @@ describe('useYAxis', () => {
   it('should handle line chart percentage stack mode', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Line,
+      selectedChartType: 'line',
       lineGroupType: 'percentage-stack' as const
-    };
+    } as Parameters<typeof useYAxis>[0];
 
     const { result } = renderHook(() => useYAxis(props));
     expect(result.current?.max).toBe(100);

@@ -5,13 +5,13 @@ const UNSUPPORTED_CHART_TYPES = ['metric', 'table'];
 
 export const useLegendAutoShow = ({
   selectedChartType,
-  showLegendProp,
+  showLegendProp = null,
   categoryAxisColumnNames,
   allYAxisColumnNames
 }: {
   selectedChartType: BusterChartProps['selectedChartType'];
   showLegendProp: BusterChartProps['showLegend'];
-  categoryAxisColumnNames: string[] | undefined;
+  categoryAxisColumnNames: string[] | null | undefined;
   allYAxisColumnNames: string[];
 }) => {
   const showLegend = useMemo(() => {

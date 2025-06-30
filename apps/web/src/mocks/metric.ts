@@ -9,14 +9,7 @@ import {
 import { ShareRole, VerificationStatus } from '@/api/asset_interfaces/share';
 
 // Utility functions for predictable mock data generation
-const CHART_TYPES = [
-  ChartType.Bar,
-  ChartType.Table,
-  ChartType.Line,
-  ChartType.Pie,
-  ChartType.Scatter,
-  ChartType.Metric
-];
+const CHART_TYPES: ChartType[] = ['bar', 'table', 'line', 'pie', 'scatter', 'metric'];
 
 const PRODUCT_NAMES = [
   'Premium Widget',
@@ -71,7 +64,7 @@ const generatePredictableEmail = (id: string): string => {
 
 const createMockChartConfig = (id: string): IBusterMetricChartConfig => {
   const hash = Array.from(id).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const chartType = CHART_TYPES[hash % CHART_TYPES.length];
+  const chartType: ChartType = CHART_TYPES[hash % CHART_TYPES.length];
 
   return {
     ...DEFAULT_CHART_CONFIG,
@@ -83,16 +76,21 @@ const createMockChartConfig = (id: string): IBusterMetricChartConfig => {
     },
     pieChartAxis: {
       x: ['product'],
-      y: ['sales']
+      y: ['sales'],
+      tooltip: null
     },
     scatterAxis: {
       x: ['date'],
-      y: ['sales']
+      y: ['sales'],
+      category: [],
+      size: [],
+      tooltip: null
     },
     metricColumnId: 'sales',
     metricHeader: {
       columnId: 'sales',
-      useValue: false
+      useValue: false,
+      aggregate: 'sum'
     }
   };
 };

@@ -29,7 +29,7 @@ import { EditYAxisScaleGlobal } from './EditYAxisScaleGlobal';
 import { StylingAppStylingNotSupported } from './StylingAppStylingNotSupported';
 
 const sectionClass = 'flex w-full flex-col space-y-3 my-3';
-const UNSUPPORTED_CHART_TYPES: ChartType[] = [ChartType.Table, ChartType.Metric];
+const UNSUPPORTED_CHART_TYPES: ChartType[] = ['table', 'metric'];
 
 export const StylingAppStyling: React.FC<
   {

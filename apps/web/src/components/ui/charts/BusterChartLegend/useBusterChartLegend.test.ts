@@ -4,10 +4,11 @@ import { describe, expect, it } from 'vitest';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import type { BusterChartLegendItem } from './interfaces';
 import { useBusterChartLegend } from './useBusterChartLegend';
+import type { ChartEncodes } from '@/api/asset_interfaces';
 
 describe('useBusterChartLegend', () => {
   const defaultProps = {
-    selectedChartType: ChartType.Line,
+    selectedChartType: 'line',
     showLegendProp: true,
     loading: false,
     lineGroupType: 'percentage-stack' as const,
@@ -16,8 +17,8 @@ describe('useBusterChartLegend', () => {
       x: ['timestamp'],
       y: ['value1', 'value2'],
       y2: ['value3']
-    }
-  };
+    } as ChartEncodes
+  } as Parameters<typeof useBusterChartLegend>[0];
 
   it('should initialize with default values', () => {
     const { result } = renderHook(() => useBusterChartLegend(defaultProps));
@@ -33,8 +34,8 @@ describe('useBusterChartLegend', () => {
   it('should not render legend for metric chart type', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Metric
-    };
+      selectedChartType: 'metric'
+    } as Parameters<typeof useBusterChartLegend>[0];
 
     const { result } = renderHook(() => useBusterChartLegend(props));
     expect(result.current.renderLegend).toBe(false);
@@ -53,9 +54,9 @@ describe('useBusterChartLegend', () => {
   it('should detect percentage stack type for bar chart', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Bar,
+      selectedChartType: 'bar',
       barGroupType: 'percentage-stack' as const
-    };
+    } as Parameters<typeof useBusterChartLegend>[0];
 
     const { result } = renderHook(() => useBusterChartLegend(props));
     expect(result.current.isStackPercentage).toBe(true);
@@ -77,7 +78,7 @@ describe('useBusterChartLegend', () => {
       {
         color: '#000',
         inactive: false,
-        type: ChartType.Line,
+        type: 'line',
         data: [1, 2, 3],
         formattedName: 'Test Series',
         id: 'test-1',
@@ -107,8 +108,8 @@ describe('useBusterChartLegend', () => {
       selectedAxis: {
         ...defaultProps.selectedAxis,
         y: ['newValue1', 'newValue2']
-      }
-    };
+      } as ChartEncodes
+    } as Parameters<typeof useBusterChartLegend>[0];
 
     rerender(newProps);
 

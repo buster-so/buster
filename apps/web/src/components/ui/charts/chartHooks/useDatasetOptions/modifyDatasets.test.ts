@@ -61,8 +61,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     expect(result).toEqual(datasets.datasets);
@@ -76,8 +76,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     expect(result).toEqual(datasets.datasets);
@@ -93,8 +93,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Slices 1, 2 and 3 should remain (>=10%)
@@ -126,8 +126,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // All slices should remain, no "Other" category
@@ -144,8 +144,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // All slices should be combined into one "Other" slice
@@ -164,8 +164,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     expect(result).toEqual([]);
@@ -208,8 +208,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Since we want a minimum percentage of 10%, it will combine the null and 0 values into the "Other" category
@@ -250,8 +250,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Should return the original datasets when all values are null/zero
@@ -267,8 +267,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Slices 1, 2 and 3 should remain (>=8.5%)
@@ -292,8 +292,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     const otherCategory = result.find((dataset) => dataset.id === 'other');
@@ -316,8 +316,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Slices 1, 2, 3, and 4 should remain (>=8%)
@@ -433,8 +433,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -488,8 +488,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -609,8 +609,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -712,8 +712,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -809,8 +809,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -923,8 +923,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -1038,8 +1038,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Verify the result has the right number of datasets
@@ -1116,8 +1116,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Negative values should be ignored in percentage calculations for pie charts
@@ -1188,8 +1188,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Slices 1 and 2 should remain (>=10%)
@@ -1270,8 +1270,8 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: 'value',
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Should maintain the same number of datasets
@@ -1294,8 +1294,8 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: 'key',
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Should maintain the same number of datasets
@@ -1319,8 +1319,8 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: null,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     // Should maintain the same number of datasets and original order
@@ -1347,8 +1347,8 @@ describe('modifyDatasets - pieSortBy tests', () => {
       barSortBy: undefined,
       pieSortBy: 'value',
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
+      lineGroupType: null,
+      selectedChartType: 'pie'
     });
 
     expect(result).toEqual([]);
@@ -1396,8 +1396,8 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1426,8 +1426,8 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1458,7 +1458,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       pieSortBy: undefined,
       barGroupType: undefined,
       lineGroupType: 'percentage-stack',
-      selectedChartType: ChartType.Line
+      selectedChartType: 'line'
     });
 
     // Should maintain the same number of datasets
@@ -1517,8 +1517,8 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1589,8 +1589,8 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1649,8 +1649,8 @@ describe('modifyDatasets - percentage stack tests', () => {
       barSortBy: undefined,
       pieSortBy: undefined,
       barGroupType: 'percentage-stack',
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets and data length
@@ -1713,8 +1713,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc', 'desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1779,8 +1779,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1816,8 +1816,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['none', 'desc'], // First one is 'none', should use 'desc'
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1845,8 +1845,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc', 'none'], // First one is 'desc', should use that
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // First dataset - should now be sorted
@@ -1897,8 +1897,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -1962,8 +1962,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     // Should maintain the same number of datasets
@@ -2015,8 +2015,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['asc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     expect(result.length).toBe(1);
@@ -2050,8 +2050,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     expect(result.length).toBe(1);
@@ -2087,8 +2087,8 @@ describe('modifyDatasets - barSortBy tests', () => {
       barSortBy: ['desc'],
       pieSortBy: undefined,
       barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null,
+      selectedChartType: 'bar'
     });
 
     expect(result.length).toBe(1);

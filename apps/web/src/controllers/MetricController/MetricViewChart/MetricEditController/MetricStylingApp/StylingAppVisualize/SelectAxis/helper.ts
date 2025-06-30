@@ -63,7 +63,7 @@ export const chartTypeToDropZones: Record<
   IBusterMetricChartConfig['selectedChartType'],
   (selectedAxis: Parameters<typeof getChartTypeDropZones>[0]['selectedAxis']) => DropZone[]
 > = {
-  [ChartType.Bar]: (selectedAxis) => {
+  ['bar']: (selectedAxis) => {
     const _selectedAxis = selectedAxis as IBusterMetricChartConfig['barAndLineAxis'];
     return [
       makeXAxisDropZone(_selectedAxis.x),
@@ -72,7 +72,7 @@ export const chartTypeToDropZones: Record<
       makeTooltipDropZone(_selectedAxis.tooltip)
     ];
   },
-  [ChartType.Line]: (selectedAxis) => {
+  ['line']: (selectedAxis) => {
     const _selectedAxis = selectedAxis as IBusterMetricChartConfig['barAndLineAxis'];
     return [
       makeXAxisDropZone(_selectedAxis.x),
@@ -81,7 +81,7 @@ export const chartTypeToDropZones: Record<
       makeTooltipDropZone(_selectedAxis.tooltip)
     ];
   },
-  [ChartType.Scatter]: (selectedAxis) => {
+  ['scatter']: (selectedAxis) => {
     const _selectedAxis = selectedAxis as IBusterMetricChartConfig['scatterAxis'];
     return [
       makeXAxisDropZone(_selectedAxis.x),
@@ -91,7 +91,7 @@ export const chartTypeToDropZones: Record<
       makeTooltipDropZone(_selectedAxis.tooltip)
     ];
   },
-  [ChartType.Pie]: (selectedAxis) => {
+  ['pie']: (selectedAxis) => {
     const _selectedAxis = selectedAxis as IBusterMetricChartConfig['pieChartAxis'];
     return [
       makeXAxisDropZone(_selectedAxis.x),
@@ -99,7 +99,7 @@ export const chartTypeToDropZones: Record<
       makeTooltipDropZone(_selectedAxis.tooltip)
     ];
   },
-  [ChartType.Combo]: (selectedAxis) => {
+  ['combo']: (selectedAxis) => {
     const _selectedAxis = selectedAxis as IBusterMetricChartConfig['comboChartAxis'];
     return [
       makeXAxisDropZone(_selectedAxis.x),
@@ -110,10 +110,10 @@ export const chartTypeToDropZones: Record<
     ];
   },
   //NOT ACUTALLY USED
-  [ChartType.Metric]: () => {
+  ['metric']: () => {
     return EMPTY_DROP_ZONE;
   },
-  [ChartType.Table]: () => {
+  ['table']: () => {
     return EMPTY_DROP_ZONE;
   }
 };

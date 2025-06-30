@@ -41,7 +41,7 @@ export const useY2Axis = ({
   }, [y2AxisKeys]);
 
   const isSupportedType = useMemo(() => {
-    return selectedChartType === ChartType.Combo;
+    return selectedChartType === 'combo';
   }, [selectedChartType]);
 
   const canUseSameY2Formatter = useMemo(() => {
@@ -56,7 +56,7 @@ export const useY2Axis = ({
     columnLabelFormats,
     y2AxisAxisTitle,
     y2AxisShowAxisTitle,
-    isSupportedChartForAxisTitles: selectedChartType === ChartType.Combo
+    isSupportedChartForAxisTitles: selectedChartType === 'combo'
   });
 
   const type = useMemo(() => {

@@ -197,10 +197,10 @@ const getSelectedAxis = (
   scatterAxis: ScatterAxis,
   barAndLineAxis: BarAndLineAxis
 ) => {
-  if (selectedChartType === ChartType.Combo) return comboChartAxis;
-  if (selectedChartType === ChartType.Pie) return pieChartAxis;
-  if (selectedChartType === ChartType.Scatter) return scatterAxis;
-  if (selectedChartType === ChartType.Bar) return barAndLineAxis;
-  if (selectedChartType === ChartType.Line) return barAndLineAxis;
+  if (selectedChartType === 'combo') return comboChartAxis;
+  if (selectedChartType === 'pie') return pieChartAxis;
+  if (selectedChartType === 'scatter') return scatterAxis;
+  if (selectedChartType === 'bar') return barAndLineAxis;
+  if (selectedChartType === 'line') return barAndLineAxis;
   return barAndLineAxis;
 };

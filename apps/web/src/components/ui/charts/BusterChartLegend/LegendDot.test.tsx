@@ -7,8 +7,8 @@ describe('LegendItemDot', () => {
   const defaultProps = {
     color: '#FF0000',
     inactive: false,
-    type: ChartType.Bar
-  };
+    type: 'bar'
+  } as Parameters<typeof LegendItemDot>[0];
 
   it('renders with default props', () => {
     render(<LegendItemDot {...defaultProps} />);
@@ -17,13 +17,13 @@ describe('LegendItemDot', () => {
   });
 
   it('renders with different chart types', () => {
-    const { rerender } = render(<LegendItemDot {...defaultProps} type={ChartType.Bar} />);
+    const { rerender } = render(<LegendItemDot {...defaultProps} type={'bar'} />);
     expect(screen.getByTestId('legend-dot')).toHaveClass('rounded-sm');
 
-    rerender(<LegendItemDot {...defaultProps} type={ChartType.Line} />);
+    rerender(<LegendItemDot {...defaultProps} type={'line'} />);
     expect(screen.getByTestId('legend-dot')).toHaveClass('rounded-sm');
 
-    rerender(<LegendItemDot {...defaultProps} type={ChartType.Scatter} />);
+    rerender(<LegendItemDot {...defaultProps} type={'scatter'} />);
     expect(screen.getByTestId('legend-dot')).toHaveClass('rounded-full');
   });
 

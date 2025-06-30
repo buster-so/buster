@@ -5,6 +5,7 @@ import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { generatePieChartData } from '../../../../mocks/chart/chartMocks';
 import { BusterChart } from '../BusterChart';
 import { sharedMeta } from './BusterChartShared';
+import type { ColumnSettings } from '@/api/asset_interfaces';
 
 type PieChartData = ReturnType<typeof generatePieChartData>;
 
@@ -18,11 +19,12 @@ type Story = StoryObj<typeof BusterChart>;
 
 export const Default: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: generatePieChartData(),
     pieChartAxis: {
       x: ['segment'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -43,7 +45,7 @@ export const Default: Story = {
 
 export const MultipleValues: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: [
       { segment: 'A', value1: 30, value2: 45 },
       { segment: 'B', value1: 20, value2: 25 },
@@ -51,7 +53,8 @@ export const MultipleValues: Story = {
     ],
     pieChartAxis: {
       x: ['segment'],
-      y: ['value1', 'value2']
+      y: ['value1', 'value2'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -77,11 +80,12 @@ export const MultipleValues: Story = {
 
 export const Donut: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: generatePieChartData(),
     pieChartAxis: {
       x: ['segment'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -102,7 +106,7 @@ export const Donut: Story = {
 
 export const DonutMultipleValues: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: [
       { segment: 'A', value1: 30, value2: 45 },
       { segment: 'B', value1: 20, value2: 25 },
@@ -110,7 +114,8 @@ export const DonutMultipleValues: Story = {
     ],
     pieChartAxis: {
       x: ['segment'],
-      y: ['value1', 'value2']
+      y: ['value1', 'value2'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -141,11 +146,12 @@ export const ResizableContainer: Story = {
     </div>
   ),
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: generatePieChartData(),
     pieChartAxis: {
       x: ['segment'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -191,14 +197,15 @@ const dates = [
 
 export const WithSortingByKey: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: Array.from({ length: 8 }, (_, index) => ({
       segment: names[index],
       value: numbers[index]
     })),
     pieChartAxis: {
       x: ['segment'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     pieSortBy: 'key',
     columnMetadata: [
@@ -224,14 +231,15 @@ export const WithSortingByKey: Story = {
 
 export const WithSortingByKeyWithDates: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: Array.from({ length: 8 }, (_, index) => ({
       date: dates[index],
       value: numbers[index]
     })),
     pieChartAxis: {
       x: ['date'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     pieSortBy: 'key',
     columnLabelFormats: {
@@ -275,7 +283,7 @@ export const ShowLabelAsPercent: Story = {
     </div>
   ),
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: Array.from({ length: 5 }, (_, index) => ({
       segment: names[index],
       value: numbers[index],
@@ -284,7 +292,8 @@ export const ShowLabelAsPercent: Story = {
     pieSortBy: 'value',
     pieChartAxis: {
       x: ['segment'],
-      y: ['value', 'value2']
+      y: ['value', 'value2'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -314,11 +323,11 @@ export const ShowLabelAsPercent: Story = {
 
 export const ManyValuesWithDataLabels: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     columnSettings: {
       value: {
         showDataLabels: true
-      }
+      } as ColumnSettings
     },
     columnLabelFormats: {
       value: {
@@ -333,7 +342,8 @@ export const ManyValuesWithDataLabels: Story = {
     })),
     pieChartAxis: {
       x: ['segment'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     pieDisplayLabelAs: 'number',
     pieLabelPosition: 'inside',
@@ -343,14 +353,15 @@ export const ManyValuesWithDataLabels: Story = {
 
 export const DataLabelsOutside: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: Array.from({ length: 5 }, (_, index) => ({
       segment: names[index],
       value: numbers[index]
     })),
     pieChartAxis: {
       x: ['segment'],
-      y: ['value']
+      y: ['value'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {
@@ -375,7 +386,7 @@ export const DataLabelsOutside: Story = {
 
 export const MinimumSlicePercentage: Story = {
   args: {
-    selectedChartType: ChartType.Pie,
+    selectedChartType: 'pie',
     data: [
       { segment: 'Major Segment', sales: 60 },
       { segment: 'Medium Segment', sales: 20 },
@@ -387,7 +398,8 @@ export const MinimumSlicePercentage: Story = {
     ],
     pieChartAxis: {
       x: ['segment'],
-      y: ['sales']
+      y: ['sales'],
+      tooltip: null
     },
     columnLabelFormats: {
       segment: {

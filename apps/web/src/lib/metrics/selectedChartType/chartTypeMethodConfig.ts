@@ -14,57 +14,45 @@ export const DetermineSelectedChartTypeRecord: Record<
   ) => boolean
 > = {
   [ChartIconType.TABLE]: ({ selectedChartType }) => {
-    return selectedChartType === ChartType.Table;
+    return selectedChartType === 'table';
   },
   [ChartIconType.COLUMN]: ({ barGroupType, selectedChartType, barLayout }) => {
-    return (
-      selectedChartType === ChartType.Bar && barLayout === 'vertical' && barGroupType === 'group'
-    );
+    return selectedChartType === 'bar' && barLayout === 'vertical' && barGroupType === 'group';
   },
   [ChartIconType.STACKED_COLUMN]: ({ selectedChartType, barLayout, barGroupType }) => {
-    return (
-      selectedChartType === ChartType.Bar && barLayout === 'vertical' && barGroupType === 'stack'
-    );
+    return selectedChartType === 'bar' && barLayout === 'vertical' && barGroupType === 'stack';
   },
   [ChartIconType.RELATIVE_STACKED_COLUMN]: ({ selectedChartType, barLayout, barGroupType }) => {
     return (
-      selectedChartType === ChartType.Bar &&
-      barLayout === 'vertical' &&
-      barGroupType === 'percentage-stack'
+      selectedChartType === 'bar' && barLayout === 'vertical' && barGroupType === 'percentage-stack'
     );
   },
   [ChartIconType.LINE]: ({ selectedChartType, hasAreaStyle }) => {
-    return selectedChartType === ChartType.Line && !hasAreaStyle;
+    return selectedChartType === 'line' && !hasAreaStyle;
   },
   [ChartIconType.COMBO]: ({ selectedChartType }) => {
-    return selectedChartType === ChartType.Combo;
+    return selectedChartType === 'combo';
   },
   [ChartIconType.BAR]: ({ selectedChartType, barLayout, barGroupType }) => {
-    return (
-      selectedChartType === ChartType.Bar && barLayout === 'horizontal' && barGroupType === 'group'
-    );
+    return selectedChartType === 'bar' && barLayout === 'horizontal' && barGroupType === 'group';
   },
   [ChartIconType.STACKED_BAR]: ({ selectedChartType, barLayout, barGroupType }) => {
-    return (
-      selectedChartType === ChartType.Bar && barGroupType === 'stack' && barLayout === 'horizontal'
-    );
+    return selectedChartType === 'bar' && barGroupType === 'stack' && barLayout === 'horizontal';
   },
   [ChartIconType.RELATIVE_STACKED_BAR]: ({ selectedChartType, barLayout, barGroupType }) => {
     return (
-      selectedChartType === ChartType.Bar &&
+      selectedChartType === 'bar' &&
       barGroupType === 'percentage-stack' &&
       barLayout === 'horizontal'
     );
   },
   [ChartIconType.AREA]: ({ selectedChartType, hasAreaStyle, lineGroupType }) => {
-    return selectedChartType === ChartType.Line && hasAreaStyle && lineGroupType === null;
+    return selectedChartType === 'line' && hasAreaStyle && lineGroupType === null;
   },
   [ChartIconType.RELATIVE_AREA]: ({ selectedChartType, hasAreaStyle, lineGroupType }) => {
-    return (
-      selectedChartType === ChartType.Line && lineGroupType === 'percentage-stack' && hasAreaStyle
-    );
+    return selectedChartType === 'line' && lineGroupType === 'percentage-stack' && hasAreaStyle;
   },
-  [ChartIconType.SCATTER]: ({ selectedChartType }) => selectedChartType === ChartType.Scatter,
-  [ChartIconType.PIE]: ({ selectedChartType }) => selectedChartType === ChartType.Pie,
-  [ChartIconType.METRIC]: ({ selectedChartType }) => selectedChartType === ChartType.Metric
+  [ChartIconType.SCATTER]: ({ selectedChartType }) => selectedChartType === 'scatter',
+  [ChartIconType.PIE]: ({ selectedChartType }) => selectedChartType === 'pie',
+  [ChartIconType.METRIC]: ({ selectedChartType }) => selectedChartType === 'metric'
 };

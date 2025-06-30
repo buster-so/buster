@@ -17,7 +17,7 @@ describe('legendHeadlineHelpers', () => {
       data: [1, 2, 3, 4, 5],
       color: '#000000',
       inactive: false,
-      type: ChartType.Line,
+      type: 'line',
       formattedName: 'Test Series'
     }
   ];
@@ -60,7 +60,7 @@ describe('legendHeadlineHelpers', () => {
         false as ShowLegendHeadline,
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -74,7 +74,7 @@ describe('legendHeadlineHelpers', () => {
         'current',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Scatter,
+        'scatter',
         mockXAxisKeys
       );
 
@@ -89,7 +89,7 @@ describe('legendHeadlineHelpers', () => {
           data: [10],
           color: '#000000',
           inactive: false,
-          type: ChartType.Pie,
+          type: 'pie',
           formattedName: 'Pie Slice'
         }
       ];
@@ -100,7 +100,7 @@ describe('legendHeadlineHelpers', () => {
         'current',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Pie,
+        'pie',
         mockXAxisKeys
       );
 
@@ -117,7 +117,7 @@ describe('legendHeadlineHelpers', () => {
         'average',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -134,7 +134,7 @@ describe('legendHeadlineHelpers', () => {
         'total',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -152,7 +152,7 @@ describe('legendHeadlineHelpers', () => {
           data: [],
           color: '#000000',
           inactive: false,
-          type: ChartType.Line,
+          type: 'line',
           formattedName: 'Invalid Data'
         }
       ];
@@ -163,7 +163,7 @@ describe('legendHeadlineHelpers', () => {
         'average',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -180,7 +180,7 @@ describe('legendHeadlineHelpers', () => {
         'min',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -197,7 +197,7 @@ describe('legendHeadlineHelpers', () => {
         'max',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -214,7 +214,7 @@ describe('legendHeadlineHelpers', () => {
         'median',
         mockColumnMetadata,
         mockColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -232,7 +232,7 @@ describe('legendHeadlineHelpers', () => {
           data: [1000, 2000, 3000, 4000, 5000],
           color: '#000000',
           inactive: false,
-          type: ChartType.Line,
+          type: 'line',
           formattedName: 'Revenue'
         }
       ];
@@ -251,7 +251,7 @@ describe('legendHeadlineHelpers', () => {
         'total',
         mockColumnMetadata,
         currencyColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 
@@ -269,7 +269,7 @@ describe('legendHeadlineHelpers', () => {
           data: [10, 20, 30, 40, 50],
           color: '#000000',
           inactive: false,
-          type: ChartType.Line,
+          type: 'line',
           formattedName: 'Active Users'
         }
       ];
@@ -289,7 +289,7 @@ describe('legendHeadlineHelpers', () => {
         'average',
         mockColumnMetadata,
         prefixColumnLabelFormats,
-        ChartType.Line,
+        'line',
         mockXAxisKeys
       );
 

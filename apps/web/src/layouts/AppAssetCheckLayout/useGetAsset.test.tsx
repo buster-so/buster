@@ -51,7 +51,7 @@ describe('useGetAsset', () => {
 
     expect(useGetMetric).toHaveBeenCalledWith(
       { id: 'metric-123', versionNumber: undefined },
-      { enabled: true }
+      { enabled: true, select: expect.any(Function) }
     );
     expect(useGetMetricData).toHaveBeenCalledWith({ id: 'metric-123', versionNumber: undefined });
     expect(result.current).toEqual({
@@ -76,7 +76,7 @@ describe('useGetAsset', () => {
 
     expect(useGetDashboard).toHaveBeenCalledWith(
       { id: 'dashboard-123', versionNumber: undefined },
-      { enabled: true }
+      { enabled: true, select: expect.any(Function) }
     );
     expect(result.current).toEqual({
       isFetched: true,
@@ -98,7 +98,9 @@ describe('useGetAsset', () => {
       useGetAsset({ assetId: 'collection-123', type: 'collection' })
     );
 
-    expect(useGetCollection).toHaveBeenCalledWith('collection-123');
+    expect(useGetCollection).toHaveBeenCalledWith('collection-123', {
+      select: expect.any(Function)
+    });
     expect(result.current).toEqual({
       isFetched: true,
       error: null,
@@ -115,7 +117,7 @@ describe('useGetAsset', () => {
 
     expect(useGetMetric).toHaveBeenCalledWith(
       { id: 'metric-123', versionNumber: 42 },
-      { enabled: true }
+      { enabled: true, select: expect.any(Function) }
     );
   });
   it('should use version number from search params if not provided in props', () => {
@@ -128,7 +130,7 @@ describe('useGetAsset', () => {
 
     expect(useGetMetric).toHaveBeenCalledWith(
       { id: 'metric-123', versionNumber: 42 },
-      { enabled: true }
+      { enabled: true, select: expect.any(Function) }
     );
   });
   it('should handle password required error (418)', () => {

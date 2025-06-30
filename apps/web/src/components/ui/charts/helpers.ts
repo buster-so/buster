@@ -7,13 +7,13 @@ const defaultAxisCheck = (selectedAxis: ChartEncodes) => {
 };
 
 const AxisMethodCheckRecord: Record<ChartType, (selectedAxis: ChartEncodes) => boolean> = {
-  [ChartType.Line]: defaultAxisCheck,
-  [ChartType.Bar]: defaultAxisCheck,
-  [ChartType.Scatter]: defaultAxisCheck,
-  [ChartType.Pie]: defaultAxisCheck,
-  [ChartType.Combo]: defaultAxisCheck,
-  [ChartType.Metric]: (selectedAxis) => true,
-  [ChartType.Table]: () => true
+  ['line']: defaultAxisCheck,
+  ['bar']: defaultAxisCheck,
+  ['scatter']: defaultAxisCheck,
+  ['pie']: defaultAxisCheck,
+  ['combo']: defaultAxisCheck,
+  ['metric']: (selectedAxis) => true,
+  ['table']: () => true
 };
 
 export const doesChartHaveValidAxis = ({

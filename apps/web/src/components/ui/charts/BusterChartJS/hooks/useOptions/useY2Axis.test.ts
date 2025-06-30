@@ -15,19 +15,19 @@ describe('useY2Axis', () => {
       y: ['metric1'],
       y2: ['metric2']
     } as ComboChartAxis,
-    selectedChartType: ChartType.Combo,
+    selectedChartType: 'combo',
     y2AxisAxisTitle: 'Test Y2 Axis',
     y2AxisShowAxisTitle: true,
     y2AxisShowAxisLabel: true,
     y2AxisStartAxisAtZero: true,
     y2AxisScaleType: 'linear' as const
-  };
+  } as Parameters<typeof useY2Axis>[0];
 
   it('should return undefined display when chart type is not Combo', () => {
     const props = {
       ...defaultProps,
-      selectedChartType: ChartType.Line
-    };
+      selectedChartType: 'line'
+    } as Parameters<typeof useY2Axis>[0];
 
     const { result } = renderHook(() => useY2Axis(props));
     expect(result.current).toEqual({ display: false });
@@ -96,9 +96,9 @@ describe('useY2Axis', () => {
       selectedAxis: {
         x: ['date'],
         y: ['metric1'],
-        y2: []
+        y2: [] as string[]
       } as ComboChartAxis
-    };
+    } as Parameters<typeof useY2Axis>[0];
 
     const { result } = renderHook(() => useY2Axis(props));
     expect(result.current?.display).toBe(false);

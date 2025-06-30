@@ -30,12 +30,12 @@ export const BusterChartJSTooltip: React.FC<{
   lineGroupType,
   barGroupType
 }) => {
-  const isPieChart = selectedChartType === ChartType.Pie;
-  const isScatter = selectedChartType === ChartType.Scatter;
-  const isLine = selectedChartType === ChartType.Line;
-  const isBar = selectedChartType === ChartType.Bar;
-  const isPie = selectedChartType === ChartType.Pie;
-  const isComboChart = selectedChartType === ChartType.Combo;
+  const isPieChart = selectedChartType === 'pie';
+  const isScatter = selectedChartType === 'scatter';
+  const isLine = selectedChartType === 'line';
+  const isBar = selectedChartType === 'bar';
+  const isPie = selectedChartType === 'pie';
+  const isComboChart = selectedChartType === 'combo';
   const datasets = chart.data.datasets;
   const dataPoints = dataPointsProp;
 

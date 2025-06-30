@@ -46,7 +46,7 @@ describe('canSupportTrendlineRecord', () => {
         show: true,
         showTrendlineLabel: true,
         trendlineLabel: 'Test Label'
-      };
+      } as Trendline;
 
       // Act
       const result = canSupportTrendlineRecord[trendlineType](mockColumnLabelFormats, trendline);
@@ -68,7 +68,7 @@ describe('canSupportTrendlineRecord', () => {
         show: true,
         showTrendlineLabel: true,
         trendlineLabel: 'Test Label'
-      };
+      } as Trendline;
 
       // Act
       const result = canSupportTrendlineRecord[trendlineType](mockColumnLabelFormats, trendline);
@@ -90,7 +90,7 @@ describe('canSupportTrendlineRecord', () => {
         show: true,
         showTrendlineLabel: true,
         trendlineLabel: 'Test Label'
-      };
+      } as Trendline;
 
       // Act
       const result = canSupportTrendlineRecord[trendlineType](mockColumnLabelFormats, trendline);

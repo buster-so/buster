@@ -24,7 +24,7 @@ import { getLegendItems } from './getLegendItems';
 interface UseBusterChartJSLegendProps {
   chartRef: React.RefObject<ChartJSOrUndefined | null>;
   colors: NonNullable<BusterChartProps['colors']>;
-  showLegend: boolean | null | undefined;
+  showLegend: boolean | null;
   selectedChartType: ChartType;
   chartMounted: boolean;
   selectedAxis: ChartEncodes | undefined;

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { HttpResponse, http } from 'msw';
-import type { IBusterMetricChartConfig, SimplifiedColumnType } from '@/api/asset_interfaces';
-import { ChartType, type IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { type IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { Button } from '@/components/ui/buttons/Button';
 import { SelectAxisContainerId } from './config';
 import {
@@ -72,7 +72,7 @@ const mockProps: SelectAxisColumnPopoverProps = {
     barRoundness: 8
   } satisfies IBusterMetricChartConfig['columnSettings'][string],
   id: 'test-id',
-  selectedChartType: ChartType.Bar,
+  selectedChartType: 'bar',
   barGroupType: 'group',
   lineGroupType: 'stack',
   zoneId: SelectAxisContainerId.XAxis,

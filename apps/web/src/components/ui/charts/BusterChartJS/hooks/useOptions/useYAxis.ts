@@ -44,7 +44,7 @@ export const useYAxis = ({
   const yAxisKeys = selectedAxis.y;
 
   const isSupportedType = useMemo(() => {
-    return selectedChartType !== ChartType.Pie;
+    return selectedChartType !== 'pie';
   }, [selectedChartType]);
 
   const grid: DeepPartial<GridLineOptions> | undefined = useMemo(() => {

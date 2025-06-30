@@ -76,8 +76,8 @@ export const LegendItemDot: React.FC<
   });
 
   const dotStyle = useMemo(() => {
-    if (type === ChartType.Line) return dotVariants({ size, type: 'line' });
-    if (type === ChartType.Scatter) return dotVariants({ size, type: 'scatter' });
+    if (type === 'line') return dotVariants({ size, type: 'line' });
+    if (type === 'scatter') return dotVariants({ size, type: 'scatter' });
     return dotVariants({ size, type: 'bar' });
   }, [type, size]);
 

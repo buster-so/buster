@@ -52,10 +52,10 @@ export const useXAxis = ({
   columnSettings: BusterChartProps['columnSettings'];
   xAxisTimeInterval: BusterChartProps['xAxisTimeInterval'];
 }): DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined => {
-  const isScatterChart = selectedChartType === ChartType.Scatter;
-  const isPieChart = selectedChartType === ChartType.Pie;
-  const isLineChart = selectedChartType === ChartType.Line;
-  const isComboChart = selectedChartType === ChartType.Combo;
+  const isScatterChart = selectedChartType === 'scatter';
+  const isPieChart = selectedChartType === 'pie';
+  const isLineChart = selectedChartType === 'line';
+  const isComboChart = selectedChartType === 'combo';
   const useGrid = isScatterChart;
 
   const isSupportedType = useMemo(() => {
@@ -103,14 +103,14 @@ export const useXAxis = ({
   const type: DeepPartial<ScaleChartOptions<'bar'>['scales']['x']['type']> = useMemo(() => {
     const xAxisKeys = Object.keys(xAxisColumnFormats);
     const xAxisKeysLength = xAxisKeys.length;
-    const hasBarChart = Object.values(yAxisColumnSettings).some(
-      (y) => y.columnVisualization === 'bar'
-    );
 
-    if (xAxisKeysLength === 1 && !hasBarChart) {
+    if (xAxisKeysLength === 1) {
       const xIsDate = firstXColumnLabelFormat.columnType === 'date';
+      const comboChartAndhasBarChart =
+        isComboChart &&
+        Object.values(yAxisColumnSettings).some((y) => y.columnVisualization === 'bar');
 
-      if ((isLineChart || isScatterChart) && xIsDate) {
+      if ((isLineChart || isScatterChart) && xIsDate && !comboChartAndhasBarChart) {
         return 'time';
       }
 

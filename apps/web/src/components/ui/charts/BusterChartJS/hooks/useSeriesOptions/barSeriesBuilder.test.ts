@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { BusterChartProps } from '@/api/asset_interfaces/metric';
+import { DEFAULT_COLUMN_SETTINGS, type BusterChartProps } from '@/api/asset_interfaces/metric';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import type { DatasetOption } from '../../../chartHooks';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks/useDatasetOptions/interfaces';
@@ -29,6 +29,7 @@ describe('barSeriesBuilder', () => {
       colors: ['#FF0000', '#00FF00', '#0000FF'],
       columnSettings: {
         sales: {
+          ...DEFAULT_COLUMN_SETTINGS,
           showDataLabels: true,
           barRoundness: 4,
           showDataLabelsAsPercentage: false
@@ -103,11 +104,13 @@ describe('barSeriesBuilder', () => {
       colors: ['#FF0000', '#00FF00'],
       columnSettings: {
         sales2022: {
+          ...DEFAULT_COLUMN_SETTINGS,
           showDataLabels: true,
           barRoundness: 4,
           showDataLabelsAsPercentage: false
         },
         sales2023: {
+          ...DEFAULT_COLUMN_SETTINGS,
           showDataLabels: true,
           barRoundness: 4,
           showDataLabelsAsPercentage: false
@@ -195,6 +198,7 @@ describe('barSeriesBuilder', () => {
       colors: ['#0000FF'],
       columnSettings: {
         marketShare: {
+          ...DEFAULT_COLUMN_SETTINGS,
           showDataLabels: true,
           barRoundness: 4,
           showDataLabelsAsPercentage: true

@@ -3,7 +3,7 @@ import type React from 'react';
 import { cn } from '@/lib/utils';
 
 const headerVariants = cva(
-  'bg-page-background flex max-h-[38px] min-h-[38px] items-center justify-between ml-[0.5px] gap-x-2.5 relative',
+  'bg-page-background flex max-h-[38px] min-h-[38px] items-center justify-between gap-x-2.5 relative',
   {
     variants: {
       sizeVariant: {

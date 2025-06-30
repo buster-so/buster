@@ -183,7 +183,7 @@ describe('useYAxisTitle', () => {
       yAxis: [],
       selectedAxis: {
         x: ['date', 'category'],
-        y: []
+        y: [] as string[]
       } as ChartEncodes,
       yAxisAxisTitle: null
     };

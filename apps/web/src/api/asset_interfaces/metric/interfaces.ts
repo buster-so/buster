@@ -1,5 +1,6 @@
 import type { BusterShare, VerificationStatus } from '../share';
 import type { BusterChartConfigProps } from './charts';
+import { z } from 'zod/v4-mini';
 
 export type BusterMetric = {
   id: string;
@@ -86,5 +87,3 @@ export type ColumnMetaData = {
 };
 
 export type IDataResult = Record<string, null | string | number>[] | null;
-
-export type SimplifiedColumnType = 'number' | 'text' | 'date';

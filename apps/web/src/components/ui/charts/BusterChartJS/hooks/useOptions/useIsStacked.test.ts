@@ -7,7 +7,7 @@ describe('useIsStacked', () => {
   it('should return true for Line chart with percentage-stack lineGroupType', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         lineGroupType: 'percentage-stack',
         barGroupType: null
       })
@@ -19,7 +19,7 @@ describe('useIsStacked', () => {
   it('should return true for Line chart with stack lineGroupType', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         lineGroupType: 'stack',
         barGroupType: null
       })
@@ -31,7 +31,7 @@ describe('useIsStacked', () => {
   it('should return false for Line chart with null lineGroupType', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         lineGroupType: null,
         barGroupType: 'stack'
       })
@@ -43,7 +43,7 @@ describe('useIsStacked', () => {
   it('should return true for Bar chart with percentage-stack barGroupType', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Bar,
+        selectedChartType: 'bar',
         lineGroupType: null,
         barGroupType: 'percentage-stack'
       })
@@ -55,7 +55,7 @@ describe('useIsStacked', () => {
   it('should return true for Bar chart with stack barGroupType', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Bar,
+        selectedChartType: 'bar',
         lineGroupType: null,
         barGroupType: 'stack'
       })
@@ -67,7 +67,7 @@ describe('useIsStacked', () => {
   it('should return false for Bar chart with group barGroupType', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Bar,
+        selectedChartType: 'bar',
         lineGroupType: null,
         barGroupType: 'group'
       })
@@ -79,7 +79,7 @@ describe('useIsStacked', () => {
   it('should return false for other chart types', () => {
     const { result } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Pie,
+        selectedChartType: 'pie',
         lineGroupType: null,
         barGroupType: 'stack'
       })
@@ -92,7 +92,7 @@ describe('useIsStacked', () => {
     // Initial render with no stacking
     const { result, rerender } = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         lineGroupType: null,
         barGroupType: null
       })
@@ -104,7 +104,7 @@ describe('useIsStacked', () => {
     rerender();
     const newHook = renderHook(() =>
       useIsStacked({
-        selectedChartType: ChartType.Line,
+        selectedChartType: 'line',
         lineGroupType: 'stack',
         barGroupType: null
       })

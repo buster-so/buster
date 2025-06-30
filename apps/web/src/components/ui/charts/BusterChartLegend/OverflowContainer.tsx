@@ -31,7 +31,7 @@ export const OverflowButton: React.FC<{
           'flex h-[24px] cursor-pointer items-center space-x-1.5 rounded-sm px-2 py-1',
           'hover:bg-item-hover'
         )}>
-        <LegendItemDot type={ChartType.Bar} color={undefined} inactive={true} />
+        <LegendItemDot type={'bar'} color={undefined} inactive={true} />
         <span className="text-sm text-nowrap select-none">Next {legendItems.length}</span>
       </div>
     </Popover>
