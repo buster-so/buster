@@ -57,6 +57,8 @@ export const useBusterNewChat = () => {
         message_id: messageId
       });
 
+      console.log('res', res);
+
       initializeNewChat(res);
     }
   );

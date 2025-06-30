@@ -9,7 +9,13 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["@buster/database#dev"]
+      "dependsOn": ["@buster/database#dev"],
+      "with": [
+        "@buster/ai#dev",
+        "@buster/server-shared#dev",
+        "@buster/access-controls#dev",
+        "@buster/data-source#dev"
+      ]
     }
   }
 }

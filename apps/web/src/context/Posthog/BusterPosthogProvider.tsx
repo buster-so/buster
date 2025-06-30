@@ -10,7 +10,7 @@ import { isDev } from '@/config';
 import { useUserConfigContextSelector } from '../Users';
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const DEBUG_POSTHOG = true;
+const DEBUG_POSTHOG = false;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {
   if ((isDev && !DEBUG_POSTHOG) || !POSTHOG_KEY) {
@@ -30,7 +30,7 @@ const options: Partial<PostHogConfig> = {
 
   loaded: () => {
     console.log(
-      '%c🚀 Buster initialized! 🦖',
+      '%c🚀 Powered by Buster',
       'background: linear-gradient(to right, #a21caf, #8b1cb1, #6b21a8); color: white; font-size: 16px; font-weight: bold; padding: 10px; border-radius: 5px;'
     );
   }

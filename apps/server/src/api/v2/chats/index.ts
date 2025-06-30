@@ -22,8 +22,18 @@ const app = new Hono()
 
     const response = await createChatHandler(request, user);
 
-    const validatedResponse: ChatCreateResponse = ChatCreateResponseSchema.parse(response);
-    return c.json(validatedResponse);
+    const validatedResponse = ChatCreateResponseSchema.safeParse(response);
+
+    console.log('success???', validatedResponse.success);
+
+    if (validatedResponse.success) {
+      return c.json(validatedResponse.data);
+    }
+
+    return c.json(
+      { ...validatedResponse.error, response, validatedResponse: validatedResponse.data },
+      400
+    );
   })
   .patch(
     '/:chat_id',
