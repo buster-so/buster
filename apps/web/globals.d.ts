@@ -81,6 +81,8 @@ declare global {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
       NEXT_PUBLIC_POSTHOG_KEY?: string;
       NEXT_PUBLIC_POSTHOG_HOST?: string;
+      POSTHOG_API_KEY?: string;
+      POSTHOG_ENV_ID?: string;
       NEXT_PUBLIC_USER?: string;
       NEXT_PUBLIC_USER_PASSWORD?: string;
 

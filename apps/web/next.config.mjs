@@ -1,6 +1,7 @@
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import env from './src/config/env.mjs';
+import { withPostHogConfig } from '@posthog/nextjs-config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -133,4 +134,8 @@ const nextConfig = {
 //   enabled: process.env.ANALYZE === 'true'
 // })(nextConfig);
 
-export default nextConfig;
+export default withPostHogConfig(nextConfig, {
+  enabled: !!process.env.POSTHOG_API_KEY && !!process.env.POSTHOG_ENV_ID,
+  personalApiKey: process.env.POSTHOG_API_KEY,
+  envId: process.env.POSTHOG_ENV_ID
+});

@@ -10,9 +10,10 @@ import { isDev } from '@/config';
 import { useUserConfigContextSelector } from '../Users';
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const DEBUG_POSTHOG = true;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {
-  if (isDev || !POSTHOG_KEY) {
+  if ((isDev && !DEBUG_POSTHOG) || !POSTHOG_KEY) {
     return <>{children}</>;
   }
 
@@ -26,6 +27,7 @@ const options: Partial<PostHogConfig> = {
   session_recording: {
     recordBody: true
   },
+
   loaded: () => {
     console.log(
       '%c🚀 Buster initialized! 🦖',

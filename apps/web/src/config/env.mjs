@@ -47,6 +47,8 @@ const clientEnvSchema = z.object({
     .string()
     .url({ message: 'NEXT_PUBLIC_POSTHOG_HOST must be a valid URL' })
     .optional(),
+  POSTHOG_API_KEY: z.string().optional(),
+  POSTHOG_ENV_ID: z.string().optional(),
 
   // Development/Testing credentials
   NEXT_PUBLIC_USER: z.string().optional(),
