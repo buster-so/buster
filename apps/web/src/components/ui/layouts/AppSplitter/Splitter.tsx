@@ -20,10 +20,10 @@ export const Splitter: React.FC<ISplitterProps> = React.memo(
       <div
         className={cn(
           'relative flex items-center justify-center transition-colors',
-          hidden ? 'bg-transparent' : 'bg-border',
-          !disabled ? (hidden ? 'hover:bg-border/80' : 'hover:bg-primary') : undefined,
-          isVertical ? 'min-w-[0.5px] cursor-col-resize' : 'min-h-[0.5px] cursor-row-resize',
-          isDragging ? (hidden ? 'bg-border/80' : 'bg-primary') : undefined,
+          hidden ? 'border-transparent' : 'border-border',
+          !disabled ? (hidden ? 'hover:border-border/80' : 'hover:border-primary') : undefined,
+          isVertical ? 'cursor-col-resize border-l' : 'cursor-row-resize border-t',
+          isDragging ? (hidden ? 'border-border/80' : 'border-primary') : undefined,
           disabled && 'cursor-default',
           className
         )}
