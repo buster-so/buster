@@ -10,6 +10,7 @@ import { Text } from '@/components/ui/typography';
 import { ShimmerText } from '@/components/ui/typography/ShimmerText';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import { BLACK_BOX_INITIAL_THOUGHT } from '@/layouts/ChatLayout/ChatContext/useBlackBoxMessage';
 
 const animations = {
   initial: { opacity: 0 },
@@ -45,7 +46,7 @@ export const ChatResponseReasoning: React.FC<{
     if (finalReasoningMessage) return finalReasoningMessage;
     if (blackBoxMessage) return blackBoxMessage;
     if (lastMessageTitle) return lastMessageTitle;
-    return lastMessageTitle || 'Thinking...';
+    return lastMessageTitle || BLACK_BOX_INITIAL_THOUGHT;
   }, [lastMessageTitle, finalReasoningMessage, blackBoxMessage]);
 
   const href = useMemo(() => {

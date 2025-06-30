@@ -21,7 +21,7 @@ export const BarContainer: React.FC<{
         isCompletedStream={isCompletedStream}
       />
 
-      <div className={'mb-2 flex w-full flex-col space-y-2 overflow-hidden'}>
+      <div className={'mb-2 flex w-full min-w-0 flex-col space-y-2'}>
         <TitleContainer
           title={title}
           secondaryTitle={secondaryTitle}

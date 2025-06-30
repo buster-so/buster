@@ -11,11 +11,21 @@ interface MessageContainerProps {
   className?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  hideAvatar?: boolean;
 }
 
 export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps>(
   (
-    { children, senderName, senderId, senderAvatar, className = '', onMouseEnter, onMouseLeave },
+    {
+      children,
+      senderName,
+      senderId,
+      senderAvatar,
+      className = '',
+      hideAvatar = false,
+      onMouseEnter,
+      onMouseLeave
+    },
     ref
   ) => {
     return (
@@ -24,11 +34,13 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
         className={'flex w-full space-x-2'}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}>
-        {senderName ? (
-          <Avatar size={24} name={senderName} image={senderAvatar || ''} useToolTip={true} />
-        ) : (
-          <Avatar size={24} />
-        )}
+        <div className={cn('w-6 transition-opacity', hideAvatar ? 'opacity-0' : 'opacity-100')}>
+          {senderName ? (
+            <Avatar size={24} name={senderName} image={senderAvatar || ''} useToolTip={true} />
+          ) : (
+            <Avatar size={24} />
+          )}
+        </div>
         <div className={cn('relative mt-1 w-full px-1', className)}>{children}</div>
       </div>
     );

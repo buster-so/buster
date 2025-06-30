@@ -30,10 +30,10 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
   const { data: finalReasoningMessage } = useGetChatMessage(messageId, {
     select: ({ final_reasoning_message }) => final_reasoning_message
   });
-  const blackBoxMessage = useQuery({
+  const { data: blackBoxMessage } = useQuery({
     ...queryKeys.chatsBlackBoxMessages(messageId),
     notifyOnChangeProps: ['data']
-  }).data;
+  });
 
   const viewportRef = useRef<HTMLDivElement>(null);
 

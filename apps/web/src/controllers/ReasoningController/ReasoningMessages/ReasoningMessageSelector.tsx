@@ -105,7 +105,7 @@ export const ReasoningMessageSelector: React.FC<ReasoningMessageSelectorProps> =
             key={animationKey}
             {...itemAnimationConfig}
             //  layout={!isCompletedStream} I removed this because it was causing weird animation issues
-            className="overflow-hidden">
+            className="">
             <div className="min-h-[1px]">
               <ReasoningMessage
                 reasoningMessageId={reasoningMessageId}

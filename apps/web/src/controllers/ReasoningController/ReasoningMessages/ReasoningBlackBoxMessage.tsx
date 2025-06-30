@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { BarContainer } from './BarContainer';
+import { BLACK_BOX_INITIAL_THOUGHT } from '@/layouts/ChatLayout/ChatContext/useBlackBoxMessage';
 
 export const BlackBoxMessage: React.FC<{
   blackBoxMessage: string | undefined | null;
@@ -13,7 +14,7 @@ export const BlackBoxMessage: React.FC<{
         showBar={false}
         status={finalReasoningMessage ? 'completed' : 'loading'}
         isCompletedStream={isCompletedStream}
-        title={finalReasoningMessage ?? blackBoxMessage ?? 'Thinking...'}
+        title={finalReasoningMessage ?? blackBoxMessage ?? BLACK_BOX_INITIAL_THOUGHT}
         secondaryTitle={''}
       />
     );

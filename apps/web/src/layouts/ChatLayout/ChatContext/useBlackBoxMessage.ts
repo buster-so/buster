@@ -3,17 +3,14 @@
 import { useQueryClient } from '@tanstack/react-query';
 import random from 'lodash/random';
 import sample from 'lodash/sample';
-import { useRef } from 'react';
-import type {
-  BusterChatMessageReasoning_text,
-  BusterChatMessage
-} from '@/api/asset_interfaces/chat';
+import { useMemo, useRef } from 'react';
+import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn, useUnmount } from '@/hooks';
 import last from 'lodash/last';
 
-const INITIAL_THOUGHT = 'Thinking...';
+export const BLACK_BOX_INITIAL_THOUGHT = 'Getting started...';
 
 export const useBlackBoxMessage = () => {
   const timeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -36,10 +33,14 @@ export const useBlackBoxMessage = () => {
 
   const addBlackBoxMessage = useMemoizedFn(({ messageId }: { messageId: string }) => {
     const options = queryKeys.chatsBlackBoxMessages(messageId);
+    const reasoningMessageIds = getChatMessageMemoized(messageId)?.reasoning_message_ids;
     const existingMessage = queryClient.getQueryData(options.queryKey);
 
-    // If no existing message, use "Thinking..." as the first message
-    const thought = existingMessage ? getRandomThought(existingMessage as string) : INITIAL_THOUGHT;
+    // If no existing message or no reasoning messages, use BLACK_BOX_INITIAL_THOUGHT as the first message
+    const thought =
+      existingMessage && reasoningMessageIds?.length
+        ? getRandomThought(existingMessage as string)
+        : BLACK_BOX_INITIAL_THOUGHT;
     queryClient.setQueryData(options.queryKey, thought);
   });
 
@@ -58,6 +59,12 @@ export const useBlackBoxMessage = () => {
       const lastReasoningMessage = message.reasoning_messages[lastReasoningMessageId];
       const isFinishedReasoningMessage = lastReasoningMessage?.status !== 'loading';
       const isFinishedReasoningLoop = message.is_completed || !!message.final_reasoning_message;
+      console.log('checkBlackBoxMessage', {
+        message,
+        isFinishedReasoningMessage,
+        isFinishedReasoningLoop,
+        reasoningMessageIds: message.reasoning_message_ids
+      });
 
       if (isFinishedReasoningMessage && !isFinishedReasoningLoop && !message.is_completed) {
         clearTimeoutRef(message.id);
@@ -88,13 +95,26 @@ export const useBlackBoxMessage = () => {
     }, randomDelay);
   });
 
+  const hasReceivedInitialThought = useMemoizedFn(
+    ({ messageId }: { messageId: string }): boolean => {
+      const message = getChatMessageMemoized(messageId);
+      const lastReasoningMessageId = (message && last(message.reasoning_message_ids)) || '';
+
+      return (
+        !!lastReasoningMessageId &&
+        queryClient.getQueryData(queryKeys.chatsBlackBoxMessages(messageId).queryKey) !==
+          BLACK_BOX_INITIAL_THOUGHT
+      );
+    }
+  );
+
   useUnmount(() => {
     for (const timeout of Object.values(timeoutRef.current)) {
       clearTimeout(timeout);
     }
   });
 
-  return { checkBlackBoxMessage, removeBlackBoxMessage };
+  return { checkBlackBoxMessage, removeBlackBoxMessage, hasReceivedInitialThought };
 };
 
 const getRandomThought = (currentThought?: string): string => {
