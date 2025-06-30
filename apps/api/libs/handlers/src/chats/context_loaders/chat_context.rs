@@ -56,188 +56,195 @@ impl ChatContextLoader {
     }
 
     // Helper function to check for tool usage and set appropriate context
-    async fn update_context_from_tool_calls(agent: &Arc<Agent>, message: &AgentMessage) {
-        // Handle tool calls from assistant messages
-        if let AgentMessage::Assistant {
-            tool_calls: Some(tool_calls),
-            ..
-        } = message
-        {
-            for tool_call in tool_calls {
-                match tool_call.function.name.as_str() {
-                    "search_data_catalog" => {
-                        // We will set data_context based on the *response* now,
-                        // but keep this for potential future use or broader context setting.
-                        // agent
-                        //     .set_state_value(String::from("data_context"), Value::Bool(true))
-                        //     .await;
-                    }
-                    "create_metrics" | "update_metrics" => {
-                        agent
-                            .set_state_value(String::from("metrics_available"), Value::Bool(true))
-                            .await;
-                    }
-                    "create_dashboards" | "update_dashboards" => {
-                        agent
-                            .set_state_value(
-                                String::from("dashboards_available"),
-                                Value::Bool(true),
-                            )
-                            .await;
-                    }
-                    "import_assets" => {
-                        // When we see import_assets, we need to check the content in the corresponding tool response
-                        // This will be handled separately when processing tool messages
-                    }
-                    name if name.contains("file")
-                        || name.contains("read")
-                        || name.contains("write")
-                        || name.contains("edit") =>
-                    {
-                        agent
-                            .set_state_value(String::from("files_available"), Value::Bool(true))
-                            .await;
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        // Handle tool responses - important for import_assets
-        if let AgentMessage::Tool {
-            name: Some(tool_name),
-            content,
-            ..
-        } = message
-        {
-            if tool_name == "import_assets" {
-                // Parse the tool response to see what was imported
-                if let Ok(import_result) = serde_json::from_str::<serde_json::Value>(content) {
-                    // Check for files array
-                    if let Some(files) = import_result.get("files").and_then(|f| f.as_array()) {
-                        if !files.is_empty() {
-                            // Set files_available for any imported files
-                            agent
-                                .set_state_value(String::from("files_available"), Value::Bool(true))
-                                .await;
-
-                            // Check each file to determine its type
-                            let mut has_metrics = false;
-                            let mut has_dashboards = false;
-                            let mut has_datasets = false;
-
-                            for file in files {
-                                // Check file_type/asset_type to determine what kind of asset this is
-                                let file_type = file
-                                    .get("file_type")
-                                    .and_then(|ft| ft.as_str())
-                                    .or_else(|| file.get("asset_type").and_then(|at| at.as_str()));
-
-                                tracing::debug!(
-                                    "Processing imported file with type: {:?}",
-                                    file_type
-                                );
-
-                                match file_type {
-                                    Some("metric") => {
-                                        has_metrics = true;
-
-                                        // Check if the metric has dataset references
-                                        if let Some(yml_content) =
-                                            file.get("yml_content").and_then(|y| y.as_str())
-                                        {
-                                            if yml_content.contains("dataset")
-                                                || yml_content.contains("datasetIds")
-                                            {
-                                                has_datasets = true;
-                                            }
+    // Updated to handle both old tool_calls format and new content array format
+    async fn update_context_from_tool_calls(agent: &Arc<Agent>, raw_message: &Value) {
+        // Try to parse as the new content array format first
+        if let Some(role) = raw_message.get("role").and_then(|r| r.as_str()) {
+            if role == "assistant" {
+                // Check for tool calls in content array
+                if let Some(content_array) = raw_message.get("content").and_then(|c| c.as_array()) {
+                    for content_item in content_array {
+                        if let Some(content_type) = content_item.get("type").and_then(|t| t.as_str()) {
+                            if content_type == "tool-call" {
+                                if let Some(tool_name) = content_item.get("toolName").and_then(|n| n.as_str()) {
+                                    match tool_name {
+                                        "search_data_catalog" => {
+                                            // Will be set based on tool response
                                         }
-                                    }
-                                    Some("dashboard") => {
-                                        has_dashboards = true;
-
-                                        // Dashboards often reference metrics too
-                                        has_metrics = true;
-
-                                        // Check if the dashboard has dataset references via metrics
-                                        if let Some(yml_content) =
-                                            file.get("yml_content").and_then(|y| y.as_str())
-                                        {
-                                            if yml_content.contains("dataset")
-                                                || yml_content.contains("datasetIds")
-                                            {
-                                                has_datasets = true;
-                                            }
+                                        "create_metrics" | "update_metrics" => {
+                                            agent
+                                                .set_state_value(String::from("metrics_available"), Value::Bool(true))
+                                                .await;
                                         }
-                                    }
-                                    _ => {
-                                        tracing::debug!(
-                                            "Unknown file type in import_assets: {:?}",
-                                            file_type
-                                        );
+                                        "create_dashboards" | "update_dashboards" => {
+                                            agent
+                                                .set_state_value(
+                                                    String::from("dashboards_available"),
+                                                    Value::Bool(true),
+                                                )
+                                                .await;
+                                        }
+                                        "import_assets" => {
+                                            // When we see import_assets, we need to check the content in the corresponding tool response
+                                            // This will be handled separately when processing tool messages
+                                        }
+                                        name if name.contains("file")
+                                            || name.contains("read")
+                                            || name.contains("write")
+                                            || name.contains("edit") =>
+                                        {
+                                            agent
+                                                .set_state_value(String::from("files_available"), Value::Bool(true))
+                                                .await;
+                                        }
+                                        _ => {}
                                     }
                                 }
                             }
-
-                            // Set appropriate state values based on what we found
-                            if has_metrics {
-                                tracing::debug!("Setting metrics_available state to true");
-                                agent
-                                    .set_state_value(
-                                        String::from("metrics_available"),
-                                        Value::Bool(true),
-                                    )
-                                    .await;
-                            }
-                            if has_dashboards {
-                                tracing::debug!("Setting dashboards_available state to true");
-                                agent
-                                    .set_state_value(
-                                        String::from("dashboards_available"),
-                                        Value::Bool(true),
-                                    )
-                                    .await;
-                            }
-                            if has_datasets {
-                                tracing::debug!("Setting data_context state to true");
-                                agent
-                                    .set_state_value(
-                                        String::from("data_context"),
-                                        Value::Bool(true),
-                                    )
-                                    .await;
-                            }
                         }
                     }
                 }
-            }
+            } else if role == "tool" {
+                // Check for tool results in content array
+                if let Some(content_array) = raw_message.get("content").and_then(|c| c.as_array()) {
+                    for content_item in content_array {
+                        if let Some(content_type) = content_item.get("type").and_then(|t| t.as_str()) {
+                            if content_type == "tool-result" {
+                                if let Some(tool_name) = content_item.get("toolName").and_then(|n| n.as_str()) {
+                                    if tool_name == "import_assets" {
+                                        // Parse the tool response to see what was imported
+                                        if let Some(result) = content_item.get("result") {
+                                            // Check for files array
+                                            if let Some(files) = result.get("files").and_then(|f| f.as_array()) {
+                                                if !files.is_empty() {
+                                                    // Set files_available for any imported files
+                                                    agent
+                                                        .set_state_value(String::from("files_available"), Value::Bool(true))
+                                                        .await;
 
-            // NEW: Check for search_data_catalog response and extract data_source_id
-            if tool_name == "search_data_catalog" {
-                match serde_json::from_str::<SearchDataCatalogToolOutput>(content) {
-                    Ok(output) => {
-                        if let Some(ds_id) = output.data_source_id {
-                            tracing::debug!(data_source_id = %ds_id, "Found data_source_id in search_data_catalog tool history, caching in agent state.");
-                            // Cache the data_source_id
-                            agent.set_state_value(
-                                "data_source_id".to_string(), 
-                                Value::String(ds_id.to_string())
-                            ).await;
-                            // Also set data_context flag to true since we found the ID
-                            agent.set_state_value("data_context".to_string(), Value::Bool(true)).await;
-                        } else {
-                            // If the tool ran but didn't return an ID (e.g., no datasets found)
-                            tracing::debug!("search_data_catalog tool ran in history but did not return a data_source_id.");
-                            // Optionally clear or set to null if needed, or just leave as is
-                            // agent.set_state_value("data_source_id".to_string(), Value::Null).await;
+                                                    // Check each file to determine its type
+                                                    let mut has_metrics = false;
+                                                    let mut has_dashboards = false;
+                                                    let mut has_datasets = false;
+
+                                                    for file in files {
+                                                        // Check file_type/asset_type to determine what kind of asset this is
+                                                        let file_type = file
+                                                            .get("file_type")
+                                                            .and_then(|ft| ft.as_str())
+                                                            .or_else(|| file.get("asset_type").and_then(|at| at.as_str()));
+
+                                                        tracing::debug!(
+                                                            "Processing imported file with type: {:?}",
+                                                            file_type
+                                                        );
+
+                                                        match file_type {
+                                                            Some("metric") => {
+                                                                has_metrics = true;
+
+                                                                // Check if the metric has dataset references
+                                                                if let Some(yml_content) =
+                                                                    file.get("yml_content").and_then(|y| y.as_str())
+                                                                {
+                                                                    if yml_content.contains("dataset")
+                                                                        || yml_content.contains("datasetIds")
+                                                                    {
+                                                                        has_datasets = true;
+                                                                    }
+                                                                }
+                                                            }
+                                                            Some("dashboard") => {
+                                                                has_dashboards = true;
+
+                                                                // Dashboards often reference metrics too
+                                                                has_metrics = true;
+
+                                                                // Check if the dashboard has dataset references via metrics
+                                                                if let Some(yml_content) =
+                                                                    file.get("yml_content").and_then(|y| y.as_str())
+                                                                {
+                                                                    if yml_content.contains("dataset")
+                                                                        || yml_content.contains("datasetIds")
+                                                                    {
+                                                                        has_datasets = true;
+                                                                    }
+                                                                }
+                                                            }
+                                                            _ => {
+                                                                tracing::debug!(
+                                                                    "Unknown file type in import_assets: {:?}",
+                                                                    file_type
+                                                                );
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // Set appropriate state values based on what we found
+                                                    if has_metrics {
+                                                        tracing::debug!("Setting metrics_available state to true");
+                                                        agent
+                                                            .set_state_value(
+                                                                String::from("metrics_available"),
+                                                                Value::Bool(true),
+                                                            )
+                                                            .await;
+                                                    }
+                                                    if has_dashboards {
+                                                        tracing::debug!("Setting dashboards_available state to true");
+                                                        agent
+                                                            .set_state_value(
+                                                                String::from("dashboards_available"),
+                                                                Value::Bool(true),
+                                                            )
+                                                            .await;
+                                                    }
+                                                    if has_datasets {
+                                                        tracing::debug!("Setting data_context state to true");
+                                                        agent
+                                                            .set_state_value(
+                                                                String::from("data_context"),
+                                                                Value::Bool(true),
+                                                            )
+                                                            .await;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // NEW: Check for search_data_catalog response and extract data_source_id
+                                    if tool_name == "search_data_catalog" {
+                                        if let Some(result) = content_item.get("result") {
+                                            match serde_json::from_value::<SearchDataCatalogToolOutput>(result.clone()) {
+                                                Ok(output) => {
+                                                    if let Some(ds_id) = output.data_source_id {
+                                                        tracing::debug!(data_source_id = %ds_id, "Found data_source_id in search_data_catalog tool history, caching in agent state.");
+                                                        // Cache the data_source_id
+                                                        agent.set_state_value(
+                                                            "data_source_id".to_string(), 
+                                                            Value::String(ds_id.to_string())
+                                                        ).await;
+                                                        // Also set data_context flag to true since we found the ID
+                                                        agent.set_state_value("data_context".to_string(), Value::Bool(true)).await;
+                                                    } else {
+                                                        // If the tool ran but didn't return an ID (e.g., no datasets found)
+                                                        tracing::debug!("search_data_catalog tool ran in history but did not return a data_source_id.");
+                                                    }
+                                                }
+                                                Err(e) => {
+                                                    tracing::warn!(
+                                                        error = %e, 
+                                                        result = %result,
+                                                        "Failed to parse search_data_catalog tool output from chat history."
+                                                    );
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    }
-                    Err(e) => {
-                        tracing::warn!(
-                            error = %e, 
-                            content = %content,
-                            "Failed to parse search_data_catalog tool output from chat history."
-                        );
                     }
                 }
             }
@@ -457,26 +464,37 @@ impl ContextLoader for ChatContextLoader {
 
         // Convert the single message's history
         let mut agent_messages = Vec::new();
-        let raw_messages =
-            match serde_json::from_value::<Vec<AgentMessage>>(message.raw_llm_messages) {
-                Ok(messages) => messages,
-                Err(e) => {
-                    tracing::error!(
-                        "Failed to parse raw LLM messages for chat {}: {}",
-                        chat.id,
-                        e
-                    );
-                    Vec::new() // Return empty if parsing fails
-                }
-            };
+        
+        // First, try to parse as raw JSON array to handle new content format
+        let raw_message_values = if let Value::Array(ref arr) = message.raw_llm_messages {
+            arr.clone()
+        } else {
+            vec![]
+        };
+
+        // Process raw messages for context detection (handles new format)
+        for raw_msg in &raw_message_values {
+            Self::update_context_from_tool_calls(agent, raw_msg).await;
+        }
+
+        // Now try to parse as AgentMessages for backwards compatibility
+        let parsed_messages = match serde_json::from_value::<Vec<AgentMessage>>(message.raw_llm_messages) {
+            Ok(messages) => messages,
+            Err(e) => {
+                tracing::error!(
+                    "Failed to parse raw LLM messages for chat {}: {}",
+                    chat.id,
+                    e
+                );
+                Vec::new() // Return empty if parsing fails
+            }
+        };
 
         // Track seen message IDs to avoid duplicates from potential re-parsing/saving issues
         let mut seen_ids: HashSet<String> = HashSet::new();
 
-        // Process messages to update context flags and collect unique messages
-        for agent_message in &raw_messages {
-            Self::update_context_from_tool_calls(agent, agent_message).await;
-
+        // Collect unique messages (only works for old format)
+        for agent_message in &parsed_messages {
             if let Some(id) = agent_message.get_id() {
                 if seen_ids.insert(id.to_string()) {
                     agent_messages.push(agent_message.clone());
@@ -488,7 +506,7 @@ impl ContextLoader for ChatContextLoader {
 
         // Check for external updates and get simulated messages
         let simulated_update_messages =
-            match Self::check_external_asset_updates(agent, &raw_messages).await {
+            match Self::check_external_asset_updates(agent, &parsed_messages).await {
                 Ok(sim_messages) => sim_messages,
                 Err(e) => {
                     tracing::error!("Failed to check for external asset updates: {}", e);
