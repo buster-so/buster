@@ -29,7 +29,7 @@ export const ChatResponseMessages: React.FC<ChatResponseMessagesProps> = React.m
 
     return (
       <MessageContainer
-        className="flex w-full flex-col space-y-3 overflow-hidden"
+        className="group flex w-full flex-col space-y-3 overflow-hidden"
         hideAvatar={hideAvatar}>
         {showReasoningMessage && (
           <ChatResponseReasoning

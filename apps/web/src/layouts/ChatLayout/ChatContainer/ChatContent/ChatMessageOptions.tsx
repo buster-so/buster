@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   useDuplicateChat,
   useGetChatMessage,
@@ -11,21 +11,32 @@ import { AppTooltip } from '@/components/ui/tooltip';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import { timeout } from '@/lib';
+import { formatDate, timeout } from '@/lib';
 import { BusterRoutes } from '@/routes';
+import { Text } from '@/components/ui/typography';
 
 export const ChatMessageOptions: React.FC<{
   messageId: string;
   chatId: string;
 }> = React.memo(({ messageId, chatId }) => {
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
+  const { openConfirmModal } = useBusterNotifications();
   const { mutateAsync: duplicateChat, isPending: isCopying } = useDuplicateChat();
   const { mutateAsync: updateChatMessageFeedback } = useUpdateChatMessageFeedback();
   const { data: feedback } = useGetChatMessage(messageId, {
     select: ({ feedback }) => feedback
   });
+  const { data: createdAt } = useGetChatMessage(messageId, {
+    select: ({ created_at }) => created_at
+  });
 
-  const { openConfirmModal } = useBusterNotifications();
+  const createdAtFormatted = useMemo(() => {
+    if (!createdAt) return '';
+    return formatDate({
+      date: createdAt,
+      format: 'lll'
+    });
+  }, [createdAt]);
 
   const warnBeforeDuplicate = useMemoizedFn(() => {
     openConfirmModal({
@@ -68,6 +79,13 @@ export const ChatMessageOptions: React.FC<{
           }
         />
       </AppTooltip>
+
+      <Text
+        className="ml-auto opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        variant={'tertiary'}
+        size={'sm'}>
+        {createdAtFormatted}
+      </Text>
     </div>
   );
 });
