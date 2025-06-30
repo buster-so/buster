@@ -222,7 +222,7 @@ async function searchStoredValues(
 const valuesAgent = new Agent({
   name: 'Extract Values',
   instructions: extractValuesInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  model: anthropicCachedModel('claude-3-5-haiku-20241022'),
 });
 
 const extractValuesSearchStepExecution = async ({

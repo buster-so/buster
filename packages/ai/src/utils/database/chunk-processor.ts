@@ -875,10 +875,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (timing && hasSecondaryTitle(entry)) {
         const seconds = timing / 1000;
         if (seconds >= 60) {
-          const minutes = Math.round(seconds / 60);
-          entry.secondary_title = `${minutes}m`;
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = Math.round(seconds % 60);
+          entry.secondary_title = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ${remainingSeconds} ${remainingSeconds === 1 ? 'second' : 'seconds'}`;
         } else {
-          entry.secondary_title = `${seconds.toFixed(1)}s`;
+          entry.secondary_title = `${seconds.toFixed(1)} seconds`;
         }
       }
     }
@@ -1713,10 +1714,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         const executionTime = Date.now() - startTime;
         const seconds = executionTime / 1000;
         if (seconds >= 60) {
-          const minutes = Math.round(seconds / 60);
-          secondaryTitle = `${minutes}m`;
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = Math.round(seconds % 60);
+          secondaryTitle = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ${remainingSeconds} ${remainingSeconds === 1 ? 'second' : 'seconds'}`;
         } else {
-          secondaryTitle = `${seconds.toFixed(1)}s`;
+          secondaryTitle = `${seconds.toFixed(1)} seconds`;
         }
         // Clean up the start time
         this.sqlExecutionStartTimes.delete(toolCallId);
