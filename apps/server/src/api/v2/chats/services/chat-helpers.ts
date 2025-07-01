@@ -212,7 +212,7 @@ export async function handleExistingChat(
   const allMessages = newMessage ? [...existingMessages, newMessage] : existingMessages;
 
   // Build chat with messages
-  const chatWithMessages = buildChatWithMessages(
+  const chatWithMessages: ChatWithMessages = buildChatWithMessages(
     chatDetails.chat,
     allMessages,
     chatDetails.user,

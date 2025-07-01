@@ -125,6 +125,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   ) {
     this.messageId = messageId;
     this.dashboardContext = dashboardContext || [];
+    
+    console.info('[ChunkProcessor] Constructor called:', {
+      messageId,
+      initialMessagesCount: initialMessages.length,
+      initialReasoningCount: initialReasoningHistory.length,
+      initialResponseCount: initialResponseHistory.length,
+      dashboardContextProvided: dashboardContext !== undefined,
+      dashboardContextLength: this.dashboardContext.length,
+    });
     this.state = {
       accumulatedMessages: [...initialMessages],
       currentAssistantMessage: null,
@@ -2162,6 +2171,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Re-evaluates which files should be shown based on priority logic
    */
   private updateFileSelection(): void {
+    console.info('[ChunkProcessor] updateFileSelection called:', {
+      dashboardContextLength: this.dashboardContext.length,
+      dashboardContext: this.dashboardContext,
+    });
+    
     const allFiles = extractFilesFromReasoning(this.state.reasoningHistory);
     const selectedFiles = selectFilesForResponse(allFiles, this.dashboardContext);
 

@@ -107,18 +107,47 @@ function detectOperationType(title?: string): 'created' | 'modified' | undefined
  */
 function extractMetricIdsFromDashboard(ymlContent: string): string[] {
   try {
-    // Parse YAML content - assuming it's in JSON format for the TypeScript side
-    const dashboardData = JSON.parse(ymlContent);
+    // First try to parse as JSON (for test data and already parsed content)
+    let dashboardData: unknown;
+    try {
+      dashboardData = JSON.parse(ymlContent);
+    } catch {
+      // If JSON parsing fails, try parsing as YAML
+      // Since we don't have a YAML parser imported here, we'll use a simple regex approach
+      // to extract metric IDs from the YAML content
+      const metricIds: string[] = [];
 
-    // For now, skip Zod validation and manually extract metric IDs
-    // This allows us to handle both UUID and non-UUID metric IDs during the transition
+      // Look for UUID patterns in the content
+      // This regex matches UUIDs in the format: id: "uuid" or id: uuid
+      const uuidRegex =
+        /id:\s*["']?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})["']?/gi;
+      let match: RegExpExecArray | null = null;
+
+      match = uuidRegex.exec(ymlContent);
+      while (match !== null) {
+        if (match[1]) {
+          metricIds.push(match[1]);
+        }
+        match = uuidRegex.exec(ymlContent);
+      }
+
+      // Remove duplicates
+      return [...new Set(metricIds)];
+    }
+
+    // If we successfully parsed as JSON, extract metric IDs from the structure
     const metricIds: string[] = [];
 
-    if (dashboardData.rows && Array.isArray(dashboardData.rows)) {
+    if (
+      dashboardData &&
+      typeof dashboardData === 'object' &&
+      'rows' in dashboardData &&
+      Array.isArray(dashboardData.rows)
+    ) {
       for (const row of dashboardData.rows) {
-        if (row.items && Array.isArray(row.items)) {
+        if (row && typeof row === 'object' && 'items' in row && Array.isArray(row.items)) {
           for (const item of row.items) {
-            if (item.id && typeof item.id === 'string') {
+            if (item && typeof item === 'object' && 'id' in item && typeof item.id === 'string') {
               metricIds.push(item.id);
             }
           }
@@ -177,9 +206,43 @@ export function selectFilesForResponse(
     metricIds: string[];
   }>
 ): ExtractedFile[] {
+  // Debug logging
+  console.info('[File Selection] Starting file selection:', {
+    totalFiles: files.length,
+    dashboardContextCount: dashboardContext?.length || 0,
+    dashboardContextProvided: dashboardContext !== undefined,
+    dashboardContextIsArray: Array.isArray(dashboardContext),
+    fileTypes: files.map((f) => ({ id: f.id, type: f.fileType, operation: f.operation })),
+  });
+
+  // Additional debug logging for dashboard context
+  if (dashboardContext === undefined) {
+    console.info('[File Selection] Dashboard context is undefined');
+  } else if (dashboardContext === null) {
+    console.info('[File Selection] Dashboard context is null');
+  } else if (dashboardContext.length === 0) {
+    console.info('[File Selection] Dashboard context is empty array');
+  } else {
+    console.info('[File Selection] Dashboard context details:', {
+      dashboardCount: dashboardContext.length,
+      dashboards: dashboardContext.map((d) => ({
+        id: d.id,
+        name: d.name,
+        metricCount: d.metricIds.length,
+        metricIds: d.metricIds,
+      })),
+    });
+  }
+
   // Separate dashboards and metrics
   const dashboards = files.filter((f) => f.fileType === 'dashboard');
   const metrics = files.filter((f) => f.fileType === 'metric');
+
+  console.info('[File Selection] File breakdown:', {
+    dashboards: dashboards.length,
+    metrics: metrics.length,
+    modifiedMetrics: metrics.filter((m) => m.operation === 'modified').length,
+  });
 
   // Track which dashboards need to be included due to modified metrics
   const dashboardsToInclude = new Set<string>();
@@ -205,9 +268,29 @@ export function selectFilesForResponse(
   if (dashboardContext && dashboardContext.length > 0) {
     for (const metric of metrics) {
       if (metric.operation === 'modified') {
+        console.info('[File Selection] Found modified metric:', {
+          metricId: metric.id,
+          metricName: metric.fileName,
+          checkingAgainstDashboards: dashboardContext.length,
+        });
+
         // Check if this metric ID is in any dashboard from context
         for (const contextDashboard of dashboardContext) {
+          console.info('[File Selection] Checking dashboard:', {
+            dashboardId: contextDashboard.id,
+            dashboardName: contextDashboard.name,
+            dashboardMetricIds: contextDashboard.metricIds,
+            lookingForMetricId: metric.id,
+            metricIdInDashboard: contextDashboard.metricIds.includes(metric.id),
+          });
+          
           if (contextDashboard.metricIds.includes(metric.id)) {
+            console.info('[File Selection] Modified metric found in dashboard:', {
+              metricId: metric.id,
+              dashboardId: contextDashboard.id,
+              dashboardName: contextDashboard.name,
+            });
+
             // Convert context dashboard to ExtractedFile format
             const dashboardFile: ExtractedFile = {
               id: contextDashboard.id,
@@ -218,7 +301,7 @@ export function selectFilesForResponse(
               containedInDashboards: [],
               operation: undefined, // These are existing dashboards, not created/modified
             };
-            
+
             // Only add if not already in our files or contextDashboardsToInclude
             const alreadyIncluded =
               files.some((f) => f.id === dashboardFile.id) ||
@@ -238,7 +321,13 @@ export function selectFilesForResponse(
 
   // 1. First priority: Dashboards from context that contain modified metrics
   if (contextDashboardsToInclude.length > 0) {
+    console.info('[File Selection] Adding context dashboards:', {
+      count: contextDashboardsToInclude.length,
+      dashboards: contextDashboardsToInclude.map(d => ({ id: d.id, name: d.fileName })),
+    });
     selectedFiles.push(...contextDashboardsToInclude);
+  } else {
+    console.info('[File Selection] No context dashboards to include');
   }
 
   // 2. Second priority: Dashboards from current session that contain modified metrics
@@ -255,7 +344,7 @@ export function selectFilesForResponse(
   if (selectedFiles.length > 0) {
     // Don't include metrics that are already represented in selected dashboards
     const metricsInDashboards = new Set<string>();
-    
+
     // Check metrics in session dashboards
     for (const dashboard of selectedFiles.filter((f) => f.ymlContent)) {
       if (dashboard.ymlContent) {
@@ -285,6 +374,16 @@ export function selectFilesForResponse(
     // No dashboards selected, just return metrics
     selectedFiles.push(...metrics);
   }
+
+  console.info('[File Selection] Final selection:', {
+    totalSelected: selectedFiles.length,
+    selectedFiles: selectedFiles.map((f) => ({
+      id: f.id,
+      type: f.fileType,
+      name: f.fileName,
+      operation: f.operation,
+    })),
+  });
 
   return selectedFiles;
 }

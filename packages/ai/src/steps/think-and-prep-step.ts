@@ -112,11 +112,20 @@ const thinkAndPrepExecution = async ({
   // Use reasoning history directly without unnecessary property reordering
   const initialReasoningHistory = rawReasoningHistory as ChatMessageReasoningMessage[];
 
-  // Initialize chunk processor with initial messages and reasoning history
-  const chunkProcessor = new ChunkProcessor(messageId, [], initialReasoningHistory, []);
+  // Get initial data early to have dashboard context
+  const initData = await getInitData();
+  const dashboardFiles = initData.dashboardFiles || [];
+
+  // Initialize chunk processor with initial messages, reasoning history, and dashboard context
+  const chunkProcessor = new ChunkProcessor(
+    messageId,
+    [],
+    initialReasoningHistory,
+    [],
+    dashboardFiles // Pass dashboard context
+  );
 
   try {
-    const initData = await getInitData();
     const todos = inputData['create-todos'].todos;
 
     // Standardize messages from workflow inputs
@@ -295,13 +304,23 @@ const thinkAndPrepExecution = async ({
     outputMessages = extractMessageHistory(completeConversationHistory);
 
     // DEBUG: Log what we're passing to analyst step
+    console.info('[Think and Prep Step] Creating result:', {
+      finished,
+      outputMessagesCount: outputMessages.length,
+      reasoningHistoryCount: chunkProcessor.getReasoningHistory().length,
+      responseHistoryCount: chunkProcessor.getResponseHistory().length,
+      dashboardFilesProvided: dashboardFiles !== undefined,
+      dashboardFilesCount: dashboardFiles?.length || 0,
+      dashboardFiles: dashboardFiles,
+    });
+
     const result = createStepResult(
       finished,
       outputMessages,
       finalStepData,
       chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
       chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
-      inputData.dashboardFiles // Pass dashboard context through
+      dashboardFiles // Pass dashboard context through
     );
 
     return result;
@@ -318,7 +337,7 @@ const thinkAndPrepExecution = async ({
         finalStepData,
         chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
         chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
-        inputData.dashboardFiles // Pass dashboard context through
+        dashboardFiles // Pass dashboard context through
       );
     }
 

@@ -21,6 +21,13 @@ export const extractValuesSearchOutputSchema = z.object({
     .record(z.record(z.array(z.string())))
     .describe('Structured results organized by schema.table.column'),
   searchPerformed: z.boolean().describe('Whether stored values search was actually performed'),
+  // Pass through dashboard context
+  dashboardFiles: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    versionNumber: z.number(),
+    metricIds: z.array(z.string()),
+  })).optional(),
 });
 
 const extractValuesInstructions = `
@@ -274,6 +281,7 @@ const extractValuesSearchStepExecution = async ({
       searchResults: storedValuesResult.searchResults,
       foundValues: storedValuesResult.foundValues,
       searchPerformed: storedValuesResult.searchPerformed,
+      dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
     };
   } catch (error) {
     // Handle AbortError gracefully
@@ -284,6 +292,7 @@ const extractValuesSearchStepExecution = async ({
         searchResults: '',
         foundValues: {},
         searchPerformed: false,
+        dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
       };
     }
 

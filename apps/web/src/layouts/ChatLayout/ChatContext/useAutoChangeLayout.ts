@@ -7,7 +7,7 @@ import { useGetChat, useGetChatMessage, useGetChatMessageMemoized } from '@/api/
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
-import { useGetInitialChatFile } from './useGetInitialChatFile';
+import { BusterRoutes } from '@/routes';
 
 export const useAutoChangeLayout = ({
   lastMessageId,
@@ -19,11 +19,6 @@ export const useAutoChangeLayout = ({
   const getChatMessageMemoized = useGetChatMessageMemoized();
   const onSetSelectedFile = useChatLayoutContextSelector((x) => x.onSetSelectedFile);
   const messageId = useChatLayoutContextSelector((x) => x.messageId);
-  const metricId = useChatLayoutContextSelector((x) => x.metricId);
-  const dashboardId = useChatLayoutContextSelector((x) => x.dashboardId);
-  const dashboardVersionNumber = useChatLayoutContextSelector((x) => x.dashboardVersionNumber);
-  const metricVersionNumber = useChatLayoutContextSelector((x) => x.metricVersionNumber);
-  const currentRoute = useChatLayoutContextSelector((x) => x.currentRoute);
   const { data: isCompletedStream = false } = useGetChatMessage(lastMessageId, {
     select: (x) => x?.is_completed
   });
@@ -33,8 +28,6 @@ export const useAutoChangeLayout = ({
   const { data: isFinishedReasoning } = useGetChatMessage(lastMessageId, {
     select: (x) => !!lastReasoningMessageId && !!(x?.is_completed || !!x.final_reasoning_message)
   });
-
-  const getInitialChatFileHref = useGetInitialChatFile();
 
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const previousLastMessageId = useRef<string | null>(null);
@@ -55,9 +48,14 @@ export const useAutoChangeLayout = ({
       return;
     }
 
+    const chatMessage = getChatMessageMemoized(lastMessageId);
+    const firstFileId = chatMessage?.response_message_ids?.find((id) => {
+      const responseMessage = chatMessage?.response_messages[id];
+      return responseMessage?.type === 'file';
+    });
+
     //this will trigger when the chat is streaming and is has not completed yet (new chat)
     if (!isCompletedStream && !isFinishedReasoning && hasReasoning && chatId) {
-      console.log('triggering auto change layout to open reasoning');
       previousLastMessageId.current = lastMessageId;
 
       if (!messageId) {
@@ -65,30 +63,20 @@ export const useAutoChangeLayout = ({
       }
     }
 
-    //this happen will when the chat is completed and it WAS streaming
-    else if (isCompletedStream && previousIsCompletedStream.current === false) {
-      console.log('triggering auto change layout to open file');
-      const chatMessage = getChatMessageMemoized(lastMessageId);
-      const lastFileId = findLast(chatMessage?.response_message_ids, (id) => {
-        const responseMessage = chatMessage?.response_messages[id];
-        return responseMessage?.type === 'file';
-      });
-      const lastFile = chatMessage?.response_messages[lastFileId || ''] as
+    //this will happen if it is streaming and has a file in the response
+    else if (!isCompletedStream && firstFileId) {
+      const firstFile = chatMessage?.response_messages[firstFileId] as
         | BusterChatResponseMessage_file
         | undefined;
 
-      console.log('triggering lastFile', { lastFileId, lastFile });
-
-      if (lastFileId && lastFile) {
+      if (firstFile) {
         const { link } = getFileLinkMeta({
-          fileId: lastFileId,
-          fileType: lastFile.file_type,
+          fileId: firstFile.id,
+          fileType: firstFile.file_type,
           chatId,
-          versionNumber: lastFile.version_number,
+          versionNumber: firstFile.version_number,
           useVersionHistoryMode: !chatId
         });
-
-        console.log('triggering link', { link });
 
         if (link) {
           onChangePage(link);
@@ -96,27 +84,13 @@ export const useAutoChangeLayout = ({
       }
     }
 
-    //this will trigger on a page refresh and the chat is completed
-    // else if (isCompletedStream && chatId) {
-    //   const isChatOnlyMode = !metricId && !dashboardId && !messageId;
-    //   console.log('triggering auto change layout to open file', { isChatOnlyMode });
-    //   if (!isChatOnlyMode) {
-    //     const href = getInitialChatFileHref({
-    //       metricId,
-    //       dashboardId,
-    //       messageId,
-    //       chatId,
-    //       dashboardVersionNumber,
-    //       metricVersionNumber,
-    //       currentRoute
-    //     });
-
-    //     console.log('href', { href });
-
-    //     if (href) {
-    //       onChangePage(href);
-    //     }
-    //   }
-    // }
+    //this happen will when the chat is completed and it WAS streaming
+    else if (isCompletedStream && previousIsCompletedStream.current === false && !firstFileId) {
+      //no file is found, so we need to collapse the chat
+      onChangePage({
+        route: BusterRoutes.APP_CHAT_ID,
+        chatId
+      });
+    }
   }, [isCompletedStream, hasReasoning, chatId, lastMessageId]); //only use these values to trigger the useEffect
 };

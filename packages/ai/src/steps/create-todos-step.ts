@@ -24,6 +24,13 @@ export const createTodosOutputSchema = z.object({
   reasoningHistory: ReasoningHistorySchema.optional().describe(
     'Reasoning history for todo creation'
   ),
+  // Pass through dashboard context
+  dashboardFiles: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    versionNumber: z.number(),
+    metricIds: z.array(z.string()),
+  })).optional(),
 });
 
 const todosInstructions = `
@@ -322,6 +329,7 @@ const todoStepExecution = async ({
     return {
       todos: todosString,
       reasoningHistory: reasoningHistory as z.infer<typeof ReasoningHistorySchema>,
+      dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
     };
   } catch (error) {
     // Handle abort errors gracefully
@@ -353,6 +361,7 @@ const todoStepExecution = async ({
       return {
         todos: todosString,
         reasoningHistory: reasoningHistory as z.infer<typeof ReasoningHistorySchema>,
+        dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
       };
     }
 
