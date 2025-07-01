@@ -50,8 +50,8 @@ const ReasoningMessage_TextSchema = z.object({
   type: z.literal('text'),
   title: z.string(),
   secondary_title: z.string().optional(),
-  message: z.string().optional(),
-  message_chunk: z.string().optional(),
+  message: z.string().optional().nullable(),
+  message_chunk: z.string().optional().nullable(),
   status: StatusSchema,
 });
 

@@ -14,7 +14,8 @@
         "@buster/ai#dev",
         "@buster/server-shared#dev",
         "@buster/access-controls#dev",
-        "@buster/data-source#dev"
+        "@buster/data-source#dev",
+        "@buster-apps/trigger#dev"
       ]
     }
   }
