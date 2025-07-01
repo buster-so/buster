@@ -12,7 +12,11 @@ import { createTodoReasoningMessage } from '../utils/memory/todos-to-messages';
 import type { BusterChatMessageReasoningSchema } from '../utils/memory/types';
 import { ReasoningHistorySchema } from '../utils/memory/types';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import { detectRetryableError, RetryWithHealingError, isRetryWithHealingError } from '../utils/retry';
+import {
+  RetryWithHealingError,
+  detectRetryableError,
+  isRetryWithHealingError,
+} from '../utils/retry';
 import type { RetryableError, WorkflowContext } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
@@ -26,12 +30,16 @@ export const createTodosOutputSchema = z.object({
     'Reasoning history for todo creation'
   ),
   // Pass through dashboard context
-  dashboardFiles: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    versionNumber: z.number(),
-    metricIds: z.array(z.string()),
-  })).optional(),
+  dashboardFiles: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        versionNumber: z.number(),
+        metricIds: z.array(z.string()),
+      })
+    )
+    .optional(),
 });
 
 const todosInstructions = `
@@ -239,6 +247,7 @@ const todoStepExecution = async ({
             const stream = await todosAgent.stream(messages, {
               toolCallStreaming: true,
               runtimeContext,
+              maxRetries: 5,
               abortSignal: abortController.signal,
               toolChoice: {
                 type: 'tool',
@@ -254,9 +263,10 @@ const todoStepExecution = async ({
                 console.error('Create Todos stream error caught in onError:', error);
 
                 // Check if this is a retryable error with custom healing message
-                const isRetryable = NoSuchToolError.isInstance(error) || 
-                                   (error instanceof Error && error.name === 'AI_InvalidToolArgumentsError');
-                                   
+                const isRetryable =
+                  NoSuchToolError.isInstance(error) ||
+                  (error instanceof Error && error.name === 'AI_InvalidToolArgumentsError');
+
                 if (!isRetryable || retryCount >= maxRetries) {
                   console.error('Create Todos onError: Not retryable or max retries reached', {
                     isRetryable,
@@ -277,7 +287,8 @@ const todoStepExecution = async ({
                       toolCallId: 'toolCallId' in error ? String(error.toolCallId) : 'unknown',
                       toolName: 'toolName' in error ? String(error.toolName) : 'unknown',
                       result: {
-                        error: 'Invalid tool call. Your job at this moment is to strictly call the createTodoList tool. This is the only tool available for creating the TODO list.',
+                        error:
+                          'Invalid tool call. Your job at this moment is to strictly call the createTodoList tool. This is the only tool available for creating the TODO list.',
                       },
                     },
                   ],
@@ -291,7 +302,9 @@ const todoStepExecution = async ({
 
                 // Throw a special error with the healing info to trigger retry
                 throw new RetryWithHealingError({
-                  type: NoSuchToolError.isInstance(error) ? 'no-such-tool' : 'invalid-tool-arguments',
+                  type: NoSuchToolError.isInstance(error)
+                    ? 'no-such-tool'
+                    : 'invalid-tool-arguments',
                   originalError: error,
                   healingMessage,
                 });
@@ -328,30 +341,46 @@ const todoStepExecution = async ({
         // Handle our special retry error
         if (isRetryWithHealingError(error)) {
           const retryableError = error.retryableError;
-          
+
           // Get the current messages from chunk processor to find the failed tool call
           const currentMessages = chunkProcessor.getAccumulatedMessages();
           const healingMessage = retryableError.healingMessage;
           let insertionIndex = currentMessages.length; // Default to end
-          
+
           // If this is a NoSuchToolError, find the correct position to insert the healing message
           if (retryableError.type === 'no-such-tool' && Array.isArray(healingMessage.content)) {
             const firstContent = healingMessage.content[0];
-            if (firstContent && typeof firstContent === 'object' && 'type' in firstContent && 
-                firstContent.type === 'tool-result' && 'toolCallId' in firstContent && 
-                'toolName' in firstContent) {
-              
+            if (
+              firstContent &&
+              typeof firstContent === 'object' &&
+              'type' in firstContent &&
+              firstContent.type === 'tool-result' &&
+              'toolCallId' in firstContent &&
+              'toolName' in firstContent
+            ) {
               // Find the assistant message with the failed tool call
               for (let i = currentMessages.length - 1; i >= 0; i--) {
                 const msg = currentMessages[i];
                 if (msg && msg.role === 'assistant' && Array.isArray(msg.content)) {
                   // Find tool calls in this message
                   const toolCalls = msg.content.filter(
-                    (c): c is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
-                      typeof c === 'object' && c !== null && 'type' in c && 
-                      c.type === 'tool-call' && 'toolCallId' in c && 'toolName' in c && 'args' in c
+                    (
+                      c
+                    ): c is {
+                      type: 'tool-call';
+                      toolCallId: string;
+                      toolName: string;
+                      args: unknown;
+                    } =>
+                      typeof c === 'object' &&
+                      c !== null &&
+                      'type' in c &&
+                      c.type === 'tool-call' &&
+                      'toolCallId' in c &&
+                      'toolName' in c &&
+                      'args' in c
                   );
-                  
+
                   // Check each tool call to see if it matches and has no result
                   for (const toolCall of toolCalls) {
                     // Check if this tool call matches the failed tool name
@@ -362,9 +391,13 @@ const todoStepExecution = async ({
                         const nextMsg = currentMessages[j];
                         if (nextMsg && nextMsg.role === 'tool' && Array.isArray(nextMsg.content)) {
                           const hasMatchingResult = nextMsg.content.some(
-                            (c) => typeof c === 'object' && c !== null && 'type' in c && 
-                                   c.type === 'tool-result' && 'toolCallId' in c && 
-                                   c.toolCallId === toolCall.toolCallId
+                            (c) =>
+                              typeof c === 'object' &&
+                              c !== null &&
+                              'type' in c &&
+                              c.type === 'tool-result' &&
+                              'toolCallId' in c &&
+                              c.toolCallId === toolCall.toolCallId
                           );
                           if (hasMatchingResult) {
                             hasResult = true;
@@ -372,61 +405,64 @@ const todoStepExecution = async ({
                           }
                         }
                       }
-                      
+
                       // If this tool call has no result, this is our failed call
                       if (!hasResult) {
-                        console.info('Create Todos: Found orphaned tool call, using its ID for healing', {
-                          toolCallId: toolCall.toolCallId,
-                          toolName: toolCall.toolName,
-                          atIndex: i,
-                        });
-                        
+                        console.info(
+                          'Create Todos: Found orphaned tool call, using its ID for healing',
+                          {
+                            toolCallId: toolCall.toolCallId,
+                            toolName: toolCall.toolName,
+                            atIndex: i,
+                          }
+                        );
+
                         // Update the healing message with the correct toolCallId
                         firstContent.toolCallId = toolCall.toolCallId;
-                        
+
                         // Insert position is right after this assistant message
                         insertionIndex = i + 1;
                         break;
                       }
                     }
                   }
-                  
+
                   // If we found the position, stop searching
                   if (insertionIndex !== currentMessages.length) break;
                 }
               }
             }
           }
-          
+
           console.info('Create Todos: Retrying with healing message', {
             retryCount,
             errorType: retryableError.type,
             insertionIndex,
             totalMessages: currentMessages.length,
           });
-          
+
           // Create new messages array with healing message inserted at the correct position
           const updatedMessages = [
             ...currentMessages.slice(0, insertionIndex),
             healingMessage,
-            ...currentMessages.slice(insertionIndex)
+            ...currentMessages.slice(insertionIndex),
           ];
-          
+
           // Update messages for the retry
           messages = updatedMessages;
-          
+
           // Reset chunk processor with the properly ordered messages
           chunkProcessor.setInitialMessages(messages);
-          
+
           // Force save to persist the healing message immediately
           await chunkProcessor.saveToDatabase();
-          
+
           retryCount++;
-          
+
           // Continue to next retry iteration
           continue;
         }
-        
+
         // Handle normal AbortError (from finishing tools)
         if (error instanceof Error && error.name === 'AbortError') {
           console.info('Create Todos: Stream aborted successfully (normal completion)');

@@ -17,7 +17,7 @@ catalog:
   axios: "^1.10.0"
   drizzle-orm: "^0.44.2"
   hono: "^4.8.0"
-  "@mastra/core": "^0.10.6"
+  "@mastra/core": "^0.10.8"
   pg: "^8.16.2"
   uuid: "^11.0.0"
   vitest: "^3.2.4"

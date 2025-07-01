@@ -15,12 +15,15 @@ export async function initializeChat(
   messageId: string;
   chat: ChatWithMessages;
 }> {
-  const messageId = request.message_id || crypto.randomUUID();
+  // Always generate a new ID for the new message
+  const messageId = crypto.randomUUID();
+  // Treat provided message_id as the redo point
+  const redoFromMessageId = request.message_id;
   const userId = user.id;
 
   try {
     if (request.chat_id) {
-      return handleExistingChat(request.chat_id, messageId, request.prompt, user);
+      return handleExistingChat(request.chat_id, messageId, request.prompt, user, redoFromMessageId);
     }
 
     const title = '';
