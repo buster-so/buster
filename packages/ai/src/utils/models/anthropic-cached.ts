@@ -15,7 +15,7 @@ const httpAgent = new http.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000,
   maxSockets: 10,
-  timeout: 60000,
+  timeout: 20000,
 });
 
 export const anthropicCachedModel = (modelId: string) => {
