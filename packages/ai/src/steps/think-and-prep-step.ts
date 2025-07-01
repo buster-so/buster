@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import type { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
-import { retryableAgentStreamWithHealing } from '../utils/retry';
+import { detectRetryableError } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
@@ -23,12 +23,16 @@ const inputSchema = z.object({
   // Include original workflow inputs to maintain access to prompt and conversationHistory
   prompt: z.string(),
   conversationHistory: z.array(z.any()).optional(),
-  dashboardFiles: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    versionNumber: z.number(),
-    metricIds: z.array(z.string()),
-  })).optional(),
+  dashboardFiles: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        versionNumber: z.number(),
+        metricIds: z.array(z.string()),
+      }),
+    )
+    .optional(),
 });
 
 import {
@@ -63,7 +67,7 @@ const createStepResult = (
     name: string;
     versionNumber: number;
     metricIds: string[];
-  }>
+  }>,
 ): z.infer<typeof outputSchema> => ({
   finished,
   outputMessages,
@@ -99,6 +103,8 @@ const thinkAndPrepExecution = async ({
   let completeConversationHistory: MessageHistory = [];
   let finished = false;
   const finalStepData: StepFinishData | null = null;
+  let retryCount = 0;
+  const maxRetries = 3;
 
   // Extract reasoning history from create-todos step
   const rawReasoningHistory = inputData['create-todos'].reasoningHistory || [];
@@ -129,7 +135,7 @@ const thinkAndPrepExecution = async ({
 
     // Create todo messages and inject them into the conversation history
     const todoCallMessage = createTodoToolCallMessage(todos);
-    const messages = [...baseMessages, todoCallMessage];
+    let messages: CoreMessage[] = [...baseMessages, todoCallMessage];
 
     // Inject stored values search results if available
     const storedValuesResults = inputData['extract-values-search'].searchResults;
@@ -141,107 +147,145 @@ const thinkAndPrepExecution = async ({
     // Update chunk processor with initial messages
     chunkProcessor.setInitialMessages(messages);
 
-    // Note: Todo reasoning message is handled by the UI layer directly from the tool call message
+    // Main execution loop with retry logic
+    while (retryCount <= maxRetries) {
+      try {
+        const wrappedStream = wrapTraced(
+          async () => {
+            // Create stream directly without retryableAgentStreamWithHealing
+            const stream = await thinkAndPrepAgent.stream(messages, {
+              toolCallStreaming: true,
+              runtimeContext,
+              abortSignal: abortController.signal,
+              toolChoice: 'required',
+              onChunk: createOnChunkHandler({
+                chunkProcessor,
+                abortController,
+                finishingToolNames: ['submitThoughts', 'respondWithoutAnalysis'],
+                onFinishingTool: () => {
+                  // Only set finished = true for respondWithoutAnalysis
+                  // submitThoughts should abort but not finish so workflow can continue
+                  const finishingToolName = chunkProcessor.getFinishingToolName();
+                  if (finishingToolName === 'respondWithoutAnalysis') {
+                    finished = true;
+                  }
+                },
+              }),
+            });
 
-    const wrappedStream = wrapTraced(
-      async () => {
-        const result = await retryableAgentStreamWithHealing({
-          agent: thinkAndPrepAgent,
-          messages,
-          options: {
-            toolCallStreaming: true,
-            runtimeContext,
-            abortSignal: abortController.signal,
-            toolChoice: 'required',
-            onChunk: createOnChunkHandler({
-              chunkProcessor,
-              abortController,
-              finishingToolNames: ['submitThoughts', 'respondWithoutAnalysis'],
-              onFinishingTool: () => {
-                // Only set finished = true for respondWithoutAnalysis
-                // submitThoughts should abort but not finish so workflow can continue
-                const finishingToolName = chunkProcessor.getFinishingToolName();
-                if (finishingToolName === 'respondWithoutAnalysis') {
-                  finished = true;
-                }
-              },
-            }),
+            return stream;
           },
-          retryConfig: {
-            maxRetries: 3,
-            onRetry: (error: RetryableError, attemptNumber: number) => {
-              // Log retry attempt for debugging
-              console.error(`Think and Prep retry attempt ${attemptNumber} for error:`, {
-                type: error.type,
-                attempt: attemptNumber,
-                messageId: runtimeContext.get('messageId'),
-                originalError:
-                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
-              });
+          {
+            name: 'Think and Prep',
+            spanAttributes: {
+              messageCount: messages.length,
+              retryAttempt: retryCount,
             },
           },
-        });
+        );
 
-        // Update messages to include any healing messages added during retries
-        if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
-          messages.length = 0;
-          messages.push(...result.conversationHistory);
-          // Update complete conversation history with healing messages
-          completeConversationHistory = result.conversationHistory;
-        } else {
-          console.error('Invalid messages or conversationHistory array');
+        const stream = await wrappedStream();
+
+        try {
+          // Process the stream - chunks are handled by onChunk callback
+          for await (const _chunk of stream.fullStream) {
+            // Stream is being processed via onChunk callback
+            // This loop just ensures the stream completes
+            if (abortController.signal.aborted) {
+              break;
+            }
+          }
+
+          // If we get here, the stream completed successfully
+          break; // Exit the retry loop
+        } catch (streamError) {
+          // Handle AbortError gracefully - this is a successful completion
+          if (streamError instanceof Error && streamError.name === 'AbortError') {
+            break; // Exit the retry loop, this is normal
+          }
+
+          // For other streaming errors, check if they're healable
+          const healingResult = await handleStreamingError(streamError, {
+            agent: thinkAndPrepAgent,
+            chunkProcessor,
+            runtimeContext,
+            abortController,
+            resourceId: runtimeContext.get('dataSourceId') as string,
+            threadId: runtimeContext.get('chatId') as string,
+            maxRetries: maxRetries - retryCount, // Remaining retries
+            onRetry: (error: RetryableError, attemptNumber: number) => {
+              console.error(
+                `Think and Prep stream retry attempt ${
+                  retryCount + attemptNumber
+                } for streaming error:`,
+                error,
+              );
+            },
+            toolChoice: 'required',
+          });
+
+          if (healingResult.shouldRetry && healingResult.healingMessage) {
+            // Add the healing message to conversation history and retry
+            messages = [...messages, healingResult.healingMessage];
+            chunkProcessor.setInitialMessages(messages);
+            retryCount++;
+            continue; // Continue to next iteration of retry loop
+          } else {
+            // Non-healable error, throw it
+            console.error('Non-healable streaming error:', streamError);
+            throw streamError;
+          }
+        }
+      } catch (error) {
+        // Handle errors during stream creation
+        if (error instanceof Error && error.name === 'AbortError') {
+          // This is expected when we abort the stream
+          break; // Exit the retry loop
         }
 
-        return result.stream;
-      },
-      {
-        name: 'Think and Prep',
-      }
-    );
+        // Check if this is a retryable error (AI SDK errors)
+        const retryableError = detectRetryableError(error);
+        if (retryableError && retryCount < maxRetries) {
+          // Add healing message to conversation history
+          messages = [...messages, retryableError.healingMessage];
+          chunkProcessor.setInitialMessages(messages);
 
-    const stream = await wrappedStream();
+          console.error(`Think and Prep retry attempt ${retryCount + 1} for error:`, {
+            type: retryableError.type,
+            attempt: retryCount + 1,
+            messageId: runtimeContext.get('messageId'),
+            originalError:
+              retryableError.originalError instanceof Error
+                ? retryableError.originalError.message
+                : 'Unknown',
+          });
 
-    try {
-      // Process the stream - chunks are handled by onChunk callback
-      for await (const _chunk of stream.fullStream) {
-        // Stream is being processed via onChunk callback
-        // This loop just ensures the stream completes
-        if (abortController.signal.aborted) {
-          break;
+          retryCount++;
+          continue; // Continue to next iteration of retry loop
         }
-      }
-    } catch (streamError) {
-      // Handle AbortError gracefully
-      if (streamError instanceof Error && streamError.name === 'AbortError') {
-        // Stream was intentionally aborted, this is normal
-      } else {
-        // Check if this is a healable streaming error
-        const healingResult = await handleStreamingError(streamError, {
-          agent: thinkAndPrepAgent,
-          chunkProcessor,
-          runtimeContext,
-          abortController,
-          //DALLIN TODO: resourceId AND threadId
-          resourceId: runtimeContext.get('dataSourceId') as string,
-          threadId: runtimeContext.get('chatId') as string,
-          maxRetries: 3,
-          onRetry: (error: RetryableError, attemptNumber: number) => {
-            console.error(
-              `Think and Prep stream retry attempt ${attemptNumber} for streaming error:`,
-              error
-            );
-          },
-          toolChoice: 'required',
-        });
 
-        if (healingResult.shouldRetry && healingResult.healingMessage) {
-          // Add the healing message to the final conversation history
-          // Continue processing rather than failing the step for better resilience
-          completeConversationHistory.push(healingResult.healingMessage);
-        } else {
-          console.error('Error processing stream:', streamError);
-          throw streamError; // Re-throw non-healable errors
+        // Not retryable or max retries exceeded
+        console.error('Error in think and prep step:', error);
+
+        // Check if it's a database connection error
+        if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+          throw new Error('Unable to connect to the analysis service. Please try again later.');
         }
+
+        // Check if it's an API/model error
+        if (
+          error instanceof Error &&
+          (error.message.includes('API') || error.message.includes('model'))
+        ) {
+          throw new Error(
+            'The analysis service is temporarily unavailable. Please try again in a few moments.',
+          );
+        }
+
+        // For unexpected errors, provide a generic friendly message
+        throw new Error(
+          'Something went wrong during the analysis. Please try again or contact support if the issue persists.',
+        );
       }
     }
 
@@ -256,42 +300,29 @@ const thinkAndPrepExecution = async ({
       finalStepData,
       chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
       chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
-      inputData.dashboardFiles // Pass dashboard context through
+      inputData.dashboardFiles, // Pass dashboard context through
     );
 
     return result;
   } catch (error) {
     // Only return a result for AbortError (which is expected when tools finish)
     if (error instanceof Error && error.name === 'AbortError') {
+      // Get final results from chunk processor
+      completeConversationHistory = chunkProcessor.getAccumulatedMessages();
+      outputMessages = extractMessageHistory(completeConversationHistory);
+
       return createStepResult(
         finished,
         outputMessages,
         finalStepData,
         chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
         chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
-        inputData.dashboardFiles // Pass dashboard context through
+        inputData.dashboardFiles, // Pass dashboard context through
       );
     }
 
-    // Check if it's a database connection error
-    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
-      throw new Error('Unable to connect to the analysis service. Please try again later.');
-    }
-
-    // Check if it's an API/model error
-    if (
-      error instanceof Error &&
-      (error.message.includes('API') || error.message.includes('model'))
-    ) {
-      throw new Error(
-        'The analysis service is temporarily unavailable. Please try again in a few moments.'
-      );
-    }
-
-    // For unexpected errors, provide a generic friendly message
-    throw new Error(
-      'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
-    );
+    // For other errors, re-throw them (they should have been handled in the retry loop)
+    throw error;
   }
 };
 

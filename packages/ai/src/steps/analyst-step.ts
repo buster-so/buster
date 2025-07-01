@@ -20,7 +20,7 @@ import {
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import { retryableAgentStreamWithHealing } from '../utils/retry';
+import { detectRetryableError } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -58,7 +58,7 @@ const outputSchema = z.object({
  */
 function transformHistoryForChunkProcessor(
   reasoningHistory: z.infer<typeof ReasoningHistorySchema> | undefined,
-  responseHistory: z.infer<typeof ResponseHistorySchema>
+  responseHistory: z.infer<typeof ResponseHistorySchema>,
 ): {
   reasoningHistory: ChatMessageReasoningMessage[];
   responseHistory: ChatMessageResponseMessage[];
@@ -84,7 +84,7 @@ function transformHistoryForChunkProcessor(
           ...container,
           pills: container.pills.map((pill) => ({
             ...pill,
-            type: validPillTypes.includes(pill.type as (typeof validPillTypes)[number])
+            type: validPillTypes.includes(pill.type as typeof validPillTypes[number])
               ? pill.type
               : 'empty',
           })),
@@ -116,7 +116,7 @@ function createMessageKey(msg: CoreMessage): string {
           c.type === 'tool-call' &&
           'toolCallId' in c &&
           'toolName' in c &&
-          'args' in c
+          'args' in c,
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
@@ -129,7 +129,7 @@ function createMessageKey(msg: CoreMessage): string {
     // For text content, use first 100 chars as key
     const textContent = msg.content.find(
       (c): c is { type: 'text'; text: string } =>
-        typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c
+        typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c,
     );
     if (textContent?.text) {
       return `assistant:text:${textContent.text.substring(0, 100)}`;
@@ -145,7 +145,7 @@ function createMessageKey(msg: CoreMessage): string {
           c !== null &&
           'type' in c &&
           c.type === 'tool-result' &&
-          'toolCallId' in c
+          'toolCallId' in c,
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
@@ -161,11 +161,11 @@ function createMessageKey(msg: CoreMessage): string {
       typeof msg.content === 'string'
         ? msg.content
         : Array.isArray(msg.content) &&
-            msg.content[0] &&
-            typeof msg.content[0] === 'object' &&
-            'text' in msg.content[0]
-          ? (msg.content[0] as { text?: string }).text || ''
-          : '';
+          msg.content[0] &&
+          typeof msg.content[0] === 'object' &&
+          'text' in msg.content[0]
+        ? (msg.content[0] as { text?: string }).text || ''
+        : '';
 
     // Fast hash function for user messages instead of JSON.stringify
     let hash = 0;
@@ -216,7 +216,7 @@ function deduplicateMessages(messages: CoreMessage[]): CoreMessage[] {
 
   if (duplicatesFound > 0) {
     console.info(
-      `Removed ${duplicatesFound} duplicate messages. Original: ${messages.length}, Deduplicated: ${deduplicated.length}`
+      `Removed ${duplicatesFound} duplicate messages. Original: ${messages.length}, Deduplicated: ${deduplicated.length}`,
     );
   }
 
@@ -247,13 +247,15 @@ const analystExecution = async ({
   const abortController = new AbortController();
   const messageId = runtimeContext.get('messageId') as string | null;
   let completeConversationHistory: CoreMessage[] = [];
+  let retryCount = 0;
+  const maxRetries = 3;
 
   // Initialize chunk processor with histories from previous step
   // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
   const { reasoningHistory: transformedReasoning, responseHistory: transformedResponse } =
     transformHistoryForChunkProcessor(
       inputData.reasoningHistory || [],
-      inputData.responseHistory || []
+      inputData.responseHistory || [],
     );
 
   const chunkProcessor = new ChunkProcessor(
@@ -261,48 +263,48 @@ const analystExecution = async ({
     [],
     transformedReasoning, // Pass transformed reasoning history
     transformedResponse, // Pass transformed response history
-    inputData.dashboardContext // Pass dashboard context
+    inputData.dashboardContext, // Pass dashboard context
   );
 
-  try {
-    // Messages come directly from think-and-prep step output
-    // They are already in CoreMessage[] format
-    let messages = inputData.outputMessages;
+  // Messages come directly from think-and-prep step output
+  // They are already in CoreMessage[] format
+  let messages = inputData.outputMessages;
 
-    if (messages && messages.length > 0) {
-      // Deduplicate messages based on role and toolCallId
-      messages = deduplicateMessages(messages);
+  if (messages && messages.length > 0) {
+    // Deduplicate messages based on role and toolCallId
+    messages = deduplicateMessages(messages);
+  }
+
+  // Critical check: Ensure messages array is not empty
+  if (!messages || messages.length === 0) {
+    console.error('CRITICAL: Empty messages array detected in analyst step', {
+      inputData,
+      messagesType: typeof messages,
+      isArray: Array.isArray(messages),
+    });
+
+    // Try to use conversationHistory as fallback
+    const fallbackMessages = inputData.conversationHistory;
+    if (fallbackMessages && Array.isArray(fallbackMessages) && fallbackMessages.length > 0) {
+      console.warn('Using conversationHistory as fallback for empty outputMessages');
+      messages = deduplicateMessages(fallbackMessages);
+    } else {
+      throw new Error(
+        'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.',
+      );
     }
+  }
 
-    // Critical check: Ensure messages array is not empty
-    if (!messages || messages.length === 0) {
-      console.error('CRITICAL: Empty messages array detected in analyst step', {
-        inputData,
-        messagesType: typeof messages,
-        isArray: Array.isArray(messages),
-      });
+  // Set initial messages in chunk processor
+  chunkProcessor.setInitialMessages(messages);
 
-      // Try to use conversationHistory as fallback
-      const fallbackMessages = inputData.conversationHistory;
-      if (fallbackMessages && Array.isArray(fallbackMessages) && fallbackMessages.length > 0) {
-        console.warn('Using conversationHistory as fallback for empty outputMessages');
-        messages = deduplicateMessages(fallbackMessages);
-      } else {
-        throw new Error(
-          'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.'
-        );
-      }
-    }
-
-    // Set initial messages in chunk processor
-    chunkProcessor.setInitialMessages(messages);
-
-    const wrappedStream = wrapTraced(
-      async () => {
-        const result = await retryableAgentStreamWithHealing({
-          agent: analystAgent,
-          messages,
-          options: {
+  // Main execution loop with retry logic
+  while (retryCount <= maxRetries) {
+    try {
+      const wrappedStream = wrapTraced(
+        async () => {
+          // Create stream directly without retryableAgentStreamWithHealing
+          const stream = await analystAgent.stream(messages, {
             toolCallStreaming: true,
             runtimeContext,
             toolChoice: 'required',
@@ -312,190 +314,161 @@ const analystExecution = async ({
               abortController,
               finishingToolNames: ['doneTool'],
             }),
-          },
-          retryConfig: {
-            maxRetries: 3,
-            onRetry: (error: RetryableError, attemptNumber: number) => {
-              // Log retry attempt for debugging
-              console.error(`Analyst retry attempt ${attemptNumber} for error:`, {
-                type: error.type,
-                attempt: attemptNumber,
-                messageId: runtimeContext.get('messageId'),
-                originalError:
-                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
-              });
+          });
+
+          return stream;
+        },
+        {
+          name: 'Analyst',
+          spanAttributes: {
+            messageCount: messages.length,
+            retryAttempt: retryCount,
+            previousStep: {
+              toolsUsed: inputData.metadata?.toolsUsed,
+              finalTool: inputData.metadata?.finalTool,
+              hasReasoning: !!inputData.metadata?.reasoning,
             },
           },
-        });
-
-        // Update messages to include any healing messages added during retries
-        if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
-          messages.length = 0;
-          messages.push(...result.conversationHistory);
-          // Update complete conversation history with healing messages
-          completeConversationHistory = result.conversationHistory;
-        } else {
-          console.error('Invalid messages or conversationHistory array');
-        }
-
-        return result.stream;
-      },
-      {
-        name: 'Analyst',
-        spanAttributes: {
-          messageCount: messages.length,
-          previousStep: {
-            toolsUsed: inputData.metadata?.toolsUsed,
-            finalTool: inputData.metadata?.finalTool,
-            hasReasoning: !!inputData.metadata?.reasoning,
-          },
         },
-      }
-    );
+      );
 
-    const stream = await wrappedStream();
+      const stream = await wrappedStream();
 
-    try {
-      // Process the stream - chunks are handled by onChunk callback
-      for await (const _chunk of stream.fullStream) {
-        // Stream is being processed via onChunk callback
-        // This loop just ensures the stream completes
-        if (abortController.signal.aborted) {
-          break;
+      try {
+        // Process the stream - chunks are handled by onChunk callback
+        for await (const _chunk of stream.fullStream) {
+          // Stream is being processed via onChunk callback
+          // This loop just ensures the stream completes
+          if (abortController.signal.aborted) {
+            break;
+          }
         }
-      }
-    } catch (streamError) {
-      // Handle AbortError gracefully
-      if (streamError instanceof Error && streamError.name === 'AbortError') {
-        // Stream was intentionally aborted, this is normal
-      } else {
-        // Check if this is a healable streaming error
+
+        // If we get here, the stream completed successfully
+        break; // Exit the retry loop
+      } catch (streamError) {
+        // Handle AbortError gracefully - this is a successful completion
+        if (streamError instanceof Error && streamError.name === 'AbortError') {
+          break; // Exit the retry loop, this is normal
+        }
+
+        // For other streaming errors, check if they're healable
         const healingResult = await handleStreamingError(streamError, {
           agent: analystAgent as typeof analystAgent,
           chunkProcessor,
           runtimeContext,
           abortController,
-          maxRetries: 3,
-          //DALLIN TODO: resourceId AND threadId
           resourceId: runtimeContext.get('dataSourceId') as string,
           threadId: runtimeContext.get('chatId') as string,
+          maxRetries: maxRetries - retryCount, // Remaining retries
           onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(
-              `Analyst stream retry attempt ${attemptNumber} for streaming error:`,
-              error
+              `Analyst stream retry attempt ${retryCount + attemptNumber} for streaming error:`,
+              error,
             );
           },
           toolChoice: 'required',
         });
 
         if (healingResult.shouldRetry && healingResult.healingMessage) {
-          // Add the healing message to the final conversation history
-          // Note: For now we just log it. A full implementation would need to restart
-          // the entire stream processing with the healed conversation.
-          completeConversationHistory.push(healingResult.healingMessage);
+          // Add the healing message to conversation history and retry
+          messages = [...messages, healingResult.healingMessage];
+          chunkProcessor.setInitialMessages(messages);
+          retryCount++;
+          continue; // Continue to next iteration of retry loop
         } else {
-          console.error('Error processing stream:', streamError);
-          throw streamError; // Re-throw non-healable errors
+          // Non-healable error, throw it
+          console.error('Non-healable streaming error:', streamError);
+          throw streamError;
         }
       }
-    }
+    } catch (error) {
+      // Handle errors during stream creation
+      if (error instanceof Error && error.name === 'AbortError') {
+        // This is expected when we abort the stream
+        break; // Exit the retry loop
+      }
 
-    // Get final conversation history from chunk processor
-    completeConversationHistory = chunkProcessor.getAccumulatedMessages();
+      // Check if this is a retryable error (AI SDK errors)
+      const retryableError = detectRetryableError(error);
+      if (retryableError && retryCount < maxRetries) {
+        // Add healing message to conversation history
+        messages = [...messages, retryableError.healingMessage];
+        chunkProcessor.setInitialMessages(messages);
 
-    // Get files metadata for the response
-    const filesMetadata = {
-      filesCreated: chunkProcessor.getTotalFilesCreated(),
-      filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
-    };
+        console.error(`Analyst retry attempt ${retryCount + 1} for error:`, {
+          type: retryableError.type,
+          attempt: retryCount + 1,
+          messageId: runtimeContext.get('messageId'),
+          originalError:
+            retryableError.originalError instanceof Error
+              ? retryableError.originalError.message
+              : 'Unknown',
+        });
 
-    // Extract selected file information
-    const fileSelection = chunkProcessor.getCurrentFileSelection();
-    const firstFile = fileSelection.files[0];
-    const selectedFile = firstFile
-      ? {
-          fileId: firstFile.id,
-          fileType: firstFile.fileType,
-          versionNumber: firstFile.versionNumber,
-        }
-      : undefined;
+        retryCount++;
+        continue; // Continue to next iteration of retry loop
+      }
 
-    return {
-      conversationHistory: completeConversationHistory,
-      finished: true,
-      outputMessages: completeConversationHistory,
-      reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
-        typeof ReasoningHistorySchema
-      >,
-      responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
-      metadata: {
-        ...inputData.metadata,
-        ...filesMetadata,
-      },
-      selectedFile,
-    };
-  } catch (error) {
-    // Handle abort errors gracefully
-    if (error instanceof Error && error.name === 'AbortError') {
-      // This is expected when we abort the stream
+      // Not retryable or max retries exceeded
+      console.error('Error in analyst step:', error);
 
-      // Get files metadata for the response
-      const filesMetadata = {
-        filesCreated: chunkProcessor.getTotalFilesCreated(),
-        filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
-      };
+      // Check if it's a database connection error
+      if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+        throw new Error('Unable to connect to the analysis service. Please try again later.');
+      }
 
-      // Extract selected file information
-      const fileSelection = chunkProcessor.getCurrentFileSelection();
-      const firstFile = fileSelection.files[0];
-      const selectedFile = firstFile
-        ? {
-            fileId: firstFile.id,
-            fileType: firstFile.fileType,
-            versionNumber: firstFile.versionNumber,
-          }
-        : undefined;
+      // Check if it's an API/model error
+      if (
+        error instanceof Error &&
+        (error.message.includes('API') || error.message.includes('model'))
+      ) {
+        throw new Error(
+          'The analysis service is temporarily unavailable. Please try again in a few moments.',
+        );
+      }
 
-      return {
-        conversationHistory: completeConversationHistory,
-        finished: true,
-        outputMessages: completeConversationHistory,
-        reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
-          typeof ReasoningHistorySchema
-        >,
-        responseHistory: chunkProcessor.getResponseHistory() as z.infer<
-          typeof ResponseHistorySchema
-        >,
-        metadata: {
-          ...inputData.metadata,
-          ...filesMetadata,
-        },
-        selectedFile,
-      };
-    }
-
-    console.error('Error in analyst step:', error);
-
-    // Check if it's a database connection error
-    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
-      throw new Error('Unable to connect to the analysis service. Please try again later.');
-    }
-
-    // Check if it's an API/model error
-    if (
-      error instanceof Error &&
-      (error.message.includes('API') || error.message.includes('model'))
-    ) {
+      // For unexpected errors, provide a generic friendly message
       throw new Error(
-        'The analysis service is temporarily unavailable. Please try again in a few moments.'
+        'Something went wrong during the analysis. Please try again or contact support if the issue persists.',
       );
     }
-
-    // For unexpected errors, provide a generic friendly message
-    throw new Error(
-      'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
-    );
   }
+
+  // Get final conversation history from chunk processor
+  completeConversationHistory = chunkProcessor.getAccumulatedMessages();
+
+  // Get files metadata for the response
+  const filesMetadata = {
+    filesCreated: chunkProcessor.getTotalFilesCreated(),
+    filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
+  };
+
+  // Extract selected file information
+  const fileSelection = chunkProcessor.getCurrentFileSelection();
+  const firstFile = fileSelection.files[0];
+  const selectedFile = firstFile
+    ? {
+        fileId: firstFile.id,
+        fileType: firstFile.fileType,
+        versionNumber: firstFile.versionNumber,
+      }
+    : undefined;
+
+  return {
+    conversationHistory: completeConversationHistory,
+    finished: true,
+    outputMessages: completeConversationHistory,
+    reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
+      typeof ReasoningHistorySchema
+    >,
+    responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
+    metadata: {
+      ...inputData.metadata,
+      ...filesMetadata,
+    },
+    selectedFile,
+  };
 };
 
 export const analystStep = createStep({
