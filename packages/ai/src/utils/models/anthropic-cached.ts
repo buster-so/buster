@@ -8,14 +8,14 @@ const httpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000, // Send keep-alive packets every 30 seconds
   maxSockets: 10, // Maximum concurrent connections
-  timeout: 20000, // 20 second timeout
+  timeout: 10000, // 20 second timeout
 });
 
 const httpAgent = new http.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000,
   maxSockets: 10,
-  timeout: 60000,
+  timeout: 10000,
 });
 
 export const anthropicCachedModel = (modelId: string) => {

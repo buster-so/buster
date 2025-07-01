@@ -48,6 +48,7 @@ use crate::chats::{
     },
     get_chat_handler,
     streaming_parser::StreamingParser,
+    utils::convert_messages_to_core_format,
 };
 use crate::messages::types::{ChatMessage, ChatUserMessage};
 
@@ -872,7 +873,7 @@ pub async fn post_chat_handler(
         reasoning: serde_json::to_value(&reasoning_messages)?,
         final_reasoning_message: Some(formatted_final_reasoning_duration), // Use formatted reasoning duration
         title: title.title.clone().unwrap_or_default(),
-        raw_llm_messages: serde_json::to_value(&raw_llm_messages)?,
+        raw_llm_messages: serde_json::to_value(&convert_messages_to_core_format(&raw_llm_messages)?)?,
         feedback: None,
         is_completed: true,
     };

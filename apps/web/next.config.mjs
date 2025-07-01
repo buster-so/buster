@@ -134,8 +134,13 @@ const nextConfig = {
 //   enabled: process.env.ANALYZE === 'true'
 // })(nextConfig);
 
-export default withPostHogConfig(nextConfig, {
-  enabled: !!process.env.POSTHOG_API_KEY && !!process.env.POSTHOG_ENV_ID,
-  personalApiKey: process.env.POSTHOG_API_KEY,
-  envId: process.env.POSTHOG_ENV_ID
-});
+// export default withPostHogConfig(nextConfig, {
+//   enabled:
+//     !!process.env.POSTHOG_API_KEY &&
+//     !!process.env.POSTHOG_ENV_ID &&
+//     process.env.POSTHOG_API_KEY !== 'undefined',
+//   personalApiKey: process.env.POSTHOG_API_KEY,
+//   envId: process.env.POSTHOG_ENV_ID
+// });
+
+export default nextConfig;

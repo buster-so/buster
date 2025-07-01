@@ -12,6 +12,12 @@ import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;
 
+// Agent output schema - only for extracting values
+const extractValuesAgentOutputSchema = z.object({
+  values: z.array(z.string()).describe('The values that the agent will search for.'),
+});
+
+// Step output schema - what the step returns after performing the search
 export const extractValuesSearchOutputSchema = z.object({
   values: z.array(z.string()).describe('The values that the agent will search for.'),
   searchResults: z

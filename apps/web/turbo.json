@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "@buster/server-shared#build", "@buster/typescript-config#build"],
       "inputs": [
         "src/**/*",
         "public/**/*",
