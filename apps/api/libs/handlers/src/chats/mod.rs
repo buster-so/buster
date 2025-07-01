@@ -4,6 +4,7 @@ pub mod post_chat_handler;
 pub mod update_chats_handler;
 pub mod delete_chats_handler;
 pub mod types;
+pub mod utils;
 pub mod streaming_parser;
 pub mod context_loaders;
 pub mod list_chats_handler;
