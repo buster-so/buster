@@ -9,6 +9,7 @@ import {
   getMessagesForChat,
   messages,
 } from '@buster/database';
+import { eq, and, gte, isNull } from 'drizzle-orm';
 import type { Chat, Message } from '@buster/database';
 import type {
   ChatMessage,
@@ -170,7 +171,8 @@ export async function handleExistingChat(
   chatId: string,
   messageId: string,
   prompt: string | undefined,
-  user: User
+  user: User,
+  redoFromMessageId?: string
 ): Promise<{
   chatId: string;
   messageId: string;
@@ -193,6 +195,27 @@ export async function handleExistingChat(
       'You do not have permission to access this chat',
       403
     );
+  }
+
+  // Handle redo logic if redoFromMessageId is provided
+  if (redoFromMessageId) {
+    // Validate that the message belongs to this chat
+    const messageToRedo = await db
+      .select({ chatId: messages.chatId })
+      .from(messages)
+      .where(eq(messages.id, redoFromMessageId))
+      .limit(1);
+
+    if (!messageToRedo.length || messageToRedo[0]?.chatId !== chatId) {
+      throw new ChatError(
+        ChatErrorCode.INVALID_REQUEST,
+        'Message does not belong to this chat',
+        400
+      );
+    }
+
+    // Soft delete from this point forward
+    await softDeleteMessagesFromPoint(redoFromMessageId);
   }
 
   // Create new message and fetch existing messages concurrently
@@ -386,4 +409,35 @@ export async function handleAssetChat(
     // Don't fail the entire request, just return the chat without asset messages
     return chat;
   }
+}
+
+/**
+ * Soft delete a message and all subsequent messages in the same chat
+ * Used for "redo from this point" functionality
+ */
+export async function softDeleteMessagesFromPoint(messageId: string): Promise<void> {
+  // Get the message to find its chat and timestamp
+  const targetMessage = await db
+    .select({ chatId: messages.chatId, createdAt: messages.createdAt })
+    .from(messages)
+    .where(eq(messages.id, messageId))
+    .limit(1);
+
+  if (!targetMessage.length || !targetMessage[0]) {
+    throw new Error(`Message not found: ${messageId}`);
+  }
+
+  const { chatId, createdAt } = targetMessage[0];
+
+  // Soft delete this message and all messages created after it in the same chat
+  await db
+    .update(messages)
+    .set({ deletedAt: new Date().toISOString() })
+    .where(
+      and(
+        eq(messages.chatId, chatId),
+        gte(messages.createdAt, createdAt),
+        isNull(messages.deletedAt)
+      )
+    );
 }
