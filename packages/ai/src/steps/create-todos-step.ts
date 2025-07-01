@@ -205,8 +205,9 @@ const todoStepExecution = async ({
   const messageId = runtimeContext.get('messageId') as string | null;
   const abortController = new AbortController();
 
-  // Initialize chunk processor for streaming
-  const chunkProcessor = new ChunkProcessor(messageId, [], [], []);
+  // Initialize chunk processor for streaming with available tools
+  const availableTools = new Set(['createTodoList']);
+  const chunkProcessor = new ChunkProcessor(messageId, [], [], [], undefined, availableTools);
 
   try {
     // Use the input data directly

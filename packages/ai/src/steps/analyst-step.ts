@@ -20,8 +20,8 @@ import {
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import { detectRetryableError } from '../utils/retry';
-import type { RetryableError } from '../utils/retry/types';
+import { RetryWithHealingError, detectRetryableError, isRetryWithHealingError } from '../utils/retry';
+import type { RetryableError, WorkflowContext } from '../utils/retry/types';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
@@ -275,12 +275,17 @@ const analystExecution = async ({
     dashboardContext: inputData.dashboardContext,
   });
 
+  // Get available tools from the analyst agent
+  const availableTools = new Set(Object.keys(analystAgent.tools || {}));
+  console.info('[Analyst Step] Available tools:', Array.from(availableTools));
+
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
     transformedReasoning, // Pass transformed reasoning history
     transformedResponse, // Pass transformed response history
-    inputData.dashboardContext // Pass dashboard context
+    inputData.dashboardContext, // Pass dashboard context
+    availableTools
   );
 
   // Messages come directly from think-and-prep step output
@@ -331,6 +336,36 @@ const analystExecution = async ({
               abortController,
               finishingToolNames: ['doneTool'],
             }),
+            onError: async (event: { error: unknown }) => {
+              const error = event.error;
+              console.error('Analyst stream error caught in onError:', error);
+
+              // Check if this is a retryable error
+              const workflowContext: WorkflowContext = {
+                currentStep: 'analyst',
+              };
+              const retryableError = detectRetryableError(error, workflowContext);
+              if (!retryableError || retryCount >= maxRetries) {
+                console.error('Analyst onError: Not retryable or max retries reached', {
+                  isRetryable: !!retryableError,
+                  retryCount,
+                  maxRetries,
+                  errorType: retryableError?.type || 'unknown',
+                });
+                // Not retryable or max retries reached - let it fail
+                return; // Let the error propagate normally
+              }
+
+              console.info('Analyst onError: Setting up retry', {
+                retryCount: retryCount + 1,
+                maxRetries,
+                errorType: retryableError.type,
+                healingMessage: retryableError.healingMessage,
+              });
+
+              // Throw a special error with the healing info to trigger retry
+              throw new RetryWithHealingError(retryableError);
+            },
           });
 
           return stream;
@@ -351,85 +386,133 @@ const analystExecution = async ({
 
       const stream = await wrappedStream();
 
-      try {
-        // Process the stream - chunks are handled by onChunk callback
-        for await (const _chunk of stream.fullStream) {
-          // Stream is being processed via onChunk callback
-          // This loop just ensures the stream completes
-          if (abortController.signal.aborted) {
-            break;
+      // Process the stream - chunks are handled by onChunk callback
+      for await (const _chunk of stream.fullStream) {
+        // Stream is being processed via onChunk callback
+        // This loop just ensures the stream completes
+        if (abortController.signal.aborted) {
+          break;
+        }
+      }
+
+      console.info('Analyst: Stream completed successfully');
+      break; // Exit the retry loop on success
+    } catch (error) {
+      console.error('Analyst: Error in stream processing', error);
+
+      // Handle our special retry error
+      if (isRetryWithHealingError(error)) {
+        const retryableError = error.retryableError;
+        
+        // Get the current messages from chunk processor to find the failed tool call
+        const currentMessages = chunkProcessor.getAccumulatedMessages();
+        const healingMessage = retryableError.healingMessage;
+        let insertionIndex = currentMessages.length; // Default to end
+        
+        // If this is a NoSuchToolError, find the correct position to insert the healing message
+        if (retryableError.type === 'no-such-tool' && Array.isArray(healingMessage.content)) {
+          const firstContent = healingMessage.content[0];
+          if (firstContent && typeof firstContent === 'object' && 'type' in firstContent && 
+              firstContent.type === 'tool-result' && 'toolCallId' in firstContent && 
+              'toolName' in firstContent) {
+            
+            // Find the assistant message with the failed tool call
+            for (let i = currentMessages.length - 1; i >= 0; i--) {
+              const msg = currentMessages[i];
+              if (msg && msg.role === 'assistant' && Array.isArray(msg.content)) {
+                // Find tool calls in this message
+                const toolCalls = msg.content.filter(
+                  (c): c is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
+                    typeof c === 'object' && c !== null && 'type' in c && 
+                    c.type === 'tool-call' && 'toolCallId' in c && 'toolName' in c && 'args' in c
+                );
+                
+                // Check each tool call to see if it matches and has no result
+                for (const toolCall of toolCalls) {
+                  // Check if this tool call matches the failed tool name
+                  if (toolCall.toolName === firstContent.toolName) {
+                    // Look ahead for tool results
+                    let hasResult = false;
+                    for (let j = i + 1; j < currentMessages.length; j++) {
+                      const nextMsg = currentMessages[j];
+                      if (nextMsg && nextMsg.role === 'tool' && Array.isArray(nextMsg.content)) {
+                        const hasMatchingResult = nextMsg.content.some(
+                          (c) => typeof c === 'object' && c !== null && 'type' in c && 
+                                 c.type === 'tool-result' && 'toolCallId' in c && 
+                                 c.toolCallId === toolCall.toolCallId
+                        );
+                        if (hasMatchingResult) {
+                          hasResult = true;
+                          break;
+                        }
+                      }
+                    }
+                    
+                    // If this tool call has no result, this is our failed call
+                    if (!hasResult) {
+                      console.info('Analyst: Found orphaned tool call, using its ID for healing', {
+                        toolCallId: toolCall.toolCallId,
+                        toolName: toolCall.toolName,
+                        atIndex: i,
+                      });
+                      
+                      // Update the healing message with the correct toolCallId
+                      firstContent.toolCallId = toolCall.toolCallId;
+                      
+                      // Insert position is right after this assistant message
+                      insertionIndex = i + 1;
+                      break;
+                    }
+                  }
+                }
+                
+                // If we found the position, stop searching
+                if (insertionIndex !== currentMessages.length) break;
+              }
+            }
           }
         }
-
-        // If we get here, the stream completed successfully
-        break; // Exit the retry loop
-      } catch (streamError) {
-        // Handle AbortError gracefully - this is a successful completion
-        if (streamError instanceof Error && streamError.name === 'AbortError') {
-          break; // Exit the retry loop, this is normal
-        }
-
-        // For other streaming errors, check if they're healable
-        const healingResult = await handleStreamingError(streamError, {
-          agent: analystAgent as typeof analystAgent,
-          chunkProcessor,
-          runtimeContext,
-          abortController,
-          resourceId: runtimeContext.get('dataSourceId') as string,
-          threadId: runtimeContext.get('chatId') as string,
-          maxRetries: maxRetries - retryCount, // Remaining retries
-          onRetry: (error: RetryableError, attemptNumber: number) => {
-            console.error(
-              `Analyst stream retry attempt ${retryCount + attemptNumber} for streaming error:`,
-              error
-            );
-          },
-          toolChoice: 'required',
+        
+        console.info('Analyst: Retrying with healing message', {
+          retryCount,
+          errorType: retryableError.type,
+          insertionIndex,
+          totalMessages: currentMessages.length,
         });
-
-        if (healingResult.shouldRetry && healingResult.healingMessage) {
-          // Add the healing message to conversation history and retry
-          messages = [...messages, healingResult.healingMessage];
-          chunkProcessor.setInitialMessages(messages);
-          retryCount++;
-          continue; // Continue to next iteration of retry loop
-        }
-
-        // Non-healable error, throw it
-        console.error('Non-healable streaming error:', streamError);
-        throw streamError;
-      }
-    } catch (error) {
-      console.error('Error in analyst step:', error);
-      // Handle errors during stream creation
-      if (error instanceof Error && error.name === 'AbortError') {
-        // This is expected when we abort the stream
-        break; // Exit the retry loop
-      }
-
-      // Check if this is a retryable error (AI SDK errors)
-      const retryableError = detectRetryableError(error);
-      if (retryableError && retryCount < maxRetries) {
-        // Add healing message to conversation history
-        messages = [...messages, retryableError.healingMessage];
+        
+        // Create new messages array with healing message inserted at the correct position
+        const updatedMessages = [
+          ...currentMessages.slice(0, insertionIndex),
+          healingMessage,
+          ...currentMessages.slice(insertionIndex)
+        ];
+        
+        // Update messages for the retry
+        messages = updatedMessages;
+        
+        // Reset chunk processor with the properly ordered messages
         chunkProcessor.setInitialMessages(messages);
-
-        console.error(`Analyst retry attempt ${retryCount + 1} for error:`, {
-          type: retryableError.type,
-          attempt: retryCount + 1,
-          messageId: runtimeContext.get('messageId'),
-          originalError:
-            retryableError.originalError instanceof Error
-              ? retryableError.originalError.message
-              : 'Unknown',
-        });
-
+        
+        // Force save to persist the healing message immediately
+        await chunkProcessor.saveToDatabase();
+        
         retryCount++;
-        continue; // Continue to next iteration of retry loop
+        
+        // Continue to next retry iteration
+        continue;
+      }
+      
+      // Handle normal AbortError (from doneTool)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.info('Analyst: Stream aborted successfully (normal completion)');
+        break; // Normal abort, exit retry loop
       }
 
-      // Not retryable or max retries exceeded
-      console.error('Error in analyst step:', error);
+      // Any other error at this point is fatal
+      console.error('Analyst: Fatal error - not retryable', {
+        errorName: error instanceof Error ? error.name : 'unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
 
       // Check if it's a database connection error
       if (error instanceof Error && error.message.includes('DATABASE_URL')) {
