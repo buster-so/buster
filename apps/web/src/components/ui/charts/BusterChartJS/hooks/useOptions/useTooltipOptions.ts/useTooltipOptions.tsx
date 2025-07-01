@@ -32,7 +32,7 @@ interface UseTooltipOptionsProps {
   colors: string[];
 }
 
-const MAX_TOOLTIP_CACHE_SIZE = 20;
+const MAX_TOOLTIP_CACHE_SIZE = 13;
 
 export const useTooltipOptions = ({
   columnLabelFormats,

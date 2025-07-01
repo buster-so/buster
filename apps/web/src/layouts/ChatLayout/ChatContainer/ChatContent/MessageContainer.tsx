@@ -13,9 +13,9 @@ interface MessageContainerProps {
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   hideAvatar?: boolean;
-  isCompletedStream: boolean;
-  isFinishedReasoning: boolean;
-  hasReasoningMessage: boolean;
+  isCompletedStream?: boolean;
+  isFinishedReasoning?: boolean;
+  hasReasoningMessage?: boolean;
 }
 
 export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps>(
@@ -27,9 +27,9 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
       senderAvatar,
       className = '',
       hideAvatar = false,
-      hasReasoningMessage,
-      isCompletedStream,
-      isFinishedReasoning,
+      hasReasoningMessage = true,
+      isCompletedStream = true,
+      isFinishedReasoning = true,
       onMouseEnter,
       onMouseLeave
     },
