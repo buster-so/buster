@@ -256,6 +256,23 @@ const analystExecution = async ({
       inputData.responseHistory || []
     );
 
+  // Log full input data to debug dashboard context
+  console.info('[Analyst Step] Input data keys:', Object.keys(inputData));
+  console.info('[Analyst Step] Dashboard context details:', {
+    hasDashboardContext: 'dashboardContext' in inputData,
+    dashboardContextValue: inputData.dashboardContext,
+    inputDataSample: JSON.stringify(inputData).substring(0, 500),
+  });
+
+  console.info('[Analyst Step] Creating ChunkProcessor:', {
+    messageId,
+    reasoningHistoryCount: transformedReasoning.length,
+    responseHistoryCount: transformedResponse.length,
+    dashboardContextProvided: inputData.dashboardContext !== undefined,
+    dashboardContextLength: inputData.dashboardContext?.length || 0,
+    dashboardContext: inputData.dashboardContext,
+  });
+
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
@@ -435,6 +452,7 @@ const analystExecution = async ({
       selectedFile,
     };
   } catch (error) {
+    console.error('[Analyst Step] Error:', error);
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream

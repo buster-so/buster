@@ -24,13 +24,13 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@mastra/core": "catalog:",
-    "@trigger.dev/sdk": "catalog:",
+    "@trigger.dev/sdk": "4.0.0-v4-beta.21",
     "ai": "catalog:",
     "braintrust": "^0.0.206",
     "vitest": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "catalog:"
+    "@trigger.dev/build": "4.0.0-v4-beta.21"
   }
 }

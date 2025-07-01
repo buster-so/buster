@@ -13,6 +13,13 @@ const inputSchema = thinkAndPrepWorkflowInputSchema;
 
 export const generateChatTitleOutputSchema = z.object({
   title: z.string().describe('The title for the chat.'),
+  // Pass through dashboard context
+  dashboardFiles: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    versionNumber: z.number(),
+    metricIds: z.array(z.string()),
+  })).optional(),
 });
 
 const generateChatTitleInstructions = `
@@ -87,13 +94,17 @@ const generateChatTitleExecution = async ({
 
     await Promise.all(updatePromises);
 
-    return title;
+    return {
+      ...title,
+      dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
+    };
   } catch (error) {
     // Handle AbortError gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // Return a fallback title when aborted
       return {
         title: 'New Analysis',
+        dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
       };
     }
 
