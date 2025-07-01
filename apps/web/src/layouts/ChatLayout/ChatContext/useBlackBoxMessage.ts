@@ -37,10 +37,10 @@ export const useBlackBoxMessage = () => {
     const existingMessage = queryClient.getQueryData(options.queryKey);
 
     // If no existing message or no reasoning messages, use BLACK_BOX_INITIAL_THOUGHT as the first message
-    const thought =
-      existingMessage && reasoningMessageIds?.length
-        ? getRandomThought(existingMessage as string)
-        : BLACK_BOX_INITIAL_THOUGHT;
+    const thought = reasoningMessageIds?.length
+      ? getRandomThought(existingMessage as string)
+      : BLACK_BOX_INITIAL_THOUGHT;
+
     queryClient.setQueryData(options.queryKey, thought);
   });
 
@@ -59,12 +59,6 @@ export const useBlackBoxMessage = () => {
       const lastReasoningMessage = message.reasoning_messages[lastReasoningMessageId];
       const isFinishedReasoningMessage = lastReasoningMessage?.status !== 'loading';
       const isFinishedReasoningLoop = message.is_completed || !!message.final_reasoning_message;
-      console.log('checkBlackBoxMessage', {
-        message,
-        isFinishedReasoningMessage,
-        isFinishedReasoningLoop,
-        reasoningMessageIds: message.reasoning_message_ids
-      });
 
       if (isFinishedReasoningMessage && !isFinishedReasoningLoop && !message.is_completed) {
         clearTimeoutRef(message.id);
@@ -89,6 +83,7 @@ export const useBlackBoxMessage = () => {
       const isLastReasoningMessageCompleted = lastReasoningMessage?.status === 'completed';
 
       if (!isMessageCompletedStream && isLastReasoningMessageCompleted) {
+        console.log('looping auto thought', { messageId });
         addBlackBoxMessage({ messageId });
         _loopAutoThought({ messageId });
       }

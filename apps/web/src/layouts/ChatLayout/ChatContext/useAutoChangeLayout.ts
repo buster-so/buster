@@ -28,6 +28,9 @@ export const useAutoChangeLayout = ({
   const { data: isFinishedReasoning } = useGetChatMessage(lastMessageId, {
     select: (x) => !!lastReasoningMessageId && !!(x?.is_completed || !!x.final_reasoning_message)
   });
+  const { data: hasResponseFile } = useGetChatMessage(lastMessageId, {
+    select: (x) => Object.values(x?.response_messages || {}).some((x) => x.type === 'file')
+  });
 
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const previousLastMessageId = useRef<string | null>(null);
@@ -54,17 +57,8 @@ export const useAutoChangeLayout = ({
       return responseMessage?.type === 'file';
     });
 
-    //this will trigger when the chat is streaming and is has not completed yet (new chat)
-    if (!isCompletedStream && !isFinishedReasoning && hasReasoning && chatId) {
-      previousLastMessageId.current = lastMessageId;
-
-      if (!messageId) {
-        onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
-      }
-    }
-
     //this will happen if it is streaming and has a file in the response
-    else if (!isCompletedStream && firstFileId) {
+    if (!isCompletedStream && firstFileId) {
       const firstFile = chatMessage?.response_messages[firstFileId] as
         | BusterChatResponseMessage_file
         | undefined;
@@ -84,6 +78,15 @@ export const useAutoChangeLayout = ({
       }
     }
 
+    //this will trigger when the chat is streaming and is has not completed yet (new chat)
+    else if (!isCompletedStream && !isFinishedReasoning && hasReasoning && chatId) {
+      previousLastMessageId.current = lastMessageId;
+
+      if (!messageId) {
+        onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
+      }
+    }
+
     //this happen will when the chat is completed and it WAS streaming
     else if (isCompletedStream && previousIsCompletedStream.current === false && !firstFileId) {
       //no file is found, so we need to collapse the chat
@@ -92,5 +95,5 @@ export const useAutoChangeLayout = ({
         chatId
       });
     }
-  }, [isCompletedStream, hasReasoning, chatId, lastMessageId]); //only use these values to trigger the useEffect
+  }, [isCompletedStream, hasReasoning, hasResponseFile, chatId, lastMessageId]); //only use these values to trigger the useEffect
 };

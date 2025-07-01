@@ -47,23 +47,6 @@ export const ReasoningMessage_File: React.FC<ReasoningMessageFileProps> = React.
       return false;
     }, [file_type]);
 
-    useMount(() => {
-      console.log('reasoningMessageFile streaming mount', {
-        file,
-        file_type,
-        id,
-        isCompletedStream,
-        status,
-        reasoningMessageId,
-        messageId,
-        chatId,
-        version_number,
-        buttons,
-        collapsible,
-        fileId
-      });
-    });
-
     if (isEmpty(file)) {
       return null;
     }

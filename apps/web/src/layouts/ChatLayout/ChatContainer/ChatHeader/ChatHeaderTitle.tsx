@@ -21,20 +21,18 @@ export const ChatHeaderTitle: React.FC<{
 }> = React.memo(({ chatTitle, chatId, isCompletedStream }) => {
   const { mutateAsync: updateChat } = useUpdateChat();
 
-  if (!chatTitle) return <div />;
-
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
-        {...(isCompletedStream ? animation : {})}
+        {...(!isCompletedStream ? animation : {})}
         key={chatTitle}
         className="flex w-full items-center overflow-hidden">
         <EditableTitle
           className="w-full"
           placeholder="New chat"
           level={5}
+          disabled={!chatTitle}
           id={CHAT_HEADER_TITLE_ID}
-          disabled={!isCompletedStream}
           onChange={(value) =>
             value && value !== chatTitle && updateChat({ id: chatId, title: value })
           }>
