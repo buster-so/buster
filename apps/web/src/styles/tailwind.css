@@ -121,8 +121,18 @@
 }
 
 @layer utilities {
-  /* any direct child of .fade-in gets bg-red-500 */
-  .fade-in > .fade-in {
+  /* Disable nested fade-in animations only for specific contexts, not streaming content */
+  .fade-in-disable-nested > .fade-in {
     @apply animate-none duration-0;
+  }
+  
+  /* Allow streaming content to animate */
+  .fade-in-streaming {
+    @apply animate-in fade-in duration-700;
+  }
+  
+  /* For streaming text content that gets appended */
+  .streaming-content {
+    @apply animate-in fade-in duration-500;
   }
 }

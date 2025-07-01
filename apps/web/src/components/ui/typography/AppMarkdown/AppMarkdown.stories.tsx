@@ -365,3 +365,111 @@ The user wants to save the existing "Monthly Sales by Sales Rep" chart into a da
 - Top-product chart limits to the top 10 by revenue.`
   }
 };
+
+// Streaming content simulation
+const StreamingMarkdown = () => {
+  const [streamedContent, setStreamedContent] = useState('# Streaming Markdown Demo\n\n');
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  const fullContent = `# Streaming Markdown Demo
+
+## Introduction
+
+This demonstrates how markdown content can be streamed and animated as it appears. Each new word, sentence, or paragraph will fade in smoothly as it's added to the content.
+
+## Streaming Features
+
+**Real-time updates**: Content appears progressively as it's streamed from a server or API.
+
+**Smooth animations**: Each new piece of content fades in with appropriate timing.
+
+**Paragraph continuity**: When words are added to existing paragraphs, they animate in seamlessly.
+
+### Code Examples
+
+Streaming can include complex formatting like:
+
+\`\`\`javascript
+function streamContent(data) {
+  // Process streaming data
+  const chunks = data.split(' ');
+  chunks.forEach((chunk, index) => {
+    setTimeout(() => {
+      appendToStream(chunk);
+    }, index * 100);
+  });
+}
+\`\`\`
+
+### Lists and Other Elements
+
+- First item appears
+- Second item fades in
+- Third item follows smoothly
+- Complex **formatting** works too
+- Including *italic* text
+- And ~~strikethrough~~ text
+
+### Tables Stream Too
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Row 1    | Data     | Values   |
+| Row 2    | More     | Content  |
+| Row 3    | Final    | Row      |
+
+> Even blockquotes can be streamed progressively, maintaining proper formatting and animation timing throughout the entire process.
+
+## Conclusion
+
+This streaming approach provides a natural, engaging way to display content as it's generated or received, perfect for AI responses, live updates, or progressive content loading.`;
+
+  const startStreaming = () => {
+    setIsStreaming(true);
+    setStreamedContent('# Streaming Markdown Demo\n\n');
+    
+    const words = fullContent.split(' ');
+    let currentContent = '# Streaming Markdown Demo\n\n';
+    
+    words.slice(4).forEach((word, index) => { // Skip the first few words that are already there
+      setTimeout(() => {
+        currentContent += word + ' ';
+        setStreamedContent(currentContent);
+        
+        if (index === words.length - 5) { // Last word
+          setIsStreaming(false);
+        }
+      }, index * 80); // 80ms delay between words
+    });
+  };
+
+  const resetContent = () => {
+    setStreamedContent('# Streaming Markdown Demo\n\n');
+    setIsStreaming(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <Button onClick={startStreaming} disabled={isStreaming}>
+          {isStreaming ? 'Streaming...' : 'Start Streaming'}
+        </Button>
+        <Button onClick={resetContent} disabled={isStreaming}>
+          Reset
+        </Button>
+      </div>
+      
+      <div className="p-4 border rounded-lg bg-gray-50">
+        <AppMarkdown 
+          markdown={streamedContent} 
+          showLoader={isStreaming} 
+          isStreaming={isStreaming}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const StreamingDemo: Story = {
+  render: () => <StreamingMarkdown />
+};

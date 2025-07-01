@@ -32,7 +32,8 @@ const AppMarkdownBase: React.FC<{
   showLoader?: boolean;
   className?: string;
   stripFormatting?: boolean;
-}> = ({ markdown = '', showLoader = false, className = '', stripFormatting = false }) => {
+  isStreaming?: boolean;
+}> = ({ markdown = '', showLoader = false, className = '', stripFormatting = false, isStreaming = false }) => {
   const currentMarkdown = markdown || '';
 
   const commonProps = useMemo(() => {
@@ -41,9 +42,10 @@ const AppMarkdownBase: React.FC<{
       markdown: currentMarkdown,
       showLoader,
       numberOfLineMarkdown,
-      stripFormatting
+      stripFormatting,
+      isStreaming
     };
-  }, [currentMarkdown, showLoader, stripFormatting]);
+  }, [currentMarkdown, showLoader, stripFormatting, isStreaming]);
 
   const text = useMemoizedFn((props: React.SVGTextElementAttributes<SVGTextElement>) => (
     <CustomParagraph {...props} {...commonProps} />
