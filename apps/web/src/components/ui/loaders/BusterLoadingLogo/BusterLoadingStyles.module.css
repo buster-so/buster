@@ -1,0 +1,23 @@
+.animatedPath {
+  animation: drawLogo 2.6s ease-in-out infinite;
+}
+
+.staticPath {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+}
+
+@keyframes drawLogo {
+  0% {
+    stroke-dashoffset: var(--path-length);
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  80% {
+    stroke-dashoffset: var(--path-length);
+  }
+  100% {
+    stroke-dashoffset: var(--path-length);
+  }
+}

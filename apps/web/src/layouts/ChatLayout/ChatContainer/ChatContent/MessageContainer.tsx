@@ -2,6 +2,7 @@ import type React from 'react';
 import { forwardRef } from 'react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/classMerge';
+import { BusterLoadingAvatar } from '@/components/ui/avatar/BusterLoadingAvatar';
 
 interface MessageContainerProps {
   children: React.ReactNode;
@@ -12,6 +13,9 @@ interface MessageContainerProps {
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   hideAvatar?: boolean;
+  isCompletedStream: boolean;
+  isFinishedReasoning: boolean;
+  hasReasoningMessage: boolean;
 }
 
 export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps>(
@@ -23,6 +27,9 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
       senderAvatar,
       className = '',
       hideAvatar = false,
+      hasReasoningMessage,
+      isCompletedStream,
+      isFinishedReasoning,
       onMouseEnter,
       onMouseLeave
     },
@@ -38,7 +45,10 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
           {senderName ? (
             <Avatar size={24} name={senderName} image={senderAvatar || ''} useToolTip={true} />
           ) : (
-            <Avatar size={24} />
+            <BusterLoadingAvatar
+              loading={!isCompletedStream && !isFinishedReasoning}
+              variant={hasReasoningMessage ? 'default' : 'gray'}
+            />
           )}
         </div>
         <div className={cn('relative mt-1 w-full px-1', className)}>{children}</div>
