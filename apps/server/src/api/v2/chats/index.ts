@@ -24,8 +24,6 @@ const app = new Hono()
 
     const validatedResponse = ChatWithMessagesSchema.safeParse(response);
 
-    console.log('success???', validatedResponse.success);
-
     if (validatedResponse.success) {
       return c.json(validatedResponse.data);
     }

@@ -9,7 +9,6 @@ import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
 import { useChatStreaming } from './useChatStreaming';
-import { useGetMetric } from '@/api/buster_rest/metrics';
 import { useChatDocumentTitle } from './useChatDocumentTitle';
 
 const useChatIndividualContext = ({

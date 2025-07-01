@@ -11,8 +11,8 @@ packages:
 
 catalog:
   "@supabase/supabase-js": "^2.50.0"
-  "@trigger.dev/build": "^3.0.0"
-  "@trigger.dev/sdk": "^3.0.0"
+  "@trigger.dev/build": "^4.0.0-v4-beta.21"
+  "@trigger.dev/sdk": "^4.0.0-v4-beta.21"
   ai: "^4.0.0"
   axios: "^1.10.0"
   drizzle-orm: "^0.44.2"
