@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority';
 import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ExtraProps } from 'react-markdown';
 import { cn } from '../../../../lib/classMerge';
 import { AppCodeBlock } from '../AppCodeBlock/AppCodeBlock';
@@ -8,6 +9,64 @@ import { AppCodeBlock } from '../AppCodeBlock/AppCodeBlock';
 const getAnimationClass = (showLoader: boolean, isStreaming: boolean = false): string => {
   if (!showLoader) return '';
   return isStreaming ? 'streaming-content' : 'fade-in duration-700';
+};
+
+// Utility to diff content and wrap new words with animations
+const useStreamingContent = (
+  newContent: string, 
+  isStreaming: boolean, 
+  showLoader: boolean
+): React.ReactNode => {
+  const [renderedContent, setRenderedContent] = useState<React.ReactNode>(newContent);
+  const previousContentRef = useRef<string>('');
+  const animationKeyRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (!isStreaming || !showLoader) {
+      setRenderedContent(newContent);
+      previousContentRef.current = newContent;
+      return;
+    }
+
+    const prevContent = previousContentRef.current;
+    
+    // If new content is longer than previous, we have new content to animate
+    if (newContent.length > prevContent.length && newContent.startsWith(prevContent)) {
+      const newPart = newContent.slice(prevContent.length);
+      const existingPart = prevContent;
+      
+      // Split new content into words for individual animation
+      const newWords = newPart.split(/(\s+)/); // Split but keep whitespace
+      
+      const animatedNewContent = newWords.map((word, index) => {
+        if (word.trim() === '') return word; // Return whitespace as-is
+        
+        animationKeyRef.current += 1;
+        return (
+          <span 
+            key={`stream-${animationKeyRef.current}`}
+            className="streaming-content"
+          >
+            {word}
+          </span>
+        );
+      });
+
+      setRenderedContent(
+        <>
+          {existingPart}
+          {animatedNewContent}
+        </>
+      );
+    } else {
+      // If content changed in other ways, just render it normally
+      setRenderedContent(newContent);
+    }
+
+    previousContentRef.current = newContent;
+  }, [newContent, isStreaming, showLoader]);
+
+  return renderedContent;
 };
 
 export interface ExtraPropsExtra extends ExtraProps {
@@ -42,24 +101,27 @@ export const CustomParagraph: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
+  // Convert children to string for diffing
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
 
-  if (Array.isArray(children)) {
-    return (
-      <p className={cn('text-size-inherit! transform-none!', getAnimationClass(showLoader, isStreaming))}>
-        {children}
-      </p>
-    );
-  }
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
 
-  //weird bug where all web components are rendered as p
-  //web components are objects
-  if (typeof children === 'object') {
+  // For non-text children (like other React elements), pass through normally
+  if (typeof children === 'object' && !Array.isArray(children) && children !== null) {
     return <>{children}</>;
   }
 
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    // Only apply base animation if not streaming (to avoid double animation)
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
   return (
-    <p className={cn('text-size-inherit! transform-none!', getAnimationClass(showLoader, isStreaming))}>
-      {children}
+    <p className={cn('text-size-inherit! transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
     </p>
   );
 };
@@ -91,14 +153,26 @@ export const CustomHeading: React.FC<
 > = ({ level, children, markdown, stripFormatting = false, showLoader, isStreaming = false, ...rest }) => {
   const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
   
+  // Convert children to string for diffing
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+  
   return (
     <HeadingTag
       className={cn(
         headingVariants({ level: stripFormatting ? 'base' : level }),
         'transform-none!',
-        getAnimationClass(showLoader, isStreaming)
+        getBaseAnimationClass()
       )}>
-      {children}
+      {isStreaming && showLoader ? streamedContent : children}
     </HeadingTag>
   );
 };
@@ -149,9 +223,22 @@ export const CustomListItem: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, showLoader, isStreaming = false }) => {
+  // Convert children to string for diffing if it's simple text
+  const textContent = typeof children === 'string' ? children : 
+    (Array.isArray(children) && children.every(child => typeof child === 'string')) ? 
+    children.join('') : null;
+
+  const streamedContent = textContent ? 
+    useStreamingContent(textContent, isStreaming, showLoader) : null;
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
   return (
-    <li className={cn('transform-none! space-y-1', getAnimationClass(showLoader, isStreaming))}>
-      {children}
+    <li className={cn('transform-none! space-y-1', getBaseAnimationClass())}>
+      {isStreaming && showLoader && streamedContent ? streamedContent : children}
     </li>
   );
 };
@@ -194,8 +281,21 @@ export const CustomSpan: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
   return (
-    <span className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>{children}</span>
+    <span className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
+    </span>
   );
 };
 
@@ -207,9 +307,20 @@ export const CustomStrong: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
   return (
-    <strong className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>
-      {children}
+    <strong className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
     </strong>
   );
 };
@@ -222,8 +333,21 @@ export const CustomEm: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
   return (
-    <em className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>{children}</em>
+    <em className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
+    </em>
   );
 };
 
@@ -235,7 +359,22 @@ export const CustomItalic: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
-  return <i className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>{children}</i>;
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
+  return (
+    <i className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
+    </i>
+  );
 };
 
 export const CustomUnderline: React.FC<
@@ -246,7 +385,22 @@ export const CustomUnderline: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
-  return <u className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>{children}</u>;
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
+  return (
+    <u className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
+    </u>
+  );
 };
 
 export const CustomStrikethrough: React.FC<
@@ -257,7 +411,22 @@ export const CustomStrikethrough: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
-  return <s className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>{children}</s>;
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
+  return (
+    <s className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
+    </s>
+  );
 };
 
 export const CustomLink: React.FC<
@@ -268,5 +437,20 @@ export const CustomLink: React.FC<
     isStreaming?: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, isStreaming = false, ...rest }) => {
-  return <a className={cn('transform-none!', getAnimationClass(showLoader, isStreaming))}>{children}</a>;
+  const textContent = typeof children === 'string' ? children : 
+    Array.isArray(children) ? children.join('') : 
+    children?.toString() || '';
+
+  const streamedContent = useStreamingContent(textContent, isStreaming, showLoader);
+
+  const getBaseAnimationClass = () => {
+    if (!showLoader) return '';
+    return !isStreaming ? 'fade-in duration-700' : '';
+  };
+
+  return (
+    <a className={cn('transform-none!', getBaseAnimationClass())}>
+      {isStreaming && showLoader ? streamedContent : children}
+    </a>
+  );
 };

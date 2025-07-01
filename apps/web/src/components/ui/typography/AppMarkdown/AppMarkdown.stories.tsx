@@ -368,95 +368,136 @@ The user wants to save the existing "Monthly Sales by Sales Rep" chart into a da
 
 // Streaming content simulation
 const StreamingMarkdown = () => {
-  const [streamedContent, setStreamedContent] = useState('# Streaming Markdown Demo\n\n');
+  const [streamedContent, setStreamedContent] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
 
-  const fullContent = `# Streaming Markdown Demo
+  const fullContent = `# Streaming Word-by-Word Demo
 
-## Introduction
+This is a **comprehensive test** of the streaming animation system. Each word should fade in smoothly as it appears, creating a natural reading experience.
 
-This demonstrates how markdown content can be streamed and animated as it appears. Each new word, sentence, or paragraph will fade in smoothly as it's added to the content.
+## Paragraph Streaming
 
-## Streaming Features
+Here we test how words get added to existing paragraphs. This sentence will demonstrate **bold text** and *italic text* being streamed word by word. The animation should be smooth and natural.
 
-**Real-time updates**: Content appears progressively as it's streamed from a server or API.
+## Mixed Content Test
 
-**Smooth animations**: Each new piece of content fades in with appropriate timing.
+### Subheading Animation
 
-**Paragraph continuity**: When words are added to existing paragraphs, they animate in seamlessly.
+This section tests streaming with **multiple formatting** types:
 
-### Code Examples
+- First list item with **bold content**
+- Second item with *italic styling*  
+- Third item with ~~strikethrough~~ text
+- Fourth item with \`inline code\` blocks
 
-Streaming can include complex formatting like:
+### Complex Paragraph
 
-\`\`\`javascript
-function streamContent(data) {
-  // Process streaming data
-  const chunks = data.split(' ');
-  chunks.forEach((chunk, index) => {
-    setTimeout(() => {
-      appendToStream(chunk);
-    }, index * 100);
-  });
-}
-\`\`\`
+This paragraph contains **bold text**, *italic text*, ~~strikethrough~~, and \`inline code\`. Each word should animate in individually while preserving the markdown formatting. The streaming should feel natural and not overwhelming.
 
-### Lists and Other Elements
+## Blockquote Test
 
-- First item appears
-- Second item fades in
-- Third item follows smoothly
-- Complex **formatting** works too
-- Including *italic* text
-- And ~~strikethrough~~ text
+> This blockquote will stream in word by word, testing how the animation works with different markdown elements. Each word should have its own fade-in animation.
 
-### Tables Stream Too
+## Final Notes
 
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| Row 1    | Data     | Values   |
-| Row 2    | More     | Content  |
-| Row 3    | Final    | Row      |
-
-> Even blockquotes can be streamed progressively, maintaining proper formatting and animation timing throughout the entire process.
-
-## Conclusion
-
-This streaming approach provides a natural, engaging way to display content as it's generated or received, perfect for AI responses, live updates, or progressive content loading.`;
+The streaming should work seamlessly across all markdown elements, providing a smooth and engaging user experience for real-time content updates.`;
 
   const startStreaming = () => {
     setIsStreaming(true);
-    setStreamedContent('# Streaming Markdown Demo\n\n');
+    setStreamedContent('');
     
-    const words = fullContent.split(' ');
-    let currentContent = '# Streaming Markdown Demo\n\n';
+    // Split content into words while preserving markdown structure
+    const words = fullContent.split(/(\s+)/); // Split but keep whitespace
+    let currentIndex = 0;
     
-    words.slice(4).forEach((word, index) => { // Skip the first few words that are already there
-      setTimeout(() => {
-        currentContent += word + ' ';
-        setStreamedContent(currentContent);
-        
-        if (index === words.length - 5) { // Last word
-          setIsStreaming(false);
-        }
-      }, index * 80); // 80ms delay between words
-    });
+         const streamNextWord = () => {
+       if (currentIndex < words.length) {
+         setStreamedContent((prev: string) => prev + words[currentIndex]);
+         currentIndex++;
+         
+         // Variable timing - faster for whitespace, slower for words
+         const isWhitespace = words[currentIndex - 1]?.trim() === '';
+         const delay = isWhitespace ? 10 : 120; // 10ms for spaces, 120ms for words
+         
+         setTimeout(streamNextWord, delay);
+       } else {
+         setIsStreaming(false);
+       }
+     };
+    
+    streamNextWord();
+  };
+
+  const startFastStreaming = () => {
+    setIsStreaming(true);
+    setStreamedContent('');
+    
+    const words = fullContent.split(/(\s+)/);
+    let currentIndex = 0;
+    
+         const streamNextWord = () => {
+       if (currentIndex < words.length) {
+         setStreamedContent((prev: string) => prev + words[currentIndex]);
+         currentIndex++;
+         
+         const isWhitespace = words[currentIndex - 1]?.trim() === '';
+         const delay = isWhitespace ? 5 : 50; // Faster streaming
+         
+         setTimeout(streamNextWord, delay);
+       } else {
+         setIsStreaming(false);
+       }
+     };
+    
+    streamNextWord();
+  };
+
+  const startParagraphStreaming = () => {
+    setIsStreaming(true);
+    setStreamedContent('# Paragraph Test\n\nThis is the beginning of a sentence');
+    
+    const additionalWords = [
+      ' that', ' will', ' continue', ' to', ' grow', ' word', ' by', ' word',
+      ' with', ' **bold**', ' and', ' *italic*', ' formatting', ' included.',
+      ' Each', ' new', ' word', ' should', ' animate', ' in', ' smoothly.'
+    ];
+    
+         additionalWords.forEach((word, index) => {
+       setTimeout(() => {
+         setStreamedContent((prev: string) => prev + word);
+         if (index === additionalWords.length - 1) {
+           setIsStreaming(false);
+         }
+       }, index * 150);
+     });
   };
 
   const resetContent = () => {
-    setStreamedContent('# Streaming Markdown Demo\n\n');
+    setStreamedContent('');
     setIsStreaming(false);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button onClick={startStreaming} disabled={isStreaming}>
-          {isStreaming ? 'Streaming...' : 'Start Streaming'}
+          {isStreaming ? 'Streaming...' : 'Start Full Demo'}
+        </Button>
+        <Button onClick={startFastStreaming} disabled={isStreaming}>
+          Fast Stream
+        </Button>
+        <Button onClick={startParagraphStreaming} disabled={isStreaming}>
+          Paragraph Test
         </Button>
         <Button onClick={resetContent} disabled={isStreaming}>
           Reset
         </Button>
+      </div>
+      
+      <div className="text-sm text-gray-600">
+        <p><strong>Full Demo:</strong> Complete streaming test with all markdown elements</p>
+        <p><strong>Fast Stream:</strong> Same content but faster timing</p>
+        <p><strong>Paragraph Test:</strong> Tests word-by-word addition to existing paragraphs</p>
       </div>
       
       <div className="p-4 border rounded-lg bg-gray-50">
