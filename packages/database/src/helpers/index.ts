@@ -54,6 +54,13 @@ export {
   type GenerateAssetMessagesInput,
 } from './assets';
 
+// Dashboard helpers
+export {
+  getChatDashboardFiles,
+  type DashboardFileContext,
+  type DashboardFile,
+} from './dashboards';
+
 // Organization helpers
 export {
   getUserOrganizationId,

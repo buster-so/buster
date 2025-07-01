@@ -10,6 +10,7 @@ import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { createInitialMetricVersionHistory, validateMetricYml } from './version-history-helpers';
 import type { MetricYml } from './version-history-types';
+import { trackFileAssociations } from './file-tracking-helper';
 
 // TypeScript types matching Rust DataMetadata structure
 enum SimpleType {
@@ -972,6 +973,7 @@ const createMetricFiles = wrapTraced(
     const userId = runtimeContext?.get('userId') as string;
     const organizationId = runtimeContext?.get('organizationId') as string;
     const workflowStartTime = runtimeContext?.get('workflowStartTime') as number | undefined;
+    const messageId = runtimeContext?.get('messageId') as string | undefined;
 
     // Generate a unique workflow ID using start time and data source
     const workflowId = workflowStartTime
@@ -1134,6 +1136,17 @@ const createMetricFiles = wrapTraced(
     const duration = Date.now() - startTime;
 
     const message = generateResultMessage(createdFiles, failedFiles);
+
+    // Track file associations if we have a messageId and created files
+    if (messageId && createdFiles.length > 0) {
+      await trackFileAssociations({
+        messageId,
+        files: createdFiles.map(file => ({
+          id: file.id,
+          version: file.version_number,
+        })),
+      });
+    }
 
     return {
       message,

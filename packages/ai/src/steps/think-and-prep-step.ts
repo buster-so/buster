@@ -23,6 +23,12 @@ const inputSchema = z.object({
   // Include original workflow inputs to maintain access to prompt and conversationHistory
   prompt: z.string(),
   conversationHistory: z.array(z.any()).optional(),
+  dashboardFiles: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    versionNumber: z.number(),
+    metricIds: z.array(z.string()),
+  })).optional(),
 });
 
 import {
@@ -51,7 +57,13 @@ const createStepResult = (
   outputMessages: MessageHistory,
   finalStepData: StepFinishData | null,
   reasoningHistory: BusterChatMessageReasoning[] = [],
-  responseHistory: BusterChatMessageResponse[] = []
+  responseHistory: BusterChatMessageResponse[] = [],
+  dashboardContext?: Array<{
+    id: string;
+    name: string;
+    versionNumber: number;
+    metricIds: string[];
+  }>
 ): z.infer<typeof outputSchema> => ({
   finished,
   outputMessages,
@@ -68,6 +80,7 @@ const createStepResult = (
     text: undefined,
     reasoning: undefined,
   },
+  dashboardContext,
 });
 
 const thinkAndPrepExecution = async ({
@@ -242,7 +255,8 @@ const thinkAndPrepExecution = async ({
       outputMessages,
       finalStepData,
       chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
-      chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
+      chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
+      inputData.dashboardFiles // Pass dashboard context through
     );
 
     return result;
@@ -254,7 +268,8 @@ const thinkAndPrepExecution = async ({
         outputMessages,
         finalStepData,
         chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
-        chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
+        chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
+        inputData.dashboardFiles // Pass dashboard context through
       );
     }
 

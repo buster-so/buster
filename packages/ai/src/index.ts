@@ -22,6 +22,12 @@ export {
   type AnalystRuntimeContext,
 } from './workflows/analyst-workflow';
 
+// Export schemas
+export {
+  type DashboardFileContext,
+  DashboardFileContextSchema,
+} from './schemas/workflow-schemas';
+
 // Export chat history utilities
 export {
   getChatHistory,

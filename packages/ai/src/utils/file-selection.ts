@@ -168,15 +168,24 @@ function buildMetricToDashboardRelationships(files: ExtractedFile[]): void {
  * Apply intelligent selection logic for files to return
  * Enhanced priority logic that considers modified files and dashboard-metric relationships
  */
-export function selectFilesForResponse(files: ExtractedFile[]): ExtractedFile[] {
+export function selectFilesForResponse(
+  files: ExtractedFile[],
+  dashboardContext?: Array<{
+    id: string;
+    name: string;
+    versionNumber: number;
+    metricIds: string[];
+  }>
+): ExtractedFile[] {
   // Separate dashboards and metrics
   const dashboards = files.filter((f) => f.fileType === 'dashboard');
   const metrics = files.filter((f) => f.fileType === 'metric');
 
   // Track which dashboards need to be included due to modified metrics
   const dashboardsToInclude = new Set<string>();
+  const contextDashboardsToInclude: ExtractedFile[] = [];
 
-  // Check if any modified metrics belong to dashboards
+  // First, check if any modified metrics belong to dashboards from the current session
   for (const metric of metrics) {
     if (metric.operation === 'modified' && metric.containedInDashboards) {
       // This metric was modified and belongs to dashboard(s)
@@ -192,21 +201,63 @@ export function selectFilesForResponse(files: ExtractedFile[]): ExtractedFile[] 
     }
   }
 
+  // Second, check if any modified metrics belong to dashboards from the database context
+  if (dashboardContext && dashboardContext.length > 0) {
+    for (const metric of metrics) {
+      if (metric.operation === 'modified') {
+        // Check if this metric ID is in any dashboard from context
+        for (const contextDashboard of dashboardContext) {
+          if (contextDashboard.metricIds.includes(metric.id)) {
+            // Convert context dashboard to ExtractedFile format
+            const dashboardFile: ExtractedFile = {
+              id: contextDashboard.id,
+              fileType: 'dashboard',
+              fileName: contextDashboard.name,
+              status: 'completed',
+              versionNumber: contextDashboard.versionNumber,
+              containedInDashboards: [],
+              operation: undefined, // These are existing dashboards, not created/modified
+            };
+            
+            // Only add if not already in our files or contextDashboardsToInclude
+            const alreadyIncluded =
+              files.some((f) => f.id === dashboardFile.id) ||
+              contextDashboardsToInclude.some((f) => f.id === dashboardFile.id);
+
+            if (!alreadyIncluded) {
+              contextDashboardsToInclude.push(dashboardFile);
+            }
+          }
+        }
+      }
+    }
+  }
+
   // Build final selection based on priority rules
   const selectedFiles: ExtractedFile[] = [];
 
-  // 1. If there are dashboards that contain modified metrics, include them
+  // 1. First priority: Dashboards from context that contain modified metrics
+  if (contextDashboardsToInclude.length > 0) {
+    selectedFiles.push(...contextDashboardsToInclude);
+  }
+
+  // 2. Second priority: Dashboards from current session that contain modified metrics
   if (dashboardsToInclude.size > 0) {
     const affectedDashboards = dashboards.filter((d) => dashboardsToInclude.has(d.id));
     selectedFiles.push(...affectedDashboards);
+  }
 
-    // Also include any other dashboards that were directly created/modified
-    const otherDashboards = dashboards.filter((d) => !dashboardsToInclude.has(d.id));
-    selectedFiles.push(...otherDashboards);
+  // 3. Third priority: Other dashboards that were directly created/modified
+  const otherDashboards = dashboards.filter((d) => !dashboardsToInclude.has(d.id));
+  selectedFiles.push(...otherDashboards);
 
-    // Don't include metrics that are already represented in dashboards
+  // 4. Determine which metrics to include
+  if (selectedFiles.length > 0) {
+    // Don't include metrics that are already represented in selected dashboards
     const metricsInDashboards = new Set<string>();
-    for (const dashboard of selectedFiles) {
+    
+    // Check metrics in session dashboards
+    for (const dashboard of selectedFiles.filter((f) => f.ymlContent)) {
       if (dashboard.ymlContent) {
         const metricIds = extractMetricIdsFromDashboard(dashboard.ymlContent);
         for (const id of metricIds) {
@@ -215,16 +266,24 @@ export function selectFilesForResponse(files: ExtractedFile[]): ExtractedFile[] 
       }
     }
 
+    // Check metrics in context dashboards
+    if (dashboardContext) {
+      for (const dashboard of selectedFiles) {
+        const contextDashboard = dashboardContext.find((d) => d.id === dashboard.id);
+        if (contextDashboard) {
+          for (const metricId of contextDashboard.metricIds) {
+            metricsInDashboards.add(metricId);
+          }
+        }
+      }
+    }
+
     // Include standalone metrics (not in any returned dashboard)
     const standaloneMetrics = metrics.filter((m) => !metricsInDashboards.has(m.id));
     selectedFiles.push(...standaloneMetrics);
   } else {
-    // Standard priority: dashboards > metrics
-    if (dashboards.length > 0) {
-      selectedFiles.push(...dashboards);
-    } else if (metrics.length > 0) {
-      selectedFiles.push(...metrics);
-    }
+    // No dashboards selected, just return metrics
+    selectedFiles.push(...metrics);
   }
 
   return selectedFiles;

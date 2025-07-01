@@ -218,6 +218,16 @@ export const StepFinishDataSchema = z.object({
   isContinued: z.boolean().optional(),
 });
 
+// Dashboard file context schema (from database)
+export const DashboardFileContextSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  versionNumber: z.number(),
+  metricIds: z.array(z.string()),
+});
+
+export type DashboardFileContext = z.infer<typeof DashboardFileContextSchema>;
+
 // Output schema for think-and-prep step
 export const ThinkAndPrepOutputSchema = z.object({
   finished: z.boolean(),
@@ -234,6 +244,7 @@ export const ThinkAndPrepOutputSchema = z.object({
       reasoning: z.string().optional(),
     })
     .optional(),
+  dashboardContext: z.array(DashboardFileContextSchema).optional(), // Add dashboard context
 });
 
 // Type exports

@@ -5,6 +5,7 @@ import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './type
 // Task 2 & 4: Database helpers (IMPLEMENTED)
 import {
   getChatConversationHistory,
+  getChatDashboardFiles,
   getMessageContext,
   getOrganizationDataSource,
 } from '@buster/database';
@@ -322,16 +323,21 @@ export const analystAgentTask: ReturnType<
         messageId: payload.message_id,
       });
 
-      // Start loading data source as soon as we have the organizationId
+      // Start loading data source and dashboard files as soon as we have the required IDs
       const dataSourcePromise = messageContextPromise.then((context) =>
         getOrganizationDataSource({ organizationId: context.organizationId })
       );
 
-      // Wait for all three operations to complete
-      const [messageContext, conversationHistory, dataSource] = await Promise.all([
+      const dashboardFilesPromise = messageContextPromise.then((context) =>
+        getChatDashboardFiles({ chatId: context.chatId })
+      );
+
+      // Wait for all four operations to complete
+      const [messageContext, conversationHistory, dataSource, dashboardFiles] = await Promise.all([
         messageContextPromise,
         conversationHistoryPromise,
         dataSourcePromise,
+        dashboardFilesPromise,
       ]);
 
       const dataLoadEnd = Date.now();
@@ -344,6 +350,7 @@ export const analystAgentTask: ReturnType<
         organizationId: messageContext.organizationId,
         dataSourceId: dataSource.dataSourceId,
         dataSourceSyntax: dataSource.dataSourceSyntax,
+        dashboardFilesCount: dashboardFiles.length,
         dataLoadTimeMs: dataLoadTime,
       });
 
@@ -359,10 +366,11 @@ export const analystAgentTask: ReturnType<
       );
       const contextSetupTime = Date.now() - contextSetupStart;
 
-      // Task 4: Prepare workflow input with conversation history
+      // Task 4: Prepare workflow input with conversation history and dashboard files
       const workflowInput = {
         prompt: messageContext.requestMessage,
         conversationHistory: conversationHistory.length > 0 ? conversationHistory : undefined,
+        dashboardFiles: dashboardFiles.length > 0 ? dashboardFiles : undefined,
       };
 
       logger.log('Workflow input prepared', {
@@ -370,6 +378,8 @@ export const analystAgentTask: ReturnType<
         hasPrompt: !!workflowInput.prompt,
         hasConversationHistory: !!workflowInput.conversationHistory,
         conversationHistoryLength: workflowInput.conversationHistory?.length || 0,
+        hasDashboardFiles: !!workflowInput.dashboardFiles,
+        dashboardFilesCount: workflowInput.dashboardFiles?.length || 0,
         contextSetupTimeMs: contextSetupTime,
         totalPrepTimeMs: Date.now() - dataLoadStart,
       });

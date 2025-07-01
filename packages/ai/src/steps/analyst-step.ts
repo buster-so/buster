@@ -260,7 +260,8 @@ const analystExecution = async ({
     messageId,
     [],
     transformedReasoning, // Pass transformed reasoning history
-    transformedResponse // Pass transformed response history
+    transformedResponse, // Pass transformed response history
+    inputData.dashboardContext // Pass dashboard context
   );
 
   try {

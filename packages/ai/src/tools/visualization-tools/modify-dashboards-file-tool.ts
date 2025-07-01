@@ -8,6 +8,7 @@ import { z } from 'zod';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { addDashboardVersionToHistory, getLatestVersionNumber } from './version-history-helpers';
 import type { DashboardYml, VersionHistory } from './version-history-types';
+import { trackFileAssociations } from './file-tracking-helper';
 
 // Core interfaces matching Rust structs
 interface FileUpdate {
@@ -271,8 +272,9 @@ const modifyDashboardFiles = wrapTraced(
     const startTime = Date.now();
 
     // Get runtime context values (for logging/tracking)
-    const userId = runtimeContext.get('userId');
-    const organizationId = runtimeContext.get('organizationId');
+    const userId = runtimeContext?.get('userId') as string;
+    const organizationId = runtimeContext?.get('organizationId') as string;
+    const messageId = runtimeContext?.get('messageId') as string | undefined;
 
     if (!userId) {
       throw new Error('User ID not found in runtime context');
@@ -391,6 +393,17 @@ const modifyDashboardFiles = wrapTraced(
       };
     }
 
+    // Track file associations if messageId is available
+    if (messageId && files.length > 0) {
+      await trackFileAssociations({
+        messageId,
+        files: files.map(file => ({
+          id: file.id,
+          version: file.version_number,
+        })),
+      });
+    }
+
     // Generate result message
     const successCount = files.length;
     const failureCount = failedFiles.length;
@@ -460,7 +473,10 @@ export const modifyDashboards = createTool({
   inputSchema,
   outputSchema,
   execute: async ({ context, runtimeContext }) => {
-    return await modifyDashboardFiles(context as UpdateFilesParams, runtimeContext);
+    return await modifyDashboardFiles(
+      context as UpdateFilesParams,
+      runtimeContext as RuntimeContext<AnalystRuntimeContext>
+    );
   },
 });
 
