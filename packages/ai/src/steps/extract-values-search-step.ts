@@ -35,7 +35,7 @@ export const extractValuesSearchOutputSchema = z.object({
         name: z.string(),
         versionNumber: z.number(),
         metricIds: z.array(z.string()),
-      })
+      }),
     )
     .optional(),
 });
@@ -93,7 +93,7 @@ Focus only on extracting meaningful, specific values that could be searched for 
  * Organizes search results by schema.table structure with columns and their values
  */
 function organizeResultsBySchemaTable(
-  results: StoredValueResult[]
+  results: StoredValueResult[],
 ): Record<string, Record<string, string[]>> {
   const organized: Record<string, Record<string, string[]>> = {};
 
@@ -149,7 +149,7 @@ function formatSearchResults(results: StoredValueResult[]): string {
  */
 async function searchStoredValues(
   values: string[],
-  dataSourceId: string
+  dataSourceId: string,
 ): Promise<{
   searchResults: string;
   foundValues: Record<string, Record<string, string[]>>;
@@ -173,7 +173,7 @@ async function searchStoredValues(
       } catch (error) {
         console.error(
           `[StoredValues] Failed to generate embedding for "${value}":`,
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : 'Unknown error',
         );
         return null;
       }
@@ -181,7 +181,7 @@ async function searchStoredValues(
 
     const embeddingResults = await Promise.all(embeddingPromises);
     const validEmbeddings = embeddingResults.filter(
-      (result): result is { value: string; embedding: number[] } => result !== null
+      (result): result is { value: string; embedding: number[] } => result !== null,
     );
 
     if (validEmbeddings.length === 0) {
@@ -201,7 +201,7 @@ async function searchStoredValues(
       } catch (error) {
         console.error(
           `[StoredValues] Failed to search stored values for "${value}":`,
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : 'Unknown error',
         );
         return [];
       }
@@ -264,21 +264,34 @@ const extractValuesSearchStepExecution = async ({
       messages = standardizeMessages(prompt);
     }
 
-    const tracedValuesExtraction = wrapTraced(
-      async () => {
-        const response = await valuesAgent.generate(messages, {
-          maxSteps: 0,
-          output: extractValuesAgentOutputSchema, // Use the agent-specific schema
-        });
+    let extractedValues: { values: string[] } = { values: [] };
 
-        return response.object;
-      },
-      {
-        name: 'Extract Values',
-      }
-    );
+    try {
+      const tracedValuesExtraction = wrapTraced(
+        async () => {
+          const response = await valuesAgent.generate(messages, {
+            maxSteps: 0,
+            output: extractValuesSearchOutputSchema,
+          });
 
-    const extractedValues = await tracedValuesExtraction();
+          return response.object;
+        },
+        {
+          name: 'Extract Values',
+        },
+      );
+
+      extractedValues = await tracedValuesExtraction();
+    } catch (llmError) {
+      // Handle LLM generation errors specifically
+      console.warn('[ExtractValues] LLM failed to generate valid response:', {
+        error: llmError instanceof Error ? llmError.message : 'Unknown error',
+        errorType: llmError instanceof Error ? llmError.name : 'Unknown',
+      });
+
+      // Continue with empty values instead of failing
+      extractedValues = { values: [] };
+    }
 
     // Get dataSourceId from runtime context for stored values search
     const dataSourceId = runtimeContext.get('dataSourceId') as string | undefined;
@@ -296,6 +309,7 @@ const extractValuesSearchStepExecution = async ({
   } catch (error) {
     // Handle AbortError gracefully
     if (error instanceof Error && error.name === 'AbortError') {
+      console.info('[ExtractValues] Step was aborted');
       // Return empty values when aborted
       return {
         values: [],
@@ -306,13 +320,14 @@ const extractValuesSearchStepExecution = async ({
       };
     }
 
-    console.error('Failed to extract values:', error);
+    console.error('[ExtractValues] Unexpected error in step execution:', error);
     // Return empty values array instead of crashing
     return {
       values: [],
       searchResults: '',
       foundValues: {},
       searchPerformed: false,
+      dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
     };
   }
 };

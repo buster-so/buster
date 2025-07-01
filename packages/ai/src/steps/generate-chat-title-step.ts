@@ -14,12 +14,16 @@ const inputSchema = thinkAndPrepWorkflowInputSchema;
 export const generateChatTitleOutputSchema = z.object({
   title: z.string().describe('The title for the chat.'),
   // Pass through dashboard context
-  dashboardFiles: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    versionNumber: z.number(),
-    metricIds: z.array(z.string()),
-  })).optional(),
+  dashboardFiles: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        versionNumber: z.number(),
+        metricIds: z.array(z.string()),
+      }),
+    )
+    .optional(),
 });
 
 const generateChatTitleInstructions = `
@@ -54,21 +58,34 @@ const generateChatTitleExecution = async ({
       messages = standardizeMessages(prompt);
     }
 
-    const tracedChatTitle = wrapTraced(
-      async () => {
-        const response = await todosAgent.generate(messages, {
-          maxSteps: 0,
-          output: generateChatTitleOutputSchema,
-        });
+    let title: { title: string };
 
-        return response.object;
-      },
-      {
-        name: 'Generate Chat Title',
-      }
-    );
+    try {
+      const tracedChatTitle = wrapTraced(
+        async () => {
+          const response = await todosAgent.generate(messages, {
+            maxSteps: 0,
+            output: generateChatTitleOutputSchema,
+          });
 
-    const title = await tracedChatTitle();
+          return response.object;
+        },
+        {
+          name: 'Generate Chat Title',
+        },
+      );
+
+      title = await tracedChatTitle();
+    } catch (llmError) {
+      // Handle LLM generation errors specifically
+      console.warn('[GenerateChatTitle] LLM failed to generate valid response:', {
+        error: llmError instanceof Error ? llmError.message : 'Unknown error',
+        errorType: llmError instanceof Error ? llmError.name : 'Unknown',
+      });
+
+      // Continue with fallback title instead of failing
+      title = { title: 'New Analysis' };
+    }
 
     const chatId = runtimeContext.get('chatId');
     const messageId = runtimeContext.get('messageId');
@@ -80,7 +97,7 @@ const generateChatTitleExecution = async ({
       updatePromises.push(
         updateChat(chatId, {
           title: title.title,
-        })
+        }),
       );
     }
 
@@ -88,7 +105,7 @@ const generateChatTitleExecution = async ({
       updatePromises.push(
         updateMessage(messageId, {
           title: title.title,
-        })
+        }),
       );
     }
 
@@ -108,10 +125,11 @@ const generateChatTitleExecution = async ({
       };
     }
 
-    console.error('Failed to generate chat title:', error);
+    console.error('[GenerateChatTitle] Failed to generate chat title:', error);
     // Return a fallback title instead of crashing
     return {
       title: 'New Analysis',
+      dashboardFiles: inputData.dashboardFiles, // Pass through dashboard context
     };
   }
 };
