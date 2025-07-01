@@ -17,7 +17,7 @@ export const useGetMessages = ({ chatId }: { chatId: string }) => {
   return useShape(shape);
 };
 
-const updateOperations: Array<`insert` | `update` | `delete`> = ['update'];
+const updateOperations: Array<'insert' | 'update' | 'delete'> = ['update'];
 
 export const useTrackAndUpdateMessageChanges = (
   {
@@ -32,7 +32,6 @@ export const useTrackAndUpdateMessageChanges = (
   callback?: (message: ReturnType<typeof updateMessageShapeToIChatMessage>) => void
 ) => {
   const { onUpdateChatMessage, onUpdateChat } = useChatUpdate();
-  const hasSeenInitialUpdate = useRef(false);
   const getChatMemoized = useGetChatMemoized();
   const shape = useMemo(
     () => messageShape({ chatId: chatId || '', messageId }),
@@ -46,21 +45,14 @@ export const useTrackAndUpdateMessageChanges = (
     updateOperations,
     useMemoizedFn((message) => {
       if (message && message.value && chatId) {
-        const killUpdate = isStreamingMessage ? false : !hasSeenInitialUpdate.current;
-
-        hasSeenInitialUpdate.current = true;
-        if (killUpdate) {
-          return;
-        }
-
         const iChatMessage = updateMessageShapeToIChatMessage(message.value);
         const chat = getChatMemoized(chatId);
+
         if (chat) {
           //ADD NEW MESSAGE ID TO CHAT
           const currentMessageIds = chat.message_ids;
           const allMessageIds = uniq([...currentMessageIds, messageId]);
           if (currentMessageIds.length !== allMessageIds.length) {
-            console.log('added message id to chat', messageId);
             onUpdateChat({
               ...chat,
               message_ids: allMessageIds

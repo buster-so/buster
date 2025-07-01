@@ -22,7 +22,6 @@ export const useTrackAndUpdateChatChanges = (
   callback?: (chat: BusterChatWithoutMessages) => void
 ) => {
   const { onUpdateChat } = useChatUpdate();
-  const hasSeenInitialUpdate = useRef(false);
   const shape = useMemo(() => chatShape({ chatId: chatId || '' }), [chatId]);
   const subscribe = !!chatId;
 
@@ -31,14 +30,6 @@ export const useTrackAndUpdateChatChanges = (
     updateOperations,
     useMemoizedFn((chat) => {
       if (chat && chat.value) {
-        const killUpdate = isStreamingMessage ? false : !hasSeenInitialUpdate.current;
-
-        hasSeenInitialUpdate.current = true;
-
-        if (killUpdate) {
-          return;
-        }
-
         callback?.(chat.value);
         onUpdateChat(chat.value);
       }
