@@ -26,17 +26,17 @@ export const ChatMessageOptions: React.FC<{
   const { data: feedback } = useGetChatMessage(messageId, {
     select: ({ feedback }) => feedback
   });
-  const { data: createdAt } = useGetChatMessage(messageId, {
-    select: ({ created_at }) => created_at
+  const { data: updatedAt } = useGetChatMessage(messageId, {
+    select: ({ updated_at }) => updated_at
   });
 
-  const createdAtFormatted = useMemo(() => {
-    if (!createdAt) return '';
+  const updatedAtFormatted = useMemo(() => {
+    if (!updatedAt) return '';
     return formatDate({
-      date: createdAt,
+      date: updatedAt,
       format: 'lll'
     });
-  }, [createdAt]);
+  }, [updatedAt]);
 
   const warnBeforeDuplicate = useMemoizedFn(() => {
     openConfirmModal({
@@ -84,7 +84,7 @@ export const ChatMessageOptions: React.FC<{
         className="ml-auto opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         variant={'tertiary'}
         size={'sm'}>
-        {createdAtFormatted}
+        {updatedAtFormatted}
       </Text>
     </div>
   );
