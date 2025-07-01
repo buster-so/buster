@@ -48,6 +48,12 @@ export const useAutoChangeLayout = ({
       return;
     }
 
+    const chatMessage = getChatMessageMemoized(lastMessageId);
+    const firstFileId = chatMessage?.response_message_ids?.find((id) => {
+      const responseMessage = chatMessage?.response_messages[id];
+      return responseMessage?.type === 'file';
+    });
+
     //this will trigger when the chat is streaming and is has not completed yet (new chat)
     if (!isCompletedStream && !isFinishedReasoning && hasReasoning && chatId) {
       previousLastMessageId.current = lastMessageId;
@@ -57,34 +63,29 @@ export const useAutoChangeLayout = ({
       }
     }
 
-    //this happen will when the chat is completed and it WAS streaming
-    else if (isCompletedStream && previousIsCompletedStream.current === false) {
-      //
-      const chatMessage = getChatMessageMemoized(lastMessageId);
-      const lastFileId = findLast(chatMessage?.response_message_ids, (id) => {
-        const responseMessage = chatMessage?.response_messages[id];
-        return responseMessage?.type === 'file';
-      });
-      const lastFile = chatMessage?.response_messages[lastFileId || ''] as
+    //this will happen if it is streaming and has a file in the response
+    else if (!isCompletedStream && firstFileId) {
+      const firstFile = chatMessage?.response_messages[firstFileId] as
         | BusterChatResponseMessage_file
         | undefined;
 
-      //has a file
-      if (lastFileId && lastFile) {
+      if (firstFile) {
         const { link } = getFileLinkMeta({
-          fileId: lastFileId,
-          fileType: lastFile.file_type,
+          fileId: firstFile.id,
+          fileType: firstFile.file_type,
           chatId,
-          versionNumber: lastFile.version_number,
+          versionNumber: firstFile.version_number,
           useVersionHistoryMode: !chatId
         });
 
         if (link) {
           onChangePage(link);
-          return () => {};
         }
       }
+    }
 
+    //this happen will when the chat is completed and it WAS streaming
+    else if (isCompletedStream && previousIsCompletedStream.current === false && !firstFileId) {
       //no file is found, so we need to collapse the chat
       onChangePage({
         route: BusterRoutes.APP_CHAT_ID,
