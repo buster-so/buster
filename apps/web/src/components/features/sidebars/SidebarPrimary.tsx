@@ -239,8 +239,10 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
 
   return (
     <div className={cn(COLLAPSED_JUSTIFY_CENTER, 'flex min-h-7 items-center')}>
-      <BusterLogoWithText className={COLLAPSED_HIDDEN} />
-      <BusterLogo className={COLLAPSED_VISIBLE} />
+      <Link href={createBusterRoute({ route: BusterRoutes.APP_HOME })}>
+        <BusterLogoWithText className={COLLAPSED_HIDDEN} />
+        <BusterLogo className={COLLAPSED_VISIBLE} />
+      </Link>
       {!hideActions && (
         <div className={cn(COLLAPSED_HIDDEN, 'items-center gap-2')}>
           <Tooltip title="Settings">

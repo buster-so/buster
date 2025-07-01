@@ -26,7 +26,8 @@ const LOW_PRIORITY_ROUTES = [
   BusterRoutes.APP_DASHBOARDS,
   BusterRoutes.APP_DATASETS,
   BusterRoutes.SETTINGS,
-  BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART
+  BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART,
+  BusterRoutes.SETTINGS_USERS
 ];
 
 const LOW_PRIORITY_PREFETCH: ((queryClient: QueryClient) => Promise<QueryClient>)[] = [
