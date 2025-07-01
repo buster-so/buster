@@ -50,7 +50,6 @@ export const useChatStreaming = ({
 
   const onUpdateReasoningMessageFromStream = useMemoizedFn(
     (d: Parameters<typeof checkBlackBoxMessage>[0]) => {
-      console.log('onUpdateReasoningMessageFromStream', d);
       checkBlackBoxMessage(d);
     }
   );
