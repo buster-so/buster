@@ -180,6 +180,10 @@ const thinkAndPrepExecution = async ({
                   }
                 },
               }),
+              onError: async (event: { error: unknown }) => {
+                const error = event.error;
+                console.error('Think and Prep stream error caught in onError:', error);
+              },
             });
 
             return stream;
