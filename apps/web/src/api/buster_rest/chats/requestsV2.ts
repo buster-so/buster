@@ -1,8 +1,8 @@
-import type { ChatCreateRequest, ChatCreateResponse } from '@buster/server-shared/chats';
+import type { ChatCreateRequest, ChatWithMessages } from '@buster/server-shared/chats';
 import { mainApiV2 } from '../instances';
 
 export const createNewChat = async (props: ChatCreateRequest) => {
-  return mainApiV2.post<ChatCreateResponse>('/chats', props).then((res) => res.data);
+  return mainApiV2.post<ChatWithMessages>('/chats', props).then((res) => res.data);
 };
 
 export const stopChat = async ({ chatId }: { chatId: string }) => {

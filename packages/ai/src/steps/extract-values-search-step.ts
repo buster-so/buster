@@ -12,6 +12,12 @@ import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;
 
+// Agent output schema - only for extracting values
+const extractValuesAgentOutputSchema = z.object({
+  values: z.array(z.string()).describe('The values that the agent will search for.'),
+});
+
+// Step output schema - what the step returns after performing the search
 export const extractValuesSearchOutputSchema = z.object({
   values: z.array(z.string()).describe('The values that the agent will search for.'),
   searchResults: z
@@ -22,12 +28,16 @@ export const extractValuesSearchOutputSchema = z.object({
     .describe('Structured results organized by schema.table.column'),
   searchPerformed: z.boolean().describe('Whether stored values search was actually performed'),
   // Pass through dashboard context
-  dashboardFiles: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    versionNumber: z.number(),
-    metricIds: z.array(z.string()),
-  })).optional(),
+  dashboardFiles: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        versionNumber: z.number(),
+        metricIds: z.array(z.string()),
+      })
+    )
+    .optional(),
 });
 
 const extractValuesInstructions = `
@@ -258,7 +268,7 @@ const extractValuesSearchStepExecution = async ({
       async () => {
         const response = await valuesAgent.generate(messages, {
           maxSteps: 0,
-          output: extractValuesSearchOutputSchema,
+          output: extractValuesAgentOutputSchema, // Use the agent-specific schema
         });
 
         return response.object;
