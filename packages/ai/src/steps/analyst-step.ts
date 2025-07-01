@@ -20,8 +20,8 @@ import {
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import { retryableAgentStreamWithHealing } from '../utils/retry';
-import type { RetryableError } from '../utils/retry/types';
+import { RetryWithHealingError, detectRetryableError, isRetryWithHealingError } from '../utils/retry';
+import type { RetryableError, WorkflowContext } from '../utils/retry/types';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
@@ -247,6 +247,8 @@ const analystExecution = async ({
   const abortController = new AbortController();
   const messageId = runtimeContext.get('messageId') as string | null;
   let completeConversationHistory: CoreMessage[] = [];
+  let retryCount = 0;
+  const maxRetries = 3;
 
   // Initialize chunk processor with histories from previous step
   // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
@@ -273,53 +275,58 @@ const analystExecution = async ({
     dashboardContext: inputData.dashboardContext,
   });
 
+  // Get available tools from the analyst agent
+  const availableTools = new Set(Object.keys(analystAgent.tools || {}));
+  console.info('[Analyst Step] Available tools:', Array.from(availableTools));
+
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
     transformedReasoning, // Pass transformed reasoning history
     transformedResponse, // Pass transformed response history
-    inputData.dashboardContext // Pass dashboard context
+    inputData.dashboardContext, // Pass dashboard context
+    availableTools
   );
 
-  try {
-    // Messages come directly from think-and-prep step output
-    // They are already in CoreMessage[] format
-    let messages = inputData.outputMessages;
+  // Messages come directly from think-and-prep step output
+  // They are already in CoreMessage[] format
+  let messages = inputData.outputMessages;
 
-    if (messages && messages.length > 0) {
-      // Deduplicate messages based on role and toolCallId
-      messages = deduplicateMessages(messages);
+  if (messages && messages.length > 0) {
+    // Deduplicate messages based on role and toolCallId
+    messages = deduplicateMessages(messages);
+  }
+
+  // Critical check: Ensure messages array is not empty
+  if (!messages || messages.length === 0) {
+    console.error('CRITICAL: Empty messages array detected in analyst step', {
+      inputData,
+      messagesType: typeof messages,
+      isArray: Array.isArray(messages),
+    });
+
+    // Try to use conversationHistory as fallback
+    const fallbackMessages = inputData.conversationHistory;
+    if (fallbackMessages && Array.isArray(fallbackMessages) && fallbackMessages.length > 0) {
+      console.warn('Using conversationHistory as fallback for empty outputMessages');
+      messages = deduplicateMessages(fallbackMessages);
+    } else {
+      throw new Error(
+        'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.'
+      );
     }
+  }
 
-    // Critical check: Ensure messages array is not empty
-    if (!messages || messages.length === 0) {
-      console.error('CRITICAL: Empty messages array detected in analyst step', {
-        inputData,
-        messagesType: typeof messages,
-        isArray: Array.isArray(messages),
-      });
+  // Set initial messages in chunk processor
+  chunkProcessor.setInitialMessages(messages);
 
-      // Try to use conversationHistory as fallback
-      const fallbackMessages = inputData.conversationHistory;
-      if (fallbackMessages && Array.isArray(fallbackMessages) && fallbackMessages.length > 0) {
-        console.warn('Using conversationHistory as fallback for empty outputMessages');
-        messages = deduplicateMessages(fallbackMessages);
-      } else {
-        throw new Error(
-          'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.'
-        );
-      }
-    }
-
-    // Set initial messages in chunk processor
-    chunkProcessor.setInitialMessages(messages);
-
-    const wrappedStream = wrapTraced(
-      async () => {
-        const result = await retryableAgentStreamWithHealing({
-          agent: analystAgent,
-          messages,
-          options: {
+  // Main execution loop with retry logic
+  while (retryCount <= maxRetries) {
+    try {
+      const wrappedStream = wrapTraced(
+        async () => {
+          // Create stream directly without retryableAgentStreamWithHealing
+          const stream = await analystAgent.stream(messages, {
             toolCallStreaming: true,
             runtimeContext,
             toolChoice: 'required',
@@ -329,50 +336,56 @@ const analystExecution = async ({
               abortController,
               finishingToolNames: ['doneTool'],
             }),
-          },
-          retryConfig: {
-            maxRetries: 3,
-            onRetry: (error: RetryableError, attemptNumber: number) => {
-              // Log retry attempt for debugging
-              console.error(`Analyst retry attempt ${attemptNumber} for error:`, {
-                type: error.type,
-                attempt: attemptNumber,
-                messageId: runtimeContext.get('messageId'),
-                originalError:
-                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
+            onError: async (event: { error: unknown }) => {
+              const error = event.error;
+              console.error('Analyst stream error caught in onError:', error);
+
+              // Check if this is a retryable error
+              const workflowContext: WorkflowContext = {
+                currentStep: 'analyst',
+              };
+              const retryableError = detectRetryableError(error, workflowContext);
+              if (!retryableError || retryCount >= maxRetries) {
+                console.error('Analyst onError: Not retryable or max retries reached', {
+                  isRetryable: !!retryableError,
+                  retryCount,
+                  maxRetries,
+                  errorType: retryableError?.type || 'unknown',
+                });
+                // Not retryable or max retries reached - let it fail
+                return; // Let the error propagate normally
+              }
+
+              console.info('Analyst onError: Setting up retry', {
+                retryCount: retryCount + 1,
+                maxRetries,
+                errorType: retryableError.type,
+                healingMessage: retryableError.healingMessage,
               });
+
+              // Throw a special error with the healing info to trigger retry
+              throw new RetryWithHealingError(retryableError);
+            },
+          });
+
+          return stream;
+        },
+        {
+          name: 'Analyst',
+          spanAttributes: {
+            messageCount: messages.length,
+            retryAttempt: retryCount,
+            previousStep: {
+              toolsUsed: inputData.metadata?.toolsUsed,
+              finalTool: inputData.metadata?.finalTool,
+              hasReasoning: !!inputData.metadata?.reasoning,
             },
           },
-        });
-
-        // Update messages to include any healing messages added during retries
-        if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
-          messages.length = 0;
-          messages.push(...result.conversationHistory);
-          // Update complete conversation history with healing messages
-          completeConversationHistory = result.conversationHistory;
-        } else {
-          console.error('Invalid messages or conversationHistory array');
         }
+      );
 
-        return result.stream;
-      },
-      {
-        name: 'Analyst',
-        spanAttributes: {
-          messageCount: messages.length,
-          previousStep: {
-            toolsUsed: inputData.metadata?.toolsUsed,
-            finalTool: inputData.metadata?.finalTool,
-            hasReasoning: !!inputData.metadata?.reasoning,
-          },
-        },
-      }
-    );
+      const stream = await wrappedStream();
 
-    const stream = await wrappedStream();
-
-    try {
       // Process the stream - chunks are handled by onChunk callback
       for await (const _chunk of stream.fullStream) {
         // Stream is being processed via onChunk callback
@@ -381,139 +394,182 @@ const analystExecution = async ({
           break;
         }
       }
-    } catch (streamError) {
-      // Handle AbortError gracefully
-      if (streamError instanceof Error && streamError.name === 'AbortError') {
-        // Stream was intentionally aborted, this is normal
-      } else {
-        // Check if this is a healable streaming error
-        const healingResult = await handleStreamingError(streamError, {
-          agent: analystAgent as typeof analystAgent,
-          chunkProcessor,
-          runtimeContext,
-          abortController,
-          maxRetries: 3,
-          //DALLIN TODO: resourceId AND threadId
-          resourceId: runtimeContext.get('dataSourceId') as string,
-          threadId: runtimeContext.get('chatId') as string,
-          onRetry: (error: RetryableError, attemptNumber: number) => {
-            console.error(
-              `Analyst stream retry attempt ${attemptNumber} for streaming error:`,
-              error
-            );
-          },
-          toolChoice: 'required',
-        });
 
-        if (healingResult.shouldRetry && healingResult.healingMessage) {
-          // Add the healing message to the final conversation history
-          // Note: For now we just log it. A full implementation would need to restart
-          // the entire stream processing with the healed conversation.
-          completeConversationHistory.push(healingResult.healingMessage);
-        } else {
-          console.error('Error processing stream:', streamError);
-          throw streamError; // Re-throw non-healable errors
-        }
-      }
-    }
+      console.info('Analyst: Stream completed successfully');
+      break; // Exit the retry loop on success
+    } catch (error) {
+      console.error('Analyst: Error in stream processing', error);
 
-    // Get final conversation history from chunk processor
-    completeConversationHistory = chunkProcessor.getAccumulatedMessages();
-
-    // Get files metadata for the response
-    const filesMetadata = {
-      filesCreated: chunkProcessor.getTotalFilesCreated(),
-      filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
-    };
-
-    // Extract selected file information
-    const fileSelection = chunkProcessor.getCurrentFileSelection();
-    const firstFile = fileSelection.files[0];
-    const selectedFile = firstFile
-      ? {
-          fileId: firstFile.id,
-          fileType: firstFile.fileType,
-          versionNumber: firstFile.versionNumber,
-        }
-      : undefined;
-
-    return {
-      conversationHistory: completeConversationHistory,
-      finished: true,
-      outputMessages: completeConversationHistory,
-      reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
-        typeof ReasoningHistorySchema
-      >,
-      responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
-      metadata: {
-        ...inputData.metadata,
-        ...filesMetadata,
-      },
-      selectedFile,
-    };
-  } catch (error) {
-    console.error('[Analyst Step] Error:', error);
-    // Handle abort errors gracefully
-    if (error instanceof Error && error.name === 'AbortError') {
-      // This is expected when we abort the stream
-
-      // Get files metadata for the response
-      const filesMetadata = {
-        filesCreated: chunkProcessor.getTotalFilesCreated(),
-        filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
-      };
-
-      // Extract selected file information
-      const fileSelection = chunkProcessor.getCurrentFileSelection();
-      const firstFile = fileSelection.files[0];
-      const selectedFile = firstFile
-        ? {
-            fileId: firstFile.id,
-            fileType: firstFile.fileType,
-            versionNumber: firstFile.versionNumber,
+      // Handle our special retry error
+      if (isRetryWithHealingError(error)) {
+        const retryableError = error.retryableError;
+        
+        // Get the current messages from chunk processor to find the failed tool call
+        const currentMessages = chunkProcessor.getAccumulatedMessages();
+        const healingMessage = retryableError.healingMessage;
+        let insertionIndex = currentMessages.length; // Default to end
+        
+        // If this is a NoSuchToolError, find the correct position to insert the healing message
+        if (retryableError.type === 'no-such-tool' && Array.isArray(healingMessage.content)) {
+          const firstContent = healingMessage.content[0];
+          if (firstContent && typeof firstContent === 'object' && 'type' in firstContent && 
+              firstContent.type === 'tool-result' && 'toolCallId' in firstContent && 
+              'toolName' in firstContent) {
+            
+            // Find the assistant message with the failed tool call
+            for (let i = currentMessages.length - 1; i >= 0; i--) {
+              const msg = currentMessages[i];
+              if (msg && msg.role === 'assistant' && Array.isArray(msg.content)) {
+                // Find tool calls in this message
+                const toolCalls = msg.content.filter(
+                  (c): c is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
+                    typeof c === 'object' && c !== null && 'type' in c && 
+                    c.type === 'tool-call' && 'toolCallId' in c && 'toolName' in c && 'args' in c
+                );
+                
+                // Check each tool call to see if it matches and has no result
+                for (const toolCall of toolCalls) {
+                  // Check if this tool call matches the failed tool name
+                  if (toolCall.toolName === firstContent.toolName) {
+                    // Look ahead for tool results
+                    let hasResult = false;
+                    for (let j = i + 1; j < currentMessages.length; j++) {
+                      const nextMsg = currentMessages[j];
+                      if (nextMsg && nextMsg.role === 'tool' && Array.isArray(nextMsg.content)) {
+                        const hasMatchingResult = nextMsg.content.some(
+                          (c) => typeof c === 'object' && c !== null && 'type' in c && 
+                                 c.type === 'tool-result' && 'toolCallId' in c && 
+                                 c.toolCallId === toolCall.toolCallId
+                        );
+                        if (hasMatchingResult) {
+                          hasResult = true;
+                          break;
+                        }
+                      }
+                    }
+                    
+                    // If this tool call has no result, this is our failed call
+                    if (!hasResult) {
+                      console.info('Analyst: Found orphaned tool call, using its ID for healing', {
+                        toolCallId: toolCall.toolCallId,
+                        toolName: toolCall.toolName,
+                        atIndex: i,
+                      });
+                      
+                      // Update the healing message with the correct toolCallId
+                      firstContent.toolCallId = toolCall.toolCallId;
+                      
+                      // Insert position is right after this assistant message
+                      insertionIndex = i + 1;
+                      break;
+                    }
+                  }
+                }
+                
+                // If we found the position, stop searching
+                if (insertionIndex !== currentMessages.length) break;
+              }
+            }
           }
-        : undefined;
+        }
+        
+        console.info('Analyst: Retrying with healing message', {
+          retryCount,
+          errorType: retryableError.type,
+          insertionIndex,
+          totalMessages: currentMessages.length,
+        });
+        
+        // Create new messages array with healing message inserted at the correct position
+        const updatedMessages = [
+          ...currentMessages.slice(0, insertionIndex),
+          healingMessage,
+          ...currentMessages.slice(insertionIndex)
+        ];
+        
+        // Update messages for the retry
+        messages = updatedMessages;
+        
+        // Reset chunk processor with the properly ordered messages
+        chunkProcessor.setInitialMessages(messages);
+        
+        // Force save to persist the healing message immediately
+        await chunkProcessor.saveToDatabase();
+        
+        retryCount++;
+        
+        // Continue to next retry iteration
+        continue;
+      }
+      
+      // Handle normal AbortError (from doneTool)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.info('Analyst: Stream aborted successfully (normal completion)');
+        break; // Normal abort, exit retry loop
+      }
 
-      return {
-        conversationHistory: completeConversationHistory,
-        finished: true,
-        outputMessages: completeConversationHistory,
-        reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
-          typeof ReasoningHistorySchema
-        >,
-        responseHistory: chunkProcessor.getResponseHistory() as z.infer<
-          typeof ResponseHistorySchema
-        >,
-        metadata: {
-          ...inputData.metadata,
-          ...filesMetadata,
-        },
-        selectedFile,
-      };
-    }
+      // Any other error at this point is fatal
+      console.error('Analyst: Fatal error - not retryable', {
+        errorName: error instanceof Error ? error.name : 'unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
 
-    console.error('Error in analyst step:', error);
+      // Check if it's a database connection error
+      if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+        throw new Error('Unable to connect to the analysis service. Please try again later.');
+      }
 
-    // Check if it's a database connection error
-    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
-      throw new Error('Unable to connect to the analysis service. Please try again later.');
-    }
+      // Check if it's an API/model error
+      if (
+        error instanceof Error &&
+        (error.message.includes('API') || error.message.includes('model'))
+      ) {
+        throw new Error(
+          'The analysis service is temporarily unavailable. Please try again in a few moments.'
+        );
+      }
 
-    // Check if it's an API/model error
-    if (
-      error instanceof Error &&
-      (error.message.includes('API') || error.message.includes('model'))
-    ) {
+      // For unexpected errors, provide a generic friendly message
       throw new Error(
-        'The analysis service is temporarily unavailable. Please try again in a few moments.'
+        'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
       );
     }
-
-    // For unexpected errors, provide a generic friendly message
-    throw new Error(
-      'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
-    );
   }
+
+  // Get final conversation history from chunk processor
+  completeConversationHistory = chunkProcessor.getAccumulatedMessages();
+
+  // Get files metadata for the response
+  const filesMetadata = {
+    filesCreated: chunkProcessor.getTotalFilesCreated(),
+    filesReturned: chunkProcessor.getCurrentFileSelection().files.length,
+  };
+
+  // Extract selected file information
+  const fileSelection = chunkProcessor.getCurrentFileSelection();
+  const firstFile = fileSelection.files[0];
+  const selectedFile = firstFile
+    ? {
+        fileId: firstFile.id,
+        fileType: firstFile.fileType,
+        versionNumber: firstFile.versionNumber,
+      }
+    : undefined;
+
+  return {
+    conversationHistory: completeConversationHistory,
+    finished: true,
+    outputMessages: completeConversationHistory,
+    reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
+      typeof ReasoningHistorySchema
+    >,
+    responseHistory: chunkProcessor.getResponseHistory() as z.infer<typeof ResponseHistorySchema>,
+    metadata: {
+      ...inputData.metadata,
+      ...filesMetadata,
+    },
+    selectedFile,
+  };
 };
 
 export const analystStep = createStep({
