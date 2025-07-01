@@ -58,7 +58,7 @@ const outputSchema = z.object({
  */
 function transformHistoryForChunkProcessor(
   reasoningHistory: z.infer<typeof ReasoningHistorySchema> | undefined,
-  responseHistory: z.infer<typeof ResponseHistorySchema>,
+  responseHistory: z.infer<typeof ResponseHistorySchema>
 ): {
   reasoningHistory: ChatMessageReasoningMessage[];
   responseHistory: ChatMessageResponseMessage[];
@@ -84,7 +84,7 @@ function transformHistoryForChunkProcessor(
           ...container,
           pills: container.pills.map((pill) => ({
             ...pill,
-            type: validPillTypes.includes(pill.type as typeof validPillTypes[number])
+            type: validPillTypes.includes(pill.type as (typeof validPillTypes)[number])
               ? pill.type
               : 'empty',
           })),
@@ -116,7 +116,7 @@ function createMessageKey(msg: CoreMessage): string {
           c.type === 'tool-call' &&
           'toolCallId' in c &&
           'toolName' in c &&
-          'args' in c,
+          'args' in c
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
@@ -129,7 +129,7 @@ function createMessageKey(msg: CoreMessage): string {
     // For text content, use first 100 chars as key
     const textContent = msg.content.find(
       (c): c is { type: 'text'; text: string } =>
-        typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c,
+        typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c
     );
     if (textContent?.text) {
       return `assistant:text:${textContent.text.substring(0, 100)}`;
@@ -145,7 +145,7 @@ function createMessageKey(msg: CoreMessage): string {
           c !== null &&
           'type' in c &&
           c.type === 'tool-result' &&
-          'toolCallId' in c,
+          'toolCallId' in c
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
@@ -161,11 +161,11 @@ function createMessageKey(msg: CoreMessage): string {
       typeof msg.content === 'string'
         ? msg.content
         : Array.isArray(msg.content) &&
-          msg.content[0] &&
-          typeof msg.content[0] === 'object' &&
-          'text' in msg.content[0]
-        ? (msg.content[0] as { text?: string }).text || ''
-        : '';
+            msg.content[0] &&
+            typeof msg.content[0] === 'object' &&
+            'text' in msg.content[0]
+          ? (msg.content[0] as { text?: string }).text || ''
+          : '';
 
     // Fast hash function for user messages instead of JSON.stringify
     let hash = 0;
@@ -216,7 +216,7 @@ function deduplicateMessages(messages: CoreMessage[]): CoreMessage[] {
 
   if (duplicatesFound > 0) {
     console.info(
-      `Removed ${duplicatesFound} duplicate messages. Original: ${messages.length}, Deduplicated: ${deduplicated.length}`,
+      `Removed ${duplicatesFound} duplicate messages. Original: ${messages.length}, Deduplicated: ${deduplicated.length}`
     );
   }
 
@@ -255,7 +255,7 @@ const analystExecution = async ({
   const { reasoningHistory: transformedReasoning, responseHistory: transformedResponse } =
     transformHistoryForChunkProcessor(
       inputData.reasoningHistory || [],
-      inputData.responseHistory || [],
+      inputData.responseHistory || []
     );
 
   const chunkProcessor = new ChunkProcessor(
@@ -263,7 +263,7 @@ const analystExecution = async ({
     [],
     transformedReasoning, // Pass transformed reasoning history
     transformedResponse, // Pass transformed response history
-    inputData.dashboardContext, // Pass dashboard context
+    inputData.dashboardContext // Pass dashboard context
   );
 
   // Messages come directly from think-and-prep step output
@@ -290,7 +290,7 @@ const analystExecution = async ({
       messages = deduplicateMessages(fallbackMessages);
     } else {
       throw new Error(
-        'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.',
+        'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.'
       );
     }
   }
@@ -329,7 +329,7 @@ const analystExecution = async ({
               hasReasoning: !!inputData.metadata?.reasoning,
             },
           },
-        },
+        }
       );
 
       const stream = await wrappedStream();
@@ -364,7 +364,7 @@ const analystExecution = async ({
           onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(
               `Analyst stream retry attempt ${retryCount + attemptNumber} for streaming error:`,
-              error,
+              error
             );
           },
           toolChoice: 'required',
@@ -376,13 +376,14 @@ const analystExecution = async ({
           chunkProcessor.setInitialMessages(messages);
           retryCount++;
           continue; // Continue to next iteration of retry loop
-        } else {
-          // Non-healable error, throw it
-          console.error('Non-healable streaming error:', streamError);
-          throw streamError;
         }
+
+        // Non-healable error, throw it
+        console.error('Non-healable streaming error:', streamError);
+        throw streamError;
       }
     } catch (error) {
+      console.error('Error in analyst step:', error);
       // Handle errors during stream creation
       if (error instanceof Error && error.name === 'AbortError') {
         // This is expected when we abort the stream
@@ -424,13 +425,13 @@ const analystExecution = async ({
         (error.message.includes('API') || error.message.includes('model'))
       ) {
         throw new Error(
-          'The analysis service is temporarily unavailable. Please try again in a few moments.',
+          'The analysis service is temporarily unavailable. Please try again in a few moments.'
         );
       }
 
       // For unexpected errors, provide a generic friendly message
       throw new Error(
-        'Something went wrong during the analysis. Please try again or contact support if the issue persists.',
+        'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
       );
     }
   }

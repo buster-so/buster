@@ -30,7 +30,7 @@ const inputSchema = z.object({
         name: z.string(),
         versionNumber: z.number(),
         metricIds: z.array(z.string()),
-      }),
+      })
     )
     .optional(),
 });
@@ -67,7 +67,7 @@ const createStepResult = (
     name: string;
     versionNumber: number;
     metricIds: string[];
-  }>,
+  }>
 ): z.infer<typeof outputSchema> => ({
   finished,
   outputMessages,
@@ -181,7 +181,7 @@ const thinkAndPrepExecution = async ({
               messageCount: messages.length,
               retryAttempt: retryCount,
             },
-          },
+          }
         );
 
         const stream = await wrappedStream();
@@ -218,7 +218,7 @@ const thinkAndPrepExecution = async ({
                 `Think and Prep stream retry attempt ${
                   retryCount + attemptNumber
                 } for streaming error:`,
-                error,
+                error
               );
             },
             toolChoice: 'required',
@@ -230,13 +230,14 @@ const thinkAndPrepExecution = async ({
             chunkProcessor.setInitialMessages(messages);
             retryCount++;
             continue; // Continue to next iteration of retry loop
-          } else {
-            // Non-healable error, throw it
-            console.error('Non-healable streaming error:', streamError);
-            throw streamError;
           }
+
+          // Non-healable error, throw it
+          console.error('Non-healable streaming error:', streamError);
+          throw streamError;
         }
       } catch (error) {
+        console.error('Error in think and prep step:', error);
         // Handle errors during stream creation
         if (error instanceof Error && error.name === 'AbortError') {
           // This is expected when we abort the stream
@@ -278,13 +279,13 @@ const thinkAndPrepExecution = async ({
           (error.message.includes('API') || error.message.includes('model'))
         ) {
           throw new Error(
-            'The analysis service is temporarily unavailable. Please try again in a few moments.',
+            'The analysis service is temporarily unavailable. Please try again in a few moments.'
           );
         }
 
         // For unexpected errors, provide a generic friendly message
         throw new Error(
-          'Something went wrong during the analysis. Please try again or contact support if the issue persists.',
+          'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
         );
       }
     }
@@ -300,7 +301,7 @@ const thinkAndPrepExecution = async ({
       finalStepData,
       chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
       chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
-      inputData.dashboardFiles, // Pass dashboard context through
+      inputData.dashboardFiles // Pass dashboard context through
     );
 
     return result;
@@ -317,7 +318,7 @@ const thinkAndPrepExecution = async ({
         finalStepData,
         chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
         chunkProcessor.getResponseHistory() as BusterChatMessageResponse[],
-        inputData.dashboardFiles, // Pass dashboard context through
+        inputData.dashboardFiles // Pass dashboard context through
       );
     }
 
