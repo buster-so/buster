@@ -7,7 +7,11 @@ import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import type { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
-import { detectRetryableError, RetryWithHealingError, isRetryWithHealingError } from '../utils/retry';
+import {
+  RetryWithHealingError,
+  detectRetryableError,
+  isRetryWithHealingError,
+} from '../utils/retry';
 import type { RetryableError, WorkflowContext } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
@@ -104,7 +108,7 @@ const thinkAndPrepExecution = async ({
   let finished = false;
   const finalStepData: StepFinishData | null = null;
   let retryCount = 0;
-  const maxRetries = 3;
+  const maxRetries = 5;
 
   // Extract reasoning history from create-todos step
   const rawReasoningHistory = inputData['create-todos'].reasoningHistory || [];
@@ -123,7 +127,7 @@ const thinkAndPrepExecution = async ({
     'respondWithoutAnalysis',
     'submitThoughts',
   ]);
-  
+
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
@@ -173,6 +177,7 @@ const thinkAndPrepExecution = async ({
             const stream = await thinkAndPrepAgent.stream(messages, {
               toolCallStreaming: true,
               runtimeContext,
+              maxRetries: 5,
               abortSignal: abortController.signal,
               toolChoice: 'required',
               onChunk: createOnChunkHandler({

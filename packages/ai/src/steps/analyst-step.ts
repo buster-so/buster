@@ -20,7 +20,11 @@ import {
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import { RetryWithHealingError, detectRetryableError, isRetryWithHealingError } from '../utils/retry';
+import {
+  RetryWithHealingError,
+  detectRetryableError,
+  isRetryWithHealingError,
+} from '../utils/retry';
 import type { RetryableError, WorkflowContext } from '../utils/retry/types';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -248,7 +252,7 @@ const analystExecution = async ({
   const messageId = runtimeContext.get('messageId') as string | null;
   let completeConversationHistory: CoreMessage[] = [];
   let retryCount = 0;
-  const maxRetries = 3;
+  const maxRetries = 5;
 
   // Initialize chunk processor with histories from previous step
   // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
@@ -329,6 +333,7 @@ const analystExecution = async ({
           const stream = await analystAgent.stream(messages, {
             toolCallStreaming: true,
             runtimeContext,
+            maxRetries: 5,
             toolChoice: 'required',
             abortSignal: abortController.signal,
             onChunk: createOnChunkHandler({
@@ -403,30 +408,46 @@ const analystExecution = async ({
       // Handle our special retry error
       if (isRetryWithHealingError(error)) {
         const retryableError = error.retryableError;
-        
+
         // Get the current messages from chunk processor to find the failed tool call
         const currentMessages = chunkProcessor.getAccumulatedMessages();
         const healingMessage = retryableError.healingMessage;
         let insertionIndex = currentMessages.length; // Default to end
-        
+
         // If this is a NoSuchToolError, find the correct position to insert the healing message
         if (retryableError.type === 'no-such-tool' && Array.isArray(healingMessage.content)) {
           const firstContent = healingMessage.content[0];
-          if (firstContent && typeof firstContent === 'object' && 'type' in firstContent && 
-              firstContent.type === 'tool-result' && 'toolCallId' in firstContent && 
-              'toolName' in firstContent) {
-            
+          if (
+            firstContent &&
+            typeof firstContent === 'object' &&
+            'type' in firstContent &&
+            firstContent.type === 'tool-result' &&
+            'toolCallId' in firstContent &&
+            'toolName' in firstContent
+          ) {
             // Find the assistant message with the failed tool call
             for (let i = currentMessages.length - 1; i >= 0; i--) {
               const msg = currentMessages[i];
               if (msg && msg.role === 'assistant' && Array.isArray(msg.content)) {
                 // Find tool calls in this message
                 const toolCalls = msg.content.filter(
-                  (c): c is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
-                    typeof c === 'object' && c !== null && 'type' in c && 
-                    c.type === 'tool-call' && 'toolCallId' in c && 'toolName' in c && 'args' in c
+                  (
+                    c
+                  ): c is {
+                    type: 'tool-call';
+                    toolCallId: string;
+                    toolName: string;
+                    args: unknown;
+                  } =>
+                    typeof c === 'object' &&
+                    c !== null &&
+                    'type' in c &&
+                    c.type === 'tool-call' &&
+                    'toolCallId' in c &&
+                    'toolName' in c &&
+                    'args' in c
                 );
-                
+
                 // Check each tool call to see if it matches and has no result
                 for (const toolCall of toolCalls) {
                   // Check if this tool call matches the failed tool name
@@ -437,9 +458,13 @@ const analystExecution = async ({
                       const nextMsg = currentMessages[j];
                       if (nextMsg && nextMsg.role === 'tool' && Array.isArray(nextMsg.content)) {
                         const hasMatchingResult = nextMsg.content.some(
-                          (c) => typeof c === 'object' && c !== null && 'type' in c && 
-                                 c.type === 'tool-result' && 'toolCallId' in c && 
-                                 c.toolCallId === toolCall.toolCallId
+                          (c) =>
+                            typeof c === 'object' &&
+                            c !== null &&
+                            'type' in c &&
+                            c.type === 'tool-result' &&
+                            'toolCallId' in c &&
+                            c.toolCallId === toolCall.toolCallId
                         );
                         if (hasMatchingResult) {
                           hasResult = true;
@@ -447,7 +472,7 @@ const analystExecution = async ({
                         }
                       }
                     }
-                    
+
                     // If this tool call has no result, this is our failed call
                     if (!hasResult) {
                       console.info('Analyst: Found orphaned tool call, using its ID for healing', {
@@ -455,53 +480,53 @@ const analystExecution = async ({
                         toolName: toolCall.toolName,
                         atIndex: i,
                       });
-                      
+
                       // Update the healing message with the correct toolCallId
                       firstContent.toolCallId = toolCall.toolCallId;
-                      
+
                       // Insert position is right after this assistant message
                       insertionIndex = i + 1;
                       break;
                     }
                   }
                 }
-                
+
                 // If we found the position, stop searching
                 if (insertionIndex !== currentMessages.length) break;
               }
             }
           }
         }
-        
+
         console.info('Analyst: Retrying with healing message', {
           retryCount,
           errorType: retryableError.type,
           insertionIndex,
           totalMessages: currentMessages.length,
         });
-        
+
         // Create new messages array with healing message inserted at the correct position
         const updatedMessages = [
           ...currentMessages.slice(0, insertionIndex),
           healingMessage,
-          ...currentMessages.slice(insertionIndex)
+          ...currentMessages.slice(insertionIndex),
         ];
-        
+
         // Update messages for the retry
         messages = updatedMessages;
-        
+
         // Reset chunk processor with the properly ordered messages
         chunkProcessor.setInitialMessages(messages);
-        
+
         // Force save to persist the healing message immediately
         await chunkProcessor.saveToDatabase();
-        
+
         retryCount++;
-        
+
         // Continue to next retry iteration
         continue;
       }
-      
+
       // Handle normal AbortError (from doneTool)
       if (error instanceof Error && error.name === 'AbortError') {
         console.info('Analyst: Stream aborted successfully (normal completion)');
