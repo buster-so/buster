@@ -96,6 +96,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private deferDoneToolResponse = false; // Whether to defer doneTool response handling
   private pendingDoneToolEntry: ResponseEntry | null = null; // Track pending doneTool entry
   private sqlExecutionStartTimes = new Map<string, number>(); // Track SQL execution start times
+  private availableTools?: Set<string>; // Track which tools are available in current step
 
   // Reactive file selection state
   private currentFileSelection: {
@@ -121,10 +122,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       name: string;
       versionNumber: number;
       metricIds: string[];
-    }>
+    }>,
+    availableTools?: Set<string>
   ) {
     this.messageId = messageId;
     this.dashboardContext = dashboardContext || [];
+    this.availableTools = availableTools || new Set();
     
     console.info('[ChunkProcessor] Constructor called:', {
       messageId,
@@ -133,6 +136,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       initialResponseCount: initialResponseHistory.length,
       dashboardContextProvided: dashboardContext !== undefined,
       dashboardContextLength: this.dashboardContext.length,
+      availableToolsCount: availableTools?.size,
+      availableTools: availableTools ? Array.from(availableTools) : undefined,
     });
     this.state = {
       accumulatedMessages: [...initialMessages],
@@ -146,6 +151,17 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         toolCallTimings: new Map(),
       },
     };
+  }
+
+  /**
+   * Check if a tool is valid for the current step
+   */
+  private isValidTool(toolName: string): boolean {
+    // If no tools specified, accept all (backward compatibility)
+    if (!this.availableTools) return true;
+    
+    // Check if tool is in the available set
+    return this.availableTools.has(toolName);
   }
 
   /**
@@ -218,6 +234,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   private handleToolCall(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-call') return;
+    
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -251,6 +268,13 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     // Start timing on first tool call
     if (!this.state.timing.startTime) {
       this.state.timing.startTime = Date.now();
+    }
+
+    // Check if tool is valid for current step before processing into reasoning/response
+    if (!this.isValidTool(chunk.toolName)) {
+      console.warn(`[ChunkProcessor] Tool ${chunk.toolName} not available in current step - excluding from reasoning/response`);
+      // Tool is still added to raw messages above, but we skip reasoning/response processing
+      return;
     }
 
     // Check if this is a response tool
@@ -373,6 +397,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   private handleToolCallStart(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-call-streaming-start') return;
+    
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -400,6 +425,13 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       toolName: chunk.toolName,
       argsText: '',
     });
+
+    // Check if tool is valid for current step before processing into reasoning/response
+    if (!this.isValidTool(chunk.toolName)) {
+      console.warn(`[ChunkProcessor] Tool ${chunk.toolName} not available in current step - excluding from reasoning/response`);
+      // Tool is still added to raw messages above, but we skip reasoning/response processing
+      return;
+    }
 
     // Create initial entries for both response and reasoning tools
     if (this.isResponseTool(chunk.toolName)) {
@@ -520,6 +552,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
       }
 
+      // Check if tool is valid for current step before processing into reasoning/response
+      if (!this.isValidTool(inProgress.toolName)) {
+        // Tool deltas are still accumulated in the raw message, but we skip reasoning/response processing
+        return;
+      }
+
       // Check if this is a response tool
       const isResponseTool = this.isResponseTool(inProgress.toolName);
 
@@ -635,6 +673,14 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       };
 
       this.state.accumulatedMessages.push(toolResultMessage);
+
+      // Check if tool is valid for current step before processing reasoning/response
+      if (!this.isValidTool(chunk.toolName)) {
+        console.warn(`[ChunkProcessor] Tool result for ${chunk.toolName} added to messages but excluded from reasoning/response`);
+        // Clear the tool from tracking but don't process reasoning/response
+        this.state.toolCallsInProgress.delete(chunk.toolCallId);
+        return;
+      }
 
       // Track tool completion timing and update reasoning entry
       if (this.state.timing.startTime) {

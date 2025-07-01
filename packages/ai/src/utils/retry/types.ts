@@ -58,3 +58,10 @@ export interface RetryResult<T extends ToolSet> {
   conversationHistory: CoreMessage[];
   retryCount: number;
 }
+
+/**
+ * Context for creating workflow-aware healing messages
+ */
+export interface WorkflowContext {
+  currentStep: 'think-and-prep' | 'analyst';
+}

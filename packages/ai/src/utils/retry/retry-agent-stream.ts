@@ -2,17 +2,20 @@ import type { ToolSet } from 'ai';
 import {
   APICallError,
   EmptyResponseBodyError,
-  InvalidResponseDataError,
   JSONParseError,
   NoContentGeneratedError,
   NoSuchToolError,
   RetryError,
   ToolExecutionError,
 } from 'ai';
-import { ZodError } from 'zod';
-import { healStreamingToolError, isHealableStreamError } from '../streaming/tool-healing';
 import { compressConversationHistory, shouldCompressHistory } from './context-compression';
-import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
+import type {
+  RetryConfig,
+  RetryResult,
+  RetryableAgentStreamParams,
+  RetryableError,
+  WorkflowContext,
+} from './types';
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
@@ -23,9 +26,41 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 /**
  * Detects if an error is retryable using AI SDK error types
  */
-export function detectRetryableError(error: unknown): RetryableError | null {
+/**
+ * Creates a workflow-aware healing message for NoSuchToolError
+ */
+function createWorkflowAwareHealingMessage(toolName: string, context?: WorkflowContext): string {
+  const baseMessage = `Tool "${toolName}" is not available in the current mode.`;
+
+  if (!context) {
+    return `${baseMessage} Please use one of the available tools instead.`;
+  }
+
+  const { currentStep } = context;
+
+  // Static message that always provides full pipeline context
+  const pipelineContext = `
+
+This workflow has two steps:
+1. think-and-prep mode: Available tools are sequentialThinking, executeSql, respondWithoutAnalysis, submitThoughts
+2. analyst mode: Available tools are createMetrics, modifyMetrics, createDashboards, modifyDashboards, doneTool
+
+You are currently in ${currentStep} mode. Please use one of the tools available in your current mode.
+
+You should proceed with the proper tool calls in the context of the current step. There is a chance you might be a little confused about where you are in the workflow. or the tools available to you.`;
+
+  return baseMessage + pipelineContext;
+}
+
+export function detectRetryableError(
+  error: unknown,
+  context?: WorkflowContext
+): RetryableError | null {
   // Handle NoSuchToolError
   if (NoSuchToolError.isInstance(error)) {
+    const toolName = 'toolName' in error ? String(error.toolName) : 'unknown';
+    const errorMessage = createWorkflowAwareHealingMessage(toolName, context);
+
     return {
       type: 'no-such-tool',
       originalError: error,
@@ -37,7 +72,7 @@ export function detectRetryableError(error: unknown): RetryableError | null {
             toolCallId: 'toolCallId' in error ? String(error.toolCallId) : 'unknown',
             toolName: 'toolName' in error ? String(error.toolName) : 'unknown',
             result: {
-              error: `Tool "${'toolName' in error ? error.toolName : 'unknown'}" is not available. Please use one of the available tools instead.`,
+              error: errorMessage,
             },
           },
         ],
