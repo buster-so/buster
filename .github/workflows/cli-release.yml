@@ -31,10 +31,10 @@ jobs:
             target: aarch64-apple-darwin
             artifact_name: buster-cli-darwin-arm64.tar.gz
             use_tar: true
-          # - os: windows-latest
-          #   target: x86_64-pc-windows-msvc
-          #   artifact_name: buster-cli-windows-x86_64.zip
-          #   use_tar: false
+          - os: windows-2022
+            target: x86_64-pc-windows-msvc
+            artifact_name: buster-cli-windows-x86_64.zip
+            use_tar: false
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -52,6 +52,17 @@ jobs:
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
+
+      - name: Cache vcpkg (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.workspace }}/vcpkg
+            ${{ env.VCPKG_INSTALLATION_ROOT }}/installed
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/*.vcpkg') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
       - name: Install libpq (macOS and Linux)
         if: runner.os != 'Windows'
@@ -71,6 +82,20 @@ jobs:
         env:
           HOMEBREW_NO_INSTALL_CLEANUP: 1 # Recommended for CI to speed up
 
+      - name: Install libpq (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          # Use vcpkg for faster, more reliable PostgreSQL installation
+          vcpkg install libpq:x64-windows-static
+          
+          # Set environment variables for pq-sys
+          $vcpkgRoot = $env:VCPKG_INSTALLATION_ROOT
+          echo "PQ_LIB_DIR=$vcpkgRoot\installed\x64-windows-static\lib" >> $env:GITHUB_ENV
+          echo "PQ_LIB_STATIC=1" >> $env:GITHUB_ENV
+          echo "VCPKGRS_DYNAMIC=0" >> $env:GITHUB_ENV
+          echo "RUSTFLAGS=-L $vcpkgRoot\installed\x64-windows-static\lib" >> $env:GITHUB_ENV
+
       - name: Configure Cargo for optimized build
         run: |
           mkdir -p .cargo
@@ -80,9 +105,17 @@ jobs:
           echo 'panic = "abort"' >> .cargo/config.toml
           echo 'opt-level = 3' >> .cargo/config.toml
           echo 'strip = true' >> .cargo/config.toml
+        shell: bash
       - name: Build optimized release
         working-directory: ./cli
-        run: cargo build --release --target ${{ matrix.target }}
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            # Use parallel compilation on Windows
+            cargo build --release --target ${{ matrix.target }} --jobs $(nproc)
+          else
+            cargo build --release --target ${{ matrix.target }}
+          fi
+        shell: bash
 
       - name: Compress binary (Unix)
         if: matrix.use_tar
@@ -95,14 +128,15 @@ jobs:
           else
             sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           fi
-      # - name: Compress binary (Windows)
-      #   if: matrix.use_tar == false
-      #   working-directory: ./cli
-      #   shell: pwsh
-      #   run: |
-      #     cd target/${{ matrix.target }}/release
-      #     Compress-Archive -Path buster-cli.exe -DestinationPath ${{ matrix.artifact_name }}
-      #     Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }} | Select-Object -ExpandProperty Hash > ${{ matrix.artifact_name }}.sha256
+
+      - name: Compress binary (Windows)
+        if: matrix.use_tar == false
+        working-directory: ./cli
+        shell: pwsh
+        run: |
+          cd target/${{ matrix.target }}/release
+          Compress-Archive -Path buster-cli.exe -DestinationPath ${{ matrix.artifact_name }}
+          Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }} | Select-Object -ExpandProperty Hash > ${{ matrix.artifact_name }}.sha256
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -146,8 +180,8 @@ jobs:
             **/buster-cli-darwin-x86_64.tar.gz.sha256
             **/buster-cli-darwin-arm64.tar.gz
             **/buster-cli-darwin-arm64.tar.gz.sha256
-            # **/buster-cli-windows-x86_64.zip
-            # **/buster-cli-windows-x86_64.zip.sha256
+            **/buster-cli-windows-x86_64.zip
+            **/buster-cli-windows-x86_64.zip.sha256
           draft: false
           prerelease: false
           generate_release_notes: true
@@ -184,14 +218,17 @@ jobs:
           SHA_ARM64=$(cat buster-cli-darwin-arm64.tar.gz.sha256 | awk '{print $1}')
           SHA_INTEL=$(cat buster-cli-darwin-x86_64.tar.gz.sha256 | awk '{print $1}')
           SHA_LINUX=$(cat buster-cli-linux-x86_64.tar.gz.sha256 | awk '{print $1}')
+          SHA_WINDOWS=$(cat buster-cli-windows-x86_64.zip.sha256 | awk '{print $1}')
 
           echo "SHA_ARM64=$SHA_ARM64" >> $GITHUB_ENV
           echo "SHA_INTEL=$SHA_INTEL" >> $GITHUB_ENV
           echo "SHA_LINUX=$SHA_LINUX" >> $GITHUB_ENV
+          echo "SHA_WINDOWS=$SHA_WINDOWS" >> $GITHUB_ENV
 
           echo "ARM64 SHA: $SHA_ARM64"
           echo "Intel SHA: $SHA_INTEL"
           echo "Linux SHA: $SHA_LINUX"
+          echo "Windows SHA: $SHA_WINDOWS"
 
       - name: Checkout Homebrew tap repository
         uses: actions/checkout@v4

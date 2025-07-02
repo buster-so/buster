@@ -202,9 +202,9 @@ async fn test_get_dashboard_admin_role_public_password() -> Result<()> {
     let result = get_dashboard_handler(&dashboard.id, &auth_user, None, None).await; // No password
 
     assert!(result.is_ok());
-    // Admins currently default to CanView if no explicit permission exists on the asset itself
+    // Admins should get Owner permissions regardless of explicit asset permissions
     let response = result.unwrap();
-    assert_eq!(response.permission, AssetPermissionRole::CanView);
+    assert_eq!(response.permission, AssetPermissionRole::Owner);
 
     cleanup_test_data(&[dashboard.id]).await?;
     Ok(())

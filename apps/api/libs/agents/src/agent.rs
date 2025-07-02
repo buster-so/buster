@@ -361,6 +361,46 @@ impl Agent {
             .map(|thread| thread.messages.clone())
     }
 
+    /// Truncate previous tool results of a specific tool to keep conversation manageable
+    pub async fn truncate_previous_tool_results(&self, tool_name: &str, replacement_content: &str) -> Result<()> {
+        let mut thread_lock = self.current_thread.write().await;
+        if let Some(thread) = thread_lock.as_mut() {
+            let mut modified_count = 0;
+            
+            // Find and truncate previous tool results, but skip the most recent one if it exists
+            let mut tool_message_indices: Vec<usize> = Vec::new();
+            for (index, message) in thread.messages.iter().enumerate() {
+                if let AgentMessage::Tool { name: Some(ref msg_tool_name), .. } = message {
+                    if msg_tool_name == tool_name {
+                        tool_message_indices.push(index);
+                    }
+                }
+            }
+            
+            // Skip the last occurrence (if any) and truncate all previous ones
+            if tool_message_indices.len() > 1 {
+                // Remove the last index (most recent) from the list to truncate
+                tool_message_indices.pop();
+                
+                for &index in &tool_message_indices {
+                    if let Some(AgentMessage::Tool { content, .. }) = thread.messages.get_mut(index) {
+                        *content = replacement_content.to_string();
+                        modified_count += 1;
+                    }
+                }
+            }
+            
+            if modified_count > 0 {
+                debug!(
+                    tool_name = tool_name,
+                    truncated_count = modified_count,
+                    "Truncated previous tool results to keep conversation manageable"
+                );
+            }
+        }
+        Ok(())
+    }
+
     /// Update the current thread with a new message
     async fn update_current_thread(&self, message: AgentMessage) -> Result<()> {
         let mut thread_lock = self.current_thread.write().await;

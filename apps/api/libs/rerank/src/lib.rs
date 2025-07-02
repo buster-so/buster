@@ -1,8 +1,8 @@
+use dotenv::dotenv;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use std::error::Error;
-use dotenv::dotenv;
 use std::env;
+use std::error::Error;
 
 pub struct Reranker {
     api_key: String,
@@ -71,4 +71,4 @@ struct RerankResponse {
 pub struct RerankResult {
     pub index: usize,
     pub relevance_score: f32,
-} 
+}
