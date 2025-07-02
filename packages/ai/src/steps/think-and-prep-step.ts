@@ -135,13 +135,17 @@ const thinkAndPrepExecution = async ({
     'messageUserClarifyingQuestion',
   ]);
 
+  // Get workflow start time from runtime context
+  const workflowStartTime = runtimeContext.get('workflowStartTime');
+  
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
     initialReasoningHistory,
     [],
     dashboardFiles, // Pass dashboard context
-    availableTools
+    availableTools,
+    workflowStartTime
   );
 
   try {

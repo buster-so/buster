@@ -257,6 +257,7 @@ export async function updateMessageFields(
     responseMessages?: any;
     reasoning?: any;
     rawLlmMessages?: any;
+    finalReasoningMessage?: string;
   }
 ): Promise<{ success: boolean }> {
   try {
@@ -278,6 +279,10 @@ export async function updateMessageFields(
     }
     if ('rawLlmMessages' in fields) {
       updateData.rawLlmMessages = fields.rawLlmMessages;
+    }
+
+    if ('finalReasoningMessage' in fields) {
+      updateData.finalReasoningMessage = fields.finalReasoningMessage;
     }
 
     await db
