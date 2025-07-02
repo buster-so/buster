@@ -728,7 +728,7 @@ importers:
         specifier: 'catalog:'
         version: 4.3.16(react@18.3.1)(zod@3.25.67)
       drizzle-kit:
-        specifier: ^0.31.2
+        specifier: ^0.31.4
         version: 0.31.4
       drizzle-orm:
         specifier: 'catalog:'

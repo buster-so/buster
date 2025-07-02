@@ -232,11 +232,9 @@ async fn test_get_metric_admin_role_public_password() -> Result<()> {
     let result = get_metric_handler(&metric.id, &auth_user, None, None).await; // No password provided
 
     assert!(result.is_ok());
-    // Admins currently default to CanView if no explicit permission exists on the asset itself,
-    // even though check_permission_access returns true. This might be desired or not.
-    // Let's assert CanView for now, reflecting current check_permission_access behavior combined with handler logic.
+    // Admins should get Owner permissions regardless of explicit asset permissions
     let response = result.unwrap();
-    assert_eq!(response.permission, AssetPermissionRole::CanView);
+    assert_eq!(response.permission, AssetPermissionRole::Owner);
 
     cleanup_test_data(&[metric.id]).await?;
     Ok(())

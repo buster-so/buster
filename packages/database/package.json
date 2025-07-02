@@ -47,7 +47,7 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
-    "drizzle-kit": "^0.31.2",
+    "drizzle-kit": "^0.31.4",
     "drizzle-orm": "catalog:",
     "postgres": "^3.4.7",
     "zod": "catalog:"

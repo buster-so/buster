@@ -86,3 +86,4 @@ drizzle/meta/
 **/evals/**/*.eval.private.ts
 *.tsbuildinfo
 /packages/aTest/.mastra
+**/*.private.*

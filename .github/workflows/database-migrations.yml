@@ -1,18 +1,16 @@
-name: Deploy Trigger.dev Tasks - Staging
+name: Database Migrations
 
 on:
   push:
-    branches:
-      - staging
+    branches: [main, staging]
 
 jobs:
-  deploy-staging:
+  migrate:
     runs-on: blacksmith-8vcpu-ubuntu-2204
-    environment: staging
+    environment: ${{ github.ref_name }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
+      - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -38,10 +36,9 @@ jobs:
           
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
-      - name: 🚀 Deploy to Staging
+      
+      - name: Run migrations
+        run: pnpm run db:migrate
         env:
-          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
-        run: |
-          cd apps/trigger
-          pnpm dlx trigger.dev@v4-beta deploy --env staging
+          DATABASE_URL: ${{ secrets.DB_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'

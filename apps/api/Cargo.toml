@@ -20,7 +20,7 @@ resolver = "2"
 # Define shared dependencies for all workspace members
 [workspace.dependencies]
 anyhow = "1.0.86"
-chrono = { version = "=0.4.38", features = ["serde"] }
+chrono = { version = "=0.4.40", features = ["serde"] }
 serde = { version = "1.0.117", features = ["derive"] }
 serde_json = { version = "1.0.117", features = ["preserve_order"] }
 serde_yaml = "0.9.34"
@@ -64,7 +64,7 @@ tokio-postgres = "0.7"
 tokio-postgres-rustls = "0.13"
 regex = "1.10.6"
 sqlparser = { version = "0.54.0", features = ["visitor"] }
-arrow = { version = "54.0.0", features = ["json"] }
+arrow = { version = "55.1.0", features = ["json"] }
 async-compression = { version = "0.4.11", features = ["tokio"] }
 axum = { version = "0.7.5", features = ["ws"] }
 base64 = "0.21"
@@ -84,7 +84,7 @@ sentry = { version = "0.37.0", features = ["tokio"] }
 sentry-tower = { version = "0.37.0", features = ["axum", "http"] }
 sentry-tracing = { version = "0.37.0"}
 serde_urlencoded = "0.7.1"
-snowflake-api = "0.11.0"
+snowflake-api = "0.12.0"
 tempfile = "3.10.1"
 tiberius = { version = "0.12.2", default-features = false, features = [
     "chrono",

@@ -23,7 +23,7 @@ use database::vault::read_secret;
 use super::{
     bigquery_query::bigquery_query, databricks_query::databricks_query, mysql_query::mysql_query,
     postgres_query::postgres_query, redshift_query::redshift_query,
-    security_utils::query_safety_filter, snowflake_query::snowflake_query,
+    security_utils::query_safety_filter, snowflake_query::{snowflake_query, ProcessingResult},
     sql_server_query::sql_server_query,
 };
 
@@ -515,7 +515,16 @@ async fn route_to_query(
             
 
             match snowflake_query(snowflake_client, sql.to_owned()).await {
-                Ok(results) => results,
+                Ok(processing_result) => {
+                    match processing_result {
+                        ProcessingResult::Processed(results) => results,
+                        ProcessingResult::RawJson(json_string) => {
+                            tracing::warn!("Snowflake query returned raw JSON due to processing error: {}", json_string);
+                            // Return empty results for now - could be enhanced to parse JSON into DataType::Json
+                            Vec::new()
+                        }
+                    }
+                },
                 Err(e) => {
                     tracing::error!("There was an issue while fetching the tables: {}", e);
                     return Err(anyhow!(e));

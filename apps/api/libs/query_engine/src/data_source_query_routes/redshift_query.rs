@@ -30,30 +30,30 @@ pub async fn redshift_query(
         for (i, column) in row.columns().iter().enumerate() {
             let column_name = column.name();
             let type_info = column.type_info().clone().to_string();
+            
             let column_value = match type_info.as_str() {
-                "BOOL" => DataType::Bool(Some(row.get::<bool, _>(i))),
-                "BYTEA" => DataType::Bytea(Some(row.get::<Vec<u8>, _>(i))),
-                "CHAR" => DataType::Char(Some(row.get::<String, _>(i))),
-                "INT8" => DataType::Int8(Some(row.get::<i64, _>(i))),
-                "INT4" => DataType::Int4(Some(row.get::<i32, _>(i))),
-                "INT2" => DataType::Int2(Some(row.get::<i16, _>(i))),
-                "TEXT" | "VARCHAR" => DataType::Text(Some(row.get::<String, _>(i))),
-                "FLOAT4" => DataType::Float4(Some(row.get::<f32, _>(i))),
-                "FLOAT8" => DataType::Float8(Some(row.get::<f64, _>(i))),
+                "BOOL" => DataType::Bool(row.try_get::<Option<bool>, _>(i).unwrap_or(None)),
+                "BYTEA" => DataType::Bytea(row.try_get::<Option<Vec<u8>>, _>(i).unwrap_or(None)),
+                "CHAR" => DataType::Char(row.try_get::<Option<String>, _>(i).unwrap_or(None)),
+                "INT8" => DataType::Int8(row.try_get::<Option<i64>, _>(i).unwrap_or(None)),
+                "INT4" => DataType::Int4(row.try_get::<Option<i32>, _>(i).unwrap_or(None)),
+                "INT2" => DataType::Int2(row.try_get::<Option<i16>, _>(i).unwrap_or(None)),
+                "TEXT" | "VARCHAR" | "CHARACTER VARYING" => DataType::Text(row.try_get::<Option<String>, _>(i).unwrap_or(None)),
+                "FLOAT4" => DataType::Float4(row.try_get::<Option<f32>, _>(i).unwrap_or(None)),
+                "FLOAT8" => DataType::Float8(row.try_get::<Option<f64>, _>(i).unwrap_or(None)),
                 "NUMERIC" => {
-                    let value: BigDecimal = row.get::<BigDecimal, _>(i);
-                    let value: f64 = value.to_f64().unwrap();
-                    DataType::Float8(Some(value))
+                    match row.try_get::<Option<BigDecimal>, _>(i).unwrap_or(None) {
+                        Some(value) => DataType::Float8(value.to_f64()),
+                        None => DataType::Float8(None),
+                    }
                 }
-                "UUID" => DataType::Uuid(Some(row.get::<uuid::Uuid, _>(i))),
-                "TIMESTAMP" => DataType::Timestamp(Some(row.get::<chrono::NaiveDateTime, _>(i))),
-                "DATE" => DataType::Date(Some(row.get::<chrono::NaiveDate, _>(i))),
-                "TIME" => DataType::Time(Some(row.get::<chrono::NaiveTime, _>(i))),
-                "TIMESTAMPTZ" => {
-                    DataType::Timestamptz(Some(row.get::<chrono::DateTime<Utc>, _>(i)))
-                }
-                "JSON" | "JSONB" => DataType::Json(Some(row.get::<serde_json::Value, _>(i))),
-                _ => DataType::Unknown(Some(row.get::<String, _>(i))),
+                "UUID" => DataType::Uuid(row.try_get::<Option<uuid::Uuid>, _>(i).unwrap_or(None)),
+                "TIMESTAMP" => DataType::Timestamp(row.try_get::<Option<chrono::NaiveDateTime>, _>(i).unwrap_or(None)),
+                "DATE" => DataType::Date(row.try_get::<Option<chrono::NaiveDate>, _>(i).unwrap_or(None)),
+                "TIME" => DataType::Time(row.try_get::<Option<chrono::NaiveTime>, _>(i).unwrap_or(None)),
+                "TIMESTAMPTZ" => DataType::Timestamptz(row.try_get::<Option<chrono::DateTime<Utc>>, _>(i).unwrap_or(None)),
+                "JSON" | "JSONB" => DataType::Json(row.try_get::<Option<serde_json::Value>, _>(i).unwrap_or(None)),
+                _ => DataType::Unknown(row.try_get::<Option<String>, _>(i).unwrap_or(None)),
             };
 
             row_map.insert(column_name.to_string(), column_value);

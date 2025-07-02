@@ -190,6 +190,9 @@ const SNOWFLAKE_DIALECT_GUIDANCE: &str = r##"
 "##;
 
 const BIGQUERY_DIALECT_GUIDANCE: &str = r##"
+- You must escape the `<PROJECT_ID>.<DATASET_ID>.<TABLE_ID>` format for table names. with the backtick character or it wont compile.
+  - Or exclude the project id from the table name.
+  - If any use the `-` you need to escape it with a backtick.
 - **Date/Time Functions (BigQuery)**:
   - **`DATE_TRUNC`**: `DATE_TRUNC(column, DAY)`, `DATE_TRUNC(column, WEEK)`, `DATE_TRUNC(column, MONTH)`, etc. Week starts Sunday by default, use `WEEK(MONDAY)` for Monday start.
   - **`EXTRACT`**: `EXTRACT(DAYOFWEEK FROM column)` (1=Sun, 7=Sat), `EXTRACT(ISOWEEK FROM column)`.
