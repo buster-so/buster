@@ -37,14 +37,19 @@ function ChartComponent<
   const renderChart = () => {
     if (!canvasRef.current) return;
 
-    chartRef.current = new ChartJS(canvasRef.current, {
-      type,
-      data: cloneData(data, datasetIdKey),
-      options: options && { ...options },
-      plugins
-    });
+    try {
+      chartRef.current = new ChartJS(canvasRef.current, {
+        type,
+        data: cloneData(data, datasetIdKey),
+        options: options && { ...options },
+        plugins
+      });
 
-    reforwardRef(ref, chartRef.current as ChartJS<TType, TData, TLabel>);
+      reforwardRef(ref, chartRef.current as ChartJS<TType, TData, TLabel>);
+    } catch (error) {
+      destroyChart();
+      console.error('🎯 Chart.js failed to initialize:', error);
+    }
   };
 
   const destroyChart = () => {
@@ -70,34 +75,46 @@ function ChartComponent<
 
   useEffect(() => {
     if (!redraw && chartRef.current && options) {
-      setOptions(chartRef.current, options);
+      try {
+        setOptions(chartRef.current, options);
+      } catch (error) {
+        console.error('🎯 Chart.js failed to set options:', error);
+      }
     }
   }, [redraw, options]);
 
   useEffect(() => {
     if (!redraw && chartRef.current) {
-      setLabels(
-        chartRef.current.config.data as ChartData<
-          keyof ChartTypeRegistry,
-          (number | [number, number] | Point | BubbleDataPoint | null)[],
-          unknown
-        >,
-        data.labels
-      );
+      try {
+        setLabels(
+          chartRef.current.config.data as ChartData<
+            keyof ChartTypeRegistry,
+            (number | [number, number] | Point | BubbleDataPoint | null)[],
+            unknown
+          >,
+          data.labels
+        );
+      } catch (error) {
+        console.error('🎯 Chart.js failed to set labels:', error);
+      }
     }
   }, [redraw, data.labels]);
 
   useEffect(() => {
     if (!redraw && chartRef.current && data.datasets) {
-      setDatasets(
-        chartRef.current.config.data as ChartData<
-          keyof ChartTypeRegistry,
-          (number | [number, number] | Point | BubbleDataPoint | null)[],
-          unknown
-        >,
-        data.datasets,
-        datasetIdKey
-      );
+      try {
+        setDatasets(
+          chartRef.current.config.data as ChartData<
+            keyof ChartTypeRegistry,
+            (number | [number, number] | Point | BubbleDataPoint | null)[],
+            unknown
+          >,
+          data.datasets,
+          datasetIdKey
+        );
+      } catch (error) {
+        console.error('🎯 Chart.js failed to set datasets:', error);
+      }
     }
   }, [redraw, data.datasets]);
 
