@@ -9,6 +9,12 @@ export interface ParsedTable {
   alias?: string;
 }
 
+export interface QueryTypeCheckResult {
+  isReadOnly: boolean;
+  queryType?: string;
+  error?: string;
+}
+
 // Map data source syntax to node-sql-parser dialect
 const DIALECT_MAPPING: Record<string, string> = {
   // Direct mappings
@@ -330,4 +336,48 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
   }
 
   return tables;
+}
+
+/**
+ * Checks if a SQL query is read-only (SELECT statements only)
+ * Returns error if query contains write operations
+ */
+export function checkQueryIsReadOnly(sql: string, dataSourceSyntax?: string): QueryTypeCheckResult {
+  const dialect = getParserDialect(dataSourceSyntax);
+  const parser = new Parser();
+
+  try {
+    // Parse SQL into AST with the appropriate dialect
+    const ast = parser.astify(sql, { database: dialect });
+    
+    // Handle single statement or array of statements
+    const statements = Array.isArray(ast) ? ast : [ast];
+    
+    // Check each statement
+    for (const statement of statements) {
+      // Check if statement has a type property
+      if ('type' in statement && statement.type) {
+        const queryType = statement.type.toLowerCase();
+        
+        // Only allow SELECT statements
+        if (queryType !== 'select') {
+          return {
+            isReadOnly: false,
+            queryType: statement.type,
+            error: `Query type '${statement.type}' is not allowed. Only SELECT statements are permitted for read-only access.`
+          };
+        }
+      }
+    }
+    
+    return {
+      isReadOnly: true,
+      queryType: 'select'
+    };
+  } catch (error) {
+    return {
+      isReadOnly: false,
+      error: `Failed to parse SQL for query type check: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+  }
 }

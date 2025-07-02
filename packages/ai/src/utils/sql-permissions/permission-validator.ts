@@ -1,5 +1,5 @@
 import { getPermissionedDatasets } from '@buster/access-controls';
-import { extractPhysicalTables, extractTablesFromYml, tablesMatch, type ParsedTable } from './sql-parser-helpers';
+import { extractPhysicalTables, extractTablesFromYml, tablesMatch, checkQueryIsReadOnly, type ParsedTable } from './sql-parser-helpers';
 
 export interface PermissionValidationResult {
   isAuthorized: boolean;
@@ -17,6 +17,16 @@ export async function validateSqlPermissions(
   dataSourceSyntax?: string
 ): Promise<PermissionValidationResult> {
   try {
+    // First check if query is read-only
+    const readOnlyCheck = checkQueryIsReadOnly(sql, dataSourceSyntax);
+    if (!readOnlyCheck.isReadOnly) {
+      return {
+        isAuthorized: false,
+        unauthorizedTables: [],
+        error: readOnlyCheck.error || 'Only read-only queries are allowed'
+      };
+    }
+    
     // Extract physical tables from SQL
     const tablesInQuery = extractPhysicalTables(sql, dataSourceSyntax);
     

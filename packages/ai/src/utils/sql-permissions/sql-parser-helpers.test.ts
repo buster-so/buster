@@ -5,6 +5,7 @@ import {
   normalizeTableIdentifier,
   tablesMatch,
   extractTablesFromYml,
+  checkQueryIsReadOnly,
   type ParsedTable
 } from './sql-parser-helpers';
 
@@ -408,6 +409,84 @@ models:
       const invalidYml = 'not valid yaml: [}';
       const tables2 = extractTablesFromYml(invalidYml);
       expect(tables2).toHaveLength(0);
+    });
+  });
+
+  describe('checkQueryIsReadOnly', () => {
+    it('should allow SELECT statements', () => {
+      const result = checkQueryIsReadOnly('SELECT * FROM users');
+      expect(result.isReadOnly).toBe(true);
+      expect(result.queryType).toBe('select');
+      expect(result.error).toBeUndefined();
+    });
+
+    it('should allow SELECT with JOIN', () => {
+      const result = checkQueryIsReadOnly('SELECT u.id, o.total FROM users u JOIN orders o ON u.id = o.user_id');
+      expect(result.isReadOnly).toBe(true);
+    });
+
+    it('should allow SELECT with CTEs', () => {
+      const sql = `
+        WITH stats AS (
+          SELECT user_id, COUNT(*) as count FROM orders GROUP BY user_id
+        )
+        SELECT * FROM stats
+      `;
+      const result = checkQueryIsReadOnly(sql);
+      expect(result.isReadOnly).toBe(true);
+    });
+
+    it('should reject INSERT statements', () => {
+      const result = checkQueryIsReadOnly('INSERT INTO users (name, email) VALUES ("John", "john@example.com")');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.queryType).toBe('insert');
+      expect(result.error).toContain("Query type 'insert' is not allowed");
+    });
+
+    it('should reject UPDATE statements', () => {
+      const result = checkQueryIsReadOnly('UPDATE users SET name = "Jane" WHERE id = 1');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.queryType).toBe('update');
+      expect(result.error).toContain("Query type 'update' is not allowed");
+    });
+
+    it('should reject DELETE statements', () => {
+      const result = checkQueryIsReadOnly('DELETE FROM users WHERE id = 1');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.queryType).toBe('delete');
+      expect(result.error).toContain("Query type 'delete' is not allowed");
+    });
+
+    it('should reject CREATE statements', () => {
+      const result = checkQueryIsReadOnly('CREATE TABLE new_users (id INT, name VARCHAR(100))');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.queryType).toBe('create');
+      expect(result.error).toContain("Query type 'create' is not allowed");
+    });
+
+    it('should reject DROP statements', () => {
+      const result = checkQueryIsReadOnly('DROP TABLE users');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.queryType).toBe('drop');
+      expect(result.error).toContain("Query type 'drop' is not allowed");
+    });
+
+    it('should reject ALTER statements', () => {
+      const result = checkQueryIsReadOnly('ALTER TABLE users ADD COLUMN age INT');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.queryType).toBe('alter');
+      expect(result.error).toContain("Query type 'alter' is not allowed");
+    });
+
+    it('should handle PostgreSQL dialect', () => {
+      const result = checkQueryIsReadOnly('SELECT * FROM postgres.public.users', 'postgres');
+      expect(result.isReadOnly).toBe(true);
+    });
+
+    it('should handle invalid SQL gracefully', () => {
+      const result = checkQueryIsReadOnly('NOT VALID SQL');
+      expect(result.isReadOnly).toBe(false);
+      expect(result.error).toContain('Failed to parse SQL');
     });
   });
 });

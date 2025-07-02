@@ -227,6 +227,72 @@ describe('Permission Validator', () => {
       expect(result.error).toContain('Failed to parse SQL');
     });
 
+    it('should reject INSERT statements', async () => {
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
+        {
+          ymlFile: `
+            models:
+              - name: users
+                schema: public
+          `,
+        },
+      ] as any);
+
+      const result = await validateSqlPermissions('INSERT INTO public.users (name) VALUES ("test")', 'user123');
+
+      expect(result.isAuthorized).toBe(false);
+      expect(result.error).toContain("Query type 'insert' is not allowed");
+      expect(result.unauthorizedTables).toHaveLength(0);
+    });
+
+    it('should reject UPDATE statements', async () => {
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
+        {
+          ymlFile: `
+            models:
+              - name: users
+                schema: public
+          `,
+        },
+      ] as any);
+
+      const result = await validateSqlPermissions('UPDATE public.users SET name = "updated" WHERE id = 1', 'user123');
+
+      expect(result.isAuthorized).toBe(false);
+      expect(result.error).toContain("Query type 'update' is not allowed");
+    });
+
+    it('should reject DELETE statements', async () => {
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
+        {
+          ymlFile: `
+            models:
+              - name: users
+                schema: public
+          `,
+        },
+      ] as any);
+
+      const result = await validateSqlPermissions('DELETE FROM public.users WHERE id = 1', 'user123');
+
+      expect(result.isAuthorized).toBe(false);
+      expect(result.error).toContain("Query type 'delete' is not allowed");
+    });
+
+    it('should reject CREATE TABLE statements', async () => {
+      const result = await validateSqlPermissions('CREATE TABLE new_table (id INT)', 'user123');
+
+      expect(result.isAuthorized).toBe(false);
+      expect(result.error).toContain("Query type 'create' is not allowed");
+    });
+
+    it('should reject DROP TABLE statements', async () => {
+      const result = await validateSqlPermissions('DROP TABLE users', 'user123');
+
+      expect(result.isAuthorized).toBe(false);
+      expect(result.error).toContain("Query type 'drop' is not allowed");
+    });
+
     it('should handle multiple datasets with overlapping tables', async () => {
       vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
         {
