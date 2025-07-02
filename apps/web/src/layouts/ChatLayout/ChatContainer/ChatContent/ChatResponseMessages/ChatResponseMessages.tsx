@@ -31,9 +31,9 @@ export const ChatResponseMessages: React.FC<ChatResponseMessagesProps> = React.m
       <MessageContainer
         className="group flex w-full flex-col space-y-3 overflow-hidden"
         hideAvatar={hideAvatar}
-        isCompletedStream={false}
-        isFinishedReasoning={false}
-        hasReasoningMessage={false}>
+        isCompletedStream={isCompletedStream}
+        isFinishedReasoning={!!finalReasoningMessage}
+        hasReasoningMessage={!!lastReasoningMessageId}>
         {showReasoningMessage && (
           <ChatResponseReasoning
             reasoningMessageId={lastReasoningMessageId}
