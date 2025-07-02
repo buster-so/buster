@@ -282,6 +282,7 @@ pub async fn get_chat_handler(
                 reasoning,
                 msg.final_reasoning_message,
                 msg.created_at,
+                msg.updated_at,
                 msg.feedback,
                 msg.is_completed,
             )

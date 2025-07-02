@@ -303,6 +303,7 @@ pub async fn post_chat_handler(
                 vec![],
                 None,
                 message.created_at,
+                message.updated_at,
                 None,
                 true,
             );
@@ -853,6 +854,7 @@ pub async fn post_chat_handler(
         final_response_messages.clone(), // Use the reordered list
         reasoning_messages.clone(),
         Some(formatted_final_reasoning_duration.clone()), // Use formatted reasoning duration
+        Utc::now(),
         Utc::now(),
         None,
         true,
@@ -2896,6 +2898,7 @@ async fn initialize_chat(
             Vec::new(),
             None,
             Utc::now(),
+            Utc::now(),
             None,
             true,
         );
@@ -2936,6 +2939,7 @@ async fn initialize_chat(
             Vec::new(),
             Vec::new(),
             None,
+            Utc::now(),
             Utc::now(),
             None,
             true,
