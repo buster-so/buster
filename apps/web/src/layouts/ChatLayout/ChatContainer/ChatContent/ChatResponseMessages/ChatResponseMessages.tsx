@@ -25,12 +25,11 @@ export const ChatResponseMessages: React.FC<ChatResponseMessagesProps> = React.m
     });
     const showReasoningMessage =
       messageIndex === 0 ? !!lastReasoningMessageId || !isCompletedStream : true;
-    const hideAvatar = !lastReasoningMessageId;
 
     return (
       <MessageContainer
         className="group flex w-full flex-col space-y-3 overflow-hidden"
-        hideAvatar={hideAvatar}
+        hideAvatar={false}
         isCompletedStream={isCompletedStream}
         isFinishedReasoning={!!finalReasoningMessage}
         hasReasoningMessage={!!lastReasoningMessageId}>
