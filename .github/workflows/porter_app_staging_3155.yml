@@ -20,7 +20,7 @@ jobs:
               aws-region: ${{ secrets.AWS_REGION }}
           - name: Download SSL certificate from S3
             run: |
-              aws s3 cp ${{ secrets.CERT_S3_URL }} ./api/cert.pem
+              aws s3 cp ${{ secrets.CERT_S3_URL }} ./apps/api/cert.pem
           - name: Set Github tag
             id: vars
             run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
