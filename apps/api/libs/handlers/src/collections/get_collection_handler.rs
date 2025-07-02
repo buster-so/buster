@@ -97,8 +97,20 @@ pub async fn get_collection_handler(
 
     // Extract permission for consistent use in response
     // If the asset is public and the user has no direct permission, default to CanView
-    let permission = collection_with_permission.permission
+    let mut permission = collection_with_permission.permission
         .unwrap_or(AssetPermissionRole::CanView);
+
+    // Check if user is WorkspaceAdmin or DataAdmin for this organization
+    let is_admin = user.organizations.iter().any(|org| {
+        org.id == collection_with_permission.collection.organization_id
+            && (org.role == database::enums::UserOrganizationRole::WorkspaceAdmin
+                || org.role == database::enums::UserOrganizationRole::DataAdmin)
+    });
+
+    if is_admin {
+        // Admin users get Owner permissions
+        permission = AssetPermissionRole::Owner;
+    }
 
     let mut conn = match get_pg_pool().get().await {
         Ok(conn) => conn,

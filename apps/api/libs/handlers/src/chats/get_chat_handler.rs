@@ -354,7 +354,19 @@ pub async fn get_chat_handler(
     );
 
     // Get the user's permission
-    let user_permission = chat_with_permission.permission;
+    let mut user_permission = chat_with_permission.permission;
+
+    // Check if user is WorkspaceAdmin or DataAdmin for this organization
+    let is_admin = user.organizations.iter().any(|org| {
+        org.id == chat_with_permission.chat.organization_id
+            && (org.role == database::enums::UserOrganizationRole::WorkspaceAdmin
+                || org.role == database::enums::UserOrganizationRole::DataAdmin)
+    });
+
+    if is_admin {
+        // Admin users get Owner permissions
+        user_permission = Some(AssetPermissionRole::Owner);
+    }
 
     // Add permissions
     Ok(chat
