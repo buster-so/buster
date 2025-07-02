@@ -4,6 +4,7 @@ export { lsTool } from './file-tools/ls-tool';
 export { doneTool } from './communication-tools/done-tool';
 export { respondWithoutAnalysis } from './communication-tools/respond-without-analysis';
 export { submitThoughts } from './communication-tools/submit-thoughts-tool';
+export { messageUserClarifyingQuestion } from './communication-tools/message-user-clarifying-question';
 export { editFileTool } from './file-tools/edit-file-tool';
 export { globTool } from './file-tools/glob-tool';
 export { grepTool } from './file-tools/grep-tool';

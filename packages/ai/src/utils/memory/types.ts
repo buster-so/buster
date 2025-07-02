@@ -239,7 +239,9 @@ export const ThinkAndPrepOutputSchema = z.object({
   metadata: z
     .object({
       toolsUsed: z.array(z.string()),
-      finalTool: z.enum(['submitThoughts', 'respondWithoutAnalysis']).optional(),
+      finalTool: z
+        .enum(['submitThoughts', 'respondWithoutAnalysis', 'messageUserClarifyingQuestion'])
+        .optional(),
       text: z.string().optional(),
       reasoning: z.string().optional(),
     })

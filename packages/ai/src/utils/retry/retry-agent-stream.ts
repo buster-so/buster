@@ -42,7 +42,7 @@ function createWorkflowAwareHealingMessage(toolName: string, context?: WorkflowC
   const pipelineContext = `
 
 This workflow has two steps:
-1. think-and-prep mode: Available tools are sequentialThinking, executeSql, respondWithoutAnalysis, submitThoughts
+1. think-and-prep mode: Available tools are sequentialThinking, executeSql, respondWithoutAnalysis, submitThoughts, messageUserClarifyingQuestion
 2. analyst mode: Available tools are createMetrics, modifyMetrics, createDashboards, modifyDashboards, doneTool
 
 You are currently in ${currentStep} mode. Please use one of the tools available in your current mode.

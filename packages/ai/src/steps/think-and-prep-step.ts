@@ -84,6 +84,7 @@ const createStepResult = (
     finalTool: getLastToolUsed(outputMessages) as
       | 'submitThoughts'
       | 'respondWithoutAnalysis'
+      | 'messageUserClarifyingQuestion'
       | undefined,
     text: undefined,
     reasoning: undefined,
@@ -131,6 +132,7 @@ const thinkAndPrepExecution = async ({
     'executeSql',
     'respondWithoutAnalysis',
     'submitThoughts',
+    'messageUserClarifyingQuestion',
   ]);
 
   const chunkProcessor = new ChunkProcessor(
@@ -188,10 +190,14 @@ const thinkAndPrepExecution = async ({
               onChunk: createOnChunkHandler({
                 chunkProcessor,
                 abortController,
-                finishingToolNames: ['submitThoughts', 'respondWithoutAnalysis'],
+                finishingToolNames: [
+                  'submitThoughts',
+                  'respondWithoutAnalysis',
+                  'messageUserClarifyingQuestion',
+                ],
                 onFinishingTool: () => {
                   // Only set finished = true for respondWithoutAnalysis
-                  // submitThoughts should abort but not finish so workflow can continue
+                  // submitThoughts and messageUserClarifyingQuestion should abort but not finish so workflow can continue
                   const finishingToolName = chunkProcessor.getFinishingToolName();
                   if (finishingToolName === 'respondWithoutAnalysis') {
                     finished = true;

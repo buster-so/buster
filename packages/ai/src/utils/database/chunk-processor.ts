@@ -128,7 +128,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     this.messageId = messageId;
     this.dashboardContext = dashboardContext || [];
     this.availableTools = availableTools || new Set();
-    
+
     console.info('[ChunkProcessor] Constructor called:', {
       messageId,
       initialMessagesCount: initialMessages.length,
@@ -159,7 +159,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private isValidTool(toolName: string): boolean {
     // If no tools specified, accept all (backward compatibility)
     if (!this.availableTools) return true;
-    
+
     // Check if tool is in the available set
     return this.availableTools.has(toolName);
   }
@@ -234,7 +234,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   private handleToolCall(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-call') return;
-    
+
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -272,7 +272,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
     // Check if tool is valid for current step before processing into reasoning/response
     if (!this.isValidTool(chunk.toolName)) {
-      console.warn(`[ChunkProcessor] Tool ${chunk.toolName} not available in current step - excluding from reasoning/response`);
+      console.warn(
+        `[ChunkProcessor] Tool ${chunk.toolName} not available in current step - excluding from reasoning/response`
+      );
       // Tool is still added to raw messages above, but we skip reasoning/response processing
       return;
     }
@@ -384,7 +386,14 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     }
 
     // Check if this is a finishing tool
-    if (['doneTool', 'respondWithoutAnalysis', 'submitThoughts'].includes(chunk.toolName)) {
+    if (
+      [
+        'doneTool',
+        'respondWithoutAnalysis',
+        'submitThoughts',
+        'messageUserClarifyingQuestion',
+      ].includes(chunk.toolName)
+    ) {
       this.state.hasFinishingTool = true;
       this.state.finishedToolName = chunk.toolName;
     }
@@ -397,7 +406,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   private handleToolCallStart(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-call-streaming-start') return;
-    
+
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -428,7 +437,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
     // Check if tool is valid for current step before processing into reasoning/response
     if (!this.isValidTool(chunk.toolName)) {
-      console.warn(`[ChunkProcessor] Tool ${chunk.toolName} not available in current step - excluding from reasoning/response`);
+      console.warn(
+        `[ChunkProcessor] Tool ${chunk.toolName} not available in current step - excluding from reasoning/response`
+      );
       // Tool is still added to raw messages above, but we skip reasoning/response processing
       return;
     }
@@ -676,7 +687,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       // Check if tool is valid for current step before processing reasoning/response
       if (!this.isValidTool(chunk.toolName)) {
-        console.warn(`[ChunkProcessor] Tool result for ${chunk.toolName} added to messages but excluded from reasoning/response`);
+        console.warn(
+          `[ChunkProcessor] Tool result for ${chunk.toolName} added to messages but excluded from reasoning/response`
+        );
         // Clear the tool from tracking but don't process reasoning/response
         this.state.toolCallsInProgress.delete(chunk.toolCallId);
         return;
@@ -1314,6 +1327,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       'done-tool',
       'respondWithoutAnalysis',
       'respond-without-analysis',
+      'messageUserClarifyingQuestion',
+      'message-user-clarifying-question',
     ];
 
     if (responseTools.includes(toolName)) {
@@ -1550,6 +1565,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       'done-tool',
       'respondWithoutAnalysis',
       'respond-without-analysis',
+      'messageUserClarifyingQuestion',
+      'message-user-clarifying-question',
     ];
     return responseTools.includes(toolName);
   }
@@ -1576,6 +1593,13 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         case 'respond-without-analysis':
           message =
             getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+          break;
+
+        case 'messageUserClarifyingQuestion':
+        case 'message-user-clarifying-question':
+          message =
+            getOptimisticValue<string>(parseResult.extractedValues, 'clarifying_question', '') ||
+            '';
           break;
 
         default:
@@ -1622,6 +1646,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'respond-without-analysis':
         message =
           getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+        break;
+
+      case 'messageUserClarifyingQuestion':
+      case 'message-user-clarifying-question':
+        message =
+          getOptimisticValue<string>(parseResult.extractedValues, 'clarifying_question', '') || '';
         break;
     }
 
@@ -2151,7 +2181,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       // Update files object - move from dummy ID keys to actual ID keys
       const updatedFiles: Record<string, unknown> = {};
-      for (const [dummyId, actualId] of idMapping) {
+      for (const [dummyId, actualId] of Array.from(idMapping.entries())) {
         const fileData = typedEntry.files[dummyId];
         if (fileData && typeof fileData === 'object') {
           // Update the file data with actual ID
@@ -2221,7 +2251,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       dashboardContextLength: this.dashboardContext.length,
       dashboardContext: this.dashboardContext,
     });
-    
+
     const allFiles = extractFilesFromReasoning(this.state.reasoningHistory);
     const selectedFiles = selectFilesForResponse(allFiles, this.dashboardContext);
 
