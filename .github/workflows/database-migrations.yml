@@ -42,4 +42,3 @@ jobs:
         run: pnpm run db:migrate
         env:
           DATABASE_URL: ${{ secrets.DB_URL }}
-          NODE_TLS_REJECT_UNAUTHORIZED: '0'
