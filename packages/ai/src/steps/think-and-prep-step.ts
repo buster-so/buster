@@ -196,10 +196,10 @@ const thinkAndPrepExecution = async ({
                   'messageUserClarifyingQuestion',
                 ],
                 onFinishingTool: () => {
-                  // Only set finished = true for respondWithoutAnalysis
-                  // submitThoughts and messageUserClarifyingQuestion should abort but not finish so workflow can continue
+                  // Set finished = true for respondWithoutAnalysis and messageUserClarifyingQuestion
+                  // submitThoughts should abort but not finish so workflow can continue
                   const finishingToolName = chunkProcessor.getFinishingToolName();
-                  if (finishingToolName === 'respondWithoutAnalysis') {
+                  if (finishingToolName === 'respondWithoutAnalysis' || finishingToolName === 'messageUserClarifyingQuestion') {
                     finished = true;
                   }
                 },
