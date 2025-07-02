@@ -10,9 +10,6 @@ import type {
 } from '@buster/server-shared/chats';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
-import { hasFailureIndicators, hasFileFailureIndicators } from '../utils/database/types';
-import type { ExtractedFile } from '../utils/file-selection';
-import { createFileResponseMessages } from '../utils/file-selection';
 import {
   MessageHistorySchema,
   ReasoningHistorySchema,

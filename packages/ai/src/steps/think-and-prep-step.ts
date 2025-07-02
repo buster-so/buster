@@ -118,7 +118,12 @@ const thinkAndPrepExecution = async ({
 
   // Get initial data early to have dashboard context
   const initData = await getInitData();
-  const dashboardFiles = initData.dashboardFiles || [];
+  const dashboardFiles = (initData.dashboardFiles || []) as Array<{
+    id: string;
+    name: string;
+    versionNumber: number;
+    metricIds: string[];
+  }>;
 
   // Initialize chunk processor with initial messages, reasoning history, and dashboard context
   const availableTools = new Set([

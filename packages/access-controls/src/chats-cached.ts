@@ -3,9 +3,9 @@ import { canUserAccessChat } from './chats';
 
 // Cache configuration
 const cache = new LRUCache<string, boolean>({
-  max: 10000,                    // Maximum 10k entries
-  ttl: 30 * 1000,               // 30 seconds
-  updateAgeOnGet: true,         // Refresh TTL on access
+  max: 10000, // Maximum 10k entries
+  ttl: 30 * 1000, // 30 seconds
+  updateAgeOnGet: true, // Refresh TTL on access
 });
 
 // Metrics
@@ -25,21 +25,21 @@ export async function canUserAccessChatCached({
   chatId: string;
 }): Promise<boolean> {
   const cacheKey = `${userId}:${chatId}`;
-  
+
   // Check cache
   const cached = cache.get(cacheKey);
   if (cached !== undefined) {
     cacheHits++;
     return cached;
   }
-  
+
   // Cache miss - call the original function
   cacheMisses++;
   const hasAccess = await canUserAccessChat({ userId, chatId });
-  
+
   // Store the boolean result
   cache.set(cacheKey, hasAccess);
-  
+
   return hasAccess;
 }
 
@@ -49,7 +49,7 @@ export async function canUserAccessChatCached({
 export function getCacheStats() {
   const total = cacheHits + cacheMisses;
   const hitRate = total > 0 ? (cacheHits / total) * 100 : 0;
-  
+
   return {
     hits: cacheHits,
     misses: cacheMisses,
@@ -87,7 +87,7 @@ export function invalidateAccess(userId: string, chatId: string) {
  * Invalidate all cached entries for a specific user
  */
 export function invalidateUserAccess(userId: string) {
-  for (const key of cache.keys()) {
+  for (const key of Array.from(cache.keys())) {
     if (key.startsWith(`${userId}:`)) {
       cache.delete(key);
     }
@@ -98,7 +98,7 @@ export function invalidateUserAccess(userId: string) {
  * Invalidate all cached entries for a specific chat
  */
 export function invalidateChatAccess(chatId: string) {
-  for (const key of cache.keys()) {
+  for (const key of Array.from(cache.keys())) {
     if (key.endsWith(`:${chatId}`)) {
       cache.delete(key);
     }
