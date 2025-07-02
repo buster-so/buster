@@ -149,7 +149,14 @@ export const useTooltipOptions = ({
 
   useUnmount(() => {
     const tooltipEl = document.getElementById('buster-chartjs-tooltip');
-    if (tooltipEl) tooltipEl.remove();
+    if (tooltipEl) {
+      // Remove all event listeners before removing the element
+      const clonedEl = tooltipEl.cloneNode(true) as HTMLElement;
+      tooltipEl.parentNode?.replaceChild(clonedEl, tooltipEl);
+      clonedEl.remove();
+    }
+    // Clear the cache to prevent memory leaks
+    tooltipCache.current = {};
   });
 
   return tooltipOptions;

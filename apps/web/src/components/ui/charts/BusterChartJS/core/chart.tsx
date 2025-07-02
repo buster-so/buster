@@ -10,7 +10,6 @@ import type {
 } from 'chart.js';
 import { Chart as ChartJS } from 'chart.js';
 import { forwardRef, useEffect, useRef } from 'react';
-import { usePreviousRef } from '@/hooks';
 import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
 import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
 
@@ -33,8 +32,7 @@ function ChartComponent<
     ...canvasProps
   } = props as ChartProps;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef = useRef<ChartJS | null>(undefined);
-  const previousDatasets = usePreviousRef(data.datasets);
+  const chartRef = useRef<ChartJS | null>(null);
 
   const renderChart = () => {
     if (!canvasRef.current) return;
@@ -53,7 +51,19 @@ function ChartComponent<
     reforwardRef(ref, null);
 
     if (chartRef.current) {
+      // Clear all event listeners
+      chartRef.current.canvas?.replaceWith(chartRef.current.canvas.cloneNode(true));
+
+      // Stop any animations
+      chartRef.current.stop();
+
+      // Clear the chart
+      chartRef.current.clear();
+
+      // Destroy the chart instance
       chartRef.current.destroy();
+
+      // Nullify the reference
       chartRef.current = null;
     }
   };

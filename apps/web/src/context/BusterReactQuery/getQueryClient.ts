@@ -8,9 +8,6 @@ const PREFETCH_STALE_TIME = 1000 * 10; // 10 seconds
 const ERROR_RETRY_DELAY = 1 * 1000; // 1 second delay after error
 const GC_TIME = 1000 * 60 * 60 * 24 * 3; // 24 hours - matches persistence duration
 
-// Track which queries have been initialized
-const initializedQueries = new Set<string>();
-
 function makeQueryClient(params?: {
   openErrorNotification?: OpenErrorNotification;
   enabled?: boolean;
