@@ -41,14 +41,26 @@ export const SQLContainer: React.FC<{
 
     const onRunQueryPreflight = useMemoizedFn(async () => {
       setIsRunning(true);
-      await onRunQuery();
-      setIsRunning(false);
+      try {
+        await onRunQuery();
+      } catch (error) {
+        // Error handling is done by the parent component
+        console.error('Error running query:', error);
+      } finally {
+        setIsRunning(false);
+      }
     });
 
     const onSaveSQLPreflight = useMemoizedFn(async () => {
       setIsSaving(true);
-      await onSaveSQL?.();
-      setIsSaving(false);
+      try {
+        await onSaveSQL?.();
+      } catch (error) {
+        // Error handling is done by the parent component
+        console.error('Error saving SQL:', error);
+      } finally {
+        setIsSaving(false);
+      }
     });
 
     const memoizedFooter = useMemo(() => {
