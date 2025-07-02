@@ -22,13 +22,19 @@ async function markMigrationsAsApplied() {
   try {
     console.log('🔧 Initializing Drizzle migration tracking...\n');
 
+    // Create the drizzle schema if it doesn't exist
+    await db.execute(sql`
+      CREATE SCHEMA IF NOT EXISTS drizzle
+    `);
+
     // Create the __drizzle_migrations table if it doesn't exist
     await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
-        id SERIAL PRIMARY KEY,
-        hash text NOT NULL,
-        created_at timestamp DEFAULT current_timestamp
-      )
+      CREATE TABLE IF NOT EXISTS drizzle.__drizzle_migrations (
+        id SERIAL NOT NULL,
+        hash TEXT NOT NULL,
+        created_at BIGINT NULL,
+        CONSTRAINT __drizzle_migrations_pkey PRIMARY KEY (id)
+      ) TABLESPACE pg_default
     `);
 
     // Read the journal to get all migrations
@@ -43,12 +49,14 @@ async function markMigrationsAsApplied() {
 
       // Check if migration is already marked
       const existing = await db.execute(sql`
-        SELECT id FROM "__drizzle_migrations" WHERE hash = ${hash}
+        SELECT id FROM drizzle.__drizzle_migrations WHERE hash = ${hash}
       `);
 
       if (existing.length === 0) {
+        // Insert with created_at as current timestamp in milliseconds
+        const createdAt = Date.now();
         await db.execute(sql`
-          INSERT INTO "__drizzle_migrations" (hash) VALUES (${hash})
+          INSERT INTO drizzle.__drizzle_migrations (hash, created_at) VALUES (${hash}, ${createdAt})
         `);
         console.log(`✅ Marked migration as applied: ${hash}`);
       } else {
