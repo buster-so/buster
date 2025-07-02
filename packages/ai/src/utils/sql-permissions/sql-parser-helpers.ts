@@ -9,22 +9,64 @@ export interface ParsedTable {
   alias?: string;
 }
 
+// Map data source syntax to node-sql-parser dialect
+const DIALECT_MAPPING: Record<string, string> = {
+  // Direct mappings
+  mysql: 'mysql',
+  postgresql: 'postgresql',
+  sqlite: 'sqlite',
+  mariadb: 'mariadb',
+  bigquery: 'bigquery',
+  snowflake: 'snowflake',
+  redshift: 'postgresql', // Redshift uses PostgreSQL dialect
+  transactsql: 'transactsql',
+  flinksql: 'flinksql',
+  hive: 'hive',
+
+  // Alternative names
+  postgres: 'postgresql',
+  mssql: 'transactsql',
+  sqlserver: 'transactsql',
+  athena: 'postgresql', // Athena uses Presto/PostgreSQL syntax
+  db2: 'db2',
+  noql: 'mysql', // Default fallback for NoQL
+};
+
+function getParserDialect(dataSourceSyntax?: string): string {
+  if (!dataSourceSyntax) {
+    console.warn('[getParserDialect] No data source syntax provided, defaulting to postgresql');
+    return 'postgresql';
+  }
+
+  const dialect = DIALECT_MAPPING[dataSourceSyntax.toLowerCase()];
+  if (!dialect) {
+    console.warn(
+      `[getParserDialect] Unknown data source syntax: ${dataSourceSyntax}, defaulting to postgresql`
+    );
+    return 'postgresql';
+  }
+
+  return dialect;
+}
+
 /**
  * Extracts physical tables from SQL query, excluding CTEs
  * Returns database.schema.table references with proper qualification
  */
-export function extractPhysicalTables(sql: string): ParsedTable[] {
+export function extractPhysicalTables(sql: string, dataSourceSyntax?: string): ParsedTable[] {
+  const dialect = getParserDialect(dataSourceSyntax);
+  console.info('[extractPhysicalTables] Using dialect:', dialect, 'for syntax:', dataSourceSyntax);
+
   const parser = new Parser();
 
   try {
     console.info('[extractPhysicalTables] Parsing SQL:', sql);
-    
-    // Parse SQL into AST
-    const ast = parser.astify(sql);
 
-    // Get all table references from parser
-    // The parser returns tables in format "type::db::table" or "type::table"
-    const allTables = parser.tableList(sql);
+    // Parse SQL into AST with the appropriate dialect
+    const ast = parser.astify(sql, { database: dialect });
+
+    // Get all table references from parser with the appropriate dialect
+    const allTables = parser.tableList(sql, { database: dialect });
     console.info('[extractPhysicalTables] Raw table list from parser:', allTables);
 
     // Extract CTE names to exclude them
@@ -70,7 +112,10 @@ export function extractPhysicalTables(sql: string): ParsedTable[] {
       physicalTables.push(parsed);
     }
 
-    console.info('[extractPhysicalTables] Final physical tables:', JSON.stringify(physicalTables, null, 2));
+    console.info(
+      '[extractPhysicalTables] Final physical tables:',
+      JSON.stringify(physicalTables, null, 2)
+    );
     return physicalTables;
   } catch (error) {
     console.error('[extractPhysicalTables] Error parsing SQL:', error);
@@ -188,17 +233,27 @@ export function tablesMatch(queryTable: ParsedTable, permissionTable: ParsedTabl
   console.info('[tablesMatch] Comparing tables:');
   console.info('[tablesMatch] Query table:', JSON.stringify(queryTable));
   console.info('[tablesMatch] Permission table:', JSON.stringify(permissionTable));
-  
+
   // Exact table name must match
   if (queryTable.table.toLowerCase() !== permissionTable.table.toLowerCase()) {
-    console.info('[tablesMatch] Table names do not match:', queryTable.table, 'vs', permissionTable.table);
+    console.info(
+      '[tablesMatch] Table names do not match:',
+      queryTable.table,
+      'vs',
+      permissionTable.table
+    );
     return false;
   }
 
   // If permission specifies schema, query must match
   if (permissionTable.schema && queryTable.schema) {
     if (permissionTable.schema.toLowerCase() !== queryTable.schema.toLowerCase()) {
-      console.info('[tablesMatch] Schemas do not match:', queryTable.schema, 'vs', permissionTable.schema);
+      console.info(
+        '[tablesMatch] Schemas do not match:',
+        queryTable.schema,
+        'vs',
+        permissionTable.schema
+      );
       return false;
     }
   }
@@ -206,7 +261,12 @@ export function tablesMatch(queryTable: ParsedTable, permissionTable: ParsedTabl
   // If permission specifies database, query must match
   if (permissionTable.database && queryTable.database) {
     if (permissionTable.database.toLowerCase() !== queryTable.database.toLowerCase()) {
-      console.info('[tablesMatch] Databases do not match:', queryTable.database, 'vs', permissionTable.database);
+      console.info(
+        '[tablesMatch] Databases do not match:',
+        queryTable.database,
+        'vs',
+        permissionTable.database
+      );
       return false;
     }
   }
@@ -245,7 +305,10 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
   try {
     // Parse YML content
     const parsed = yaml.parse(ymlContent);
-    console.info('[extractTablesFromYml] Parsed YML structure:', `${JSON.stringify(parsed, null, 2).substring(0, 500)}...`);
+    console.info(
+      '[extractTablesFromYml] Parsed YML structure:',
+      `${JSON.stringify(parsed, null, 2).substring(0, 500)}...`
+    );
 
     // Check for flat format (top-level name, schema, database)
     if (parsed?.name && !parsed?.models && (parsed?.schema || parsed?.database)) {
@@ -281,7 +344,11 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
 
     // Look for models array
     if (parsed?.models && Array.isArray(parsed.models)) {
-      console.info('[extractTablesFromYml] Found models array with', parsed.models.length, 'models');
+      console.info(
+        '[extractTablesFromYml] Found models array with',
+        parsed.models.length,
+        'models'
+      );
       for (const model of parsed.models) {
         console.info('[extractTablesFromYml] Processing model:', JSON.stringify(model));
         // Process models that have name and at least schema or database
@@ -314,7 +381,10 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
             tables.push(parsedTable);
           }
         } else {
-          console.warn('[extractTablesFromYml] Skipping model without schema/database:', JSON.stringify(model));
+          console.warn(
+            '[extractTablesFromYml] Skipping model without schema/database:',
+            JSON.stringify(model)
+          );
         }
       }
     }

@@ -13,14 +13,16 @@ export interface PermissionValidationResult {
  */
 export async function validateSqlPermissions(
   sql: string,
-  userId: string
+  userId: string,
+  dataSourceSyntax?: string
 ): Promise<PermissionValidationResult> {
   try {
     console.info('[validateSqlPermissions] Starting validation for userId:', userId);
     console.info('[validateSqlPermissions] SQL query:', sql);
+    console.info('[validateSqlPermissions] Data source syntax:', dataSourceSyntax);
     
     // Extract physical tables from SQL
-    const tablesInQuery = extractPhysicalTables(sql);
+    const tablesInQuery = extractPhysicalTables(sql, dataSourceSyntax);
     console.info('[validateSqlPermissions] Tables extracted from SQL:', JSON.stringify(tablesInQuery, null, 2));
     
     if (tablesInQuery.length === 0) {

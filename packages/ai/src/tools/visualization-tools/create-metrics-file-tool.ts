@@ -1163,7 +1163,7 @@ async function processMetricFile(
   _fileName: string,
   ymlContent: string,
   dataSourceId: string,
-  _dataSourceDialect: string,
+  dataSourceDialect: string,
   userId: string,
   _organizationId: string,
   workflowId: string
@@ -1180,7 +1180,7 @@ async function processMetricFile(
     const metricId = randomUUID();
 
     // Validate SQL by running it
-    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, workflowId, userId);
+    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, workflowId, userId, dataSourceDialect);
 
     if (!sqlValidationResult.success) {
       return {
@@ -1240,7 +1240,8 @@ async function validateSql(
   sqlQuery: string,
   dataSourceId: string,
   workflowId: string,
-  userId: string
+  userId: string,
+  dataSourceSyntax?: string
 ): Promise<ValidationResult> {
   try {
     if (!sqlQuery.trim()) {
@@ -1257,7 +1258,7 @@ async function validateSql(
     }
 
     // Validate permissions before attempting to get data source
-    const permissionResult = await validateSqlPermissions(sqlQuery, userId);
+    const permissionResult = await validateSqlPermissions(sqlQuery, userId, dataSourceSyntax);
     if (!permissionResult.isAuthorized) {
       return {
         success: false,

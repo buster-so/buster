@@ -263,7 +263,8 @@ async function validateSql(
   sqlQuery: string,
   dataSourceId: string,
   workflowId: string,
-  userId: string
+  userId: string,
+  dataSourceSyntax?: string
 ): Promise<SqlValidationResult> {
   try {
     if (!sqlQuery.trim()) {
@@ -280,7 +281,7 @@ async function validateSql(
     }
 
     // Validate permissions before attempting to get data source
-    const permissionResult = await validateSqlPermissions(sqlQuery, userId);
+    const permissionResult = await validateSqlPermissions(sqlQuery, userId, dataSourceSyntax);
     if (!permissionResult.isAuthorized) {
       return {
         success: false,
@@ -431,7 +432,8 @@ async function processMetricFileUpdate(
   dataSourceId: string,
   workflowId: string,
   duration: number,
-  userId: string
+  userId: string,
+  dataSourceSyntax?: string
 ): Promise<{
   success: boolean;
   updatedFile?: typeof metricFiles.$inferSelect;
@@ -488,7 +490,7 @@ async function processMetricFileUpdate(
     }
 
     // Validate SQL if it has changed or if metadata is missing
-    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId, userId);
+    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId, userId, dataSourceSyntax);
     if (!sqlValidation.success) {
       const error = `SQL validation failed: ${sqlValidation.error}`;
       modificationResults.push({
@@ -592,6 +594,7 @@ const modifyMetricFiles = wrapTraced(
     const organizationId = runtimeContext?.get('organizationId') as string;
     const workflowStartTime = runtimeContext?.get('workflowStartTime') as number | undefined;
     const messageId = runtimeContext?.get('messageId') as string | undefined;
+    const dataSourceSyntax = runtimeContext?.get('dataSourceSyntax') as string | undefined;
 
     // Generate a unique workflow ID using start time and data source
     const workflowId = workflowStartTime
@@ -664,7 +667,8 @@ const modifyMetricFiles = wrapTraced(
             dataSourceId,
             workflowId,
             Date.now() - startTime,
-            userId
+            userId,
+            dataSourceSyntax
           );
 
           if (!result.success) {

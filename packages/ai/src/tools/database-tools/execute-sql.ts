@@ -372,7 +372,8 @@ async function executeSingleStatement(
     return { success: false, error: 'User authentication required for SQL execution' };
   }
 
-  const permissionResult = await validateSqlPermissions(limitedSql, userId);
+  const dataSourceSyntax = runtimeContext.get('dataSourceSyntax');
+  const permissionResult = await validateSqlPermissions(limitedSql, userId, dataSourceSyntax);
   if (!permissionResult.isAuthorized) {
     return {
       success: false,
