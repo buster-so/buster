@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
 import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { DataContainer } from './DataContainer';
@@ -49,19 +49,27 @@ export const AppVerticalCodeSplitter = forwardRef<AppSplitterRef, AppVerticalCod
       <AppSplitter
         ref={ref}
         leftPanelClassName={sqlContainerClassName}
-        leftChildren={
-          <SQLContainer
-            sql={sql}
-            setDatasetSQL={setSQL}
-            error={runSQLError}
-            onRunQuery={onRunQuery}
-            onSaveSQL={onSaveSQL}
-            disabledSave={disabledSave}
-            readOnly={readOnly}
-          />
-        }
+        leftChildren={useMemo(
+          () => (
+            <SQLContainer
+              sql={sql}
+              setDatasetSQL={setSQL}
+              error={runSQLError}
+              onRunQuery={onRunQuery}
+              onSaveSQL={onSaveSQL}
+              disabledSave={disabledSave}
+              readOnly={readOnly}
+            />
+          ),
+          [sql, setSQL, runSQLError, onRunQuery, onSaveSQL, disabledSave, readOnly]
+        )}
         rightPanelClassName={dataContainerClassName}
-        rightChildren={<DataContainer data={data} fetchingData={fetchingData} />}
+        rightChildren={useMemo(
+          () => (
+            <DataContainer data={data} fetchingData={fetchingData} />
+          ),
+          [data, fetchingData]
+        )}
         split="horizontal"
         defaultLayout={defaultLayout}
         autoSaveId={autoSaveId}
