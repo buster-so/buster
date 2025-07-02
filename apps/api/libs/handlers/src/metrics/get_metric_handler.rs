@@ -138,9 +138,22 @@ pub async fn get_metric_handler(
     tracing::debug!(metric_id = %metric_id, ?direct_permission_level, has_sufficient_direct_permission, "Direct permission check result");
 
     if has_sufficient_direct_permission {
-        // User has direct/admin permission, use that role
-        permission = direct_permission_level.unwrap_or(AssetPermissionRole::CanView); // Default just in case
-        tracing::debug!(metric_id = %metric_id, user_id = %user.id, ?permission, "Granting access via direct/admin permission.");
+        // Check if user is WorkspaceAdmin or DataAdmin for this organization
+        let is_admin = user.organizations.iter().any(|org| {
+            org.id == metric_file.organization_id
+                && (org.role == database::enums::UserOrganizationRole::WorkspaceAdmin
+                    || org.role == database::enums::UserOrganizationRole::DataAdmin)
+        });
+
+        if is_admin {
+            // Admin users get Owner permissions
+            permission = AssetPermissionRole::Owner;
+            tracing::debug!(metric_id = %metric_id, user_id = %user.id, ?permission, "Granting Owner access to admin user.");
+        } else {
+            // User has direct permission, use that role
+            permission = direct_permission_level.unwrap_or(AssetPermissionRole::CanView); // Default just in case
+            tracing::debug!(metric_id = %metric_id, user_id = %user.id, ?permission, "Granting access via direct permission.");
+        }
     } else {
         // No sufficient direct/admin permission, check public access rules
         tracing::debug!(metric_id = %metric_id, "Insufficient direct/admin permission. Checking public access rules.");
