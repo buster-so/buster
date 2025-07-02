@@ -10,18 +10,6 @@ import {
 } from '../utils/memory/types';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
-// Helper function to format duration
-const formatDuration = (durationMs: number): string => {
-  const seconds = Math.round(durationMs / 1000);
-
-  if (seconds < 60) {
-    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
-  }
-
-  const minutes = Math.floor(seconds / 60);
-
-  return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-};
 
 // Analyst-specific metadata schema
 const AnalystMetadataSchema = z.object({
@@ -46,6 +34,7 @@ const inputSchema = z.object({
     fileType: z.string().optional(),
     versionNumber: z.number().optional(),
   }).optional(),
+  finalReasoningMessage: z.string().optional(),
 });
 
 // Output schema passes through analyst data plus completion info
@@ -77,16 +66,10 @@ const markMessageCompleteExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   try {
     const messageId = runtimeContext.get('messageId');
-    const workflowStartTime = runtimeContext.get('workflowStartTime');
     const completedAt = new Date().toISOString();
 
-    // Calculate workflow duration
-    let finalReasoningMessage = 'complete';
-    if (workflowStartTime) {
-      const durationMs = Date.now() - workflowStartTime;
-      const formattedDuration = formatDuration(durationMs);
-      finalReasoningMessage = `Reasoned for ${formattedDuration}`;
-    }
+    // Use the finalReasoningMessage from ChunkProcessor if available
+    const finalReasoningMessage = inputData.finalReasoningMessage || 'complete';
 
     // If no messageId, this is expected when running without database operations
     if (!messageId) {

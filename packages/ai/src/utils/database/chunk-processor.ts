@@ -71,6 +71,7 @@ interface ChunkProcessorState {
   // Track if we've seen certain finishing tools
   hasFinishingTool: boolean;
   finishedToolName?: string;
+  finalReasoningMessage?: string; // Track the final reasoning message
 
   // Track the index of last processed message to avoid re-processing
   lastProcessedMessageIndex: number;
@@ -86,6 +87,7 @@ interface ChunkProcessorState {
 export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private state: ChunkProcessorState;
   private messageId: string | null;
+  private workflowStartTime: number; // Track workflow start time - always defined
   private lastSaveTime = 0;
   private readonly SAVE_THROTTLE_MS = 0; // Increased throttle for better batching
   private fileMessagesAdded = false; // Track if file messages have been added
@@ -123,22 +125,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       versionNumber: number;
       metricIds: string[];
     }>,
-    availableTools?: Set<string>
+    availableTools?: Set<string>,
+    workflowStartTime?: number
   ) {
     this.messageId = messageId;
     this.dashboardContext = dashboardContext || [];
     this.availableTools = availableTools || new Set();
+    // Always ensure workflowStartTime has a value - use current time if not provided
+    this.workflowStartTime = workflowStartTime || Date.now();
 
-    console.info('[ChunkProcessor] Constructor called:', {
-      messageId,
-      initialMessagesCount: initialMessages.length,
-      initialReasoningCount: initialReasoningHistory.length,
-      initialResponseCount: initialResponseHistory.length,
-      dashboardContextProvided: dashboardContext !== undefined,
-      dashboardContextLength: this.dashboardContext.length,
-      availableToolsCount: availableTools?.size,
-      availableTools: availableTools ? Array.from(availableTools) : undefined,
-    });
     this.state = {
       accumulatedMessages: [...initialMessages],
       currentAssistantMessage: null,
@@ -175,7 +170,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           break;
 
         case 'tool-call':
-          this.handleToolCall(chunk);
+          await this.handleToolCall(chunk);
           break;
 
         case 'tool-call-streaming-start':
@@ -232,8 +227,14 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     textPart.text += chunk.textDelta || '';
   }
 
-  private handleToolCall(chunk: TextStreamPart<T>) {
+  private async handleToolCall(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-call') return;
+    
+    console.log('[ChunkProcessor] handleToolCall:', {
+      toolName: chunk.toolName,
+      toolCallId: chunk.toolCallId,
+      hasArgs: !!chunk.args,
+    });
 
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
@@ -386,16 +387,72 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     }
 
     // Check if this is a finishing tool
-    if (
-      [
-        'doneTool',
-        'respondWithoutAnalysis',
-        'submitThoughts',
-        'messageUserClarifyingQuestion',
-      ].includes(chunk.toolName)
-    ) {
+    const finishingTools = [
+      'doneTool',
+      'respondWithoutAnalysis',
+      'submitThoughts',
+      'messageUserClarifyingQuestion',
+    ];
+    
+    if (finishingTools.includes(chunk.toolName)) {
       this.state.hasFinishingTool = true;
       this.state.finishedToolName = chunk.toolName;
+
+      // Tools that complete the ENTIRE workflow (not just a step)
+      const workflowCompletingTools = [
+        'doneTool',
+        'respondWithoutAnalysis', 
+        'messageUserClarifyingQuestion',
+      ];
+
+      // Only calculate and update finalReasoningMessage for tools that complete the entire workflow
+      if (workflowCompletingTools.includes(chunk.toolName)) {
+        // Calculate the final reasoning message
+        const durationMs = Date.now() - this.workflowStartTime;
+        const seconds = Math.round(durationMs / 1000);
+
+        if (seconds < 60) {
+          this.state.finalReasoningMessage = `Reasoned for ${seconds} second${seconds !== 1 ? 's' : ''}`;
+        } else {
+          const minutes = Math.floor(seconds / 60);
+          this.state.finalReasoningMessage = `Reasoned for ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+        }
+
+        console.log('[ChunkProcessor] Workflow-completing tool detected:', {
+          toolName: chunk.toolName,
+          messageId: this.messageId,
+          workflowStartTime: this.workflowStartTime,
+          currentTime: Date.now(),
+          durationMs,
+          seconds,
+          finalReasoningMessage: this.state.finalReasoningMessage,
+        });
+
+        // Update the database immediately for workflow-completing tools
+        if (this.messageId && this.state.finalReasoningMessage) {
+          console.log('[ChunkProcessor] Updating finalReasoningMessage in database:', {
+            messageId: this.messageId,
+            finalReasoningMessage: this.state.finalReasoningMessage,
+          });
+          
+          try {
+            await updateMessageFields(this.messageId, {
+              finalReasoningMessage: this.state.finalReasoningMessage,
+            });
+            console.log('[ChunkProcessor] Successfully updated finalReasoningMessage in database');
+          } catch (error) {
+            console.error('Error updating finalReasoningMessage in database:', {
+              messageId: this.messageId,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            });
+          }
+        }
+      } else {
+        console.log('[ChunkProcessor] Step-finishing tool detected (not updating finalReasoningMessage):', {
+          toolName: chunk.toolName,
+          messageId: this.messageId,
+        });
+      }
     }
 
     // Track SQL execution start time
@@ -406,6 +463,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   private handleToolCallStart(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-call-streaming-start') return;
+    
+    console.log('[ChunkProcessor] handleToolCallStart:', {
+      toolName: chunk.toolName,
+      toolCallId: chunk.toolCallId,
+    });
 
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
@@ -527,8 +589,64 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       }
     }
 
-    // Don't mark as finishing tool during streaming start - wait for complete tool call
-    // This prevents the stream from being aborted before we receive all the content
+    // Check if this is a workflow-completing tool and update finalReasoningMessage
+    // We do this here for streaming tools since they might not send a complete tool-call event
+    const workflowCompletingTools = [
+      'doneTool',
+      'respondWithoutAnalysis', 
+      'messageUserClarifyingQuestion',
+    ];
+
+    if (workflowCompletingTools.includes(chunk.toolName)) {
+      // DON'T mark as finishing tool here - that happens in handleToolCall
+      // We only want to update the finalReasoningMessage, not control the stream
+      
+      // Calculate the final reasoning message
+      const durationMs = Date.now() - this.workflowStartTime;
+      const seconds = Math.round(durationMs / 1000);
+
+      if (seconds < 60) {
+        this.state.finalReasoningMessage = `Reasoned for ${seconds} second${seconds !== 1 ? 's' : ''}`;
+      } else {
+        const minutes = Math.floor(seconds / 60);
+        this.state.finalReasoningMessage = `Reasoned for ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+      }
+
+      console.log('[ChunkProcessor] Workflow-completing tool detected in streaming start:', {
+        toolName: chunk.toolName,
+        messageId: this.messageId,
+        workflowStartTime: this.workflowStartTime,
+        currentTime: Date.now(),
+        durationMs,
+        seconds,
+        finalReasoningMessage: this.state.finalReasoningMessage,
+      });
+
+      // Update the database immediately for workflow-completing tools
+      if (this.messageId && this.state.finalReasoningMessage) {
+        console.log('[ChunkProcessor] Updating finalReasoningMessage in database from streaming start:', {
+          messageId: this.messageId,
+          finalReasoningMessage: this.state.finalReasoningMessage,
+        });
+        
+        // Don't await here to avoid blocking the stream
+        updateMessageFields(this.messageId, {
+          finalReasoningMessage: this.state.finalReasoningMessage,
+        })
+          .then(() => {
+            console.log('[ChunkProcessor] Successfully updated finalReasoningMessage in database from streaming start');
+          })
+          .catch((error) => {
+            console.error('Error updating finalReasoningMessage in database from streaming start:', {
+              messageId: this.messageId,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            });
+          });
+      }
+    }
+    
+    // Don't handle submitThoughts here - let it be handled normally in handleToolCall
+    // The stream control logic should remain unchanged
   }
 
   private handleToolCallDelta(chunk: TextStreamPart<T>) {
@@ -837,6 +955,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         rawLlmMessages: CoreMessage[];
         reasoning: ReasoningEntry[];
         responseMessages?: ResponseEntry[];
+        finalReasoningMessage?: string;
       } = {
         rawLlmMessages: allMessages,
         reasoning: this.state.reasoningHistory,
@@ -844,6 +963,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       if (this.state.responseHistory.length > 0) {
         updateFields.responseMessages = this.state.responseHistory;
+      }
+
+      // Include finalReasoningMessage if it's been set
+      if (this.state.finalReasoningMessage) {
+        updateFields.finalReasoningMessage = this.state.finalReasoningMessage;
       }
 
       await updateMessageFields(this.messageId, updateFields);
@@ -1726,6 +1850,13 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   }
 
   /**
+   * Get the final reasoning message
+   */
+  getFinalReasoningMessage(): string | undefined {
+    return this.state.finalReasoningMessage;
+  }
+
+  /**
    * Update SQL file content with results from tool execution
    */
   private updateSqlFileWithResults(toolCallId: string, toolResult: unknown): void {
@@ -2247,11 +2378,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Re-evaluates which files should be shown based on priority logic
    */
   private updateFileSelection(): void {
-    console.info('[ChunkProcessor] updateFileSelection called:', {
-      dashboardContextLength: this.dashboardContext.length,
-      dashboardContext: this.dashboardContext,
-    });
-
     const allFiles = extractFilesFromReasoning(this.state.reasoningHistory);
     const selectedFiles = selectFilesForResponse(allFiles, this.dashboardContext);
 
@@ -2261,11 +2387,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         files: selectedFiles,
         version: this.currentFileSelection.version + 1,
       };
-      console.info('File selection updated:', {
-        version: this.currentFileSelection.version,
-        filesCount: selectedFiles.length,
-        fileTypes: selectedFiles.map((f) => `${f.fileType}: ${f.fileName}`),
-      });
     }
   }
 
@@ -2309,11 +2430,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Add file messages to the beginning of response history
       this.state.responseHistory.unshift(...fileResponseMessages);
       this.fileMessagesAdded = true;
-
-      console.info('Inserted file selection into response messages:', {
-        fileCount: fileResponseMessages.length,
-        fileTypes: this.currentFileSelection.files.map((f) => `${f.fileType}: ${f.fileName}`),
-      });
     }
   }
 }

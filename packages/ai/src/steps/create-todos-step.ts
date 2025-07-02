@@ -218,7 +218,8 @@ const todoStepExecution = async ({
 
   // Initialize chunk processor for streaming with available tools
   const availableTools = new Set(['createTodoList']);
-  const chunkProcessor = new ChunkProcessor(messageId, [], [], [], undefined, availableTools);
+  const workflowStartTime = runtimeContext.get('workflowStartTime');
+  const chunkProcessor = new ChunkProcessor(messageId, [], [], [], undefined, availableTools, workflowStartTime);
 
   try {
     // Use the input data directly

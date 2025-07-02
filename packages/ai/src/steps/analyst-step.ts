@@ -52,6 +52,7 @@ const outputSchema = z.object({
       versionNumber: z.number().optional(),
     })
     .optional(),
+  finalReasoningMessage: z.string().optional(),
 });
 
 /**
@@ -189,7 +190,7 @@ function deduplicateMessages(messages: CoreMessage[]): CoreMessage[] {
   const deduplicated: CoreMessage[] = [];
   let duplicatesFound = 0;
 
-  for (const [index, msg] of messages.entries()) {
+  for (const [index, msg] of Array.from(messages.entries())) {
     const key = createMessageKey(msg);
     if (!seen.has(key)) {
       seen.add(key);
@@ -280,13 +281,17 @@ const analystExecution = async ({
   const availableTools = new Set(Object.keys(analystAgent.tools || {}));
   console.info('[Analyst Step] Available tools:', Array.from(availableTools));
 
+  // Get workflow start time from runtime context
+  const workflowStartTime = runtimeContext.get('workflowStartTime');
+
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
     transformedReasoning, // Pass transformed reasoning history
     transformedResponse, // Pass transformed response history
     inputData.dashboardContext, // Pass dashboard context
-    availableTools
+    availableTools,
+    workflowStartTime
   );
 
   // Messages come directly from think-and-prep step output
@@ -591,6 +596,7 @@ const analystExecution = async ({
       ...filesMetadata,
     },
     selectedFile,
+    finalReasoningMessage: chunkProcessor.getFinalReasoningMessage(),
   };
 };
 
