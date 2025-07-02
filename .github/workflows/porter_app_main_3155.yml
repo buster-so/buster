@@ -6,45 +6,6 @@
         - api/**
 name: Deploy to main
 jobs:
-  database-deploy:
-    runs-on: blacksmith-16vcpu-ubuntu-2204
-    environment: main
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Install Diesel CLI
-        run: cargo install diesel_cli --no-default-features --features postgres
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Download Postgres certificate from S3
-        run: |
-          mkdir -p ~/.postgresql
-          aws s3 cp ${{ secrets.CERT_S3_URL }} ~/.postgresql/root.crt
-
-      - name: Run migrations
-        working-directory: ./api
-        run: diesel migration run
-        env:
-          DATABASE_URL: ${{ secrets.DB_URL }}
-          PGSSLMODE: verify-full
-
   porter-deploy:
       runs-on: blacksmith-32vcpu-ubuntu-2204
       environment: main
