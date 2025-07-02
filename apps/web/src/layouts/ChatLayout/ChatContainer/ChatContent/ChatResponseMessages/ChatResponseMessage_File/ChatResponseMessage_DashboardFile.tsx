@@ -45,11 +45,11 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
       versionNumber: version_number
     },
     {
-      select: ({ dashboard, metrics }) => {
-        return { dashboard, metrics };
-      }
+      select: ({ dashboard, metrics }) => ({ dashboard, metrics })
     }
   );
+
+  const hasMetrics = Object.keys(dashboardResponse?.metrics || {}).length > 0;
 
   const HeaderWrapper = useMemo(() => {
     if (metricId) {
@@ -87,12 +87,12 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
         }}>
         <CollapisbleFileCard
           collapseContent={true}
-          collapsible={'chevron'}
+          collapsible={hasMetrics ? 'chevron' : false}
           selected={isSelectedFile}
           collapseDefaultIcon={<HeaderIcon isLoading={isLoading} isError={isError} />}
           fileName={FileInfo}
           headerWrapper={HeaderWrapper}>
-          {dashboardResponse ? (
+          {!hasMetrics ? null : dashboardResponse ? (
             <Content
               dashboardResponse={dashboardResponse}
               isFetched={isFetched}
