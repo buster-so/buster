@@ -46,8 +46,7 @@ const app = new Hono()
       return response;
     } catch (_error) {
       console.error('Error fetching data from Electric Shape', _error);
-      errorResponse('Error fetching data from Electric Shape', 500);
-      return;
+      throw errorResponse('Error fetching data from Electric Shape', 500);
     }
   });
 
