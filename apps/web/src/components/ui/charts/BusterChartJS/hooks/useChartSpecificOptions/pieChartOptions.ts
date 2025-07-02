@@ -13,6 +13,7 @@ import type {
 import { determineFontColorContrast } from '@/lib/colors';
 import { formatLabel } from '@/lib/columnFormatter';
 import { ArrayOperations } from '@/lib/math';
+import { countTotalDigits } from '@/lib/numbers';
 import { getPieInnerLabelTitle } from '../../../commonHelpers';
 import type { ChartProps } from '../../core';
 import type { ChartJSOrUndefined } from '../../core/types';
@@ -20,8 +21,6 @@ import type { ChartSpecificOptionsProps } from './interfaces';
 import { defaultLabelOptionConfig } from './labelOptionConfig';
 
 type PieOptions = ChartProps<'pie'>['options'] | ChartProps<'doughnut'>['options'];
-
-const COMPACT_THRESHOLD = 9999999; //seven digits
 
 export const pieOptionsHandler = ({
   pieDonutWidth = 0
@@ -155,7 +154,7 @@ const getInnerLabelValue = (
 
     const formattedLabel = formatLabel(result, {
       ...yColumnLabel,
-      compactNumbers: yColumnLabel?.compactNumbers || result > COMPACT_THRESHOLD
+      compactNumbers: yColumnLabel?.compactNumbers || countTotalDigits(result) >= 9
     });
     return formattedLabel;
   } catch (error) {

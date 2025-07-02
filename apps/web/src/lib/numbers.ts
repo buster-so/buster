@@ -92,3 +92,21 @@ export const formatNumber = (
   }
   */
 };
+
+/**
+ * Counts the total number of digits in a number, including digits after the decimal point
+ * The number is first rounded to the specified number of decimal places before counting
+ * @param num - The number to count digits for
+ * @param roundToDecimals - Number of decimal places to round to before counting (default: 2)
+ * @returns The total count of digits (excluding the decimal point itself)
+ * @example
+ * countTotalDigits(123.456) // returns 5 (rounds to 123.46, counts 5 digits)
+ * countTotalDigits(123.456, 1) // returns 4 (rounds to 123.5, counts 4 digits)
+ * countTotalDigits(1000000) // returns 7
+ * countTotalDigits(-123.4) // returns 4 (ignores sign)
+ */
+export const countTotalDigits = (num: number, roundToDecimals: number = 2): number => {
+  const roundedNum = roundNumber(num, 0, roundToDecimals);
+  const str = Math.abs(roundedNum).toString();
+  return str.replace('.', '').length;
+};
