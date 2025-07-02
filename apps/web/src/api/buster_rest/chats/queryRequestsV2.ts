@@ -27,8 +27,6 @@ export const useStartNewChat = () => {
     },
     onSuccess: (data) => {
       const { iChat, iChatMessages } = updateChatToIChat(data);
-      console.log('iChat', iChat);
-      console.log('iChatMessages', iChatMessages);
       saveAllChatMessages(iChatMessages);
       onUpdateChat(iChat);
     }

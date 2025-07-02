@@ -32,22 +32,17 @@ export const getMyUserInfo_server = async ({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${jwtToken}`
     }
-  })
-    .then(async (response) => {
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw {
-          status: response.status,
-          statusText: response.statusText,
-          ...errorData
-        };
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      console.log('oh no!', error);
-      throw error;
-    });
+  }).then(async (response) => {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw {
+        status: response.status,
+        statusText: response.statusText,
+        ...errorData
+      };
+    }
+    return response.json();
+  });
 };
 
 export const getUser = async ({ userId }: { userId: string }) => {

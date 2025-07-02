@@ -62,7 +62,14 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
 
   const FileInfo = useMemo(() => {
     if (metricId) {
-      return <SelectDashboardButtonAndText fileName={file_name} dashboardId={id} chatId={chatId} />;
+      return (
+        <SelectDashboardButtonAndText
+          fileName={file_name}
+          dashboardId={id}
+          chatId={chatId}
+          versionNumber={version_number}
+        />
+      );
     }
 
     return <TextAndVersionText text={file_name} version={version_number} />;
@@ -225,7 +232,8 @@ const SelectDashboardButtonAndText: React.FC<{
   chatId: string;
   dashboardId: string;
   fileName: string;
-}> = React.memo(({ fileName, dashboardId, chatId }) => {
+  versionNumber: number;
+}> = React.memo(({ fileName, dashboardId, chatId, versionNumber }) => {
   return (
     <div className="flex w-full items-center justify-between space-x-1.5 overflow-hidden">
       <Text size={'base'} truncate>
@@ -233,9 +241,10 @@ const SelectDashboardButtonAndText: React.FC<{
       </Text>
       <Link
         href={createBusterRoute({
-          route: BusterRoutes.APP_CHAT_ID_DASHBOARD_ID,
+          route: BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_VERSION_NUMBER,
           chatId,
-          dashboardId
+          dashboardId,
+          versionNumber
         })}>
         <Button size={'small'} variant={'default'} className="min-w-fit">
           View dashboard

@@ -20,7 +20,6 @@ export default function ErrorBoundary({
     const isPosthogLoaded = posthog.__loaded;
 
     if (isPosthogLoaded) {
-      console.log('posthog.captureException', error);
       posthog.captureException(error);
     }
 

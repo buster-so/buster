@@ -83,7 +83,6 @@ export const useBlackBoxMessage = () => {
       const isLastReasoningMessageCompleted = lastReasoningMessage?.status === 'completed';
 
       if (!isMessageCompletedStream && isLastReasoningMessageCompleted) {
-        console.log('looping auto thought', { messageId });
         addBlackBoxMessage({ messageId });
         _loopAutoThought({ messageId });
       }
