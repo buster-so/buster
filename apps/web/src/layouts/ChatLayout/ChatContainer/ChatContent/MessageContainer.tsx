@@ -51,7 +51,7 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
             />
           )}
         </div>
-        <div className={cn('relative mt-1 w-full px-1', className)}>{children}</div>
+        <div className={cn('relative mt-0.5 w-full px-1', className)}>{children}</div>
       </div>
     );
   }

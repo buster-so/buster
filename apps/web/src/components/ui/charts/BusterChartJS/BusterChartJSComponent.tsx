@@ -223,7 +223,7 @@ const ChartMountedWrapper = ({ children }: { children: React.ReactNode }) => {
   });
 
   if (!isMounted) {
-    return <div className="bg-transparent" />;
+    return <div className="h-full w-full bg-transparent" />;
   }
 
   return children;

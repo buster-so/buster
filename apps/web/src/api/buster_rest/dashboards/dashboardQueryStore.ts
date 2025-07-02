@@ -41,7 +41,7 @@ export const useGetDashboardVersionNumber = (props?: {
 
   const effectiveVersionNumber = useMemo(() => {
     if (versionNumber === null) return null;
-    return versionNumber || paramVersionNumber || latestVersionNumber || 0;
+    return versionNumber || paramVersionNumber || latestVersionNumber || null;
   }, [versionNumber, paramVersionNumber, latestVersionNumber]);
 
   return useMemo(() => {
