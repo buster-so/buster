@@ -16,6 +16,7 @@ import {
 } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 import { trackFileAssociations } from './file-tracking-helper';
+import { validateSqlPermissions, createPermissionErrorMessage } from '../../utils/sql-permissions';
 
 // TypeScript types matching Rust DataMetadata structure
 enum SimpleType {
@@ -261,7 +262,8 @@ interface SqlValidationResult {
 async function validateSql(
   sqlQuery: string,
   dataSourceId: string,
-  workflowId: string
+  workflowId: string,
+  userId: string
 ): Promise<SqlValidationResult> {
   try {
     if (!sqlQuery.trim()) {
@@ -275,6 +277,15 @@ async function validateSql(
 
     if (!sqlQuery.toLowerCase().includes('from')) {
       return { success: false, error: 'SQL query must contain FROM clause' };
+    }
+
+    // Validate permissions before attempting to get data source
+    const permissionResult = await validateSqlPermissions(sqlQuery, userId);
+    if (!permissionResult.isAuthorized) {
+      return {
+        success: false,
+        error: createPermissionErrorMessage(permissionResult.unauthorizedTables)
+      };
     }
 
     // Get data source from workflow manager (reuses existing connections)
@@ -419,7 +430,8 @@ async function processMetricFileUpdate(
   ymlContent: string,
   dataSourceId: string,
   workflowId: string,
-  duration: number
+  duration: number,
+  userId: string
 ): Promise<{
   success: boolean;
   updatedFile?: typeof metricFiles.$inferSelect;
@@ -476,7 +488,7 @@ async function processMetricFileUpdate(
     }
 
     // Validate SQL if it has changed or if metadata is missing
-    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId);
+    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId, userId);
     if (!sqlValidation.success) {
       const error = `SQL validation failed: ${sqlValidation.error}`;
       modificationResults.push({
@@ -651,7 +663,8 @@ const modifyMetricFiles = wrapTraced(
             fileUpdate.yml_content,
             dataSourceId,
             workflowId,
-            Date.now() - startTime
+            Date.now() - startTime,
+            userId
           );
 
           if (!result.success) {

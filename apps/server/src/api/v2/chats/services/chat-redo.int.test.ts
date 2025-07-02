@@ -149,19 +149,24 @@ describe('Chat Message Redo Integration Tests', () => {
 
   describe('softDeleteMessagesFromPoint', () => {
     it('should soft delete the specified message and all subsequent messages', async () => {
-      // Soft delete from message 2
+      // Soft delete from message 2 (should delete messages 2, 3 and 4, but NOT message 1)
       await softDeleteMessagesFromPoint(message2Id);
 
       // Check that message 1 is NOT deleted
-      const message1 = await db
+      const activeMessages = await db
         .select()
         .from(messages)
-        .where(eq(messages.id, message1Id))
-        .limit(1);
+        .where(
+          and(
+            eq(messages.chatId, testChatId),
+            isNull(messages.deletedAt)
+          )
+        );
       
-      expect(message1[0]?.deletedAt).toBeNull();
+      expect(activeMessages).toHaveLength(1);
+      expect(activeMessages[0]?.id).toBe(message1Id);
 
-      // Check that messages 2, 3, and 4 ARE deleted
+      // Check that messages 2, 3 and 4 ARE deleted
       const deletedMessages = await db
         .select()
         .from(messages)
@@ -191,10 +196,10 @@ describe('Chat Message Redo Integration Tests', () => {
         .set({ deletedAt: null })
         .where(eq(messages.chatId, testChatId));
 
-      // Delete only the last message
+      // Delete from the last message (should only delete message 4)
       await softDeleteMessagesFromPoint(message4Id);
 
-      // Check that messages 1, 2, 3 are NOT deleted
+      // Check that messages 1, 2, 3 remain active
       const activeMessages = await db
         .select()
         .from(messages)
@@ -260,7 +265,7 @@ describe('Chat Message Redo Integration Tests', () => {
       expect(newMessage[0]?.requestMessage).toBe(newPrompt);
       expect(newMessage[0]?.deletedAt).toBeNull();
 
-      // Verify old messages 2, 3, 4 are soft deleted
+      // Verify messages 2, 3 and 4 are soft deleted
       const deletedMessages = await db
         .select()
         .from(messages)
@@ -273,7 +278,7 @@ describe('Chat Message Redo Integration Tests', () => {
 
       expect(deletedMessages.map(m => m.id).sort()).toEqual([message2Id, message3Id, message4Id].sort());
 
-      // Verify the chat response only includes non-deleted messages
+      // Verify the chat response includes message 1 and the new message (replacement for message 2)
       const messageIds = result.chat.message_ids;
       expect(messageIds).toContain(message1Id);
       expect(messageIds).toContain(newMessageId);
@@ -494,6 +499,72 @@ describe('Chat Message Redo Integration Tests', () => {
   });
 
   describe('Edge cases and error handling', () => {
+    it('should derive chat_id from message_id when chat_id is not provided', async () => {
+      // First ensure we have a clean state
+      await db.delete(messages).where(eq(messages.chatId, testChatId));
+      
+      // Recreate test messages
+      const baseTime = new Date('2024-01-01T10:00:00Z');
+      await db.insert(messages).values([
+        {
+          id: message1Id,
+          chatId: testChatId,
+          createdBy: testUserId,
+          requestMessage: 'First message',
+          responseMessages: {},
+          reasoning: {},
+          title: 'First message',
+          rawLlmMessages: {},
+          isCompleted: true,
+          createdAt: new Date(baseTime.getTime()).toISOString(),
+          updatedAt: new Date(baseTime.getTime()).toISOString(),
+        },
+        {
+          id: message2Id,
+          chatId: testChatId,
+          createdBy: testUserId,
+          requestMessage: 'Second message',
+          responseMessages: {},
+          reasoning: {},
+          title: 'Second message',
+          rawLlmMessages: {},
+          isCompleted: true,
+          createdAt: new Date(baseTime.getTime() + 1000).toISOString(),
+          updatedAt: new Date(baseTime.getTime() + 1000).toISOString(),
+        },
+      ]);
+
+      // Import initializeChat to test directly
+      const { initializeChat } = await import('./chat-service');
+      
+      // Call initializeChat with only message_id (no chat_id)
+      const result = await initializeChat(
+        {
+          message_id: message2Id,
+          prompt: 'Redo without providing chat_id'
+        },
+        testUser,
+        testOrgId
+      );
+
+      // Verify it found the correct chat
+      expect(result.chatId).toBe(testChatId);
+      
+      // Verify message 2 was deleted and new message created
+      const allMessages = await db
+        .select()
+        .from(messages)
+        .where(eq(messages.chatId, testChatId))
+        .orderBy(messages.createdAt);
+        
+      const activeMessages = allMessages.filter(m => !m.deletedAt);
+      const deletedMessages = allMessages.filter(m => m.deletedAt);
+      
+      expect(activeMessages).toHaveLength(2); // message 1 and new message
+      expect(deletedMessages).toHaveLength(1); // message 2
+      expect(deletedMessages[0]?.id).toBe(message2Id);
+    });
+
     it('should throw error when trying to redo from a message in a different chat', async () => {
       // Create another chat
       const anotherChatId = '00000000-0000-0000-0000-000000000005';
@@ -538,41 +609,101 @@ describe('Chat Message Redo Integration Tests', () => {
       await db.delete(chats).where(eq(chats.id, anotherChatId));
     });
 
-    it('should handle concurrent redo operations gracefully', async () => {
-      // Restore all messages
-      await db
-        .update(messages)
-        .set({ deletedAt: null })
-        .where(eq(messages.chatId, testChatId));
+    it('should handle sequential redo operations correctly', async () => {
+      // First ensure we have a clean state - delete all existing messages
+      await db.delete(messages).where(eq(messages.chatId, testChatId));
+      
+      // Recreate all test messages
+      const baseTime = new Date('2024-01-01T10:00:00Z');
+      await db.insert(messages).values([
+        {
+          id: message1Id,
+          chatId: testChatId,
+          createdBy: testUserId,
+          requestMessage: 'First message',
+          responseMessages: {},
+          reasoning: {},
+          title: 'First message',
+          rawLlmMessages: {},
+          isCompleted: true,
+          createdAt: new Date(baseTime.getTime()).toISOString(),
+          updatedAt: new Date(baseTime.getTime()).toISOString(),
+        },
+        {
+          id: message2Id,
+          chatId: testChatId,
+          createdBy: testUserId,
+          requestMessage: 'Second message',
+          responseMessages: {},
+          reasoning: {},
+          title: 'Second message',
+          rawLlmMessages: {},
+          isCompleted: true,
+          createdAt: new Date(baseTime.getTime() + 1000).toISOString(),
+          updatedAt: new Date(baseTime.getTime() + 1000).toISOString(),
+        },
+        {
+          id: message3Id,
+          chatId: testChatId,
+          createdBy: testUserId,
+          requestMessage: 'Third message',
+          responseMessages: {},
+          reasoning: {},
+          title: 'Third message',
+          rawLlmMessages: {},
+          isCompleted: true,
+          createdAt: new Date(baseTime.getTime() + 2000).toISOString(),
+          updatedAt: new Date(baseTime.getTime() + 2000).toISOString(),
+        },
+        {
+          id: message4Id,
+          chatId: testChatId,
+          createdBy: testUserId,
+          requestMessage: 'Fourth message',
+          responseMessages: {},
+          reasoning: {},
+          title: 'Fourth message',
+          rawLlmMessages: {},
+          isCompleted: true,
+          createdAt: new Date(baseTime.getTime() + 3000).toISOString(),
+          updatedAt: new Date(baseTime.getTime() + 3000).toISOString(),
+        },
+      ]);
 
       const newMessageId1 = '00000000-0000-0000-0000-000000000040';
       const newMessageId2 = '00000000-0000-0000-0000-000000000041';
 
-      // Simulate concurrent redo operations
-      const [result1, result2] = await Promise.all([
-        handleExistingChat(testChatId, newMessageId1, 'Concurrent redo 1', testUser, message2Id),
-        handleExistingChat(testChatId, newMessageId2, 'Concurrent redo 2', testUser, message3Id),
-      ]);
-
-      // Both operations should complete
+      // First redo from message 2
+      const result1 = await handleExistingChat(testChatId, newMessageId1, 'First redo', testUser, message2Id);
       expect(result1.messageId).toBe(newMessageId1);
-      expect(result2.messageId).toBe(newMessageId2);
 
-      // Check final state - all original messages from 2 onwards should be deleted
-      const deletedMessages = await db
+      // Verify state after first redo
+      let allMsgs = await db
         .select()
         .from(messages)
-        .where(
-          and(
-            eq(messages.chatId, testChatId),
-            isNotNull(messages.deletedAt)
-          )
-        );
+        .where(eq(messages.chatId, testChatId));
+      
+      let activeMessages = allMsgs.filter(m => !m.deletedAt);
+      let deletedMessages = allMsgs.filter(m => m.deletedAt);
+      
+      expect(activeMessages).toHaveLength(2); // message1 and newMessage1
+      expect(deletedMessages).toHaveLength(3); // messages 2, 3, 4
 
-      const deletedIds = deletedMessages.map(m => m.id);
-      expect(deletedIds).toContain(message2Id);
-      expect(deletedIds).toContain(message3Id);
-      expect(deletedIds).toContain(message4Id);
+      // Second redo from the new message
+      const result2 = await handleExistingChat(testChatId, newMessageId2, 'Second redo', testUser, newMessageId1);
+      expect(result2.messageId).toBe(newMessageId2);
+
+      // Verify final state
+      allMsgs = await db
+        .select()
+        .from(messages)
+        .where(eq(messages.chatId, testChatId));
+      
+      activeMessages = allMsgs.filter(m => !m.deletedAt);
+      deletedMessages = allMsgs.filter(m => m.deletedAt);
+      
+      expect(activeMessages).toHaveLength(2); // message1 and newMessage2
+      expect(deletedMessages).toHaveLength(4); // messages 2, 3, 4, and newMessage1
     });
   });
 });

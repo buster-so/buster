@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { ensureSqlLimit } from './sql-limit-helper';
+import { validateSqlPermissions, createPermissionErrorMessage } from '../../utils/sql-permissions';
 
 const executeSqlStatementInputSchema = z.object({
   statements: z.array(z.string()).describe(
@@ -284,7 +285,7 @@ const executeSqlStatement = wrapTraced(
         withRateLimit(
           'sql-execution',
           async () => {
-            const result = await executeSingleStatement(sqlStatement, dataSource);
+            const result = await executeSingleStatement(sqlStatement, dataSource, runtimeContext);
             return { sql: sqlStatement, result };
           },
           {
@@ -346,7 +347,8 @@ const executeSqlStatement = wrapTraced(
 
 async function executeSingleStatement(
   sqlStatement: string,
-  dataSource: DataSource
+  dataSource: DataSource,
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>
 ): Promise<{
   success: boolean;
   data?: Record<string, unknown>[];
@@ -363,6 +365,20 @@ async function executeSingleStatement(
 
   // Ensure the SQL statement has a LIMIT clause to prevent excessive results
   const limitedSql = ensureSqlLimit(sqlStatement, 25);
+
+  // Validate permissions before execution
+  const userId = runtimeContext.get('userId');
+  if (!userId) {
+    return { success: false, error: 'User authentication required for SQL execution' };
+  }
+
+  const permissionResult = await validateSqlPermissions(limitedSql, userId);
+  if (!permissionResult.isAuthorized) {
+    return {
+      success: false,
+      error: createPermissionErrorMessage(permissionResult.unauthorizedTables)
+    };
+  }
 
   // Attempt execution with retries
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {

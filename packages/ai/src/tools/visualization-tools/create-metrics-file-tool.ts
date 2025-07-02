@@ -11,6 +11,7 @@ import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { createInitialMetricVersionHistory, validateMetricYml } from './version-history-helpers';
 import type { MetricYml } from './version-history-types';
 import { trackFileAssociations } from './file-tracking-helper';
+import { validateSqlPermissions, createPermissionErrorMessage } from '../../utils/sql-permissions';
 
 // TypeScript types matching Rust DataMetadata structure
 enum SimpleType {
@@ -1163,7 +1164,7 @@ async function processMetricFile(
   ymlContent: string,
   dataSourceId: string,
   _dataSourceDialect: string,
-  _userId: string,
+  userId: string,
   _organizationId: string,
   workflowId: string
 ): Promise<MetricFileResult> {
@@ -1179,7 +1180,7 @@ async function processMetricFile(
     const metricId = randomUUID();
 
     // Validate SQL by running it
-    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, workflowId);
+    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, workflowId, userId);
 
     if (!sqlValidationResult.success) {
       return {
@@ -1238,7 +1239,8 @@ async function processMetricFile(
 async function validateSql(
   sqlQuery: string,
   dataSourceId: string,
-  workflowId: string
+  workflowId: string,
+  userId: string
 ): Promise<ValidationResult> {
   try {
     if (!sqlQuery.trim()) {
@@ -1252,6 +1254,15 @@ async function validateSql(
 
     if (!sqlQuery.toLowerCase().includes('from')) {
       return { success: false, error: 'SQL query must contain FROM clause' };
+    }
+
+    // Validate permissions before attempting to get data source
+    const permissionResult = await validateSqlPermissions(sqlQuery, userId);
+    if (!permissionResult.isAuthorized) {
+      return {
+        success: false,
+        error: createPermissionErrorMessage(permissionResult.unauthorizedTables)
+      };
     }
 
     // Get data source from workflow manager (reuses existing connections)
