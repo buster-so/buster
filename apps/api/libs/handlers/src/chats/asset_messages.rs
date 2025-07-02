@@ -46,9 +46,6 @@ pub async fn generate_asset_messages(
     // Fetch detailed asset information
     let mut conn = get_pg_pool().get().await?;
 
-    // Create the import_assets tool call sequence
-    let tool_call_id = format!("call_{}", Uuid::new_v4().simple().to_string());
-
     // Prepare asset data based on asset type
     let (asset_data, asset_type_str, additional_files) = match asset_type {
         AssetType::MetricFile => {
@@ -176,41 +173,19 @@ pub async fn generate_asset_messages(
     let mut all_files = vec![asset_data];
     all_files.extend(additional_files);
 
-    // Create the tool response result
-    let tool_response_result = json!({
-        "message": message_text,
-        "duration": 928, // Example duration
-        "files": all_files
+    // Create the user message with imported asset information
+    let user_message = serde_json::json!({
+        "role": "user",
+        "content": format!(
+            "I've imported the following {}:\n\n{}\n\nFile details:\n{}",
+            asset_type_str,
+            message_text,
+            serde_json::to_string_pretty(&all_files).unwrap_or_else(|_| "Unable to format file details".to_string())
+        )
     });
 
-    // Create the Assistant message with tool call using new content array format
-    let assistant_message = serde_json::json!({
-        "role": "assistant",
-        "content": [
-            {
-                "args": {},
-                "type": "tool-call",
-                "toolName": "import_assets",
-                "toolCallId": tool_call_id
-            }
-        ]
-    });
-
-    // Create the Tool response message using new content array format
-    let tool_message = serde_json::json!({
-        "role": "tool",
-        "content": [
-            {
-                "type": "tool-result",
-                "result": tool_response_result,
-                "toolName": "import_assets",
-                "toolCallId": tool_call_id
-            }
-        ]
-    });
-
-    // Combine into raw_llm_messages
-    let raw_llm_messages = serde_json::json!([assistant_message, tool_message]);
+    // Create raw_llm_messages with just the user message
+    let raw_llm_messages = serde_json::json!([user_message]);
 
     let message = Message {
         id: message_id,
