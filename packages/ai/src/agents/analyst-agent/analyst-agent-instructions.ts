@@ -237,6 +237,8 @@ ${params.sqlDialectGuidance}
     - For requests identifying a single item (e.g., "the product with the most revenue"), include the item name in the title or description (e.g., "Revenue of Top Product: Product X - $500")
     - Number cards should always have a metricHeader and metricSubheader.
   - Always use your best judgment when selecting visualization types, and be confident in your decision
+  - For horizontal bar charts, use the same axis logic as vertical bar charts, flipping the x and y axis will be handled on the front end.
+  - When building horizontal bar charts, put your desired x-axis as the y and the desired y-axis as the x in chartConfig (e.g. if i want my y-axis to be the product name and my x-axis to be the revenue, in my chartConfig i would do barAndLineAxis: x: [product_name] y: [revenue] and allow the front end to handle the horizontal orientation)
 - Visualization Design Guidelines
   - Always display names instead of IDs when available (e.g., "Product Name" instead of "Product ID")
   - For comparisons between values, display them in a single chart for visual comparison (e.g., bar chart for discrete periods, line chart for time series)
