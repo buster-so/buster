@@ -109,6 +109,7 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
     startColumnSpans: [],
     currentColumnSpans: columnSpans
   });
+  const [preventTransition, setPreventTransition] = useState(true);
 
   // Use refs to maintain stable references for event handlers and avoid stale closures
   const dragStateRef = useRef(dragState);
@@ -357,6 +358,14 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
     };
   }, [handleMouseMove, handleMouseUp]);
 
+  useEffect(() => {
+    //there was a bug was being applied on the first render of the component
+    const timeout = setTimeout(() => {
+      setPreventTransition(false);
+    }, 800);
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
     <div ref={containerRef} className={cn('relative h-full w-full', className)}>
       {/* Column Markers */}
@@ -374,13 +383,16 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
           const span = displayColumnSpans[index];
           const widthPercentage = (span / NUMBER_OF_COLUMNS) * 100;
 
+          console.log('widthPercentage', widthPercentage);
+
           return (
             <div
               key={`column-${index}`}
-              className="relative h-full transition-all duration-200 ease-out"
+              className="relative h-full"
               style={{
                 width: `${widthPercentage}%`,
-                transition: dragState.isDragging ? 'none' : 'width 200ms ease-out'
+                transition:
+                  dragState.isDragging || preventTransition ? 'none' : 'width 200ms ease-out'
               }}>
               {child}
 

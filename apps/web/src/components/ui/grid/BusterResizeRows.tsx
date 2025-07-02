@@ -57,8 +57,8 @@ export const BusterResizeRows: React.FC<{
     <div
       ref={ref}
       className={cn(
-        className,
-        'buster-resize-row relative mb-10 flex h-full w-full flex-col space-y-3 opacity-100 transition'
+        'buster-resize-row relative mb-10 flex h-full w-full flex-col space-y-3 opacity-100 transition',
+        className
       )}>
       <ResizeRowHandle
         id={TOP_SASH_ID}
@@ -162,7 +162,7 @@ const ResizeRowHandle: React.FC<{
     const showActive = (active || isDropzoneActive) && !readOnly;
 
     return (
-      <div className="relative">
+      <div className="relative" data-testid={`resize-row-handle-${id}`}>
         <button
           type="button"
           id={id}

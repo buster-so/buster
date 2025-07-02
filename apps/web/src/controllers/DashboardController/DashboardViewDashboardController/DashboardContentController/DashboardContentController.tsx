@@ -129,7 +129,7 @@ export const DashboardContentController: React.FC<{
     }, [dashboard?.id, remapMetrics]);
 
     return (
-      <div className="dashboard-content-controller">
+      <div className="dashboard-content-controller overflow-hidden">
         {hasMetrics && !!dashboardRows.length && !!dashboard ? (
           <DashboardContentControllerProvider dashboard={dashboard}>
             <BusterResizeableGrid
