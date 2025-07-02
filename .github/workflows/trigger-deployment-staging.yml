@@ -3,7 +3,7 @@ name: Deploy Trigger.dev Tasks - Staging
 on:
   push:
     branches:
-      - staging
+      - mastra-braintrust
     paths:
       - 'trigger/**'
       - 'package.json'
