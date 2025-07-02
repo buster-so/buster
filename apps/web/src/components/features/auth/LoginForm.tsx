@@ -4,7 +4,6 @@ import Cookies from 'js-cookie';
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { rustErrorHandler } from '@/api/buster_rest/errors';
 import { Button } from '@/components/ui/buttons';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
 import Github from '@/components/ui/icons/customIcons/Github';
@@ -37,23 +36,18 @@ export const LoginForm: React.FC = () => {
   const [signUpFlow, setSignUpFlow] = useState(true);
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const errorFallback = useMemoizedFn((error: unknown) => {
-    const errorMessage = rustErrorHandler(error);
-    if (errorMessage?.message) {
-      setErrorMessages(['Invalid email or password']);
-    } else {
-      setErrorMessages(['An error occurred']);
-    }
-  });
-
   const onSignInWithUsernameAndPassword = useMemoizedFn(
     async ({ email, password }: { email: string; password: string }) => {
       setLoading('email');
       try {
-        await signInWithEmailAndPassword({ email, password });
+        const result = await signInWithEmailAndPassword({ email, password });
+        if (result && 'success' in result && !result.success) {
+          setErrorMessages([result.error]);
+          setLoading(null);
+        }
       } catch (error: unknown) {
         console.error(error);
-        errorFallback(error);
+        setErrorMessages(['An unexpected error occurred. Please try again.']);
         setLoading(null);
       }
     }
@@ -62,10 +56,14 @@ export const LoginForm: React.FC = () => {
   const onSignInWithGoogle = useMemoizedFn(async () => {
     setLoading('google');
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      if (result && 'success' in result && !result.success) {
+        setErrorMessages([result.error]);
+        setLoading(null);
+      }
     } catch (error: unknown) {
       console.error(error);
-      errorFallback(error);
+      setErrorMessages(['An unexpected error occurred. Please try again.']);
       setLoading(null);
     }
   });
@@ -73,10 +71,14 @@ export const LoginForm: React.FC = () => {
   const onSignInWithGithub = useMemoizedFn(async () => {
     setLoading('github');
     try {
-      const res = await signInWithGithub();
+      const result = await signInWithGithub();
+      if (result && 'success' in result && !result.success) {
+        setErrorMessages([result.error]);
+        setLoading(null);
+      }
     } catch (error: unknown) {
       console.error(error);
-      errorFallback(error);
+      setErrorMessages(['An unexpected error occurred. Please try again.']);
       setLoading(null);
     }
   });
@@ -84,9 +86,14 @@ export const LoginForm: React.FC = () => {
   const onSignInWithAzure = useMemoizedFn(async () => {
     setLoading('azure');
     try {
-      await signInWithAzure();
+      const result = await signInWithAzure();
+      if (result && 'success' in result && !result.success) {
+        setErrorMessages([result.error]);
+        setLoading(null);
+      }
     } catch (error: unknown) {
-      errorFallback(error);
+      console.error(error);
+      setErrorMessages(['An unexpected error occurred. Please try again.']);
       setLoading(null);
     }
   });
@@ -94,11 +101,16 @@ export const LoginForm: React.FC = () => {
   const onSignUp = useMemoizedFn(async (d: { email: string; password: string }) => {
     setLoading('email');
     try {
-      await signUp(d);
-      setSignUpSuccess(true);
+      const result = await signUp(d);
+      if (result && 'success' in result && !result.success) {
+        setErrorMessages([result.error]);
+        setLoading(null);
+      } else {
+        setSignUpSuccess(true);
+      }
     } catch (error: unknown) {
       console.error(error);
-      errorFallback(error);
+      setErrorMessages(['An unexpected error occurred. Please try again.']);
       setLoading(null);
     }
   });
@@ -112,16 +124,7 @@ export const LoginForm: React.FC = () => {
       else onSignInWithUsernameAndPassword(d);
     } catch (error: unknown) {
       console.error(error);
-      const errorMessage = rustErrorHandler(error);
-      if (errorMessage?.message === 'User already registered') {
-        onSignInWithUsernameAndPassword(d);
-        return;
-      }
-      if (errorMessage?.message) {
-        setErrorMessages([errorMessage.message]);
-      } else {
-        setErrorMessages(['An error occurred']);
-      }
+      setErrorMessages(['An unexpected error occurred. Please try again.']);
       setLoading(null);
     }
   });

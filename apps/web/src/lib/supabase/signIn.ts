@@ -9,13 +9,18 @@ const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({
   route: BusterRoutes.AUTH_CALLBACK
 })}`;
 
+// Type for server action results
+type ServerActionResult<T = void> = 
+  | { success: true; data?: T }
+  | { success: false; error: string };
+
 export const signInWithEmailAndPassword = async ({
   email,
   password
 }: {
   email: string;
   password: string;
-}) => {
+}): Promise<ServerActionResult> => {
   'use server';
   const supabase = await createClient();
 
@@ -26,7 +31,8 @@ export const signInWithEmailAndPassword = async ({
 
   if (error) {
     console.error('supabase error', error);
-    throw error;
+    // Return the actual Supabase error message
+    return { success: false, error: error.message };
   }
 
   revalidatePath('/', 'layout');
@@ -37,7 +43,7 @@ export const signInWithEmailAndPassword = async ({
   );
 };
 
-export const signInWithGoogle = async () => {
+export const signInWithGoogle = async (): Promise<ServerActionResult<string>> => {
   'use server';
 
   const supabase = await createClient();
@@ -50,14 +56,14 @@ export const signInWithGoogle = async () => {
   });
 
   if (error) {
-    throw error;
+    return { success: false, error: error.message };
   }
 
   revalidatePath('/', 'layout');
   return redirect(data.url);
 };
 
-export const signInWithGithub = async () => {
+export const signInWithGithub = async (): Promise<ServerActionResult<string>> => {
   'use server';
 
   const supabase = await createClient();
@@ -70,14 +76,14 @@ export const signInWithGithub = async () => {
   });
 
   if (error) {
-    throw error;
+    return { success: false, error: error.message };
   }
 
   revalidatePath('/', 'layout');
   return redirect(data.url);
 };
 
-export const signInWithAzure = async () => {
+export const signInWithAzure = async (): Promise<ServerActionResult<string>> => {
   'use server';
 
   const supabase = await createClient();
@@ -91,13 +97,13 @@ export const signInWithAzure = async () => {
   });
 
   if (error) {
-    throw error;
+    return { success: false, error: error.message };
   }
   revalidatePath('/', 'layout');
   return redirect(data.url);
 };
 
-export const signUp = async ({ email, password }: { email: string; password: string }) => {
+export const signUp = async ({ email, password }: { email: string; password: string }): Promise<ServerActionResult> => {
   'use server';
   const supabase = await createClient();
   const authURL = createBusterRoute({
@@ -114,7 +120,8 @@ export const signUp = async ({ email, password }: { email: string; password: str
   });
   if (error) {
     console.error('supabase error in signUp', error);
-    throw error;
+    // Return the actual Supabase error message
+    return { success: false, error: error.message };
   }
 
   revalidatePath('/', 'layout');
