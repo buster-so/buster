@@ -7,6 +7,6 @@ export const getCurrencies = queryOptions<{ code: string; description: string; f
   staleTime: 1000 * 60 * 60 * 24 * 7 //7 days
 });
 
-export const nextjsQueryKeys = {
+export const currencyQueryKeys = {
   getCurrencies
 };

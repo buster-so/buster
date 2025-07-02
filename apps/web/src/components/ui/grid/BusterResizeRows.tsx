@@ -58,9 +58,7 @@ export const BusterResizeRows: React.FC<{
       ref={ref}
       className={cn(
         className,
-        'buster-resize-row relative',
-        'mb-10 flex h-full w-full flex-col space-y-3 transition',
-        'opacity-100'
+        'buster-resize-row relative mb-10 flex h-full w-full flex-col space-y-3 opacity-100 transition'
       )}>
       <ResizeRowHandle
         id={TOP_SASH_ID}
@@ -127,7 +125,8 @@ const ResizeRowHandle: React.FC<{
     const isDropzoneActive = showDropzone && isOver;
 
     const handler = useMemoizedFn((mouseDownEvent: React.MouseEvent<HTMLButtonElement>) => {
-      if (!index) return;
+      if (typeof index !== 'number') return;
+
       const startPosition = mouseDownEvent.pageY;
       const style = document.createElement('style');
       style.innerHTML = '* { cursor: row-resize; }';
@@ -135,7 +134,7 @@ const ResizeRowHandle: React.FC<{
       setIsDraggingResizeId(index);
 
       function onMouseMove(mouseMoveEvent: MouseEvent) {
-        if (!index) return;
+        if (typeof index !== 'number') return;
         const newSize = sizes[index] + (mouseMoveEvent.pageY - startPosition);
         const clampedSize = clamp(newSize, MIN_ROW_HEIGHT, MAX_ROW_HEIGHT);
         onResize(index, clampedSize);
@@ -168,9 +167,9 @@ const ResizeRowHandle: React.FC<{
           type="button"
           id={id}
           className={cn(
-            !readOnly && 'hover:bg-border cursor-row-resize',
+            !readOnly && !top && 'hover:bg-border cursor-row-resize',
             showActive && 'bg-primary! z-10 opacity-100',
-            'h-1 w-full cursor-pointer rounded-sm transition-colors duration-200 ease-in-out select-none',
+            'h-1 w-full rounded-sm transition-colors duration-200 ease-in-out select-none',
             !top && 'dragger absolute'
           )}
           style={memoizedStyle}

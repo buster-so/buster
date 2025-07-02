@@ -1,12 +1,8 @@
 import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import {
-  type ChartEncodes,
-  ChartType,
-  type ColumnSettings
-} from '@/api/asset_interfaces/metric/charts';
+import { type ChartEncodes, type ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { useGetCurrencies } from '@/api/buster_rest/nextjs/currency';
+import { useGetCurrencies } from '@/api/buster_rest/currency';
 import { ErrorBoundary } from '@/components/ui/error';
 import { Text } from '@/components/ui/typography';
 import { useUpdateMetricChart } from '@/context/Metrics';
