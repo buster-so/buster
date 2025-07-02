@@ -21,6 +21,8 @@ import { defaultLabelOptionConfig } from './labelOptionConfig';
 
 type PieOptions = ChartProps<'pie'>['options'] | ChartProps<'doughnut'>['options'];
 
+const COMPACT_THRESHOLD = 9999999; //seven digits
+
 export const pieOptionsHandler = ({
   pieDonutWidth = 0
 }: ChartSpecificOptionsProps): ChartProps<ChartJSChartType>['options'] => {
@@ -150,7 +152,11 @@ const getInnerLabelValue = (
 
     const yColumn = selectedAxis.y[0] || 'defaultYColumn';
     const yColumnLabel = columnLabelFormats[yColumn];
-    const formattedLabel = formatLabel(result, yColumnLabel);
+
+    const formattedLabel = formatLabel(result, {
+      ...yColumnLabel,
+      compactNumbers: yColumnLabel?.compactNumbers || result > COMPACT_THRESHOLD
+    });
     return formattedLabel;
   } catch (error) {
     return '';
