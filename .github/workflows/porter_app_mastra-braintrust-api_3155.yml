@@ -2,8 +2,6 @@
     push:
         branches:
             - mastra-braintrust
-        paths:
-            - apps/api/**
 name: Deploy to mastra-braintrust-api
 jobs:
     porter-deploy:

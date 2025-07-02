@@ -606,6 +606,9 @@ importers:
       '@buster/vitest-config':
         specifier: workspace:*
         version: link:../vitest-config
+      lru-cache:
+        specifier: ^11.1.0
+        version: 11.1.0
       zod:
         specifier: 'catalog:'
         version: 3.25.67
