@@ -38,6 +38,7 @@ export const useGetMetric = <TData = IBusterMetric>(
 
   const { selectedVersionNumber, paramVersionNumber, latestVersionNumber } =
     useGetMetricVersionNumber({
+      metricId: id,
       versionNumber: versionNumberProp
     });
 
@@ -120,7 +121,8 @@ export const useGetMetricData = <TData = IBusterMetricData>(
   const getAssetPassword = useBusterAssetsContextSelector((x) => x.getAssetPassword);
   const { password } = getAssetPassword(id);
   const { selectedVersionNumber } = useGetMetricVersionNumber({
-    versionNumber: versionNumberProp
+    versionNumber: versionNumberProp,
+    metricId: id
   });
   const {
     isFetched: isFetchedMetric,
@@ -174,6 +176,7 @@ export const prefetchGetMetricDataClient = async (
   }
 };
 
+//used in list version histories
 export const usePrefetchGetMetricDataClient = () => {
   const queryClient = useQueryClient();
   return useMemoizedFn(({ id, versionNumber }: { id: string; versionNumber: number }) =>

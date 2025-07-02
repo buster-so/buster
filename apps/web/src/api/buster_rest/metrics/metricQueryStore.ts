@@ -20,7 +20,7 @@ export const useMetricQueryStore = create<MetricQueryStore>((set) => ({
 }));
 
 export const useGetMetricVersionNumber = (props?: {
-  metricId?: string;
+  metricId: string | undefined;
   versionNumber?: number | null;
 }): {
   selectedVersionNumber: number | null;
@@ -50,7 +50,7 @@ export const useGetMetricVersionNumber = (props?: {
       paramVersionNumber,
       latestVersionNumber
     };
-  }, [effectiveVersionNumber, paramVersionNumber, latestVersionNumber]);
+  }, [effectiveVersionNumber, paramVersionNumber, latestVersionNumber, metricId]);
 };
 
 export const useGetLatestMetricVersionMemoized = () => {

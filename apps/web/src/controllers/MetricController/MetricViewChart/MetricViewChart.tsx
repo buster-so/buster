@@ -3,7 +3,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 import React, { useMemo } from 'react';
-import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
