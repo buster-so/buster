@@ -17,12 +17,15 @@ export function extractPhysicalTables(sql: string): ParsedTable[] {
   const parser = new Parser();
 
   try {
+    console.info('[extractPhysicalTables] Parsing SQL:', sql);
+    
     // Parse SQL into AST
     const ast = parser.astify(sql);
 
     // Get all table references from parser
     // The parser returns tables in format "type::db::table" or "type::table"
     const allTables = parser.tableList(sql);
+    console.info('[extractPhysicalTables] Raw table list from parser:', allTables);
 
     // Extract CTE names to exclude them
     const cteNames = new Set<string>();
@@ -46,16 +49,20 @@ export function extractPhysicalTables(sql: string): ParsedTable[] {
     const processedTables = new Set<string>();
 
     for (const tableRef of allTables) {
+      console.info('[extractPhysicalTables] Processing table reference:', tableRef);
       const parsed = parseTableReference(tableRef);
+      console.info('[extractPhysicalTables] Parsed table:', JSON.stringify(parsed));
 
       // Skip if it's a CTE
       if (cteNames.has(parsed.table.toLowerCase())) {
+        console.info('[extractPhysicalTables] Skipping CTE:', parsed.table);
         continue;
       }
 
       // Skip duplicates
       const tableKey = `${parsed.database || ''}.${parsed.schema || ''}.${parsed.table}`;
       if (processedTables.has(tableKey)) {
+        console.info('[extractPhysicalTables] Skipping duplicate:', tableKey);
         continue;
       }
 
@@ -63,8 +70,10 @@ export function extractPhysicalTables(sql: string): ParsedTable[] {
       physicalTables.push(parsed);
     }
 
+    console.info('[extractPhysicalTables] Final physical tables:', JSON.stringify(physicalTables, null, 2));
     return physicalTables;
   } catch (error) {
+    console.error('[extractPhysicalTables] Error parsing SQL:', error);
     throw new Error(
       `Failed to parse SQL: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
@@ -221,12 +230,17 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
   const tables: ParsedTable[] = [];
   const processedTables = new Set<string>();
 
+  console.info('[extractTablesFromYml] Starting YML extraction');
+  console.info('[extractTablesFromYml] YML content:', ymlContent.substring(0, 200) + '...');
+
   try {
     // Parse YML content
     const parsed = yaml.parse(ymlContent);
+    console.info('[extractTablesFromYml] Parsed YML structure:', JSON.stringify(parsed, null, 2).substring(0, 500) + '...');
 
     // Check for flat format (top-level name, schema, database)
     if (parsed?.name && !parsed?.models && (parsed?.schema || parsed?.database)) {
+      console.info('[extractTablesFromYml] Found flat format dataset');
       const parsedTable: ParsedTable = {
         table: parsed.name,
         fullName: parsed.name,
@@ -248,6 +262,7 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
         }
       }
 
+      console.info('[extractTablesFromYml] Flat format table:', JSON.stringify(parsedTable));
       const key = normalizeTableIdentifier(parsedTable);
       if (!processedTables.has(key)) {
         processedTables.add(key);
@@ -257,7 +272,9 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
 
     // Look for models array
     if (parsed?.models && Array.isArray(parsed.models)) {
+      console.info('[extractTablesFromYml] Found models array with', parsed.models.length, 'models');
       for (const model of parsed.models) {
+        console.info('[extractTablesFromYml] Processing model:', JSON.stringify(model));
         // Process models that have name and at least schema or database
         if (model.name && (model.schema || model.database)) {
           const parsedTable: ParsedTable = {
@@ -281,18 +298,23 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
             }
           }
 
+          console.info('[extractTablesFromYml] Parsed model table:', JSON.stringify(parsedTable));
           const key = normalizeTableIdentifier(parsedTable);
           if (!processedTables.has(key)) {
             processedTables.add(key);
             tables.push(parsedTable);
           }
+        } else {
+          console.warn('[extractTablesFromYml] Skipping model without schema/database:', JSON.stringify(model));
         }
       }
     }
   } catch (error) {
     // If YML parsing fails, return empty array
-    console.warn('Failed to parse YML:', error);
+    console.error('[extractTablesFromYml] Failed to parse YML:', error);
   }
 
+  console.info('[extractTablesFromYml] Total tables extracted:', tables.length);
+  console.info('[extractTablesFromYml] Extracted tables:', JSON.stringify(tables, null, 2));
   return tables;
 }

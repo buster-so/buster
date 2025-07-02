@@ -16,16 +16,22 @@ export async function validateSqlPermissions(
   userId: string
 ): Promise<PermissionValidationResult> {
   try {
+    console.info('[validateSqlPermissions] Starting validation for userId:', userId);
+    console.info('[validateSqlPermissions] SQL query:', sql);
+    
     // Extract physical tables from SQL
     const tablesInQuery = extractPhysicalTables(sql);
+    console.info('[validateSqlPermissions] Tables extracted from SQL:', JSON.stringify(tablesInQuery, null, 2));
     
     if (tablesInQuery.length === 0) {
       // No tables referenced (might be a function call or constant select)
+      console.info('[validateSqlPermissions] No tables found in query, allowing access');
       return { isAuthorized: true, unauthorizedTables: [] };
     }
     
     // Get user's permissioned datasets
     const permissionedDatasets = await getPermissionedDatasets(userId, 0, 1000);
+    console.info('[validateSqlPermissions] Found', permissionedDatasets.length, 'permissioned datasets for user');
     
     // Extract all allowed tables from datasets
     const allowedTables: ParsedTable[] = [];
@@ -33,9 +39,14 @@ export async function validateSqlPermissions(
     for (const dataset of permissionedDatasets) {
       if (dataset.ymlFile) {
         const tables = extractTablesFromYml(dataset.ymlFile);
+        console.info('[validateSqlPermissions] Extracted', tables.length, 'tables from dataset:', dataset.name || 'unnamed');
+        console.info('[validateSqlPermissions] Tables from YML:', JSON.stringify(tables, null, 2));
         allowedTables.push(...tables);
       }
     }
+    
+    console.info('[validateSqlPermissions] Total allowed tables:', allowedTables.length);
+    console.info('[validateSqlPermissions] All allowed tables:', JSON.stringify(allowedTables, null, 2));
     
     // Check each table in query against permissions
     const unauthorizedTables: string[] = [];
@@ -45,23 +56,31 @@ export async function validateSqlPermissions(
       
       // Check if query table matches any allowed table
       for (const allowedTable of allowedTables) {
-        if (tablesMatch(queryTable, allowedTable)) {
+        const matches = tablesMatch(queryTable, allowedTable);
+        if (matches) {
+          console.info('[validateSqlPermissions] Table match found:', 
+            `Query: ${JSON.stringify(queryTable)} matches Allowed: ${JSON.stringify(allowedTable)}`);
           isAuthorized = true;
           break;
         }
       }
       
       if (!isAuthorized) {
+        console.error('[validateSqlPermissions] Unauthorized table access:', queryTable.fullName);
         unauthorizedTables.push(queryTable.fullName);
       }
     }
     
-    return {
+    const result = {
       isAuthorized: unauthorizedTables.length === 0,
       unauthorizedTables
     };
     
+    console.info('[validateSqlPermissions] Final result:', JSON.stringify(result, null, 2));
+    return result;
+    
   } catch (error) {
+    console.error('[validateSqlPermissions] Error during validation:', error);
     return {
       isAuthorized: false,
       unauthorizedTables: [],
