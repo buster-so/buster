@@ -4,6 +4,7 @@
             - mastra-braintrust
         paths:
             - apps/server/**
+            - packages/**
 name: Deploy to buster-server
 jobs:
     porter-deploy:

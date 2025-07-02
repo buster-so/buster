@@ -4,7 +4,6 @@
             - mastra-braintrust
         paths:
             - apps/api/**
-            - packages/**
 name: Deploy to mastra-braintrust-api
 jobs:
     porter-deploy:
