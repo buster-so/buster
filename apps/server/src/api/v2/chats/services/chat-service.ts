@@ -1,4 +1,6 @@
+import { db, messages } from '@buster/database';
 import type { User } from '@buster/database';
+import { eq } from 'drizzle-orm';
 import type { ChatCreateHandlerRequest, ChatWithMessages } from '@buster/server-shared/chats';
 import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { handleExistingChat, handleNewChat } from './chat-helpers';
@@ -22,8 +24,28 @@ export async function initializeChat(
   const userId = user.id;
 
   try {
-    if (request.chat_id) {
-      return handleExistingChat(request.chat_id, messageId, request.prompt, user, redoFromMessageId);
+    // If message_id is provided but not chat_id, get the chat_id from the message
+    let chatId = request.chat_id;
+    if (redoFromMessageId && !chatId) {
+      const messageDetails = await db
+        .select({ chatId: messages.chatId })
+        .from(messages)
+        .where(eq(messages.id, redoFromMessageId))
+        .limit(1);
+      
+      if (!messageDetails.length || !messageDetails[0]) {
+        throw new ChatError(
+          ChatErrorCode.INVALID_REQUEST,
+          'Message not found',
+          404
+        );
+      }
+      
+      chatId = messageDetails[0].chatId;
+    }
+
+    if (chatId) {
+      return handleExistingChat(chatId, messageId, request.prompt, user, redoFromMessageId);
     }
 
     const title = '';

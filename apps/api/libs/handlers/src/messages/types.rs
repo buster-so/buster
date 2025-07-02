@@ -18,6 +18,7 @@ pub struct ChatMessage {
     #[serde(default)]
     pub reasoning_messages: HashMap<String, Value>,
     pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
     pub final_reasoning_message: Option<String>,
     pub feedback: Option<String>,
     pub is_completed: bool,
@@ -38,6 +39,7 @@ impl ChatMessage {
         sender_name: String,
         sender_avatar: Option<String>,
     ) -> Self {
+        let now = Utc::now();
         Self {
             id: Uuid::new_v4(),
             request_message: Some(ChatUserMessage {
@@ -50,7 +52,8 @@ impl ChatMessage {
             response_messages: HashMap::new(),
             reasoning_message_ids: Vec::new(),
             reasoning_messages: HashMap::new(),
-            created_at: Utc::now(),
+            created_at: now,
+            updated_at: now,
             final_reasoning_message: None,
             feedback: None,
             is_completed: false,
@@ -64,6 +67,7 @@ impl ChatMessage {
         reasoning_messages: Vec<Value>,
         final_reasoning_message: Option<String>,
         created_at: chrono::DateTime<chrono::Utc>,
+        updated_at: chrono::DateTime<chrono::Utc>,
         feedback: Option<String>,
         is_completed: bool,
     ) -> Self {
@@ -101,6 +105,7 @@ impl ChatMessage {
             reasoning_message_ids,
             reasoning_messages: reasoning_messages_map,
             created_at,
+            updated_at,
             final_reasoning_message,
             feedback,
             is_completed,

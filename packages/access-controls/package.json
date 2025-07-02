@@ -24,9 +24,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@buster/database": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@buster/database": "workspace:*",
+    "lru-cache": "^11.1.0",
     "zod": "catalog:"
   }
 }

@@ -19,5 +19,16 @@ export {
 
 export { canUserAccessChat } from './chats';
 
+// Export cached version and cache management functions
+export {
+  canUserAccessChatCached,
+  getCacheStats,
+  resetCacheStats,
+  clearCache,
+  invalidateAccess,
+  invalidateUserAccess,
+  invalidateChatAccess,
+} from './chats-cached';
+
 // Export utility functions
 export { formatPermissionName, buildAccessQuery } from './utils';

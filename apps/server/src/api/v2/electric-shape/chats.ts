@@ -4,22 +4,20 @@ import { errorResponse } from '../../../utils/response';
 import { extractParamFromWhere } from './_helpers';
 
 export const chatsProxyRouter = async (url: URL, _userId: string, c: Context) => {
-  const matches = extractParamFromWhere(url, 'id');
-  const chatId = matches?.[0];
+  const chatId = extractParamFromWhere(url, 'id');
 
   if (!chatId) {
-    errorResponse('Chat ID (id) is required', 403);
-    return;
+    throw errorResponse('Chat ID (id) is required', 403);
   }
 
+  // User must have access to the chat
   const userHasAccessToChat = await canUserAccessChat({
     userId: c.get('supabaseUser').id,
     chatId,
   });
 
   if (!userHasAccessToChat) {
-    errorResponse('You do not have access to this chat', 403);
-    return;
+    throw errorResponse('You do not have access to this chat', 403);
   }
 
   return url;

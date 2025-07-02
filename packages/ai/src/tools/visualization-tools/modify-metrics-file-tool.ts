@@ -16,6 +16,7 @@ import {
 } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 import { trackFileAssociations } from './file-tracking-helper';
+import { validateSqlPermissions, createPermissionErrorMessage } from '../../utils/sql-permissions';
 
 // TypeScript types matching Rust DataMetadata structure
 enum SimpleType {
@@ -261,7 +262,9 @@ interface SqlValidationResult {
 async function validateSql(
   sqlQuery: string,
   dataSourceId: string,
-  workflowId: string
+  workflowId: string,
+  userId: string,
+  dataSourceSyntax?: string
 ): Promise<SqlValidationResult> {
   try {
     if (!sqlQuery.trim()) {
@@ -275,6 +278,15 @@ async function validateSql(
 
     if (!sqlQuery.toLowerCase().includes('from')) {
       return { success: false, error: 'SQL query must contain FROM clause' };
+    }
+
+    // Validate permissions before attempting to get data source
+    const permissionResult = await validateSqlPermissions(sqlQuery, userId, dataSourceSyntax);
+    if (!permissionResult.isAuthorized) {
+      return {
+        success: false,
+        error: createPermissionErrorMessage(permissionResult.unauthorizedTables)
+      };
     }
 
     // Get data source from workflow manager (reuses existing connections)
@@ -419,7 +431,9 @@ async function processMetricFileUpdate(
   ymlContent: string,
   dataSourceId: string,
   workflowId: string,
-  duration: number
+  duration: number,
+  userId: string,
+  dataSourceSyntax?: string
 ): Promise<{
   success: boolean;
   updatedFile?: typeof metricFiles.$inferSelect;
@@ -476,7 +490,7 @@ async function processMetricFileUpdate(
     }
 
     // Validate SQL if it has changed or if metadata is missing
-    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId);
+    const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId, workflowId, userId, dataSourceSyntax);
     if (!sqlValidation.success) {
       const error = `SQL validation failed: ${sqlValidation.error}`;
       modificationResults.push({
@@ -580,6 +594,7 @@ const modifyMetricFiles = wrapTraced(
     const organizationId = runtimeContext?.get('organizationId') as string;
     const workflowStartTime = runtimeContext?.get('workflowStartTime') as number | undefined;
     const messageId = runtimeContext?.get('messageId') as string | undefined;
+    const dataSourceSyntax = runtimeContext?.get('dataSourceSyntax') as string | undefined;
 
     // Generate a unique workflow ID using start time and data source
     const workflowId = workflowStartTime
@@ -651,7 +666,9 @@ const modifyMetricFiles = wrapTraced(
             fileUpdate.yml_content,
             dataSourceId,
             workflowId,
-            Date.now() - startTime
+            Date.now() - startTime,
+            userId,
+            dataSourceSyntax
           );
 
           if (!result.success) {

@@ -39,6 +39,7 @@ pub struct MessageWithUser {
     pub reasoning: Value,
     pub final_reasoning_message: Option<String>,
     pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub user_id: Uuid,
     pub user_name: Option<String>,
     pub user_attributes: Value,
@@ -122,6 +123,7 @@ pub async fn get_chat_handler(
                     messages::reasoning,
                     messages::final_reasoning_message,
                     messages::created_at,
+                    messages::updated_at,
                     users::id,
                     users::name.nullable(),
                     users::attributes,
@@ -280,6 +282,7 @@ pub async fn get_chat_handler(
                 reasoning,
                 msg.final_reasoning_message,
                 msg.created_at,
+                msg.updated_at,
                 msg.feedback,
                 msg.is_completed,
             )
