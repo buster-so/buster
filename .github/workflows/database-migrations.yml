@@ -2,13 +2,12 @@ name: Database Migrations
 
 on:
   push:
-    branches: [main, mastra-braintrust]
+    branches: [main, staging]
 
 jobs:
   migrate:
-    runs-on: blacksmith-32vcpu-ubuntu-2204
-    environment: staging 
-    
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    environment: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
       

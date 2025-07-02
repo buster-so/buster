@@ -3,11 +3,11 @@ name: Deploy Trigger.dev Tasks - Staging
 on:
   push:
     branches:
-      - mastra-braintrust
+      - staging
 
 jobs:
   deploy-staging:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-8vcpu-ubuntu-2204
     environment: staging
     steps:
       - name: Checkout code
