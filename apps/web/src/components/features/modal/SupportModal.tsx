@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { submitAppSupportRequest } from '@/api/buster_rest/nextjs/support';
+import { submitAppSupportRequest } from '@/api/buster_rest/support';
 import { Input } from '@/components/ui/inputs';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
 import { AppModal } from '@/components/ui/modal';
