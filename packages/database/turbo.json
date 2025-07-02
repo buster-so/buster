@@ -25,7 +25,7 @@
       "persistent": false,
       "dependsOn": ["db:start-supabase", "db:reset", "db:migrate"]
     },
-    "dev:init": {
+    "db:init": {
       "cache": false,
       "persistent": false,
       "dependsOn": ["db:start-supabase", "db:reset", "db:migrate", "db:seed"]
