@@ -52,6 +52,10 @@
   margin-inline-start: 1.5em;
 }
 
+.container ol + ul {
+  margin-inline-start: 2.25em;
+}
+
 .container ul li::marker {
   color: var(--color-text-secondary);
 }
