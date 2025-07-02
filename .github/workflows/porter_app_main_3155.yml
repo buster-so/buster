@@ -3,7 +3,8 @@
     branches:
         - main
     paths:
-        - api/**
+        - apps/api/**
+        - .github/workflows/porter_app_main_3155.yml
 name: Deploy to main
 jobs:
   porter-deploy:
