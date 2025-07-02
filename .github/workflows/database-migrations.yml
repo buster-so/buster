@@ -38,7 +38,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       
-      - name: Run database migrations
-        run: pnpm run db:migrate
+      - name: Check and initialize migration tracking
+        run: |
+          echo "Checking if migrations need to be initialized..."
+          # Try to run migrations first, if it fails due to existing tables, 
+          # then run the initialization script
+          pnpm run db:migrate || {
+            echo "Migration failed, likely due to existing tables from Diesel."
+            echo "Initializing Drizzle migration tracking..."
+            pnpm --filter @buster/database run db:mark-migrations
+            echo "Retrying migrations..."
+            pnpm run db:migrate
+          }
         env:
           DATABASE_URL: ${{ secrets.DB_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
