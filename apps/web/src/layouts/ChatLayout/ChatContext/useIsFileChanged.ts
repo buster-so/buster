@@ -37,5 +37,11 @@ export const useIsFileChanged = ({
         onResetToOriginal: onResetDashboardToOriginal
       };
     return { isFileChanged: false, onResetToOriginal: () => {} };
-  }, [isMetricChanged, isDashboardChanged, onResetMetricToOriginal, onResetDashboardToOriginal]);
+  }, [
+    isMetricChanged,
+    isDashboardChanged,
+    selectedFileType,
+    onResetMetricToOriginal,
+    onResetDashboardToOriginal
+  ]);
 };

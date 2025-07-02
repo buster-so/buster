@@ -64,6 +64,13 @@ export const useIsDashboardChanged = ({ dashboardId }: { dashboardId: string | u
     );
   }, [originalDashboard, isEditor, currentDashboard, isLatestVersion]);
 
+  // console.log('isDashboardChanged', isDashboardChanged, {
+  //   originalDashboard,
+  //   currentDashboard,
+  //   isEditor,
+  //   isLatestVersion
+  // });
+
   return {
     onResetDashboardToOriginal,
     isDashboardChanged

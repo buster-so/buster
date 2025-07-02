@@ -5,7 +5,7 @@ import { cn } from '@/lib/classMerge';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Text } from '../typography/Text';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronExpandY, ChevronReduceY, CircleChevronExpand2 } from '../icons';
+import { ChevronDown, ChevronExpandY, ChevronReduceY } from '../icons';
 
 interface CollapisbleFileCardProps {
   fileName?: string | React.ReactNode;

@@ -48,7 +48,7 @@ export const useEnsureDashboardConfig = (prefetchData = true) => {
 
 export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
   const queryClient = useQueryClient();
-  const setOriginalDashboards = useOriginalDashboardStore((x) => x.setOriginalDashboard);
+  const setOriginalDashboard = useOriginalDashboardStore((x) => x.setOriginalDashboard);
   const onSetLatestDashboardVersion = useDashboardQueryStore((x) => x.onSetLatestDashboardVersion);
   const getAssetPassword = useBusterAssetsContextSelector((state) => state.getAssetPassword);
 
@@ -80,7 +80,10 @@ export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
       version_number: version_number || undefined
     }).then((data) => {
       initializeMetrics(data.metrics);
-      setOriginalDashboards(data.dashboard);
+      const isLatestVersion = data.dashboard.version_number === last(data.versions)?.version_number;
+      if (isLatestVersion) {
+        setOriginalDashboard(data.dashboard);
+      }
 
       if (data.dashboard.version_number) {
         queryClient.setQueryData(

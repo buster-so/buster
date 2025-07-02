@@ -124,14 +124,4 @@ const DashboardMetricItemBase: React.FC<{
   );
 };
 
-export const DashboardMetricItem = React.memo(DashboardMetricItemBase, (prev, next) => {
-  return (
-    prev.metricId === next.metricId &&
-    prev.dashboardId === next.dashboardId &&
-    prev.versionNumber === next.versionNumber &&
-    prev.chatId === next.chatId &&
-    prev.readOnly === next.readOnly &&
-    prev.isDragOverlay === next.isDragOverlay &&
-    prev.numberOfMetrics === next.numberOfMetrics
-  );
-});
+export const DashboardMetricItem = React.memo(DashboardMetricItemBase);

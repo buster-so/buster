@@ -117,14 +117,12 @@ const ThreeDotMenu: React.FC<{
     [dashboardId, metricId]
   );
 
-  const onClick = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-  });
-
   return (
     <div
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
       className={cn('hidden w-8.5 rounded group-hover:block', className, isOpen && 'block')}>
       <div className="absolute right-1.5">
         <Dropdown items={dropdownItems} side="top" align="end" onOpenChange={setIsOpen}>

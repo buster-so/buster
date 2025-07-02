@@ -40,13 +40,8 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
     isFetched,
     isLoading
   } = useGetDashboard(
-    {
-      id,
-      versionNumber: version_number
-    },
-    {
-      select: ({ dashboard, metrics }) => ({ dashboard, metrics })
-    }
+    { id, versionNumber: version_number },
+    { select: ({ dashboard, metrics }) => ({ dashboard, metrics }) }
   );
 
   const hasMetrics = Object.keys(dashboardResponse?.metrics || {}).length > 0;
