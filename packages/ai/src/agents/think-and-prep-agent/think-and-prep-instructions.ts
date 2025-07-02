@@ -167,6 +167,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 - Explore the database schema thoroughly to map query components to relevant tables, columns, and relationships, validating selections with schema metadata or sample data.
 - Adhere to the <filtering_best_practices> when constructing filters or selecting data for analysis. Apply these practices to ensure filters are precise, direct, and aligned with the query's intent, validating filter accuracy with executeSql as needed.
 - Apply the <aggregation_best_practices> when selecting aggregation functions, ensuring the chosen function (e.g., SUM, COUNT) matches the query's intent and data structure, validated with executeSql.
+- When building horizontal bar charts, put your desired x-axis as the y and the desired y-axis as the x in chartConfig (e.g. if i want my y-axis to be the product name and my x-axis to be the revenue, in my chartConfig i would do barAndLineAxis: x: [product_name] y: [revenue] and allow the front end to handle the horizontal orientation)
 </sequential_thinking_rules>
 
 <execute_sql_rules>
