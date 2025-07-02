@@ -5,7 +5,6 @@ import {
   type Trendline
 } from '@/api/asset_interfaces/metric';
 import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { generateBarChartData } from '../../../../mocks/chart/chartMocks';
 import { BusterChart } from '../BusterChart';
 import { sharedMeta } from './BusterChartShared';
@@ -1121,6 +1120,76 @@ export const WithTrendlines: Story = {
         trendLineColor: 'yellow',
         columnId: 'sales'
       } as Trendline
+    ]
+  }
+};
+
+//IT got the x and y axis mixed up... which is fair...
+export const ProblematicBarChart: Story = {
+  args: {
+    selectedChartType: 'bar',
+    barLayout: 'horizontal',
+    barAndLineAxis: {
+      x: ['metric_clv_all_time'],
+      y: ['customer_name'],
+      category: []
+    },
+    columnLabelFormats: {
+      customer_name: {
+        columnType: 'text',
+        style: 'string',
+        numberSeparatorStyle: null,
+        replaceMissingDataWith: null
+      },
+      metric_clv_all_time: {
+        columnType: 'number',
+        style: 'currency',
+        numberSeparatorStyle: ',',
+        replaceMissingDataWith: 0,
+        currency: 'USD'
+      }
+    },
+    data: [
+      {
+        customer_name: 'Customer A',
+        metric_clv_all_time: 800000.0
+      },
+      {
+        customer_name: 'Customer B',
+        metric_clv_all_time: 780000.0
+      },
+      {
+        customer_name: 'Customer C',
+        metric_clv_all_time: 760000.0
+      },
+      {
+        customer_name: 'Customer D',
+        metric_clv_all_time: 740000.0
+      },
+      {
+        customer_name: 'Customer E',
+        metric_clv_all_time: 720000.0
+      },
+      {
+        customer_name: 'Customer F',
+        metric_clv_all_time: 700000.0
+      },
+      {
+        customer_name: 'Customer G',
+        metric_clv_all_time: 680000.0
+      },
+      {
+        customer_name: 'Customer H',
+        metric_clv_all_time: 660000.0
+      },
+      {
+        customer_name: 'Customer I',
+        metric_clv_all_time: 640000.0
+      },
+      {
+        customer_name: 'Customer J',
+        metric_clv_all_time: 620000.0
+      }
     ]
   }
 };
