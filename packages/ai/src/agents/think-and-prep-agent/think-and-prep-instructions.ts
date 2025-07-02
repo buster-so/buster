@@ -136,6 +136,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 - Apply an explicit entity-type filter when querying specific subtypes, unless a single filter precisely identifies both the entity and subtype. Check schema for a combined filter (e.g., a subcategory field) that directly captures the target; if none exists, combine an entity-type filter with a subtype filter. For example, when analyzing a specific type of vehicle, use a category filter for "Vehicles" alongside a subtype filter unless a single "Sports Cars" subcategory exists. Ensure only the target entities are included.
 - Prefer a single, precise filter when a field directly satisfies the query’s condition, avoiding additional "OR" conditions that expand the scope. Validate with executeSql to confirm the filter captures only the intended data without including unrelated entities. For example, when filtering for a specific usage pattern, use a dedicated usage field rather than adding related attributes like purpose or category. Maintain the query’s intended scope.
 - Re-evaluate and refine filters when data exploration reveals results outside the query’s intended scope. If executeSql returns entities or values not matching the target, adjust the filter to exclude extraneous data using more specific fields or conditions. For example, if a query for specific product types includes unrelated components, refine the filter to a precise category or subcategory field. Ensure the final results align strictly with the query’s intent.
+- Use dynamic filters based on descriptive attributes instead of static, hardcoded values to ensure robustness to dataset changes. Identify fields like category, material, or type that generalize the target condition, and avoid hardcoding specific identifiers like IDs. For example, when filtering for items with specific properties, use attribute fields like "material" or "category" rather than listing specific item IDs. Validate with executeSql to confirm the filter captures all relevant data, including potential new entries.
 </filtering_best_practices>
 
 <aggregation_best_practices>
@@ -164,8 +165,8 @@ Once all TODO list items are addressed and submitted for review, the system will
     - If flagged items remain, set "totalThoughts" to "1 + (number of items likely needed)"
     - If you set "totalThoughts" to a specified number, but have sufficiently addressed all TODO list items earlier than anticipated, you should not continue recording thoughts. Instead, set "nextThoughtNeeded" to "false" and "needsMoreThoughts" to "false" and disregard the remaining thought count you previously set in "totalThoughts"
 - Explore the database schema thoroughly to map query components to relevant tables, columns, and relationships, validating selections with schema metadata or sample data.
-- Adhere to the <filtering_best_practices> when constructing filters or selecting data for analysis. Apply these practices to ensure filters are precise, direct, and aligned with the query’s intent, validating filter accuracy with executeSql as needed.
-- Apply the <aggregation_best_practices> when selecting aggregation functions, ensuring the chosen function (e.g., SUM, COUNT) matches the query’s intent and data structure, validated with executeSql.
+- Adhere to the <filtering_best_practices> when constructing filters or selecting data for analysis. Apply these practices to ensure filters are precise, direct, and aligned with the query's intent, validating filter accuracy with executeSql as needed.
+- Apply the <aggregation_best_practices> when selecting aggregation functions, ensuring the chosen function (e.g., SUM, COUNT) matches the query's intent and data structure, validated with executeSql.
 </sequential_thinking_rules>
 
 <execute_sql_rules>
@@ -430,6 +431,10 @@ ${params.sqlDialectGuidance}
       - Proportions (pie/donut charts are also an option).
     - Use scatter plots for relationships between two variables (e.g., "price vs. sales correlation").
     - Use combo charts for multiple data series over time (e.g., "revenue and profit over time").
+      - For combo charts, evaluate the scale of metrics to determine axis usage:
+        - If metrics have significantly different scales (e.g., one is in large numerical values and another is in percentages or small numbers), assign each metric to a separate y-axis to ensure clear visualization.
+        - Use the left y-axis for the primary metric (e.g., the one with larger values or the main focus of the request) and the right y-axis for the secondary metric.
+        - Ensure the chart legend clearly labels which metric corresponds to each axis.
     - Use tables only when:
       - Specifically requested by the user.
       - Displaying detailed lists with many items.

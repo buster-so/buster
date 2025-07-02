@@ -22,7 +22,7 @@ function createLogger() {
       });
     } catch (error) {
       console.error('pino-pretty not available, falling back to JSON logging', error);
-      isPinoPrettyAvailable = true;
+      isPinoPrettyAvailable = false;
     }
   }
 

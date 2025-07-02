@@ -12,10 +12,10 @@ export interface PoolConfig {
 
 // Default pool configuration
 const defaultPoolConfig: PoolConfig = {
-  max: 20,
+  max: 100,
   idle_timeout: 30,
   connect_timeout: 30,
-  prepare: false,
+  prepare: true,
 };
 
 // Global pool instance
@@ -25,6 +25,9 @@ let globalDb: PostgresJsDatabase | null = null;
 // Initialize the database pool
 export function initializePool(config: PoolConfig = {}): PostgresJsDatabase {
   const connectionString = process.env.DATABASE_URL;
+  const poolSize = process.env.DATABASE_POOL_SIZE
+    ? Number.parseInt(process.env.DATABASE_POOL_SIZE)
+    : 100;
 
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is required');
@@ -34,7 +37,7 @@ export function initializePool(config: PoolConfig = {}): PostgresJsDatabase {
     return globalDb;
   }
 
-  const poolConfig = { ...defaultPoolConfig, ...config };
+  const poolConfig = { ...defaultPoolConfig, ...config, max: poolSize };
 
   // Create postgres client with pool configuration
   globalPool = postgres(connectionString, poolConfig);
