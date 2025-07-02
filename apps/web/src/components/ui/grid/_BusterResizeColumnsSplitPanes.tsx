@@ -383,8 +383,6 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
           const span = displayColumnSpans[index];
           const widthPercentage = (span / NUMBER_OF_COLUMNS) * 100;
 
-          console.log('widthPercentage', widthPercentage);
-
           return (
             <div
               key={`column-${index}`}
