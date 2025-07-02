@@ -15,5 +15,5 @@ export interface AppSupportRequest {
 }
 
 export const submitAppSupportRequest = async (data: AppSupportRequest) => {
-  return await mainApiV2.post<{ success: boolean }>('/api/support', data).then((res) => res.data);
+  return await mainApiV2.post<{ success: boolean }>('/support', data).then((res) => res.data);
 };
