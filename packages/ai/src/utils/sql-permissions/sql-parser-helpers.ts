@@ -185,14 +185,20 @@ export function normalizeTableIdentifier(identifier: ParsedTable): string {
  * For example, "schema.table" matches "database.schema.table" if schema and table match
  */
 export function tablesMatch(queryTable: ParsedTable, permissionTable: ParsedTable): boolean {
+  console.info('[tablesMatch] Comparing tables:');
+  console.info('[tablesMatch] Query table:', JSON.stringify(queryTable));
+  console.info('[tablesMatch] Permission table:', JSON.stringify(permissionTable));
+  
   // Exact table name must match
   if (queryTable.table.toLowerCase() !== permissionTable.table.toLowerCase()) {
+    console.info('[tablesMatch] Table names do not match:', queryTable.table, 'vs', permissionTable.table);
     return false;
   }
 
   // If permission specifies schema, query must match
   if (permissionTable.schema && queryTable.schema) {
     if (permissionTable.schema.toLowerCase() !== queryTable.schema.toLowerCase()) {
+      console.info('[tablesMatch] Schemas do not match:', queryTable.schema, 'vs', permissionTable.schema);
       return false;
     }
   }
@@ -200,6 +206,7 @@ export function tablesMatch(queryTable: ParsedTable, permissionTable: ParsedTabl
   // If permission specifies database, query must match
   if (permissionTable.database && queryTable.database) {
     if (permissionTable.database.toLowerCase() !== queryTable.database.toLowerCase()) {
+      console.info('[tablesMatch] Databases do not match:', queryTable.database, 'vs', permissionTable.database);
       return false;
     }
   }
@@ -207,9 +214,11 @@ export function tablesMatch(queryTable: ParsedTable, permissionTable: ParsedTabl
   // If permission has schema but query doesn't, it's not a match
   // (we require explicit schema matching for security)
   if (permissionTable.schema && !queryTable.schema) {
+    console.info('[tablesMatch] Permission requires schema but query has none');
     return false;
   }
 
+  console.info('[tablesMatch] Tables match!');
   return true;
 }
 
@@ -231,12 +240,12 @@ export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
   const processedTables = new Set<string>();
 
   console.info('[extractTablesFromYml] Starting YML extraction');
-  console.info('[extractTablesFromYml] YML content:', ymlContent.substring(0, 200) + '...');
+  console.info('[extractTablesFromYml] YML content:', `${ymlContent.substring(0, 200)}...`);
 
   try {
     // Parse YML content
     const parsed = yaml.parse(ymlContent);
-    console.info('[extractTablesFromYml] Parsed YML structure:', JSON.stringify(parsed, null, 2).substring(0, 500) + '...');
+    console.info('[extractTablesFromYml] Parsed YML structure:', `${JSON.stringify(parsed, null, 2).substring(0, 500)}...`);
 
     // Check for flat format (top-level name, schema, database)
     if (parsed?.name && !parsed?.models && (parsed?.schema || parsed?.database)) {

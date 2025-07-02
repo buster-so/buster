@@ -19,6 +19,7 @@ describe('canUserAccessChat Integration Tests', () => {
   
   // Test data IDs
   const testOrgId = randomUUID();
+  const systemUserId = randomUUID(); // System user for created_by/updated_by fields
   const testUserId = randomUUID();
   const testAdminUserId = randomUUID();
   const testChatId = randomUUID();
@@ -36,7 +37,18 @@ describe('canUserAccessChat Integration Tests', () => {
       updatedAt: new Date().toISOString(),
     });
 
-    // Create test users with unique emails
+    // Create system user first (needed for created_by/updated_by references)
+    await db.insert(users).values({
+      id: systemUserId,
+      email: `system-${Date.now()}@example.com`,
+      name: 'System User',
+      config: {},
+      attributes: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Create test users
     const timestamp = Date.now();
     await db.insert(users).values([
       {
@@ -74,6 +86,8 @@ describe('canUserAccessChat Integration Tests', () => {
         userId: testUserId,
         organizationId: testOrgId,
         role: 'querier',
+        createdBy: systemUserId,
+        updatedBy: systemUserId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -81,6 +95,8 @@ describe('canUserAccessChat Integration Tests', () => {
         userId: testAdminUserId,
         organizationId: testOrgId,
         role: 'workspace_admin',
+        createdBy: systemUserId,
+        updatedBy: systemUserId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -88,6 +104,8 @@ describe('canUserAccessChat Integration Tests', () => {
         userId: testUserNoAccessId,
         organizationId: testOrgId,
         role: 'viewer',
+        createdBy: systemUserId,
+        updatedBy: systemUserId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -148,7 +166,7 @@ describe('canUserAccessChat Integration Tests', () => {
       updatedAt: new Date().toISOString(),
     });
 
-    // Create collection permission
+    // Create collection permission for testUserId
     await db.insert(assetPermissions).values({
       identityId: testUserId,
       identityType: 'user',
@@ -174,8 +192,12 @@ describe('canUserAccessChat Integration Tests', () => {
   });
 
   afterAll(async () => {
-    // Clean up test data
+    // Clean up test data in reverse order of creation
+    
+    // Delete collections_to_assets
     await db.delete(collectionsToAssets).where(eq(collectionsToAssets.collectionId, testCollectionId));
+    
+    // Delete asset_permissions
     await db.delete(assetPermissions).where(
       and(
         eq(assetPermissions.assetId, testChatId),
@@ -188,12 +210,23 @@ describe('canUserAccessChat Integration Tests', () => {
         eq(assetPermissions.identityId, testUserId)
       )
     );
-    await db.delete(chats).where(eq(chats.organizationId, testOrgId));
+    
+    // Delete collections
     await db.delete(collections).where(eq(collections.id, testCollectionId));
+    
+    // Delete chats
+    await db.delete(chats).where(eq(chats.organizationId, testOrgId));
+    
+    // Delete users_to_organizations
     await db.delete(usersToOrganizations).where(eq(usersToOrganizations.organizationId, testOrgId));
+    
+    // Delete users
     await db.delete(users).where(eq(users.id, testUserId));
     await db.delete(users).where(eq(users.id, testAdminUserId));
     await db.delete(users).where(eq(users.id, testUserNoAccessId));
+    await db.delete(users).where(eq(users.id, systemUserId));
+    
+    // Delete organization
     await db.delete(organizations).where(eq(organizations.id, testOrgId));
   });
 
