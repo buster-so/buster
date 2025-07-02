@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   BusterOrganizationRole,
+  BusterOrganizationRoleLabels,
   type BusterUser,
   type OrganizationUser
 } from '@/api/asset_interfaces';
@@ -44,11 +45,17 @@ export const UserDefaultAccess: React.FC<{
 };
 
 const accessOptions: SelectItem<OrganizationUser['role']>[] = [
-  { label: 'Data Admin', value: BusterOrganizationRole.DATA_ADMIN },
-  { label: 'Workspace Admin', value: BusterOrganizationRole.WORKSPACE_ADMIN },
-  { label: 'Querier', value: BusterOrganizationRole.QUERIER },
-  { label: 'Restricted Querier', value: BusterOrganizationRole.RESTRICTED_QUERIER },
-  { label: 'Viewer', value: BusterOrganizationRole.VIEWER }
+  { label: BusterOrganizationRoleLabels.dataAdmin, value: BusterOrganizationRole.DATA_ADMIN },
+  {
+    label: BusterOrganizationRoleLabels.workspaceAdmin,
+    value: BusterOrganizationRole.WORKSPACE_ADMIN
+  },
+  { label: BusterOrganizationRoleLabels.querier, value: BusterOrganizationRole.QUERIER },
+  {
+    label: BusterOrganizationRoleLabels.restrictedQuerier,
+    value: BusterOrganizationRole.RESTRICTED_QUERIER
+  },
+  { label: BusterOrganizationRoleLabels.viewer, value: BusterOrganizationRole.VIEWER }
 ];
 
 const DefaultAccessCard = React.memo(

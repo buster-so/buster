@@ -1,13 +1,27 @@
 import Link from 'next/link';
 import React from 'react';
 import { Button } from '@/components/ui/buttons';
-import { ArrowUpRight, CircleCheck } from '@/components/ui/icons';
+import { ArrowUpRight, CircleCheck, AlertWarning } from '@/components/ui/icons';
 import { Paragraph, Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
 import type { useNewChatWarning } from './useNewChatWarning';
+import {
+  BusterOrganizationRoleLabels,
+  type BusterOrganizationRole
+} from '@/api/asset_interfaces/organizations';
+
+const translateRole = (role: BusterOrganizationRole) => {
+  return BusterOrganizationRoleLabels[role];
+};
 
 export const NewChatWarning = React.memo(
-  ({ hasDatasets, hasDatasources }: ReturnType<typeof useNewChatWarning>) => {
+  ({ hasDatasets, hasDatasources, isAdmin, userRole }: ReturnType<typeof useNewChatWarning>) => {
+    // If user is not an admin, show the contact admin card
+    if (!isAdmin) {
+      return <ContactAdminCard userRole={userRole} />;
+    }
+
+    // Admin users see the setup checklist
     const allCompleted = hasDatasets && hasDatasources;
     const progress = [hasDatasources, hasDatasets].filter(Boolean).length;
     const progressPercentage = (progress / 2) * 100;
@@ -137,6 +151,53 @@ const SetupItem = ({ number, status, title, description, link, linkText }: Setup
             </Button>
           </Link>
         )}
+      </div>
+    </div>
+  );
+};
+
+interface ContactAdminCardProps {
+  userRole?: BusterOrganizationRole;
+}
+
+const ContactAdminCard = ({ userRole }: ContactAdminCardProps) => {
+  const roleLabel = userRole ? translateRole(userRole) : 'User';
+
+  return (
+    <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <Text className="text-xl font-medium text-gray-800">Contact Admin Required</Text>
+        <div className="rounded-full bg-blue-100 px-3 py-1">
+          <Text className="text-sm font-medium text-blue-700">{roleLabel}</Text>
+        </div>
+      </div>
+
+      <Paragraph className="mb-4 text-sm text-gray-500">
+        You don&apos;t have admin permissions to set up data sources and datasets.
+      </Paragraph>
+
+      <div className="space-y-4">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200">
+              <Text className="text-sm font-medium text-blue-700">
+                <AlertWarning />
+              </Text>
+            </div>
+            <div className="min-w-0 flex-1">
+              <Text className="font-medium text-blue-800">Permission Required</Text>
+              <Paragraph className="mt-1 text-sm text-blue-700">
+                Your current role is <span className="font-semibold">{roleLabel}</span>. To start
+                asking questions, an admin needs to:
+              </Paragraph>
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-blue-700">
+                <li>Connect data sources to your organization</li>
+                <li>Create datasets from those data sources</li>
+                <li>Grant you access to the relevant datasets</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
