@@ -41,4 +41,4 @@ jobs:
       - name: Run database migrations
         run: pnpm run db:migrate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DB_URL }}
