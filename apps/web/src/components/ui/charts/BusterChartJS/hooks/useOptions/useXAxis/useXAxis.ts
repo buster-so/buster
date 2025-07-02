@@ -106,15 +106,18 @@ export const useXAxis = ({
 
     if (xAxisKeysLength === 1) {
       const xIsDate = firstXColumnLabelFormat.columnType === 'date';
-      const comboChartAndhasBarChart =
-        isComboChart &&
-        Object.values(yAxisColumnSettings).some((y) => y.columnVisualization === 'bar');
 
-      if ((isLineChart || isScatterChart) && xIsDate && !comboChartAndhasBarChart) {
+      if ((isLineChart || isScatterChart) && xIsDate) {
         return 'time';
       }
 
-      if (isComboChart && columnSettings && xIsDate) {
+      if (
+        isComboChart &&
+        columnSettings &&
+        xIsDate &&
+        //if there is a bar chart, we don't want to use time scale, it causes the bars to be cut off
+        !Object.values(yAxisColumnSettings).some((y) => y.columnVisualization === 'bar')
+      ) {
         const allYAxisKeys = [...selectedAxis.y, ...((selectedAxis as ComboChartAxis).y2 || [])];
         const atLeastOneLineVisualization = allYAxisKeys.some(
           (y) =>
