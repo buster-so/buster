@@ -49,16 +49,18 @@ export const useChatInputFlow = ({
       return;
     }
 
+    const trimmedInputValue = inputValue.trim();
+
     const method = async () => {
       switch (flow) {
         case 'followup-chat':
-          await onFollowUpChat({ prompt: inputValue, chatId });
+          await onFollowUpChat({ prompt: trimmedInputValue, chatId });
           break;
 
         case 'followup-metric':
           if (!selectedFileId) return;
           await onStartChatFromFile({
-            prompt: inputValue,
+            prompt: trimmedInputValue,
             fileId: selectedFileId,
             fileType: 'metric'
           });
@@ -66,14 +68,14 @@ export const useChatInputFlow = ({
         case 'followup-dashboard':
           if (!selectedFileId) return;
           await onStartChatFromFile({
-            prompt: inputValue,
+            prompt: trimmedInputValue,
             fileId: selectedFileId,
             fileType: 'dashboard'
           });
           break;
 
         case 'new':
-          await onStartNewChat({ prompt: inputValue });
+          await onStartNewChat({ prompt: trimmedInputValue });
           break;
 
         default: {

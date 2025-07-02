@@ -25,7 +25,8 @@ export const NewChatInput: React.FC<Record<string, never>> = () => {
     if (disabledSubmit) return;
     try {
       setLoading(true);
-      await onStartNewChat({ prompt: value });
+      const trimmedValue = value.trim();
+      await onStartNewChat({ prompt: trimmedValue });
     } catch (error) {
       setLoading(false);
     }
