@@ -1352,9 +1352,14 @@ definitions:
                 type: array
                 items:
                   type: string
+              y2:
+                type: array
+                items:
+                  type: string
             required:
               - x
               - y
+              - y2
         required:
           - selectedChartType
           - comboChartAxis
