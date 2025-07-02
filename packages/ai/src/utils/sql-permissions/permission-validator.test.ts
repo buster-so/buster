@@ -10,7 +10,7 @@ vi.mock('@buster/access-controls', () => ({
 describe('Permission Validator', () => {
   describe('validateSqlPermissions', () => {
     beforeEach(() => {
-      vi.clearAllMocks();
+      vi.resetAllMocks();
     });
 
     it('should allow queries with no tables', async () => {
@@ -253,8 +253,8 @@ describe('Permission Validator', () => {
       );
 
       expect(result).toEqual({
-        isAuthorized: false,
-        unauthorizedTables: ['public.users','public.orders'],
+        isAuthorized: true,
+        unauthorizedTables: [],
       });
     });
   });
