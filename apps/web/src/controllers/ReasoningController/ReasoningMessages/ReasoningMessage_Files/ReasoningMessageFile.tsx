@@ -5,7 +5,6 @@ import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { StreamingMessageCode } from '@/components/ui/streaming/StreamingMessageCode';
 import { ReasoningFileButtons } from './ReasoningFileButtons';
 import { StreamingMessageStatus } from './StreamingMessageStatus';
-import { useMount } from '@/hooks';
 
 export type ReasoningMessageFileProps = {
   chatId: string;

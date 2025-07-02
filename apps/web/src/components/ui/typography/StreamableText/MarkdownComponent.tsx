@@ -6,5 +6,6 @@ import remarkGfm from 'remark-gfm';
 
 export const MarkdownComponent: LLMOutputComponent = ({ blockMatch }) => {
   const markdown = blockMatch.output;
-  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>;
+
+  return <AppMarkdown markdown={markdown} stripFormatting showLoader={!blockMatch.isComplete} />;
 };

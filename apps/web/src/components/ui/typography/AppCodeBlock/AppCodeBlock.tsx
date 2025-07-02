@@ -1,18 +1,12 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import React from 'react';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { Button } from '../../buttons/Button';
 import { FileCard } from '../../card/FileCard';
 import { Copy } from '../../icons/NucleoIconOutlined';
-import lightTheme from './light';
-
-const SyntaxHighlighter = dynamic(
-  () => import('react-syntax-highlighter').then((mod) => mod.Prism),
-  { ssr: false }
-);
+import { SyntaxHighlighter } from '../SyntaxHighlight';
 
 export const AppCodeBlock: React.FC<{
   language?: string;
@@ -31,9 +25,9 @@ export const AppCodeBlock: React.FC<{
     wrapperClassName = '',
     language,
     showCopyButton = true,
-    ...rest
+    style
   } = props;
-  const style = lightTheme;
+
   const code = String(children).replace(/\n$/, '');
   const { openSuccessMessage } = useBusterNotifications();
 
@@ -65,19 +59,12 @@ export const AppCodeBlock: React.FC<{
       headerButtons={headerButtons}>
       <div className="w-full overflow-x-auto">
         <div className="code-wrapper">
-          {language ? (
-            <SyntaxHighlighter
-              {...rest}
-              className={`${className} p-3! transition ${!style ? 'opacity-100' : 'm-0! border-none! p-0! opacity-100'}`}
-              language={language}
-              style={style}>
-              {code}
-            </SyntaxHighlighter>
-          ) : (
-            <code {...rest} className={className}>
-              {children}
-            </code>
-          )}
+          <SyntaxHighlighter
+            className={`${className} m-0! border-none! p-3! opacity-100 transition`}
+            language={language}
+            customStyle={style}>
+            {code}
+          </SyntaxHighlighter>
         </div>
       </div>
     </FileCard>
@@ -94,21 +81,3 @@ const CodeInlineWrapper: React.FC<{
     </code>
   );
 };
-
-const PulseLoader = React.memo(({ className, size = 4 }: { className?: string; size?: number }) => {
-  return (
-    <span
-      className={className}
-      style={{
-        opacity: 0.6,
-        display: 'inline-block',
-        width: size,
-        height: size,
-        backgroundColor: 'var(--color-text-default)',
-        borderRadius: '100%'
-      }}>
-      {/* Pulse animation can be added here if needed */}
-    </span>
-  );
-});
-PulseLoader.displayName = 'PulseLoader';

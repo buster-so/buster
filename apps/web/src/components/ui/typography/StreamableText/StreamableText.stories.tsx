@@ -37,6 +37,22 @@ print('Hello llm-ui!')
 \`\`\`typescript
 console.log('Hello llm-ui!');
 \`\`\`
+
+## YAML
+
+\`\`\`yaml
+name: Buster
+version: 1.0.0
+test:
+  - item1
+  - item2
+    - item3:
+      - item4
+      - item5
+
+\`\`\`
+
+## JSON
 `;
 
 const randomMarkdownBlocks = [
@@ -209,12 +225,24 @@ export const Default: Story = {
     isStreamFinished: false
   },
   render: (args) => {
-    const [currentMessage, setCurrentMessage] = useState(args.message);
+    const [currentMessage, setCurrentMessage] = useState(
+      args.message + randomMarkdownBlocks.join('\n\n---\n\n')
+    );
+
+    const { output, isStreamFinished, start } = useStreamExample(currentMessage, {
+      autoStart: true,
+      autoStartDelayMs: 0,
+      startIndex: 0,
+      delayMultiplier: 0.075
+    });
 
     const addRandomMarkdown = fn(() => {
       const randomBlock =
         randomMarkdownBlocks[Math.floor(Math.random() * randomMarkdownBlocks.length)];
       setCurrentMessage((prev: string) => prev + '\n\n---\n\n' + randomBlock);
+      setTimeout(() => {
+        start();
+      }, 1);
     });
 
     return (
@@ -235,7 +263,8 @@ export const Default: Story = {
             Add Random Markdown Block
           </button>
         </div>
-        <StreamableText message={currentMessage} isStreamFinished={args.isStreamFinished} />
+
+        <StreamableText message={output} isStreamFinished={isStreamFinished} />
       </div>
     );
   }

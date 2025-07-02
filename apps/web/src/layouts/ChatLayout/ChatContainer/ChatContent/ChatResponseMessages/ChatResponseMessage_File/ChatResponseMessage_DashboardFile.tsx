@@ -2,9 +2,6 @@ import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat
 import { useGetDashboard, usePrefetchGetDashboardClient } from '@/api/buster_rest/dashboards';
 import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { cn } from '@/lib/classMerge';
-import { FileCard } from '@/components/ui/card/FileCard';
-import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
 import { itemAnimationConfig } from '@/components/ui/streaming/animationConfig';
 import { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { CircleSpinnerLoader } from '@/components/ui/loaders/CircleSpinnerLoader';

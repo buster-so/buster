@@ -2,16 +2,12 @@
 
 import pluralize from 'pluralize';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { SyntaxHighlighter } from '@/components/ui/typography/SyntaxHighlight';
 import type { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
-import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
 import { cn } from '@/lib/classMerge';
 import { FileCard } from '../../card/FileCard';
 import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
-import { useMount } from '@/hooks';
-
-const style = SyntaxHighlighterLightTheme;
 
 type LineSegment = {
   type: 'text' | 'hidden';
@@ -147,7 +143,6 @@ const MemoizedSyntaxHighlighter = React.memo(
   ({ lineNumber, text }: { lineNumber: number; text: string }) => {
     return (
       <SyntaxHighlighter
-        style={style}
         language={'yaml'}
         showLineNumbers
         startingLineNumber={lineNumber}
