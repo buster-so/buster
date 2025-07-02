@@ -221,84 +221,193 @@ describe('SQL Parser Helpers', () => {
   });
 
   describe('extractTablesFromYml', () => {
-    it('should extract table_name from YML', () => {
+    it('should handle flat YML format with separate schema and database fields', () => {
       const yml = `
-        models:
-          - name: users
-            table_name: public.users
-            columns:
-              - name: id
-      `;
+name: customer
+schema: ont_ont
+database: postgres
+`;
       const tables = extractTablesFromYml(yml);
       expect(tables).toHaveLength(1);
-      expect(tables[0]).toMatchObject({ schema: 'public', table: 'users' });
+      expect(tables[0]).toMatchObject({
+        database: 'postgres',
+        schema: 'ont_ont',
+        table: 'customer',
+        fullName: 'postgres.ont_ont.customer'
+      });
     });
 
-    it('should extract sql_table_name from YML', () => {
+    it('should handle flat YML format with only schema', () => {
       const yml = `
-        version: 2
-        sources:
-          - name: raw
-            tables:
-              - name: orders
-                sql_table_name: raw_data.orders
-      `;
+name: users
+schema: public
+description: User data table
+`;
       const tables = extractTablesFromYml(yml);
       expect(tables).toHaveLength(1);
-      expect(tables[0]).toMatchObject({ schema: 'raw_data', table: 'orders' });
+      expect(tables[0]).toMatchObject({
+        schema: 'public',
+        table: 'users',
+        fullName: 'public.users'
+      });
     });
 
-    it('should extract from: patterns', () => {
+    it('should handle flat YML format with only database', () => {
       const yml = `
-        metrics:
-          - name: revenue
-            from: finance.transactions
-            measure: sum
-      `;
+name: orders
+database: analytics
+version: 2
+`;
       const tables = extractTablesFromYml(yml);
       expect(tables).toHaveLength(1);
-      expect(tables[0]).toMatchObject({ schema: 'finance', table: 'transactions' });
+      expect(tables[0]).toMatchObject({
+        database: 'analytics',
+        table: 'orders',
+        fullName: 'analytics.orders'
+      });
     });
 
-    it('should handle quoted table names', () => {
+    it('should handle models array with separate schema and database fields', () => {
       const yml = `
-        models:
-          - name: users
-            table_name: "public.users"
-          - name: orders
-            table_name: 'sales.orders'
-      `;
+models:
+  - name: customer
+    schema: ont_ont
+    database: postgres
+  - name: currency
+    schema: ont_ont
+    database: postgres
+  - name: product
+    schema: catalog
+    database: postgres
+`;
+      const tables = extractTablesFromYml(yml);
+      expect(tables).toHaveLength(3);
+      expect(tables[0]).toMatchObject({
+        database: 'postgres',
+        schema: 'ont_ont',
+        table: 'customer',
+        fullName: 'postgres.ont_ont.customer'
+      });
+      expect(tables[1]).toMatchObject({
+        database: 'postgres',
+        schema: 'ont_ont',
+        table: 'currency',
+        fullName: 'postgres.ont_ont.currency'
+      });
+      expect(tables[2]).toMatchObject({
+        database: 'postgres',
+        schema: 'catalog',
+        table: 'product',
+        fullName: 'postgres.catalog.product'
+      });
+    });
+
+    it('should handle models array with different schema/database combinations', () => {
+      const yml = `
+models:
+  - name: customer
+    schema: ont_ont
+    database: postgres
+  - name: users
+    schema: public
+  - name: analytics_fact
+    database: warehouse
+`;
+      const tables = extractTablesFromYml(yml);
+      expect(tables).toHaveLength(3);
+      expect(tables[0]).toMatchObject({
+        database: 'postgres',
+        schema: 'ont_ont',
+        table: 'customer',
+        fullName: 'postgres.ont_ont.customer'
+      });
+      expect(tables[1]).toMatchObject({
+        schema: 'public',
+        table: 'users',
+        fullName: 'public.users'
+      });
+      expect(tables[2]).toMatchObject({
+        database: 'warehouse',
+        table: 'analytics_fact',
+        fullName: 'warehouse.analytics_fact'
+      });
+    });
+
+    it('should handle models with both schema and database fields', () => {
+      const yml = `
+models:
+  - name: users
+    schema: public
+    database: primary
+  - name: orders
+    schema: sales
+    database: analytics
+`;
       const tables = extractTablesFromYml(yml);
       expect(tables).toHaveLength(2);
-      expect(tables[0]).toMatchObject({ schema: 'public', table: 'users' });
-      expect(tables[1]).toMatchObject({ schema: 'sales', table: 'orders' });
+      expect(tables[0]).toMatchObject({ 
+        database: 'primary',
+        schema: 'public', 
+        table: 'users',
+        fullName: 'primary.public.users'
+      });
+      expect(tables[1]).toMatchObject({ 
+        database: 'analytics',
+        schema: 'sales', 
+        table: 'orders',
+        fullName: 'analytics.sales.orders'
+      });
     });
 
-    it('should deduplicate tables', () => {
+    it('should deduplicate tables with same name/schema/database', () => {
       const yml = `
-        models:
-          - table_name: public.users
-          - table_name: public.users
-        sources:
-          - sql_table_name: public.users
-      `;
-      const tables = extractTablesFromYml(yml);
-      expect(tables).toHaveLength(1);
-      expect(tables[0]).toMatchObject({ schema: 'public', table: 'users' });
-    });
-
-    it('should handle database.schema.table format', () => {
-      const yml = `
-        models:
-          - table_name: mydb.public.users
-      `;
+models:
+  - name: users
+    schema: public
+    database: postgres
+  - name: users
+    schema: public
+    database: postgres
+  - name: users
+    schema: public
+    database: postgres
+`;
       const tables = extractTablesFromYml(yml);
       expect(tables).toHaveLength(1);
       expect(tables[0]).toMatchObject({ 
-        database: 'mydb',
+        database: 'postgres',
         schema: 'public', 
-        table: 'users' 
+        table: 'users',
+        fullName: 'postgres.public.users'
       });
+    });
+
+    it('should handle models with only name field (no schema/database)', () => {
+      const yml = `
+models:
+  - name: simple_table
+    description: A simple table without schema
+  - name: users
+    schema: public
+`;
+      const tables = extractTablesFromYml(yml);
+      // Should only extract the one with schema
+      expect(tables).toHaveLength(1);
+      expect(tables[0]).toMatchObject({
+        schema: 'public',
+        table: 'users',
+        fullName: 'public.users'
+      });
+    });
+
+    it('should handle empty or invalid YML gracefully', () => {
+      const emptyYml = '';
+      const tables1 = extractTablesFromYml(emptyYml);
+      expect(tables1).toHaveLength(0);
+
+      const invalidYml = 'not valid yaml: [}';
+      const tables2 = extractTablesFromYml(invalidYml);
+      expect(tables2).toHaveLength(0);
     });
   });
 });

@@ -1,4 +1,5 @@
 import { Parser } from 'node-sql-parser';
+import * as yaml from 'yaml';
 
 export interface ParsedTable {
   database?: string;
@@ -205,37 +206,92 @@ export function tablesMatch(queryTable: ParsedTable, permissionTable: ParsedTabl
 
 /**
  * Extracts table references from dataset YML content
- * Looks for patterns like:
- * - table_name: schema.table
- * - table_name: "schema.table"
- * - sql_table_name: schema.table
+ * Handles multiple formats:
+ * 1. Flat format (top-level fields):
+ *    name: table_name
+ *    schema: schema_name
+ *    database: database_name
+ * 2. Models array with separate fields:
+ *    models:
+ *      - name: table_name
+ *        schema: schema_name
+ *        database: database_name
  */
 export function extractTablesFromYml(ymlContent: string): ParsedTable[] {
   const tables: ParsedTable[] = [];
   const processedTables = new Set<string>();
 
-  // Match various table name patterns in YML
-  const patterns = [
-    /table_name:\s*["']?([^"'\n]+)["']?/g,
-    /sql_table_name:\s*["']?([^"'\n]+)["']?/g,
-    /from:\s*["']?([^"'\n]+)["']?/g,
-  ];
+  try {
+    // Parse YML content
+    const parsed = yaml.parse(ymlContent);
 
-  for (const pattern of patterns) {
-    const matches = ymlContent.matchAll(pattern);
+    // Check for flat format (top-level name, schema, database)
+    if (parsed?.name && !parsed?.models && (parsed?.schema || parsed?.database)) {
+      const parsedTable: ParsedTable = {
+        table: parsed.name,
+        fullName: parsed.name,
+      };
 
-    for (const match of matches) {
-      if (match[1]) {
-        const tableRef = match[1].trim();
-        const parsed = parseTableReference(tableRef);
-        const key = normalizeTableIdentifier(parsed);
+      // Add schema if present
+      if (parsed.schema) {
+        parsedTable.schema = parsed.schema;
+        parsedTable.fullName = `${parsed.schema}.${parsed.name}`;
+      }
 
-        if (!processedTables.has(key)) {
-          processedTables.add(key);
-          tables.push(parsed);
+      // Add database if present
+      if (parsed.database) {
+        parsedTable.database = parsed.database;
+        if (parsed.schema) {
+          parsedTable.fullName = `${parsed.database}.${parsed.schema}.${parsed.name}`;
+        } else {
+          parsedTable.fullName = `${parsed.database}.${parsed.name}`;
+        }
+      }
+
+      const key = normalizeTableIdentifier(parsedTable);
+      if (!processedTables.has(key)) {
+        processedTables.add(key);
+        tables.push(parsedTable);
+      }
+    }
+
+    // Look for models array
+    if (parsed?.models && Array.isArray(parsed.models)) {
+      for (const model of parsed.models) {
+        // Process models that have name and at least schema or database
+        if (model.name && (model.schema || model.database)) {
+          const parsedTable: ParsedTable = {
+            table: model.name,
+            fullName: model.name,
+          };
+
+          // Add schema if present
+          if (model.schema) {
+            parsedTable.schema = model.schema;
+            parsedTable.fullName = `${model.schema}.${model.name}`;
+          }
+
+          // Add database if present
+          if (model.database) {
+            parsedTable.database = model.database;
+            if (model.schema) {
+              parsedTable.fullName = `${model.database}.${model.schema}.${model.name}`;
+            } else {
+              parsedTable.fullName = `${model.database}.${model.name}`;
+            }
+          }
+
+          const key = normalizeTableIdentifier(parsedTable);
+          if (!processedTables.has(key)) {
+            processedTables.add(key);
+            tables.push(parsedTable);
+          }
         }
       }
     }
+  } catch (error) {
+    // If YML parsing fails, return empty array
+    console.warn('Failed to parse YML:', error);
   }
 
   return tables;

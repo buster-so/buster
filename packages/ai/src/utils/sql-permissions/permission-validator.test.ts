@@ -27,7 +27,7 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
           `,
         },
       ] as any);
@@ -46,7 +46,7 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
           `,
         },
       ] as any);
@@ -65,9 +65,9 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
               - name: orders
-                table_name: public.orders
+                schema: public
           `,
         },
       ] as any);
@@ -89,7 +89,7 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
           `,
         },
       ] as any);
@@ -110,10 +110,10 @@ describe('Permission Validator', () => {
         {
           ymlFile: `
             models:
-              - name: product_revenue
-                table_name: ont_ont.product_total_revenue
-              - name: product_sales
-                table_name: ont_ont.product_quarterly_sales
+              - name: product_total_revenue
+                schema: ont_ont
+              - name: product_quarterly_sales
+                schema: ont_ont
           `,
         },
       ] as any);
@@ -143,9 +143,9 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
               - name: orders
-                table_name: public.orders
+                schema: public
           `,
         },
       ] as any);
@@ -171,7 +171,7 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
           `,
         },
       ] as any);
@@ -233,16 +233,16 @@ describe('Permission Validator', () => {
           ymlFile: `
             models:
               - name: users
-                table_name: public.users
+                schema: public
           `,
         },
         {
           ymlFile: `
             models:
-              - name: users_v2
-                table_name: public.users
+              - name: users
+                schema: public
               - name: orders
-                table_name: public.orders
+                schema: public
           `,
         },
       ] as any);
