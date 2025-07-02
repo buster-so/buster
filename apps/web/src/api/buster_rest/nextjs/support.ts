@@ -1,4 +1,4 @@
-import nextApi from '@/api/next/instances';
+import { mainApiV2 } from '../instances';
 
 export interface AppSupportRequest {
   userName: string;
@@ -15,5 +15,5 @@ export interface AppSupportRequest {
 }
 
 export const submitAppSupportRequest = async (data: AppSupportRequest) => {
-  return await nextApi.post('/api/support', data).then((res) => res.data);
+  return await mainApiV2.post<{ success: boolean }>('/api/support', data).then((res) => res.data);
 };

@@ -7,3 +7,4 @@ export * from './sql';
 export * from './sql';
 export * from './teams';
 export * from './users';
+export * from './currency';

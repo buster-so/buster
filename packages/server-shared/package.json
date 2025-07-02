@@ -18,6 +18,10 @@
     "./chats": {
       "types": "./dist/chats/index.d.ts",
       "default": "./dist/chats/index.js"
+    },
+    "./currency": {
+      "types": "./dist/currency/index.d.ts",
+      "default": "./dist/currency/index.js"
     }
   },
   "dependencies": {

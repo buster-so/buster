@@ -85,9 +85,6 @@ declare global {
       POSTHOG_ENV_ID?: string;
       NEXT_PUBLIC_USER?: string;
       NEXT_PUBLIC_USER_PASSWORD?: string;
-
-      //server only
-      NEXT_SLACK_APP_SUPPORT_URL?: string;
     }
   }
 }

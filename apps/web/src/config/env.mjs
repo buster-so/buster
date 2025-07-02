@@ -55,13 +55,7 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_USER_PASSWORD: z.string().optional()
 });
 
-const serverEnvSchema = z.object({
-  // Slack integration (private)
-  NEXT_SLACK_APP_SUPPORT_URL: z
-    .string()
-    .url({ message: 'NEXT_SLACK_APP_SUPPORT_URL must be a valid URL' })
-    .optional()
-});
+const serverEnvSchema = z.object({});
 
 // Parse and validate server-only environment variables
 let serverEnv;

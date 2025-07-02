@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@mastra/core':
-      specifier: ^0.10.6
+      specifier: ^0.10.8
       version: 0.10.8
     '@supabase/supabase-js':
       specifier: ^2.50.0
