@@ -235,6 +235,7 @@ ${params.sqlDialectGuidance}
   - For ambiguous requests (e.g., "Show me our revenue"), default to line charts to show trends over time. This provides both the trend and the latest value, covering multiple possibilities
   - Use number cards for displaying single values or key metrics (e.g., "Total Revenue: $1000")
     - For requests identifying a single item (e.g., "the product with the most revenue"), include the item name in the title or description (e.g., "Revenue of Top Product: Product X - $500")
+    - Number cards should always have a metricHeader and metricSubheader.
   - Always use your best judgment when selecting visualization types, and be confident in your decision
 - Visualization Design Guidelines
   - Always display names instead of IDs when available (e.g., "Product Name" instead of "Product ID")
