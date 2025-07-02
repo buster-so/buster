@@ -1,7 +1,11 @@
 'use client';
 import { codeBlockLookBack, findCompleteCodeBlock, findPartialCodeBlock } from '@llm-ui/code';
 import { markdownLookBack } from '@llm-ui/markdown';
+<<<<<<< HEAD
 import { useLLMOutput } from '@llm-ui/react';
+=======
+import { throttleBasic, useLLMOutput, useStreamExample } from '@llm-ui/react';
+>>>>>>> staging
 import { MarkdownComponent } from './MarkdownComponent';
 import { CodeBlock } from './CodeBlockComponent';
 
@@ -10,11 +14,20 @@ export interface StreamableTextProps {
   isStreamFinished?: boolean;
 }
 
+<<<<<<< HEAD
+=======
+const throttle = throttleBasic();
+
+>>>>>>> staging
 export const StreamableText = ({
   message: llmOutput,
   isStreamFinished = false
 }: StreamableTextProps) => {
+<<<<<<< HEAD
   const { blockMatches, visibleText } = useLLMOutput({
+=======
+  const { blockMatches, visibleText, ...rest } = useLLMOutput({
+>>>>>>> staging
     llmOutput,
     fallbackBlock: {
       component: MarkdownComponent,
@@ -28,9 +41,21 @@ export const StreamableText = ({
         lookBack: codeBlockLookBack()
       }
     ],
+<<<<<<< HEAD
     isStreamFinished
   });
 
+=======
+    throttle,
+    onFinish: () => {
+      console.log('finished');
+    },
+    isStreamFinished
+  });
+
+  console.log(isStreamFinished, visibleText);
+
+>>>>>>> staging
   return (
     <div>
       {blockMatches.length ? (
