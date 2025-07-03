@@ -2,9 +2,6 @@ on:
   push:
     branches:
     - main
-    paths:
-    - apps/server/**
-    - packages/**
 name: Deploy to Porter
 jobs:
   porter-deploy:
