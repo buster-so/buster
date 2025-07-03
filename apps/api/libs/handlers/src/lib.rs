@@ -9,6 +9,7 @@ pub mod messages;
 pub mod metrics;
 pub mod organizations;
 pub mod search;
+pub mod slack;
 pub mod users;
 pub mod utils;
 
