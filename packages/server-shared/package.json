@@ -8,7 +8,9 @@
     "build": "tsc --build",
     "dev": "tsc --watch",
     "lint": "biome check",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "exports": {
     ".": {
@@ -27,5 +29,9 @@
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@buster/vitest-config": "workspace:*",
+    "vitest": "catalog:"
   }
 }
