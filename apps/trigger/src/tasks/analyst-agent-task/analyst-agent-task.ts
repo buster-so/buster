@@ -23,6 +23,160 @@ import type { MessageContextOutput, OrganizationDataSourceOutput } from '@buster
 
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 
+// Import CoreMessage type for conversion
+import type { CoreMessage } from 'ai';
+
+/**
+ * Helper function to detect if messages are in old OpenAI format
+ */
+function isOldMessageFormat(messages: unknown[]): boolean {
+  if (!Array.isArray(messages) || messages.length === 0) return false;
+  
+  const firstMessage = messages[0] as any;
+  // Old format has tool_calls property, new format has content array
+  return (
+    firstMessage?.role && 
+    (firstMessage?.tool_calls !== undefined || 
+     firstMessage?.tool_call_id !== undefined ||
+     (typeof firstMessage?.content === 'string' && firstMessage?.role !== 'system'))
+  );
+}
+
+/**
+ * Converts old OpenAI message format to new CoreMessage format
+ */
+function convertOldFormatToCoreMessages(oldMessages: any[]): CoreMessage[] {
+  const coreMessages: CoreMessage[] = [];
+  const toolResults: Map<string, { toolName: string; result: unknown }> = new Map();
+
+  // First pass: collect tool results
+  for (const message of oldMessages) {
+    if (message.role === 'tool' && message.tool_call_id && message.content) {
+      try {
+        const result = JSON.parse(message.content);
+        toolResults.set(message.tool_call_id, {
+          toolName: message.name || 'unknown_tool',
+          result,
+        });
+      } catch {
+        // If content isn't JSON, use as string
+        toolResults.set(message.tool_call_id, {
+          toolName: message.name || 'unknown_tool',
+          result: message.content,
+        });
+      }
+    }
+  }
+
+  // Second pass: convert messages
+  for (const message of oldMessages) {
+    switch (message.role) {
+      case 'system':
+        coreMessages.push({
+          role: 'system',
+          content: message.content || '',
+        });
+        break;
+
+      case 'user':
+        coreMessages.push({
+          role: 'user',
+          content: message.content || '',
+        });
+        break;
+
+      case 'assistant':
+        if (message.tool_calls && message.tool_calls.length > 0) {
+          // Assistant message with tool calls
+          const content: any[] = [];
+
+          // Add tool calls
+          for (const toolCall of message.tool_calls) {
+            let args: unknown;
+            try {
+              args = JSON.parse(toolCall.function.arguments);
+            } catch {
+              args = toolCall.function.arguments;
+            }
+
+            content.push({
+              type: 'tool-call',
+              toolCallId: toolCall.id,
+              toolName: toolCall.function.name,
+              args,
+            });
+          }
+
+          coreMessages.push({
+            role: 'assistant',
+            content,
+          });
+
+          // Add corresponding tool results if they exist
+          const toolContent: any[] = [];
+          for (const toolCall of message.tool_calls) {
+            const toolResult = toolResults.get(toolCall.id);
+            if (toolResult) {
+              toolContent.push({
+                type: 'tool-result',
+                toolCallId: toolCall.id,
+                toolName: toolResult.toolName,
+                result: toolResult.result,
+              });
+            }
+          }
+
+          if (toolContent.length > 0) {
+            coreMessages.push({
+              role: 'tool',
+              content: toolContent,
+            });
+          }
+        } else {
+          // Regular assistant message
+          coreMessages.push({
+            role: 'assistant',
+            content: message.content || '',
+          });
+        }
+        break;
+
+      case 'tool':
+        // Tool messages are handled in the assistant case above
+        // Skip them here to avoid duplication
+        break;
+
+      default:
+        logger.warn(`Unknown message role during conversion: ${message.role}`, {
+          messageId: message.id,
+        });
+    }
+  }
+
+  return coreMessages;
+}
+
+/**
+ * Ensures conversation history is in the correct CoreMessage format
+ * Handles both old OpenAI format and new CoreMessage format
+ */
+function ensureCoreMessageFormat(conversationHistory: unknown[]): CoreMessage[] {
+  if (!Array.isArray(conversationHistory)) {
+    return [];
+  }
+
+  // Check if messages are in old format
+  if (isOldMessageFormat(conversationHistory)) {
+    logger.log('Converting old message format to CoreMessage format', {
+      messageCount: conversationHistory.length,
+    });
+    return convertOldFormatToCoreMessages(conversationHistory);
+  }
+
+  // Already in correct format
+  return conversationHistory as CoreMessage[];
+}
+
 /**
  * Task 3: Setup runtime context from Task 2 database helper outputs
  * Uses individual helper results to populate Mastra RuntimeContext
@@ -384,9 +538,12 @@ export const analystAgentTask: ReturnType<
       const contextSetupTime = Date.now() - contextSetupStart;
 
       // Task 4: Prepare workflow input with conversation history and dashboard files
+      // Convert conversation history to ensure it's in the correct CoreMessage format
+      const formattedConversationHistory = ensureCoreMessageFormat(conversationHistory);
+      
       const workflowInput = {
         prompt: messageContext.requestMessage,
-        conversationHistory: conversationHistory.length > 0 ? conversationHistory : undefined,
+        conversationHistory: formattedConversationHistory.length > 0 ? formattedConversationHistory : undefined,
         dashboardFiles: dashboardFiles.length > 0 ? dashboardFiles : undefined,
       };
 
