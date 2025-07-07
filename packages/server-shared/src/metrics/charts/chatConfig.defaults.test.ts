@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { DEFAULT_CHART_CONFIG } from './chatConfig.defaults';
-import { BusterChartConfigPropsSchema } from './chartConfigProps';
+import { ChartConfigPropsSchema } from './chartConfigProps';
 import { DEFAULT_CHART_THEME } from './configColors';
 
 describe('DEFAULT_CHART_CONFIG', () => {
-  it('should conform to BusterChartConfigPropsSchema and have expected default values', () => {
+  it('should conform to ChartConfigPropsSchema and have expected default values', () => {
     // Verify that DEFAULT_CHART_CONFIG is valid according to the schema
-    const parseResult = BusterChartConfigPropsSchema.safeParse(DEFAULT_CHART_CONFIG);
+    const parseResult = ChartConfigPropsSchema.safeParse(DEFAULT_CHART_CONFIG);
     expect(parseResult.success).toBe(true);
 
     if (parseResult.success) {

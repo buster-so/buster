@@ -97,7 +97,6 @@ describe('SlackHandler', () => {
         organizationId: 'org-123',
         userId: 'user-123',
         metadata: {
-          returnUrl: '/dashboard',
           ipAddress: '192.168.1.1',
         },
       });

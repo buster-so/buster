@@ -10,7 +10,19 @@ describe('logger middleware', () => {
     debug: typeof console.debug;
   };
 
-  import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+  beforeEach(() => {
+    // Save original env and console
+    originalEnv = { ...process.env };
+    originalConsole = {
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+      debug: console.debug
+    };
+    
+    // Clear module cache to ensure fresh imports
+    vi.resetModules();
+  });
 
   afterEach(() => {
     // Restore original env and console
@@ -19,9 +31,13 @@ describe('logger middleware', () => {
     console.warn = originalConsole.warn;
     console.error = originalConsole.error;
     console.debug = originalConsole.debug;
+    
+    // Clear module cache
+    vi.resetModules();
   });
 
   it('should use info level by default when LOG_LEVEL is not set', async () => {
+    // Remove LOG_LEVEL completely before importing
     delete process.env.LOG_LEVEL;
     
     const { loggerMiddleware } = await import('./logger');

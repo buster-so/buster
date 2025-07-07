@@ -9,9 +9,10 @@ vi.mock('@buster/database', () => ({
 
 describe('ChunkProcessor - Escape Normalization', () => {
   let processor: ChunkProcessor<ToolSet>;
+  const availableTools = new Set(['sequential-thinking', 'submitThoughts', 'sequentialThinking']);
 
   beforeEach(() => {
-    processor = new ChunkProcessor<ToolSet>('test-message-id');
+    processor = new ChunkProcessor<ToolSet>('test-message-id', [], [], [], [], availableTools);
   });
 
   it('should normalize double-escaped newlines in sequential thinking tool', async () => {

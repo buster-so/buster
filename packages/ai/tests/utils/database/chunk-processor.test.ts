@@ -11,7 +11,9 @@ describe('ChunkProcessor', () => {
   const mockMessageId = 'test-message-id';
 
   it('should not include user messages in reasoning', async () => {
-    const processor = new ChunkProcessor(mockMessageId);
+    // Specify available tools including sequentialThinking
+    const availableTools = new Set(['sequentialThinking']);
+    const processor = new ChunkProcessor(mockMessageId, [], [], [], [], availableTools);
 
     // Simulate a user message chunk
     const userMessage: CoreMessage = {
@@ -47,7 +49,8 @@ describe('ChunkProcessor', () => {
   });
 
   it('should extract response messages with correct field names', async () => {
-    const processor = new ChunkProcessor(mockMessageId);
+    const availableTools = new Set(['doneTool', 'respondWithoutAnalysis']);
+    const processor = new ChunkProcessor(mockMessageId, [], [], [], [], availableTools);
 
     // Process doneTool with final_response
     await processor.processChunk({
@@ -92,6 +95,7 @@ describe('ChunkProcessor', () => {
   });
 
   it('should prevent duplicate processing with lastProcessedMessageIndex', async () => {
+    const availableTools = new Set(['sequentialThinking']);
     const initialMessages: CoreMessage[] = [
       {
         role: 'user',
@@ -110,7 +114,7 @@ describe('ChunkProcessor', () => {
       },
     ];
 
-    const processor = new ChunkProcessor(mockMessageId, initialMessages);
+    const processor = new ChunkProcessor(mockMessageId, initialMessages, [], [], [], availableTools);
 
     // Process a new tool call
     await processor.processChunk({
