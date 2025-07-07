@@ -192,6 +192,7 @@ describe('MaxRows Limiting Tests', () => {
     let mockStream: {
       on: ReturnType<typeof vi.fn>;
       destroy: ReturnType<typeof vi.fn>;
+      destroyed?: boolean;
     };
 
     beforeEach(() => {
@@ -222,14 +223,19 @@ describe('MaxRows Limiting Tests', () => {
       };
       mockConnection = {
         execute: vi.fn(),
+        destroy: vi.fn(),
       };
       mockStatement.streamRows.mockReturnValue(mockStream);
-      (
-        adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }
-      ).connection = mockConnection;
-      (
-        adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }
-      ).connected = true;
+      
+      // Create a mock pool that returns our mock connection
+      const mockPool = {
+        acquire: vi.fn().mockResolvedValue(mockConnection),
+        release: vi.fn(),
+      };
+      
+      // Set the pool on the adapter using reflection
+      (adapter as any).pool = mockPool;
+      (adapter as any).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {

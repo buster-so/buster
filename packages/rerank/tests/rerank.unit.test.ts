@@ -7,15 +7,28 @@ vi.mock('axios');
 const mockedAxios = vi.mocked(axios);
 
 describe('Reranker - Unit Tests', () => {
+  const originalEnv = { ...process.env };
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockedAxios.create.mockReturnValue({
       post: vi.fn(),
     });
+    
+    // Set default environment variables for tests
+    process.env.RERANK_API_KEY = 'test-api-key';
+    process.env.RERANK_BASE_URL = 'https://test.api.com';
+    process.env.RERANK_MODEL = 'test-model';
+    
+    // Mock console.error
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    // Restore original environment variables
+    process.env = { ...originalEnv };
   });
 
   describe('Constructor', () => {
@@ -33,30 +46,21 @@ describe('Reranker - Unit Tests', () => {
     });
 
     it('should throw error if API key is missing', () => {
-      const originalApiKey = process.env.RERANK_API_KEY;
-      process.env.RERANK_API_KEY = '';
+      delete process.env.RERANK_API_KEY;
 
       expect(() => new Reranker()).toThrow('RERANK_API_KEY is required');
-
-      process.env.RERANK_API_KEY = originalApiKey;
     });
 
     it('should throw error if base URL is missing', () => {
-      const originalBaseUrl = process.env.RERANK_BASE_URL;
-      process.env.RERANK_BASE_URL = '';
+      delete process.env.RERANK_BASE_URL;
 
       expect(() => new Reranker()).toThrow('RERANK_BASE_URL is required');
-
-      process.env.RERANK_BASE_URL = originalBaseUrl;
     });
 
     it('should throw error if model is missing', () => {
-      const originalModel = process.env.RERANK_MODEL;
-      process.env.RERANK_MODEL = '';
+      delete process.env.RERANK_MODEL;
 
       expect(() => new Reranker()).toThrow('RERANK_MODEL is required');
-
-      process.env.RERANK_MODEL = originalModel;
     });
   });
 
@@ -167,7 +171,7 @@ describe('Reranker - Unit Tests', () => {
         expect(result.index).toBe(index);
         expect(result.relevance_score).toBe(1.0);
       });
-      expect(console.error).toHaveBeenCalledWith('Rerank failed:', expect.any(Error));
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Rerank failed:', expect.any(Error));
     });
 
     it('should handle network timeouts', async () => {
@@ -179,7 +183,7 @@ describe('Reranker - Unit Tests', () => {
       const results = await reranker.rerank('query', documents);
 
       expect(results).toHaveLength(documents.length);
-      expect(console.error).toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
     it('should handle invalid API responses', async () => {
@@ -209,7 +213,7 @@ describe('Reranker - Unit Tests', () => {
       const results = await reranker.rerank('query', documents);
 
       expect(results).toHaveLength(documents.length);
-      expect(console.error).toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalled();
     });
   });
 
