@@ -287,7 +287,7 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
       });
 
       expect(response.status).toBe(302);
-      expect(response.headers.get('Location')).toBe('/settings/integrations?status=cancelled');
+      expect(response.headers.get('Location')).toBe('/app/settings/integrations?status=cancelled');
     });
 
     it('should redirect on invalid parameters', async () => {
@@ -297,7 +297,7 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
 
       expect(response.status).toBe(302);
       expect(response.headers.get('Location')).toBe(
-        '/settings/integrations?status=error&error=invalid_parameters'
+        '/app/settings/integrations?status=error&error=invalid_parameters'
       );
     });
 
@@ -355,7 +355,7 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
 
       expect(response.status).toBe(302);
       expect(response.headers.get('Location')).toBe(
-        '/settings/integrations?status=error&error=Invalid%20or%20expired%20OAuth%20state'
+        '/app/settings/integrations?status=error&error=Invalid%20or%20expired%20OAuth%20state'
       );
     });
   });

@@ -132,7 +132,9 @@ describe('SlackHandler', () => {
 
       await handler.handleOAuthCallback(mockContext);
 
-      expect(mockContext.redirect).toHaveBeenCalledWith('/settings/integrations?status=cancelled');
+      expect(mockContext.redirect).toHaveBeenCalledWith(
+        '/app/settings/integrations?status=cancelled'
+      );
     });
 
     it('should redirect on invalid parameters', async () => {
@@ -141,7 +143,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/settings/integrations?status=error&error=invalid_parameters'
+        '/app/settings/integrations?status=error&error=invalid_parameters'
       );
     });
 
@@ -186,7 +188,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/settings/integrations?status=error&error=invalid_state'
+        '/app/settings/integrations?status=error&error=invalid_state'
       );
     });
   });

@@ -136,7 +136,7 @@ export class SlackHandler {
 
       // Check if service is available
       if (!slackOAuthService) {
-        return c.redirect('/settings/integrations?status=error&error=not_configured');
+        return c.redirect('/app/settings/integrations?status=error&error=not_configured');
       }
 
       // Parse query parameters
@@ -153,7 +153,7 @@ export class SlackHandler {
         // Handle user denial
         if (query.error === 'access_denied') {
           console.info('OAuth flow cancelled by user');
-          return c.redirect('/settings/integrations?status=cancelled');
+          return c.redirect('/app/settings/integrations?status=cancelled');
         }
 
         console.error('Invalid OAuth callback parameters:', {
@@ -161,7 +161,7 @@ export class SlackHandler {
           providedKeys: Object.keys(query),
           expectedKeys: ['code', 'state'],
         });
-        return c.redirect('/settings/integrations?status=error&error=invalid_parameters');
+        return c.redirect('/app/settings/integrations?status=error&error=invalid_parameters');
       }
 
       // Handle OAuth callback
@@ -178,11 +178,11 @@ export class SlackHandler {
           resultKeys: Object.keys(result),
         });
         const errorParam = encodeURIComponent(result.error || 'unknown_error');
-        return c.redirect(`/settings/integrations?status=error&error=${errorParam}`);
+        return c.redirect(`/app/settings/integrations?status=error&error=${errorParam}`);
       }
 
       // Use metadata to determine return URL
-      const returnUrl = result.metadata?.returnUrl || '/settings/integrations';
+      const returnUrl = result.metadata?.returnUrl || '/app/settings/integrations';
       const workspaceParam = result.teamName
         ? `&workspace=${encodeURIComponent(result.teamName)}`
         : '';
@@ -197,7 +197,7 @@ export class SlackHandler {
       });
       const errorMessage = error instanceof Error ? error.message : 'callback_failed';
       return c.redirect(
-        `/settings/integrations?status=error&error=${encodeURIComponent(errorMessage)}`
+        `/app/settings/integrations?status=error&error=${encodeURIComponent(errorMessage)}`
       );
     }
   }
