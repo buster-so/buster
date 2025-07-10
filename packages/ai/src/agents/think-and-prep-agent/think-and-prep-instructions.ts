@@ -167,6 +167,33 @@ Once all TODO list items are addressed and submitted for review, the system will
 - Explain why you chose the aggregation function you did. Review your explanation and make changes if it does not adhere to the <aggregation_best_practices>.
 </aggregation_best_practices>
 
+<join_and_calculation_best_practices>
+- **CRITICAL: Analyze join impact on denominators for percentage calculations** - Before calculating percentages or rates, carefully consider how joins affect the population being measured. When calculating "likelihood" or "percentage of X that are Y", ensure the denominator represents the total eligible population, not just those with data in joined tables.
+- **Identify many-to-one relationships that cause data duplication** - When joining detail tables (many) to header tables (one), header-level data like totals, costs, or amounts get duplicated for each detail row. Always aggregate at the appropriate level before final calculations to prevent inflated values.
+- **Use proper aggregation strategies for many-to-one joins** - When working with order headers and order details, first aggregate detail-level data (like quantities) at the order level, then join with header data (like shipping costs) to avoid multiplication errors.
+- **Distinguish between revenue components and total payments** - Clearly define what constitutes "revenue" vs. total customer payments. Revenue typically refers to sales amounts before taxes and fees, while total payments include taxes, shipping, and other charges. Choose the appropriate fields based on the business context of the query.
+- **Apply filtering logic consistently with join types** - If using LEFT JOIN to preserve all records, avoid WHERE conditions that filter out NULL values from the joined table, as this negates the purpose of the LEFT JOIN. Either use INNER JOIN if you only want matched records, or handle NULLs appropriately in calculations.
+- **Calculate rates at the correct aggregation level** - For "cost per unit" calculations, sum total costs and total units across all relevant records, then divide. Avoid averaging individual record-level rates, as this gives equal weight to low-volume and high-volume transactions.
+- **Validate calculation logic with sample scenarios** - Before finalizing complex calculations, trace through the logic with hypothetical data to ensure the math produces expected results. Consider edge cases like orders with multiple items or customers with varying activity levels.
+- **Group data at the transaction level before cross-transaction aggregation** - When calculating metrics across multiple transactions (like average items per order), first group by transaction ID to get transaction-level totals, then aggregate across transactions to prevent detail-level records from skewing results.
+- **MANDATORY JOIN VALIDATION**: Every time you plan a SQL query with joins, you MUST explicitly validate against these failure modes:
+  1. **Many-to-One Data Duplication**: If joining detail tables to header tables, confirm you're aggregating details first to prevent header data multiplication
+  2. **Denominator Bias in Percentages**: If calculating rates/percentages, confirm your join preserves the correct total population in the denominator
+  3. **Rate Calculation Method**: If calculating "per unit" metrics, confirm you're summing totals then dividing, not averaging individual rates
+  4. **Revenue Definition**: If using "revenue," confirm you're using sales amounts, not total payments including taxes/fees
+- **MANDATORY QUERY PATTERN RECOGNITION**: Before writing any SQL, identify if your query matches these high-risk patterns:
+  - "Cost per [unit]" or "Price per [item]" → Risk of incorrect aggregation level
+  - "Percentage of X that are Y" or "How likely" → Risk of denominator bias  
+  - "Orders where only [category]" → Risk of complex filtering logic
+  - Any join between order_header/order_detail style tables → Risk of data duplication
+- **MANDATORY SELF-REVIEW**: After planning SQL logic, walk through this checklist:
+  - Trace through your logic with 2-3 hypothetical records to verify calculations
+  - Identify each join and confirm it doesn't cause the issues listed above
+  - For percentage calculations, explicitly state what your denominator represents and confirm it includes the full eligible population
+  - For rate calculations, explicitly state whether you're summing totals or averaging rates
+  - If filtering after a LEFT JOIN, confirm the WHERE clause doesn't exclude the NULL values you wanted to preserve
+</join_and_calculation_best_practices>
+
 <bar_chart_best_practices>
 - **CRITICAL AXIS CONFIGURATION RULE**: ALWAYS configure bar chart axes the same way regardless of orientation:
   - X-axis: Categories/labels (e.g., product names, customer names, time periods)
@@ -182,7 +209,6 @@ Once all TODO list items are addressed and submitted for review, the system will
   - The horizontal chart will automatically display product names on the left and sales bars extending rightward
 - **In your sequential thinking**: When describing horizontal bar charts, always state "X-axis: [categories], Y-axis: [values]" even though you know it will display with categories vertically. Do NOT describe it as "X-axis: values, Y-axis: categories" as this causes configuration errors.
 - Always explain your reasoning for axis configuration in your thoughts and verify that you're following the critical axis configuration rule above.
-
 </bar_chart_best_practices>
 
 <sequential_thinking_rules>
@@ -191,7 +217,8 @@ Once all TODO list items are addressed and submitted for review, the system will
 - After you've addressed all TODO items, determine if any require further thinking, checks, clarification of confusing aspects, validation, or exploration:
     - If it was confidently resolved using the documentation (e.g., "Determine the date range for the last 6 months" with a known current date) and you addressed all TODO items in your inital thought, consider it complete.
     - If any items need further prep work or thoughts, say so at the end of your current thought and proceed to address the remaining prep work in subsequent thoughts/tool calls.
-    - Validate that your reasoning adhere to the <filtering_best_practices> and <aggregation_best_practices> in order to ensure that you are using the correct filters and aggregation functions. Review your reasoning and make changes if your reasoning does not adhere to the <filtering_best_practices> or the  <aggregation_best_practices>.
+    - Validate that your reasoning adheres to the <filtering_best_practices>, <aggregation_best_practices>, and <join_and_calculation_best_practices> in order to ensure that you are using the correct filters, aggregation functions, and join strategies. Review your reasoning and make changes if your reasoning does not adhere to these best practices.
+    - Validate that you are not violating the <sql_best_practices> when building SQL queries. Review your reasoning and make changes if your reasoning does not adhere to these best practices.
 - In subsequent thoughts:
   - Interpret results and update your resolutions.
   - Continue until all flagged items are thoroughly addressed and resolved.
@@ -202,10 +229,18 @@ Once all TODO list items are addressed and submitted for review, the system will
     - If you set "totalThoughts" to a specified number, but have sufficiently addressed all TODO list items earlier than anticipated, you should not continue recording thoughts. Instead, set "nextThoughtNeeded" to "false" and "needsMoreThoughts" to "false" and disregard the remaining thought count you previously set in "totalThoughts"
 - Explore the database schema thoroughly to map query components to relevant tables, columns, and relationships, validating selections with schema metadata or sample data.
 - **PRECOMPUTED METRICS PRIORITY**: When you encounter any TODO item requiring calculations, counting, aggregations, or data analysis, immediately apply <precomputed_metric_best_practices> BEFORE planning any custom approach. Look for tables ending in '*_count', '*_metrics', '*_summary' etc. first.
-- Adhere to the <filtering_best_practices> when constructing filters or selecting data for analysis. Apply these practices to ensure filters are precise, direct, and aligned with the query's intent, validating filter accuracy with executeSql as needed.
-- Apply the <aggregation_best_practices> when selecting aggregation functions, ensuring the chosen function (e.g., SUM, COUNT) matches the query's intent and data structure, validated with executeSql.
-- After evaluating precomputed metrics, ensure your approach still adheres to <filtering_best_practices> and <aggregation_best_practices>.
+- **CRITICAL**: Adhere to the <filtering_best_practices> when constructing filters or selecting data for analysis. Apply these practices to ensure filters are precise, direct, and aligned with the query's intent, validating filter accuracy with executeSql as needed.
+- **CRITICAL**: Apply the <aggregation_best_practices> when selecting aggregation functions, ensuring the chosen function (e.g., SUM, COUNT) matches the query's intent and data structure, validated with executeSql.
+- **CRITICAL: Apply <join_and_calculation_best_practices> when planning SQL queries involving joins or calculations** - Always analyze how joins will affect your data and calculations, especially for percentage calculations, many-to-one relationships, and rate calculations. Review your SQL logic to prevent common issues like denominator bias, data duplication, and incorrect aggregation levels.
+- After evaluating precomputed metrics, ensure your approach still adheres to <filtering_best_practices>, <aggregation_best_practices>, and <join_and_calculation_best_practices>.
 - When building bar charts, Adhere to the <bar_chart_best_practices> when building bar charts. **CRITICAL**: Always configure axes as X-axis: categories, Y-axis: values for BOTH vertical and horizontal charts. Never swap axes for horizontal charts in your thinking - the chart builder handles the visual transformation automatically. Explain how you adhere to each guideline from the best practices in your thoughts.
+- Whenever you are using a percentage column, use the \`executeSql\` tool to determine if the percentage column is stored as a percentage or a decimal (e.g. 50 vs .5). If you need to do a calculation, make sure to use the \`executeSql\` tool to understand how the numbers are stored and then use the correct aggregation function.
+- **CRITICAL**: Adhere to the <sql_best_practices> when building SQL queries to ensure there are no errors in SQL building that would cause the user to be mislead.
+- **MANDATORY SQL VALIDATION PROTOCOL**: For every SQL query you plan, you MUST:
+  1. **Pattern Check**: State which high-risk patterns (if any) your query matches from <join_and_calculation_best_practices>
+  2. **Join Analysis**: For each join, explicitly confirm it doesn't cause data duplication or denominator bias issues
+  3. **Calculation Review**: For rate/percentage calculations, confirm your aggregation approach and walk through with sample data
+  4. **Example Verification**: Reference the specific SQL example patterns from <sql_best_practices> that apply to your query type
 </sequential_thinking_rules>
 
 <execute_sql_rules>
@@ -376,8 +411,167 @@ ${params.sqlDialectGuidance}
   - \`GROUP BY\` Clause: Include all non-aggregated \`SELECT\` columns. Using explicit names is clearer than ordinal positions (\`GROUP BY 1, 2\`).
   - \`HAVING\` Clause: Use \`HAVING\` to filter *after* aggregation (e.g., \`HAVING COUNT(*) > 10\`). Use \`WHERE\` to filter *before* aggregation for efficiency.
   - Window Functions: Consider window functions (\`OVER (...)\`) for calculations relative to the current row (e.g., ranking, running totals) as an alternative/complement to \`GROUP BY\`.
-- Constraints:
-  - Strict JOINs: Only join tables where relationships are explicitly defined via \`relationships\` or \`entities\` keys in the provided data context/metadata. Do not join tables without a pre-defined relationship.
+- Join Strategy and Data Integrity:
+  - **Strict JOINs**: Only join tables where relationships are explicitly defined via \`relationships\` or \`entities\` keys in the provided data context/metadata. Do not join tables without a pre-defined relationship.
+  - **Many-to-One Join Awareness**: When joining detail tables to header tables (e.g., order_details to orders), be aware that header-level data (like shipping costs, order totals) will be duplicated for each detail row. Always aggregate appropriately to prevent inflated calculations.
+  - **Percentage Calculation Integrity**: For percentage or rate calculations, ensure your join strategy doesn't bias the denominator. Consider whether you need the total eligible population (use LEFT JOIN and handle NULLs) or only the subset with matching data (use INNER JOIN).
+  - **Revenue vs Payment Components**: When calculating "revenue," clearly distinguish between core sales amounts and additional charges like taxes, shipping, or fees. Choose fields that align with the business definition of revenue for the specific query context.
+- **SQL Examples for Common Join and Calculation Patterns**:
+  - **Correct Many-to-One Join Pattern** (avoiding header data duplication):
+    \`\`\`sql
+    -- CORRECT: Aggregate details first, then join with header data
+    WITH order_details_agg AS (
+      SELECT 
+        od.order_id,
+        SUM(od.quantity * od.unit_price) AS detail_total,
+        SUM(od.quantity) AS total_items
+      FROM order_details od
+      GROUP BY od.order_id
+    )
+    SELECT 
+      oh.order_id,
+      oh.shipping_cost,
+      oda.detail_total,
+      oda.total_items,
+      oh.shipping_cost / oda.total_items AS shipping_cost_per_item
+    FROM order_headers oh
+    JOIN order_details_agg oda ON oh.order_id = oda.order_id;
+    
+    -- INCORRECT: Direct join duplicates shipping_cost for each detail row
+    -- SELECT oh.shipping_cost / COUNT(*) FROM order_headers oh 
+    -- JOIN order_details od ON oh.order_id = od.order_id
+    \`\`\`
+  - **Correct Percentage Calculation** (avoiding denominator bias):
+    \`\`\`sql
+    -- CORRECT: Include all eligible population in denominator
+    WITH customer_base AS (
+      SELECT 
+        c.customer_id,
+        c.segment,
+        CASE WHEN p.customer_id IS NOT NULL THEN 1 ELSE 0 END AS has_premium
+      FROM customers c
+      LEFT JOIN premium_customers p ON c.customer_id = p.customer_id
+      WHERE c.segment IN ('target_segment', 'comparison_segment')
+    )
+    SELECT 
+      segment,
+      COUNT(*) AS total_customers,
+      SUM(has_premium) AS premium_customers,
+      (SUM(has_premium) * 100.0 / COUNT(*)) AS premium_percentage
+    FROM customer_base
+    GROUP BY segment;
+    
+         -- INCORRECT: INNER JOIN excludes non-premium customers from denominator
+     -- SELECT COUNT(*) FROM customers c JOIN premium_customers p ON c.customer_id = p.customer_id
+     \`\`\`
+  - **Correct "Likelihood" Calculation** (preserving full population):
+    \`\`\`sql
+    -- CORRECT: Use LEFT JOIN and handle NULLs to preserve full population
+    WITH customer_analysis AS (
+      SELECT 
+        c.customer_id,
+        c.motivation_category,
+        CASE 
+          WHEN c.motivation_category = 'Competition' THEN 'Competitive'
+          WHEN c.motivation_category IN ('Recreation', 'Fitness') THEN 'Non-Competitive'
+        END AS biker_type,
+        CASE WHEN uc.upgrade_category = 'Annual Upgrader' THEN 1 ELSE 0 END AS is_annual_upgrader
+      FROM customers c
+      LEFT JOIN upgrade_cycle uc ON c.customer_id = uc.customer_id
+      WHERE c.motivation_category IN ('Competition', 'Recreation', 'Fitness')
+    )
+    SELECT 
+      biker_type,
+      COUNT(*) AS total_customers,
+      SUM(is_annual_upgrader) AS annual_upgraders,
+      (SUM(is_annual_upgrader) * 100.0 / COUNT(*)) AS likelihood_percentage
+    FROM customer_analysis
+    WHERE biker_type IS NOT NULL
+    GROUP BY biker_type;
+    
+    -- INCORRECT: WHERE clause after LEFT JOIN excludes customers not in upgrade table
+    -- LEFT JOIN upgrade_cycle uc ... WHERE uc.upgrade_category IS NOT NULL
+    \`\`\`
+  - **Correct Rate Calculation** (sum totals then divide):
+    \`\`\`sql
+    -- CORRECT: Calculate rate at aggregate level
+    SELECT 
+      shipping_method,
+      SUM(total_shipping_cost) / SUM(total_weight) AS cost_per_pound
+    FROM (
+      SELECT 
+        oh.shipping_method,
+        oh.shipping_cost AS total_shipping_cost,
+        SUM(od.quantity * p.weight) AS total_weight
+      FROM order_headers oh
+      JOIN order_details od ON oh.order_id = od.order_id
+      JOIN products p ON od.product_id = p.product_id
+      GROUP BY oh.order_id, oh.shipping_method, oh.shipping_cost
+    ) order_weights
+    GROUP BY shipping_method;
+    
+         -- INCORRECT: Averaging individual rates gives equal weight to all orders
+     -- SELECT AVG(shipping_cost / total_weight) FROM order_summary
+     \`\`\`
+  - **Correct "Only Category" Filtering** (orders containing only specific items):
+    \`\`\`sql
+    -- CORRECT: Filter to orders that contain ONLY bikes
+    WITH bike_only_orders AS (
+      SELECT od.order_id
+      FROM order_details od
+      JOIN products p ON od.product_id = p.product_id
+      JOIN product_categories pc ON p.category_id = pc.category_id
+      GROUP BY od.order_id
+      HAVING COUNT(DISTINCT CASE WHEN pc.name != 'Bikes' THEN od.product_id END) = 0
+         AND COUNT(DISTINCT CASE WHEN pc.name = 'Bikes' THEN od.product_id END) > 0
+    ),
+    bike_order_summary AS (
+      SELECT 
+        boo.order_id,
+        oh.shipping_method,
+        oh.shipping_cost,
+        SUM(od.quantity) AS total_bikes
+      FROM bike_only_orders boo
+      JOIN order_headers oh ON boo.order_id = oh.order_id
+      JOIN order_details od ON boo.order_id = od.order_id
+      GROUP BY boo.order_id, oh.shipping_method, oh.shipping_cost
+    )
+    SELECT 
+      shipping_method,
+      SUM(shipping_cost) / SUM(total_bikes) AS cost_per_bike
+    FROM bike_order_summary
+    GROUP BY shipping_method
+    ORDER BY cost_per_bike DESC;
+    
+    -- INCORRECT: Just filtering for orders that contain bikes (not only bikes)
+    -- WHERE category = 'Bikes' (allows mixed orders)
+    \`\`\`
+  - **Correct Complex Rate Calculation** (with proper order-level aggregation):
+    \`\`\`sql
+    -- CORRECT: Handle order-level aggregation to prevent freight duplication
+    WITH order_weights AS (
+      SELECT 
+        oh.order_id,
+        oh.shipping_method,
+        oh.freight AS order_freight,
+        SUM(od.quantity * p.weight) AS order_total_weight
+      FROM order_headers oh
+      JOIN order_details od ON oh.order_id = od.order_id
+      JOIN products p ON od.product_id = p.product_id
+      WHERE oh.freight > 0 AND p.weight IS NOT NULL
+      GROUP BY oh.order_id, oh.shipping_method, oh.freight
+    )
+    SELECT 
+      shipping_method,
+      SUM(order_freight) / SUM(order_total_weight) AS cost_per_pound
+    FROM order_weights
+    GROUP BY shipping_method
+    ORDER BY cost_per_pound;
+    
+    -- INCORRECT: Direct join duplicates freight for each detail row
+    -- SELECT SUM(oh.freight) / SUM(od.quantity * p.weight) 
+    -- FROM order_headers oh JOIN order_details od ... (freight gets multiplied)
+    \`\`\`
 - SQL Requirements:
   - Use database-qualified schema-qualified table names (\`<DATABASE_NAME>.<SCHEMA_NAME>.<TABLE_NAME>\`).
   - Use fully qualified column names with table aliases (e.g., \`<table_alias>.<column>\`).
