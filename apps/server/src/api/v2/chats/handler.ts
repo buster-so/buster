@@ -1,4 +1,4 @@
-import { getUserOrganizationId } from '@buster/database';
+import { db, getUserOrganizationId, sql, updateMessage } from '@buster/database';
 import type { User } from '@buster/database';
 import {
   type ChatCreateHandlerRequest,
@@ -87,6 +87,12 @@ export async function createChatHandler(
           // This would indicate a serious issue with Trigger.dev service
           throw new Error('Trigger service returned invalid handle');
         }
+
+        // Update the message with the trigger run ID
+        // Using raw SQL until database types are regenerated with triggerRunId field
+        await db.execute(
+          sql`UPDATE messages SET trigger_run_id = ${taskHandle.id} WHERE id = ${messageId}`
+        );
 
         // Task was successfully queued - background analysis will proceed
       } catch (triggerError) {

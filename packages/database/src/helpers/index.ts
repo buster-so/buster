@@ -53,22 +53,7 @@ export {
   type GenerateAssetMessagesInput,
 } from './assets';
 
-// Dashboard helpers
-export {
-  getChatDashboardFiles,
-  type DashboardFileContext,
-  type DashboardFile,
-} from './dashboards';
-
-// Organization helpers
-export {
-  getUserOrganizationId,
-  GetUserOrganizationInputSchema,
-  type GetUserOrganizationInput,
-  type UserToOrganization,
-} from './organizations';
-
-// Braintrust metadata helper
+// Braintrust metadata helpers
 export {
   getBraintrustMetadata,
   BraintrustMetadataInputSchema,
@@ -76,3 +61,6 @@ export {
   type BraintrustMetadataInput,
   type BraintrustMetadataOutput,
 } from './braintrustMetadata';
+
+// Message types
+export type { UpdateableMessageFields } from './messages';

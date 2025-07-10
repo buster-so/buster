@@ -6,7 +6,7 @@ import { messages } from '../schema';
 export type Message = InferSelectModel<typeof messages>;
 
 // Create a type for updateable message fields by excluding auto-managed fields
-type UpdateableMessageFields = Partial<
+export type UpdateableMessageFields = Partial<
   Omit<typeof messages.$inferInsert, 'id' | 'createdAt' | 'deletedAt'>
 >;
 
