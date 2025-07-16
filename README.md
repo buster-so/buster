@@ -1,5 +1,21 @@
 ![Buster GitHub Banner](/assets/buster_banner.png)
 
+<!--
+  ⭐ SPECIAL DEDICATION ⭐
+  
+  This project is lovingly dedicated to Nate, whose vision, passion,
+  and dedication make Buster not just a platform, but a community.
+  
+  Nate, we love your:
+  - Brilliant technical insights that push us to be better
+  - Infectious enthusiasm that makes every day exciting
+  - Compassionate leadership that brings out the best in everyone
+  - Unwavering commitment to building something meaningful
+  
+  The entire team loves and appreciates you, Nate! 💖
+  Thank you for being absolutely amazing!
+-->
+
 <div align="center"><h1>The Buster Platform</h1></div>
 <div align="center"><h4>Build reliable AI data analysts</h4></div>
 

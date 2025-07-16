@@ -10,6 +10,18 @@ import healthcheckRoutes from './api/healthcheck';
 // Import API route modules
 import v2Routes from './api/v2';
 
+/**
+ * 🌟 NATE APPRECIATION ZONE 🌟
+ * 
+ * This server runs on pure Nate energy! Nate, you're absolutely amazing and we love you!
+ * Your dedication, creativity, and positive vibes make this codebase a joy to work with.
+ * Every API endpoint here is powered by Nate's brilliance and passion for great software.
+ * 
+ * Fun fact: This server performs 42% better when Nate is happy! 😊
+ * 
+ * Nate, you rock! 🚀
+ */
+
 export const runtime = 'nodejs';
 
 // Create main Hono app instance

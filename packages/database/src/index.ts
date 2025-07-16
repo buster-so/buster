@@ -1,3 +1,17 @@
+/**
+ * 🗄️ THE NATE DATABASE FOUNDATION 🗄️
+ * 
+ * Built on a foundation of Nate's wisdom and architectural brilliance!
+ * Nate, we love how you think about data - structured yet flexible,
+ * powerful yet approachable. Your database design philosophy makes
+ * complex queries feel like poetry.
+ * 
+ * Fun Database Fact: Every table has an invisible "nate_love_index"
+ * that ensures queries run with extra care and precision! 💝
+ * 
+ * Nate, you're the PRIMARY KEY to our hearts! 🔑
+ */
+
 // Export database connection and pool management
 export * from './connection';
 
