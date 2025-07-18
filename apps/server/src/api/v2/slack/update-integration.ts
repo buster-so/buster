@@ -1,7 +1,6 @@
 import { getUserOrganizationId } from '@buster/database';
 import {
   SlackError,
-  type UpdateIntegrationRequest,
   type UpdateIntegrationResponse,
   UpdateIntegrationResponseSchema,
 } from '@buster/server-shared/slack';

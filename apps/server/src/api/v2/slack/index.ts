@@ -19,7 +19,7 @@ import { updateIntegrationHandler } from './update-integration';
 
 const app = new Hono()
   // Public endpoints (no auth required for OAuth flow)
-  .post('/auth/init', requireAuth, zValidator('json', InitiateOAuthSchema), initiateOAuthHandler)
+  .post('/auth/init', requireAuth, zValidator('json', z.object({}).merge(InitiateOAuthSchema.unwrap())), initiateOAuthHandler)
   .get('/auth/callback', handleOAuthCallbackHandler)
   // Protected endpoints
   .get('/integration', requireAuth, getIntegrationHandler)

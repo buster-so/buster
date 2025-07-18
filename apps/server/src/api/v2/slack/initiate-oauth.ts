@@ -1,6 +1,5 @@
 import { getUserOrganizationId } from '@buster/database';
 import {
-  type InitiateOAuthRequest,
   type InitiateOAuthResponse,
   InitiateOAuthResponseSchema,
   SlackError,
