@@ -1,5 +1,8 @@
 import { getUserOrganizationId } from '@buster/database';
-import type { GetIntegrationResponse } from '@buster/server-shared/slack';
+import {
+  type GetIntegrationResponse,
+  GetIntegrationResponseSchema,
+} from '@buster/server-shared/slack';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { createSlackOAuthService } from './services/slack-oauth-service';
@@ -36,7 +39,13 @@ export async function getIntegrationHandler(c: Context): Promise<Response> {
       }),
     };
 
-    return c.json<GetIntegrationResponse>(response);
+    const validatedResponse = GetIntegrationResponseSchema.safeParse(response);
+    if (!validatedResponse.success) {
+      console.error('Invalid response format:', validatedResponse.error);
+      throw new HTTPException(500, { message: 'Invalid response format' });
+    }
+
+    return c.json<GetIntegrationResponse>(validatedResponse.data);
   } catch (error) {
     console.error('Failed to get integration status:', error);
     throw new HTTPException(500, { message: 'Failed to get integration status' });

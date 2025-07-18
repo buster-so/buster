@@ -1,7 +1,8 @@
 import { getUserOrganizationId } from '@buster/database';
 import {
+  type InitiateOAuthRequest,
   type InitiateOAuthResponse,
-  InitiateOAuthSchema,
+  InitiateOAuthResponseSchema,
   SlackError,
   type SlackErrorResponse,
 } from '@buster/server-shared/slack';
@@ -45,10 +46,8 @@ export async function initiateOAuthHandler(c: Context): Promise<Response> {
       throw new HTTPException(400, { message: 'Organization not found' });
     }
 
-    const body: unknown = await c.req.json().catch(() => ({}));
-    const parsed = InitiateOAuthSchema.safeParse(body);
-
-    const metadata = parsed.success ? parsed.data?.metadata : undefined;
+    const request = c.req.valid('json');
+    const metadata = request?.metadata;
 
     const enrichedMetadata = {
       ...metadata,
@@ -61,10 +60,17 @@ export async function initiateOAuthHandler(c: Context): Promise<Response> {
       metadata: enrichedMetadata,
     });
 
-    return c.json<InitiateOAuthResponse>({
+    const response: InitiateOAuthResponse = {
       auth_url: result.authUrl,
       state: result.state,
-    });
+    };
+
+    const validatedResponse = InitiateOAuthResponseSchema.safeParse(response);
+    if (!validatedResponse.success) {
+      throw new SlackError('Invalid response format', 500, 'INVALID_RESPONSE');
+    }
+
+    return c.json<InitiateOAuthResponse>(validatedResponse.data);
   } catch (error) {
     console.error('Failed to initiate OAuth:', error);
 

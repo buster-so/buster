@@ -3,7 +3,7 @@ import {
   SlackError,
   type UpdateIntegrationRequest,
   type UpdateIntegrationResponse,
-  UpdateIntegrationSchema,
+  UpdateIntegrationResponseSchema,
 } from '@buster/server-shared/slack';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -23,23 +23,34 @@ export async function updateIntegrationHandler(c: Context): Promise<Response> {
   }
 
   try {
-    const body: unknown = await c.req.json();
-    const parsed = UpdateIntegrationSchema.safeParse(body);
+    const request = c.req.valid('json');
 
-    if (!parsed.success) {
-      throw new HTTPException(400, { message: 'Invalid request body' });
+    const updateData: {
+      defaultChannel?: { id: string; name: string };
+      defaultSharingPermissions?: 'shareWithWorkspace' | 'shareWithChannel' | 'noSharing';
+    } = {};
+
+    if (request.default_channel) {
+      updateData.defaultChannel = request.default_channel;
+    }
+    if (request.default_sharing_permissions) {
+      updateData.defaultSharingPermissions = request.default_sharing_permissions;
     }
 
-    const request: UpdateIntegrationRequest = parsed.data;
+    await updateIntegrationSettings(organizationGrant.organizationId, updateData);
 
-    await updateIntegrationSettings(organizationGrant.organizationId, {
-      defaultChannel: request.default_channel,
-      defaultSharingPermissions: request.default_sharing_permissions,
-    });
-
-    return c.json<UpdateIntegrationResponse>({
+    const response: UpdateIntegrationResponse = {
       message: 'Integration settings updated successfully',
-    });
+      default_channel: request.default_channel,
+      default_sharing_permissions: request.default_sharing_permissions,
+    };
+
+    const validatedResponse = UpdateIntegrationResponseSchema.safeParse(response);
+    if (!validatedResponse.success) {
+      throw new HTTPException(500, { message: 'Invalid response format' });
+    }
+
+    return c.json<UpdateIntegrationResponse>(validatedResponse.data);
   } catch (error) {
     console.error('Failed to update integration:', error);
 

@@ -1,5 +1,9 @@
 import { getUserOrganizationId } from '@buster/database';
-import { type GetChannelsResponse, SlackError } from '@buster/server-shared/slack';
+import {
+  type GetChannelsResponse,
+  GetChannelsResponseSchema,
+  SlackError,
+} from '@buster/server-shared/slack';
 import { SlackChannelService } from '@buster/slack';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -35,15 +39,19 @@ export async function getChannelsHandler(c: Context): Promise<Response> {
     const channelService = new SlackChannelService();
     const channels = await channelService.getAvailableChannels(accessToken);
 
-    return c.json<GetChannelsResponse>({
+    const response: GetChannelsResponse = {
       channels: channels.map((channel) => ({
         id: channel.id,
         name: channel.name,
-        is_private: channel.is_private,
-        is_archived: channel.is_archived,
-        is_member: channel.is_member,
       })),
-    });
+    };
+
+    const validatedResponse = GetChannelsResponseSchema.safeParse(response);
+    if (!validatedResponse.success) {
+      throw new HTTPException(500, { message: 'Invalid response format' });
+    }
+
+    return c.json<GetChannelsResponse>(validatedResponse.data);
   } catch (error) {
     console.error('Failed to get channels:', error);
 

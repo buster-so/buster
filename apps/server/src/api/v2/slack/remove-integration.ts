@@ -1,5 +1,9 @@
 import { getUserOrganizationId } from '@buster/database';
-import { type RemoveIntegrationResponse, SlackError } from '@buster/server-shared/slack';
+import {
+  type RemoveIntegrationResponse,
+  RemoveIntegrationResponseSchema,
+  SlackError,
+} from '@buster/server-shared/slack';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { createSlackOAuthService } from './services/slack-oauth-service';
@@ -32,9 +36,16 @@ export async function removeIntegrationHandler(c: Context): Promise<Response> {
       );
     }
 
-    return c.json<RemoveIntegrationResponse>({
+    const response: RemoveIntegrationResponse = {
       message: 'Slack integration removed successfully',
-    });
+    };
+
+    const validatedResponse = RemoveIntegrationResponseSchema.safeParse(response);
+    if (!validatedResponse.success) {
+      throw new HTTPException(500, { message: 'Invalid response format' });
+    }
+
+    return c.json<RemoveIntegrationResponse>(validatedResponse.data);
   } catch (error) {
     console.error('Failed to remove integration:', error);
 

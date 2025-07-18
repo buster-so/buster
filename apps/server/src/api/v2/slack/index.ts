@@ -1,6 +1,12 @@
-import { SlackError } from '@buster/server-shared/slack';
+import {
+  InitiateOAuthSchema,
+  SlackError,
+  UpdateIntegrationSchema,
+} from '@buster/server-shared/slack';
+import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { z } from 'zod';
 import { requireAuth } from '../../../middleware/auth';
 import { slackWebhookValidator } from '../../../middleware/slack-webhook-validator';
 import { handleSlackEventsEndpoint } from './events';
@@ -13,11 +19,16 @@ import { updateIntegrationHandler } from './update-integration';
 
 const app = new Hono()
   // Public endpoints (no auth required for OAuth flow)
-  .post('/auth/init', requireAuth, initiateOAuthHandler)
+  .post('/auth/init', requireAuth, zValidator('json', InitiateOAuthSchema), initiateOAuthHandler)
   .get('/auth/callback', handleOAuthCallbackHandler)
   // Protected endpoints
   .get('/integration', requireAuth, getIntegrationHandler)
-  .put('/integration', requireAuth, updateIntegrationHandler)
+  .put(
+    '/integration',
+    requireAuth,
+    zValidator('json', UpdateIntegrationSchema),
+    updateIntegrationHandler
+  )
   .get('/channels', requireAuth, getChannelsHandler)
   .delete('/integration', requireAuth, removeIntegrationHandler)
   // Events endpoint (no auth required for Slack webhooks)
