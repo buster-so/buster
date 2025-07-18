@@ -1,8 +1,8 @@
-import { describe, expect, test } from 'vitest';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
 } from '@buster/server-shared/chats';
+import { describe, expect, test } from 'vitest';
 import { hasFailureIndicators, hasFileFailureIndicators } from '../utils/database/types';
 
 // Import the functions we want to test (we'll need to export them from analyst-step.ts)

@@ -78,7 +78,7 @@ name [Red Bull, Monster Energy]`;
       const fileId = reasoningMessage.file_ids[0]!;
       expect(reasoningMessage.files[fileId]).toBeDefined();
 
-      const file = reasoningMessage.files[fileId]!
+      const file = reasoningMessage.files[fileId]!;
       expect(file.file_type).toBe('agent-action');
       expect(file.file_name).toBe('stored-values-search');
       expect(file.version_number).toBe(1);
@@ -112,7 +112,7 @@ name [Red Bull, Monster Energy]`;
       const reasoningMessage = createStoredValuesReasoningMessage(searchResults);
 
       const fileId = reasoningMessage.file_ids[0]!;
-      const file = reasoningMessage.files[fileId]!
+      const file = reasoningMessage.files[fileId]!;
 
       expect(file.id).toBe(fileId);
       expect(file.file_type).toBe('agent-action');
@@ -136,7 +136,7 @@ name [Red Bull, Monster Energy]`;
 
       // Verify file structure
       const fileId = reasoningMessage.file_ids[0]!;
-      const file = reasoningMessage.files[fileId]!
+      const file = reasoningMessage.files[fileId]!;
       expect(file).toHaveProperty('id');
       expect(file).toHaveProperty('file_type');
       expect(file).toHaveProperty('file_name');

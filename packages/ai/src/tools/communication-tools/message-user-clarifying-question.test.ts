@@ -49,7 +49,8 @@ describe('Message User Clarifying Question Tool Unit Tests', () => {
   test('should execute successfully with valid question', async () => {
     const result = await messageUserClarifyingQuestion.execute({
       context: {
-        clarifying_question: '## Which metric would you like to focus on?\n\n- Revenue: Total sales revenue\n- Profit: Net profit after costs\n- Volume: Number of units sold',
+        clarifying_question:
+          '## Which metric would you like to focus on?\n\n- Revenue: Total sales revenue\n- Profit: Net profit after costs\n- Volume: Number of units sold',
       },
       runtimeContext: {} as any,
     });
@@ -58,8 +59,6 @@ describe('Message User Clarifying Question Tool Unit Tests', () => {
   });
 });
 
-describe.skip('Process Clarification Response Tool Tests (SKIPPED - Tool not implemented)', () => {
-});
+describe.skip('Process Clarification Response Tool Tests (SKIPPED - Tool not implemented)', () => {});
 
-describe.skip('Should Ask Clarification Helper Tests (SKIPPED - Helper not implemented)', () => {
-});
+describe.skip('Should Ask Clarification Helper Tests (SKIPPED - Helper not implemented)', () => {});

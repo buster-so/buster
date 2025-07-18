@@ -5,11 +5,7 @@ import {
   createInitialDashboardVersionHistory,
   createInitialMetricVersionHistory,
 } from './version-history-helpers';
-import type {
-  DashboardYml,
-  MetricYml,
-  VersionHistory,
-} from './version-history-types';
+import type { DashboardYml, MetricYml, VersionHistory } from './version-history-types';
 
 describe('Version History Helper Functions', () => {
   describe('Metric Version History JSONB Format', () => {

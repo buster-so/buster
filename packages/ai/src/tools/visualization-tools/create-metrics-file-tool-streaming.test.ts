@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { parseStreamingArgs } from './create-metrics-file-tool';
 import { validateArrayAccess } from '../../utils/validation-helpers';
+import { parseStreamingArgs } from './create-metrics-file-tool';
 
 describe('Create Metrics File Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {

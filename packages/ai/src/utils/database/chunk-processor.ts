@@ -13,7 +13,6 @@ import {
 } from '../file-selection';
 import { normalizeEscapedText } from '../streaming/escape-normalizer';
 import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
-import { extractResponseMessages } from './format-llm-messages-as-reasoning';
 import type {
   AssistantMessageContent,
   GenericToolSet,
@@ -2018,18 +2017,18 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Update the existing file with results appended
       const fileObj = file as { file?: { text?: string } };
       const currentContent = fileObj.file?.text || '';
-      
+
       // Append results to the existing content
       if (fileObj.file) {
-        fileObj.file.text = currentContent + '\n\n' + resultsYaml;
+        fileObj.file.text = `${currentContent}\n\n${resultsYaml}`;
       }
-      
+
       // Update the entry title and secondary title
       if ('title' in entry) {
-        (entry as any).title = title;
+        (entry as ReasoningEntry & { title: string }).title = title;
       }
       if ('secondary_title' in entry && secondaryTitle) {
-        (entry as any).secondary_title = secondaryTitle;
+        (entry as ReasoningEntry & { secondary_title: string }).secondary_title = secondaryTitle;
       }
     } catch (error) {
       console.error('Error updating SQL file with results:', {

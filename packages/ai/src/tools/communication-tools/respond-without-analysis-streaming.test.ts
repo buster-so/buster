@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { parseStreamingArgs } from './respond-without-analysis';
 import { validateArrayAccess } from '../../utils/validation-helpers';
+import { parseStreamingArgs } from './respond-without-analysis';
 
 describe('Respond Without Analysis Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {

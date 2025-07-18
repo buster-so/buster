@@ -28,12 +28,12 @@ describe('createTestMessage', () => {
   beforeEach(async () => {
     await setupTestEnvironment();
     vi.clearAllMocks();
-    
-    const dbMock = await vi.importMock('@buster/database') as any;
+
+    const dbMock = (await vi.importMock('@buster/database')) as any;
     mockValues = dbMock.mockValues;
     mockInsert = dbMock.mockInsert;
     mockMessages = dbMock.mockMessages;
-    
+
     mockValues.mockResolvedValue(undefined);
   });
 
@@ -86,7 +86,6 @@ describe('createTestMessage', () => {
 
     expect(messageId).toBeDefined();
 
-
     expect(mockValues).toHaveBeenCalledWith(
       expect.objectContaining({
         id: messageId,
@@ -115,7 +114,6 @@ describe('createTestMessage', () => {
     const messageId = await createTestMessage(chatId, createdBy, options);
 
     expect(messageId).toBeDefined();
-
 
     expect(mockValues).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -179,7 +177,6 @@ describe('createTestMessage', () => {
     };
 
     await createTestMessage(chatId, createdBy, options);
-
 
     expect(mockValues).toHaveBeenCalledWith(
       expect.objectContaining({

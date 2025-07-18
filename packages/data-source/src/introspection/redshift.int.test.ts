@@ -1,9 +1,9 @@
 import { afterEach, describe, expect } from 'vitest';
 import { DataSource } from '../data-source';
 import type { DataSourceConfig } from '../data-source';
+import { TEST_TIMEOUT, skipIfNoCredentials, testConfig } from '../setup';
 import { DataSourceType } from '../types/credentials';
 import type { RedshiftCredentials } from '../types/credentials';
-import { TEST_TIMEOUT, skipIfNoCredentials, testConfig } from '../setup';
 
 function createRedshiftCredentials(): RedshiftCredentials {
   if (

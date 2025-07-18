@@ -9,11 +9,11 @@ import { oauthStateStorage, tokenStorage } from './token-storage';
  */
 function validateScopes(currentScopeString?: string | null): boolean {
   if (!currentScopeString) return false;
-  
-  const currentScopes = currentScopeString.includes(',') 
-    ? currentScopeString.split(',').map(s => s.trim())
-    : currentScopeString.split(' ').map(s => s.trim());
-    
+
+  const currentScopes = currentScopeString.includes(',')
+    ? currentScopeString.split(',').map((s) => s.trim())
+    : currentScopeString.split(' ').map((s) => s.trim());
+
   const requiredScopes = [...SLACK_OAUTH_SCOPES];
   return requiredScopes.every((scope) => currentScopes.includes(scope));
 }

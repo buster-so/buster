@@ -128,7 +128,7 @@ export function convertToolCallToMessage(
           message: parsed.message,
         };
         return { type: 'response', message: responseMessage };
-      } catch (error) {
+      } catch (_) {
         return null;
       }
     }
@@ -144,7 +144,7 @@ export function convertToolCallToMessage(
           message: parsed.message,
         };
         return { type: 'response', message: responseMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -164,7 +164,7 @@ export function convertToolCallToMessage(
           finished_reasoning: !parsed.nextThoughtNeeded,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -223,7 +223,7 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -241,7 +241,7 @@ export function convertToolCallToMessage(
           status,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -300,7 +300,7 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -359,7 +359,7 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -418,7 +418,7 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }

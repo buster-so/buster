@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { parseStreamingArgs } from './done-tool';
 import { validateArrayAccess } from '../../utils/validation-helpers';
+import { parseStreamingArgs } from './done-tool';
 
 describe('Done Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {

@@ -411,8 +411,8 @@ export function selectFilesForResponse(
 
       // Check if any standalone metrics are the result of deduplication
       const originalMetrics = files.filter((f) => f.fileType === 'metric');
-      const hasDeduplicatedMetrics = standaloneMetrics.some(metric => {
-        const duplicates = originalMetrics.filter(m => m.id === metric.id);
+      const hasDeduplicatedMetrics = standaloneMetrics.some((metric) => {
+        const duplicates = originalMetrics.filter((m) => m.id === metric.id);
         return duplicates.length > 1;
       });
 
@@ -420,7 +420,9 @@ export function selectFilesForResponse(
         // Include all standalone metrics when deduplication occurred
         selectedFiles.push(...standaloneMetrics);
       } else {
-        const standaloneModifiedMetrics = standaloneMetrics.filter(m => m.operation === 'modified');
+        const standaloneModifiedMetrics = standaloneMetrics.filter(
+          (m) => m.operation === 'modified'
+        );
         selectedFiles.push(...standaloneModifiedMetrics);
       }
     } else {

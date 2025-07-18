@@ -244,12 +244,16 @@ describe('MaxRows Limiting Tests', () => {
       });
 
       mockConnection.execute.mockImplementation(
-        (options: { sqlText: string; binds?: unknown; complete: (err?: unknown, stmt?: unknown, rows?: unknown[]) => void }) => {
+        (options: {
+          sqlText: string;
+          binds?: unknown;
+          complete: (err?: unknown, stmt?: unknown, rows?: unknown[]) => void;
+        }) => {
           // The new Snowflake adapter doesn't use streaming for maxRows
           // It returns all rows and limits in memory
           options.complete(undefined, mockStatement, [
             { id: 1, name: 'User 1' },
-            { id: 2, name: 'User 2' }
+            { id: 2, name: 'User 2' },
           ]);
         }
       );

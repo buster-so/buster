@@ -262,9 +262,12 @@ export function extractFileResultsFromToolResult(toolResult: unknown): Array<{
         if (file && typeof file === 'object' && 'id' in file) {
           const fileObj = file as Record<string, unknown>;
           const id = typeof fileObj.id === 'string' ? fileObj.id : String(fileObj.id);
-          
+
           // Check if this individual file has an error property or success: false
-          if (('error' in fileObj && fileObj.error) || ('success' in fileObj && fileObj.success === false)) {
+          if (
+            ('error' in fileObj && fileObj.error) ||
+            ('success' in fileObj && fileObj.success === false)
+          ) {
             fileResults.push({
               id,
               status: 'failed' as const,

@@ -24,12 +24,14 @@ describe('updateMessageFields - Unit Tests', () => {
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
-    const { createTestMessageWithContext } = await import('./messages/createTestMessageWithContext');
+
+    const { createTestMessageWithContext } = await import(
+      './messages/createTestMessageWithContext'
+    );
     const result = await createTestMessageWithContext();
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith();
   });
@@ -40,19 +42,21 @@ describe('updateMessageFields - Unit Tests', () => {
       requestMessage: 'Initial request',
       isCompleted: false,
     };
-    
+
     const mockResult = {
       messageId: 'test-message-id',
       userId: 'test-user-id',
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
-    const { createTestMessageWithContext } = await import('./messages/createTestMessageWithContext');
+
+    const { createTestMessageWithContext } = await import(
+      './messages/createTestMessageWithContext'
+    );
     const result = await createTestMessageWithContext(options);
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith(options);
   });

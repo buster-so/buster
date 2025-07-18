@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { RedshiftAdapter } from './redshift';
 import { DataSourceType } from '../types/credentials';
 import type { RedshiftCredentials } from '../types/credentials';
+import { RedshiftAdapter } from './redshift';
 
 // Check if Redshift test credentials are available
 const hasRedshiftCredentials = !!(

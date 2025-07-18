@@ -49,6 +49,8 @@ describe('MetricSchema', () => {
       publicly_accessible: false,
       public_password: null,
       permission: 'owner',
+      workspace_sharing: null,
+      workspace_member_count: null,
     };
 
     const result = MetricSchema.safeParse(validMetric);
@@ -112,6 +114,8 @@ describe('MetricSchema', () => {
       publicly_accessible: false,
       public_password: null,
       permission: 'canView',
+      workspace_sharing: null,
+      workspace_member_count: null,
       // chart_config is omitted, should get default
     };
 
@@ -191,6 +195,8 @@ describe('MetricSchema', () => {
       publicly_accessible: false,
       public_password: null,
       permission: 'canEdit',
+      workspace_sharing: null,
+      workspace_member_count: null,
     };
 
     const result = MetricSchema.safeParse(metricWithCustomConfig);
@@ -277,6 +283,8 @@ describe('MetricSchema', () => {
       publicly_accessible: true,
       public_password: 'secret123',
       permission: 'canEdit',
+      workspace_sharing: null,
+      workspace_member_count: null,
     };
 
     const result = MetricSchema.safeParse(metricWithPartialConfig);
@@ -349,6 +357,8 @@ describe('MetricSchema', () => {
       publicly_accessible: false,
       public_password: null, // nullable
       permission: 'canView',
+      workspace_sharing: null,
+      workspace_member_count: null,
     };
 
     const result = MetricSchema.safeParse(metricWithNulls);

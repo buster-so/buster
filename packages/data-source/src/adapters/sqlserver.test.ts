@@ -1,8 +1,8 @@
+import sql from 'mssql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SQLServerAdapter } from './sqlserver';
 import { DataSourceType } from '../types/credentials';
 import type { SQLServerCredentials } from '../types/credentials';
-import sql from 'mssql';
+import { SQLServerAdapter } from './sqlserver';
 
 // Mock mssql module
 vi.mock('mssql');
@@ -16,23 +16,23 @@ describe('SQLServerAdapter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     adapter = new SQLServerAdapter();
-    
+
     // Create mock request for each test
     mockRequest = {
       query: vi.fn(),
       input: vi.fn().mockReturnThis(),
     };
-    
+
     // Create mock pool for each test
     mockPool = {
       request: vi.fn().mockReturnValue(mockRequest),
       close: vi.fn().mockResolvedValue(undefined),
       connect: vi.fn().mockResolvedValue(undefined),
     };
-    
+
     // Mock the ConnectionPool constructor
     mockedSql.ConnectionPool = vi.fn().mockReturnValue(mockPool);
-    
+
     // Mock SQL Server data types
     mockedSql.NVarChar = vi.fn();
     mockedSql.Int = vi.fn();
@@ -170,7 +170,7 @@ describe('SQLServerAdapter', () => {
       const result = await adapter.query('SELECT * FROM users');
 
       expect(mockRequest.query).toHaveBeenCalledWith('SELECT * FROM users');
-      
+
       expect(result).toEqual({
         rows: [{ id: 1, name: 'Test' }],
         rowCount: 1,
@@ -202,22 +202,23 @@ describe('SQLServerAdapter', () => {
       let recordsetCallback: any;
       let rowCallback: any;
       let doneCallback: any;
-      
+
       mockRequest.on = vi.fn((event, callback) => {
         if (event === 'recordset') recordsetCallback = callback;
         if (event === 'row') rowCallback = callback;
         if (event === 'done') doneCallback = callback;
-        if (event === 'error') {} // Ignore error callback
+        if (event === 'error') {
+        } // Ignore error callback
       });
-      
+
       mockRequest.pause = vi.fn();
       mockRequest.cancel = vi.fn();
-      
+
       mockRequest.query.mockImplementation(() => {
         // Simulate async behavior
         setTimeout(() => {
           recordsetCallback?.({ id: { name: 'id', type: () => ({ name: 'int' }) } });
-          rows.forEach(row => rowCallback?.(row));
+          rows.forEach((row) => rowCallback?.(row));
           doneCallback?.();
         }, 0);
       });
@@ -236,22 +237,23 @@ describe('SQLServerAdapter', () => {
       let recordsetCallback: any;
       let rowCallback: any;
       let doneCallback: any;
-      
+
       mockRequest.on = vi.fn((event, callback) => {
         if (event === 'recordset') recordsetCallback = callback;
         if (event === 'row') rowCallback = callback;
         if (event === 'done') doneCallback = callback;
-        if (event === 'error') {} // Ignore error callback
+        if (event === 'error') {
+        } // Ignore error callback
       });
-      
+
       mockRequest.pause = vi.fn();
       mockRequest.cancel = vi.fn();
-      
+
       mockRequest.query.mockImplementation(() => {
         // Simulate async behavior
         setTimeout(() => {
           recordsetCallback?.({ id: { name: 'id', type: () => ({ name: 'int' }) } });
-          rows.forEach(row => rowCallback?.(row));
+          rows.forEach((row) => rowCallback?.(row));
           doneCallback?.();
         }, 0);
       });
@@ -332,22 +334,23 @@ describe('SQLServerAdapter', () => {
       let recordsetCallback: any;
       let rowCallback: any;
       let doneCallback: any;
-      
+
       mockRequest.on = vi.fn((event, callback) => {
         if (event === 'recordset') recordsetCallback = callback;
         if (event === 'row') rowCallback = callback;
         if (event === 'done') doneCallback = callback;
-        if (event === 'error') {} // Ignore error callback
+        if (event === 'error') {
+        } // Ignore error callback
       });
-      
+
       mockRequest.pause = vi.fn();
       mockRequest.cancel = vi.fn();
-      
+
       mockRequest.query.mockImplementation(() => {
         // Simulate async behavior
         setTimeout(() => {
           recordsetCallback?.({ id: { name: 'id', type: () => ({ name: 'int' }) } });
-          rows.forEach(row => rowCallback?.(row));
+          rows.forEach((row) => rowCallback?.(row));
           doneCallback?.();
         }, 0);
       });
@@ -417,7 +420,7 @@ describe('SQLServerAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockRequest.query.mockResolvedValueOnce({
         recordset: [{ test: 1 }],
       });
@@ -438,7 +441,7 @@ describe('SQLServerAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockRequest.query.mockRejectedValueOnce(new Error('Connection test failed'));
 
       const result = await adapter.testConnection();
@@ -471,7 +474,7 @@ describe('SQLServerAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockPool.close.mockRejectedValueOnce(new Error('Close failed'));
 
       // Should not throw
@@ -490,9 +493,9 @@ describe('SQLServerAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       const introspector = adapter.introspect();
-      
+
       // Just verify it returns an introspector with the correct interface
       expect(introspector).toBeDefined();
       expect(introspector.getDatabases).toBeDefined();

@@ -90,10 +90,11 @@ function formatMessageAsReasoningEntry(
               if (args.thought) {
                 const thoughtNumber = args.thoughtNumber as number;
                 const totalThoughts = args.totalThoughts as number;
-                const title = thoughtNumber && totalThoughts 
-                  ? `Thought ${thoughtNumber} of ${totalThoughts}`
-                  : 'Thinking...';
-                
+                const title =
+                  thoughtNumber && totalThoughts
+                    ? `Thought ${thoughtNumber} of ${totalThoughts}`
+                    : 'Thinking...';
+
                 const textEntry: ReasoningTextEntry = {
                   id: toolCall.toolCallId,
                   type: 'text',

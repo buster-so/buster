@@ -24,14 +24,16 @@ describe('Message Updates Test Helpers - Unit Tests', () => {
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
-    const { createTestMessageWithContext } = await import('./messages/createTestMessageWithContext');
+
+    const { createTestMessageWithContext } = await import(
+      './messages/createTestMessageWithContext'
+    );
     const result = await createTestMessageWithContext({
       reasoning: { steps: ['Initial step'], conclusion: 'Test conclusion' },
     });
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith({
       reasoning: { steps: ['Initial step'], conclusion: 'Test conclusion' },
@@ -45,14 +47,16 @@ describe('Message Updates Test Helpers - Unit Tests', () => {
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
-    const { createTestMessageWithContext } = await import('./messages/createTestMessageWithContext');
+
+    const { createTestMessageWithContext } = await import(
+      './messages/createTestMessageWithContext'
+    );
     const result = await createTestMessageWithContext({
       responseMessages: { content: 'Streaming response', metadata: { streaming: true } },
     });
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith({
       responseMessages: { content: 'Streaming response', metadata: { streaming: true } },
@@ -64,22 +68,24 @@ describe('Message Updates Test Helpers - Unit Tests', () => {
       { role: 'user', content: 'Hello' },
       { role: 'assistant', content: 'Hi there' },
     ];
-    
+
     const mockResult = {
       messageId: 'test-message-id',
       userId: 'test-user-id',
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
-    const { createTestMessageWithContext } = await import('./messages/createTestMessageWithContext');
+
+    const { createTestMessageWithContext } = await import(
+      './messages/createTestMessageWithContext'
+    );
     const result = await createTestMessageWithContext({
       rawLlmMessages,
       requestMessage: 'Hello',
     });
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith({
       rawLlmMessages,

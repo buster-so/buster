@@ -1,8 +1,8 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { initLogger } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { thinkAndPrepStep } from './think-and-prep-step';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+import { thinkAndPrepStep } from './think-and-prep-step';
 
 describe('Think and Prep Step - Todos in Message History Integration', { timeout: 30000 }, () => {
   beforeAll(() => {

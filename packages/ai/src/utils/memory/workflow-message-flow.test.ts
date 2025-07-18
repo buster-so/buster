@@ -6,8 +6,8 @@ import type {
   ToolResultPart,
 } from 'ai';
 import { describe, expect, test } from 'vitest';
-import { extractMessageHistory } from './message-history';
 import { validateArrayAccess } from '../validation-helpers';
+import { extractMessageHistory } from './message-history';
 
 describe('Workflow Message Flow', () => {
   test('should maintain sequential order when passing messages between steps', () => {

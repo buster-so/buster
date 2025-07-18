@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { createTestChat } from '../chats/createTestChat';
 import { cleanupTestEnvironment, setupTestEnvironment } from '../../envHelpers/env-helpers';
+import { createTestChat } from '../chats/createTestChat';
 import { type CreateTestMessageOptions, createTestMessage } from './createTestMessage';
 import { createTestMessageWithContext } from './createTestMessageWithContext';
 

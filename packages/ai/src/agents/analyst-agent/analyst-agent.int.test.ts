@@ -2,8 +2,8 @@ import { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { initLogger, wrapTraced } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { analystAgent } from './analyst-agent';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import { analystAgent } from './analyst-agent';
 
 describe('Analyst Agent Integration Tests', () => {
   beforeAll(async () => {

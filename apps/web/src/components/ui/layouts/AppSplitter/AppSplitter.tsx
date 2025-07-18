@@ -7,7 +7,9 @@ import React, {
   useState,
   useImperativeHandle,
   forwardRef,
-  useMemo
+  useMemo,
+  createContext,
+  useContext
 } from 'react';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { cn } from '@/lib/classMerge';
@@ -191,6 +193,18 @@ interface SplitterState {
   hasUserInteracted: boolean;
 }
 
+const AppSplitterContext = createContext<{
+  splitterAutoSaveId: string;
+  containerRef: React.RefObject<HTMLDivElement> | null;
+}>({
+  splitterAutoSaveId: '',
+  containerRef: null
+});
+
+const useAppSplitterContext = () => {
+  return useContext(AppSplitterContext);
+};
+
 // ================================
 // MAIN COMPONENT
 // ================================
@@ -214,27 +228,38 @@ const AppSplitterWrapper = forwardRef<AppSplitterRef, IAppSplitterProps>(
     const [mounted, setMounted] = useState(!props.bustStorageOnInit);
     const splitterAutoSaveId = createAutoSaveId(autoSaveId);
 
-    useMount(() => {
-      setMounted(true);
+    const { splitterAutoSaveId: parentSplitterAutoSaveId } = useAppSplitterContext();
+
+    useMount(async () => {
+      //we need to wait for the parent to be mounted and the container to be sized
+      if (parentSplitterAutoSaveId || !containerRef.current?.offsetWidth) {
+        requestAnimationFrame(() => {
+          setMounted(true);
+        });
+      } else {
+        setMounted(true);
+      }
     });
 
     return (
-      <div
-        ref={containerRef}
-        id={splitterAutoSaveId}
-        className={cn('flex h-full w-full', isVertical ? 'flex-row' : 'flex-col', className)}
-        style={style}>
-        {mounted && (
-          <AppSplitterBase
-            {...props}
-            ref={componentRef}
-            isVertical={isVertical}
-            containerRef={containerRef}
-            splitterAutoSaveId={splitterAutoSaveId}
-            split={split}
-          />
-        )}
-      </div>
+      <AppSplitterContext.Provider value={{ splitterAutoSaveId, containerRef }}>
+        <div
+          ref={containerRef}
+          id={splitterAutoSaveId}
+          className={cn('flex h-full w-full', isVertical ? 'flex-row' : 'flex-col', className)}
+          style={style}>
+          {mounted && (
+            <AppSplitterBase
+              {...props}
+              ref={componentRef}
+              isVertical={isVertical}
+              containerRef={containerRef}
+              splitterAutoSaveId={splitterAutoSaveId}
+              split={split}
+            />
+          )}
+        </div>
+      </AppSplitterContext.Provider>
     );
   }
 );

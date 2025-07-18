@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { parseStreamingArgs } from './execute-sql';
 import { validateArrayAccess } from '../../utils/validation-helpers';
+import { parseStreamingArgs } from './execute-sql';
 
 describe('Execute SQL Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {

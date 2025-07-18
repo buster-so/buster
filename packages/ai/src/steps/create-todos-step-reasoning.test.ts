@@ -1,9 +1,9 @@
 import { createTestChat, createTestMessage, withTestEnv } from '@buster/test-utils';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 import { createTodosStep } from './create-todos-step';
 import { getRawLlmMessagesByMessageId } from './get-chat-history';
-import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 describe('Create Todos Step - Reasoning Integration', () => {
   beforeAll(async () => {

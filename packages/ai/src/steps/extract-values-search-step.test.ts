@@ -1,7 +1,7 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { extractValuesSearchStep } from './extract-values-search-step';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+import { extractValuesSearchStep } from './extract-values-search-step';
 
 // Mock the stored-values package
 vi.mock('@buster/stored-values/search', () => {

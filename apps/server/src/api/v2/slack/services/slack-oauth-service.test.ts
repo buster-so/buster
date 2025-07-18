@@ -66,7 +66,8 @@ describe('SlackOAuthService', () => {
         id: 'existing-integration',
         organizationId: 'org-123',
         status: 'active',
-        scope: 'app_mentions:read,channels:history,channels:join,channels:manage,channels:read,chat:write,chat:write.public,commands,files:read,files:write,groups:history,groups:write,im:history,im:read,im:write,mpim:history,mpim:read,mpim:write,reactions:write,reactions:read,users:read,users:read.email',
+        scope:
+          'app_mentions:read,channels:history,channels:join,channels:manage,channels:read,chat:write,chat:write.public,commands,files:read,files:write,groups:history,groups:write,im:history,im:read,im:write,mpim:history,mpim:read,mpim:write,reactions:write,reactions:read,users:read,users:read.email',
       } as any);
 
       await expect(

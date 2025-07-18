@@ -136,7 +136,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/app/settings/integrations?status=cancelled'
+        'http://localhost:3000/app/settings/integrations?status=cancelled'
       );
     });
 
@@ -146,7 +146,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/app/settings/integrations?status=error&error=invalid_parameters'
+        'http://localhost:3000/app/settings/integrations?status=error&error=invalid_parameters'
       );
     });
 
@@ -171,7 +171,7 @@ describe('SlackHandler', () => {
         state: 'test-state',
       });
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/dashboard?status=success&workspace=Test%20Workspace'
+        'http://localhost:3000/dashboard?status=success&workspace=Test%20Workspace'
       );
     });
 
@@ -191,7 +191,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/app/settings/integrations?status=error&error=invalid_state'
+        'http://localhost:3000/app/settings/integrations?status=error&error=invalid_state'
       );
     });
   });

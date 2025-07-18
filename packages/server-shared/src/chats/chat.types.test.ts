@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { ShareIndividualSchema } from '../share';
 import {
   AssetPermissionRoleSchema,
   ChatCreateHandlerRequestSchema,
   ChatCreateRequestSchema,
   ChatWithMessagesSchema,
 } from './chat.types';
-import { ShareIndividualSchema } from '../share';
 
 describe('AssetPermissionRoleSchema', () => {
   it('should accept valid role values', () => {

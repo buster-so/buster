@@ -1,7 +1,7 @@
 import type { CoreMessage } from 'ai';
 import { describe, expect, test } from 'vitest';
-import { extractMessageHistory } from './message-history';
 import { validateArrayAccess } from '../validation-helpers';
+import { extractMessageHistory } from './message-history';
 
 describe('AI SDK Message Bundling Issues', () => {
   test('identify when AI SDK returns bundled messages', () => {

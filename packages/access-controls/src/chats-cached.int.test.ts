@@ -147,15 +147,15 @@ describe('canUserAccessChatCached Integration Tests', () => {
     // Wait for cache to expire (30 seconds + buffer)
     // Note: In a real test environment, we'd want a shorter TTL
     // For now, we'll just verify the cache works within the TTL
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     // Should still be cached
     await canUserAccessChatCached({ userId, chatId });
     expect(spiedCanUserAccessChat).toHaveBeenCalledTimes(1);
 
     // Clear the specific cache entry to simulate expiration
     invalidateAccess(userId, chatId);
-    
+
     // Next call should hit the database again
     await canUserAccessChatCached({ userId, chatId });
     expect(spiedCanUserAccessChat).toHaveBeenCalledTimes(2);
@@ -181,15 +181,15 @@ describe('canUserAccessChatCached Integration Tests', () => {
     expect(spiedCanUserAccessChat).toHaveBeenCalledTimes(1); // Still only 1 DB call
 
     // Wait a bit to simulate time passing
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     // Should still be cached (TTL is refreshed on each access)
     await canUserAccessChatCached({ userId, chatId });
     expect(spiedCanUserAccessChat).toHaveBeenCalledTimes(1);
 
     // Manually invalidate the cache entry to verify refresh behavior
     invalidateAccess(userId, chatId);
-    
+
     // Next call should hit the database again
     await canUserAccessChatCached({ userId, chatId });
     expect(spiedCanUserAccessChat).toHaveBeenCalledTimes(2);

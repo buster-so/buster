@@ -1,9 +1,8 @@
 'use client';
 
 import type React from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { useMount } from '@/hooks';
 import { ChatContainer } from '../ChatContainer';
 import { ChatContextProvider } from '../ChatContext/ChatContext';
 import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';

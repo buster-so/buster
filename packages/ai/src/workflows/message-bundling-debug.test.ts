@@ -118,14 +118,12 @@ describe('Message Bundling Debug', () => {
           : 'text'
       );
       if (msg.role === 'assistant' && Array.isArray(msg.content)) {
-        (msg.content as any[]).forEach(
-          (item: any, j) => {
-            if (item.type === 'tool-call') {
-              const toolCall = item as ToolCallPart;
-              console.log(`    [${j}] tool-call: ${toolCall.toolName} (${toolCall.toolCallId})`);
-            }
+        (msg.content as any[]).forEach((item: any, j) => {
+          if (item.type === 'tool-call') {
+            const toolCall = item as ToolCallPart;
+            console.log(`    [${j}] tool-call: ${toolCall.toolName} (${toolCall.toolCallId})`);
           }
-        );
+        });
       }
     });
 

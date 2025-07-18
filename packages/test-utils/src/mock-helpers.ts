@@ -12,7 +12,7 @@ export function mockConsole() {
     warn: console.warn,
     info: console.info,
   };
-  
+
   const mockedMethods = {
     log: vi.fn(),
     error: vi.fn(),

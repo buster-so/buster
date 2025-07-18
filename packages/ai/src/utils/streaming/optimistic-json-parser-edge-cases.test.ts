@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  OptimisticJsonParser,
-  getOptimisticValue,
-} from './optimistic-json-parser';
+import { OptimisticJsonParser, getOptimisticValue } from './optimistic-json-parser';
 
 describe('OptimisticJsonParser - Edge Cases and Special Characters', () => {
   describe('Special Characters and Escape Sequences', () => {

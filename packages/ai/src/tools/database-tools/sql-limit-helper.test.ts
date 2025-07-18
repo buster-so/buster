@@ -1,8 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import {
-  ensureSqlLimit,
-  ensureSqlLimitsForMultiple,
-} from './sql-limit-helper';
+import { ensureSqlLimit, ensureSqlLimitsForMultiple } from './sql-limit-helper';
 
 describe('SQL Limit Helper', () => {
   describe('ensureSqlLimit', () => {

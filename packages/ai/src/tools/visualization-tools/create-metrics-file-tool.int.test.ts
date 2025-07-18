@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { createMetrics } from './create-metrics-file-tool';
 import { validateArrayAccess } from '../../utils/validation-helpers';
+import { createMetrics } from './create-metrics-file-tool';
 
 describe('Create Metrics File Tool Integration Tests', () => {
   let mockRuntimeContext: Record<string, unknown>;

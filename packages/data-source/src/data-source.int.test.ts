@@ -9,13 +9,13 @@ const TEST_TIMEOUT = 5000;
 
 // Check if credentials are available
 const hasPostgreSQLCredentials = !!(
-  process.env.TEST_POSTGRES_DATABASE && 
-  process.env.TEST_POSTGRES_USERNAME && 
+  process.env.TEST_POSTGRES_DATABASE &&
+  process.env.TEST_POSTGRES_USERNAME &&
   process.env.TEST_POSTGRES_PASSWORD
 );
 const hasMySQLCredentials = !!(
-  process.env.TEST_MYSQL_DATABASE && 
-  process.env.TEST_MYSQL_USERNAME && 
+  process.env.TEST_MYSQL_DATABASE &&
+  process.env.TEST_MYSQL_USERNAME &&
   process.env.TEST_MYSQL_PASSWORD
 );
 
@@ -303,9 +303,9 @@ describe('DataSource Integration', () => {
     it('should throw error when querying non-existent data source', async () => {
       dataSource = new DataSource({ dataSources: [] });
 
-      await expect(
-        dataSource.query('SELECT 1', [], { warehouse: 'non-existent' })
-      ).rejects.toThrow('Data source non-existent not found');
+      await expect(dataSource.query('SELECT 1', [], { warehouse: 'non-existent' })).rejects.toThrow(
+        'Data source non-existent not found'
+      );
     });
   });
 });

@@ -2,10 +2,10 @@ import { chats, db, eq, messages } from '@buster/database';
 import {
   SlackMessagingService,
   addReaction,
+  convertMarkdownToSlack,
   getReactions,
   getThreadMessages,
   removeReaction,
-  convertMarkdownToSlack,
 } from '@buster/slack';
 import { type TaskOutput, logger, runs, schemaTask, wait } from '@trigger.dev/sdk';
 import { z } from 'zod';
@@ -549,10 +549,10 @@ export const slackAgentTask: ReturnType<
 
         // Convert markdown to Slack format
         const convertedResponse = convertMarkdownToSlack(responseText);
-        
+
         // Create the message with converted text and any blocks from conversion
         const messageBlocks = [...(convertedResponse.blocks || [])];
-        
+
         // If no blocks were created from conversion, create a section block with the converted text
         if (messageBlocks.length === 0 && convertedResponse.text) {
           messageBlocks.push({
@@ -563,7 +563,7 @@ export const slackAgentTask: ReturnType<
             },
           });
         }
-        
+
         // Add the action button block
         messageBlocks.push({
           type: 'actions' as const,
@@ -579,7 +579,7 @@ export const slackAgentTask: ReturnType<
             },
           ],
         });
-        
+
         const completionMessage = {
           text: convertedResponse.text || responseText, // Use converted text as fallback
           thread_ts: chatDetails.slackThreadTs,

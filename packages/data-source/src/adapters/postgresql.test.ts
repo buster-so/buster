@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Client } from 'pg';
-import { PostgreSQLAdapter } from './postgresql';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DataSourceType } from '../types/credentials';
 import type { PostgreSQLCredentials } from '../types/credentials';
+import { PostgreSQLAdapter } from './postgresql';
 
 // Create mock client instance
 const mockClient = {
@@ -94,9 +94,7 @@ describe('PostgreSQLAdapter', () => {
         password: 'testpass',
       } as any;
 
-      await expect(adapter.initialize(credentials)).rejects.toThrow(
-        'Database name is required'
-      );
+      await expect(adapter.initialize(credentials)).rejects.toThrow('Database name is required');
     });
 
     it('should use default port when not specified', async () => {
@@ -239,7 +237,7 @@ describe('PostgreSQLAdapter', () => {
 
       expect(mockClient.query).toHaveBeenCalledWith('SET statement_timeout = 60000');
       expect(mockClient.query).toHaveBeenCalledWith('SELECT * FROM users', undefined);
-      
+
       expect(result).toEqual({
         rows: [{ id: 1, name: 'Test' }],
         rowCount: 1,
@@ -356,7 +354,7 @@ describe('PostgreSQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockClient.query.mockResolvedValueOnce({ rows: [{ result: 1 }] });
 
       const result = await adapter.testConnection();
@@ -375,7 +373,7 @@ describe('PostgreSQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockClient.query.mockRejectedValueOnce(new Error('Connection test failed'));
 
       const result = await adapter.testConnection();
@@ -408,7 +406,7 @@ describe('PostgreSQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockClient.end.mockRejectedValueOnce(new Error('Close failed'));
 
       // Should not throw
@@ -427,9 +425,9 @@ describe('PostgreSQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       const introspector = adapter.introspect();
-      
+
       // Just verify it returns an introspector with the correct interface
       expect(introspector).toBeDefined();
       expect(introspector.getDatabases).toBeDefined();

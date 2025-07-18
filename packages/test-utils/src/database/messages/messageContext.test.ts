@@ -24,12 +24,12 @@ describe('Message Context Helper - Unit Tests', () => {
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
+
     const { createTestMessageWithContext } = await import('./createTestMessageWithContext');
     const result = await createTestMessageWithContext();
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith();
   });
@@ -40,19 +40,19 @@ describe('Message Context Helper - Unit Tests', () => {
       requestMessage: 'Custom request',
       isCompleted: false,
     };
-    
+
     const mockResult = {
       messageId: 'test-message-id',
       userId: 'test-user-id',
       chatId: 'test-chat-id',
       organizationId: 'test-org-id',
     };
-    
+
     mockCreateTestMessageWithContext.mockResolvedValue(mockResult);
-    
+
     const { createTestMessageWithContext } = await import('./createTestMessageWithContext');
     const result = await createTestMessageWithContext(options);
-    
+
     expect(result).toEqual(mockResult);
     expect(mockCreateTestMessageWithContext).toHaveBeenCalledWith(options);
   });

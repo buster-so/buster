@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { SnowflakeAdapter } from './snowflake';
 import { DataSourceType } from '../types/credentials';
 import type { SnowflakeCredentials } from '../types/credentials';
+import { SnowflakeAdapter } from './snowflake';
 
 // Check if Snowflake test credentials are available
 const hasSnowflakeCredentials = !!(

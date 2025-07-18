@@ -5,6 +5,7 @@ import currencyRoutes from './currency';
 
 const app = new Hono();
 
-export default app.use('*', requireAuth)
+export default app
+  .use('*', requireAuth)
   .route('/color-themes', colorThemesRoutes)
   .route('/currency', currencyRoutes);

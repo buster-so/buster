@@ -1,8 +1,5 @@
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
-import {
-  convertToolCallToMessage,
-  extractMessagesFromToolCalls,
-} from './message-converters';
+import { convertToolCallToMessage, extractMessagesFromToolCalls } from './message-converters';
 
 describe('message-converters error handling', () => {
   // Mock console.error to verify error logging

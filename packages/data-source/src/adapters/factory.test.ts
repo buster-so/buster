@@ -1,9 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createAdapterInstance,
-  getSupportedTypes,
-  isSupported,
-} from './factory';
 import { DataSourceType } from '../types/credentials';
 import type {
   BigQueryCredentials,
@@ -14,6 +9,7 @@ import type {
   SQLServerCredentials,
   SnowflakeCredentials,
 } from '../types/credentials';
+import { createAdapterInstance, getSupportedTypes, isSupported } from './factory';
 
 // Type for testing unsupported data source types
 type UnsupportedCredentials = {

@@ -1,13 +1,10 @@
-import type { AssistantContent } from 'ai';
-import { describe, expect, it } from 'vitest';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
 } from '@buster/server-shared/chats';
-import {
-  convertToolCallToMessage,
-  extractMessagesFromToolCalls,
-} from './message-converters';
+import type { AssistantContent } from 'ai';
+import { describe, expect, it } from 'vitest';
+import { convertToolCallToMessage, extractMessagesFromToolCalls } from './message-converters';
 
 // Extract ToolCall type from AssistantContent
 type ToolCall = Extract<AssistantContent, { type: 'tool-call' }>;
@@ -156,7 +153,10 @@ describe('message-converters', () => {
 
         expect(result).not.toBeNull();
         expect(result?.type).toBe('reasoning');
-        const reasoning = result?.message as Extract<ChatMessageReasoningMessage, { type: 'files' }>;
+        const reasoning = result?.message as Extract<
+          ChatMessageReasoningMessage,
+          { type: 'files' }
+        >;
         expect(reasoning).toMatchObject({
           id: 'test-id-6',
           type: 'files',
@@ -190,7 +190,10 @@ describe('message-converters', () => {
 
         const result = convertToolCallToMessage(toolCall, toolResult, 'completed');
 
-        const reasoning = result?.message as Extract<ChatMessageReasoningMessage, { type: 'files' }>;
+        const reasoning = result?.message as Extract<
+          ChatMessageReasoningMessage,
+          { type: 'files' }
+        >;
         expect(reasoning.title).toBe('Created 1 metric');
         expect(reasoning.secondary_title).toBeUndefined();
       });
@@ -215,7 +218,10 @@ describe('message-converters', () => {
 
         expect(result).not.toBeNull();
         expect(result?.type).toBe('reasoning');
-        const reasoning = result?.message as Extract<ChatMessageReasoningMessage, { type: 'files' }>;
+        const reasoning = result?.message as Extract<
+          ChatMessageReasoningMessage,
+          { type: 'files' }
+        >;
         expect(reasoning.files!['dashboard-1']!.file_type).toBe('dashboard');
       });
     });
@@ -237,7 +243,10 @@ describe('message-converters', () => {
 
         const result = convertToolCallToMessage(toolCall, toolResult, 'completed');
 
-        const reasoning = result?.message as Extract<ChatMessageReasoningMessage, { type: 'files' }>;
+        const reasoning = result?.message as Extract<
+          ChatMessageReasoningMessage,
+          { type: 'files' }
+        >;
         expect(reasoning.title).toBe('Modified 1 metric');
         expect(reasoning.files!['metric-1']!.version_number).toBe(2);
       });
@@ -256,7 +265,10 @@ describe('message-converters', () => {
 
         const result = convertToolCallToMessage(toolCall, toolResult, 'completed');
 
-        const reasoning = result?.message as Extract<ChatMessageReasoningMessage, { type: 'files' }>;
+        const reasoning = result?.message as Extract<
+          ChatMessageReasoningMessage,
+          { type: 'files' }
+        >;
         expect(reasoning.title).toBe('Modified 0 dashboards');
         expect(reasoning.secondary_title).toBe('1 failed');
         expect(reasoning.status).toBe('completed');

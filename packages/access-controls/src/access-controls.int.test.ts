@@ -500,7 +500,7 @@ describe('Access Controls Integration Tests - Organization Default Permission Gr
 
 describe('getPermissionedDatasets Integration Tests', () => {
   const db = getDb();
-  
+
   // Generate unique IDs for our test users
   const testUserId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
   const noAccessUserId = uuidv4();
@@ -514,7 +514,7 @@ describe('getPermissionedDatasets Integration Tests', () => {
 
   beforeAll(async () => {
     const now = new Date().toISOString();
-    
+
     // Create test organization
     await db.insert(organizations).values({
       id: testOrgIdForUsers,
@@ -653,29 +653,27 @@ describe('getPermissionedDatasets Integration Tests', () => {
 
   afterAll(async () => {
     // Clean up test data
-    await db.delete(datasetsToPermissionGroups)
+    await db
+      .delete(datasetsToPermissionGroups)
       .where(eq(datasetsToPermissionGroups.permissionGroupId, limitedPermissionGroupId));
-    
-    await db.delete(permissionGroupsToIdentities)
+
+    await db
+      .delete(permissionGroupsToIdentities)
       .where(eq(permissionGroupsToIdentities.permissionGroupId, limitedPermissionGroupId));
-      
-    await db.delete(permissionGroups)
-      .where(eq(permissionGroups.id, limitedPermissionGroupId));
-      
-    await db.delete(datasets)
-      .where(eq(datasets.organizationId, testOrgIdForUsers));
-      
-    await db.delete(dataSources)
-      .where(eq(dataSources.id, testDataSourceIdForUsers));
-      
-    await db.delete(usersToOrganizations)
+
+    await db.delete(permissionGroups).where(eq(permissionGroups.id, limitedPermissionGroupId));
+
+    await db.delete(datasets).where(eq(datasets.organizationId, testOrgIdForUsers));
+
+    await db.delete(dataSources).where(eq(dataSources.id, testDataSourceIdForUsers));
+
+    await db
+      .delete(usersToOrganizations)
       .where(eq(usersToOrganizations.organizationId, testOrgIdForUsers));
-      
-    await db.delete(users)
-      .where(inArray(users.id, [noAccessUserId, limitedAccessUserId]));
-      
-    await db.delete(organizations)
-      .where(eq(organizations.id, testOrgIdForUsers));
+
+    await db.delete(users).where(inArray(users.id, [noAccessUserId, limitedAccessUserId]));
+
+    await db.delete(organizations).where(eq(organizations.id, testOrgIdForUsers));
   });
 
   describe('User Dataset Access - Full Access User', () => {

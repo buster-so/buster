@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BigQueryAdapter } from './bigquery';
 import { DataSourceType } from '../types/credentials';
 import type { BigQueryCredentials } from '../types/credentials';
+import { BigQueryAdapter } from './bigquery';
 
 // Create mock BigQuery instance
 const mockBigQuery = {
@@ -169,7 +169,7 @@ describe('BigQueryAdapter', () => {
         jobTimeoutMs: 60000,
         useLegacySql: false,
       });
-      
+
       expect(result).toEqual({
         rows: mockRows,
         rowCount: 1,
@@ -330,7 +330,7 @@ describe('BigQueryAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       const mockJob = {
         getQueryResults: vi.fn().mockResolvedValueOnce([[]]),
       };
@@ -354,7 +354,7 @@ describe('BigQueryAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockBigQuery.createQueryJob.mockRejectedValueOnce(new Error('Connection test failed'));
 
       const result = await adapter.testConnection();
@@ -386,9 +386,9 @@ describe('BigQueryAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       const introspector = adapter.introspect();
-      
+
       // Just verify it returns an introspector with the correct interface
       expect(introspector).toBeDefined();
       expect(introspector.getDatabases).toBeDefined();

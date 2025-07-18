@@ -12,7 +12,14 @@ describe('ChunkProcessor - Escape Normalization', () => {
 
   beforeEach(() => {
     const availableTools = new Set(['sequential-thinking', 'submitThoughts']);
-    processor = new ChunkProcessor<ToolSet>('test-message-id', [], [], [], undefined, availableTools);
+    processor = new ChunkProcessor<ToolSet>(
+      'test-message-id',
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
   });
 
   it('should normalize double-escaped newlines in sequential thinking tool', async () => {

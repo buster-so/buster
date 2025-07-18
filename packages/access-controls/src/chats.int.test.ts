@@ -223,11 +223,14 @@ describe('canUserAccessChat Integration Tests', () => {
       await db.delete(chats).where(eq(chats.organizationId, testOrgId));
 
       // Delete users_to_organizations - these reference users
-      await db.delete(usersToOrganizations).where(eq(usersToOrganizations.organizationId, testOrgId));
+      await db
+        .delete(usersToOrganizations)
+        .where(eq(usersToOrganizations.organizationId, testOrgId));
 
       // Update any remaining references to set createdBy/updatedBy to null before deleting users
       // This handles any references we might have missed
-      await db.update(usersToOrganizations)
+      await db
+        .update(usersToOrganizations)
         .set({ createdBy: null, updatedBy: null })
         .where(
           and(
@@ -235,7 +238,7 @@ describe('canUserAccessChat Integration Tests', () => {
             isNull(usersToOrganizations.deletedAt)
           )
         );
-      
+
       // Now we can safely delete users
       await db.delete(users).where(eq(users.id, testUserId));
       await db.delete(users).where(eq(users.id, testAdminUserId));

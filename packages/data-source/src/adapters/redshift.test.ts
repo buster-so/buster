@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Client } from 'pg';
-import { RedshiftAdapter } from './redshift';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DataSourceType } from '../types/credentials';
 import type { RedshiftCredentials } from '../types/credentials';
+import { RedshiftAdapter } from './redshift';
 
 // Mock pg-cursor
 vi.mock('pg-cursor');
@@ -195,7 +195,7 @@ describe('RedshiftAdapter', () => {
 
       expect(mockClient.query).toHaveBeenCalledWith('SET statement_timeout = 60000');
       expect(mockClient.query).toHaveBeenCalledWith('SELECT * FROM users', undefined);
-      
+
       expect(result).toEqual({
         rows: [{ id: 1, name: 'Test' }],
         rowCount: 1,
@@ -233,10 +233,8 @@ describe('RedshiftAdapter', () => {
         }),
         close: vi.fn((callback) => callback(null)),
         _result: {
-          fields: [
-            { name: 'id', dataTypeID: 23, dataTypeSize: 4 }
-          ]
-        }
+          fields: [{ name: 'id', dataTypeID: 23, dataTypeSize: 4 }],
+        },
       };
 
       // Mock the SET statement_timeout call
@@ -258,10 +256,8 @@ describe('RedshiftAdapter', () => {
         }),
         close: vi.fn((callback) => callback(null)),
         _result: {
-          fields: [
-            { name: 'id', dataTypeID: 23, dataTypeSize: 4 }
-          ]
-        }
+          fields: [{ name: 'id', dataTypeID: 23, dataTypeSize: 4 }],
+        },
       };
 
       // Mock the SET statement_timeout call
@@ -359,7 +355,7 @@ describe('RedshiftAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockClient.query.mockResolvedValueOnce({ rows: [{ result: 1 }] });
 
       const result = await adapter.testConnection();
@@ -378,7 +374,7 @@ describe('RedshiftAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockClient.query.mockRejectedValueOnce(new Error('Connection test failed'));
 
       const result = await adapter.testConnection();
@@ -411,7 +407,7 @@ describe('RedshiftAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockClient.end.mockRejectedValueOnce(new Error('Close failed'));
 
       // Should not throw
@@ -430,9 +426,9 @@ describe('RedshiftAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       const introspector = adapter.introspect();
-      
+
       // Just verify it returns an introspector with the correct interface
       expect(introspector).toBeDefined();
       expect(introspector.getDatabases).toBeDefined();

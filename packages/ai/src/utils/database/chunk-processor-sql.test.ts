@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
 import type { ChatMessageReasoningMessage } from '@buster/server-shared/chats';
-import { ChunkProcessor } from './chunk-processor';
+import { describe, expect, it } from 'vitest';
 import { validateArrayAccess } from '../validation-helpers';
+import { ChunkProcessor } from './chunk-processor';
 
 describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
   it('should create SQL reasoning entry with statements array', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { parseStreamingArgs } from './sequential-thinking-tool';
 import { validateArrayAccess } from '../../utils/validation-helpers';
+import { parseStreamingArgs } from './sequential-thinking-tool';
 
 describe('Sequential Thinking Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {

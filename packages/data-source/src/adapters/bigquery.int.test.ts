@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { BigQueryAdapter } from './bigquery';
 import { DataSourceType } from '../types/credentials';
 import type { BigQueryCredentials } from '../types/credentials';
+import { BigQueryAdapter } from './bigquery';
 
 // Check if BigQuery test credentials are available
 const hasBigQueryCredentials = !!(

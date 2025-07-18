@@ -17,8 +17,8 @@ describe('Organization Data Source Helper - Unit Tests', () => {
   beforeEach(async () => {
     await setupTestEnvironment();
     vi.clearAllMocks();
-    
-    const createTestDataSourceMock = await vi.importMock('./createTestDataSource') as any;
+
+    const createTestDataSourceMock = (await vi.importMock('./createTestDataSource')) as any;
     mockCreateTestDataSource = createTestDataSourceMock.createTestDataSource;
   });
 
@@ -32,7 +32,7 @@ describe('Organization Data Source Helper - Unit Tests', () => {
       organizationId: 'test-org-id',
       dataSourceType: 'postgresql',
     };
-    
+
     const mockResult = {
       dataSourceId: 'test-data-source-id',
       dataSourceSyntax: 'postgresql',
@@ -43,7 +43,7 @@ describe('Organization Data Source Helper - Unit Tests', () => {
 
     const { getOrganizationDataSource } = await import('@buster/database');
     const { createTestDataSource } = await import('./createTestDataSource');
-    
+
     const { dataSourceId, organizationId, dataSourceType } = await createTestDataSource();
     const input = { organizationId };
     const result = await getOrganizationDataSource(input);
@@ -53,7 +53,9 @@ describe('Organization Data Source Helper - Unit Tests', () => {
   });
 
   test('getOrganizationDataSource validates UUID input', async () => {
-    mockGetOrganizationDataSource.mockRejectedValue(new Error('Organization ID must be a valid UUID'));
+    mockGetOrganizationDataSource.mockRejectedValue(
+      new Error('Organization ID must be a valid UUID')
+    );
 
     const { getOrganizationDataSource } = await import('@buster/database');
     const input = { organizationId: 'invalid-uuid' };
@@ -64,7 +66,9 @@ describe('Organization Data Source Helper - Unit Tests', () => {
   });
 
   test('getOrganizationDataSource throws for non-existent organization', async () => {
-    mockGetOrganizationDataSource.mockRejectedValue(new Error('No data sources found for organization'));
+    mockGetOrganizationDataSource.mockRejectedValue(
+      new Error('No data sources found for organization')
+    );
 
     const { getOrganizationDataSource } = await import('@buster/database');
     const input = {
@@ -84,11 +88,15 @@ describe('Organization Data Source Helper - Unit Tests', () => {
     };
 
     mockCreateTestDataSource.mockResolvedValue(mockDataSource);
-    mockGetOrganizationDataSource.mockRejectedValue(new Error('Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.'));
+    mockGetOrganizationDataSource.mockRejectedValue(
+      new Error(
+        'Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.'
+      )
+    );
 
     const { getOrganizationDataSource } = await import('@buster/database');
     const { createTestDataSource } = await import('./createTestDataSource');
-    
+
     const { organizationId } = await createTestDataSource();
     await createTestDataSource({ organizationId });
 

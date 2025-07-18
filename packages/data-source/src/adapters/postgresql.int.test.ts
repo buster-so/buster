@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { PostgreSQLAdapter } from './postgresql';
 import { DataSourceType } from '../types/credentials';
 import type { PostgreSQLCredentials } from '../types/credentials';
+import { PostgreSQLAdapter } from './postgresql';
 
 // Check if PostgreSQL test credentials are available
 const hasPostgreSQLCredentials = !!(

@@ -20,7 +20,14 @@ describe('Workflow Message Accumulation Integration', () => {
   it('should not create duplicate messages when passing from think-and-prep to analyst step', async () => {
     // Step 1: Simulate think-and-prep step processing
     const availableTools = new Set(['sequentialThinking', 'executeSql']);
-    const thinkAndPrepProcessor = new ChunkProcessor(mockMessageId, [], [], [], undefined, availableTools);
+    const thinkAndPrepProcessor = new ChunkProcessor(
+      mockMessageId,
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
 
     // Initial user message
     const userMessage: CoreMessage = {

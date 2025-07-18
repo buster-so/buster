@@ -1,8 +1,8 @@
+import mysql from 'mysql2/promise';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MySQLAdapter } from './mysql';
 import { DataSourceType } from '../types/credentials';
 import type { MySQLCredentials } from '../types/credentials';
-import mysql from 'mysql2/promise';
+import { MySQLAdapter } from './mysql';
 
 // Mock mysql2/promise module
 vi.mock('mysql2/promise');
@@ -15,7 +15,7 @@ describe('MySQLAdapter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     adapter = new MySQLAdapter();
-    
+
     // Create mock connection for each test
     mockConnection = {
       connect: vi.fn().mockResolvedValue(undefined),
@@ -24,7 +24,7 @@ describe('MySQLAdapter', () => {
       end: vi.fn().mockResolvedValue(undefined),
       ping: vi.fn().mockResolvedValue(undefined),
     };
-    
+
     mockedMysql.createConnection = vi.fn().mockResolvedValue(mockConnection);
   });
 
@@ -164,7 +164,7 @@ describe('MySQLAdapter', () => {
       const result = await adapter.query('SELECT * FROM users');
 
       expect(mockConnection.execute).toHaveBeenCalledWith('SELECT * FROM users', undefined);
-      
+
       expect(result).toEqual({
         rows: [{ id: 1, name: 'Test' }],
         rowCount: 1,
@@ -177,10 +177,7 @@ describe('MySQLAdapter', () => {
     });
 
     it('should execute parameterized query', async () => {
-      const mockResult = [
-        [{ id: 1 }],
-        [{ name: 'id', type: 'LONG' }],
-      ];
+      const mockResult = [[{ id: 1 }], [{ name: 'id', type: 'LONG' }]];
 
       mockConnection.execute.mockResolvedValueOnce(mockResult);
 
@@ -246,10 +243,7 @@ describe('MySQLAdapter', () => {
     });
 
     it('should handle empty result sets', async () => {
-      const mockResult = [
-        [],
-        [{ name: 'id', type: 'LONG' }],
-      ];
+      const mockResult = [[], [{ name: 'id', type: 'LONG' }]];
 
       mockConnection.execute.mockResolvedValueOnce(mockResult);
 
@@ -282,7 +276,7 @@ describe('MySQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockConnection.execute.mockResolvedValueOnce([[], []]);
 
       const result = await adapter.testConnection();
@@ -301,7 +295,7 @@ describe('MySQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockConnection.execute.mockRejectedValueOnce(new Error('Connection test failed'));
 
       const result = await adapter.testConnection();
@@ -334,7 +328,7 @@ describe('MySQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       mockConnection.end.mockRejectedValueOnce(new Error('Close failed'));
 
       // Should not throw
@@ -353,9 +347,9 @@ describe('MySQLAdapter', () => {
       };
 
       await adapter.initialize(credentials);
-      
+
       const introspector = adapter.introspect();
-      
+
       // Just verify it returns an introspector with the correct interface
       expect(introspector).toBeDefined();
       expect(introspector.getDatabases).toBeDefined();

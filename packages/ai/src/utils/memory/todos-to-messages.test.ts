@@ -1,9 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import {
-  createTodoReasoningMessage,
-  createTodoToolCallMessage,
-} from './todos-to-messages';
 import { validateArrayAccess } from '../validation-helpers';
+import { createTodoReasoningMessage, createTodoToolCallMessage } from './todos-to-messages';
 
 describe('Todos to Message Conversion', () => {
   const sampleTodos = `[ ] Determine how "sales" is identified

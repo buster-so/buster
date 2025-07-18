@@ -1,12 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { DataSourceType } from '../types/credentials';
+import type { Credentials, MySQLCredentials, PostgreSQLCredentials } from '../types/credentials';
 import { BaseAdapter } from './base';
 import type { AdapterQueryResult } from './base';
-import { DataSourceType } from '../types/credentials';
-import type {
-  Credentials,
-  MySQLCredentials,
-  PostgreSQLCredentials,
-} from '../types/credentials';
 
 // Mock implementation of BaseAdapter for testing
 class MockAdapter extends BaseAdapter {

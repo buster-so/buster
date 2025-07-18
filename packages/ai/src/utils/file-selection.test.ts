@@ -309,13 +309,13 @@ describe('file-selection', () => {
       const selected = selectFilesForResponse(files);
 
       expect(selected).toHaveLength(2);
-      
-      const dashboard = selected.find(f => f.fileType === 'dashboard');
-      const metric = selected.find(f => f.fileType === 'metric');
-      
+
+      const dashboard = selected.find((f) => f.fileType === 'dashboard');
+      const metric = selected.find((f) => f.fileType === 'metric');
+
       expect(dashboard?.versionNumber).toBe(2);
       expect(dashboard?.operation).toBe('modified');
-      
+
       expect(metric?.versionNumber).toBe(3);
       expect(metric?.operation).toBe('created');
     });

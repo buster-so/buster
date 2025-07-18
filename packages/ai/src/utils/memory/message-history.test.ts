@@ -1,5 +1,6 @@
 import type { CoreMessage } from 'ai';
 import { describe, expect, test } from 'vitest';
+import { hasToolCallId, validateArrayAccess } from '../validation-helpers';
 import {
   extractMessageHistory,
   getAllToolsUsed,
@@ -9,7 +10,6 @@ import {
   properlyInterleaveMessages,
   unbundleMessages,
 } from './message-history';
-import { hasToolCallId, validateArrayAccess } from '../validation-helpers';
 
 describe('Message History Utilities', () => {
   describe('Message Format Validation', () => {

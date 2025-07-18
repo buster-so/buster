@@ -6,8 +6,20 @@ import type { GenericToolSet } from './types';
 describe('ChunkProcessor - Deferred doneTool Response', () => {
   test('should defer doneTool response when completed files exist', async () => {
     // Use null messageId to avoid database saves in unit tests
-        const availableTools = new Set(['createMetrics', 'doneTool', 'sequentialThinking', 'submitThoughts']);
-    const processor = new ChunkProcessor<GenericToolSet>(null, [], [], [], undefined, availableTools);
+    const availableTools = new Set([
+      'createMetrics',
+      'doneTool',
+      'sequentialThinking',
+      'submitThoughts',
+    ]);
+    const processor = new ChunkProcessor<GenericToolSet>(
+      null,
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
 
     // First, start streaming a file creation
     const fileToolStart: TextStreamPart<ToolSet> = {
@@ -114,8 +126,20 @@ describe('ChunkProcessor - Deferred doneTool Response', () => {
 
   test('should not defer doneTool response when no completed files exist', async () => {
     // Use null messageId to avoid database saves in unit tests
-        const availableTools = new Set(['createMetrics', 'doneTool', 'sequentialThinking', 'submitThoughts']);
-    const processor = new ChunkProcessor<GenericToolSet>(null, [], [], [], undefined, availableTools);
+    const availableTools = new Set([
+      'createMetrics',
+      'doneTool',
+      'sequentialThinking',
+      'submitThoughts',
+    ]);
+    const processor = new ChunkProcessor<GenericToolSet>(
+      null,
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
 
     // Start streaming doneTool without any files
     const doneToolStart: TextStreamPart<ToolSet> = {
@@ -153,8 +177,20 @@ describe('ChunkProcessor - Deferred doneTool Response', () => {
 
   test('should not defer doneTool response when files exist but are not completed', async () => {
     // Use null messageId to avoid database saves in unit tests
-        const availableTools = new Set(['createMetrics', 'doneTool', 'sequentialThinking', 'submitThoughts']);
-    const processor = new ChunkProcessor<GenericToolSet>(null, [], [], [], undefined, availableTools);
+    const availableTools = new Set([
+      'createMetrics',
+      'doneTool',
+      'sequentialThinking',
+      'submitThoughts',
+    ]);
+    const processor = new ChunkProcessor<GenericToolSet>(
+      null,
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
 
     // Add a file that's still loading
     const fileToolCall: TextStreamPart<ToolSet> = {

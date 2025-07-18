@@ -432,7 +432,9 @@ describe('retry-helpers', () => {
 
       const healingMessage: CoreMessage = {
         role: 'tool',
-        content: [{ type: 'tool-result', toolCallId: '123', toolName: 'testTool', result: 'Result' }],
+        content: [
+          { type: 'tool-result', toolCallId: '123', toolName: 'testTool', result: 'Result' },
+        ],
       };
 
       const messages: CoreMessage[] = [

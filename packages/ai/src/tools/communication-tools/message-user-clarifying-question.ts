@@ -77,7 +77,9 @@ async function processMessageUserClarifyingQuestion(): Promise<
 
 // Main message user clarifying question function with tracing
 const executeMessageUserClarifyingQuestion = wrapTraced(
-  async (clarifyingQuestion: string): Promise<z.infer<typeof messageUserClarifyingQuestionOutputSchema>> => {
+  async (
+    _clarifyingQuestion: string
+  ): Promise<z.infer<typeof messageUserClarifyingQuestionOutputSchema>> => {
     return await processMessageUserClarifyingQuestion();
   },
   { name: 'message-user-clarifying-question' }
@@ -91,7 +93,9 @@ export const messageUserClarifyingQuestion = createTool({
   inputSchema: messageUserClarifyingQuestionInputSchema,
   outputSchema: messageUserClarifyingQuestionOutputSchema,
   execute: async ({ context }) => {
-    return await executeMessageUserClarifyingQuestion((context as z.infer<typeof messageUserClarifyingQuestionInputSchema>).clarifying_question);
+    return await executeMessageUserClarifyingQuestion(
+      (context as z.infer<typeof messageUserClarifyingQuestionInputSchema>).clarifying_question
+    );
   },
 });
 

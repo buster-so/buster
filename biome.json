@@ -23,7 +23,8 @@
         "noConsoleLog": "warn"
       },
       "complexity": {
-        "noExcessiveCognitiveComplexity": "off"
+        "noExcessiveCognitiveComplexity": "off",
+        "noForEach": "off"
       },
       "performance": {
         "noDelete": "error"
@@ -128,6 +129,9 @@
           "suspicious": {
             "noConsoleLog": "off",
             "noExplicitAny": "off"
+          },
+          "performance": {
+            "noDelete": "off"
           }
         }
       }

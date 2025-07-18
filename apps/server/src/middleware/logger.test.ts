@@ -34,7 +34,6 @@ describe('logger middleware', () => {
   });
 
   it('should use info level by default when LOG_LEVEL is not set', async () => {
-    // biome-ignore lint/performance/noDelete: <explanation>
     delete process.env.LOG_LEVEL;
 
     const { loggerMiddleware } = await import('./logger');
@@ -83,7 +82,6 @@ describe('logger middleware', () => {
   });
 
   it('should not capture console methods when LOG_LEVEL is not set', async () => {
-    // biome-ignore lint/performance/noDelete: <explanation>
     delete process.env.LOG_LEVEL;
 
     // Create mocks

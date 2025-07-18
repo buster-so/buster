@@ -113,7 +113,14 @@ describe('ChunkProcessor', () => {
     ];
 
     const availableTools = new Set(['sequentialThinking']);
-    const processor = new ChunkProcessor(mockMessageId, initialMessages, [], [], undefined, availableTools);
+    const processor = new ChunkProcessor(
+      mockMessageId,
+      initialMessages,
+      [],
+      [],
+      undefined,
+      availableTools
+    );
 
     // Process a new tool call
     await processor.processChunk({
@@ -244,7 +251,14 @@ describe('ChunkProcessor - Cross-Step Message Accumulation', () => {
   it('should properly accumulate messages across workflow steps without duplicates', async () => {
     // Step 1: think-and-prep processes initial messages
     const availableTools = new Set(['sequentialThinking']);
-    const thinkAndPrepProcessor = new ChunkProcessor(mockMessageId, [], [], [], undefined, availableTools);
+    const thinkAndPrepProcessor = new ChunkProcessor(
+      mockMessageId,
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
 
     const initialMessages: CoreMessage[] = [
       { role: 'user', content: 'What are the top products?' },
@@ -361,7 +375,14 @@ describe('ChunkProcessor - Cross-Step Message Accumulation', () => {
 
     // Simulate analyst-step receiving these messages
     const availableTools = new Set(['executeSql']);
-    const analystProcessor = new ChunkProcessor(mockMessageId, [], [], [], undefined, availableTools);
+    const analystProcessor = new ChunkProcessor(
+      mockMessageId,
+      [],
+      [],
+      [],
+      undefined,
+      availableTools
+    );
     analystProcessor.setInitialMessages(messagesFromThinkAndPrep);
 
     expect(analystProcessor.getAccumulatedMessages()).toHaveLength(4);

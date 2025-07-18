@@ -1,10 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BigQueryAdapter } from './bigquery';
-import { MySQLAdapter } from './mysql';
-import { PostgreSQLAdapter } from './postgresql';
-import { RedshiftAdapter } from './redshift';
-import { SnowflakeAdapter } from './snowflake';
-import { SQLServerAdapter } from './sqlserver';
 import type {
   BigQueryCredentials,
   MySQLCredentials,
@@ -13,6 +7,12 @@ import type {
   SQLServerCredentials,
   SnowflakeCredentials,
 } from '../types/credentials';
+import { BigQueryAdapter } from './bigquery';
+import { MySQLAdapter } from './mysql';
+import { PostgreSQLAdapter } from './postgresql';
+import { RedshiftAdapter } from './redshift';
+import { SnowflakeAdapter } from './snowflake';
+import { SQLServerAdapter } from './sqlserver';
 
 // Mock all external dependencies
 vi.mock('@google-cloud/bigquery');
@@ -72,7 +72,7 @@ describe.skip('Adapter Timeout Tests', () => {
   describe('PostgreSQLAdapter timeout', () => {
     it('should timeout after specified duration', async () => {
       vi.useFakeTimers();
-      
+
       const mockClient = {
         connect: vi.fn().mockResolvedValue(undefined),
         query: vi.fn(
@@ -153,7 +153,7 @@ describe.skip('Adapter Timeout Tests', () => {
   describe('MySQLAdapter timeout', () => {
     it('should timeout after specified duration', async () => {
       vi.useFakeTimers();
-      
+
       const mockConnection = {
         execute: vi.fn(
           () =>
@@ -195,7 +195,7 @@ describe.skip('Adapter Timeout Tests', () => {
   describe('SnowflakeAdapter timeout', () => {
     it('should timeout after specified duration', async () => {
       vi.useFakeTimers();
-      
+
       const mockConnection = {
         connect: vi.fn((callback: (err: unknown) => void) => callback(null)),
         execute: vi.fn(() => {
@@ -234,7 +234,7 @@ describe.skip('Adapter Timeout Tests', () => {
   describe('SqlServerAdapter timeout', () => {
     it('should timeout after specified duration', async () => {
       vi.useFakeTimers();
-      
+
       const mockRequest = {
         query: vi.fn(
           () =>
@@ -280,7 +280,7 @@ describe.skip('Adapter Timeout Tests', () => {
   describe('Default timeout behavior', () => {
     it('should use default timeout when none specified', async () => {
       vi.useFakeTimers();
-      
+
       const mockConnection = {
         execute: vi.fn(
           () =>

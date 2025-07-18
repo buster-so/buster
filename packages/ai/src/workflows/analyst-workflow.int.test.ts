@@ -5,9 +5,7 @@ import type { CoreMessage } from 'ai';
 import { initLogger, wrapTraced } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getRawLlmMessagesByMessageId } from '../';
-import analystWorkflow, {
-  type AnalystRuntimeContext,
-} from './analyst-workflow';
+import analystWorkflow, { type AnalystRuntimeContext } from './analyst-workflow';
 
 describe('Analyst Workflow Integration Tests', () => {
   beforeAll(() => {
@@ -140,9 +138,22 @@ describe('Analyst Workflow Integration Tests', () => {
 
     console.log('\n=== DATABASE SAVE VERIFICATION ===');
     console.log('Message ID:', messageId);
-    console.log('Raw LLM Messages count:', Array.isArray(updatedMessage[0]!.rawLlmMessages) ? updatedMessage[0]!.rawLlmMessages.length : 0);
-    console.log('Reasoning entries count:', Array.isArray(updatedMessage[0]!.reasoning) ? updatedMessage[0]!.reasoning.length : 0);
-    console.log('Response messages count:', Array.isArray(updatedMessage[0]!.responseMessages) ? updatedMessage[0]!.responseMessages.length : 0);
+    console.log(
+      'Raw LLM Messages count:',
+      Array.isArray(updatedMessage[0]!.rawLlmMessages)
+        ? updatedMessage[0]!.rawLlmMessages.length
+        : 0
+    );
+    console.log(
+      'Reasoning entries count:',
+      Array.isArray(updatedMessage[0]!.reasoning) ? updatedMessage[0]!.reasoning.length : 0
+    );
+    console.log(
+      'Response messages count:',
+      Array.isArray(updatedMessage[0]!.responseMessages)
+        ? updatedMessage[0]!.responseMessages.length
+        : 0
+    );
 
     // Check reasoning entries for partial content
     if (updatedMessage[0]!.reasoning && Array.isArray(updatedMessage[0]!.reasoning)) {
