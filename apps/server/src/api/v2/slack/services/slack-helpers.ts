@@ -194,8 +194,10 @@ export async function updateIntegrationAfterOAuth(
 ): Promise<void> {
   try {
     const currentIntegration = await getIntegrationById(integrationId);
-    const isReinstallation = (currentIntegration?.oauthMetadata as Record<string, unknown>)?.isReinstallation;
-    const originalSettings = (currentIntegration?.oauthMetadata as Record<string, unknown>)?.originalSettings as OriginalSettings;
+    const isReinstallation = (currentIntegration?.oauthMetadata as Record<string, unknown>)
+      ?.isReinstallation;
+    const originalSettings = (currentIntegration?.oauthMetadata as Record<string, unknown>)
+      ?.originalSettings as OriginalSettings;
 
     const baseUpdateData = {
       ...params,
@@ -207,17 +209,18 @@ export async function updateIntegrationAfterOAuth(
       updatedAt: new Date().toISOString(),
     };
 
-    const updateData = isReinstallation && originalSettings
-      ? {
-          ...baseUpdateData,
-          ...(originalSettings.defaultChannel !== undefined && {
-            defaultChannel: originalSettings.defaultChannel,
-          }),
-          ...(originalSettings.defaultSharingPermissions !== undefined && {
-            defaultSharingPermissions: originalSettings.defaultSharingPermissions,
-          }),
-        }
-      : baseUpdateData;
+    const updateData =
+      isReinstallation && originalSettings
+        ? {
+            ...baseUpdateData,
+            ...(originalSettings.defaultChannel !== undefined && {
+              defaultChannel: originalSettings.defaultChannel,
+            }),
+            ...(originalSettings.defaultSharingPermissions !== undefined && {
+              defaultSharingPermissions: originalSettings.defaultSharingPermissions,
+            }),
+          }
+        : baseUpdateData;
 
     await db
       .update(slackIntegrations)
@@ -249,8 +252,10 @@ export async function markIntegrationAsFailed(
       return;
     }
 
-    const isReinstallation = (integration.oauthMetadata as Record<string, unknown>)?.isReinstallation;
-    const originalSettings = (integration.oauthMetadata as Record<string, unknown>)?.originalSettings as OriginalSettings;
+    const isReinstallation = (integration.oauthMetadata as Record<string, unknown>)
+      ?.isReinstallation;
+    const originalSettings = (integration.oauthMetadata as Record<string, unknown>)
+      ?.originalSettings as OriginalSettings;
 
     if (integration.status === 'pending') {
       if (isReinstallation && originalSettings) {
@@ -589,6 +594,41 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   }
 }
 
+/**
+ * Update integration settings
+ */
+export async function updateIntegrationSettings(
+  organizationId: string,
+  settings: {
+    defaultChannel?: { id: string; name: string };
+    defaultSharingPermissions?: (typeof slackSharingPermissionEnum.enumValues)[number];
+  }
+): Promise<void> {
+  try {
+    const integration = await getActiveIntegration(organizationId);
+
+    if (!integration) {
+      throw new Error('No active Slack integration found');
+    }
+
+    await db
+      .update(slackIntegrations)
+      .set({
+        defaultChannel: settings.defaultChannel,
+        defaultSharingPermissions: settings.defaultSharingPermissions,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(slackIntegrations.id, integration.id));
+  } catch (error) {
+    console.error('Failed to update integration settings:', error);
+    throw new Error(
+      `Failed to update integration settings: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
+  }
+}
+
 // Export as namespace for easier import
 export const SlackHelpers = {
   getActiveIntegration,
@@ -602,6 +642,8 @@ export const SlackHelpers = {
   hasActiveIntegration,
   getExistingIntegration,
   updateDefaultChannel,
+  updateDefaultSharingPermissions,
+  updateIntegrationSettings,
   cleanupExpiredPendingIntegrations,
   getActiveIntegrationByTeamId,
   getAccessToken,

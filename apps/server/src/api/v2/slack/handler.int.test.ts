@@ -148,8 +148,7 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
       // Need to clear the module cache and re-import to pick up the env change
       vi.resetModules();
 
-      // Re-import the handler to get a fresh instance with disabled integration
-      const { slackHandler: disabledHandler } = await import('./handler');
+      // Re-import the routes to get a fresh instance with disabled integration
       const { default: freshRoutes } = await import('./index');
 
       // Create a fresh app instance with the new routes
