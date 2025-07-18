@@ -1,6 +1,7 @@
 import { getUserOrganizationId } from '@buster/database';
 import {
   SlackError,
+  type UpdateIntegrationRequest,
   type UpdateIntegrationResponse,
   UpdateIntegrationResponseSchema,
 } from '@buster/server-shared/slack';
@@ -22,7 +23,7 @@ export async function updateIntegrationHandler(c: Context): Promise<Response> {
   }
 
   try {
-    const request = c.req.valid('json');
+    const request = c.req.valid('json') as UpdateIntegrationRequest;
 
     const updateData: {
       defaultChannel?: { id: string; name: string };
