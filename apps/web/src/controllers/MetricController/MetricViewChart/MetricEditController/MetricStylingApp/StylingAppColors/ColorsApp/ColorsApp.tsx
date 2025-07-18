@@ -5,25 +5,42 @@ import { useMemoizedFn } from '@/hooks';
 import type { IColorTheme } from '@/components/features/colors/ThemeList';
 import { ThemeList } from '@/components/features/colors/ThemeList';
 import { useColorThemes } from '@/api/buster_rest/dictionaries';
-import { useGetMyUserInfo, useGetUser } from '@/api/buster_rest/users';
+import { useOrganizationThemes } from '@/hooks/useOrganizationThemes';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { EditCustomThemeMenu } from '@/components/features/colors/DefaultThemeSelector/EditCustomThemeMenu';
+import { AddThemeProviderWrapper } from '@/components/features/colors/DefaultThemeSelector/AddThemeProviderWrapper';
 
 export const ColorsApp: React.FC<{
   colors: ChartConfigProps['colors'];
   onUpdateChartConfig: (chartConfig: Partial<ChartConfigProps>) => void;
 }> = ({ colors, onUpdateChartConfig }) => {
-  const { data: themes } = useColorThemes();
-  const { data: userConfig } = useGetMyUserInfo();
+  const { data: themes = [] } = useColorThemes();
+  const isAdmin = useUserConfigContextSelector((x) => x.isAdmin);
+  const {
+    organizationColorPalettes,
+    onCreateCustomTheme,
+    onDeleteCustomTheme,
+    onModifyCustomTheme
+  } = useOrganizationThemes();
 
-  const organizationPalettes =
-    userConfig?.organizations?.[0]?.organizationColorPalettes?.palettes || [];
+  const organizationPalettes = organizationColorPalettes?.palettes || [];
 
   const iThemes: Required<IColorTheme>[] = useMemo(() => {
-    const organizationAndDefaultThemes = [...(organizationPalettes || []), ...themes];
-
-    return organizationAndDefaultThemes.map((theme) => ({
+    // Organization themes should show the three dot menu (for admins)
+    const orgThemes = organizationPalettes.map((theme) => ({
       ...theme,
-      selected: isEqual(theme.colors, colors)
+      selected: isEqual(theme.colors, colors),
+      hideThreeDotMenu: false // Show three dot menu for org themes
     }));
+
+    // Dictionary themes should hide the three dot menu
+    const dictThemes = themes.map((theme) => ({
+      ...theme,
+      selected: isEqual(theme.colors, colors),
+      hideThreeDotMenu: true // Hide three dot menu for dictionary themes
+    }));
+
+    return [...orgThemes, ...dictThemes];
   }, [themes, organizationPalettes, colors]);
 
   const onChangeColorTheme = useMemoizedFn((theme: IColorTheme) => {
@@ -32,7 +49,16 @@ export const ColorsApp: React.FC<{
 
   return (
     <div className="flex flex-col space-y-2">
-      <ColorPicker themes={iThemes} onChangeColorTheme={onChangeColorTheme} />
+      <AddThemeProviderWrapper
+        createCustomTheme={onCreateCustomTheme}
+        deleteCustomTheme={onDeleteCustomTheme}
+        modifyCustomTheme={onModifyCustomTheme}>
+        <ColorPicker
+          themes={iThemes}
+          onChangeColorTheme={onChangeColorTheme}
+          isAdmin={isAdmin}
+        />
+      </AddThemeProviderWrapper>
     </div>
   );
 };
@@ -40,7 +66,14 @@ export const ColorsApp: React.FC<{
 const ColorPicker: React.FC<{
   themes: Required<IColorTheme>[];
   onChangeColorTheme: (theme: IColorTheme) => void;
-}> = React.memo(({ themes, onChangeColorTheme }) => {
-  return <ThemeList themes={themes} onChangeColorTheme={onChangeColorTheme} />;
+  isAdmin: boolean;
+}> = React.memo(({ themes, onChangeColorTheme, isAdmin }) => {
+  return (
+    <ThemeList
+      themes={themes}
+      onChangeColorTheme={onChangeColorTheme}
+      themeThreeDotsMenu={isAdmin ? EditCustomThemeMenu : undefined}
+    />
+  );
 });
 ColorPicker.displayName = 'ColorPicker';

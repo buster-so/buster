@@ -26,7 +26,7 @@ export const ThemeList: React.FC<{
           theme={theme}
           selected={theme.selected}
           onChangeColorTheme={onChangeColorTheme}
-          threeDotMenu={themeThreeDotsMenu}
+          threeDotMenu={theme.hideThreeDotMenu ? undefined : themeThreeDotsMenu}
         />
       ))}
     </div>
