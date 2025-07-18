@@ -46,7 +46,7 @@ export async function initiateOAuthHandler(c: Context): Promise<Response> {
       throw new HTTPException(400, { message: 'Organization not found' });
     }
 
-    const request = c.req.valid('json') as InitiateOAuthRequest;
+    const request = c.req.valid('json');
     const metadata = request?.metadata;
 
     const enrichedMetadata = {

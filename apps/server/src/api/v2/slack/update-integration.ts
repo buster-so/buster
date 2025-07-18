@@ -23,7 +23,7 @@ export async function updateIntegrationHandler(c: Context): Promise<Response> {
   }
 
   try {
-    const request = c.req.valid('json') as UpdateIntegrationRequest;
+    const request = c.req.valid('json');
 
     const updateData: {
       defaultChannel?: { id: string; name: string };
