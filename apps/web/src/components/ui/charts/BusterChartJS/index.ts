@@ -1,1 +1,1 @@
-export * from './BusterChartJS';
+export { BusterChartJS } from './BusterChartJS';

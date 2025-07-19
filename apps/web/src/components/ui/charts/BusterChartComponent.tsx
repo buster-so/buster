@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useMemo } from 'react';
-import { BusterChartJS } from './BusterChartJS';
+import { BusterChartJSDynamic } from './BusterChartJSDynamic';
 import { useDatasetOptions } from './chartHooks';
 import type {
   BusterChartComponentProps,
@@ -72,5 +72,5 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     ]
   );
 
-  return <BusterChartJS {...chartProps} />;
+  return <BusterChartJSDynamic {...chartProps} />;
 };

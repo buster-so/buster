@@ -2,6 +2,7 @@ import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import env from './src/config/env.mjs';
 import { withPostHogConfig } from '@posthog/nextjs-config';
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -146,17 +147,6 @@ const nextConfig = {
   }
 };
 
-// export default withBundleAnalyzer({
-//   enabled: process.env.ANALYZE === 'true'
-// })(nextConfig);
-
-// export default withPostHogConfig(nextConfig, {
-//   enabled:
-//     !!process.env.POSTHOG_API_KEY &&
-//     !!process.env.POSTHOG_ENV_ID &&
-//     process.env.POSTHOG_API_KEY !== 'undefined',
-//   personalApiKey: process.env.POSTHOG_API_KEY,
-//   envId: process.env.POSTHOG_ENV_ID
-// });
-
-export default nextConfig;
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true'
+})(nextConfig);
