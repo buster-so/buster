@@ -25,6 +25,7 @@ export const useGetMessages = ({ chatId }: { chatId: string }) => {
 };
 
 const updateOperations: Array<'insert' | 'update' | 'delete'> = ['update'];
+const insertOperations: Array<'insert' | 'update' | 'delete'> = ['insert'];
 
 export const useTrackAndUpdateMessageChanges = (
   {
@@ -64,6 +65,7 @@ export const useTrackAndUpdateMessageChanges = (
           if (currentMessageIds.length !== allMessageIds.length) {
             onUpdateChat({
               ...chat,
+              id: chatId,
               message_ids: allMessageIds
             });
           }
@@ -128,4 +130,38 @@ const useCheckIfWeHaveAFollowupDashboard = (messageId: string) => {
   };
 
   return useMemoizedFn(method);
+};
+
+export const useTrackAndUpdateNewMessages = ({ chatId }: { chatId: string | undefined }) => {
+  const { onUpdateChat } = useChatUpdate();
+  const getChatMemoized = useGetChatMemoized();
+
+  const subscribe = !!chatId;
+
+  const shape = useMemo(() => messagesShape({ chatId: chatId || '' }), [chatId]);
+
+  return useShapeStream(
+    shape,
+    insertOperations,
+    useMemoizedFn((message) => {
+      if (message && message.value && chatId) {
+        const messageId = message.value.id;
+        const chat = getChatMemoized(chatId);
+
+        if (chat && messageId) {
+          const currentMessageIds = chat.message_ids;
+          const allMessageIds = uniq([...currentMessageIds, messageId]);
+          
+          if (currentMessageIds.length !== allMessageIds.length) {
+            onUpdateChat({
+              ...chat,
+              id: chatId,
+              message_ids: allMessageIds
+            });
+          }
+        }
+      }
+    }),
+    subscribe
+  );
 };
