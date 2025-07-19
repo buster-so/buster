@@ -15,9 +15,10 @@ export const assetReroutes = async (
 ) => {
   const userExists = !!user && !!user.id;
   if (!userExists && !isPublicPage(request)) {
-    return NextResponse.redirect(
-      new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url)
-    );
+    const originalUrl = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+    const loginUrl = new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url);
+    loginUrl.searchParams.set('next', encodeURIComponent(originalUrl));
+    return NextResponse.redirect(loginUrl);
   }
 
   if (!userExists && isShareableAssetPage(request)) {
@@ -25,9 +26,10 @@ export const assetReroutes = async (
     if (redirect) {
       return NextResponse.redirect(new URL(redirect, request.url));
     }
-    return NextResponse.redirect(
-      new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url)
-    );
+    const originalUrl = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+    const loginUrl = new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url);
+    loginUrl.searchParams.set('next', encodeURIComponent(originalUrl));
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;

@@ -9,15 +9,26 @@ const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({
   route: BusterRoutes.AUTH_CALLBACK
 })}`;
 
+const isValidRedirectUrl = (url: string): boolean => {
+  try {
+    const decoded = decodeURIComponent(url);
+    return decoded.startsWith('/') && !decoded.startsWith('//');
+  } catch {
+    return false;
+  }
+};
+
 // Type for server action results
 type ServerActionResult<T = void> = { success: true; data?: T } | { success: false; error: string };
 
 export const signInWithEmailAndPassword = async ({
   email,
-  password
+  password,
+  redirectTo
 }: {
   email: string;
   password: string;
+  redirectTo?: string | null;
 }): Promise<ServerActionResult> => {
   'use server';
   const supabase = await createSupabaseServerClient();
@@ -34,22 +45,26 @@ export const signInWithEmailAndPassword = async ({
   }
 
   revalidatePath('/', 'layout');
-  return redirect(
-    createBusterRoute({
-      route: BusterRoutes.APP_HOME
-    })
-  );
+  const finalRedirect = redirectTo && isValidRedirectUrl(redirectTo) 
+    ? decodeURIComponent(redirectTo)
+    : createBusterRoute({ route: BusterRoutes.APP_HOME });
+  return redirect(finalRedirect);
 };
 
-export const signInWithGoogle = async (): Promise<ServerActionResult<string>> => {
+export const signInWithGoogle = async ({ redirectTo }: { redirectTo?: string | null } = {}): Promise<ServerActionResult<string>> => {
   'use server';
 
   const supabase = await createSupabaseServerClient();
 
+  const callbackUrl = new URL(authURLFull);
+  if (redirectTo && isValidRedirectUrl(redirectTo)) {
+    callbackUrl.searchParams.set('next', redirectTo);
+  }
+  
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: authURLFull
+      redirectTo: callbackUrl.toString()
     }
   });
 
@@ -61,15 +76,20 @@ export const signInWithGoogle = async (): Promise<ServerActionResult<string>> =>
   return redirect(data.url);
 };
 
-export const signInWithGithub = async (): Promise<ServerActionResult<string>> => {
+export const signInWithGithub = async ({ redirectTo }: { redirectTo?: string | null } = {}): Promise<ServerActionResult<string>> => {
   'use server';
 
   const supabase = await createSupabaseServerClient();
 
+  const callbackUrl = new URL(authURLFull);
+  if (redirectTo && isValidRedirectUrl(redirectTo)) {
+    callbackUrl.searchParams.set('next', redirectTo);
+  }
+  
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: authURLFull
+      redirectTo: callbackUrl.toString()
     }
   });
 
@@ -81,15 +101,20 @@ export const signInWithGithub = async (): Promise<ServerActionResult<string>> =>
   return redirect(data.url);
 };
 
-export const signInWithAzure = async (): Promise<ServerActionResult<string>> => {
+export const signInWithAzure = async ({ redirectTo }: { redirectTo?: string | null } = {}): Promise<ServerActionResult<string>> => {
   'use server';
 
   const supabase = await createSupabaseServerClient();
 
+  const callbackUrl = new URL(authURLFull);
+  if (redirectTo && isValidRedirectUrl(redirectTo)) {
+    callbackUrl.searchParams.set('next', redirectTo);
+  }
+  
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
     options: {
-      redirectTo: authURLFull,
+      redirectTo: callbackUrl.toString(),
       scopes: 'email'
     }
   });
@@ -103,10 +128,12 @@ export const signInWithAzure = async (): Promise<ServerActionResult<string>> => 
 
 export const signUp = async ({
   email,
-  password
+  password,
+  redirectTo
 }: {
   email: string;
   password: string;
+  redirectTo?: string | null;
 }): Promise<ServerActionResult> => {
   'use server';
   const supabase = await createSupabaseServerClient();
@@ -129,11 +156,10 @@ export const signUp = async ({
   }
 
   revalidatePath('/', 'layout');
-  return redirect(
-    createBusterRoute({
-      route: BusterRoutes.APP_HOME
-    })
-  );
+  const finalRedirect = redirectTo && isValidRedirectUrl(redirectTo) 
+    ? decodeURIComponent(redirectTo)
+    : createBusterRoute({ route: BusterRoutes.APP_HOME });
+  return redirect(finalRedirect);
 };
 
 export const signInWithAnonymousUser = async () => {

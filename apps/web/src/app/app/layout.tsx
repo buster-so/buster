@@ -40,7 +40,9 @@ export default async function Layout({
     (supabaseContext.user?.is_anonymous && pathname !== loginRoute) ||
     !supabaseContext?.user?.id
   ) {
-    return <ClientRedirect to={loginRoute} />;
+    const redirectParam = pathname ? encodeURIComponent(pathname) : '';
+    const loginUrlWithRedirect = redirectParam ? `${loginRoute}?next=${redirectParam}` : loginRoute;
+    return <ClientRedirect to={loginUrlWithRedirect} />;
   }
 
   if ((!userInfo?.organizations?.[0]?.id || !userInfo?.user?.name) && pathname !== newUserRoute) {
