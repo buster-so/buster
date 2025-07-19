@@ -9,3 +9,4 @@ export { createDashboards } from './visualization-tools/create-dashboards-file-t
 export { modifyDashboards } from './visualization-tools/modify-dashboards-file-tool';
 export { executeSql } from './database-tools/execute-sql';
 export { createTodoList } from './planning-thinking-tools/create-todo-item-tool';
+export { readFiles } from './file-tools/read-files';
