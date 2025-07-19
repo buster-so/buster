@@ -2,9 +2,9 @@ import isEmpty from 'lodash/isEmpty';
 import React, { useMemo } from 'react';
 import type { BusterChatMessageReasoning_files } from '@/api/asset_interfaces/chat';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
-import { StreamingMessageCode } from '@/components/ui/streaming/StreamingMessageCode';
 import { ReasoningFileButtons } from './ReasoningFileButtons';
 import { StreamingMessageStatus } from './StreamingMessageStatus';
+import { ReasoningFileCode } from '@/components/features/reasoning/ReasoningFileCode';
 
 export type ReasoningMessageFileProps = {
   chatId: string;
@@ -51,7 +51,7 @@ export const ReasoningMessage_File: React.FC<ReasoningMessageFileProps> = React.
     }
 
     return (
-      <StreamingMessageCode
+      <ReasoningFileCode
         {...file}
         collapsible={collapsible}
         buttons={buttons}

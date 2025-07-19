@@ -4,11 +4,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import type { FileType } from '@/api/asset_interfaces';
 import { Button } from '@/components/ui/buttons';
-import { StreamingMessageCode } from './StreamingMessageCode';
+import { ReasoningFileCode } from './ReasoningFileCode';
 
-const meta: Meta<typeof StreamingMessageCode> = {
-  title: 'UI/streaming/StreamingMessageCode',
-  component: StreamingMessageCode,
+const meta: Meta<typeof ReasoningFileCode> = {
+  title: 'UI/streaming/ReasoningFileCode',
+  component: ReasoningFileCode,
   parameters: {
     layout: 'centered'
   },
@@ -16,7 +16,7 @@ const meta: Meta<typeof StreamingMessageCode> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof StreamingMessageCode>;
+type Story = StoryObj<typeof ReasoningFileCode>;
 
 const sampleYaml = `apiVersion: v1
 kind: ConfigMap
@@ -180,7 +180,7 @@ export const InteractiveStreaming: Story = {
 
     return (
       <div className="space-y-4">
-        <StreamingMessageCode
+        <ReasoningFileCode
           {...args}
           isCompletedStream={!isStreaming}
           file={{

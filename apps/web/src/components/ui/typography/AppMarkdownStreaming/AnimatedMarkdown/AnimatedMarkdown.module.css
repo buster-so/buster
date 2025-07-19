@@ -1,0 +1,77 @@
+.container {
+  @apply block;
+}
+
+.container table {
+  border-radius: var(--radius);
+  border-width: 0.5px;
+}
+
+.container th {
+  @apply border;
+  min-width: 30px;
+  border-right-width: 0.5px;
+  border-bottom-width: 0.5px;
+  border-style: solid;
+  padding: calc(var(--spacing) * 1.5);
+}
+
+.container th:last-child {
+  border-right-width: 0;
+}
+
+.container td {
+  border-color: var(--color-border);
+  border-right-width: 0.5px;
+  border-style: solid;
+  padding: calc(var(--spacing) * 1.5);
+}
+
+.container td:last-child {
+  border-right-width: 0;
+}
+
+.container tr {
+  border-bottom-width: 0.5px;
+  border-style: solid;
+  border-color: var(--color-border);
+}
+
+.container tr:last-child {
+  border-bottom-width: 0;
+}
+
+.container ul,
+.container ol,
+.container dl {
+  list-style-position: outside;
+}
+
+.container ol,
+.container ul {
+  margin-inline-start: 1.5em;
+}
+
+.container ol + ul {
+  margin-inline-start: 2.25em;
+}
+
+.container ul li::marker {
+  color: var(--color-text-secondary);
+}
+
+.container ol {
+  list-style-type: decimal;
+}
+
+.container ul {
+  list-style-type: disc;
+}
+
+.container a {
+  color: var(--color-primary);
+}
+
+.container strong {
+  font-weight: 600;
+}

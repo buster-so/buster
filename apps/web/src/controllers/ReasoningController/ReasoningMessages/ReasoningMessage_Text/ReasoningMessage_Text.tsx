@@ -1,8 +1,9 @@
 import React from 'react';
 import type { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
-import { AppMarkdown } from '@/components/ui/typography/AppMarkdown';
+import AppMarkdownStreaming from '@/components/ui/typography/AppMarkdownStreaming/AppMarkdownStreaming';
 import type { ReasoningMessageProps } from '../ReasoningMessageSelector';
+import { cn } from '@/lib/classMerge';
 
 export const ReasoningMessage_Text: React.FC<ReasoningMessageProps> = React.memo(
   ({ reasoningMessageId, messageId, isCompletedStream }) => {
@@ -14,12 +15,12 @@ export const ReasoningMessage_Text: React.FC<ReasoningMessageProps> = React.memo
     if (!message) return null;
 
     return (
-      <AppMarkdown
-        markdown={message}
-        showLoader={!isCompletedStream}
-        className="text-text-secondary text-xs!"
-        stripFormatting
-      />
+      <div className={cn("text-text-secondary text-xs!")}>
+        <AppMarkdownStreaming
+          content={message}
+          isStreamFinished={isCompletedStream}
+        />
+      </div>
     );
   }
 );

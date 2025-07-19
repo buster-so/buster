@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 import type React from 'react';
 import type { ExtraProps } from 'react-markdown';
 import { cn } from '../../../../lib/classMerge';
-import { AppCodeBlock } from '../AppCodeBlock/AppCodeBlock';
+import { StreamingMessageCode } from '../../streaming/StreamingMessageCode';
 
 export interface ExtraPropsExtra extends ExtraProps {
   numberOfLineMarkdown: number;
@@ -19,11 +19,7 @@ export const CustomCode: React.FC<
   const matchRegex = /language-(\w+)/.exec(className || '');
   const language = matchRegex ? matchRegex[1] : undefined;
 
-  return (
-    <AppCodeBlock wrapperClassName="my-2.5" className="" language={language}>
-      {children}
-    </AppCodeBlock>
-  );
+  return <StreamingMessageCode isStreamFinished={showLoader} text={markdown} fileName={language} />;
 };
 
 export const CustomParagraph: React.FC<
@@ -57,7 +53,7 @@ export const CustomParagraph: React.FC<
 const headingVariants = cva('', {
   variants: {
     level: {
-      1: 'text-3xl ',
+      1: 'text-3xl',
       2: 'text-2xl',
       3: 'text-xl',
       4: 'text-lg',

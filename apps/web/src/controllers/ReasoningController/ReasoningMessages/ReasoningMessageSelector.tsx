@@ -21,8 +21,8 @@ const itemAnimationConfig: MotionProps = {
     transition: {
       height: {
         type: 'spring',
-        stiffness: 400,
-        damping: 32
+        stiffness: 300,
+        damping: 40
       },
       opacity: { duration: 0.16 }
     }
@@ -33,8 +33,8 @@ const itemAnimationConfig: MotionProps = {
     transition: {
       height: {
         type: 'spring',
-        stiffness: 450,
-        damping: 35
+        stiffness: 350,
+        damping: 45
       },
       opacity: { duration: 0.12 }
     }
