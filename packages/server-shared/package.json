@@ -63,6 +63,10 @@
     "./dictionary": {
       "types": "./dist/dictionary/index.d.ts",
       "default": "./dist/dictionary/index.js"
+    },
+    "./github": {
+      "types": "./dist/github/index.d.ts",
+      "default": "./dist/github/index.js"
     }
   },
   "dependencies": {
