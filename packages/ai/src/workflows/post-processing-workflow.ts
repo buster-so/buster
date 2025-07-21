@@ -28,7 +28,7 @@ const postProcessingWorkflow = createWorkflow({
       formatFollowUpMessageStep,
     ],
     // Otherwise use initial message format
-    [async () => true, formatInitialMessageStep],
+    [async ({ inputData }) => inputData?.isSlackFollowUp === false, formatInitialMessageStep],
   ])
   .commit();
 
