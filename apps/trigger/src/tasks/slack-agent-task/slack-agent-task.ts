@@ -352,7 +352,7 @@ export const slackAgentTask: ReturnType<
           });
 
           // Check if task has started
-          if (run.status === 'EXECUTING' || run.status === 'REATTEMPTING') {
+          if (run.status === 'EXECUTING') {
             hasStartedRunning = true;
             logger.log('Analyst task started executing during rapid poll', {
               runId: analystHandle.id,
@@ -438,8 +438,7 @@ export const slackAgentTask: ReturnType<
             run.status === 'SYSTEM_FAILURE' ||
             run.status === 'CRASHED' ||
             run.status === 'CANCELED' ||
-            run.status === 'TIMED_OUT' ||
-            run.status === 'INTERRUPTED'
+            run.status === 'TIMED_OUT'
           ) {
             // Task already completed or failed during rapid polling
             isComplete = true;
@@ -474,7 +473,7 @@ export const slackAgentTask: ReturnType<
           });
 
           // Handle transition from queued to executing if we haven't sent progress message yet
-          if (!hasStartedRunning && (run.status === 'EXECUTING' || run.status === 'REATTEMPTING')) {
+          if (!hasStartedRunning && (run.status === 'EXECUTING')) {
             hasStartedRunning = true;
             logger.log('Analyst task has started executing', {
               runId: analystHandle.id,
@@ -563,8 +562,7 @@ export const slackAgentTask: ReturnType<
             run.status === 'SYSTEM_FAILURE' ||
             run.status === 'CRASHED' ||
             run.status === 'CANCELED' ||
-            run.status === 'TIMED_OUT' ||
-            run.status === 'INTERRUPTED'
+            run.status === 'TIMED_OUT'
           ) {
             isComplete = true;
             analystResult = { ok: false, error: run.error || 'Task failed' };
