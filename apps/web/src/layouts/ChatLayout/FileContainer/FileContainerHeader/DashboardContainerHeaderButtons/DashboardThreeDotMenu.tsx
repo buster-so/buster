@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ShareAssetType } from '@buster/server-shared/share';
 import {
   useAddDashboardToCollection,
@@ -22,11 +22,13 @@ import {
 import {
   ArrowUpRight,
   Dots,
+  Download4,
   Filter,
   History,
   Pencil,
   Plus,
   ShareRight,
+  SquareChart,
   Star,
   Trash
 } from '@/components/ui/icons';
@@ -39,6 +41,7 @@ import { useMemoizedFn } from '@/hooks';
 import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
 import { timeout } from '@/lib';
+import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
 import { canEdit, canFilter, getIsEffectiveOwner } from '@/lib/share';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 
@@ -54,6 +57,8 @@ export const DashboardThreeDotMenu = React.memo(
     const shareMenu = useShareMenuSelectMenu({ dashboardId });
     const addContentToDashboardMenu = useAddContentToDashboardSelectMenu();
     const filterDashboardMenu = useFilterDashboardSelectMenu();
+    const downloadCSVMenu = useDownloadDashboardCSVSelectMenu({ dashboardId });
+    const downloadPNGMenu = useDownloadDashboardPNGSelectMenu({ dashboardId });
     const { data: permission } = useGetDashboard(
       { id: dashboardId },
       { select: (x) => x.permission }
@@ -74,6 +79,9 @@ export const DashboardThreeDotMenu = React.memo(
           favoriteDashboard,
           versionHistoryItems,
           { type: 'divider' },
+          downloadCSVMenu,
+          downloadPNGMenu,
+          { type: 'divider' },
           isEditor && !isViewingOldVersion && renameDashboardMenu,
           isEffectiveOwner && !isViewingOldVersion && deleteDashboardMenu
         ].filter(Boolean) as DropdownItems,
@@ -86,6 +94,8 @@ export const DashboardThreeDotMenu = React.memo(
         collectionSelectMenu,
         favoriteDashboard,
         versionHistoryItems,
+        downloadCSVMenu,
+        downloadPNGMenu,
         renameDashboardMenu,
         deleteDashboardMenu
       ]
@@ -326,5 +336,77 @@ export const useShareMenuSelectMenu = ({ dashboardId }: { dashboardId: string })
           : undefined
     }),
     [dashboardId, dashboard, isOwner]
+  );
+};
+
+const useDownloadDashboardCSVSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { data: dashboardResponse } = useGetDashboard({ id: dashboardId });
+  const { openErrorMessage } = useBusterNotifications();
+
+  return useMemo(
+    () => ({
+      label: 'Download as CSV',
+      value: 'download-csv',
+      icon: <Download4 />,
+      loading: isDownloading,
+      onClick: async () => {
+        if (!dashboardResponse?.metrics || !dashboardResponse?.dashboard?.name) {
+          openErrorMessage('Dashboard data not available for export');
+          return;
+        }
+
+        setIsDownloading(true);
+        try {
+          const metricIds = Object.keys(dashboardResponse.metrics);
+          
+          const aggregatedData = metricIds.map((metricId) => {
+            const metric = dashboardResponse.metrics[metricId];
+            return {
+              metric_id: metricId,
+              metric_name: metric.name,
+              metric_description: metric.description || '',
+              metric_status: metric.status,
+              created_at: metric.created_at,
+              updated_at: metric.updated_at
+            };
+          });
+
+          await exportJSONToCSV(aggregatedData, `${dashboardResponse.dashboard.name}_metrics`);
+        } catch (error) {
+          console.error('Error exporting dashboard CSV:', error);
+          openErrorMessage('Failed to export dashboard as CSV');
+        } finally {
+          setIsDownloading(false);
+        }
+      }
+    }),
+    [dashboardResponse, isDownloading, openErrorMessage]
+  );
+};
+
+const useDownloadDashboardPNGSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
+  const { openErrorMessage } = useBusterNotifications();
+  const { data: dashboardResponse } = useGetDashboard({ id: dashboardId });
+
+  return useMemo(
+    () => ({
+      label: 'Download as PNG',
+      value: 'download-png',
+      icon: <SquareChart />,
+      onClick: async () => {
+        const dashboardContainer = document.querySelector('.dashboard-content-controller') as HTMLElement;
+        if (dashboardContainer && dashboardResponse?.dashboard?.name) {
+          try {
+            return await downloadElementToImage(dashboardContainer, `${dashboardResponse.dashboard.name}.png`);
+          } catch (error) {
+            console.error('Error exporting dashboard PNG:', error);
+          }
+        }
+
+        openErrorMessage('Failed to download PNG');
+      }
+    }),
+    [dashboardResponse, openErrorMessage]
   );
 };
