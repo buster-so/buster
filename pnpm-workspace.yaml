@@ -15,7 +15,7 @@ catalog:
   "@trigger.dev/build": "^4.0.0-v4-beta.24"
   "@trigger.dev/sdk": "^4.0.0-v4-beta.24"
   ai: "^4.0.0"
-  axios: "^1.10.0"
+  axios: "^1.11.0"
   "braintrust": "^0.0.209"
   dotenv: "^17.2.0"
   drizzle-orm: "^0.44.2"
