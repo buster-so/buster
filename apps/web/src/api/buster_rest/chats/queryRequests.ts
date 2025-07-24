@@ -216,23 +216,33 @@ export const useDeleteChat = () => {
     }) => {
       const method = () => deleteChat(data);
       if (useConfirmModal) {
-        return await openConfirmModal({
+        const result = await openConfirmModal({
           title: 'Delete Chat',
           content: 'Are you sure you want to delete this chat?',
           onOk: method
         });
+        return {
+          wasCancelled: result === undefined,
+          result
+        };
       }
-      return method();
+      const result = await method();
+      return {
+        wasCancelled: false,
+        result
+      };
     }
   );
 
   return useMutation({
     mutationFn,
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: chatQueryKeys.chatsGetList().queryKey,
-        refetchType: 'all'
-      });
+    onSuccess(data) {
+      if (!data.wasCancelled) {
+        queryClient.invalidateQueries({
+          queryKey: chatQueryKeys.chatsGetList().queryKey,
+          refetchType: 'all'
+        });
+      }
     }
   });
 };

@@ -46,9 +46,11 @@ export const ChatContainerHeaderDropdown: React.FC<{
           deleteChat(
             { data: [chatId] },
             {
-              onSuccess: () => {
-                onChangePage({ route: BusterRoutes.APP_CHAT });
-                openSuccessMessage('Chat deleted');
+              onSuccess: (data) => {
+                if (!data.wasCancelled) {
+                  onChangePage({ route: BusterRoutes.APP_CHAT });
+                  openSuccessMessage('Chat deleted');
+                }
               }
             }
           )
