@@ -13,8 +13,7 @@ import {
 } from '@/lib/messages/confidence-translations';
 import { CircleCheck, OctagonWarning } from '@/components/ui/icons';
 import { Pill } from '@/components/ui/pills/Pill';
-import { AppMarkdownStreaming } from '@/components/ui/streaming/AppMarkdownStreaming';
-import { AnimatedMarkdown } from '../../ui/typography/AnimatedMarkdown';
+import AppMarkdownStreaming from '@/components/ui/streaming/AppMarkdownStreaming/AppMarkdownStreaming';
 
 type MessageAssumptionsProps = Pick<
   PostProcessingMessage,
@@ -151,13 +150,12 @@ const AssumptionSummary = ({
           {summary_title}
         </Title>
       </div>
-      <div className="mt-2">
-        <AnimatedMarkdown
-          content={summary_message}
-          className="text-text-secondary"
-          animation="none"
-        />
-      </div>
+      <AppMarkdownStreaming
+        content={summary_message}
+        isStreamFinished={true}
+        stripFormatting={true}
+        className="mt-2 text-text-secondary"
+      />
     </div>
   );
 };
@@ -273,7 +271,12 @@ const AssumptionCard = ({
         <Title as={'h4'} className="text-base">
           {title}
         </Title>
-        <AnimatedMarkdown content={explanation} animation="none" className="text-text-secondary" />
+        <AppMarkdownStreaming
+          content={explanation}
+          isStreamFinished={true}
+          stripFormatting={true}
+          className="text-text-secondary text-sm"
+        />
       </div>
 
       <div className="flex items-center justify-between border-t px-3.5 py-2">

@@ -16,7 +16,7 @@ const AppMarkdownStreaming = ({
   animationDuration = 300,
   animationTimingFunction = 'linear',
   className,
-  stripFormatting = false
+  stripFormatting = true
 }: {
   content: string;
   isStreamFinished: boolean;
@@ -66,7 +66,7 @@ const AppMarkdownStreamingContext = createContext<{
   animationTimingFunction: 'ease-in-out',
   isStreamFinished: false,
   isThrottleStreamingFinished: false,
-  stripFormatting: false
+  stripFormatting: true
 });
 
 export const useAppMarkdownStreaming = () => {

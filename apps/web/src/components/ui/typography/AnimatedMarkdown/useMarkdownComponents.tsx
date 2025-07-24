@@ -37,7 +37,7 @@ export const useMarkdownComponents = ({
   animationDuration = 700,
   animationTimingFunction = 'ease-in-out',
   isStreamFinished = true,
-  stripFormatting = false
+  stripFormatting = true
 }: UseMarkdownComponentsProps) => {
   const commonProps = useMemo(() => {
     return {

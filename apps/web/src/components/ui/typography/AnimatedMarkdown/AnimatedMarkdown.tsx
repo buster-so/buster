@@ -26,7 +26,7 @@ const AnimatedMarkdown: React.FC<AnimatedMarkdownProps> = ({
   animationDuration = 300,
   animationTimingFunction = 'ease-in-out',
   isStreamFinished = true,
-  stripFormatting = false,
+  stripFormatting = true,
   className
 }) => {
   const { components } = useMarkdownComponents({
