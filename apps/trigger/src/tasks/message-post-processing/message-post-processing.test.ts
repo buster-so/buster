@@ -143,7 +143,12 @@ describe('messagePostProcessingTask', () => {
     // Setup mocks
     vi.mocked(helpers.fetchMessageWithContext).mockResolvedValue(messageContext);
     vi.mocked(helpers.fetchPreviousPostProcessingMessages).mockResolvedValue([]);
-    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue([]);
+    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue({
+      datasets: [],
+      total: 0,
+      page: 0,
+      pageSize: 1000,
+    });
     vi.mocked(helpers.getExistingSlackMessageForChat).mockResolvedValue({ exists: false });
     vi.mocked(helpers.buildWorkflowInput).mockReturnValue({
       conversationHistory: [{ role: 'user', content: 'Hello' }],
@@ -235,7 +240,12 @@ describe('messagePostProcessingTask', () => {
       organizationId: 'org-123',
     });
     vi.mocked(helpers.fetchPreviousPostProcessingMessages).mockResolvedValue(previousResults);
-    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue([]);
+    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue({
+      datasets: [],
+      total: 0,
+      page: 0,
+      pageSize: 1000,
+    });
     vi.mocked(helpers.getExistingSlackMessageForChat).mockResolvedValue({
       exists: true,
       slackMessageTs: 'ts-123',
@@ -299,7 +309,12 @@ describe('messagePostProcessingTask', () => {
       organizationId: 'org-123',
     });
     vi.mocked(helpers.fetchPreviousPostProcessingMessages).mockResolvedValue([]);
-    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue([]);
+    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue({
+      datasets: [],
+      total: 0,
+      page: 0,
+      pageSize: 1000,
+    });
     vi.mocked(helpers.getExistingSlackMessageForChat).mockResolvedValue({ exists: false });
     vi.mocked(helpers.sendSlackNotification).mockResolvedValue({
       sent: true,
@@ -376,7 +391,12 @@ describe('messagePostProcessingTask', () => {
       organizationId: 'org-123',
     });
     vi.mocked(helpers.fetchPreviousPostProcessingMessages).mockResolvedValue([]);
-    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue([]);
+    vi.mocked(helpers.fetchUserDatasets).mockResolvedValue({
+      datasets: [],
+      total: 0,
+      page: 0,
+      pageSize: 1000,
+    });
     vi.mocked(helpers.getExistingSlackMessageForChat).mockResolvedValue({ exists: false });
     vi.mocked(helpers.sendSlackNotification).mockResolvedValue({
       sent: true,

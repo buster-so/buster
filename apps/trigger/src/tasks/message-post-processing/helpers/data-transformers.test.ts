@@ -1,3 +1,4 @@
+import type { PermissionedDataset } from '@buster/access-controls';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MessageContext } from '../types';
 import {
@@ -83,21 +84,21 @@ describe('data-transformers', () => {
         {
           id: '1',
           name: 'Dataset 1',
-          ymlFile: 'content1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
+          ymlContent: 'content1',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           dataSourceId: 'ds1',
-        },
+          organizationId: 'org-123',
+        } as PermissionedDataset,
         {
           id: '2',
           name: 'Dataset 2',
-          ymlFile: 'content2',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
+          ymlContent: 'content2',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           dataSourceId: 'ds2',
-        },
+          organizationId: 'org-123',
+        } as PermissionedDataset,
       ];
 
       const result = concatenateDatasets(datasets);
@@ -109,21 +110,21 @@ describe('data-transformers', () => {
         {
           id: '1',
           name: 'Dataset 1',
-          ymlFile: 'content1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
+          ymlContent: 'content1',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           dataSourceId: 'ds1',
-        },
+          organizationId: 'org-123',
+        } as PermissionedDataset,
         {
           id: '2',
           name: 'Dataset 2',
-          ymlFile: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
+          ymlContent: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           dataSourceId: 'ds2',
-        },
+          organizationId: 'org-123',
+        } as PermissionedDataset,
       ];
 
       const result = concatenateDatasets(datasets);
@@ -140,12 +141,12 @@ describe('data-transformers', () => {
         {
           id: '1',
           name: 'Dataset 1',
-          ymlFile: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          deletedAt: null,
+          ymlContent: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           dataSourceId: 'ds1',
-        },
+          organizationId: 'org-123',
+        } as PermissionedDataset,
       ];
 
       const result = concatenateDatasets(datasets);
@@ -166,15 +167,15 @@ describe('data-transformers', () => {
 
     const basePreviousResults: any[] = [];
 
-    const baseDatasets = [
+    const baseDatasets: PermissionedDataset[] = [
       {
         id: '1',
         name: 'Dataset 1',
-        ymlFile: 'yaml content',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deletedAt: null,
+        ymlContent: 'yaml content',
         dataSourceId: 'ds1',
+        organizationId: 'org-123',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ];
 

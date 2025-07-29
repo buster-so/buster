@@ -160,11 +160,11 @@ const thinkAndPrepExecution = async ({
     const userId = runtimeContext.get('userId');
     const dataSourceSyntax = runtimeContext.get('dataSourceSyntax');
 
-    const datasets = await getPermissionedDatasets(userId, 0, 1000);
+    const datasetResults = await getPermissionedDatasets({ userId, page: 0, pageSize: 1000 });
 
     // Extract yml_content from each dataset and join with separators
-    const assembledYmlContent = datasets
-      .map((dataset: { ymlFile: string | null | undefined }) => dataset.ymlFile)
+    const assembledYmlContent = datasetResults.datasets
+      .map((dataset: { ymlContent: string | null | undefined }) => dataset.ymlContent)
       .filter((content: string | null | undefined) => content !== null && content !== undefined)
       .join('\n---\n');
 

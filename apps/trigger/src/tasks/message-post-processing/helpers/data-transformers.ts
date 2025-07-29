@@ -28,14 +28,14 @@ export function formatPreviousMessages(results: PostProcessingResult[]): string[
  */
 export function concatenateDatasets(datasets: PermissionedDataset[]): string {
   const validDatasets = datasets.filter(
-    (dataset) => dataset.ymlFile !== null && dataset.ymlFile !== undefined
+    (dataset) => dataset.ymlContent !== null && dataset.ymlContent !== undefined
   );
 
   if (validDatasets.length === 0) {
     return '';
   }
 
-  return validDatasets.map((dataset) => dataset.ymlFile).join('\n---\n');
+  return validDatasets.map((dataset) => dataset.ymlContent).join('\n---\n');
 }
 
 /**

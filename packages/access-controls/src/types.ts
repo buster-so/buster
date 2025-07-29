@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-// Custom error class for access control operations
+// Re-export all internal types
+export * from './types/asset-permissions';
+export * from './types/dataset-permissions';
+export * from './types/cascading-permissions';
+export * from './types/errors';
+
+// Custom error class for access control operations (legacy - use AccessControlError instead)
 export class AccessControlsError extends Error {
   constructor(
     message: string,

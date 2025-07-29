@@ -36,6 +36,14 @@ export const assetTypeEnum = pgEnum('asset_type_enum', [
   'chat',
   'metric_file',
   'dashboard_file',
+  'data_source',
+  'metric',
+  'filter',
+  'dataset',
+  'tool',
+  'source',
+  'collection_file',
+  'dataset_permission',
 ]);
 export const dataSourceOnboardingStatusEnum = pgEnum('data_source_onboarding_status_enum', [
   'notStarted',

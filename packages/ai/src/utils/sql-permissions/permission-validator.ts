@@ -52,14 +52,18 @@ export async function validateSqlPermissions(
     }
 
     // Get user's permissioned datasets
-    const permissionedDatasets = await getPermissionedDatasets(userId, 0, 1000);
+    const permissionedDatasets = await getPermissionedDatasets({
+      userId,
+      page: 0,
+      pageSize: 1000,
+    });
 
     // Extract all allowed tables from datasets
     const allowedTables: ParsedTable[] = [];
 
-    for (const dataset of permissionedDatasets) {
-      if (dataset.ymlFile) {
-        const tables = extractTablesFromYml(dataset.ymlFile);
+    for (const dataset of permissionedDatasets.datasets) {
+      if (dataset.ymlContent) {
+        const tables = extractTablesFromYml(dataset.ymlContent);
         allowedTables.push(...tables);
       }
     }

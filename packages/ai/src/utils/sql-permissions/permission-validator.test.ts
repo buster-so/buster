@@ -22,15 +22,20 @@ describe('Permission Validator', () => {
     });
 
     it('should allow access to permitted table', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions('SELECT id, name FROM public.users', 'user123');
 
@@ -41,15 +46,20 @@ describe('Permission Validator', () => {
     });
 
     it('should deny access to unpermitted table', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'SELECT id, user_id FROM public.orders',
@@ -63,17 +73,22 @@ describe('Permission Validator', () => {
     });
 
     it('should check multiple tables in JOIN', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
               - name: orders
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'SELECT u.id, u.name, o.id, o.total FROM public.users u JOIN public.orders o ON u.id = o.user_id',
@@ -87,15 +102,20 @@ describe('Permission Validator', () => {
     });
 
     it('should deny when one table in JOIN is unpermitted', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'SELECT u.id, u.name, o.id, o.total FROM public.users u JOIN sales.orders o ON u.id = o.user_id',
@@ -109,17 +129,22 @@ describe('Permission Validator', () => {
     });
 
     it('should handle complex query with CTEs', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: product_total_revenue
                 schema: ont_ont
               - name: product_quarterly_sales
                 schema: ont_ont
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const sql = `
         WITH top5 AS (
@@ -141,17 +166,22 @@ describe('Permission Validator', () => {
     });
 
     it('should handle subqueries', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
               - name: orders
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const sql = `
         SELECT u.id, u.name FROM public.users u
@@ -169,15 +199,20 @@ describe('Permission Validator', () => {
     });
 
     it('should match tables with different qualification levels', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       // Query has full qualification, permission has partial
       // Note: Parser may not support database.schema.table in FROM clause
@@ -190,15 +225,20 @@ describe('Permission Validator', () => {
     });
 
     it('should require schema match when permission specifies schema', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 table_name: public.users
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       // Query missing schema that permission requires
       const result = await validateSqlPermissions('SELECT id, name FROM users', 'user123');
@@ -222,7 +262,12 @@ describe('Permission Validator', () => {
     });
 
     it('should handle SQL parse errors gracefully', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([]);
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [],
+        total: 0,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions('INVALID SQL SYNTAX HERE', 'user123');
 
@@ -231,15 +276,20 @@ describe('Permission Validator', () => {
     });
 
     it('should reject INSERT statements', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'INSERT INTO public.users (name) VALUES ("test")',
@@ -252,15 +302,20 @@ describe('Permission Validator', () => {
     });
 
     it('should reject UPDATE statements', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'UPDATE public.users SET name = "updated" WHERE id = 1',
@@ -272,15 +327,20 @@ describe('Permission Validator', () => {
     });
 
     it('should reject DELETE statements', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 1,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'DELETE FROM public.users WHERE id = 1',
@@ -306,24 +366,29 @@ describe('Permission Validator', () => {
     });
 
     it('should handle multiple datasets with overlapping tables', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce([
-        {
-          ymlFile: `
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValueOnce({
+        datasets: [
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
           `,
-        },
-        {
-          ymlFile: `
+          } as accessControls.PermissionedDataset,
+          {
+            ymlContent: `
             models:
               - name: users
                 schema: public
               - name: orders
                 schema: public
           `,
-        },
-      ] as any);
+          } as accessControls.PermissionedDataset,
+        ],
+        total: 2,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await validateSqlPermissions(
         'SELECT u.id, u.name, o.id, o.total FROM public.users u JOIN public.orders o ON u.id = o.user_id',

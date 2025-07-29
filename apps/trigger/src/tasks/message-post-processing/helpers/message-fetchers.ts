@@ -125,8 +125,8 @@ export async function fetchPreviousPostProcessingMessages(
 export async function fetchUserDatasets(userId: string) {
   try {
     // Using the existing access control function
-    const datasets = await getPermissionedDatasets(userId, 0, 1000);
-    return datasets;
+    const datasetResults = await getPermissionedDatasets({ userId, page: 0, pageSize: 1000 });
+    return datasetResults;
   } catch (error) {
     throw new DataFetchError(
       `Failed to fetch datasets for user ${userId}`,

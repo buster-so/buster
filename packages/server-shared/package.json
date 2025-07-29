@@ -68,6 +68,10 @@
     "./title": {
       "types": "./dist/title/index.d.ts",
       "default": "./dist/title/index.js"
+    },
+    "./access-controls": {
+      "types": "./dist/access-controls/index.d.ts",
+      "default": "./dist/access-controls/index.js"
     }
   },
   "dependencies": {

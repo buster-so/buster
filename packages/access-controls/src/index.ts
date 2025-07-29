@@ -1,4 +1,38 @@
-// Export access control functionality
+// Export all types
+export * from './types';
+
+// Export asset permissions (excluding cache functions to avoid conflicts)
+export {
+  // From permissions.ts
+  hasAssetPermission,
+  createPermission,
+  createPermissionByEmail,
+  removePermission,
+  removePermissionByEmail,
+  listPermissions,
+  // From checks.ts
+  checkPermission,
+  type AssetPermissionCheck,
+  type AssetPermissionResult,
+  // From cascading-permissions.ts
+  checkCascadingPermissions,
+} from './assets';
+
+// Export dataset permissions
+export * from './datasets';
+
+// Export user utilities
+export * from './users';
+
+// Export cache functions separately
+export {
+  clearAllCaches,
+  invalidateUser,
+  invalidateOnPermissionChange,
+  getCacheStats as getAssetCacheStats,
+} from './assets/cache';
+
+// Export legacy access control functionality (for backward compatibility)
 export {
   AccessControlsError,
   type Permission,
@@ -6,15 +40,15 @@ export {
   type AccessControlOptions,
 } from './types';
 
-// Export access control functions
+// Export legacy access control functions
 export {
-  checkPermission,
+  checkPermission as legacyCheckPermission,
   hasRole,
   validateAccess,
-  getPermissionedDatasets,
-  hasDatasetAccess,
-  hasAllDatasetsAccess,
-  type PermissionedDataset,
+  getPermissionedDatasets as legacyGetPermissionedDatasets,
+  hasDatasetAccess as legacyHasDatasetAccess,
+  hasAllDatasetsAccess as legacyHasAllDatasetsAccess,
+  type PermissionedDataset as LegacyPermissionedDataset,
 } from './access-controls';
 
 export { canUserAccessChat } from './chats';

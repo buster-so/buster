@@ -201,19 +201,43 @@ describe('message-fetchers', () => {
         },
       ];
 
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValue(datasets);
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValue({
+        datasets: datasets as any,
+        total: datasets.length,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await fetchUserDatasets('user-id');
 
-      expect(result).toEqual(datasets);
-      expect(accessControls.getPermissionedDatasets).toHaveBeenCalledWith('user-id', 0, 1000);
+      expect(result).toEqual({
+        datasets: datasets,
+        total: datasets.length,
+        page: 0,
+        pageSize: 1000,
+      });
+      expect(accessControls.getPermissionedDatasets).toHaveBeenCalledWith({
+        userId: 'user-id',
+        page: 0,
+        pageSize: 1000,
+      });
     });
 
     it('should handle empty dataset list', async () => {
-      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValue([]);
+      vi.mocked(accessControls.getPermissionedDatasets).mockResolvedValue({
+        datasets: [],
+        total: 0,
+        page: 0,
+        pageSize: 1000,
+      });
 
       const result = await fetchUserDatasets('user-id');
-      expect(result).toEqual([]);
+      expect(result).toEqual({
+        datasets: [],
+        total: 0,
+        page: 0,
+        pageSize: 1000,
+      });
     });
 
     it('should wrap errors in DataFetchError', async () => {

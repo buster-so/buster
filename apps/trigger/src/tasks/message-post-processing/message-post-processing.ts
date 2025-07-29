@@ -130,7 +130,7 @@ export const messagePostProcessingTask: ReturnType<
       logger.log('Fetched required data', {
         messageId: payload.messageId,
         previousPostProcessingCount: previousPostProcessingResults.length,
-        datasetsCount: datasets.length,
+        datasetsCount: datasets.datasets.length,
         braintrustMetadata, // Log the metadata to verify it's working
         slackMessageExists: existingSlackMessage?.exists || false,
         hasRawLlmMessages: !!messageContext.rawLlmMessages,
@@ -140,7 +140,7 @@ export const messagePostProcessingTask: ReturnType<
       const workflowInput = buildWorkflowInput(
         messageContext,
         previousPostProcessingResults,
-        datasets,
+        datasets.datasets,
         existingSlackMessage?.exists || false
       );
 
