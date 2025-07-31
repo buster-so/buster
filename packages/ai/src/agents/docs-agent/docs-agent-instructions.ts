@@ -368,13 +368,6 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 Today's date is: ${params.currentDate}
 
 Start immediately by using the \`sequentialThinking\` to record your first thought; thoroughly assess the user needs, overall objective, your TODO list, and determine the next action you should take.
-
----
-
-<repository_directory>
-Below is the file structure of the dbt repository:
-{{folder_structure _ere}}
-</repository_directory>
 `;
 };
 

@@ -186,7 +186,7 @@ describe('docs-agent-workflow', () => {
       });
 
       const input = createTestWorkflowInput({
-        message: TEST_MESSAGES.documentAll,
+        message: TEST_MESSAGES.documentSpecific,
         context,
       });
 
