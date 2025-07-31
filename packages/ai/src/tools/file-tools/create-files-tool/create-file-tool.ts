@@ -6,6 +6,11 @@ import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { type DocsAgentContext, DocsAgentContextKeys } from '../../../context/docs-agent-context';
+import {
+  type GitCommitResult,
+  createGitCheckpoint,
+  hasSuccessfulOperations,
+} from '../shared/git-checkpoint';
 
 const fileCreateParamsSchema = z.object({
   path: z.string().describe('The relative or absolute path to create the file at'),
@@ -14,6 +19,12 @@ const fileCreateParamsSchema = z.object({
 
 const createFilesInputSchema = z.object({
   files: z.array(fileCreateParamsSchema).describe('Array of file creation operations to perform'),
+  what_i_did: z
+    .string()
+    .optional()
+    .describe(
+      'Optional description of changes made. If provided, will create a git commit after successful file operations.'
+    ),
 });
 
 const createFilesOutputSchema = z.object({
@@ -30,6 +41,14 @@ const createFilesOutputSchema = z.object({
       }),
     ])
   ),
+  gitCommit: z
+    .object({
+      attempted: z.boolean(),
+      success: z.boolean(),
+      commitHash: z.string().optional(),
+      errorMessage: z.string().optional(),
+    })
+    .optional(),
 });
 
 const createFilesExecution = wrapTraced(
@@ -37,7 +56,7 @@ const createFilesExecution = wrapTraced(
     params: z.infer<typeof createFilesInputSchema>,
     runtimeContext: RuntimeContext<DocsAgentContext>
   ): Promise<z.infer<typeof createFilesOutputSchema>> => {
-    const { files } = params;
+    const { files, what_i_did } = params;
 
     if (!files || files.length === 0) {
       return { results: [] };
@@ -134,20 +153,29 @@ console.log(JSON.stringify(results));
         }
 
         try {
-          return {
-            results: fileResults.map((fileResult) => {
-              if (fileResult.success) {
-                return {
-                  status: 'success' as const,
-                  filePath: fileResult.filePath,
-                };
-              }
+          const mappedResults = fileResults.map((fileResult) => {
+            if (fileResult.success) {
               return {
-                status: 'error' as const,
+                status: 'success' as const,
                 filePath: fileResult.filePath,
-                errorMessage: fileResult.error || 'Unknown error',
               };
-            }),
+            }
+            return {
+              status: 'error' as const,
+              filePath: fileResult.filePath,
+              errorMessage: fileResult.error || 'Unknown error',
+            };
+          });
+
+          // Attempt git commit if requested and there were successful operations
+          let gitCommitResult: GitCommitResult | undefined;
+          if (what_i_did && hasSuccessfulOperations(mappedResults)) {
+            gitCommitResult = await createGitCheckpoint(what_i_did, runtimeContext);
+          }
+
+          return {
+            results: mappedResults,
+            ...(gitCommitResult && { gitCommit: gitCommitResult }),
           };
         } catch (mapError) {
           console.error('Error mapping fileResults:', fileResults);

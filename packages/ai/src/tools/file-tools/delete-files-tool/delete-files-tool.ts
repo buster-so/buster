@@ -3,12 +3,23 @@ import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { type DocsAgentContext, DocsAgentContextKeys } from '../../../context/docs-agent-context';
+import {
+  type GitCommitResult,
+  createGitCheckpoint,
+  hasSuccessfulOperations,
+} from '../shared/git-checkpoint';
 
 const deleteFilesInputSchema = z.object({
   paths: z
     .array(z.string())
     .describe(
       'Array of file paths to delete. Can be absolute paths (e.g., /path/to/file.txt) or relative paths (e.g., ./relative/file.txt). Only files can be deleted, not directories.'
+    ),
+  what_i_did: z
+    .string()
+    .optional()
+    .describe(
+      'Optional description of changes made. If provided, will create a git commit after successful file operations.'
     ),
 });
 
@@ -26,6 +37,14 @@ const deleteFilesOutputSchema = z.object({
       }),
     ])
   ),
+  gitCommit: z
+    .object({
+      attempted: z.boolean(),
+      success: z.boolean(),
+      commitHash: z.string().optional(),
+      errorMessage: z.string().optional(),
+    })
+    .optional(),
 });
 
 const deleteFilesExecution = wrapTraced(
@@ -33,7 +52,7 @@ const deleteFilesExecution = wrapTraced(
     params: z.infer<typeof deleteFilesInputSchema>,
     runtimeContext: RuntimeContext<DocsAgentContext>
   ): Promise<z.infer<typeof deleteFilesOutputSchema>> => {
-    const { paths } = params;
+    const { paths, what_i_did } = params;
 
     if (!paths || paths.length === 0) {
       return { results: [] };
@@ -113,7 +132,16 @@ const deleteFilesExecution = wrapTraced(
           }
         }
 
-        return { results };
+        // Attempt git commit if requested and there were successful operations
+        let gitCommitResult: GitCommitResult | undefined;
+        if (what_i_did && hasSuccessfulOperations(results)) {
+          gitCommitResult = await createGitCheckpoint(what_i_did, runtimeContext);
+        }
+
+        return {
+          results,
+          ...(gitCommitResult && { gitCommit: gitCommitResult }),
+        };
       }
 
       // When not in sandbox, we can't delete files

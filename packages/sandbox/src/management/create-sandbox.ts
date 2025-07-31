@@ -132,5 +132,29 @@ export async function createSandboxWithGit(options: CreateSandboxWithGitOptions)
     }
   }
 
+  // Generate random branch name
+  const randomBranchName = `docs-agent-${Math.floor(Math.random() * 1000000)}`;
+
+  // Get the repository name from the URL to determine the directory
+  const repoName = validatedOptions.gitUrl.split('/').pop()?.replace('.git', '') || '';
+
+  // Create and checkout new branch
+  try {
+    const checkoutResult = await sandbox.process.executeCommand(
+      `cd ${repoName} && git checkout -b ${randomBranchName}`
+    );
+
+    if (checkoutResult.exitCode !== 0) {
+      const error = new Error(`Git checkout failed: ${checkoutResult.result}`);
+      console.info('Git checkout command failed:', error.message);
+      throw error;
+    }
+
+    console.info(`Successfully created and checked out branch: ${randomBranchName}`);
+  } catch (error) {
+    console.info('Error creating git branch:', error);
+    throw error;
+  }
+
   return sandbox;
 }

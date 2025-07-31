@@ -6,6 +6,11 @@ import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { type DocsAgentContext, DocsAgentContextKeys } from '../../../context/docs-agent-context';
+import {
+  type GitCommitResult,
+  createGitCheckpoint,
+  hasSuccessfulOperations,
+} from '../shared/git-checkpoint';
 
 const editFileParamsSchema = z.object({
   filePath: z.string().describe('Relative or absolute path to the file'),
@@ -19,7 +24,13 @@ const editFilesInputSchema = z.object({
     .min(1, 'At least one edit must be provided')
     .max(100, 'Maximum 100 edits allowed per request')
     .describe(
-      'Array of edit operations to perform. Each edit specifies a file path, text to find, and replacement text. The find string must appear exactly once in the file.'
+      'Array of edit operations to perform. Group multiple edits to the same file together for efficiency. Each edit specifies a file path, text to find, and replacement text.'
+    ),
+  what_i_did: z
+    .string()
+    .optional()
+    .describe(
+      'Optional description of changes made. If provided, will create a git commit after successful file operations.'
     ),
 });
 
@@ -43,6 +54,14 @@ const editFilesOutputSchema = z.object({
     successful: z.number(),
     failed: z.number(),
   }),
+  gitCommit: z
+    .object({
+      attempted: z.boolean(),
+      success: z.boolean(),
+      commitHash: z.string().optional(),
+      errorMessage: z.string().optional(),
+    })
+    .optional(),
 });
 
 const editFilesExecution = wrapTraced(
@@ -50,7 +69,7 @@ const editFilesExecution = wrapTraced(
     params: z.infer<typeof editFilesInputSchema>,
     runtimeContext: RuntimeContext<DocsAgentContext>
   ): Promise<z.infer<typeof editFilesOutputSchema>> => {
-    const { edits } = params;
+    const { edits, what_i_did } = params;
 
     if (!edits || edits.length === 0) {
       return {
@@ -165,26 +184,35 @@ console.log(JSON.stringify(results));
         const successful = fileResults.filter((r) => r.success).length;
         const failed = fileResults.length - successful;
 
-        return {
-          results: fileResults.map((fileResult) => {
-            if (fileResult.success) {
-              return {
-                status: 'success' as const,
-                file_path: fileResult.filePath,
-                message: fileResult.message || 'File edited successfully',
-              };
-            }
+        const mappedResults = fileResults.map((fileResult) => {
+          if (fileResult.success) {
             return {
-              status: 'error' as const,
+              status: 'success' as const,
               file_path: fileResult.filePath,
-              error_message: fileResult.error || 'Unknown error',
+              message: fileResult.message || 'File edited successfully',
             };
-          }),
+          }
+          return {
+            status: 'error' as const,
+            file_path: fileResult.filePath,
+            error_message: fileResult.error || 'Unknown error',
+          };
+        });
+
+        // Attempt git commit if requested and there were successful operations
+        let gitCommitResult: GitCommitResult | undefined;
+        if (what_i_did && hasSuccessfulOperations(mappedResults)) {
+          gitCommitResult = await createGitCheckpoint(what_i_did, runtimeContext);
+        }
+
+        return {
+          results: mappedResults,
           summary: {
             total: fileResults.length,
             successful,
             failed,
           },
+          ...(gitCommitResult && { gitCommit: gitCommitResult }),
         };
       }
 
@@ -222,22 +250,20 @@ console.log(JSON.stringify(results));
 
 export const editFiles = createTool({
   id: 'edit-files',
-  description: `Performs find-and-replace operations on files with validation and bulk editing support. Replaces specified text content with new content, but only if the find string appears exactly once in the file. Supports both relative and absolute file paths and can handle bulk operations through an array of edit objects.
+  description: `Performs multiple find-and-replace operations on files efficiently. This tool is optimized for making multiple edits to the same file in a single operation, reducing overhead and improving performance.
 
 Key features:
-- Validates that the find string appears exactly once (returns error if 0 or multiple occurrences)
-- Supports both relative and absolute file paths
-- Handles bulk operations with individual success/failure tracking
-- Continues processing remaining edits when errors occur
-- Returns detailed error messages for various failure scenarios
+- **Batch multiple edits to the same file** - When making multiple changes to a file, include all edits in a single tool call
+- **Efficient bulk operations** - Process multiple related edits together (e.g., updating multiple column descriptions, adding multiple relationships)
+- **Smart validation** - Each find string must appear exactly once, but you can edit many different strings in one operation
+- **Atomic file operations** - All edits to a single file are applied together for consistency
 
-Error conditions:
-- File doesn't exist: Returns error indicating file not found
-- Find string not found: Returns error indicating no match
-- Find string found multiple times: Returns error suggesting a more specific string
-- Permission/IO errors: Returns appropriate error messages
+Best practices:
+- **Group related edits** - When updating a YAML file, include all dimension updates, measure updates, and relationship updates in one call
+- **Think in batches** - Instead of editing one column at a time, prepare all column edits and submit together
+- **Use specific find strings** - Include enough context to ensure uniqueness (e.g., include the full YAML block)
 
-For bulk operations, each edit is processed independently and the tool returns both successful and failed operations with detailed results.`,
+Example: When documenting a model with 10 columns, create 10 edit operations in a single tool call rather than 10 separate calls.`,
   inputSchema: editFilesInputSchema,
   outputSchema: editFilesOutputSchema,
   execute: async ({
