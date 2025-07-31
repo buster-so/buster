@@ -1,66 +1,77 @@
-# Build stage
-FROM node:22-alpine AS builder
+# Optimized Dockerfile for Next.js in Turborepo monorepo
+# Uses turbo prune for minimal production images
 
+# 1. Base stage with pnpm
+FROM node:22-alpine AS base
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# 2. Pruner stage - creates minimal subset of monorepo
+FROM base AS pruner
+WORKDIR /app
+COPY . .
+RUN pnpm dlx turbo prune @buster-app/web --docker
 
-# Only keep build-time public env vars as args
+# 3. Builder stage
+FROM base AS builder
+WORKDIR /app
+
+# Build arguments for NEXT_PUBLIC_* variables
+# Porter will pass these via --build-arg
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_API2_URL
 ARG NEXT_PUBLIC_URL
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG NEXT_PUBLIC_WEB_SOCKET_URL
+# PostHog analytics (commented out for now)
+# ARG NEXT_PUBLIC_POSTHOG_KEY
+# ARG NEXT_PUBLIC_POSTHOG_HOST
 
-# Set public env vars for build time
+# Set build-time environment variables
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API2_URL=$NEXT_PUBLIC_API2_URL
 ENV NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_WEB_SOCKET_URL=$NEXT_PUBLIC_WEB_SOCKET_URL
+# PostHog vars commented out to avoid validation errors
+# ENV NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY
+# ENV NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST
 
-# Copy package files and install dependencies first for better caching
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+# Skip environment validation during build
+ENV SKIP_ENV_CHECK=true
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# Copy other necessary configuration files and the rest of the application code
-COPY next.config.mjs ./
-COPY tsconfig*.json ./
-COPY public ./public
-COPY . .
+# Copy pruned dependencies and install
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+# Use --no-frozen-lockfile to handle pruned dependencies correctly
+RUN pnpm install --no-frozen-lockfile
 
-# Build with verbose output
-RUN pnpm run build
+# Copy pruned source code
+COPY --from=pruner /app/out/full/ .
+COPY turbo.json turbo.json
 
-# Production stage
-FROM node:20-alpine
+# Build the application
+RUN pnpm turbo run build --filter=@buster-app/web...
 
+# 4. Production runner stage
+FROM gcr.io/distroless/nodejs20-debian12 AS runner
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Set to production environment
+# Production environment
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy necessary files from builder
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-# Copy package.json and install only production dependencies in the runtime stage
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
-COPY --from=builder /app/next.config.mjs ./
+# Copy standalone output from builder
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 
-# Expose the port your app runs on
+# The standalone server is at ./apps/web/server.js
 EXPOSE 3000
 
-# Add tini for proper signal handling
-RUN apk add --no-cache tini
-
-# Use tini as entrypoint
-ENTRYPOINT ["/sbin/tini", "--"]
-
-# Start the application
-CMD ["pnpm", "start"]
+# Start the standalone server
+CMD ["apps/web/server.js"]
