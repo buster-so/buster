@@ -187,6 +187,9 @@ importers:
       '@buster/ai':
         specifier: workspace:*
         version: link:../../packages/ai
+      '@buster/data-source':
+        specifier: workspace:*
+        version: link:../../packages/data-source
       '@buster/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -759,6 +762,9 @@ importers:
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../env-utils
+      '@buster/server-shared':
+        specifier: workspace:*
+        version: link:../server-shared
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -786,6 +792,12 @@ importers:
       snowflake-sdk:
         specifier: ^2.1.1
         version: 2.1.1(asn1.js@5.4.1)
+      yaml:
+        specifier: ^2.8.0
+        version: 2.8.0
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.1
     devDependencies:
       '@types/mssql':
         specifier: ^9.1.7
@@ -23989,7 +24001,7 @@ snapshots:
       debug: 4.4.1
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.5(@types/node@20.19.4)(jiti@2.4.2)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.5(@types/node@20.19.4)(jiti@2.4.2)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -24010,7 +24022,7 @@ snapshots:
       debug: 4.4.1
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -24064,6 +24076,24 @@ snapshots:
       tinyglobby: 0.2.14
     optionalDependencies:
       '@types/node': 24.0.10
+      fsevents: 2.3.3
+      jiti: 2.4.2
+      lightningcss: 1.30.1
+      sass: 1.89.2
+      terser: 5.43.1
+      tsx: 4.20.3
+      yaml: 2.8.0
+
+  vite@7.0.5(@types/node@20.19.4)(jiti@2.4.2)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0):
+    dependencies:
+      esbuild: 0.25.5
+      fdir: 6.4.6(picomatch@4.0.2)
+      picomatch: 4.0.2
+      postcss: 8.5.6
+      rollup: 4.44.2
+      tinyglobby: 0.2.14
+    optionalDependencies:
+      '@types/node': 20.19.4
       fsevents: 2.3.3
       jiti: 2.4.2
       lightningcss: 1.30.1

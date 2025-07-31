@@ -8,6 +8,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./schema-sync": {
+      "types": "./dist/schema-sync/index.d.ts",
+      "default": "./dist/schema-sync/index.js"
     }
   },
   "main": "dist/index.js",
@@ -30,6 +34,7 @@
   },
   "dependencies": {
     "@buster/env-utils": "workspace:*",
+    "@buster/server-shared": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@google-cloud/bigquery": "^8.1.0",
@@ -38,7 +43,9 @@
     "mysql2": "^3.14.1",
     "pg": "catalog:",
     "pg-cursor": "^2.15.3",
-    "snowflake-sdk": "^2.1.1"
+    "snowflake-sdk": "^2.1.1",
+    "yaml": "^2.8.0",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/mssql": "^9.1.7",
