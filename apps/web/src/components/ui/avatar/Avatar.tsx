@@ -3,7 +3,7 @@ import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { getFirstTwoCapitalizedLetters } from '@/lib/text';
 import { cn } from '@/lib/utils';
 import { Tooltip } from '../tooltip/Tooltip';
-import { Avatar as AvatarBase, AvatarFallback, AvatarImage } from './AvatarBase';
+import { AvatarBase as AvatarBase, AvatarFallback, AvatarImage } from './AvatarBase';
 
 export interface AvatarProps {
   image?: string | null | undefined;

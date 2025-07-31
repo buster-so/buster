@@ -165,11 +165,15 @@ export function buildChatWithMessages(
   // Ensure message_ids array has no duplicates
   const uniqueMessageIds = [...new Set(messageIds)];
 
+  // Reverse the array to go from oldest to newest
+  // (messages come from DB in desc order, but we want asc in response)
+  const reversedMessageIds = uniqueMessageIds.reverse();
+
   return {
     id: chat.id,
     title: chat.title,
     is_favorited: isFavorited,
-    message_ids: uniqueMessageIds,
+    message_ids: reversedMessageIds,
     messages: messageMap,
     created_at: chat.createdAt,
     updated_at: chat.updatedAt,

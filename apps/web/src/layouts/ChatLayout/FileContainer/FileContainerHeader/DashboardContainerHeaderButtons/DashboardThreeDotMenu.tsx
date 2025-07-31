@@ -145,15 +145,11 @@ const useVersionHistorySelectMenu = ({ dashboardId }: { dashboardId: string }) =
 const useCollectionSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
   const { mutateAsync: saveDashboardToCollection } = useAddDashboardToCollection();
   const { mutateAsync: removeDashboardFromCollection } = useRemoveDashboardFromCollection();
-  const { data: collections } = useGetDashboard(
+  const { data: selectedCollections } = useGetDashboard(
     { id: dashboardId },
-    { select: (x) => x.collections }
+    { select: (x) => x.collections?.map((collection) => collection.id) }
   );
   const { openInfoMessage } = useBusterNotifications();
-
-  const selectedCollections = useMemo(() => {
-    return collections?.map((x) => x.id) || [];
-  }, [collections]);
 
   const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
     await saveDashboardToCollection({ dashboardIds: [dashboardId], collectionIds });
@@ -171,7 +167,7 @@ const useCollectionSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
   const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
     onSaveToCollection,
     onRemoveFromCollection,
-    selectedCollections
+    selectedCollections: selectedCollections || []
   });
 
   const collectionSubMenu = useMemo(() => {

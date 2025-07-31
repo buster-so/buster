@@ -63,7 +63,8 @@ export const useFavoriteMetricSelectMenu = ({ metricId }: { metricId: string }) 
       label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
       value: 'add-to-favorites',
       icon: isFavorited ? <StarFilled /> : <Star />,
-      onClick: onFavoriteClick
+      onClick: onFavoriteClick,
+      closeOnSelect: false
     }),
     [isFavorited, onFavoriteClick]
   );

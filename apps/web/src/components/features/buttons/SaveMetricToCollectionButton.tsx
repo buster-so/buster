@@ -1,7 +1,6 @@
-import uniq from 'lodash/uniq';
 import type React from 'react';
-import { useState } from 'react';
 import {
+  useGetMetric,
   useRemoveMetricFromCollection,
   useSaveMetricToCollections
 } from '@/api/buster_rest/metrics';
@@ -11,38 +10,29 @@ import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdow
 import { CollectionButton } from './CollectionsButton';
 
 export const SaveMetricToCollectionButton: React.FC<{
-  metricIds: string[];
-  selectedCollections: string[];
+  metricId: string;
   buttonType?: 'ghost' | 'default';
   useText?: boolean;
-}> = ({
-  metricIds,
-  selectedCollections: selectedCollectionsProp,
-  buttonType = 'ghost',
-  useText = false
-}) => {
+}> = ({ metricId, buttonType = 'ghost', useText = false }) => {
   const { openInfoMessage } = useBusterNotifications();
   const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
   const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
-
-  const [selectedCollections, setSelectedCollections] =
-    useState<Parameters<typeof SaveToCollectionsDropdown>[0]['selectedCollections']>(
-      selectedCollectionsProp
-    );
+  const { data: selectedCollections } = useGetMetric(
+    { id: metricId },
+    { select: (x) => x.collections?.map((x) => x.id) }
+  );
 
   const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
-    setSelectedCollections((prev) => uniq([...prev, ...collectionIds]));
     await saveMetricToCollection({
-      metricIds,
+      metricIds: [metricId],
       collectionIds
     });
     openInfoMessage('Metrics saved to collections');
   });
 
   const onRemoveFromCollection = useMemoizedFn(async (collectionId: string) => {
-    setSelectedCollections((prev) => prev.filter((x) => x !== collectionId));
     await removeMetricFromCollection({
-      metricIds,
+      metricIds: [metricId],
       collectionIds: [collectionId]
     });
     openInfoMessage('Metrics removed from collections');
@@ -52,7 +42,7 @@ export const SaveMetricToCollectionButton: React.FC<{
     <SaveToCollectionsDropdown
       onSaveToCollection={onSaveToCollection}
       onRemoveFromCollection={onRemoveFromCollection}
-      selectedCollections={selectedCollections}>
+      selectedCollections={selectedCollections || []}>
       <CollectionButton buttonType={buttonType} useText={useText} />
     </SaveToCollectionsDropdown>
   );

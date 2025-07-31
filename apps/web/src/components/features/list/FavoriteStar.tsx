@@ -81,21 +81,23 @@ export const useFavoriteStar = ({
     return userFavorites?.some((favorite) => favorite.id === id);
   }, [userFavorites, id]);
 
-  const onFavoriteClick = useMemoizedFn(async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.stopPropagation();
-    e?.preventDefault();
-    if (!isFavorited) {
-      return await addItemToFavorite([
-        {
-          asset_type: type,
-          id,
-          name
-        }
-      ]);
-    }
+  const onFavoriteClick = useMemoizedFn(
+    async (e?: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>) => {
+      e?.stopPropagation();
+      e?.preventDefault();
+      if (!isFavorited) {
+        return await addItemToFavorite([
+          {
+            asset_type: type,
+            id,
+            name
+          }
+        ]);
+      }
 
-    return await removeItemFromFavorite([id]);
-  });
+      return await removeItemFromFavorite([id]);
+    }
+  );
 
   return useMemo(
     () => ({

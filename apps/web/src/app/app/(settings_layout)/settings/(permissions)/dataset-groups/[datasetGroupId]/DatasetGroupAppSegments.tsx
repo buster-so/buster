@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AppSegmented } from '@/components/ui/segmented';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useDebounce } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';

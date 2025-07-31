@@ -198,7 +198,7 @@ const DropdownMenuCheckboxItemMultiple = React.forwardRef<
             'absolute left-2 flex h-3.5 w-3.5 items-center justify-center opacity-0 group-hover:opacity-100',
             checked && 'opacity-100'
           )}>
-          <Checkbox size="sm" checked={checked} />
+          <Checkbox size="default" checked={checked} />
         </span>
         {children}
       </DropdownMenuPrimitive.CheckboxItem>

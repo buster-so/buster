@@ -3,7 +3,7 @@
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import * as React from 'react';
 import {
-  Tooltip,
+  TooltipBase,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
@@ -70,7 +70,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
           </SliderPrimitive.Track>
 
           <TooltipProvider>
-            <Tooltip open={useTooltip}>
+            <TooltipBase open={useTooltip}>
               <TooltipTrigger asChild>
                 <SliderPrimitive.Thumb
                   onMouseEnter={() => setUseTooltip(true)}
@@ -81,7 +81,7 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
               <TooltipContent side="top" sideOffset={5}>
                 {internalValues[0]}
               </TooltipContent>
-            </Tooltip>
+            </TooltipBase>
           </TooltipProvider>
         </SliderPrimitive.Root>
       </ErrorBoundary>

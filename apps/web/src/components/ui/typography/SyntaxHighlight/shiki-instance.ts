@@ -40,7 +40,7 @@ export const initializeHighlighter = async (): Promise<HighlighterCore> => {
 };
 
 // Highlight code
-export const highlightCode = async (
+export const getHighlightedCode = async (
   code: string,
   language: 'sql' | 'yaml',
   theme: 'github-light' | 'github-dark',

@@ -101,3 +101,25 @@ export const boldHighlights = (name: string, highlights: string[]): React.ReactN
     return String(name);
   }
 };
+
+export const ensureElementExists = async <T extends HTMLElement>(
+  nodeCheck: () => T | null,
+  params?: { timeoutMs?: number; intervalMs?: number }
+): Promise<T | null> => {
+  const { timeoutMs = 3000, intervalMs = 50 } = params || {};
+  const start = Date.now();
+
+  return new Promise((resolve) => {
+    const check = () => {
+      const el = nodeCheck();
+      if (el) {
+        resolve(el);
+      } else if (Date.now() - start < timeoutMs) {
+        setTimeout(check, intervalMs);
+      } else {
+        resolve(null);
+      }
+    };
+    check();
+  });
+};

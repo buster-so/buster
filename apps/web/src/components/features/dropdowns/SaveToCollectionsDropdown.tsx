@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
@@ -56,6 +56,8 @@ export const useSaveToCollectionsDropdownContent = ({
 > & {
   ModalComponent: React.ReactNode;
 } => {
+  const [openCollectionModal, setOpenCollectionModal] = useState(false);
+
   const { data: collectionsList, isPending: isCreatingCollection } = useGetCollectionsList({});
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
 
@@ -74,8 +76,6 @@ export const useSaveToCollectionsDropdownContent = ({
     });
     return collectionsItems;
   }, [collectionsList, selectedCollections]);
-
-  const [openCollectionModal, setOpenCollectionModal] = React.useState(false);
 
   const menuHeader = useMemo(() => {
     return items.length > 0 ? 'Save to a collection' : undefined;

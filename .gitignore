@@ -75,7 +75,9 @@ web/playwright-tests/auth-utils/auth.json
 
 .trigger
 
-.claude
+.claude/tasks
+.claude/commands
+.claude/settings.local.json
 
 # Drizzle specific
 drizzle/.env

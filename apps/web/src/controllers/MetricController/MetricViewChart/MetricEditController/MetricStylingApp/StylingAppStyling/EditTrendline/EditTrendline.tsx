@@ -11,7 +11,7 @@ import type {
 } from '@buster/server-shared/metrics';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { useMemoizedFn, useSet } from '@/hooks';
 import { formatLabel } from '@/lib/columnFormatter';
 import { JOIN_CHARACTER } from '@/lib/axisFormatter';

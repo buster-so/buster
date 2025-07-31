@@ -77,11 +77,11 @@ export const defaultAxiosRequestHandler = async (
       token = await getSupabaseTokenFromCookies();
     } else {
       // Always check token validity before making requests
-      const tokenResult = await options?.checkTokenValidity();
+      const tokenResult = await options?.checkTokenValidity?.();
       token = tokenResult?.access_token || '';
     }
 
-    if (!token) {
+    if (!token && options?.checkTokenValidity) {
       throw new Error('User authentication error - no token found');
     }
 

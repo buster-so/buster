@@ -15,10 +15,6 @@ const meta: Meta<typeof Dropdown> = {
     layout: 'centered'
   },
   argTypes: {
-    closeOnSelect: {
-      control: 'boolean',
-      defaultValue: true
-    },
     align: {
       control: 'select',
       options: ['start', 'center', 'end'],

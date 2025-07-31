@@ -5,6 +5,7 @@ export * from './useDebounceEffect';
 export * from './useDebounceSearch';
 export * from './useInViewport';
 export * from './useIsChanged';
+export * from './useIsTouchDevice';
 export * from './useMemoizedFn';
 export * from './useMergedRefs';
 export * from './useMount';

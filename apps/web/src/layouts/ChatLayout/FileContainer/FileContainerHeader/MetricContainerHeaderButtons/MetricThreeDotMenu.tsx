@@ -49,7 +49,8 @@ import {
   type MetricFileViewSecondary,
   useChatLayoutContextSelector
 } from '@/layouts/ChatLayout/ChatLayoutContext';
-import { timeout } from '@/lib';
+import { timeout } from '@/lib/timeout';
+import { ensureElementExists } from '@/lib/element';
 import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
 import { canEdit, getIsEffectiveOwner, getIsOwner } from '@/lib/share';
 import { BusterRoutes } from '@/routes';
@@ -152,6 +153,7 @@ const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
   const { mutateAsync: saveMetricsToDashboard } = useAddMetricsToDashboard();
   const { mutateAsync: removeMetricsFromDashboard } = useRemoveMetricsFromDashboard();
   const { data: dashboards } = useGetMetric({ id: metricId }, { select: (x) => x.dashboards });
+  const { openInfoMessage } = useBusterNotifications();
 
   const onSaveToDashboard = useMemoizedFn(async (dashboardIds: string[]) => {
     await Promise.all(
@@ -159,14 +161,16 @@ const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
         saveMetricsToDashboard({ metricIds: [metricId], dashboardId })
       )
     );
+    openInfoMessage('Metric added to dashboard');
   });
 
   const onRemoveFromDashboard = useMemoizedFn(async (dashboardIds: string[]) => {
     await Promise.all(
       dashboardIds.map((dashboardId) =>
-        removeMetricsFromDashboard({ metricIds: [metricId], dashboardId })
+        removeMetricsFromDashboard({ metricIds: [metricId], dashboardId, useConfirmModal: false })
       )
     );
+    openInfoMessage('Metric removed from dashboard');
   });
 
   const { items, footerContent, selectType, menuHeader } = useSaveToDashboardDropdownContent({
@@ -190,6 +194,7 @@ const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
     () => ({
       label: 'Add to dashboard',
       value: 'add-to-dashboard',
+      closeOnSelect: false,
       icon: <ASSET_ICONS.dashboardAdd />,
       items: [<React.Fragment key="dashboard-sub-menu">{dashboardSubMenu}</React.Fragment>]
     }),
@@ -202,12 +207,11 @@ const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
 const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
   const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
   const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
-  const { data: collections } = useGetMetric({ id: metricId }, { select: (x) => x.collections });
+  const { data: selectedCollections } = useGetMetric(
+    { id: metricId },
+    { select: (x) => x.collections?.map((x) => x.id) }
+  );
   const { openInfoMessage } = useBusterNotifications();
-
-  const selectedCollections = useMemo(() => {
-    return collections?.map((x) => x.id) || [];
-  }, [collections]);
 
   const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
     await saveMetricToCollection({
@@ -228,7 +232,7 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
   const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
     onSaveToCollection,
     onRemoveFromCollection,
-    selectedCollections
+    selectedCollections: selectedCollections || []
   });
 
   const CollectionSubMenu = useMemo(() => {
@@ -432,15 +436,27 @@ const useDeleteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
 
 const useRenameMetricSelectMenu = ({ metricId }: { metricId: string }) => {
   const onSetFileView = useChatLayoutContextSelector((x) => x.onSetFileView);
+  const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
+  const chatId = useChatLayoutContextSelector((x) => x.chatId);
+  const dashboardId = useChatLayoutContextSelector((x) => x.dashboardId);
   return useMemo(
     () => ({
       label: 'Rename metric',
       value: 'rename-metric',
       icon: <Pencil />,
       onClick: async () => {
-        onSetFileView({ fileView: 'chart' });
-        await timeout(125);
-        const input = document.getElementById(METRIC_CHART_TITLE_INPUT_ID) as HTMLInputElement;
+        const route = assetParamsToRoute({
+          type: 'metric',
+          assetId: metricId,
+          chatId,
+          dashboardId,
+          page: 'chart'
+        });
+        await onChangePage(route);
+        await timeout(100);
+        const input = await ensureElementExists(
+          () => document.getElementById(METRIC_CHART_TITLE_INPUT_ID) as HTMLInputElement
+        );
         if (input) {
           input.focus();
           input.select();

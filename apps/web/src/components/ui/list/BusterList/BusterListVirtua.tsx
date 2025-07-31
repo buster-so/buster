@@ -3,7 +3,7 @@
 import React, { useMemo, useRef } from 'react';
 import { VList } from 'virtua';
 import { useMemoizedFn } from '@/hooks';
-import { ContextMenu, type ContextMenuProps } from '../../context/ContextMenu';
+import { ContextMenu, type ContextMenuProps } from '../../context-menu/ContextMenu';
 import { BusterListHeader } from './BusterListHeader';
 import { BusterListRowComponentSelector } from './BusterListRowComponentSelector';
 import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';

@@ -29,8 +29,12 @@
     "eval:metrics": "npx braintrust eval evals/agents/analyst-agent/metrics",
     "eval:post-processing": "npx braintrust eval evals/agents/post-processing-agent",
     "eval:golden": "npx braintrust eval evals/golden-dataset",
+    "eval:charting": "npx braintrust eval evals/agents/analyst-agent/chart-formatting",
+    "eval:tool-order": "npx braintrust eval evals/agents/analyst-agent/tool-order",
     "braintrust:push": "npx braintrust push evals/agents/analyst-agent/metrics/test_scorers.ts",
-    "braintrust:push:staged": "npx braintrust push evals/agents/analyst-agent/metrics/staged_scorers.ts"
+    "braintrust:push:metric:staged": "npx braintrust push evals/agents/analyst-agent/metrics/staged_scorers.ts",
+    "braintrust:push:chart:staged": "npx braintrust push evals/agents/analyst-agent/chart-formatting/staged-scorers.ts",
+    "braintrust:push:tools:staged": "npx braintrust push evals/agents/analyst-agent/tool-order/staged-scorers.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",

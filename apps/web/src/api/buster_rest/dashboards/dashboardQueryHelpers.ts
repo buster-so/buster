@@ -15,18 +15,25 @@ import {
 import { dashboardsGetDashboard } from './requests';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 
-export const useEnsureDashboardConfig = (prefetchData = true) => {
+export const useEnsureDashboardConfig = (params?: { prefetchData?: boolean }) => {
+  const { prefetchData = true } = params || {};
   const queryClient = useQueryClient();
-  const prefetchDashboard = useGetDashboardAndInitializeMetrics(prefetchData);
+  const prefetchDashboard = useGetDashboardAndInitializeMetrics({
+    prefetchData
+  });
   const { openErrorMessage } = useBusterNotifications();
   const getLatestDashboardVersion = useGetLatestDashboardVersionMemoized();
 
-  const method = useMemoizedFn(async (dashboardId: string) => {
+  const method = useMemoizedFn(async (dashboardId: string, initializeMetrics = true) => {
     const latestVersion = getLatestDashboardVersion(dashboardId);
     const options = dashboardQueryKeys.dashboardGetDashboard(dashboardId, latestVersion);
     let dashboardResponse = queryClient.getQueryData(options.queryKey);
     if (!dashboardResponse) {
-      const res = await prefetchDashboard(dashboardId, latestVersion || undefined).catch((e) => {
+      const res = await prefetchDashboard(
+        dashboardId,
+        latestVersion || undefined,
+        initializeMetrics
+      ).catch((e) => {
         openErrorMessage('Failed to save metrics to dashboard. Dashboard not found');
         return null;
       });
@@ -46,7 +53,8 @@ export const useEnsureDashboardConfig = (prefetchData = true) => {
   return method;
 };
 
-export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
+export const useGetDashboardAndInitializeMetrics = (params?: { prefetchData?: boolean }) => {
+  const { prefetchData = true } = params || {};
   const queryClient = useQueryClient();
   const setOriginalDashboard = useOriginalDashboardStore((x) => x.setOriginalDashboard);
   const onSetLatestDashboardVersion = useDashboardQueryStore((x) => x.onSetLatestDashboardVersion);
@@ -72,32 +80,40 @@ export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
     }
   });
 
-  return useMemoizedFn(async (id: string, version_number: number | null | undefined) => {
-    const { password } = getAssetPassword?.(id) || {};
+  return useMemoizedFn(
+    async (
+      id: string,
+      version_number: number | null | undefined,
+      shouldInitializeMetrics = true
+    ) => {
+      const { password } = getAssetPassword?.(id) || {};
 
-    return dashboardsGetDashboard({
-      id: id || '',
-      password,
-      version_number: version_number || undefined
-    }).then((data) => {
-      initializeMetrics(data.metrics);
-      const latestVersion = last(data.versions)?.version_number || 1;
-      const isLatestVersion = data.dashboard.version_number === latestVersion;
+      return dashboardsGetDashboard({
+        id: id || '',
+        password,
+        version_number: version_number || undefined
+      }).then((data) => {
+        if (shouldInitializeMetrics) initializeMetrics(data.metrics);
+        const latestVersion = last(data.versions)?.version_number || 1;
+        const isLatestVersion = data.dashboard.version_number === latestVersion;
 
-      if (isLatestVersion) {
-        setOriginalDashboard(data.dashboard);
-      }
+        if (isLatestVersion) {
+          setOriginalDashboard(data.dashboard);
+        }
 
-      if (data.dashboard.version_number) {
-        queryClient.setQueryData(
-          dashboardQueryKeys.dashboardGetDashboard(data.dashboard.id, data.dashboard.version_number)
-            .queryKey,
-          data
-        );
-        onSetLatestDashboardVersion(data.dashboard.id, latestVersion);
-      }
+        if (data.dashboard.version_number) {
+          queryClient.setQueryData(
+            dashboardQueryKeys.dashboardGetDashboard(
+              data.dashboard.id,
+              data.dashboard.version_number
+            ).queryKey,
+            data
+          );
+          onSetLatestDashboardVersion(data.dashboard.id, latestVersion);
+        }
 
-      return data;
-    });
-  });
+        return data;
+      });
+    }
+  );
 };

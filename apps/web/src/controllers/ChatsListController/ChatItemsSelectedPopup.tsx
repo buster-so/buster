@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShareAssetType } from '@buster/server-shared/share';
 import {
   useDeleteChat,
   useRemoveChatFromCollections,

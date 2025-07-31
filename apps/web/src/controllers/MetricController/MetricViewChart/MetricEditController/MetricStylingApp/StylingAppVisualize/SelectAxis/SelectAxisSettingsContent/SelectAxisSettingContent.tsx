@@ -1,5 +1,5 @@
 import type React from 'react';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/typography';
 import type { SelectAxisContainerId } from '../config';
 import { ZoneIdToTitle } from '../helper';

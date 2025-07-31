@@ -4,6 +4,12 @@ This file provides guidance to Claude Code when working with code in this monore
 
 **Note**: Many packages and apps have their own CLAUDE.md files with specific implementation details and patterns. Always check for a local CLAUDE.md when working in a specific directory.
 
+## Key Agent Workflow
+1. **Planning**: Always start with the `monorepo-task-planner` agent for new tasks or requirement changes
+2. **Implementation**: Follow the plan in `.claude/tasks/`, updating status as you work
+3. **Quality Assurance**: Use the `qa-test-engineer` agent for comprehensive testing before completion
+4. **Focus on**: Type safety (`turbo build:dry-run`), linting (`turbo lint`), and modular code design
+
 ## Monorepo Structure
 
 This is a pnpm-based monorepo using Turborepo with the following structure:
@@ -35,6 +41,28 @@ This is a pnpm-based monorepo using Turborepo with the following structure:
 - `packages/slack` - Standalone Slack integration (OAuth, messaging, channels)
 - `packages/supabase` - Supabase setup and configuration
 - `packages/sandbox` - Sandboxed code execution using Daytona SDK
+
+## Agent-Based Workflow
+
+### Planning with monorepo-task-planner
+- **Always use the monorepo-task-planner agent first** when starting any new task, feature, or when requirements change
+- The planner will create detailed implementation plans and write them to `.claude/tasks/TASK_NAME.md`
+- **Reference and update task files**: Frequently check the task files created by the planner and update the status of items and specs as you work
+- Update task files with detailed descriptions of changes made so work can be easily handed over
+
+### Testing with qa-test-engineer
+- **Use the qa-test-engineer agent** after completing implementation work to ensure proper test coverage
+- The QA engineer will run tests, analyze coverage, and ensure code quality
+- Every completed task goes through QA review, so focus on writing modular, testable code
+
+### Development Best Practices
+- **Follow test-driven development**: 
+  - Stub out tests and assertions first
+  - Build your functions to meet those tests
+  - Run `turbo test:unit` to verify your implementation works
+  - If struggling with tests after completing functional code, pass to qa-test-engineer
+- **Run quality checks while working**: Periodically run `turbo build:dry-run` and `turbo lint` to catch issues early
+- **Your primary job is the functional implementation**: Focus on accomplishing the task; the QA engineer specializes in comprehensive testing
 
 ## Development Workflow
 
@@ -164,29 +192,24 @@ turbo run test:watch
 ```
 
 ### 6. Pre-Completion Checklist
-**IMPORTANT: Before finishing any task or creating PRs, always run:**
+**IMPORTANT: Before finishing any task:**
 ```bash
-# 1. Run unit tests for the entire monorepo
+# Run build and lint checks during development
+turbo run build:dry-run lint
+
+# Run unit tests to verify your implementation
 turbo run test:unit
 
-# 2. Build dry-run to ensure everything compiles (faster than full build)
-turbo run build:dry-run
-
-# 3. Run linting for the entire monorepo
-turbo run lint
-
-# Or run all checks simultaneously:
-turbo run build:dry-run lint test:unit
+# The qa-test-engineer agent will handle comprehensive testing and coverage
 ```
 
-**Key Testing Guidelines:**
-- **Always run unit tests, build:dry-run, and lint** when working locally before considering a task complete
-- **Unit tests** should be run for the entire monorepo to catch any breaking changes
-- **Build:dry-run** must pass for the entire monorepo to ensure type safety
-- **Integration tests** should only be run for specific packages/features you're working on (NOT the entire monorepo)
-- **Fix all failing tests, build errors, and lint errors** before completing any task
-- **Heavily bias toward unit tests** - they are faster and cheaper to run
-- **Mock everything you can** in unit tests for isolation and speed
+**Key Guidelines:**
+- **Focus on type safety and linting** during development
+- **Write modular, testable code** following functional patterns
+- **Run unit tests** to verify your implementation works
+- **The qa-test-engineer agent** will ensure comprehensive test coverage
+- **Update task status** in `.claude/tasks/` files as you complete work
+- **Document changes** in task files for handover
 
 **Filtering Commands to Specific Packages:**
 All turbo commands support filtering to specific packages using the `--filter` flag:
@@ -304,5 +327,19 @@ export async function getWorkspaceSettingsHandler(
 - **Purpose** - This is primarily for writing and iterating on integration tests to verify database state and test query behavior
 
 ## Pre-Completion Workflow
-- Always run `turbo run test:unit`, `turbo run lint`, and `turbo run build:dry-run` before making any pull request or finishing a feature, bugfix, etc. to ensure things make it through CI/CD
-- You can run all these checks simultaneously with `turbo run build:dry-run lint test:unit`
+- Run `turbo build:dry-run lint` during development to ensure type safety and code quality
+- The qa-test-engineer agent will handle comprehensive testing before PRs
+- Update task status and documentation in `.claude/tasks/` files
+- Coordinate with the monorepo-task-planner for any requirement changes
+
+## Local Development
+
+### Local Development Details
+- The local dev app is typically running at localhost:3000
+- To get the app up and running you need to run turbo dev from root
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

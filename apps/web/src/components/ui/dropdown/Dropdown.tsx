@@ -31,7 +31,8 @@ export interface DropdownItem<T = string> {
   secondaryLabel?: string;
   value: T;
   shortcut?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  closeOnSelect?: boolean; //default is true
   icon?: React.ReactNode;
   disabled?: boolean;
   loading?: boolean;
@@ -52,7 +53,6 @@ export interface DropdownProps<T = string> extends DropdownMenuProps {
   items: DropdownItems<T>;
   selectType?: 'single' | 'multiple' | 'none';
   menuHeader?: string | React.ReactNode; //if string it will render a search box
-  closeOnSelect?: boolean;
   onSelect?: (value: T) => void;
   align?: 'start' | 'center' | 'end';
   side?: 'top' | 'right' | 'bottom' | 'left';
@@ -81,7 +81,6 @@ export const DropdownBase = <T,>({
   selectType = 'none',
   menuHeader,
   contentClassName = '',
-  closeOnSelect = true,
   onSelect,
   children,
   align = 'start',
@@ -114,7 +113,6 @@ export const DropdownBase = <T,>({
           items={items}
           selectType={selectType}
           menuHeader={menuHeader}
-          closeOnSelect={closeOnSelect}
           onSelect={onSelect}
           showIndex={showIndex}
           emptyStateText={emptyStateText}
@@ -135,7 +133,6 @@ export const DropdownContent = <T,>({
   items,
   selectType,
   menuHeader,
-  closeOnSelect = true,
   showIndex = false,
   emptyStateText = 'No items found',
   footerContent,
@@ -198,7 +195,7 @@ export const DropdownContent = <T,>({
       if (!disabled && onSelect) {
         onSelect(item.value);
         // Close the dropdown if closeOnSelect is true
-        if (closeOnSelect) {
+        if (item.closeOnSelect !== false) {
           const dropdownTrigger = document.querySelector('[data-state="open"][role="menu"]');
           if (dropdownTrigger) {
             const closeEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
@@ -248,7 +245,7 @@ export const DropdownContent = <T,>({
                   selectType={selectType}
                   onSelect={onSelect}
                   onSelectItem={onSelectItem}
-                  closeOnSelect={closeOnSelect}
+                  closeOnSelect={(item as DropdownItem).closeOnSelect !== false}
                   showIndex={showIndex}
                 />
               );
@@ -270,7 +267,7 @@ export const DropdownContent = <T,>({
                   selectType={selectType}
                   onSelect={onSelect}
                   onSelectItem={onSelectItem}
-                  closeOnSelect={closeOnSelect}
+                  closeOnSelect={(item as DropdownItem).closeOnSelect !== false}
                   showIndex={showIndex}
                 />
               );
@@ -365,7 +362,7 @@ const DropdownItem = <T,>({
   selectType: DropdownProps<T>['selectType'];
 }) => {
   const onClickItem = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
-    if (onClick) onClick();
+    if (onClick) onClick(e);
     if (onSelect) onSelect(value as T);
   });
   const enabledHotKeys = showIndex && !disabled && !!onSelectItem;

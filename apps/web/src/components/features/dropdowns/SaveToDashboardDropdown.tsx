@@ -89,7 +89,12 @@ export const useSaveToDashboardDropdownContent = ({
           value: dashboard.id,
           label: dashboard.name || 'New dashboard',
           selected: selectedDashboards.some((d) => d === dashboard.id),
-          onClick: () => onClickItem(dashboard),
+          closeOnSelect: false,
+          onClick: (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onClickItem(dashboard);
+          },
           link: createBusterRoute({
             route: BusterRoutes.APP_DASHBOARD_ID,
             dashboardId: dashboard.id

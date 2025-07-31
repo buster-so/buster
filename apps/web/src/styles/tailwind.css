@@ -1,24 +1,84 @@
+@source '../**/*.{ts,tsx}';
+
 @import 'tailwindcss';
+@import 'tw-animate-css';
 @import './tailwindAnimations.css';
 @plugin 'tailwind-scrollbar';
-@plugin "tailwindcss-animate";
+@plugin 'tailwind-scrollbar-hide';
+@import 'shadcn-prose';
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:is(.dark *));
 
-@theme {
-  /* font */
+:root {
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #000000;
+  --background-secondary: #f3f3f3;
+  --foreground-hover: #393939;
+  --primary: #7c3aed;
+  --primary-light: #a26cff;
+  --primary-dark: #6d28d9;
+  --primary-foreground: #7c3aed;
+  --secondary: #575859;
+  --secondary-foreground: #000000;
+  --muted: #f8f8f8;
+  --muted-foreground: #575859;
+  --accent: #7c3aed;
+  --accent-foreground: #7c3aed;
+  --destructive: #c4242a;
+  --destructive-foreground: #c4242a;
+  --border: #e0e0e0;
+  --input: #e0e0e0;
+  --ring: #f8f8f8;
+  --brand: #7c3aed;
+
+  /* Additional colors */
+  --gray-light: #969597;
+  --gray-dark: #575859;
+  --disabled: #e6e6e6;
+  --danger-background: #ffedef;
+  --danger-background-hover: #ffdade;
+  --danger-foreground: #c4242a;
+  --warning-background: #fef3e3;
+  --warning-foreground: #ff9e00;
+  --warning-background-hover: #ffebd4;
+  --success-background: #e6fce6;
+  --success-background-hover: #cdfbcd;
+  --success-foreground: #34a32d;
+
+  /* Component colors */
+  --page-background: #fcfcfc;
+  --item-hover: #f8f8f8;
+  --item-hover-active: #f0f0f0;
+  --item-active: #f2f2f2;
+  --item-select: #f3f3f3;
+  --nav-item-hover: #efeeee;
+  --nav-item-select: #e6e6e6;
+  --track-background: hsl(0 0% 89.8%);
+  --icon-color: #575859;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+
+  /* Text colors */
+  --text-default: var(--foreground);
+  --text-disabled: var(--gray-light);
+  --text-secondary: var(--gray-dark);
+  --text-tertiary: var(--gray-light);
+  --text-danger: var(--destructive);
+  --text-primary: var(--primary);
+
+  /* Font families */
   --font-sans: 'Roobert_Pro', sans-serif;
   --font-mono: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-  /* shadows */
+  /* Shadows */
   --shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.05);
-  --shadow-hard: 0 1px 0 0 rgb(0 0 0 / 0.05);
   --shadow-scroll-indicator: 0px 3px 5px 0px rgba(0, 0, 0, 0.08);
 
-  /* border */
+  /* Border */
   --default-border-width: 0.5px;
 
-  /* font size */
+  /* Font sizes */
   --text-3xs: 6px;
   --text-3xs--line-height: 1;
   --text-2xs: 8px;
@@ -50,13 +110,146 @@
   --text-icon-size-lg: 18px;
   --text-icon-size-lg--line-height: 1.05;
 
-  /* line height */
+  /* Line heights */
   --leading-1_3: 1.3;
   --leading-1_5: 1.5;
   --leading-1_7: 1.7;
 
-  /* radius */
+  /* Radius */
   --radius: 6px;
+
+  /* Spacing */
+  --spacing: 4px;
+
+  /* Shadcn compatibility - pointing to existing vars */
+  --card: var(--background);
+  --card-foreground: var(--foreground);
+}
+
+.dark {
+  /* Dark mode overrides would go here if needed */
+}
+
+@theme inline {
+  /* Core theme colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-background-secondary: var(--background-secondary);
+  --color-foreground-hover: var(--foreground-hover);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+
+  /* Utils */
+  --breakpoint-3xl: 1600px;
+  --breakpoint-4xl: 2000px;
+
+  /* Additional colors */
+  --color-gray-light: var(--gray-light);
+  --color-gray-dark: var(--gray-dark);
+  --color-disabled: var(--disabled);
+  --color-danger-background: var(--danger-background);
+  --color-danger-background-hover: var(--danger-background-hover);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-warning-background: var(--warning-background);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-background-hover: var(--warning-background-hover);
+  --color-success-background: var(--success-background);
+  --color-success-background-hover: var(--success-background-hover);
+  --color-success-foreground: var(--success-foreground);
+
+  /* Component colors */
+  --color-page-background: var(--page-background);
+  --color-item-hover: var(--item-hover);
+  --color-item-hover-active: var(--item-hover-active);
+  --color-item-active: var(--item-active);
+  --color-item-select: var(--item-select);
+  --color-nav-item-hover: var(--nav-item-hover);
+  --color-nav-item-select: var(--nav-item-select);
+  --color-track-background: var(--track-background);
+  --color-icon-color: var(--icon-color);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Text colors */
+  --color-text-default: var(--text-default);
+  --color-text-disabled: var(--text-disabled);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-danger: var(--text-danger);
+  --color-text-primary: var(--text-primary);
+
+  /* Font families */
+  --font-heading:
+    'var(--font-heading)', 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
+    'Segoe UI Variable Display', 'Segoe UI', 'Helvetica', 'Apple Color Emoji', 'Arial',
+    'sans-serif', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono:
+    'var(--font-mono)', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  --font-sans:
+    'var(--font-sans)', 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
+    'Segoe UI Variable Display', 'Segoe UI', 'Helvetica', 'Apple Color Emoji', 'Arial',
+    'sans-serif', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  /* Shadows */
+  --shadow: var(--shadow);
+  --shadow-scroll-indicator: var(--shadow-scroll-indicator);
+
+  /* Border */
+  --default-border-width: var(--default-border-width);
+
+  /* Font sizes */
+  --text-3xs: var(--text-3xs);
+  --text-3xs--line-height: var(--text-3xs--line-height);
+  --text-2xs: var(--text-2xs);
+  --text-2xs--line-height: var(--text-2xs--line-height);
+  --text-xs: var(--text-xs);
+  --text-xs--line-height: var(--text-xs--line-height);
+  --text-sm: var(--text-sm);
+  --text-sm--line-height: var(--text-sm--line-height);
+  --text-base: var(--text-base);
+  --text-base--line-height: var(--text-base--line-height);
+  --text-md: var(--text-md);
+  --text-md--line-height: var(--text-md--line-height);
+  --text-lg: var(--text-lg);
+  --text-lg--line-height: var(--text-lg--line-height);
+  --text-xl: var(--text-xl);
+  --text-xl--line-height: var(--text-xl--line-height);
+  --text-2xl: var(--text-2xl);
+  --text-2xl--line-height: var(--text-2xl--line-height);
+  --text-3xl: var(--text-3xl);
+  --text-3xl--line-height: var(--text-3xl--line-height);
+  --text-4xl: var(--text-4xl);
+  --text-4xl--line-height: var(--text-4xl--line-height);
+  --text-size-inherit: var(--text-size-inherit);
+
+  --text-icon-size: var(--text-icon-size);
+  --text-icon-size--line-height: var(--text-icon-size--line-height);
+  --text-icon-size-sm: var(--text-icon-size-sm);
+  --text-icon-size-sm--line-height: var(--text-icon-size-sm--line-height);
+  --text-icon-size-lg: var(--text-icon-size-lg);
+  --text-icon-size-lg--line-height: var(--text-icon-size-lg--line-height);
+
+  /* Line heights */
+  --leading-1_3: var(--leading-1_3);
+  --leading-1_5: var(--leading-1_5);
+  --leading-1_7: var(--leading-1_7);
+
+  /* Radius */
   --radius-xs: calc(var(--radius) - 4px);
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: calc(var(--radius) + 2px);
@@ -64,65 +257,15 @@
   --radius-xl: calc(var(--radius) + 6px);
   --radius-2xl: calc(var(--radius) + 8px);
 
-  /* base color */
-  --color-background: #ffffff;
-  --color-foreground: #000000;
-  --color-background-secondary: '#f3f3f3';
-  --color-foreground-hover: #393939;
-  --color-primary: #7c3aed;
-  --color-primary-light: #a26cff;
-  --color-primary-dark: #6d28d9;
-  --color-border: #e0e0e0;
-  --color-gray-light: #969597;
-  --color-gray-dark: #575859;
-  --color-disabled: #e6e6e6;
-  --color-danger-background: #ffedef;
-  --color-danger-background-hover: #ffdade;
-  --color-danger-foreground: #c4242a;
-  --color-warning-background: #fef3e3;
-  --color-warning-foreground: #ff9e00;
-  --color-warning-background-hover: #ffebd4;
-  --color-success-background: #e6fce6;
-  --color-success-background-hover: #cdfbcd;
-  --color-success-foreground: #34a32d;
-
-  /* component color */
-  --color-page-background: #fcfcfc;
-  --color-item-hover: #f8f8f8;
-  --color-item-hover-active: #f0f0f0;
-  --color-item-active: #f2f2f2;
-  --color-item-select: #f3f3f3;
-  --color-nav-item-hover: #efeeee;
-  --color-nav-item-select: var(--color-disabled);
-  --color-track-background: hsl(0 0% 89.8%);
-  --color-icon-color: var(--color-gray-dark);
-  --color-ring: var(--color-item-hover);
-  --color-popover: var(--color-background);
-  --color-popover-foreground: var(--color-foreground);
-
-  /* text color */
-  --color-text-default: var(--color-foreground);
-  --color-text-disabled: var(--color-gray-light);
-  --color-text-secondary: var(--color-gray-dark);
-  --color-text-tertiary: var(--color-gray-light);
-  --color-text-danger: var(--color-danger-foreground);
-  --color-text-primary: var(--color-primary);
-
-  --spacing: 4px;
+  /* Spacing */
+  --spacing: var(--spacing);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/0;
   }
   body {
     @apply bg-background-secondary text-foreground text-base;
-  }
-}
-
-@layer utilities {
-  /* any direct child of .fade-in gets bg-red-500 */
-  .fade-in > .fade-in {
-    @apply animate-none duration-0;
   }
 }

@@ -150,9 +150,9 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
         if ((e.metaKey || e.ctrlKey) && onPressMetaEnter) {
           e.preventDefault();
           onPressMetaEnter(e);
-        } else if (!e.shiftKey) {
+        } else if (!e.shiftKey && onPressEnter) {
           e.preventDefault();
-          onPressEnter?.(e);
+          onPressEnter(e);
         }
       }
       props.onKeyDown?.(e);

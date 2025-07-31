@@ -22,6 +22,7 @@ import {
   updateMetric,
   updateMetricShare
 } from './requests';
+import type { BusterCollection } from '@/api/asset_interfaces/collection';
 
 /**
  * This is a mutation that saves a metric to the server.
@@ -141,6 +142,7 @@ export const useSaveMetricToCollections = () => {
   const queryClient = useQueryClient();
   const { data: userFavorites, refetch: refreshFavoritesList } = useGetUserFavorites();
   const { mutateAsync: addAssetToCollection } = useAddAssetToCollection();
+  const getLatestMetricVersion = useGetLatestMetricVersionMemoized();
 
   const saveMetricToCollection = useMemoizedFn(
     async ({ metricIds, collectionIds }: { metricIds: string[]; collectionIds: string[] }) => {
@@ -157,16 +159,46 @@ export const useSaveMetricToCollections = () => {
 
   return useMutation({
     mutationFn: saveMetricToCollection,
-    onSuccess: (_, { collectionIds }) => {
+    onMutate: ({ metricIds, collectionIds }) => {
+      metricIds.forEach((id) => {
+        const latestVersionNumber = getLatestMetricVersion(id);
+        queryClient.setQueryData(
+          metricsQueryKeys.metricsGetMetric(id, latestVersionNumber).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
+            const newData: BusterMetric = create(oldData, (draft) => {
+              // Add new collections, then deduplicate by collection id
+              const existingCollections = draft.collections || [];
+              const newCollections = collectionIds.map((id) => ({ id, name: '' }));
+              // Merge and deduplicate by id
+              const merged = [...existingCollections, ...newCollections];
+              const deduped = merged.filter(
+                (col, idx, arr) => arr.findIndex((c) => c.id === col.id) === idx
+              );
+
+              draft.collections = deduped;
+            });
+            return newData;
+          }
+        );
+      });
+    },
+    onSuccess: (_, { collectionIds, metricIds }) => {
       const collectionIsInFavorites = userFavorites.some((f) => {
         return collectionIds.includes(f.id);
       });
       if (collectionIsInFavorites) refreshFavoritesList();
-      queryClient.invalidateQueries({
-        queryKey: collectionIds.map(
-          (id) => collectionQueryKeys.collectionsGetCollection(id).queryKey
-        ),
-        refetchType: 'all'
+
+      collectionIds.forEach((id) => {
+        queryClient.invalidateQueries({
+          queryKey: collectionQueryKeys.collectionsGetCollection(id).queryKey
+        });
+      });
+
+      metricIds.forEach((id) => {
+        queryClient.invalidateQueries({
+          queryKey: metricsQueryKeys.metricsGetMetric(id, null).queryKey
+        });
       });
     }
   });
@@ -175,6 +207,7 @@ export const useSaveMetricToCollections = () => {
 export const useRemoveMetricFromCollection = () => {
   const { data: userFavorites, refetch: refreshFavoritesList } = useGetUserFavorites();
   const { mutateAsync: removeAssetFromCollection } = useRemoveAssetFromCollection();
+  const getLatestMetricVersion = useGetLatestMetricVersionMemoized();
   const queryClient = useQueryClient();
 
   const removeMetricFromCollection = useMemoizedFn(
@@ -192,17 +225,49 @@ export const useRemoveMetricFromCollection = () => {
 
   return useMutation({
     mutationFn: removeMetricFromCollection,
+    onMutate: ({ metricIds, collectionIds }) => {
+      metricIds.forEach((id) => {
+        const latestVersionNumber = getLatestMetricVersion(id);
+        queryClient.setQueryData(
+          metricsQueryKeys.metricsGetMetric(id, latestVersionNumber).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
+            const newData: BusterMetric = create(oldData, (draft) => {
+              draft.collections = draft.collections?.filter((c) => !collectionIds.includes(c.id));
+            });
+            return newData;
+          }
+        );
+      });
+      collectionIds.forEach((id) => {
+        queryClient.setQueryData(
+          collectionQueryKeys.collectionsGetCollection(id).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
+            const newData: BusterCollection = create(oldData, (draft) => {
+              draft.assets = draft.assets?.filter((a) => !metricIds.includes(a.id)) || [];
+            });
+            return newData;
+          }
+        );
+      });
+    },
     onSuccess: (_, { collectionIds, metricIds }) => {
       const collectionIsInFavorites = userFavorites.some((f) => {
         return collectionIds.includes(f.id);
       });
       if (collectionIsInFavorites) refreshFavoritesList();
 
-      queryClient.invalidateQueries({
-        queryKey: collectionIds.map(
-          (id) => collectionQueryKeys.collectionsGetCollection(id).queryKey
-        ),
-        refetchType: 'all'
+      collectionIds.forEach((id) => {
+        queryClient.invalidateQueries({
+          queryKey: collectionQueryKeys.collectionsGetCollection(id).queryKey
+        });
+      });
+
+      metricIds.forEach((id) => {
+        queryClient.invalidateQueries({
+          queryKey: metricsQueryKeys.metricsGetMetric(id, null).queryKey
+        });
       });
     }
   });

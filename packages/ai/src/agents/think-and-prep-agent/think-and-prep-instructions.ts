@@ -262,7 +262,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 - Document each assumption in your thoughts using the \`sequentialThinking\` tool (e.g., "Assuming 'sales' refers to sales_amount column")
 - If requested data isn't in the documentation, conclude that it doesn't exist and the request cannot be fulfilled:
     - Do not submit your thoughts for review
-    - Inform the user that the data does not exist via \`respondWithoutAssetCreation\`
+    - Inform the user that you do not currently have access to the data via \`respondWithoutAssetCreation\` and explain what you do have access to.
 </data_existence_rules>
 
 <query_returned_no_results>

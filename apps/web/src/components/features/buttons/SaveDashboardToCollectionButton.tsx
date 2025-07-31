@@ -14,50 +14,48 @@ export const SaveDashboardToCollectionButton: React.FC<{
   buttonType?: 'ghost' | 'default';
   useText?: boolean;
   selectedCollections: string[];
-}> = React.memo(
-  ({
-    dashboardIds,
-    buttonType = 'ghost',
-    useText = false,
-    selectedCollections: selectedCollectionsProp
-  }) => {
-    const { openInfoMessage } = useBusterNotifications();
+}> = React.memo(({ dashboardIds, buttonType = 'ghost', useText = false, selectedCollections }) => {
+  const { openInfoMessage } = useBusterNotifications();
 
-    const [selectedCollections, setSelectedCollections] =
-      useState<Parameters<typeof SaveToCollectionsDropdown>[0]['selectedCollections']>(
-        selectedCollectionsProp
-      );
-    const { mutateAsync: addDashboardToCollection } = useAddDashboardToCollection();
-    const { mutateAsync: removeDashboardFromCollection } = useRemoveDashboardFromCollection();
+  const { mutateAsync: addDashboardToCollection } = useAddDashboardToCollection();
+  const { mutateAsync: removeDashboardFromCollection } = useRemoveDashboardFromCollection();
 
-    const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
-      setSelectedCollections((prev) => uniq([...prev, ...collectionIds]));
-      await addDashboardToCollection({
+  const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
+    await addDashboardToCollection(
+      {
         dashboardIds,
         collectionIds
-      });
+      },
+      {
+        onSuccess: () => {
+          openInfoMessage('Dashboards saved to collections');
+        }
+      }
+    );
+  });
 
-      openInfoMessage('Dashboards saved to collections');
-    });
-
-    const onRemoveFromCollection = useMemoizedFn(async (collectionId: string) => {
-      setSelectedCollections((prev) => prev.filter((id) => id !== collectionId));
-      await removeDashboardFromCollection({
+  const onRemoveFromCollection = useMemoizedFn(async (collectionId: string) => {
+    await removeDashboardFromCollection(
+      {
         dashboardIds,
         collectionIds: [collectionId]
-      });
-      openInfoMessage('Dashboards removed from collections');
-    });
-
-    return (
-      <SaveToCollectionsDropdown
-        onSaveToCollection={onSaveToCollection}
-        onRemoveFromCollection={onRemoveFromCollection}
-        selectedCollections={selectedCollections}>
-        <CollectionButton buttonType={buttonType} useText={useText} />
-      </SaveToCollectionsDropdown>
+      },
+      {
+        onSuccess: () => {
+          openInfoMessage('Dashboards removed from collections');
+        }
+      }
     );
-  }
-);
+  });
+
+  return (
+    <SaveToCollectionsDropdown
+      onSaveToCollection={onSaveToCollection}
+      onRemoveFromCollection={onRemoveFromCollection}
+      selectedCollections={selectedCollections}>
+      <CollectionButton buttonType={buttonType} useText={useText} />
+    </SaveToCollectionsDropdown>
+  );
+});
 
 SaveDashboardToCollectionButton.displayName = 'SaveDashboardToCollectionButton';

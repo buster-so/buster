@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/buttons';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { Plus } from '@/components/ui/icons';
 import { Input, InputNumber } from '@/components/ui/inputs';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn, useSet } from '@/hooks';
 import { LabelAndInput } from '../Common';

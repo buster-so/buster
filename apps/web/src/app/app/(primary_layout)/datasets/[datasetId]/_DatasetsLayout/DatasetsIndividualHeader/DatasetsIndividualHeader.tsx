@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { PreventNavigation } from '@/components/ui/layouts/PreventNavigation';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { useDatasetPageContextSelector } from '../DatasetPageContext';

@@ -252,7 +252,9 @@ ${params.sqlDialectGuidance}
 
 <when_to_create_new_metric_vs_update_exsting_metric>
 - If the user asks for something that hasn't been created yet (like a different chart or a metric you haven't made yet) create a new metric
-- If the user wants to change something you've already built (like switching a chart from monthly to weekly data or adding a filter) just update the existing metric, don't create a new one
+- If the user wants to change something you've already built (like switching a chart from monthly to weekly data or adding a filter) just update the existing metric, don't create a new one unless the user specifically asks for you to recreate it.
+- If the user says, 'Hey Buster. Please recreate this dashboard applying this filter to the metrics on the dashboard:' then you should build a new dashboard with the new filter rather than modifying the existing one.
+- If the user says, 'Hey Buster. Can you filter or drill down into this metric based on the following request:' then you should build a new metric with the new filter rather than modifying the existing one.
 </when_to_create_new_metric_vs_update_exsting_metric>
 
 <system_limitations>

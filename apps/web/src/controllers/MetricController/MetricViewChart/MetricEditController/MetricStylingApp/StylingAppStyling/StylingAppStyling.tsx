@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { ChartConfigProps, BarAndLineAxis, ChartType } from '@buster/server-shared/metrics';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { EditGrouping } from '../StylingAppVisualize/SelectAxis/SelectAxisSettingsContent/EditGrouping';

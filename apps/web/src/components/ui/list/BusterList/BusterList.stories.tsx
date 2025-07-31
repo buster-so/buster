@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useMemo } from 'react';
-import type { ContextMenuProps } from '../../context/ContextMenu';
+import type { ContextMenuProps } from '../../context-menu/ContextMenu';
 import { BusterList } from './index';
 import type { BusterListRow } from './interfaces';
 

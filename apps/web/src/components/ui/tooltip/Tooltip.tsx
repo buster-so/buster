@@ -2,7 +2,7 @@ import omit from 'lodash/omit';
 import React from 'react';
 import { KeyboardShortcutPill } from '../pills/KeyboardShortcutPills';
 import {
-  Tooltip as TooltipBase,
+  TooltipBase,
   TooltipContent as TooltipContentBase,
   TooltipProvider,
   TooltipTrigger
@@ -41,22 +41,23 @@ export const Tooltip = React.memo(
       if (!title || (!title && !shortcuts?.length)) return children;
 
       return (
-        <TooltipProvider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
-          <TooltipBase open={open}>
-            <TooltipTrigger asChild>
-              <span ref={ref} className={triggerClassName}>
-                {children}
-              </span>
-            </TooltipTrigger>
-            <TooltipContentBase
-              align={align}
-              side={side}
-              sideOffset={sideOffset}
-              className={contentClassName}>
-              <TooltipContent title={title} shortcut={shortcuts} />
-            </TooltipContentBase>
-          </TooltipBase>
-        </TooltipProvider>
+        <TooltipBase
+          open={open}
+          delayDuration={delayDuration}
+          skipDelayDuration={skipDelayDuration}>
+          <TooltipTrigger asChild>
+            <span ref={ref} className={triggerClassName}>
+              {children}
+            </span>
+          </TooltipTrigger>
+          <TooltipContentBase
+            align={align}
+            side={side}
+            sideOffset={sideOffset}
+            className={contentClassName}>
+            <TooltipContent title={title} shortcut={shortcuts} />
+          </TooltipContentBase>
+        </TooltipBase>
       );
     }
   ),

@@ -126,14 +126,7 @@ const EditChartButton = React.memo(({ metricId }: { metricId: string }) => {
 EditChartButton.displayName = 'EditChartButton';
 
 const SaveToCollectionButton = React.memo(({ metricId }: { metricId: string }) => {
-  const { data: collections } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.collections?.map((x) => x.id) }
-  );
-
-  return (
-    <SaveMetricToCollectionButton metricIds={[metricId]} selectedCollections={collections || []} />
-  );
+  return <SaveMetricToCollectionButton metricId={metricId} />;
 });
 SaveToCollectionButton.displayName = 'SaveToCollectionButton';
 

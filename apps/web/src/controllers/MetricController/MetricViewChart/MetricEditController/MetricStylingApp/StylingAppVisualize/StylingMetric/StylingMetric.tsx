@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import type { ColumnMetaData, ChartConfigProps } from '@buster/server-shared/metrics';
 import type { DerivedMetricTitle } from '@buster/server-shared/metrics';
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { EditHeaderTitle } from './EditHeaderTitle';

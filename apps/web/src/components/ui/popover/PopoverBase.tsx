@@ -8,9 +8,11 @@ import { cn } from '@/lib/utils';
 
 export type PopoverTriggerType = 'click' | 'hover';
 
-const Popover = PopoverPrimitive.Root;
+function PopoverBase({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
+}
 
-interface PopoverProps extends React.ComponentPropsWithoutRef<typeof Popover> {
+interface PopoverProps extends React.ComponentPropsWithoutRef<typeof PopoverBase> {
   trigger?: PopoverTriggerType;
   children: React.ReactNode;
   open?: boolean;
@@ -42,13 +44,15 @@ const PopoverRoot: React.FC<PopoverProps> = ({ children, trigger = 'click', ...p
     );
 
   return (
-    <Popover {...props} open={trigger === 'hover' ? isOpen : undefined}>
+    <PopoverBase {...props} open={trigger === 'hover' ? isOpen : undefined}>
       {content}
-    </Popover>
+    </PopoverBase>
   );
 };
 
-const PopoverTrigger = PopoverPrimitive.Trigger;
+function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
+}
 
 const popoverContentVariant = cva('', {
   variants: {
@@ -88,4 +92,8 @@ const PopoverContent = React.forwardRef<
 ));
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { PopoverRoot, PopoverTrigger, PopoverContent };
+function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
+  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
+}
+
+export { PopoverBase, PopoverRoot, PopoverTrigger, PopoverContent, PopoverAnchor };

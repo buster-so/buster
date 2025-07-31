@@ -1,6 +1,6 @@
 'use client';
 
-import { Separator } from '@/components/ui/seperator';
+import { Separator } from '@/components/ui/separator';
 import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
 import { OverviewData } from './OverviewData';
 import { OverviewHeader } from './OverviewHeader';
