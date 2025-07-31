@@ -111,8 +111,7 @@ export function createTestWorkflowInput(options: CreateTestInputOptions) {
  * Common test messages for different scenarios
  */
 export const TEST_MESSAGES = {
-  documentAll:
-    'Please document all the models in this dbt project. The project files are in the dbt_project directory. First, use grepSearch to find all .sql and .yml files. Use path "dbt_project" and pattern "\\.sql$|\\.yml$" with recursive=true.',
+  documentAll: 'Please document all the models in 4_marts/1_common models please',
   documentSpecific: 'Please create a simple documentation file for the fct_mrr model.',
   updateReadme: 'Update the README files to include setup instructions',
   addTests: 'Add schema tests for all staging models',

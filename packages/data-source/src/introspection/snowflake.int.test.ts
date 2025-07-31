@@ -1,31 +1,45 @@
-import { afterEach, describe, expect } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { DataSource } from '../data-source';
 import type { DataSourceConfig } from '../data-source';
-import { TEST_TIMEOUT, skipIfNoCredentials, testConfig } from '../setup';
 import { DataSourceType } from '../types/credentials';
 import type { SnowflakeCredentials } from '../types/credentials';
 import type { ColumnStatistics, Table, TableStatistics } from '../types/introspection';
 
+// Check if Snowflake test credentials are available
+const hasSnowflakeCredentials = !!(
+  process.env.TEST_SNOWFLAKE_ACCOUNT_ID &&
+  process.env.TEST_SNOWFLAKE_WAREHOUSE_ID &&
+  process.env.TEST_SNOWFLAKE_USERNAME &&
+  process.env.TEST_SNOWFLAKE_PASSWORD &&
+  process.env.TEST_SNOWFLAKE_DATABASE
+);
+
+// Skip tests if credentials are not available
+const testWithCredentials = hasSnowflakeCredentials ? it : it.skip;
+
+// Test timeout - 30 seconds
+const TEST_TIMEOUT = 30000;
+
 function createSnowflakeCredentials(): SnowflakeCredentials {
   if (
-    !testConfig.snowflake.account_id ||
-    !testConfig.snowflake.warehouse_id ||
-    !testConfig.snowflake.username ||
-    !testConfig.snowflake.password ||
-    !testConfig.snowflake.default_database
+    !process.env.TEST_SNOWFLAKE_ACCOUNT_ID ||
+    !process.env.TEST_SNOWFLAKE_WAREHOUSE_ID ||
+    !process.env.TEST_SNOWFLAKE_USERNAME ||
+    !process.env.TEST_SNOWFLAKE_PASSWORD ||
+    !process.env.TEST_SNOWFLAKE_DATABASE
   ) {
     throw new Error('Missing required Snowflake credentials');
   }
 
   return {
     type: DataSourceType.Snowflake,
-    account_id: testConfig.snowflake.account_id,
-    warehouse_id: testConfig.snowflake.warehouse_id,
-    username: testConfig.snowflake.username,
-    password: testConfig.snowflake.password,
-    default_database: testConfig.snowflake.default_database,
-    default_schema: testConfig.snowflake.default_schema,
-    role: testConfig.snowflake.role,
+    account_id: process.env.TEST_SNOWFLAKE_ACCOUNT_ID,
+    warehouse_id: process.env.TEST_SNOWFLAKE_WAREHOUSE_ID,
+    username: process.env.TEST_SNOWFLAKE_USERNAME,
+    password: process.env.TEST_SNOWFLAKE_PASSWORD,
+    default_database: process.env.TEST_SNOWFLAKE_DATABASE,
+    default_schema: process.env.TEST_SNOWFLAKE_SCHEMA || 'COMMON',
+    role: process.env.TEST_SNOWFLAKE_ROLE,
   };
 }
 
@@ -101,9 +115,7 @@ async function validateColumnMapping(
   }
 }
 
-const testWithCredentials = skipIfNoCredentials('snowflake');
-
-describe.skip('Snowflake DataSource Introspection', () => {
+describe('Snowflake DataSource Introspection', () => {
   let dataSource: DataSource;
 
   afterEach(async () => {
@@ -304,7 +316,7 @@ describe.skip('Snowflake DataSource Introspection', () => {
     { timeout: 120000 }
   );
 
-  describe.skip('Snowflake Filtering Tests', () => {
+  describe('Snowflake Filtering Tests', () => {
     testWithCredentials(
       'should filter by database only',
       async () => {
@@ -394,53 +406,59 @@ describe.skip('Snowflake DataSource Introspection', () => {
       { timeout: 120000 }
     );
 
-    testWithCredentials(
-      'should filter by both database and schema',
-      async () => {
-        const config: DataSourceConfig = {
-          name: 'test-snowflake',
-          type: DataSourceType.Snowflake,
-          credentials: createSnowflakeCredentials(),
-        };
+    describe('should filter by both database and schema', () => {
+      testWithCredentials(
+        'should filter by both database and schema',
+        async () => {
+          const config: DataSourceConfig = {
+            name: 'test-snowflake',
+            type: DataSourceType.Snowflake,
+            credentials: createSnowflakeCredentials(),
+          };
 
-        dataSource = new DataSource({ dataSources: [config] });
+          dataSource = new DataSource({ dataSources: [config] });
 
-        // Get full introspection with both filters
-        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
-          databases: ['DBT'],
-          schemas: ['REVENUE'],
-        });
+          // Get full introspection with both filters
+          const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+            databases: ['ANALYTICS'],
+            schemas: ['COMMON'],
+          });
 
-        // Verify only DBT database is returned
-        expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
+          // Store introspection data for debugging
+          const introspectionJson = JSON.stringify(filteredIntrospection, null, 2);
+          console.info('Filtered introspection JSON:', introspectionJson);
 
-        // Verify only REVENUE schema in DBT database is returned
-        expect(filteredIntrospection.schemas.length).toBeGreaterThan(0);
-        for (const schema of filteredIntrospection.schemas) {
-          expect(schema.name).toBe('REVENUE');
-          expect(schema.database).toBe('DBT');
-        }
+          // Verify only DBT database is returned
+          expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
 
-        // Verify all tables belong to DBT.REVENUE
-        for (const table of filteredIntrospection.tables) {
-          expect(table.database).toBe('DBT');
-          expect(table.schema).toBe('REVENUE');
-        }
+          // Verify only REVENUE schema in DBT database is returned
+          expect(filteredIntrospection.schemas.length).toBeGreaterThan(0);
+          for (const schema of filteredIntrospection.schemas) {
+            expect(schema.name).toBe('REVENUE');
+            expect(schema.database).toBe('DBT');
+          }
 
-        // Verify all columns belong to DBT.REVENUE tables
-        for (const column of filteredIntrospection.columns) {
-          expect(column.database).toBe('DBT');
-          expect(column.schema).toBe('REVENUE');
-        }
+          // Verify all tables belong to DBT.REVENUE
+          for (const table of filteredIntrospection.tables) {
+            expect(table.database).toBe('DBT');
+            expect(table.schema).toBe('REVENUE');
+          }
 
-        // Verify all views belong to DBT.REVENUE
-        for (const view of filteredIntrospection.views) {
-          expect(view.database).toBe('DBT');
-          expect(view.schema).toBe('REVENUE');
-        }
-      },
-      { timeout: 180000 }
-    );
+          // Verify all columns belong to DBT.REVENUE tables
+          for (const column of filteredIntrospection.columns) {
+            expect(column.database).toBe('DBT');
+            expect(column.schema).toBe('REVENUE');
+          }
+
+          // Verify all views belong to DBT.REVENUE
+          for (const view of filteredIntrospection.views) {
+            expect(view.database).toBe('DBT');
+            expect(view.schema).toBe('REVENUE');
+          }
+        },
+        { timeout: 180000 }
+      );
+    });
 
     testWithCredentials(
       'should handle non-existent database filter',

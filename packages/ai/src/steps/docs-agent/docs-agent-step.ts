@@ -135,7 +135,7 @@ const docsAgentExecution = async ({
       instructions,
       runtimeContext,
       toolChoice: 'required',
-      maxSteps: 50, // Allow more steps for complex documentation tasks
+      maxSteps: 100, // Allow more steps for complex documentation tasks
       abortSignal: abortController.signal, // Add abort signal
     });
 

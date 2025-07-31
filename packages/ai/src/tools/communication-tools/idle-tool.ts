@@ -1,6 +1,8 @@
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { type DocsAgentContext, DocsAgentContextKeys } from '../../context/docs-agent-context';
 
 // Input/Output schemas
 const idleInputSchema = z.object({
@@ -71,15 +73,49 @@ const idleOutputSchema = z.object({
 
 type IdleOutput = z.infer<typeof idleOutputSchema>;
 
-async function processIdle(_input: IdleToolExecuteInput): Promise<IdleOutput> {
+async function processIdle(
+  _input: IdleToolExecuteInput,
+  runtimeContext: RuntimeContext<DocsAgentContext>
+): Promise<IdleOutput> {
+  // Check if sandbox is available
+  const sandbox = runtimeContext.get(DocsAgentContextKeys.Sandbox);
+
+  if (sandbox) {
+    try {
+      // Check for {{TODO}} strings in files
+      const grepCommand = 'grep -rlF "{{TODO}}" . 2>/dev/null || true';
+      const result = await sandbox.process.executeCommand(grepCommand);
+
+      // Check if grep found any files
+      const output = (result.result || '').trim();
+      const filesWithTodos = output ? output.split('\n').filter(Boolean) : [];
+
+      if (filesWithTodos.length > 0) {
+        throw new Error(
+          `Cannot enter idle state: Found {{TODO}} markers in ${filesWithTodos.length} file(s): ${filesWithTodos.slice(0, 5).join(', ')}${filesWithTodos.length > 5 ? '...' : ''}`
+        );
+      }
+    } catch (error) {
+      // If it's our TODO error, re-throw it
+      if (error instanceof Error && error.message.includes('Cannot enter idle state')) {
+        throw error;
+      }
+      // Otherwise, log warning but don't block idle
+      console.warn('Warning: Could not check for TODOs:', error);
+    }
+  }
+
   return {
     success: true,
   };
 }
 
 const executeIdle = wrapTraced(
-  async (input: IdleToolExecuteInput): Promise<z.infer<typeof idleOutputSchema>> => {
-    return await processIdle(input);
+  async (
+    input: IdleToolExecuteInput,
+    runtimeContext: RuntimeContext<DocsAgentContext>
+  ): Promise<z.infer<typeof idleOutputSchema>> => {
+    return await processIdle(input, runtimeContext);
   },
   { name: 'idle-tool' }
 );
@@ -91,8 +127,14 @@ export const idleTool = createTool({
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and enters an idle state. Use this when current work is finished but the agent should remain available for future tasks. This must be in markdown format and not use the '•' bullet character.",
   inputSchema: idleInputSchema,
   outputSchema: idleOutputSchema,
-  execute: async ({ context }) => {
-    return await executeIdle(context as IdleToolExecuteInput);
+  execute: async ({
+    context,
+    runtimeContext,
+  }: {
+    context: z.infer<typeof idleInputSchema>;
+    runtimeContext: RuntimeContext<DocsAgentContext>;
+  }) => {
+    return await executeIdle(context as IdleToolExecuteInput, runtimeContext);
   },
 });
 

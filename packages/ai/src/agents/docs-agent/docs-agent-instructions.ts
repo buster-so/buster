@@ -119,46 +119,46 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 </repository_structure>
 
 <yaml_files>
+- these files are located in the \`buster/docs\` folder of the repository.
 - .yml files are used for structured dbt model documentation
 - Each .yml file corresponds to a specific model (e.g., \`orders.yml\` for the \`orders.sql\` model).
 - The file should follow the following structure: 
     \`\`\`yaml
-    models:
-    - name: model_name  # Required: Unique identifier (typically snake_case)
-        description: "Description of the model"  # Required: Clear explanation of the model's purpose, utility, contents, and key details
-        dimensions:  # Optional: List of non-numeric attributes for grouping, filtering, or segmenting
-        - name: dimension_name  # Required: Matches column name in database
-            description: "Description of the dimension, including what it represents, value patterns, and analytical utility"  # Required
-            type: string  # Recommended: Data type (e.g., string, timestamp, boolean, date, number/integer)
-            searchable: true  # Optional: Whether this dimension can be used in natural language searches
-        measures:  # Optional: List of quantifiable numeric attributes that can be aggregated
-        - name: measure_name  # Required: Matches column name in database
-            description: "Description of the measure, including what it represents, how it's calculated (if derived), and utility"  # Required
-            type: decimal  # Required: Raw data type from database (e.g., decimal/number, integer)
-        metrics:  # Optional: List of derived calculations and business KPIs
-        - name: metric_name  # Required: Descriptive name
-            description: "Description of the metric, its business significance, and interpretation"  # Required
-            expr: "SQL expression for the metric"  # Required: SQL formula (e.g., sum(revenue) / count(order_id))
-            args:  # Optional: Parameters for dynamic metrics
-            - name: arg_name
-                type: integer
-                description: "Description of the argument"
-                default: 30  # Optional
-        filters:  # Optional: Reusable boolean conditions for queries
-        - name: filter_name  # Required
-            description: "Description of the filter and its use"  # Required
-            expr: "Boolean SQL expression"  # Required (e.g., status = 'complete')
-            args:  # Optional
-            - name: arg_name
-                type: number
-                description: "Description of the argument"
-        relationships:  # Optional: Connections to other models
-        - name: related_model_name  # Required: Name of the other model
-            description: "Description of the relationship and its analytical utility"  # Required
-            source_col: local_column  # Required: Join key in this model
-            ref_col: related_column  # Required: Join key in the related model
-            cardinality: many-to-one  # Optional: Relationship type (kebab-case: one-to-one, one-to-many, many-to-one, many-to-many)
-            type: left  # Optional: Join type (kebab-case: left, inner, right, full-outer)
+    name: model_name  # Required: Unique identifier (typically snake_case)
+    description: "Description of the model"  # Required: Clear explanation of the model's purpose, utility, contents, and key details
+    dimensions:  # Optional: List of non-numeric attributes for grouping, filtering, or segmenting
+    - name: dimension_name  # Required: Matches column name in database
+        description: "Description of the dimension, including what it represents, value patterns, and analytical utility"  # Required
+        type: string  # Recommended: Data type (e.g., string, timestamp, boolean, date, number/integer)
+        searchable: true  # Optional: Whether this dimension can be used in natural language searches
+    measures:  # Optional: List of quantifiable numeric attributes that can be aggregated
+    - name: measure_name  # Required: Matches column name in database
+        description: "Description of the measure, including what it represents, how it's calculated (if derived), and utility"  # Required
+        type: decimal  # Required: Raw data type from database (e.g., decimal/number, integer)
+    metrics:  # Optional: List of derived calculations and business KPIs
+    - name: metric_name  # Required: Descriptive name
+        description: "Description of the metric, its business significance, and interpretation"  # Required
+        expr: "SQL expression for the metric"  # Required: SQL formula (e.g., sum(revenue) / count(order_id))
+        args:  # Optional: Parameters for dynamic metrics
+        - name: arg_name
+            type: integer
+            description: "Description of the argument"
+            default: 30  # Optional
+    filters:  # Optional: Reusable boolean conditions for queries
+    - name: filter_name  # Required
+        description: "Description of the filter and its use"  # Required
+        expr: "Boolean SQL expression"  # Required (e.g., status = 'complete')
+        args:  # Optional
+        - name: arg_name
+            type: number
+            description: "Description of the argument"
+    relationships:  # Optional: Connections to other models
+    - name: related_model_name  # Required: Name of the other model
+        description: "Description of the relationship and its analytical utility"  # Required
+        source_col: local_column  # Required: Join key in this model
+        ref_col: related_column  # Required: Join key in the related model
+        cardinality: many-to-one  # Optional: Relationship type (kebab-case: one-to-one, one-to-many, many-to-one, many-to-many)
+        type: left  # Optional: Join type (kebab-case: left, inner, right, full-outer)
     \`\`\`
 - Ensure YAML is properly formatted and valid
 - Use tools like \`readFiles\` to validate before committing
@@ -179,6 +179,7 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 </markdown_files>
 
 <metadata_files>
+- These are located in the \`buster/metadata\` folder of the repository
 - .json files that store semi-structured metadata for models.
 - Each model should have an associated \`model_name.json\` file containing metadata related to the model
 - Metadata files are pre-populated and read-only

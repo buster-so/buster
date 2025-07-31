@@ -48,11 +48,21 @@ const rgSearchExecution = wrapTraced(
         // Execute all commands concurrently
         const resultPromises = commands.map(async (command) => {
           try {
+            console.info(`[grep-search-tool] Executing command: ${command}`);
+
             // Use executeCommand like bash-tool does
             const result = await sandbox.process.executeCommand(command);
 
+            console.info(`[grep-search-tool] Command result:`, {
+              command,
+              exitCode: result.exitCode,
+              hasResult: !!result.result,
+              resultLength: result.result?.length || 0,
+              resultPreview: result.result ? `${result.result.substring(0, 100)}...` : 'empty',
+            });
+
             // The sandbox returns the full output in result.result
-            const output = (result.result || '').trim();
+            const output = result.result || '';
 
             // For ripgrep, exit code 1 means no matches found, which is not an error
             const isRgNoMatchesFound = result.exitCode === 1 && command.includes('rg ');
@@ -68,14 +78,17 @@ const rgSearchExecution = wrapTraced(
             return {
               success: false,
               command: command,
-              stdout: '',
-              stderr: output,
+              stdout: output || '',
+              stderr: '',
               error: `Command failed with exit code ${result.exitCode}`,
             };
           } catch (error) {
+            console.error(`[grep-search-tool] Execution error for command: ${command}`, error);
             return {
               success: false,
               command: command,
+              stdout: '',
+              stderr: '',
               error: `Execution error: ${error instanceof Error ? error.message : 'Unknown error'}`,
             };
           }

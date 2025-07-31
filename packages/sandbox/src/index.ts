@@ -1,6 +1,10 @@
 export { runTypescript } from './execute/run-typescript';
-export { createSandbox } from './management/create-sandbox';
+export { createSandbox, createSandboxWithGit } from './management/create-sandbox';
 export type { RunTypeScriptOptions, CodeRunResponse } from './execute/run-typescript';
+export type {
+  CreateSandboxOptions,
+  CreateSandboxWithGitOptions,
+} from './management/create-sandbox';
 export type { Sandbox } from '@daytonaio/sdk';
 
 // Filesystem operations

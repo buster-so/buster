@@ -1,4 +1,5 @@
 import type { Sandbox } from '@buster/sandbox';
+import { createSandboxWithGit } from '@buster/sandbox';
 import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import type { Logger as BraintrustLogger } from 'braintrust';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -160,4 +161,63 @@ describe('docs-agent-workflow', () => {
       }
     });
   }, 300000);
+
+  describe('real repository tests', () => {
+    it('should successfully document the sample repository', async () => {
+      // Create sandbox and clone the real dbt repository
+      const sandbox = await createSandboxWithGit({
+        gitUrl: process.env.SAMPLE_REPO || '',
+        githubToken: process.env.GITHUB_PAT,
+        language: 'typescript',
+      });
+
+      // Store reference for cleanup
+      testSandbox = {
+        sandbox,
+        sandboxId: sandbox.id, // Add required sandboxId property
+        projectPath: '~/', // Default path where git clone puts the repo
+        cleanup: async () => {
+          await sandbox.delete();
+        },
+      };
+
+      const context = createTestContext({
+        sandbox: testSandbox.sandbox,
+      });
+
+      const input = createTestWorkflowInput({
+        message: TEST_MESSAGES.documentAll,
+        context,
+      });
+
+      const result = await runWorkflowWithTracing(input, {
+        testType: 'real-repository',
+        projectType: 'dbt',
+        repositoryUrl: process.env.SAMPLE_REPO || '',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.status).toBe('success');
+
+      if (result.status === 'success') {
+        // Check that the workflow completes successfully
+        expect(result.result).toBeDefined();
+        expect(result.result.todos).toBeDefined();
+        expect(result.result.todoList).toBeDefined();
+
+        // Log detailed results for debugging
+        console.log('Real repository workflow completed with:', {
+          documentationCreated: result.result.documentationCreated,
+          filesCreated: result.result.metadata?.filesCreated,
+          toolsUsed: result.result.metadata?.toolsUsed,
+          finished: result.result.finished,
+          clarificationNeeded: result.result.clarificationNeeded,
+        });
+
+        // Verify the agent actually attempted to create documentation
+        // The real test will show what files were created/modified
+        expect(result.result.finished).toBeDefined();
+      }
+    }, 800000); // Extended timeout for real repository operations
+  });
 });
