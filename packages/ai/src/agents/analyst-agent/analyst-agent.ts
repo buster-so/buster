@@ -6,8 +6,10 @@ import {
   createReports,
   doneTool,
   editReports,
+  executeSql,
   modifyDashboards,
   modifyMetrics,
+  sequentialThinking,
 } from '../../tools';
 import { Sonnet4 } from '../../utils/models/sonnet-4';
 
@@ -29,6 +31,8 @@ export const analystAgent = new Agent({
   tools: {
     createMetrics,
     modifyMetrics,
+    sequentialThinking,
+    executeSql,
     createDashboards,
     modifyDashboards,
     createReports,
