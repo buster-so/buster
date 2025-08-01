@@ -1,9 +1,6 @@
 import { runTypescript } from '@buster/sandbox';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import {
-  type DocsAgentContext,
-  DocsAgentContextKeys,
-} from '../../../../context/docs-agent-context';
+import { type DocsAgentContext, DocsAgentContextKeys } from '../../../context/docs-agent-context';
 
 export interface GitCommitResult {
   attempted: boolean;

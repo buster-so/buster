@@ -57,8 +57,13 @@ function initializeHaiku35() {
 export const Haiku35 = new Proxy({} as ReturnType<typeof createFallback>, {
   get(_target, prop) {
     const instance = initializeHaiku35();
-    // Direct property access without receiver to avoid proxy conflicts
-    return instance[prop as keyof typeof instance];
+    // Use Reflect.get to properly handle getters and preserve 'this' context
+    const value = Reflect.get(instance, prop, instance);
+    // If it's a function, bind it to the instance to preserve 'this'
+    if (typeof value === 'function') {
+      return value.bind(instance);
+    }
+    return value;
   },
   has(_target, prop) {
     const instance = initializeHaiku35();

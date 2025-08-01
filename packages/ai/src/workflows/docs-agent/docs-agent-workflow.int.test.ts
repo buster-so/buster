@@ -287,7 +287,7 @@ describe('docs-agent-workflow', () => {
         results.push({
           filePath,
           success: result.status === 'success',
-          error: result.status === 'error' ? JSON.stringify(result) : undefined,
+          error: result.status === 'failed' ? JSON.stringify(result) : '',
         });
 
         console.log(`Completed workflow for ${filePath}: ${result.status}`);

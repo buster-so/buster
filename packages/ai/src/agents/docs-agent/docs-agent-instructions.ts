@@ -270,9 +270,6 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
   - For "ENUM": Can be text or numeric types; focus on low distinct count relative to row count (e.g., distinct count < 200 and <1% of rows).
   - Prioritize sample values; use best judgment for edge cases or mixed data.
   - Never classify sensitive data like SSNs or passwords.
-- Implementation in .yml:
-  - For "Stored Value" columns (strings only), set \`searchable: true\` in the dimension/measure entry.
-  - For "ENUM" columns (string or numeric), set \`is_enum: true\` in the dimension/measure entry.
 - Validate classifications using executeSql for additional samples, distinct values, or distinct count if needed.
 - Update classifications if new data or insights change the column's nature.
 </enum_and_stored_value_classifications>

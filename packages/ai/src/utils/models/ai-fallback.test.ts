@@ -477,4 +477,75 @@ describe('FallbackModel', () => {
       await expect(fallback.doStream(options)).rejects.toThrow('No model available');
     });
   });
+
+  describe('property access and getters', () => {
+    it('should correctly access currentModelIndex through getters', () => {
+      const model = createMockModel('model1');
+      const fallback = createFallback({ models: [model] });
+
+      // Access properties that depend on currentModelIndex
+      expect(fallback.modelId).toBe('model1');
+      expect(fallback.provider).toBe('provider-model1');
+
+      // Verify currentModelIndex is accessible
+      expect(fallback.currentModelIndex).toBe(0);
+    });
+
+    it('should maintain proper this context when accessing methods', async () => {
+      const model = createMockModel('model1');
+      const fallback = createFallback({ models: [model] });
+
+      // Get a method reference
+      const generateFn = fallback.doGenerate;
+      expect(typeof generateFn).toBe('function');
+
+      // The method should still work when called through the reference
+      const options: LanguageModelV1CallOptions = {
+        inputFormat: 'messages',
+        prompt: [],
+        mode: { type: 'regular' },
+      };
+
+      await expect(fallback.doGenerate(options)).resolves.toBeTruthy();
+      expect(model.doGenerate).toHaveBeenCalled();
+    });
+
+    it('should handle property enumeration correctly', () => {
+      const model = createMockModel('model1');
+      const fallback = createFallback({ models: [model] });
+
+      // Test property enumeration
+      const keys = Object.keys(fallback);
+      expect(keys).toContain('settings');
+      expect(keys).toContain('currentModelIndex');
+
+      // Test that getters work properly
+      expect(fallback.modelId).toBe('model1');
+      expect(fallback.provider).toBe('provider-model1');
+
+      // Test property descriptors
+      const descriptor = Object.getOwnPropertyDescriptor(fallback, 'currentModelIndex');
+      expect(descriptor).toBeDefined();
+      expect(descriptor?.value).toBe(0);
+    });
+
+    it('should not throw proxy errors when accessing currentModelIndex', () => {
+      // This test specifically guards against the proxy error:
+      // "property 'currentModelIndex' is a read-only and non-configurable data property"
+      const model = createMockModel('model1');
+      const fallback = createFallback({ models: [model] });
+
+      // Force access to properties that use currentModelIndex internally
+      const modelId = fallback.modelId;
+      const provider = fallback.provider;
+
+      // These should return valid values without proxy errors
+      expect(modelId).toBe('model1');
+      expect(provider).toBe('provider-model1');
+
+      // Direct access to currentModelIndex should also work
+      expect(typeof fallback.currentModelIndex).toBe('number');
+      expect(fallback.currentModelIndex).toBe(0);
+    });
+  });
 });

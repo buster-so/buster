@@ -19,14 +19,16 @@ export const thinkAndPrepWorkflowInputSchema = z.object({
 });
 
 // Runtime context schema for type safety
-export const AnalystRuntimeContextSchema = z.object({
-  userId: z.string(),
-  chatId: z.string(),
-  dataSourceId: z.string(),
-  dataSourceSyntax: z.string(),
-  organizationId: z.string(),
-  messageId: z.string().optional(), // Optional for testing scenarios
-  workflowStartTime: z.number().optional(), // Track workflow start time in milliseconds - optional for backward compatibility
-});
+export const AnalystRuntimeContextSchema = z
+  .object({
+    userId: z.string(),
+    chatId: z.string(),
+    dataSourceId: z.string(),
+    dataSourceSyntax: z.string(),
+    organizationId: z.string(),
+    messageId: z.string().optional(), // Optional for testing scenarios
+    workflowStartTime: z.number().optional(), // Track workflow start time in milliseconds - optional for backward compatibility
+  })
+  .catchall(z.string()); // Allows additional string-to-string key-value pairs
 
 export type AnalystRuntimeContext = z.infer<typeof AnalystRuntimeContextSchema>;

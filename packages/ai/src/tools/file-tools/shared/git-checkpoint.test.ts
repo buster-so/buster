@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
-import { createGitCheckpoint, hasSuccessfulOperations } from './git-checkpoint';
 import { RuntimeContext } from '@mastra/core/runtime-context';
-import { DocsAgentContextKeys } from '../../../../context/docs-agent-context';
+import { describe, expect, it, vi } from 'vitest';
+import { DocsAgentContextKeys } from '../../../context/docs-agent-context';
+import { createGitCheckpoint, hasSuccessfulOperations } from './git-checkpoint';
 
 // Mock runTypescript
 vi.mock('@buster/sandbox', () => ({
@@ -13,19 +13,12 @@ import { runTypescript } from '@buster/sandbox';
 describe('git-checkpoint', () => {
   describe('hasSuccessfulOperations', () => {
     it('should return true if any operation has success status', () => {
-      const results = [
-        { status: 'error' },
-        { status: 'success' },
-        { status: 'error' },
-      ];
+      const results = [{ status: 'error' }, { status: 'success' }, { status: 'error' }];
       expect(hasSuccessfulOperations(results)).toBe(true);
     });
 
     it('should return false if no operation has success status', () => {
-      const results = [
-        { status: 'error' },
-        { status: 'error' },
-      ];
+      const results = [{ status: 'error' }, { status: 'error' }];
       expect(hasSuccessfulOperations(results)).toBe(false);
     });
 
@@ -39,9 +32,9 @@ describe('git-checkpoint', () => {
 
     it('should return error when sandbox is not available', async () => {
       const runtimeContext = new RuntimeContext();
-      
+
       const result = await createGitCheckpoint('test commit', runtimeContext);
-      
+
       expect(result).toEqual({
         attempted: false,
         success: false,
@@ -61,7 +54,7 @@ describe('git-checkpoint', () => {
       });
 
       const result = await createGitCheckpoint('test commit', runtimeContext);
-      
+
       expect(result).toEqual({
         attempted: false,
         success: false,
@@ -81,7 +74,7 @@ describe('git-checkpoint', () => {
       });
 
       const result = await createGitCheckpoint('test commit', runtimeContext);
-      
+
       expect(result).toEqual({
         attempted: false,
         success: false,
@@ -109,7 +102,7 @@ describe('git-checkpoint', () => {
       });
 
       const result = await createGitCheckpoint('test commit', runtimeContext);
-      
+
       expect(result).toEqual({
         attempted: true,
         success: true,
@@ -118,8 +111,8 @@ describe('git-checkpoint', () => {
 
       // Verify the commit message includes the description
       const commitCall = mockRunTypescript.mock.calls[1];
-      expect(commitCall[1]).toContain('checkpoint: test commit');
-      expect(commitCall[1]).toContain('🤖 Automated file operation checkpoint');
+      expect(commitCall?.[1]).toContain('checkpoint: test commit');
+      expect(commitCall?.[1]).toContain('🤖 Automated file operation checkpoint');
     });
 
     it('should handle commit failures gracefully', async () => {
@@ -142,7 +135,7 @@ describe('git-checkpoint', () => {
       });
 
       const result = await createGitCheckpoint('test commit', runtimeContext);
-      
+
       expect(result).toEqual({
         attempted: true,
         success: false,
