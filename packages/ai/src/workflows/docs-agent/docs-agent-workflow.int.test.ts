@@ -251,7 +251,7 @@ describe('docs-agent-workflow', () => {
         expect(result.status).toBe('success');
       } else {
         // Run workflows concurrently with limit of 10
-        await processFilesWithConcurrencyLimit(todoFiles, sandbox, 10);
+        await processFilesWithConcurrencyLimit(todoFiles, sandbox, 5);
       }
     }, 800000); // Extended timeout for real repository operations
   });

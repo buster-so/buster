@@ -98,6 +98,52 @@ try {
     }
 
     const commitData = JSON.parse(commitResult.result.trim());
+
+    // Push to origin
+    const pushCode = `
+const { execSync } = require('child_process');
+
+try {
+  // Get the current branch name
+  const currentBranch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' }).trim();
+  
+  // Check if the remote branch exists
+  let remoteBranchExists = false;
+  try {
+    execSync(\`git ls-remote --heads origin \${currentBranch}\`, { encoding: 'utf8' });
+    remoteBranchExists = true;
+  } catch (error) {
+    // Remote branch doesn't exist, we'll need to set upstream
+  }
+  
+  // Push to origin
+  if (remoteBranchExists) {
+    // Regular push if remote branch exists
+    execSync('git push origin', { encoding: 'utf8' });
+  } else {
+    // Push and set upstream if remote branch doesn't exist
+    execSync(\`git push -u origin \${currentBranch}\`, { encoding: 'utf8' });
+  }
+  
+  console.log(JSON.stringify({ success: true, pushed: true, branch: currentBranch }));
+} catch (error) {
+  console.log(JSON.stringify({ success: false, error: error.message }));
+  process.exit(1);
+}
+`;
+
+    const pushResult = await runTypescript(sandbox, pushCode);
+
+    if (pushResult.exitCode !== 0) {
+      const pushError = JSON.parse(pushResult.result.trim());
+      return {
+        attempted: true,
+        success: true, // Commit was successful even if push failed
+        commitHash: commitData.commitHash,
+        errorMessage: `Commit successful but push failed: ${pushError.error || 'Unknown error'}`,
+      };
+    }
+
     return {
       attempted: true,
       success: true,

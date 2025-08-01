@@ -52,28 +52,37 @@ describe.sequential('grep-search-tool integration test', () => {
       const runtimeContext = new RuntimeContext();
       runtimeContext.set(DocsAgentContextKeys.Sandbox, sharedSandbox);
 
-      const result = await grepSearch.execute({
+      // Test searching in a specific file with full path
+      const result1 = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -n "test" test1.txt`, `cd ${testDir} && rg -n "Hello" .`],
+          pattern: 'test',
+          path: `${testDir}/test1.txt`,
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(2);
+      expect(result1.title).toBe('test');
+      expect(result1.metadata.matches).toBe(1);
+      expect(result1.output).toContain(`${testDir}/test1.txt:`);
+      expect(result1.output).toContain('Line 2: This is a test file');
 
-      // Check first command results
-      const firstResult = result.results[0];
-      expect(firstResult?.success).toBe(true);
-      expect(firstResult?.command).toBe(`cd ${testDir} && rg -n "test" test1.txt`);
-      expect(firstResult?.stdout).toContain('2:This is a test file');
+      // Test searching all files in the test directory
+      const result2 = await grepSearch.execute({
+        context: {
+          pattern: 'Hello',
+          path: testDir,
+        },
+        runtimeContext,
+      });
 
-      // Check second command results (searches all files)
-      const secondResult = result.results[1];
-      expect(secondResult?.success).toBe(true);
-      expect(secondResult?.command).toBe(`cd ${testDir} && rg -n "Hello" .`);
-      expect(secondResult?.stdout).toContain('test1.txt:1:Hello world');
-      expect(secondResult?.stdout).toContain('test2.txt:2:Hello again');
-      expect(secondResult?.stdout).toContain('test3.txt:2:Hello from subdirectory');
+      expect(result2.title).toBe('Hello');
+      expect(result2.metadata.matches).toBe(3);
+      expect(result2.output).toContain(`${testDir}/test1.txt:`);
+      expect(result2.output).toContain('Line 1: Hello world');
+      expect(result2.output).toContain(`${testDir}/test2.txt:`);
+      expect(result2.output).toContain('Line 2: Hello again');
+      expect(result2.output).toContain(`${testDir}/subdir/test3.txt:`);
+      expect(result2.output).toContain('Line 2: Hello from subdirectory');
     },
     65000
   );
@@ -102,17 +111,19 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -i -n "hello" case-test.txt`],
+          pattern: 'hello',
+          path: `${testDir}/case-test.txt`,
+          flags: { caseInsensitive: true },
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
-      expect(search?.stdout).toContain('1:HELLO World');
-      expect(search?.stdout).toContain('2:hello world');
-      expect(search?.stdout).toContain('3:HeLLo WoRLd');
+      expect(result.title).toBe('hello');
+      expect(result.metadata.matches).toBe(3);
+      expect(result.output).toContain(`${testDir}/case-test.txt:`);
+      expect(result.output).toContain('Line 1: HELLO World');
+      expect(result.output).toContain('Line 2: hello world');
+      expect(result.output).toContain('Line 3: HeLLo WoRLd');
     },
     65000
   );
@@ -141,17 +152,19 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -w -n "test" word-test.txt`],
+          pattern: 'test',
+          path: `${testDir}/word-test.txt`,
+          flags: { wholeWord: true },
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
-      expect(search?.stdout).toContain('1:test testing');
-      expect(search?.stdout).toContain('3:test');
-      expect(search?.stdout).not.toContain('tester'); // Should not match partial words
+      expect(result.title).toBe('test');
+      expect(result.metadata.matches).toBe(2);
+      expect(result.output).toContain(`${testDir}/word-test.txt:`);
+      expect(result.output).toContain('Line 1: test testing');
+      expect(result.output).toContain('Line 3: test');
+      expect(result.output).not.toContain('tester'); // Should not match partial words
     },
     65000
   );
@@ -180,15 +193,17 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -F -n "$10.99" regex-test.txt`],
+          pattern: '$10.99',
+          path: `${testDir}/regex-test.txt`,
+          flags: { fixedString: true },
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
-      expect(search?.stdout).toContain('1:Price: $10.99');
+      expect(result.title).toBe('$10.99');
+      expect(result.metadata.matches).toBe(1);
+      expect(result.output).toContain(`${testDir}/regex-test.txt:`);
+      expect(result.output).toContain('Line 1: Price: $10.99');
     },
     65000
   );
@@ -217,16 +232,18 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -v -n "test" invert-test.txt`],
+          pattern: 'test',
+          path: `${testDir}/invert-test.txt`,
+          flags: { invertMatch: true },
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
-      expect(search?.stdout).toContain('2:line without');
-      expect(search?.stdout).toContain('4:no match here');
+      expect(result.title).toBe('test');
+      expect(result.metadata.matches).toBe(2);
+      expect(result.output).toContain(`${testDir}/invert-test.txt:`);
+      expect(result.output).toContain('Line 2: line without');
+      expect(result.output).toContain('Line 4: no match here');
     },
     65000
   );
@@ -255,16 +272,17 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -m 3 -n "test" many-matches.txt`],
+          pattern: 'test',
+          path: `${testDir}/many-matches.txt`,
+          flags: { maxCount: 3 },
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
-      const lines = search?.stdout?.trim().split('\n') || [];
-      expect(lines).toHaveLength(3); // Should only return 3 matches
+      expect(result.title).toBe('test');
+      expect(result.metadata.matches).toBe(3); // Should only return 3 matches
+      const lines = result.output.split('\n').filter((line) => line.includes('Line '));
+      expect(lines).toHaveLength(3);
     },
     65000
   );
@@ -293,21 +311,21 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg -n "nonexistent" no-match.txt`],
+          pattern: 'nonexistent',
+          path: `${testDir}/no-match.txt`,
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true); // Exit code 1 is treated as success for rg
-      expect(search?.stdout).toBe('');
+      expect(result.title).toBe('nonexistent');
+      expect(result.metadata.matches).toBe(0);
+      expect(result.output).toBe('No matches found');
     },
     65000
   );
 
   (hasApiKey ? it : it.skip)(
-    'should handle multiple commands',
+    'should handle glob patterns',
     async () => {
       const testDir = getTestDir();
 
@@ -321,6 +339,7 @@ describe.sequential('grep-search-tool integration test', () => {
         
         fs.writeFileSync('file1.txt', 'First file with test');
         fs.writeFileSync('file2.txt', 'Second file with test');
+        fs.writeFileSync('file.js', 'JavaScript file with test');
         console.log('Files created in ' + process.cwd());
       `;
 
@@ -329,21 +348,21 @@ describe.sequential('grep-search-tool integration test', () => {
       const runtimeContext = new RuntimeContext();
       runtimeContext.set(DocsAgentContextKeys.Sandbox, sharedSandbox);
 
+      // Test with glob pattern
       const result = await grepSearch.execute({
         context: {
-          commands: [
-            `cd ${testDir} && rg -n "test" file1.txt`,
-            `cd ${testDir} && rg -n "test" file2.txt`,
-            `cd ${testDir} && rg -n "nonexistent" file1.txt`,
-          ],
+          pattern: 'test',
+          path: testDir,
+          include: '*.txt',
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(3);
-      expect(result.results[0]?.stdout).toContain('First file with test');
-      expect(result.results[1]?.stdout).toContain('Second file with test');
-      expect(result.results[2]?.stdout).toBe(''); // No match
+      expect(result.title).toBe('test');
+      expect(result.metadata.matches).toBe(2);
+      expect(result.output).toContain(`${testDir}/file1.txt`);
+      expect(result.output).toContain(`${testDir}/file2.txt`);
+      expect(result.output).not.toContain('file.js'); // Should not match .js file
     },
     65000
   );
@@ -356,16 +375,16 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: ['rg "test" /nonexistent/path/file.txt'],
+          pattern: 'test',
+          path: '/nonexistent/path/file.txt',
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(false);
-      expect(search?.error).toBeDefined();
-      expect(search?.stderr).toBeDefined();
+      // Should handle file not found gracefully
+      expect(result.title).toBe('test');
+      expect(result.metadata.matches).toBe(0);
+      expect(result.output).toBe('No matches found');
     },
     65000
   );
@@ -397,17 +416,20 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg --type ts --color never -n "TODO" src/`],
+          pattern: 'TODO',
+          path: `${testDir}/src/`,
+          include: '*.ts',
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
-      expect(search?.stdout).toContain('src/main.ts:1:TODO: implement feature');
-      expect(search?.stdout).toContain('src/utils.ts:1:TODO: fix bug');
-      expect(search?.stdout).not.toContain('readme.md'); // Should not match .md files
+      expect(result.title).toBe('TODO');
+      expect(result.metadata.matches).toBe(2);
+      expect(result.output).toContain(`${testDir}/src/main.ts:`);
+      expect(result.output).toContain('Line 1: TODO: implement feature');
+      expect(result.output).toContain(`${testDir}/src/utils.ts:`);
+      expect(result.output).toContain('Line 1: TODO: fix bug');
+      expect(result.output).not.toContain('readme.md'); // Should not match .md files
     },
     65000
   );
@@ -436,17 +458,20 @@ describe.sequential('grep-search-tool integration test', () => {
 
       const result = await grepSearch.execute({
         context: {
-          commands: [`cd ${testDir} && rg --json "test" json-test.txt`],
+          pattern: 'test',
+          path: `${testDir}/json-test.txt`,
+          flags: { json: true },
         },
         runtimeContext,
       });
 
-      expect(result.results).toHaveLength(1);
-      const search = result.results[0];
-      expect(search?.success).toBe(true);
+      expect(result.title).toBe('test');
+      // JSON output is returned as-is
+      expect(result.output).toContain('{');
+      expect(result.output).toContain('}');
 
       // Parse JSON output
-      const jsonLines = search?.stdout?.trim().split('\n') || [];
+      const jsonLines = result.output.trim().split('\n');
       expect(jsonLines.length).toBeGreaterThan(0);
 
       const firstLine = JSON.parse(jsonLines[0] || '{}');
