@@ -10,7 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
 class BigQueryCancellableQuery implements CancellableQuery<AdapterQueryResult> {
   private cancelled = false;
   private controller = new BaseCancellationController();
-  private job?: any;
+  private job?: unknown;
 
   constructor(
     private client: BigQuery,
@@ -66,7 +66,7 @@ class BigQueryCancellableQuery implements CancellableQuery<AdapterQueryResult> {
     this.controller.onCancellation(async () => {
       if (this.job) {
         try {
-          await this.job.cancel();
+          await (this.job as any).cancel();
         } catch (error) {
           console.warn('BigQuery job cancellation warning:', error);
         }
