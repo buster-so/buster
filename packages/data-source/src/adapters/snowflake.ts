@@ -1,6 +1,11 @@
 import snowflake from 'snowflake-sdk';
+import { BaseCancellationController, type CancellableQuery } from '../cancellation/index.js';
 import { TIMEOUT_CONFIG } from '../config/timeouts';
-import { QueryTimeoutError, classifyError } from '../errors/data-source-errors';
+import {
+  QueryCancellationError,
+  QueryTimeoutError,
+  classifyError,
+} from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SnowflakeIntrospector } from '../introspection/snowflake';
 import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';
@@ -20,6 +25,141 @@ interface SnowflakeStatement {
   }>;
   streamRows?: (options?: { start?: number; end?: number }) => NodeJS.ReadableStream;
   cancel?: (callback: (err: Error | undefined) => void) => void;
+}
+
+class SnowflakeCancellableQuery implements CancellableQuery<AdapterQueryResult> {
+  private statement?: SnowflakeStatement;
+  private cancelled = false;
+  private controller = new BaseCancellationController();
+
+  constructor(
+    private connection: snowflake.Connection,
+    private sql: string,
+    private params?: QueryParameter[],
+    private maxRows?: number
+  ) {}
+
+  async execute(): Promise<AdapterQueryResult> {
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    const limit = this.maxRows && this.maxRows > 0 ? this.maxRows : 5000;
+
+    return new Promise<AdapterQueryResult>((resolve, reject) => {
+      if (!this.connection) {
+        reject(new Error('Failed to acquire Snowflake connection'));
+        return;
+      }
+
+      this.connection.execute({
+        sqlText: this.sql,
+        binds: this.params as snowflake.Binds,
+        streamResult: true,
+        complete: (err: SnowflakeError | undefined, stmt: SnowflakeStatement) => {
+          if (err) {
+            reject(new Error(`Snowflake query failed: ${err.message}`));
+            return;
+          }
+
+          this.statement = stmt;
+
+          this.controller.onCancellation(async () => {
+            if (this.statement?.cancel) {
+              return new Promise<void>((resolve) => {
+                this.statement?.cancel?.((err) => {
+                  if (err) {
+                    console.warn('Snowflake statement cancellation warning:', err);
+                  }
+                  resolve();
+                });
+              });
+            }
+          });
+
+          if (this.cancelled) {
+            this.cancel().catch(() => {});
+            reject(new QueryCancellationError(this.sql));
+            return;
+          }
+
+          const rows: Record<string, unknown>[] = [];
+          let hasMoreRows = false;
+
+          const stream = stmt.streamRows?.({ start: 0, end: limit });
+          if (!stream) {
+            reject(new Error('Snowflake streaming not supported'));
+            return;
+          }
+
+          let rowCount = 0;
+
+          stream
+            .on('data', (row: Record<string, unknown>) => {
+              if (this.cancelled) {
+                if ('destroy' in stream && typeof stream.destroy === 'function') {
+                  stream.destroy();
+                }
+                reject(new QueryCancellationError(this.sql));
+                return;
+              }
+
+              if (rowCount < limit) {
+                const transformedRow: Record<string, unknown> = {};
+                for (const [key, value] of Object.entries(row)) {
+                  transformedRow[key.toLowerCase()] = value;
+                }
+                rows.push(transformedRow);
+              }
+              rowCount++;
+            })
+            .on('error', (streamErr: Error) => {
+              reject(new Error(`Snowflake stream error: ${streamErr.message}`));
+            })
+            .on('end', () => {
+              if (this.cancelled) {
+                reject(new QueryCancellationError(this.sql));
+                return;
+              }
+
+              hasMoreRows = rowCount > limit;
+
+              const fields: FieldMetadata[] =
+                stmt?.getColumns?.()?.map((col) => ({
+                  name: col.getName().toLowerCase(),
+                  type: col.getType(),
+                  nullable: col.isNullable(),
+                  scale: col.getScale() > 0 ? col.getScale() : 0,
+                  precision: col.getPrecision() > 0 ? col.getPrecision() : 0,
+                })) || [];
+
+              resolve({
+                rows,
+                rowCount: rows.length,
+                fields,
+                hasMoreRows,
+              });
+            });
+        },
+      });
+    });
+  }
+
+  async cancel(): Promise<void> {
+    this.cancelled = true;
+    await this.controller.cancel();
+  }
+
+  async onTimeout(timeoutMs: number): Promise<AdapterQueryResult> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(async () => {
+        await this.cancel();
+        reject(new QueryCancellationError(this.sql));
+      }, timeoutMs);
+    });
+
+    return Promise.race([this.execute(), timeoutPromise]);
+  }
 }
 
 // Configure Snowflake SDK to disable logging
@@ -346,6 +486,25 @@ export class SnowflakeAdapter extends BaseAdapter {
       lastActivity: this.lastActivity,
       isWarmConnection: this.connection === warmConnection,
     };
+  }
+
+  createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult> {
+    this.ensureConnected();
+    if (!this.connection) {
+      throw new Error('Snowflake connection not initialized');
+    }
+    return new SnowflakeCancellableQuery(this.connection, sql, params);
+  }
+
+  async cancelQuery(_queryId: string): Promise<void> {
+    console.warn('Snowflake cancelQuery by ID not implemented - use CancellableQuery instead');
+  }
+
+  isQueryCancellable(): boolean {
+    return true;
   }
 
   /**

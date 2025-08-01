@@ -1,3 +1,4 @@
+import type { CancellableQuery } from '../cancellation/index.js';
 import type { DataSourceIntrospector } from '../introspection/base';
 import type { Credentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
@@ -78,6 +79,24 @@ export interface DatabaseAdapter {
    * Get an introspector instance for this adapter
    */
   introspect(): DataSourceIntrospector;
+
+  /**
+   * Create a cancellable query instance
+   */
+  createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult>;
+
+  /**
+   * Cancel a query by ID (if supported)
+   */
+  cancelQuery(queryId: string): Promise<void>;
+
+  /**
+   * Check if this adapter supports query cancellation
+   */
+  isQueryCancellable(): boolean;
 }
 
 /**
@@ -98,6 +117,12 @@ export abstract class BaseAdapter implements DatabaseAdapter {
   abstract close(): Promise<void>;
   abstract getDataSourceType(): string;
   abstract introspect(): DataSourceIntrospector;
+  abstract createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult>;
+  abstract cancelQuery(queryId: string): Promise<void>;
+  abstract isQueryCancellable(): boolean;
 
   /**
    * Check if the adapter is connected
