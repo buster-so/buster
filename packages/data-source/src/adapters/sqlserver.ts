@@ -1,4 +1,6 @@
 import sql from 'mssql';
+import { BaseCancellationController, type CancellableQuery } from '../cancellation/index.js';
+import { QueryCancellationError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SQLServerIntrospector } from '../introspection/sqlserver';
 import { type Credentials, DataSourceType, type SQLServerCredentials } from '../types/credentials';
@@ -10,6 +12,175 @@ interface ColumnMetadata {
   type?: (() => { name?: string }) | { name?: string };
   length?: number;
   nullable?: boolean;
+}
+
+class SQLServerCancellableQuery implements CancellableQuery<AdapterQueryResult> {
+  private cancelled = false;
+  private controller = new BaseCancellationController();
+  private request?: sql.Request;
+
+  constructor(
+    private pool: sql.ConnectionPool,
+    private sql: string,
+    private params?: QueryParameter[],
+    private maxRows?: number,
+    private timeout?: number
+  ) {}
+
+  async execute(): Promise<AdapterQueryResult> {
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    this.request = this.pool.request();
+
+    this.controller.onCancellation(async () => {
+      if (this.request) {
+        try {
+          this.request.cancel();
+        } catch (error) {
+          console.warn('SQL Server request cancellation warning:', error);
+        }
+      }
+    });
+
+    const executeWithTimeout = async <T>(
+      queryPromise: Promise<T>,
+      timeoutMs: number
+    ): Promise<T> => {
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`SQL Server query execution timeout after ${timeoutMs}ms`));
+        }, timeoutMs);
+      });
+
+      return Promise.race([queryPromise, timeoutPromise]);
+    };
+
+    const timeoutMs = this.timeout || 60000;
+    let processedQuery = this.sql;
+
+    if (this.params && this.params.length > 0) {
+      this.params.forEach((param, index) => {
+        this.request?.input(`param${index}`, param);
+      });
+
+      let paramIndex = 0;
+      processedQuery = processedQuery.replace(/\?/g, () => `@param${paramIndex++}`);
+    }
+
+    if (!this.maxRows || this.maxRows <= 0) {
+      const result = await executeWithTimeout(this.request.query(processedQuery), timeoutMs);
+
+      if (this.cancelled) {
+        throw new QueryCancellationError(this.sql);
+      }
+
+      const fields: FieldMetadata[] = result.recordset?.columns
+        ? Object.keys(result.recordset.columns).map((name) => {
+            const column = result.recordset?.columns?.[name];
+            const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
+            const typedColumnType = columnType as { name?: string } | undefined;
+
+            return {
+              name,
+              type: typedColumnType?.name || 'unknown',
+              length: column?.length ?? 0,
+              nullable: column?.nullable ?? true,
+            };
+          })
+        : [];
+
+      return {
+        rows: result.recordset || [],
+        rowCount: result.recordset?.length || 0,
+        fields,
+        hasMoreRows: false,
+      };
+    }
+
+    const streamingPromise = new Promise<AdapterQueryResult>((resolve, reject) => {
+      const rows: Record<string, unknown>[] = [];
+      let hasMoreRows = false;
+      let fields: FieldMetadata[] = [];
+      let rowCount = 0;
+
+      if (this.request) {
+        this.request.stream = true;
+      }
+
+      this.request?.on('recordset', (columns: Record<string, ColumnMetadata>) => {
+        fields = Object.keys(columns).map((name) => {
+          const column = columns[name];
+          const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
+          const typedColumnType = columnType as { name?: string } | undefined;
+
+          return {
+            name,
+            type: typedColumnType?.name || 'unknown',
+            length: column?.length ?? 0,
+            nullable: column?.nullable ?? true,
+          };
+        });
+      });
+
+      this.request?.on('row', (row: Record<string, unknown>) => {
+        if (this.cancelled) {
+          this.request?.cancel();
+          reject(new QueryCancellationError(this.sql));
+          return;
+        }
+
+        const maxRows = this.maxRows || 0;
+        if (rowCount < maxRows) {
+          rows.push(row);
+          rowCount++;
+        } else if (rowCount === maxRows) {
+          hasMoreRows = true;
+          this.request?.pause();
+          this.request?.cancel();
+        }
+      });
+
+      this.request?.on('error', (err) => {
+        reject(new Error(`SQL Server query failed: ${err.message}`));
+      });
+
+      this.request?.on('done', () => {
+        if (this.cancelled) {
+          reject(new QueryCancellationError(this.sql));
+          return;
+        }
+
+        resolve({
+          rows,
+          rowCount: rows.length,
+          fields,
+          hasMoreRows,
+        });
+      });
+
+      this.request?.query(processedQuery);
+    });
+
+    return await executeWithTimeout(streamingPromise, timeoutMs);
+  }
+
+  async cancel(): Promise<void> {
+    this.cancelled = true;
+    await this.controller.cancel();
+  }
+
+  async onTimeout(timeoutMs: number): Promise<AdapterQueryResult> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(async () => {
+        await this.cancel();
+        reject(new QueryCancellationError(this.sql));
+      }, timeoutMs);
+    });
+
+    return Promise.race([this.execute(), timeoutPromise]);
+  }
 }
 
 /**
@@ -248,5 +419,24 @@ export class SQLServerAdapter extends BaseAdapter {
       this.introspector = new SQLServerIntrospector('sqlserver', this);
     }
     return this.introspector;
+  }
+
+  createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult> {
+    this.ensureConnected();
+    if (!this.pool) {
+      throw new Error('SQL Server connection pool not initialized');
+    }
+    return new SQLServerCancellableQuery(this.pool, sql, params);
+  }
+
+  async cancelQuery(_queryId: string): Promise<void> {
+    console.warn('SQL Server cancelQuery by ID not implemented - use CancellableQuery instead');
+  }
+
+  isQueryCancellable(): boolean {
+    return true;
   }
 }

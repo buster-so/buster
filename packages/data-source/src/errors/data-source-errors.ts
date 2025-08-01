@@ -84,6 +84,53 @@ export class QueryTimeoutError extends DataSourceError {
 }
 
 /**
+ * Query cancellation error
+ */
+export class QueryCancellationError extends DataSourceError {
+  readonly code = 'QUERY_CANCELLATION';
+  readonly isRetryable = false;
+
+  constructor(
+    public readonly sql?: string,
+    originalError?: Error
+  ) {
+    super('Query was cancelled', originalError);
+  }
+}
+
+/**
+ * Cancellation timeout error
+ */
+export class CancellationTimeoutError extends DataSourceError {
+  readonly code = 'CANCELLATION_TIMEOUT';
+  readonly isRetryable = false;
+
+  constructor(
+    timeout: number,
+    public readonly sql?: string,
+    originalError?: Error
+  ) {
+    super(`Query cancellation timed out after ${timeout}ms`, originalError);
+  }
+}
+
+/**
+ * Cancellation failed error
+ */
+export class CancellationFailedError extends DataSourceError {
+  readonly code = 'CANCELLATION_FAILED';
+  readonly isRetryable = false;
+
+  constructor(
+    message: string,
+    public readonly sql?: string,
+    originalError?: Error
+  ) {
+    super(`Failed to cancel query: ${message}`, originalError);
+  }
+}
+
+/**
  * Authentication/credential errors
  */
 export class AuthenticationError extends DataSourceError {
@@ -143,6 +190,11 @@ export function classifyError(
   // Timeout errors
   if (errorMessage.includes('timeout') || errorMessage.includes('Timeout')) {
     return new QueryTimeoutError(context?.timeout || 60000, context?.sql, originalError);
+  }
+
+  // Cancellation errors
+  if (errorMessage.includes('cancel') || errorMessage.includes('Cancel')) {
+    return new QueryCancellationError(context?.sql, originalError);
   }
 
   // Authentication errors
@@ -213,6 +265,15 @@ export function formatErrorForUser(error: unknown): string {
 
       case 'QUERY_TIMEOUT':
         return 'Your query took too long to execute. Try simplifying your query or reducing the data range.';
+
+      case 'QUERY_CANCELLATION':
+        return 'Your query was cancelled. You can try running it again.';
+
+      case 'CANCELLATION_TIMEOUT':
+        return 'The query cancellation timed out. The query may still be running on the database.';
+
+      case 'CANCELLATION_FAILED':
+        return 'Failed to cancel the query. The query may still be running on the database.';
 
       case 'AUTHENTICATION_ERROR':
         return 'Unable to authenticate with the database. Please check your credentials.';

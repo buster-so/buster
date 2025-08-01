@@ -1,5 +1,7 @@
 import { Client, type ClientConfig } from 'pg';
 import Cursor from 'pg-cursor';
+import { BaseCancellationController, type CancellableQuery } from '../cancellation/index.js';
+import { QueryCancellationError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { RedshiftIntrospector } from '../introspection/redshift';
 import { type Credentials, DataSourceType, type RedshiftCredentials } from '../types/credentials';
@@ -17,6 +19,151 @@ interface CursorResult {
 
 interface CursorWithResult extends Cursor {
   _result?: CursorResult;
+}
+
+class RedshiftCancellableQuery implements CancellableQuery<AdapterQueryResult> {
+  private cancelled = false;
+  private controller = new BaseCancellationController();
+
+  constructor(
+    private client: Client,
+    private sql: string,
+    private params?: QueryParameter[],
+    private maxRows?: number,
+    private timeout?: number
+  ) {}
+
+  async execute(): Promise<AdapterQueryResult> {
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    this.controller.onCancellation(async () => {
+      try {
+        await this.client.query('SELECT pg_cancel_backend(pg_backend_pid())');
+      } catch (error) {
+        console.warn('Redshift query cancellation warning:', error);
+      }
+    });
+
+    const timeoutMs = this.timeout || 60000;
+    await this.client.query(`SET statement_timeout = ${timeoutMs}`);
+
+    if (!this.maxRows || this.maxRows <= 0) {
+      const result = await this.client.query(this.sql, this.params);
+
+      if (this.cancelled) {
+        throw new QueryCancellationError(this.sql);
+      }
+
+      const fields: FieldMetadata[] =
+        result.fields?.map((field) => ({
+          name: field.name,
+          type: `redshift_type_${field.dataTypeID}`,
+          nullable: true,
+          length: field.dataTypeSize > 0 ? field.dataTypeSize : 0,
+        })) || [];
+
+      return {
+        rows: result.rows,
+        rowCount: result.rowCount || result.rows.length,
+        fields,
+        hasMoreRows: false,
+      };
+    }
+
+    const cursor = this.client.query(new Cursor(this.sql, this.params)) as CursorWithResult;
+    const rows: Record<string, unknown>[] = [];
+    let hasMoreRows = false;
+    let fields: FieldMetadata[] = [];
+
+    const batchSize = Math.min(this.maxRows, 1000);
+    let totalRead = 0;
+
+    try {
+      while (totalRead < this.maxRows) {
+        if (this.cancelled) {
+          throw new QueryCancellationError(this.sql);
+        }
+
+        const remainingRows = this.maxRows - totalRead;
+        const readSize = Math.min(batchSize, remainingRows) + 1;
+
+        const batchRows = await new Promise<Record<string, unknown>[]>((resolve, reject) => {
+          cursor.read(readSize, (err, batchRows) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(batchRows);
+            }
+          });
+        });
+
+        if (batchRows.length === 0) {
+          break;
+        }
+
+        if (fields.length === 0 && cursor._result?.fields) {
+          fields = cursor._result.fields.map((field) => ({
+            name: field.name,
+            type: `redshift_type_${field.dataTypeID}`,
+            nullable: true,
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : 0,
+          }));
+        }
+
+        if (totalRead + batchRows.length > this.maxRows) {
+          hasMoreRows = true;
+          rows.push(...batchRows.slice(0, this.maxRows - totalRead));
+          break;
+        }
+
+        rows.push(...batchRows);
+        totalRead += batchRows.length;
+
+        if (batchRows.length < readSize) {
+          break;
+        }
+      }
+    } finally {
+      await new Promise<void>((resolve, reject) => {
+        cursor.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
+
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    return {
+      rows,
+      rowCount: rows.length,
+      fields,
+      hasMoreRows,
+    };
+  }
+
+  async cancel(): Promise<void> {
+    this.cancelled = true;
+    await this.controller.cancel();
+  }
+
+  async onTimeout(timeoutMs: number): Promise<AdapterQueryResult> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(async () => {
+        await this.cancel();
+        reject(new QueryCancellationError(this.sql));
+      }, timeoutMs);
+    });
+
+    return Promise.race([this.execute(), timeoutPromise]);
+  }
 }
 
 /**
@@ -212,5 +359,24 @@ export class RedshiftAdapter extends BaseAdapter {
       this.introspector = new RedshiftIntrospector('redshift', this);
     }
     return this.introspector;
+  }
+
+  createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult> {
+    this.ensureConnected();
+    if (!this.client) {
+      throw new Error('Redshift client not initialized');
+    }
+    return new RedshiftCancellableQuery(this.client, sql, params);
+  }
+
+  async cancelQuery(_queryId: string): Promise<void> {
+    console.warn('Redshift cancelQuery by ID not implemented - use CancellableQuery instead');
+  }
+
+  isQueryCancellable(): boolean {
+    return true;
   }
 }

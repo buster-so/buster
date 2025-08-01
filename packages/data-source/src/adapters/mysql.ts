@@ -1,9 +1,110 @@
 import mysql from 'mysql2/promise';
+import { BaseCancellationController, type CancellableQuery } from '../cancellation/index.js';
+import { QueryCancellationError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { MySQLIntrospector } from '../introspection/mysql';
 import { type Credentials, DataSourceType, type MySQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
+
+class MySQLCancellableQuery implements CancellableQuery<AdapterQueryResult> {
+  private cancelled = false;
+  private controller = new BaseCancellationController();
+  private connection?: mysql.Connection;
+
+  constructor(
+    private createConnection: () => Promise<mysql.Connection>,
+    private sql: string,
+    private params?: QueryParameter[],
+    private maxRows?: number,
+    private timeout?: number
+  ) {}
+
+  async execute(): Promise<AdapterQueryResult> {
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    this.connection = await this.createConnection();
+
+    this.controller.onCancellation(async () => {
+      if (this.connection) {
+        try {
+          await this.connection.end();
+        } catch (error) {
+          console.warn('MySQL connection termination warning:', error);
+        }
+      }
+    });
+
+    const timeoutMs = this.timeout || 60000;
+
+    const queryPromise = this.connection.execute(this.sql, this.params);
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Query execution timeout after ${timeoutMs}ms`));
+      }, timeoutMs);
+    });
+
+    const [rows, fields] = await Promise.race([queryPromise, timeoutPromise]);
+
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    let resultRows: Record<string, unknown>[] = [];
+    let rowCount = 0;
+    let hasMoreRows = false;
+
+    if (Array.isArray(rows)) {
+      if (this.maxRows && this.maxRows > 0 && rows.length > this.maxRows) {
+        hasMoreRows = true;
+        resultRows = rows.slice(0, this.maxRows) as Record<string, unknown>[];
+      } else {
+        resultRows = rows as Record<string, unknown>[];
+      }
+      rowCount = resultRows.length;
+    } else if (rows && typeof rows === 'object' && 'affectedRows' in rows) {
+      const resultSet = rows as mysql.ResultSetHeader;
+      rowCount = resultSet.affectedRows || 0;
+      resultRows = [];
+    }
+
+    const fieldMetadata: FieldMetadata[] = Array.isArray(fields)
+      ? fields.map((field) => ({
+          name: field.name,
+          type: `mysql_type_${field.type}`,
+          nullable: typeof field.flags === 'number' ? (field.flags & 1) === 0 : true,
+          length: typeof field.length === 'number' && field.length > 0 ? field.length : 0,
+          precision: typeof field.decimals === 'number' && field.decimals > 0 ? field.decimals : 0,
+        }))
+      : [];
+
+    return {
+      rows: resultRows,
+      rowCount,
+      fields: fieldMetadata,
+      hasMoreRows,
+    };
+  }
+
+  async cancel(): Promise<void> {
+    this.cancelled = true;
+    await this.controller.cancel();
+  }
+
+  async onTimeout(timeoutMs: number): Promise<AdapterQueryResult> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(async () => {
+        await this.cancel();
+        reject(new QueryCancellationError(this.sql));
+      }, timeoutMs);
+    });
+
+    return Promise.race([this.execute(), timeoutPromise]);
+  }
+}
 
 /**
  * MySQL database adapter
@@ -173,5 +274,52 @@ export class MySQLAdapter extends BaseAdapter {
       this.introspector = new MySQLIntrospector('mysql', this);
     }
     return this.introspector;
+  }
+
+  createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult> {
+    this.ensureConnected();
+
+    const createConnection = async () => {
+      const credentials = this.credentials as MySQLCredentials;
+      const config: mysql.ConnectionOptions = {
+        host: credentials.host,
+        port: credentials.port || 3306,
+        database: credentials.database,
+        user: credentials.username,
+        password: credentials.password,
+      };
+
+      if (credentials.ssl !== undefined && typeof credentials.ssl === 'object') {
+        config.ssl = {
+          rejectUnauthorized: credentials.ssl.rejectUnauthorized ?? true,
+          ...(credentials.ssl.ca && { ca: credentials.ssl.ca }),
+          ...(credentials.ssl.cert && { cert: credentials.ssl.cert }),
+          ...(credentials.ssl.key && { key: credentials.ssl.key }),
+        };
+      }
+
+      if (credentials.connection_timeout) {
+        config.connectTimeout = credentials.connection_timeout;
+      }
+
+      if (credentials.charset) {
+        config.charset = credentials.charset;
+      }
+
+      return mysql.createConnection(config);
+    };
+
+    return new MySQLCancellableQuery(createConnection, sql, params);
+  }
+
+  async cancelQuery(_queryId: string): Promise<void> {
+    console.warn('MySQL cancelQuery by ID not implemented - use CancellableQuery instead');
+  }
+
+  isQueryCancellable(): boolean {
+    return true;
   }
 }

@@ -1,9 +1,122 @@
 import { BigQuery, type BigQueryOptions, type Query } from '@google-cloud/bigquery';
+import { BaseCancellationController, type CancellableQuery } from '../cancellation/index.js';
+import { QueryCancellationError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { BigQueryIntrospector } from '../introspection/bigquery';
 import { type BigQueryCredentials, type Credentials, DataSourceType } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
+
+class BigQueryCancellableQuery implements CancellableQuery<AdapterQueryResult> {
+  private cancelled = false;
+  private controller = new BaseCancellationController();
+  private job?: any;
+
+  constructor(
+    private client: BigQuery,
+    private sql: string,
+    private params?: QueryParameter[],
+    private maxRows?: number,
+    private timeout?: number
+  ) {}
+
+  async execute(): Promise<AdapterQueryResult> {
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    const options: Query = {
+      query: this.sql,
+      useLegacySql: false,
+    };
+
+    if (this.timeout || this.timeout === 0) {
+      options.jobTimeoutMs = this.timeout;
+    } else {
+      options.jobTimeoutMs = 60000;
+    }
+
+    let hasMoreRows = false;
+    if (this.maxRows && this.maxRows > 0) {
+      options.maxResults = this.maxRows + 1;
+    }
+
+    if (this.params && this.params.length > 0) {
+      let processedSql = this.sql;
+      const namedParams: Record<string, QueryParameter> = {};
+
+      let paramIndex = 0;
+      processedSql = this.sql.replace(/\?/g, () => {
+        const paramName = `param${paramIndex}`;
+        const paramValue = this.params?.[paramIndex];
+        if (paramValue !== undefined) {
+          namedParams[paramName] = paramValue;
+        }
+        paramIndex++;
+        return `@${paramName}`;
+      });
+
+      options.query = processedSql;
+      options.params = namedParams;
+    }
+
+    const [job] = await this.client.createQueryJob(options);
+    this.job = job;
+
+    this.controller.onCancellation(async () => {
+      if (this.job) {
+        try {
+          await this.job.cancel();
+        } catch (error) {
+          console.warn('BigQuery job cancellation warning:', error);
+        }
+      }
+    });
+
+    if (this.cancelled) {
+      await this.cancel();
+      throw new QueryCancellationError(this.sql);
+    }
+
+    const [rows] = await job.getQueryResults();
+
+    if (this.cancelled) {
+      throw new QueryCancellationError(this.sql);
+    }
+
+    let resultRows: Record<string, unknown>[] = rows.map((row) => ({ ...row }));
+
+    if (this.maxRows && resultRows.length > this.maxRows) {
+      hasMoreRows = true;
+      resultRows = resultRows.slice(0, this.maxRows);
+    }
+
+    const fields: FieldMetadata[] = [];
+
+    return {
+      rows: resultRows,
+      rowCount: resultRows.length,
+      fields,
+      hasMoreRows,
+    };
+  }
+
+  async cancel(): Promise<void> {
+    this.cancelled = true;
+    await this.controller.cancel();
+  }
+
+  async onTimeout(timeoutMs: number): Promise<AdapterQueryResult> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(async () => {
+        await this.cancel();
+        reject(new QueryCancellationError(this.sql));
+      }, timeoutMs);
+    });
+
+    return Promise.race([this.execute(), timeoutPromise]);
+  }
+}
 
 /**
  * BigQuery database adapter
@@ -167,5 +280,24 @@ export class BigQueryAdapter extends BaseAdapter {
       this.introspector = new BigQueryIntrospector('bigquery', this);
     }
     return this.introspector;
+  }
+
+  createCancellableQuery(
+    sql: string,
+    params?: QueryParameter[]
+  ): CancellableQuery<AdapterQueryResult> {
+    this.ensureConnected();
+    if (!this.client) {
+      throw new Error('BigQuery client not initialized');
+    }
+    return new BigQueryCancellableQuery(this.client, sql, params);
+  }
+
+  async cancelQuery(_queryId: string): Promise<void> {
+    console.warn('BigQuery cancelQuery by ID not implemented - use CancellableQuery instead');
+  }
+
+  isQueryCancellable(): boolean {
+    return true;
   }
 }
