@@ -48,7 +48,12 @@ export interface DataSourceIntrospector {
   /**
    * Get column statistics for all columns in a specific table
    */
-  getColumnStatistics(database: string, schema: string, table: string): Promise<ColumnStatistics[]>;
+  getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string,
+    tableRowCount?: number
+  ): Promise<ColumnStatistics[]>;
 
   /**
    * Get all indexes in a schema (or all indexes if no schema/database specified)
@@ -101,7 +106,8 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
   abstract getColumnStatistics(
     database: string,
     schema: string,
-    table: string
+    table: string,
+    tableRowCount?: number
   ): Promise<ColumnStatistics[]>;
   abstract getDataSourceType(): string;
 
@@ -264,11 +270,15 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
                 const column = columnMap.get(key);
                 if (column) {
                   column.distinctCount = stat.distinctCount ?? 0;
-                  column.nullCount = stat.nullCount ?? 0;
+                  column.nullPercentage = stat.nullPercentage ?? 0;
                   column.minValue = stat.minValue ?? '';
                   column.maxValue = stat.maxValue ?? '';
                   // Apply smart truncation to sample values
                   column.sampleValues = this.truncateSampleValues(stat.sampleValues, column) ?? '';
+                  if (stat.topKDistribution) {
+                    column.topKDistribution = stat.topKDistribution;
+                  }
+                  column.isSampled = stat.isSampled ?? false;
                 }
               }
             } catch (error) {

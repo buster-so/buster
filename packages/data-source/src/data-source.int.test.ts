@@ -303,9 +303,13 @@ describe('DataSource Integration', () => {
     it('should throw error when querying non-existent data source', async () => {
       dataSource = new DataSource({ dataSources: [] });
 
-      await expect(dataSource.query('SELECT 1', [], { warehouse: 'non-existent' })).rejects.toThrow(
-        'Data source non-existent not found'
-      );
+      await expect(
+        dataSource.execute({
+          sql: 'SELECT 1',
+          params: [],
+          warehouse: 'non-existent',
+        })
+      ).rejects.toThrow("Specified data source 'non-existent' not found");
     });
   });
 });

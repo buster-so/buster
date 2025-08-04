@@ -8,6 +8,7 @@ import type {
   Schema,
   Table,
   TableStatistics,
+  ValueDistribution,
   View,
 } from '../types/introspection';
 import { BaseIntrospector } from './base';
@@ -377,6 +378,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       schema,
       database,
       rowCount: this.parseNumber(basicStats?.n_live_tup) ?? 0,
+      sizeBytes: 0, // PostgreSQL doesn't provide size in pg_stat_user_tables
       columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
@@ -388,7 +390,8 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
   async getColumnStatistics(
     database: string,
     schema: string,
-    table: string
+    table: string,
+    _tableRowCount?: number
   ): Promise<ColumnStatistics[]> {
     // Get columns for this table
     const columns = await this.getColumns(database, schema, table);
@@ -416,10 +419,14 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       // Parse results - each row represents one column's statistics
       for (const row of statsResult.rows) {
         if (row) {
+          const totalRows = this.parseNumber(row.total_rows) ?? 0;
+          const nullCount = this.parseNumber(row.null_count) ?? 0;
+          const nullPercentage = totalRows > 0 ? (nullCount / totalRows) * 100 : 0;
+
           columnStatistics.push({
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count) ?? 0,
-            nullCount: this.parseNumber(row.null_count) ?? 0,
+            nullPercentage: nullPercentage,
             minValue: this.getString(row.min_value) ?? '',
             maxValue: this.getString(row.max_value) ?? '',
             sampleValues: this.getString(row.sample_values) ?? '',
@@ -434,7 +441,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
         columnStatistics.push({
           columnName: column.name,
           distinctCount: 0,
-          nullCount: 0,
+          nullPercentage: 0,
           minValue: '',
           maxValue: '',
           sampleValues: '',
@@ -460,6 +467,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
 
         let selectClause = `
         COUNT(DISTINCT ${columnName}) AS distinct_count_${this.sanitizeColumnName(columnName)},
+        COUNT(*) AS total_rows_${this.sanitizeColumnName(columnName)},
         COUNT(*) - COUNT(${columnName}) AS null_count_${this.sanitizeColumnName(columnName)}`;
 
         if (isNumeric || isDate) {
@@ -515,6 +523,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
         '${columnName}' AS column_name,
         rs.distinct_count_${sanitizedName} AS distinct_count,
         rs.null_count_${sanitizedName} AS null_count,
+        rs.total_rows_${sanitizedName} AS total_rows,
         ${minMaxClause}
     FROM raw_stats rs`;
       })
@@ -540,6 +549,7 @@ SELECT
     s.column_name,
     s.distinct_count,
     s.null_count,
+    s.total_rows,
     s.min_value,
     s.max_value,
     sv.sample_values
@@ -600,6 +610,45 @@ ORDER BY s.column_name`;
     const dateTypes = ['date', 'timestamp', 'timestamptz', 'time', 'timetz'];
 
     return dateTypes.some((type) => dataType.toLowerCase().includes(type));
+  }
+
+  /**
+   * Determine if we should skip sample values for a column
+   * Skip types that are not human-readable or meaningful as samples
+   */
+  private shouldSkipSampleValues(column: Column): boolean {
+    const dataType = column.dataType.toLowerCase();
+
+    // Skip binary types - not human readable
+    if (dataType.includes('bytea')) {
+      return true;
+    }
+
+    // Skip high-cardinality columns (same logic as Snowflake)
+    const skipPatterns = [/_id$/i, /_uuid$/i, /_guid$/i, /^id$/i, /_key$/i, /_hash$/i, /_token$/i];
+
+    if (skipPatterns.some((pattern) => pattern.test(column.name))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Parse TOP_K result into ValueDistribution array
+   * Note: PostgreSQL doesn't have APPROX_TOP_K, this is a placeholder for compatibility
+   */
+  private parseTopKAsDistribution(
+    topKResult: unknown,
+    totalRows: number
+  ): ValueDistribution[] | undefined {
+    if (!topKResult || totalRows === 0) {
+      return undefined;
+    }
+
+    // PostgreSQL doesn't have native TOP_K functionality like Snowflake
+    // This would need to be implemented with custom logic if needed
+    return undefined;
   }
 
   /**
@@ -755,7 +804,8 @@ ORDER BY s.column_name`;
               const columnStats = await this.getColumnStatistics(
                 table.database,
                 table.schema,
-                table.name
+                table.name,
+                table.rowCount
               );
 
               // Attach statistics to corresponding columns
@@ -764,10 +814,14 @@ ORDER BY s.column_name`;
                 const column = columnMap.get(key);
                 if (column) {
                   column.distinctCount = stat.distinctCount ?? 0;
-                  column.nullCount = stat.nullCount ?? 0;
+                  column.nullPercentage = stat.nullPercentage ?? 0;
                   column.minValue = stat.minValue ?? '';
                   column.maxValue = stat.maxValue ?? '';
                   column.sampleValues = stat.sampleValues ?? '';
+                  if (stat.topKDistribution) {
+                    column.topKDistribution = stat.topKDistribution;
+                  }
+                  column.isSampled = stat.isSampled ?? false;
                 }
               }
             } catch (error) {

@@ -323,7 +323,8 @@ export class BigQueryIntrospector extends BaseIntrospector {
   async getColumnStatistics(
     database: string,
     schema: string,
-    table: string
+    table: string,
+    _tableRowCount?: number
   ): Promise<ColumnStatistics[]> {
     const targetDataset = database || schema;
     // Get columns for this table
@@ -354,7 +355,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
           columnStatistics.push({
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count) ?? 0,
-            nullCount: this.parseNumber(row.null_count) ?? 0,
+            nullPercentage: 0, // TODO: Calculate percentage when total_rows available
             minValue: this.getString(row.min_value) ?? '',
             maxValue: this.getString(row.max_value) ?? '',
             sampleValues: this.getString(row.sample_values) ?? '',
@@ -369,7 +370,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
         columnStatistics.push({
           columnName: column.name,
           distinctCount: 0,
-          nullCount: 0,
+          nullPercentage: 0,
           minValue: '',
           maxValue: '',
           sampleValues: '',
@@ -701,7 +702,7 @@ ORDER BY s.column_name`;
                 const column = columnMap.get(key);
                 if (column) {
                   column.distinctCount = stat.distinctCount ?? 0;
-                  column.nullCount = stat.nullCount ?? 0;
+                  column.nullPercentage = stat.nullPercentage ?? 0;
                   column.minValue = stat.minValue ?? '';
                   column.maxValue = stat.maxValue ?? '';
                   column.sampleValues = stat.sampleValues ?? '';

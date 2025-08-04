@@ -50,7 +50,14 @@ export class PostgreSQLAdapter extends BaseAdapter {
 
       // Handle SSL configuration
       if (pgCredentials.ssl !== undefined) {
-        config.ssl = pgCredentials.ssl;
+        if (pgCredentials.ssl === true) {
+          // For SSL connections that may have self-signed certificates (like Supabase)
+          config.ssl = {
+            rejectUnauthorized: false,
+          };
+        } else {
+          config.ssl = pgCredentials.ssl;
+        }
       }
 
       // Handle connection timeout

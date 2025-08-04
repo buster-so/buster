@@ -8,6 +8,7 @@ import type {
   Schema,
   Table,
   TableStatistics,
+  ValueDistribution,
   View,
 } from '../types/introspection';
 import { BaseIntrospector } from './base';
@@ -576,12 +577,10 @@ export class SnowflakeIntrospector extends BaseIntrospector {
     columns: Column[],
     tableRowCount?: number
   ): Promise<ColumnStatistics[]> {
-    const columnStatistics: ColumnStatistics[] = [];
-
-    if (columns.length === 0) return columnStatistics;
+    if (columns.length === 0) return [];
 
     try {
-      // Build the optimized query with conditional sampling
+      // Build the optimized CTE-based query that gets all statistics in one scan
       const statsQuery = this.buildOptimizedColumnStatsQuery(
         database,
         schema,
@@ -589,38 +588,53 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         columns,
         tableRowCount
       );
-      const statsResult = await this.adapter.query(statsQuery);
+      const statsResult = await this.adapter.query(statsQuery, undefined, undefined, 300000); // 5 minutes
 
       // Parse results - each row represents one column's statistics
+      const columnStatistics: ColumnStatistics[] = [];
+
       for (const row of statsResult.rows) {
         if (row) {
-          columnStatistics.push({
+          const totalRows = this.parseNumber(row.total_rows) ?? 0;
+          const nullCount = this.parseNumber(row.null_count) ?? 0;
+          const nullPercentage = totalRows > 0 ? (nullCount / totalRows) * 100 : 0;
+
+          const stats: ColumnStatistics = {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count) ?? 0,
-            nullCount: this.parseNumber(row.null_count) ?? 0,
+            nullPercentage: nullPercentage,
             minValue: this.getString(row.min_value) ?? '',
             maxValue: this.getString(row.max_value) ?? '',
             sampleValues: this.getString(row.sample_values) ?? '',
-          });
+            isSampled: row.is_sampled === true,
+          };
+
+          // Parse TOP_K distribution if present
+          if (row.topk_values) {
+            const topK = this.parseTopKAsDistribution(row.topk_values, totalRows);
+            if (topK) {
+              stats.topKDistribution = topK;
+            }
+          }
+
+          columnStatistics.push(stats);
         }
       }
+
+      return columnStatistics;
     } catch (error) {
-      console.warn(`Could not get statistics for table ${table}:`, error);
+      console.warn(`Failed to get statistics for table ${database}.${schema}.${table}:`, error);
 
-      // Fallback: create empty statistics for each column
-      for (const column of columns) {
-        columnStatistics.push({
-          columnName: column.name,
-          distinctCount: 0,
-          nullCount: 0,
-          minValue: '',
-          maxValue: '',
-          sampleValues: '',
-        });
-      }
+      // Return empty statistics for each column on error
+      return columns.map((column) => ({
+        columnName: column.name,
+        distinctCount: 0,
+        nullPercentage: 0,
+        minValue: '',
+        maxValue: '',
+        sampleValues: '',
+      }));
     }
-
-    return columnStatistics;
   }
 
   /**
@@ -671,10 +685,12 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         if (shouldSample) {
           selectClause = `
         APPROX_COUNT_DISTINCT(${columnName}) AS distinct_count_${sanitizedName},
+        COUNT(*) AS total_rows_${sanitizedName},
         ${nullFunc}(${columnName} IS NULL) AS null_count_${sanitizedName}`;
         } else {
           selectClause = `
         APPROX_COUNT_DISTINCT(${columnName}) AS distinct_count_${sanitizedName},
+        COUNT(*) AS total_rows_${sanitizedName},
         ${nullFunc} ${columnName} IS NULL THEN 1 ELSE 0 END) AS null_count_${sanitizedName}`;
         }
 
@@ -684,32 +700,58 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         MAX(${columnName}) AS max_${sanitizedName}`;
         }
 
+        // Add APPROX_TOP_K conditionally based on column characteristics
+        const shouldGetTopK = this.shouldComputeTopK(column);
+        if (shouldGetTopK) {
+          selectClause += `,
+        APPROX_TOP_K(${columnName}, 50, 10000) AS topk_${sanitizedName}`;
+        } else {
+          selectClause += `,
+        NULL AS topk_${sanitizedName}`;
+        }
+
         return selectClause;
       })
       .join(',');
 
-    // Build sample_values CTE
-    const sampleValuesUnions = columns
-      .map((column) => {
-        const columnName = column.name;
-        return `
+    // Build sample_values CTE - only for columns where samples make sense
+    const eligibleForSamples = columns.filter((col) => !this.shouldSkipSampleValues(col));
+    const sampleValuesUnions =
+      eligibleForSamples.length > 0
+        ? eligibleForSamples
+            .map((column) => {
+              const columnName = column.name;
+              const dataType = column.dataType.toUpperCase();
+              // For semi-structured types, convert to VARCHAR first
+              const needsConversion =
+                dataType.includes('VARIANT') ||
+                dataType.includes('OBJECT') ||
+                dataType.includes('ARRAY');
+              const columnExpr = needsConversion
+                ? `TO_VARCHAR(${columnName})`
+                : `TO_VARCHAR(${columnName})`;
+
+              return `
     SELECT '${columnName}' AS column_name,
-           LISTAGG(
-               CASE 
-                   WHEN LENGTH(sample_val) > 100 
-                   THEN LEFT(sample_val, 100) || '...'
-                   ELSE sample_val
-               END, 
+           ARRAY_TO_STRING(
+               ARRAY_AGG(
+                   CASE 
+                       WHEN LENGTH(sample_val) > 100 
+                       THEN LEFT(sample_val, 100) || '...'
+                       ELSE sample_val
+                   END
+               ) WITHIN GROUP (ORDER BY sample_val),
                ','
-           ) WITHIN GROUP (ORDER BY sample_val) AS sample_values
+           ) AS sample_values
     FROM (
-        SELECT DISTINCT TO_VARCHAR(${columnName}) AS sample_val
+        SELECT DISTINCT ${columnExpr} AS sample_val
         FROM sample_data
         WHERE ${columnName} IS NOT NULL
         LIMIT 20
     )`;
-      })
-      .join('\n    UNION ALL');
+            })
+            .join('\n    UNION ALL')
+        : `SELECT NULL AS column_name, NULL AS sample_values WHERE 1=0`;
 
     // Build stats CTE with UNION ALL for each column
     const statsUnions = columns
@@ -730,7 +772,9 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         '${columnName}' AS column_name,
         rs.distinct_count_${sanitizedName} AS distinct_count,
         rs.null_count_${sanitizedName} AS null_count,
-        ${minMaxClause}
+        rs.total_rows_${sanitizedName} AS total_rows,
+        ${minMaxClause},
+        rs.topk_${sanitizedName} AS topk_values
     FROM raw_stats rs`;
       })
       .join('\n    UNION ALL');
@@ -756,9 +800,12 @@ SELECT
     s.column_name,
     s.distinct_count,
     s.null_count,
+    s.total_rows,
     s.min_value,
     s.max_value,
-    sv.sample_values
+    s.topk_values,
+    sv.sample_values,
+    ${shouldSample} AS is_sampled
 FROM stats s
 LEFT JOIN sample_values sv ON s.column_name = sv.column_name
 ORDER BY s.column_name`;
@@ -806,6 +853,96 @@ ORDER BY s.column_name`;
     const dateTypes = ['DATE', 'TIMESTAMP', 'TIMESTAMP_LTZ', 'TIMESTAMP_TZ', 'TIME'];
 
     return dateTypes.some((type) => dataType.toUpperCase().includes(type));
+  }
+
+  /**
+   * Determine if we should compute TOP_K for a column based on its characteristics
+   * Skip high-cardinality columns like IDs, UUIDs, timestamps, etc.
+   */
+  private shouldComputeTopK(column: Column): boolean {
+    // Skip ID-like columns
+    const skipPatterns = [
+      /_id$/i, // Ends with _id
+      /_uuid$/i, // Ends with _uuid
+      /_guid$/i, // Ends with _guid
+      /^id$/i, // Exactly "id"
+      /_key$/i, // Ends with _key
+      /_hash$/i, // Ends with _hash
+      /_token$/i, // Ends with _token
+      /_code$/i, // Ends with _code (often unique)
+    ];
+
+    if (skipPatterns.some((pattern) => pattern.test(column.name))) {
+      return false;
+    }
+
+    // Skip timestamp/date columns
+    if (this.isDateType(column.dataType)) {
+      return false;
+    }
+
+    // Skip numeric columns unless they have very low cardinality (handled in query building)
+    // This will be further refined based on distinct count if available
+
+    return true;
+  }
+
+  /**
+   * Determine if we should skip sample values for a column
+   * Skip types that are not human-readable or meaningful as samples
+   */
+  private shouldSkipSampleValues(column: Column): boolean {
+    const dataType = column.dataType.toUpperCase();
+
+    // Skip spatial types - not human readable
+    if (dataType.includes('GEOGRAPHY') || dataType.includes('GEOMETRY')) {
+      return true;
+    }
+
+    // Skip binary types - hex strings are not meaningful
+    if (dataType.includes('BINARY')) {
+      return true;
+    }
+
+    // Skip high-cardinality columns (same logic as TOP_K)
+    const skipPatterns = [/_id$/i, /_uuid$/i, /_guid$/i, /^id$/i, /_key$/i, /_hash$/i, /_token$/i];
+
+    if (skipPatterns.some((pattern) => pattern.test(column.name))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Parse Snowflake's APPROX_TOP_K result into ValueDistribution array
+   * APPROX_TOP_K returns a JSON array of [value, count] pairs
+   */
+  private parseTopKAsDistribution(
+    topKResult: unknown,
+    totalRows: number
+  ): ValueDistribution[] | undefined {
+    if (!topKResult || totalRows === 0) {
+      return undefined;
+    }
+
+    try {
+      // Handle if it's a string that needs parsing
+      const parsed = typeof topKResult === 'string' ? JSON.parse(topKResult) : topKResult;
+
+      if (!Array.isArray(parsed)) {
+        return undefined;
+      }
+
+      return parsed.map(([value, count]: [unknown, number]) => ({
+        value: String(value ?? 'NULL'),
+        count: count || 0,
+        percentage: totalRows > 0 ? (count / totalRows) * 100 : 0,
+      }));
+    } catch (error) {
+      console.warn('Failed to parse TOP_K result:', error);
+      return undefined;
+    }
   }
 
   /**
@@ -973,10 +1110,14 @@ ORDER BY s.column_name`;
                 const column = columnMap.get(key);
                 if (column) {
                   column.distinctCount = stat.distinctCount ?? 0;
-                  column.nullCount = stat.nullCount ?? 0;
+                  column.nullPercentage = stat.nullPercentage ?? 0;
                   column.minValue = stat.minValue ?? '';
                   column.maxValue = stat.maxValue ?? '';
                   column.sampleValues = stat.sampleValues ?? '';
+                  if (stat.topKDistribution) {
+                    column.topKDistribution = stat.topKDistribution;
+                  }
+                  column.isSampled = stat.isSampled ?? false;
                 }
               }
             } catch (error) {

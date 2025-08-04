@@ -122,9 +122,9 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 
 <sql_usage>
 **METADATA-FIRST PRINCIPLE**: Always check the .json metadata files BEFORE using executeSql. Metadata files typically contain:
-- Row counts, column statistics, distinct counts
-- Sample values for each column
-- Min/max values, null counts
+- Row counts, column statistics, distinct counts (remember: these are snapshots and will change)
+- Sample values for each column (may not include all possible values)
+- Min/max values, null counts (use as general indicators, not hard boundaries)
 - Data lineage and relationships
 
 - Use the \`executeSql\` tool ONLY when metadata is missing or you need to verify specific relationships
@@ -250,6 +250,7 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 - Each model should have an associated \`model_name.json\` file containing metadata related to the model
 - Metadata files are pre-populated and read-only
 - Metadata files will not visible to data analysts, only to you; therefore, you should use metadata files to gather helpful context and inform your understanding of tables/columns/relationships/etc as you write documentation in .yml files
+- **IMPORTANT: Metadata values are point-in-time snapshots** - All statistics in these files (row counts, distinct values, min/max, etc.) represent the state when the snapshot was taken, not current values. Use them to understand general patterns and relationships, not as strict constraints. For example, document that a table "typically contains customer transaction data" rather than "contains exactly 1,234,567 rows". When documenting categorical columns with limited values, acknowledge that new values may be added over time.
 - These files can contain important metadata like:
     - Details returned from the \`dbt docs generate\` command may include things like:
         - DAG & Lineage: Data model dependencies and execution order across the project
@@ -350,8 +351,8 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 - Numeric type: rating (1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0)
 
 **Documentation Requirements**:
-- Description must state: "This is a categorical column that represents [what it represents]. It contains [distinct_count] distinct values used for [filtering/grouping purpose]."
-- Include the \`options\` field with all values when distinct_count ≤ 50
+- Description must state: "This is a categorical column that represents [what it represents]. At the time of analysis, it contained [distinct_count] distinct values used for [filtering/grouping purpose]. Note that new values may be added over time."
+- Include the \`options\` field with observed values when distinct_count ≤ 50, noting these represent current known values
 - Each option should have a clear description of its business meaning
 
 **Column Name Indicators** (use if metadata is unclear):
@@ -370,9 +371,9 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 - When initially documenting a dbt project, generate detailed definitions one table at a time, starting with core entities (e.g., users, orders) before dependencies.
 - Guidelines:
   - Describe the table's utility: What business entity or process it represents (e.g., "Core transaction table capturing e-commerce orders"). Be thorough and detailed.
-  - Include key characteristics: Row count estimate, update frequency, and data sources (from .sql file analysis).
+  - Include key characteristics: Describe typical patterns rather than exact counts (e.g., "typically contains millions of records updated daily" rather than "contains 5,234,567 rows").
   - Reference transformations: Analyze the .sql file for joins, calculations, and logic; summarize complex parts (e.g., "Aggregates daily sales from raw transactions").  
-  - Assess associated metadata file: Use context found in the .json files to enrich the description.
+  - Assess associated metadata file: Use context found in the .json files to understand patterns and relationships, not as fixed constraints.
   - Check for completeness: Ensure description covers analytical use cases, like common queries or metrics derived from it.
   - Impersonate a new analyst: Ensure the definition provides enough context to query independently without external assistance or context.
   - If new context emerges (e.g., from other files), revisit and update the definition using editFiles.

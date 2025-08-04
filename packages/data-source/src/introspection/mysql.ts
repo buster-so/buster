@@ -302,7 +302,8 @@ export class MySQLIntrospector extends BaseIntrospector {
   async getColumnStatistics(
     database: string,
     schema: string,
-    table: string
+    table: string,
+    _tableRowCount?: number
   ): Promise<ColumnStatistics[]> {
     const targetDatabase = database || schema;
     // Get columns for this table
@@ -330,10 +331,12 @@ export class MySQLIntrospector extends BaseIntrospector {
       // Parse results - each row represents one column's statistics
       for (const row of statsResult.rows) {
         if (row) {
+          const totalRows = this.parseNumber(row.total_rows) ?? 0;
+          const nullCount = this.parseNumber(row.null_count) ?? 0;
           columnStatistics.push({
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count) ?? 0,
-            nullCount: this.parseNumber(row.null_count) ?? 0,
+            nullPercentage: totalRows > 0 ? (nullCount / totalRows) * 100 : 0,
             minValue: this.getString(row.min_value) ?? '',
             maxValue: this.getString(row.max_value) ?? '',
             sampleValues: this.getString(row.sample_values) ?? '',
@@ -348,7 +351,7 @@ export class MySQLIntrospector extends BaseIntrospector {
         columnStatistics.push({
           columnName: column.name,
           distinctCount: 0,
-          nullCount: 0,
+          nullPercentage: 0,
           minValue: '',
           maxValue: '',
           sampleValues: '',
@@ -378,6 +381,7 @@ export class MySQLIntrospector extends BaseIntrospector {
 
         let selectClause = `
         COUNT(DISTINCT \`${columnName}\`) AS distinct_count_${this.sanitizeColumnName(columnName)},
+        COUNT(*) AS total_rows_${this.sanitizeColumnName(columnName)},
         SUM(CASE WHEN \`${columnName}\` IS NULL THEN 1 ELSE 0 END) AS null_count_${this.sanitizeColumnName(columnName)}`;
 
         if (isNumeric || isDate) {
@@ -433,6 +437,7 @@ export class MySQLIntrospector extends BaseIntrospector {
         '${columnName}' AS column_name,
         rs.distinct_count_${sanitizedName} AS distinct_count,
         rs.null_count_${sanitizedName} AS null_count,
+        rs.total_rows_${sanitizedName} AS total_rows,
         ${minMaxClause}
     FROM raw_stats rs`;
       })
@@ -458,6 +463,7 @@ SELECT
     s.column_name,
     s.distinct_count,
     s.null_count,
+    s.total_rows,
     s.min_value,
     s.max_value,
     sv.sample_values
@@ -681,7 +687,7 @@ ORDER BY s.column_name`;
                 const column = columnMap.get(key);
                 if (column) {
                   column.distinctCount = stat.distinctCount ?? 0;
-                  column.nullCount = stat.nullCount ?? 0;
+                  column.nullPercentage = stat.nullPercentage ?? 0;
                   column.minValue = stat.minValue ?? '';
                   column.maxValue = stat.maxValue ?? '';
                   column.sampleValues = stat.sampleValues ?? '';

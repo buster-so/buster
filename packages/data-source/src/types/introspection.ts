@@ -3,6 +3,18 @@
  */
 
 /**
+ * Represents value distribution for a column (top K values)
+ */
+export interface ValueDistribution {
+  /** The value */
+  value: string;
+  /** Count of occurrences */
+  count: number;
+  /** Percentage of total rows (0-100) */
+  percentage: number;
+}
+
+/**
  * Represents a database in a data source
  */
 export interface Database {
@@ -112,14 +124,18 @@ export interface Column {
   isForeignKey?: boolean;
   /** Approximate distinct value count */
   distinctCount?: number;
-  /** Null value count */
-  nullCount?: number;
+  /** Null value percentage (0-100) */
+  nullPercentage?: number;
   /** Minimum value */
   minValue?: string;
   /** Maximum value */
   maxValue?: string;
   /** Sample values (comma-separated string of up to 20 distinct values) */
   sampleValues?: string;
+  /** Top K value distribution */
+  topKDistribution?: ValueDistribution[];
+  /** Whether statistics are based on sampling */
+  isSampled?: boolean;
   /** Additional column-specific metadata */
   metadata?: Record<string, unknown>;
 }
@@ -156,14 +172,18 @@ export interface ColumnStatistics {
   columnName: string;
   /** Approximate distinct value count */
   distinctCount?: number;
-  /** Null value count */
-  nullCount?: number;
+  /** Null value percentage (0-100) */
+  nullPercentage?: number;
   /** Minimum value */
   minValue?: string;
   /** Maximum value */
   maxValue?: string;
   /** Sample values (comma-separated string of up to 20 distinct values) */
   sampleValues?: string;
+  /** Top K value distribution */
+  topKDistribution?: ValueDistribution[];
+  /** Whether statistics are based on sampling */
+  isSampled?: boolean;
   /** Additional column-specific statistics */
   metadata?: Record<string, unknown>;
 }
