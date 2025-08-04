@@ -1,0 +1,51 @@
+{
+  "name": "@buster-app/cli",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/main.ts"
+    }
+  },
+  "bin": {
+    "buster": "./dist/main.js"
+  },
+  "scripts": {
+    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || (tsx scripts/validate-env.ts && pnpm run typecheck)",
+    "build": "tsup",
+    "build:dry-run": "tsup",
+    "build:binary": "bun build --compile --target=bun-linux-x64 --target=bun-darwin-x64 --target=bun-windows-x64 --outfile buster ./src/main.ts",
+    "dev": "tsx --watch src/main.ts",
+    "lint": "biome check --write",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts'",
+    "test:integration": "vitest run **/*.int.test.ts **/*.integration.test.ts",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@buster/server-shared": "workspace:*",
+    "commander": "^14.0.0",
+    "ink": "^6.0.1",
+    "react": "^19.0.0",
+    "ink-text-input": "^6.0.0",
+    "ink-select-input": "^6.0.0",
+    "ink-table": "^3.1.0",
+    "ink-spinner": "^5.0.0",
+    "ink-confirm-input": "^2.0.0",
+    "zod": "catalog:",
+    "js-yaml": "^4.1.0",
+    "fast-glob": "^3.3.2",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.2.0",
+    "@types/react": "^19.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.7.1"
+  }
+}

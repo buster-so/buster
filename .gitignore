@@ -75,7 +75,6 @@ web/playwright-tests/auth-utils/auth.json
 
 .trigger
 
-.claude/tasks
 .claude/commands
 .claude/settings.local.json
 
