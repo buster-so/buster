@@ -50,7 +50,7 @@ const getRepositoryTreeExecution = async ({
     // Get the tree structure with gitignore option enabled
     const treeResult = await getRepositoryTree(sandbox, '.', {
       gitignore: true,
-      maxDepth: 5, // Limit depth to avoid extremely large outputs
+      maxDepth: 10, // Limit depth to avoid extremely large outputs
     });
 
     if (!treeResult.success || !treeResult.output) {

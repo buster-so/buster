@@ -164,9 +164,15 @@ describe('docs-agent-workflow', () => {
 
   describe('real repository tests', () => {
     it('should successfully document the sample repository', async () => {
+      // Skip test if SAMPLE_REPO is not set
+      if (!process.env.SAMPLE_REPO) {
+        console.warn('Skipping real repository test - SAMPLE_REPO environment variable not set');
+        return;
+      }
+
       // Create sandbox and clone the real dbt repository
       const sandbox = await createSandboxWithGit({
-        gitUrl: process.env.SAMPLE_REPO || '',
+        gitUrl: process.env.SAMPLE_REPO,
         githubToken: process.env.GITHUB_PAT,
         language: 'typescript',
       });
@@ -253,7 +259,7 @@ describe('docs-agent-workflow', () => {
         // Run workflows concurrently with limit of 10
         await processFilesWithConcurrencyLimit(todoFiles, sandbox, 5);
       }
-    }, 800000); // Extended timeout for real repository operations
+    }, 1200000); // Extended timeout for real repository operations (20 minutes)
   });
 
   /**

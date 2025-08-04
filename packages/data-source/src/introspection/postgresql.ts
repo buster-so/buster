@@ -167,18 +167,19 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       }
 
       const tablesResult = await this.adapter.query(`
-        SELECT t.table_catalog as database,
+        SELECT DISTINCT ON (t.table_catalog, t.table_schema, t.table_name)
+               t.table_catalog as database,
                t.table_schema as schema,
                t.table_name as name,
                t.table_type as type,
-               c.reltuples::bigint as row_count_estimate,
-               pg_total_relation_size(c.oid) as size_bytes
+               COALESCE(c.reltuples::bigint, 0) as row_count_estimate,
+               COALESCE(pg_total_relation_size(c.oid), 0) as size_bytes
         FROM information_schema.tables t
-        LEFT JOIN pg_class c ON c.relname = t.table_name
-        LEFT JOIN pg_namespace n ON c.relnamespace = n.oid AND n.nspname = t.table_schema
+        LEFT JOIN pg_namespace n ON n.nspname = t.table_schema
+        LEFT JOIN pg_class c ON c.relname = t.table_name AND c.relnamespace = n.oid
         ${whereClause}
         AND t.table_type != 'VIEW'
-        ORDER BY schema, name
+        ORDER BY t.table_catalog, t.table_schema, t.table_name
       `);
 
       const tables = tablesResult.rows.map((row) => ({
@@ -489,8 +490,8 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
            string_agg(
                CASE 
                    WHEN length(sample_val::text) > 100 
-                   THEN left(sample_val::text, 100) || '...'
-                   ELSE sample_val::text
+                   THEN left(replace(replace(sample_val::text, E'\\n', ' '), E'\\r', ' '), 100) || '...'
+                   ELSE replace(replace(sample_val::text, E'\\n', ' '), E'\\r', ' ')
                END, 
                ','
                ORDER BY sample_val::text

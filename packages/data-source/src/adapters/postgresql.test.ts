@@ -30,7 +30,7 @@ describe('PostgreSQLAdapter', () => {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
         port: 5432,
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -52,7 +52,7 @@ describe('PostgreSQLAdapter', () => {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
         port: 5432,
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -101,7 +101,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -119,7 +119,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         ssl: true,
@@ -138,7 +138,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         schema: 'custom_schema',
@@ -157,7 +157,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         connection_timeout: 10000,
@@ -181,7 +181,7 @@ describe('PostgreSQLAdapter', () => {
         password: 'testpass',
       };
 
-      await expect(adapter.initialize(credentials)).rejects.toThrow(
+      await expect(adapter.initialize(credentials as any)).rejects.toThrow(
         'Invalid credentials type. Expected postgres, got mysql'
       );
     });
@@ -190,7 +190,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -207,7 +207,7 @@ describe('PostgreSQLAdapter', () => {
     const credentials: PostgreSQLCredentials = {
       type: DataSourceType.PostgreSQL,
       host: 'localhost',
-      database: 'testdb',
+      default_database: 'testdb',
       username: 'testuser',
       password: 'testpass',
     };
@@ -348,7 +348,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -367,7 +367,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -385,7 +385,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -400,7 +400,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -419,7 +419,7 @@ describe('PostgreSQLAdapter', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
