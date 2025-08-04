@@ -8,3 +8,5 @@ export * from './organizations';
 export * from './dashboards';
 export * from './metrics';
 export * from './collections';
+export * from './schema-sync';
+export * from './slack';

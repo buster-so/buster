@@ -1,0 +1,31 @@
+name: scrap_reason
+data_source_name: adventure_works
+schema: ont_ont
+database: postgres
+description: This model helps with quality control analysis, defect categorization, and waste reduction initiatives. It enables manufacturing teams to systematically track and analyze the reasons for scrapped materials and products, providing valuable insights for continuous improvement. The data helps answer critical business questions about the most common causes of product defects, trends in quality issues over time, and opportunities for process improvements to minimize waste and reduce manufacturing costs.
+relationships:
+- name: work_order
+  ref_: null
+  expr: scrapreasonid
+  type: foreign
+  description: Reference to work orders with this scrap reason
+  project_path: null
+dimensions:
+- name: name
+  expr: name
+  type: character varying
+  description: The name of the scrap reason.
+  searchable: true
+- name: modifieddate
+  expr: modifieddate
+  type: timestamp without time zone
+  description: The date and time when the scrap reason was last modified.
+  searchable: false
+measures:
+- name: scrapreasonid
+  expr: scrapreasonid
+  agg: sum
+  description: The unique identifier for the scrap reason entries.
+  type: integer
+metrics: []
+filters: []

@@ -49,6 +49,10 @@
       "types": "./dist/message/index.d.ts",
       "default": "./dist/message/index.js"
     },
+    "./schema-sync": {
+      "types": "./dist/schema-sync/index.d.ts",
+      "default": "./dist/schema-sync/index.js"
+    },
     "./organization": {
       "types": "./dist/organization/index.d.ts",
       "default": "./dist/organization/index.js"

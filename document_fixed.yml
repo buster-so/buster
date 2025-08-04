@@ -1,0 +1,72 @@
+name: document
+data_source_name: adventure_works
+schema: ont_ont
+database: postgres
+description: Enterprise document management model supporting technical documentation tracking, product specification management, and organizational knowledge management. Facilitates document versioning analysis, content lifecycle tracking, and cross-reference capabilities between products and their documentation. Essential for regulatory compliance, technical support, and content governance initiatives.
+model: null
+relationships:
+- name: product_document
+  ref_: null
+  expr: documentnode
+  type: foreign
+  description: Reference to products linked to this document
+  project_path: null
+dimensions:
+- name: documentnode
+  expr: documentnode
+  type: character varying
+  description: Identifier of the document node in the system
+  searchable: false
+- name: title
+  expr: title
+  type: character varying
+  description: Title of the document
+  searchable: true
+- name: filename
+  expr: filename
+  type: character varying
+  description: Name of the file
+  searchable: true
+- name: fileextension
+  expr: fileextension
+  type: character varying
+  description: File extension of the document file
+  searchable: true
+- name: revision
+  expr: revision
+  type: character
+  description: Revision number or letter of the document
+  searchable: true
+- name: documentsummary
+  expr: documentsummary
+  type: text
+  description: Short summary or abstract of the document
+  searchable: false
+- name: document
+  expr: document
+  type: bytea
+  description: Binary content of the document
+  searchable: false
+- name: rowguid
+  expr: rowguid
+  type: uuid
+  description: Row GUID for unique identification
+  searchable: false
+- name: modifieddate
+  expr: modifieddate
+  type: timestamp without time zone
+  description: Timestamp when the document was last modified
+  searchable: false
+- name: status
+  expr: status
+  type: smallint
+  description: Status code for the document
+  searchable: true
+measures:
+- name: changenumber
+  expr: changenumber
+  agg: sum
+  description: Total number of changes to the document
+  type: integer
+metrics: []
+filters: []

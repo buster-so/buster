@@ -78,3 +78,30 @@ export {
   batchWithRateLimit,
   getAllRateLimiterStats,
 } from './utils/rate-limiter';
+
+// Schema sync exports
+export {
+  parseDatasetYml,
+  extractColumnsFromYml,
+  normalizeColumnNames,
+} from './schema-sync/yml-parser';
+export type {
+  ParsedDatasetYml,
+  YmlDimension,
+  YmlMeasure,
+  YmlColumnInfo,
+} from './schema-sync/yml-parser';
+
+export {
+  compareSchemaWithYml,
+  categorizeDiscrepancies,
+  dedupDiscrepancies,
+} from './schema-sync/schema-comparator';
+
+export {
+  createIntrospectionService,
+} from './schema-sync/introspection-service';
+export type {
+  SchemaIntrospectionService,
+  IntrospectionResult,
+} from './schema-sync/introspection-service';

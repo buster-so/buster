@@ -24,6 +24,7 @@
     "@buster/server-shared": "workspace:*",
     "@buster/ai": "workspace:*",
     "@buster/database": "workspace:*",
+    "@buster/data-source": "workspace:*",
     "@buster/slack": "workspace:*",
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
