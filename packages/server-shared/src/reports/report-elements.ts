@@ -6,9 +6,15 @@ import { z } from 'zod';
  * Shared optional attributes for alignment and other element-specific settings.
  */
 const AttributesSchema = z.object({
+  id: z.string().optional(),
+  indent: z.number().int().min(0).optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+  lineHeight: z.number().optional(),
+  subscript: z.boolean().optional(),
+  superscript: z.boolean().optional(),
   attributes: z
     .object({
-      align: z.enum(['left', 'center', 'right']).optional(),
+      align: z.enum(['left', 'center', 'right']).optional(), //yes in both places
     })
     .optional(),
 });
@@ -20,20 +26,32 @@ const AttributesSchema = z.object({
  */
 
 // Basic text node with formatting flags
-export const TextSchema = z.object({
-  text: z.string(),
-  bold: z.boolean().optional(),
-  italic: z.boolean().optional(),
-  underline: z.boolean().optional(),
-  highlight: z.boolean().optional(),
-  kbd: z.boolean().optional(),
-  strikethrough: z.boolean().optional(),
-  code: z.boolean().optional(),
-});
+export const TextSchema = z
+  .object({
+    text: z.string(),
+    bold: z.boolean().optional(),
+    italic: z.boolean().optional(),
+    underline: z.boolean().optional(),
+    highlight: z.boolean().optional(),
+    kbd: z.boolean().optional(),
+    strikethrough: z.boolean().optional(),
+    code: z.boolean().optional(),
+    fontSize: z
+      .string()
+      .regex(/^(?:\d+px)$/)
+      .optional(),
+  })
+  .merge(AttributesSchema);
 
 // Simplified text node (plain text without formatting)
-export const SimpleTextSchema = z.object({
-  text: z.string(),
+export const SimpleTextSchema = z
+  .object({
+    text: z.string(),
+  })
+  .merge(AttributesSchema);
+
+export const VoidTextSchema = z.object({
+  text: z.literal(''),
 });
 
 /**
@@ -57,6 +75,13 @@ export const AnchorSchema = z.object({
   children: z.array(z.union([TextSchema, MentionSchema])),
 });
 
+const DateSchema = z.object({
+  type: z.literal('date'),
+  date: z.string(),
+  children: z.array(VoidTextSchema),
+  id: z.string().optional(),
+});
+
 /**
  * Block Elements
  * --------------
@@ -72,15 +97,36 @@ export const HeaderElementSchema = z
   })
   .merge(AttributesSchema);
 
+const ListStylesAttributesSchema = z.object({
+  listStyleType: z
+    .enum([
+      'disc',
+      'circle',
+      'square',
+      'decimal',
+      'decimal-leading-zero',
+      'todo',
+      'lower-alpha',
+      'upper-alpha',
+      'lower-roman',
+      'upper-roman',
+    ])
+    .optional(),
+  listRestart: z.boolean().optional(),
+  listRestartPolite: z.boolean().optional(),
+  listStart: z.number().int().min(0).optional(),
+  indent: z.number().int().min(0).max(20).optional(),
+  checked: z.boolean().optional(), //used with todo list style
+});
+
 // Paragraph element with optional list styling and indentation
 export const ParagraphElementSchema = z
   .object({
     type: z.literal('p'),
-    listStyleType: z.enum(['disc', 'circle', 'square']).optional(),
-    indent: z.number().int().min(0).optional(),
-    children: z.array(z.union([TextSchema, AnchorSchema, MentionSchema])),
+    children: z.array(z.union([TextSchema, AnchorSchema, MentionSchema, DateSchema])),
   })
-  .merge(AttributesSchema);
+  .merge(AttributesSchema)
+  .merge(ListStylesAttributesSchema);
 
 // Blockquote element
 export const BlockquoteElementSchema = z
@@ -110,8 +156,9 @@ export const ImageElementSchema = z
     alt: z.string().optional(),
     width: z.union([z.number(), z.string().regex(/^(?:\d+px|\d+%)$/)]).optional(),
     height: z.number().optional(),
-    children: z.array(TextSchema).default([]),
+    children: z.array(VoidTextSchema).default([]),
     caption: z.array(z.union([TextSchema, ParagraphElementSchema])).default([]),
+    id: z.string().optional(),
   })
   .merge(AttributesSchema);
 
@@ -120,14 +167,16 @@ export const EmojiElementSchema = z.object({
   type: z.literal('emoji'),
   emoji: z.string().optional(),
   code: z.string().optional(),
-  children: z.array(TextSchema).default([]),
+  children: z.array(VoidTextSchema).default([]),
+  id: z.string().optional(),
 });
 
 // Audio element
 export const AudioElementSchema = z.object({
   type: z.literal('audio'),
   url: z.string(),
-  children: z.array(TextSchema).default([]),
+  children: z.array(VoidTextSchema).default([]),
+  id: z.string().optional(),
 });
 
 // File element for attachments or uploads
@@ -136,13 +185,15 @@ export const FileElementSchema = z.object({
   url: z.string(),
   name: z.string(),
   isUpload: z.boolean().optional(),
-  children: z.array(TextSchema),
+  children: z.array(VoidTextSchema),
+  id: z.string().optional(),
 });
 
 // Table of Contents element
 export const TocElementSchema = z.object({
   type: z.literal('toc'),
-  children: z.array(TextSchema).default([]),
+  children: z.array(VoidTextSchema).default([]),
+  id: z.string().optional(),
 });
 
 /**
@@ -155,16 +206,33 @@ export const TocElementSchema = z.object({
 const CodeLineElementSchema = z.object({
   type: z.literal('code_line'),
   children: z.array(SimpleTextSchema),
+  id: z.string().optional(),
 });
 
 // Code block element with language selection
-export const CodeBlockElementSchema = z.object({
-  type: z.literal('code_block'),
-  lang: z
-    .enum(['sql', 'yaml', 'javascript', 'typescript', 'python', 'bash', 'json'])
-    .default('sql'),
-  children: z.array(CodeLineElementSchema),
-});
+export const CodeBlockElementSchema = z
+  .object({
+    type: z.literal('code_block'),
+    lang: z
+      .enum(['sql', 'yaml', 'javascript', 'typescript', 'python', 'bash', 'json'])
+      .default('sql'),
+    children: z.array(CodeLineElementSchema),
+  })
+  .merge(AttributesSchema);
+
+const NestedToggleElementSchema = z
+  .object({
+    type: z.literal('toggle'),
+    children: z.array(z.union([TextSchema, ParagraphElementSchema])),
+  })
+  .merge(AttributesSchema);
+
+export const ToggleElementSchema = z
+  .object({
+    type: z.literal('toggle'),
+    children: z.array(z.union([TextSchema, ParagraphElementSchema, NestedToggleElementSchema])),
+  })
+  .merge(AttributesSchema);
 
 /**
  * Callout Element
@@ -193,6 +261,7 @@ export const CalloutElementSchema = z
 // Column within a column group
 export const ColumnElementSchema = z.object({
   type: z.literal('column'),
+  id: z.string().optional(),
   width: z.union([z.string(), z.number()]).optional(),
   children: z.array(
     z.union([
@@ -209,6 +278,7 @@ export const ColumnElementSchema = z.object({
 export const ColumnGroupElementSchema = z.object({
   type: z.literal('column_group'),
   children: z.array(ColumnElementSchema),
+  id: z.string().optional(),
 });
 
 // Table cell types: data cell or header cell
@@ -279,10 +349,30 @@ export const ListItemElementSchema = z.object({
   children: z.array(TextSchema).default([]),
 });
 
+// Equation element
+
+export const EquationElementSchema = z.object({
+  type: z.literal('equation'),
+  id: z.string().optional(),
+  texExpression: z.string(),
+  children: z.array(VoidTextSchema).default([]),
+});
+
+// CUSTOM ELEMENTS
+
 export const MetricElementSchema = z.object({
   type: z.literal('metric'),
   metricId: z.string(),
-  children: z.array(SimpleTextSchema).default([]),
+  children: z.array(VoidTextSchema).default([]),
+  caption: z.array(z.union([TextSchema, ParagraphElementSchema])).default([]),
+});
+
+export const MediaEmbedElementSchema = z.object({
+  type: z.literal('media_embed'),
+  id: z.string().optional(),
+  url: z.string(),
+  width: z.union([z.number(), z.string().regex(/^(?:\d+px|\d+%)$/)]).optional(),
+  children: z.array(VoidTextSchema).default([]),
   caption: z.array(z.union([TextSchema, ParagraphElementSchema])).default([]),
 });
 
@@ -314,16 +404,14 @@ export const ReportElementSchema = z.discriminatedUnion('type', [
   AudioElementSchema,
   FileElementSchema,
   MetricElementSchema,
+  ToggleElementSchema,
+  MediaEmbedElementSchema,
+  EquationElementSchema,
 ]);
 
 // Array of report elements for complete documents
 export const ReportElementsSchema = z.array(ReportElementSchema);
 
-/**
- * Exported TypeScript Types
- * -------------------------
- * Inferred types from Zod schemas for type-safe usage.
- */
 export type TextElement = z.infer<typeof TextSchema>;
 export type SimpleTextElement = z.infer<typeof SimpleTextSchema>;
 export type MentionElement = z.infer<typeof MentionSchema>;

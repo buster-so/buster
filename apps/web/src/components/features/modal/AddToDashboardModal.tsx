@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/modal/InputSelectModal';
 import { useDebounce, useMemoizedFn } from '@/hooks';
 import { formatDate } from '@/lib';
+import type { BusterSearchResult } from '@/api/asset_interfaces/search';
 
 export const AddToDashboardModal: React.FC<{
   open: boolean;
@@ -35,7 +36,7 @@ export const AddToDashboardModal: React.FC<{
     { enabled: true }
   );
 
-  const columns = useMemo<InputSelectModalProps['columns']>(
+  const columns = useMemo<InputSelectModalProps<BusterSearchResult>['columns']>(
     () => [
       {
         title: 'Name',
@@ -45,7 +46,7 @@ export const AddToDashboardModal: React.FC<{
         title: 'Updated',
         dataIndex: 'updated_at',
         width: 140,
-        render: (value: string, x) => {
+        render: (value) => {
           return formatDate({
             date: value,
             format: 'lll'
@@ -56,7 +57,7 @@ export const AddToDashboardModal: React.FC<{
     []
   );
 
-  const rows: BusterListRowItem[] = useMemo(() => {
+  const rows = useMemo(() => {
     return (
       searchResults?.map((result) => ({
         id: result.id,

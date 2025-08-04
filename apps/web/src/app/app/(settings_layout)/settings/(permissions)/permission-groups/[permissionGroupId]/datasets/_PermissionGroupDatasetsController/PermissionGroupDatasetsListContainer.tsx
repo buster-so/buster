@@ -32,7 +32,7 @@ export const PermissionGroupDatasetsListContainer: React.FC<{
     });
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<GetPermissionGroupDatasetsResponse>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -42,11 +42,11 @@ export const PermissionGroupDatasetsListContainer: React.FC<{
         title: 'Assigned',
         dataIndex: 'assigned',
         width: 130 + 85,
-        render: (assigned: boolean, permissionGroup: GetPermissionGroupUsersResponse) => {
+        render: (assigned, dataset: GetPermissionGroupDatasetsResponse) => {
           return (
             <div className="flex justify-end">
               <PermissionAssignedCell
-                id={permissionGroup.id}
+                id={dataset.id}
                 assigned={assigned}
                 text="assigned"
                 onSelect={onSelectAssigned}
@@ -61,14 +61,14 @@ export const PermissionGroupDatasetsListContainer: React.FC<{
 
   const { cannotQueryPermissionUsers, canQueryPermissionUsers } = useMemo(() => {
     const result: {
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<GetPermissionGroupDatasetsResponse>[];
+      canQueryPermissionUsers: BusterListRowItem<GetPermissionGroupDatasetsResponse>[];
     } = filteredDatasets.reduce<{
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<GetPermissionGroupDatasetsResponse>[];
+      canQueryPermissionUsers: BusterListRowItem<GetPermissionGroupDatasetsResponse>[];
     }>(
       (acc, dataset) => {
-        const datasetItem: BusterListRowItem = {
+        const datasetItem: BusterListRowItem<GetPermissionGroupDatasetsResponse> = {
           id: dataset.id,
           data: dataset,
           link: createBusterRoute({
@@ -84,18 +84,18 @@ export const PermissionGroupDatasetsListContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionUsers: [] as BusterListRowItem[],
-        canQueryPermissionUsers: [] as BusterListRowItem[]
+        cannotQueryPermissionUsers: [],
+        canQueryPermissionUsers: []
       }
     );
     return result;
   }, [filteredDatasets]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<GetPermissionGroupDatasetsResponse>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -105,7 +105,7 @@ export const PermissionGroupDatasetsListContainer: React.FC<{
       ...canQueryPermissionUsers,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Not assigned',

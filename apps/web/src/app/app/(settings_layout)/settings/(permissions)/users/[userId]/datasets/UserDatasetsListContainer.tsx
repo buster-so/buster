@@ -28,7 +28,7 @@ export const UserDatasetsListContainer: React.FC<{
     await updateUserDatasets([params]);
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<BusterUserDataset>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -38,7 +38,7 @@ export const UserDatasetsListContainer: React.FC<{
         title: 'Assigned',
         dataIndex: 'assigned',
         width: 130,
-        render: (assigned: boolean, permissionGroup: BusterUserPermissionGroup) => {
+        render: (assigned, permissionGroup) => {
           return (
             <div className="flex justify-end">
               <PermissionAssignedCell
@@ -57,14 +57,14 @@ export const UserDatasetsListContainer: React.FC<{
 
   const { cannotQueryPermissionUsers, canQueryPermissionUsers } = useMemo(() => {
     const result: {
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<BusterUserDataset>[];
+      canQueryPermissionUsers: BusterListRowItem<BusterUserDataset>[];
     } = filteredDatasets.reduce<{
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<BusterUserDataset>[];
+      canQueryPermissionUsers: BusterListRowItem<BusterUserDataset>[];
     }>(
       (acc, dataset) => {
-        const user: BusterListRowItem = {
+        const user: BusterListRowItem<BusterUserDataset> = {
           id: dataset.id,
           data: dataset,
           link: createBusterRoute({
@@ -80,18 +80,18 @@ export const UserDatasetsListContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionUsers: [] as BusterListRowItem[],
-        canQueryPermissionUsers: [] as BusterListRowItem[]
+        cannotQueryPermissionUsers: [],
+        canQueryPermissionUsers: []
       }
     );
     return result;
   }, [filteredDatasets]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<BusterUserDataset>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -101,7 +101,7 @@ export const UserDatasetsListContainer: React.FC<{
       ...canQueryPermissionUsers,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Not assigned',

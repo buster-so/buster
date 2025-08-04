@@ -4,7 +4,8 @@ import * as React from 'react';
 
 import { ListStyleType, someList, toggleList } from '@platejs/list';
 import { useIndentTodoToolBarButton, useIndentTodoToolBarButtonState } from '@platejs/list/react';
-import { UnorderedList, OrderedList, ListTodo } from '@/components/ui/icons';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel } from '../config/labels';
 import { useEditorRef, useEditorSelector } from 'platejs/react';
 
 import {
@@ -20,7 +21,7 @@ import {
   ToolbarSplitButton,
   ToolbarSplitButtonPrimary,
   ToolbarSplitButtonSecondary
-} from './Toolbar';
+} from '@/components/ui/toolbar/Toolbar';
 
 export function BulletedListToolbarButton() {
   const editor = useEditorRef();
@@ -42,12 +43,12 @@ export function BulletedListToolbarButton() {
         }}
         data-state={pressed ? 'on' : 'off'}>
         <div className="size-4">
-          <UnorderedList />
+          <NodeTypeIcons.bulletedList />
         </div>
       </ToolbarSplitButtonPrimary>
 
       <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger>
           <ToolbarSplitButtonSecondary />
         </DropdownMenuTrigger>
 
@@ -120,12 +121,12 @@ export function NumberedListToolbarButton() {
         }
         data-state={pressed ? 'on' : 'off'}>
         <div className="size-4">
-          <OrderedList />
+          <NodeTypeIcons.numberedList />
         </div>
       </ToolbarSplitButtonPrimary>
 
       <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger>
           <ToolbarSplitButtonSecondary />
         </DropdownMenuTrigger>
 
@@ -183,9 +184,9 @@ export function TodoListToolbarButton(props: React.ComponentProps<typeof Toolbar
   const { props: buttonProps } = useIndentTodoToolBarButton(state);
 
   return (
-    <ToolbarButton {...props} {...buttonProps} tooltip="Todo">
+    <ToolbarButton {...props} {...buttonProps} tooltip={createLabel('todo')}>
       <div className="size-4">
-        <ListTodo />
+        <NodeTypeIcons.todoList />
       </div>
     </ToolbarButton>
   );

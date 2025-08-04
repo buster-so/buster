@@ -10,7 +10,7 @@ export const BlockSelectionKit = [
     options: {
       enableContextMenu: true,
       isSelectable: (element) => {
-        return !getPluginTypes(editor, [KEYS.column, KEYS.codeLine, KEYS.table, KEYS.td]).includes(
+        return !getPluginTypes(editor, [KEYS.column, KEYS.codeLine, KEYS.td]).includes(
           element.type
         );
       }
@@ -19,7 +19,7 @@ export const BlockSelectionKit = [
       belowRootNodes: (props) => {
         if (!props.attributes.className?.includes('slate-selectable')) return null;
 
-        //@ts-expect-error --
+        //@ts-expect-error -- TODO: fix this
         return <BlockSelection {...props} />;
       }
     }

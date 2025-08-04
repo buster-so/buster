@@ -17,7 +17,8 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "no-console": "off",
     "react/no-array-index-key": "off",
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "off",
+    "@next/next/no-img-element": "off"
   },
   "overrides": [
     {

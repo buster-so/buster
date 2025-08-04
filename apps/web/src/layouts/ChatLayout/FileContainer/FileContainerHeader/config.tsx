@@ -9,7 +9,8 @@ import { ReasoningContainerHeaderSegment } from './ReasoningContainerHeaderSegme
 export const SelectedFileSegmentRecord: Record<FileType, React.FC<FileContainerSegmentProps>> = {
   metric: MetricContainerHeaderSegment,
   dashboard: DashboardContainerHeaderSegment,
-  reasoning: ReasoningContainerHeaderSegment
+  reasoning: ReasoningContainerHeaderSegment,
+  report: () => <div>TODO: Report</div>
   // value: ValueContainerHeaderSegment,
   // term: TermContainerHeaderSegment,
   // dataset: DatasetContainerHeaderSegment,
@@ -19,6 +20,7 @@ export const SelectedFileSegmentRecord: Record<FileType, React.FC<FileContainerS
 export const SelectedFileButtonsRecord: Record<FileType, React.FC<FileContainerButtonsProps>> = {
   metric: MetricContainerHeaderButtons,
   dashboard: DashboardContainerHeaderButtons,
+  report: () => <div>TODO: Report buttons</div>,
   reasoning: () => null
   // value: ValueContainerHeaderButtons,
   // term: TermContainerHeaderButtons,

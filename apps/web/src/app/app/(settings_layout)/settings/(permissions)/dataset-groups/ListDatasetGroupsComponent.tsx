@@ -13,7 +13,7 @@ export const ListDatasetGroupsComponent: React.FC<{
   datasetGroups: DatasetGroup[];
   isFetched: boolean;
 }> = React.memo(({ datasetGroups, isFetched }) => {
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<DatasetGroup>[] = useMemo(
     () => [
       {
         title: 'Title',
@@ -23,7 +23,7 @@ export const ListDatasetGroupsComponent: React.FC<{
     []
   );
 
-  const datasetGroupsRows: BusterListRowItem[] = useMemo(() => {
+  const datasetGroupsRows: BusterListRowItem<DatasetGroup>[] = useMemo(() => {
     return datasetGroups.map((datasetGroup) => ({
       id: datasetGroup.id,
       data: datasetGroup,

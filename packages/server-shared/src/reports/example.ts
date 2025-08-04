@@ -287,7 +287,7 @@ export const SAMPLE_REPORT_ELEMENTS = [
   {
     type: 'metric',
     metricId: '123',
-    children: [{ text: '100' }],
+    children: [{ text: '' }],
     caption: [{ text: 'This is a metric' }],
   },
 ] satisfies ReportElement[];

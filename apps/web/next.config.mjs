@@ -29,20 +29,38 @@ const createCspHeader = (isEmbed = false) => {
     "img-src 'self' blob: data: https: http:",
     // Fonts
     "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
-    // Frame ancestors
-    isEmbed ? `frame-ancestors 'self' *` : "frame-ancestors 'none'",
-    // Frame sources
-    "frame-src 'self' https://vercel.live",
+    // Frame ancestors - allow framing in development, restrict in production
+    isEmbed
+      ? `frame-ancestors 'self' *`
+      : isDev
+        ? `frame-ancestors 'self' *`
+        : "frame-ancestors 'none'",
+    // Frame sources - allow embeds from accepted domains
+    "frame-src 'self' https://vercel.live https://*.twitter.com https://twitter.com https://*.x.com https://x.com https://*.youtube.com https://youtube.com https://*.youtube-nocookie.com https://youtube-nocookie.com https://*.youtu.be https://youtu.be https://*.vimeo.com https://vimeo.com",
     // Connect sources for API calls
     (() => {
       const connectSources = [
         "'self'",
+        'data:', // Allow data URLs for PDF exports and other data URI downloads
         localDomains,
         'https://*.vercel.app',
         'https://*.supabase.co',
         'wss://*.supabase.co',
         'https://*.posthog.com',
         'https://*.slack.com',
+        // Social media and video platform APIs for embeds
+        'https://*.twitter.com',
+        'https://twitter.com',
+        'https://*.x.com',
+        'https://x.com',
+        'https://*.youtube.com',
+        'https://youtube.com',
+        'https://*.youtube-nocookie.com',
+        'https://youtube-nocookie.com',
+        'https://*.youtu.be',
+        'https://youtu.be',
+        'https://*.vimeo.com',
+        'https://vimeo.com',
         apiUrl,
         api2Url,
         profilePictureURL
@@ -52,8 +70,8 @@ const createCspHeader = (isEmbed = false) => {
 
       return `connect-src ${connectSources.join(' ')}`;
     })(),
-    // Media
-    "media-src 'self'",
+    // Media - allow media content from accepted domains
+    "media-src 'self' https://*.twitter.com https://twitter.com https://*.x.com https://x.com https://*.youtube.com https://youtube.com https://*.youtube-nocookie.com https://youtube-nocookie.com https://*.youtu.be https://youtu.be https://*.vimeo.com https://vimeo.com",
     // Object
     "object-src 'none'",
     // Form actions

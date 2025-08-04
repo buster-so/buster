@@ -7,7 +7,7 @@ import { dashboardFiles, messages, messagesToFiles, metricFiles } from '../../sc
 // Type inference from schema
 type Message = InferSelectModel<typeof messages>;
 
-const DatabaseAssetTypeSchema = z.enum(['metric_file', 'dashboard_file']);
+const DatabaseAssetTypeSchema = z.enum(['metric_file', 'dashboard_file', 'report_file']);
 export type DatabaseAssetType = z.infer<typeof DatabaseAssetTypeSchema>;
 
 /**
@@ -70,7 +70,7 @@ function extractMetricIds(content: unknown): string[] {
  */
 async function getAssetDetails(
   assetId: string,
-  assetType: 'metric_file' | 'dashboard_file'
+  assetType: DatabaseAssetType
 ): Promise<AssetDetails | null> {
   if (assetType === 'metric_file') {
     const [metric] = await db
@@ -99,6 +99,10 @@ async function getAssetDetails(
       .limit(1);
 
     return dashboard || null;
+  }
+
+  if (assetType === 'report_file') {
+    throw new Error('Report files are not supported yet');
   }
 
   const _exhaustiveCheck: never = assetType;
@@ -259,7 +263,7 @@ export async function generateAssetMessages(input: GenerateAssetMessagesInput): 
 interface CreateFileAssociationInput {
   messageId: string;
   fileId: string;
-  fileType: 'metric_file' | 'dashboard_file';
+  fileType: DatabaseAssetType;
   version: number;
 }
 
@@ -360,6 +364,10 @@ export async function getAssetDetailsById(
       versionNumber,
       createdBy: dashboard.createdBy,
     };
+  }
+
+  if (validated.assetType === 'report_file') {
+    throw new Error('Report files are not supported yet');
   }
 
   // Exhaustive check

@@ -11,7 +11,8 @@ import { insertEquation, insertInlineEquation } from '@platejs/math';
 import {
   insertAudioPlaceholder,
   insertFilePlaceholder,
-  insertMedia,
+  insertPlaceholder,
+  insertImagePlaceholder,
   insertVideoPlaceholder
 } from '@platejs/media';
 import { SuggestionPlugin } from '@platejs/suggestion/react';
@@ -41,16 +42,19 @@ const insertBlockMap: Record<string, (editor: PlateEditor, type: string) => void
   [KEYS.codeBlock]: (editor) => insertCodeBlock(editor, { select: true }),
   [KEYS.equation]: (editor) => insertEquation(editor, { select: true }),
   [KEYS.file]: (editor) => insertFilePlaceholder(editor, { select: true }),
-  [KEYS.img]: (editor) =>
-    insertMedia(editor, {
-      select: true,
-      type: KEYS.img
-    }),
-  [KEYS.mediaEmbed]: (editor) =>
-    insertMedia(editor, {
-      select: true,
-      type: KEYS.mediaEmbed
-    }),
+  [KEYS.img]: (editor) => {
+    insertImagePlaceholder(editor, {
+      select: true
+    });
+  },
+  [KEYS.mediaEmbed]: (editor) => {
+    editor.tf.insertNodes(
+      editor.api.create.block({
+        type: KEYS.mediaEmbed
+      }),
+      { select: true }
+    );
+  },
   [KEYS.table]: (editor) => editor.getTransforms(TablePlugin).insert.table({}, { select: true }),
   [KEYS.toc]: (editor) => insertToc(editor, { select: true }),
   [KEYS.video]: (editor) => insertVideoPlaceholder(editor, { select: true })

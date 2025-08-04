@@ -18,12 +18,12 @@ export const ListUsersComponent: React.FC<{
   users: OrganizationUser[];
   isFetched: boolean;
 }> = React.memo(({ users, isFetched }) => {
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<OrganizationUser>[] = useMemo(
     () => [
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (name: string, user: OrganizationUser) => {
+        render: (name, user) => {
           return <ListUserItem name={name} email={user.email} avatarURL={user.avatar_url} />;
         }
       },
@@ -31,7 +31,7 @@ export const ListUsersComponent: React.FC<{
         title: 'Default access',
         dataIndex: 'role',
         width: 165,
-        render: (role: OrganizationUser['role']) => {
+        render: (role) => {
           return <Text variant="secondary">{OrganizationUserRoleText[role].title}</Text>;
         }
       }
@@ -40,12 +40,15 @@ export const ListUsersComponent: React.FC<{
   );
 
   const { activeUsers, inactiveUsers } = useMemo((): {
-    activeUsers: BusterListRowItem[];
-    inactiveUsers: BusterListRowItem[];
+    activeUsers: BusterListRowItem<OrganizationUser>[];
+    inactiveUsers: BusterListRowItem<OrganizationUser>[];
   } => {
-    return users.reduce<{ activeUsers: BusterListRowItem[]; inactiveUsers: BusterListRowItem[] }>(
+    return users.reduce<{
+      activeUsers: BusterListRowItem<OrganizationUser>[];
+      inactiveUsers: BusterListRowItem<OrganizationUser>[];
+    }>(
       (acc, user) => {
-        const rowItem: BusterListRowItem = {
+        const rowItem: BusterListRowItem<OrganizationUser> = {
           id: user.id,
           data: user,
           link: createBusterRoute({
@@ -66,11 +69,11 @@ export const ListUsersComponent: React.FC<{
     );
   }, [users]);
 
-  const rows: BusterListRowItem[] = useMemo(
+  const rows: BusterListRowItem<OrganizationUser>[] = useMemo(
     () => [
       {
         id: 'header-active',
-        data: {},
+        data: null,
         hidden: users.length === 0,
         rowSection: {
           title: 'Active',
@@ -80,7 +83,7 @@ export const ListUsersComponent: React.FC<{
       ...activeUsers,
       {
         id: 'header-inactive',
-        data: {},
+        data: null,
         hidden: inactiveUsers.length === 0,
         rowSection: {
           title: 'Inactive',

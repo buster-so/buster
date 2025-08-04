@@ -4,9 +4,10 @@ import * as React from 'react';
 
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
-import { Keyboard, Dots, Subscript, Superscript } from '@/components/ui/icons';
 import { KEYS } from 'platejs';
 import { useEditorRef } from 'platejs/react';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel, NodeTypeLabels } from '../config/labels';
 
 import {
   DropdownMenu,
@@ -16,7 +17,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton } from '@/components/ui/toolbar/Toolbar';
 
 export function MoreToolbarButton(props: DropdownMenuProps) {
   const editor = useEditorRef();
@@ -24,9 +25,9 @@ export function MoreToolbarButton(props: DropdownMenuProps) {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false} {...props}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton pressed={open} tooltip="Insert">
-          <Dots />
+      <DropdownMenuTrigger>
+        <ToolbarButton pressed={open} tooltip={createLabel('more')}>
+          <NodeTypeIcons.moreHorizontal />
         </ToolbarButton>
       </DropdownMenuTrigger>
 
@@ -40,8 +41,8 @@ export function MoreToolbarButton(props: DropdownMenuProps) {
               editor.tf.collapse({ edge: 'end' });
               editor.tf.focus();
             }}>
-            <Keyboard />
-            Keyboard input
+            <NodeTypeIcons.keyboard />
+            {NodeTypeLabels.keyboardInput.label}
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -51,9 +52,8 @@ export function MoreToolbarButton(props: DropdownMenuProps) {
               });
               editor.tf.focus();
             }}>
-            <Superscript />
-            Superscript
-            {/* (⌘+,) */}
+            <NodeTypeIcons.superscript />
+            {NodeTypeLabels.superscript.label}
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => {
@@ -62,9 +62,8 @@ export function MoreToolbarButton(props: DropdownMenuProps) {
               });
               editor.tf.focus();
             }}>
-            <Subscript />
-            Subscript
-            {/* (⌘+.) */}
+            <NodeTypeIcons.subscript />
+            {NodeTypeLabels.subscript.label}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

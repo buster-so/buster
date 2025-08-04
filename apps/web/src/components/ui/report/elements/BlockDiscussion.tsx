@@ -7,7 +7,7 @@ import type { PlateElementProps, RenderNodeWrapper } from 'platejs/react';
 import { getDraftCommentKey } from '@platejs/comment';
 import { CommentPlugin } from '@platejs/comment/react';
 import { SuggestionPlugin } from '@platejs/suggestion/react';
-import { TextArea, Message, Pencil } from '@/components/ui/icons';
+import { Message, Pencil } from '@/components/ui/icons';
 import {
   type AnyPluginConfig,
   type NodeEntry,

@@ -5,7 +5,7 @@ import type { ChatListItem } from '@buster/server-shared/chats';
 import { FavoriteStar } from '@/components/features/list';
 import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator';
 import { Avatar } from '@/components/ui/avatar';
-import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
+import type { BusterListColumn, BusterListRowItem } from '@/components/ui/list';
 import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
 import { useCreateListByDate } from '@/components/ui/list/useCreateListByDate';
 import { Text } from '@/components/ui/typography';
@@ -41,9 +41,9 @@ export const ChatItemsContainer: React.FC<{
     });
   });
 
-  const chatsByDate: BusterListRow[] = useMemo(() => {
-    return Object.entries(logsRecord).flatMap(([key, chats]) => {
-      const records = chats.map((chat) => ({
+  const chatsByDate: BusterListRowItem<ChatListItem>[] = useMemo(() => {
+    return Object.entries(logsRecord).flatMap<BusterListRowItem<ChatListItem>>(([key, chats]) => {
+      const records = chats.map<BusterListRowItem<ChatListItem>>((chat) => ({
         id: chat.id,
         data: chat,
         link: getLink(chat)
@@ -52,21 +52,20 @@ export const ChatItemsContainer: React.FC<{
 
       if (!hasRecords) return [];
 
-      return [
-        {
-          id: key,
-          data: {},
-          rowSection: {
-            title: makeHumanReadble(key),
-            secondaryTitle: String(records.length)
-          }
-        },
-        ...records
-      ];
+      const additionalItem: BusterListRowItem<ChatListItem> = {
+        id: key,
+        data: null,
+        rowSection: {
+          title: makeHumanReadble(key),
+          secondaryTitle: String(records.length)
+        }
+      };
+
+      return [additionalItem, ...records];
     });
   }, [logsRecord]);
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<ChatListItem>[] = useMemo(
     () => [
       {
         dataIndex: 'name',
@@ -113,7 +112,7 @@ export const ChatItemsContainer: React.FC<{
 
   return (
     <>
-      <BusterList
+      <BusterList<ChatListItem>
         rows={chatsByDate}
         columns={columns}
         onSelectChange={onSelectChange}

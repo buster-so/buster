@@ -31,7 +31,7 @@ export const PermissionListUsersContainer: React.FC<{
     updatePermissionUsers([params]);
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<ListPermissionUsersResponse>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -62,14 +62,14 @@ export const PermissionListUsersContainer: React.FC<{
 
   const { cannotQueryPermissionUsers, canQueryPermissionUsers } = useMemo(() => {
     const result: {
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<ListPermissionUsersResponse>[];
+      canQueryPermissionUsers: BusterListRowItem<ListPermissionUsersResponse>[];
     } = filteredPermissionUsers.reduce<{
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<ListPermissionUsersResponse>[];
+      canQueryPermissionUsers: BusterListRowItem<ListPermissionUsersResponse>[];
     }>(
       (acc, permissionUser) => {
-        const user: BusterListRowItem = {
+        const user = {
           id: permissionUser.id,
           data: permissionUser,
           link: createBusterRoute({
@@ -85,18 +85,18 @@ export const PermissionListUsersContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionUsers: [] as BusterListRowItem[],
-        canQueryPermissionUsers: [] as BusterListRowItem[]
+        cannotQueryPermissionUsers: [],
+        canQueryPermissionUsers: []
       }
     );
     return result;
   }, [filteredPermissionUsers]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<ListPermissionUsersResponse>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -106,7 +106,7 @@ export const PermissionListUsersContainer: React.FC<{
       ...canQueryPermissionUsers,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Not assigned',

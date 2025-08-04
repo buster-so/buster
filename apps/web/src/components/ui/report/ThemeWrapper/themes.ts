@@ -1,3 +1,5 @@
+import { THEME_RESET_COLORS } from '@/styles/theme-reset';
+
 const _THEMES = {
   ayu: {
     id: 'ayu',
@@ -149,56 +151,7 @@ const _THEMES = {
     },
     name: 'Default Palette'
   },
-  'default-shadcn': {
-    id: 'default-shadcn',
-    dark: {
-      accent: '240 3.7% 15.9%',
-      'accent-foreground': '0 0% 98%',
-      background: '240 10% 3.9%',
-      border: '240 3.7% 15.9%',
-      brand: '213.3 93.9% 67.8%',
-      card: '240 10% 3.9%',
-      'card-foreground': '0 0% 98%',
-      destructive: '0 62.8% 30.6%',
-      'destructive-foreground': '0 0% 98%',
-      foreground: '0 0% 98%',
-      highlight: '48 96% 53%',
-      input: '240 3.7% 15.9%',
-      muted: '240 3.7% 15.9%',
-      'muted-foreground': '240 5% 64.9%',
-      popover: '240 10% 3.9%',
-      'popover-foreground': '0 0% 98%',
-      primary: '0 0% 98%',
-      'primary-foreground': '240 5.9% 10%',
-      ring: '240 4.9% 83.9%',
-      secondary: '240 3.7% 15.9%',
-      'secondary-foreground': '0 0% 98%'
-    },
-    light: {
-      accent: '240 4.8% 95.9%',
-      'accent-foreground': '240 5.9% 10%',
-      background: '0 0% 100%',
-      border: '240 5.9% 90%',
-      brand: '217.2 91.2% 59.8%',
-      card: '0 0% 100%',
-      'card-foreground': '240 10% 3.9%',
-      destructive: '0 84.2% 60.2%',
-      'destructive-foreground': '0 0% 98%',
-      foreground: '240 10% 3.9%',
-      highlight: '47.9 95.8% 53.1%',
-      input: '240 5.9% 90%',
-      muted: '240 4.8% 95.9%',
-      'muted-foreground': '240 3.8% 46.1%',
-      popover: '0 0% 100%',
-      'popover-foreground': '240 10% 3.9%',
-      primary: '240 5.9% 10%',
-      'primary-foreground': '0 0% 98%',
-      ring: '240 10% 3.9%',
-      secondary: '240 4.8% 95.9%',
-      'secondary-foreground': '240 5.9% 10%'
-    },
-    name: 'Default'
-  },
+  'default-shadcn': THEME_RESET_COLORS,
   dune: {
     id: 'dune',
     dark: {
@@ -553,7 +506,7 @@ export function themeColorsToCssVariables(colors: Record<string, string>): Recor
   //     `${cssVars["--primary"]} / ${100 - key * 20}%`
   // }
 
-  return cssVars;
+  return { ...cssVars };
 }
 
 export function themeColorNameToCssVariable(name: string) {

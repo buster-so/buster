@@ -16,33 +16,41 @@ import {
   ContextMenuContent,
   ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuShortcut,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger
 } from '@/components/ui/context-menu';
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice';
+import { THEME_RESET_STYLE } from '@/styles/theme-reset';
+import { NodeTypeIcons } from '../config/icons';
+import { NodeTypeLabels } from '../config/labels';
+
+// Helper function to render menu item content
+const MenuItemContent = ({
+  icon,
+  labelKey
+}: {
+  icon: React.ComponentType;
+  labelKey: keyof typeof NodeTypeLabels;
+}) => {
+  const label = NodeTypeLabels[labelKey];
+  const Icon = icon;
+  return (
+    <>
+      <div className="text-icon-color text-md size-4">
+        <Icon />
+      </div>
+      {label.label}
+      {label.keyboard && <ContextMenuShortcut>{label.keyboard}</ContextMenuShortcut>}
+    </>
+  );
+};
 
 type Value = 'askAI' | null;
-/**
- * BlockContextMenu provides a right-click context menu for selected blocks in the Plate.js editor.
- *
- * Features:
- * - Ask AI: Trigger AI chat for the selected block
- * - Delete: Remove the selected block(s)
- * - Duplicate: Create a copy of the selected block(s)
- * - Turn into: Convert block type (paragraph, headings, blockquote)
- * - Indent/Outdent: Adjust block indentation
- * - Align: Set text alignment (left, center, right)
- *
- * The menu is automatically disabled on touch devices and in read-only mode.
- * Block selection is maintained during menu interactions.
- *
- * @param children - The child elements to wrap with the context menu trigger
- * @returns A context menu component wrapped around the provided children
- */
 
-export function BlockContextMenu({ children }: { children: React.ReactNode }) {
+function BlockContextMenuComponent({ children }: { children: React.ReactNode }) {
   const { api, editor } = useEditorPlugin(BlockMenuPlugin);
   const [value, setValue] = React.useState<Value>(null);
   const isTouch = useIsTouchDevice();
@@ -92,8 +100,10 @@ export function BlockContextMenu({ children }: { children: React.ReactNode }) {
         asChild
         onContextMenu={(event) => {
           const dataset = (event.target as HTMLElement).dataset;
-
-          const disabled = dataset?.slateEditor === 'true' || readOnly;
+          const disabled =
+            dataset?.slateEditor === 'true' ||
+            readOnly ||
+            dataset?.plateOpenContextMenu === 'false';
 
           if (disabled) return event.preventDefault();
 
@@ -102,10 +112,11 @@ export function BlockContextMenu({ children }: { children: React.ReactNode }) {
             y: event.clientY
           });
         }}>
-        <div className="w-full">{children}</div>
+        <div className="block-context-menu-trigger">{children}</div>
       </ContextMenuTrigger>
       <ContextMenuContent
         className="w-64"
+        style={THEME_RESET_STYLE}
         onCloseAutoFocus={(e) => {
           e.preventDefault();
           editor.getApi(BlockSelectionPlugin).blockSelection.focus();
@@ -117,56 +128,84 @@ export function BlockContextMenu({ children }: { children: React.ReactNode }) {
           setValue(null);
         }}>
         <ContextMenuGroup>
-          <ContextMenuItem
+          {/* <ContextMenuItem
             onClick={() => {
               setValue('askAI');
             }}>
-            Ask AI
-          </ContextMenuItem>
+            <MenuItemContent icon={NodeTypeIcons.ai} labelKey="askAI" />
+          </ContextMenuItem> */}
           <ContextMenuItem
             onClick={() => {
               editor.getTransforms(BlockSelectionPlugin).blockSelection.removeNodes();
               editor.tf.focus();
             }}>
-            Delete
+            <MenuItemContent icon={NodeTypeIcons.trash} labelKey="delete" />
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => {
               editor.getTransforms(BlockSelectionPlugin).blockSelection.duplicate();
             }}>
-            Duplicate
-            {/* <ContextMenuShortcut>⌘ + D</ContextMenuShortcut> */}
+            <MenuItemContent icon={NodeTypeIcons.copy} labelKey="duplicate" />
           </ContextMenuItem>
           <ContextMenuSub>
-            <ContextMenuSubTrigger>Turn into</ContextMenuSubTrigger>
+            <ContextMenuSubTrigger>
+              <MenuItemContent icon={NodeTypeIcons.turnInto} labelKey="turnInto" />
+            </ContextMenuSubTrigger>
             <ContextMenuSubContent className="w-48">
-              <ContextMenuItem onClick={() => handleTurnInto(KEYS.p)}>Paragraph</ContextMenuItem>
+              <ContextMenuItem onClick={() => handleTurnInto(KEYS.p)}>
+                <MenuItemContent icon={NodeTypeIcons.paragraph} labelKey="paragraph" />
+              </ContextMenuItem>
 
-              <ContextMenuItem onClick={() => handleTurnInto(KEYS.h1)}>Heading 1</ContextMenuItem>
-              <ContextMenuItem onClick={() => handleTurnInto(KEYS.h2)}>Heading 2</ContextMenuItem>
-              <ContextMenuItem onClick={() => handleTurnInto(KEYS.h3)}>Heading 3</ContextMenuItem>
+              <ContextMenuItem onClick={() => handleTurnInto(KEYS.h1)}>
+                <MenuItemContent icon={NodeTypeIcons.h1} labelKey="h1" />
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleTurnInto(KEYS.h2)}>
+                <MenuItemContent icon={NodeTypeIcons.h2} labelKey="h2" />
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleTurnInto(KEYS.h3)}>
+                <MenuItemContent icon={NodeTypeIcons.h3} labelKey="h3" />
+              </ContextMenuItem>
               <ContextMenuItem onClick={() => handleTurnInto(KEYS.blockquote)}>
-                Blockquote
+                <MenuItemContent icon={NodeTypeIcons.quote} labelKey="blockquote" />
               </ContextMenuItem>
             </ContextMenuSubContent>
           </ContextMenuSub>
         </ContextMenuGroup>
 
         <ContextMenuGroup>
-          <ContextMenuItem
-            onClick={() => editor.getTransforms(BlockSelectionPlugin).blockSelection.setIndent(1)}>
-            Indent
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={() => editor.getTransforms(BlockSelectionPlugin).blockSelection.setIndent(-1)}>
-            Outdent
-          </ContextMenuItem>
           <ContextMenuSub>
-            <ContextMenuSubTrigger>Align</ContextMenuSubTrigger>
+            <ContextMenuSubTrigger>
+              <MenuItemContent icon={NodeTypeIcons.indent} labelKey="indentation" />
+            </ContextMenuSubTrigger>
             <ContextMenuSubContent className="w-48">
-              <ContextMenuItem onClick={() => handleAlign('left')}>Left</ContextMenuItem>
-              <ContextMenuItem onClick={() => handleAlign('center')}>Center</ContextMenuItem>
-              <ContextMenuItem onClick={() => handleAlign('right')}>Right</ContextMenuItem>
+              <ContextMenuItem
+                onClick={() =>
+                  editor.getTransforms(BlockSelectionPlugin).blockSelection.setIndent(1)
+                }>
+                <MenuItemContent icon={NodeTypeIcons.indent} labelKey="indent" />
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() =>
+                  editor.getTransforms(BlockSelectionPlugin).blockSelection.setIndent(-1)
+                }>
+                <MenuItemContent icon={NodeTypeIcons.outdent} labelKey="outdent" />
+              </ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <MenuItemContent icon={NodeTypeIcons.alignLeft} labelKey="align" />
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              <ContextMenuItem onClick={() => handleAlign('left')}>
+                <MenuItemContent icon={NodeTypeIcons.alignLeft} labelKey="alignLeft" />
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleAlign('center')}>
+                <MenuItemContent icon={NodeTypeIcons.alignCenter} labelKey="alignCenter" />
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleAlign('right')}>
+                <MenuItemContent icon={NodeTypeIcons.alignRight} labelKey="alignRight" />
+              </ContextMenuItem>
             </ContextMenuSubContent>
           </ContextMenuSub>
         </ContextMenuGroup>
@@ -174,3 +213,5 @@ export function BlockContextMenu({ children }: { children: React.ReactNode }) {
     </ContextMenu>
   );
 }
+
+export const BlockContextMenu = React.memo(BlockContextMenuComponent);

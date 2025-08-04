@@ -6,7 +6,7 @@ import {
   type WithPlateOptions
 } from 'platejs/react';
 
-import { AllEditorPlugins } from './all-editor-plugins';
+import { EditorKit } from './editor-kit';
 
 const USE_DEPENDENCIES = true;
 
@@ -24,7 +24,7 @@ export const useReportEditor = (
 ) => {
   return usePlateEditor(
     {
-      plugins: AllEditorPlugins,
+      plugins: EditorKit,
       value,
       readOnly: disabled,
       onReady
@@ -33,6 +33,6 @@ export const useReportEditor = (
   ); // Pass dependencies to usePlateEditor
 };
 
-export type ReportEditor = TPlateEditor<Value, (typeof AllEditorPlugins)[number]>;
+export type ReportEditor = TPlateEditor<Value, (typeof EditorKit)[number]>;
 
 export const useEditor = () => useEditorRef<ReportEditor>();

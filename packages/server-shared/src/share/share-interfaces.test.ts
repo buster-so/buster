@@ -52,7 +52,7 @@ describe('ShareAssetTypeSchema', () => {
   });
 
   it('should reject invalid asset type values', () => {
-    const invalidTypes = ['report', 'query', 'table', '', 'METRIC'];
+    const invalidTypes = ['report-id', 'query', 'table', '', 'METRIC'];
 
     for (const type of invalidTypes) {
       const result = ShareAssetTypeSchema.safeParse(type);

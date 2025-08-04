@@ -12,7 +12,7 @@ import { Text } from '@/components/ui/typography';
 
 export const UserDatasetListContainer = React.memo(
   ({ filteredDatasets }: { filteredDatasets: OrganizationUserDataset[] }) => {
-    const columns: BusterListColumn[] = useMemo(
+    const columns: BusterListColumn<OrganizationUserDataset>[] = useMemo(
       () => [
         {
           title: 'Name',
@@ -32,16 +32,16 @@ export const UserDatasetListContainer = React.memo(
 
     const { canQuery, cannotQuery, disabled } = useMemo(() => {
       const results: {
-        canQuery: BusterListRowItem[];
-        cannotQuery: BusterListRowItem[];
-        disabled: BusterListRowItem[];
+        canQuery: BusterListRowItem<OrganizationUserDataset>[];
+        cannotQuery: BusterListRowItem<OrganizationUserDataset>[];
+        disabled: BusterListRowItem<OrganizationUserDataset>[];
       } = filteredDatasets.reduce<{
-        canQuery: BusterListRowItem[];
-        cannotQuery: BusterListRowItem[];
-        disabled: BusterListRowItem[];
+        canQuery: BusterListRowItem<OrganizationUserDataset>[];
+        cannotQuery: BusterListRowItem<OrganizationUserDataset>[];
+        disabled: BusterListRowItem<OrganizationUserDataset>[];
       }>(
         (acc, dataset) => {
-          const datasetItem: BusterListRowItem = {
+          const datasetItem: BusterListRowItem<OrganizationUserDataset> = {
             id: dataset.id,
             data: dataset
           };
@@ -60,11 +60,11 @@ export const UserDatasetListContainer = React.memo(
       return results;
     }, [filteredDatasets]);
 
-    const rows: BusterListRowItem[] = useMemo(() => {
+    const rows: BusterListRowItem<OrganizationUserDataset>[] = useMemo(() => {
       return [
         {
           id: 'header-can-query',
-          data: {},
+          data: null,
           hidden: canQuery.length === 0,
           rowSection: {
             title: 'Can query',
@@ -74,7 +74,7 @@ export const UserDatasetListContainer = React.memo(
         ...canQuery,
         {
           id: 'header-cannot-query',
-          data: {},
+          data: null,
           hidden: cannotQuery.length === 0,
           rowSection: {
             title: 'Cannot Query',
@@ -84,7 +84,7 @@ export const UserDatasetListContainer = React.memo(
         ...cannotQuery,
         {
           id: 'header-disabled',
-          data: {},
+          data: null,
           hidden: disabled.length === 0,
           rowSection: {
             title: 'Disabled',

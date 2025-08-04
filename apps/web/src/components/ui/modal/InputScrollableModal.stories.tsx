@@ -3,9 +3,15 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import React from 'react';
 import { useSet } from '@/hooks';
-import { InputSelectModal } from './InputSelectModal';
+import { InputSelectModal, type InputSelectModalProps } from './InputSelectModal';
 
-const meta: Meta<typeof InputSelectModal> = {
+// Define the data type for the list items
+type ListItemData = {
+  name: string;
+  email: string;
+};
+
+const meta: Meta<typeof InputSelectModal<ListItemData>> = {
   title: 'UI/Modal/InputSelectModal',
   component: InputSelectModal,
   parameters: {
@@ -15,7 +21,7 @@ const meta: Meta<typeof InputSelectModal> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof InputSelectModal>;
+type Story = StoryObj<typeof InputSelectModal<ListItemData>>;
 
 export const Default: Story = {
   render: (args) => {
@@ -26,7 +32,7 @@ export const Default: Story = {
     };
 
     return (
-      <InputSelectModal
+      <InputSelectModal<ListItemData>
         {...args}
         open={true}
         selectedRowKeys={Array.from(selectedItems)}
@@ -50,17 +56,17 @@ export const Default: Story = {
     columns: [
       {
         title: 'Name',
-        dataIndex: 'name'
+        dataIndex: 'name' as const
       },
       {
         title: 'Email',
-        dataIndex: 'email'
+        dataIndex: 'email' as const
       }
-    ],
+    ] satisfies InputSelectModalProps<ListItemData>['columns'],
     selectedRowKeys: [],
     rows: Array.from({ length: 3000 }, () => ({
       id: faker.string.uuid(),
-      data: { name: faker.person.fullName(), email: faker.internet.email() }
+      data: { name: faker.person.fullName(), email: faker.internet.email() } as ListItemData
     }))
   }
 };

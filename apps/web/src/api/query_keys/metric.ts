@@ -9,7 +9,7 @@ import type { listMetrics } from '../buster_rest/metrics';
 export const metricsGetMetric = (metricId: string, version_number: number | null) => {
   return queryOptions<BusterMetric>({
     queryKey: ['metrics', 'get', metricId, version_number || 'INITIAL'] as const,
-    staleTime: 60 * 1000
+    staleTime: 60 * 1000 // 60 seconds
   });
 };
 

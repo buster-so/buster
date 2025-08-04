@@ -38,7 +38,7 @@ const sizeVariants = {
 };
 
 export const buttonVariants = cva(
-  'inline-flex whitespace-nowrap items-center overflow-hidden text-base justify-center gap-1.5 shadow rounded transition-all duration-300 focus-visible:outline-none disabled:pointer-events-none disabled:cursor-not-allowed data-[loading=true]:cursor-progress',
+  'inline-flex cursor-pointer whitespace-nowrap items-center overflow-hidden text-base justify-center gap-1.5 shadow rounded transition-all duration-300 focus-visible:outline-none disabled:pointer-events-none disabled:cursor-not-allowed data-[loading=true]:cursor-progress',
   {
     variants: {
       variant: buttonTypeClasses,
@@ -168,10 +168,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <Comp
-        className={cn(
-          'cursor-pointer',
-          buttonVariants({ variant, size, iconButton, rounding, block, className })
-        )}
+        className={cn(buttonVariants({ variant, size, iconButton, rounding, block, className }))}
         onClick={onClick}
         ref={ref}
         disabled={disabled}

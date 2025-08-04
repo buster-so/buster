@@ -174,6 +174,24 @@ const collectionItems: DropdownItem<ShareRole>[] = [
   }
 ];
 
+const reportItems: DropdownItem<ShareRole>[] = [
+  {
+    value: 'fullAccess',
+    label: 'Full access',
+    secondaryLabel: 'Can edit and share with others.'
+  },
+  {
+    value: 'canEdit',
+    label: 'Can edit',
+    secondaryLabel: 'Can edit but not share with others.'
+  },
+  {
+    value: 'canView',
+    label: 'Can view',
+    secondaryLabel: 'Can view asset but not edit.'
+  }
+];
+
 const workspaceItems: DropdownItem<WorkspaceShareRole>[] = [
   {
     value: 'fullAccess',
@@ -198,10 +216,11 @@ const workspaceItems: DropdownItem<WorkspaceShareRole>[] = [
 ];
 
 const itemsRecord: Record<ShareAssetType, DropdownItem<ShareRole>[]> = {
-  ['dashboard']: dashboardItems,
-  ['metric']: metricItems,
-  ['collection']: collectionItems,
-  ['chat']: collectionItems
+  dashboard: dashboardItems,
+  metric: metricItems,
+  collection: collectionItems,
+  chat: collectionItems,
+  report: reportItems
 };
 
 const OWNER_ITEM: DropdownItem<DropdownValue> = {

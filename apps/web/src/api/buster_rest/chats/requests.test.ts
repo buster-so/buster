@@ -32,7 +32,8 @@ describe('Chat API Requests', () => {
           latest_file_id: 'file-1',
           latest_file_type: 'dashboard',
           latest_version_number: 1,
-          latest_file_name: 'Test File'
+          latest_file_name: 'Test File',
+          is_shared: false
         }
       ];
 

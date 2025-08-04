@@ -6,20 +6,55 @@ import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import type { TMediaEmbedElement } from 'platejs';
 import type { PlateElementProps } from 'platejs/react';
 
-import { parseTwitterUrl, parseVideoUrl } from '@platejs/media';
+import { parseTwitterUrl, parseVideoUrl, type EmbedUrlParser } from '@platejs/media';
 import { MediaEmbedPlugin, useMediaState } from '@platejs/media/react';
 import { ResizableProvider, useResizableValue } from '@platejs/resizable';
-import { PlateElement, withHOC } from 'platejs/react';
+import {
+  PlateElement,
+  useEditorRef,
+  useElement,
+  useFocused,
+  useReadOnly,
+  useSelected,
+  withHOC
+} from 'platejs/react';
 
 import { cn } from '@/lib/utils';
 
 import { Caption, CaptionTextarea } from './CaptionNode';
 import { MediaToolbar } from './MediaToolbar';
 import { mediaResizeHandleVariants, Resizable, ResizeHandle } from './ResizeHandle';
+import { PopoverAnchor, PopoverBase, PopoverContent } from '../../popover';
+import { Text } from '../../typography';
+import { Input } from '../../inputs';
+import { Button } from '../../buttons';
+import { Separator } from '../../separator';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useEffect } from 'react';
+import { useClickAway } from '@/hooks/useClickAway';
+import { isUrlFromAcceptedDomain } from '@/lib/url';
+import { NodeTypeIcons } from '../config/icons';
+
+const parseGenericUrl: EmbedUrlParser = (url: string) => {
+  return {
+    url,
+    provider: 'generic'
+  };
+};
+
+const urlParsers: EmbedUrlParser[] = [parseTwitterUrl, parseVideoUrl, parseGenericUrl];
+const ACCEPTED_DOMAINS = [
+  process.env.NEXT_PUBLIC_URL,
+  'twitter.com',
+  'x.com',
+  'youtube.com',
+  'vimeo.com'
+];
 
 export const MediaEmbedElement = withHOC(
   ResizableProvider,
   function MediaEmbedElement(props: PlateElementProps<TMediaEmbedElement>) {
+    const url = props.element.url;
     const {
       align = 'center',
       embed,
@@ -28,16 +63,22 @@ export const MediaEmbedElement = withHOC(
       isVideo,
       isYoutube,
       readOnly,
-      selected
+      selected,
+      ...rest
     } = useMediaState({
-      urlParsers: [parseTwitterUrl, parseVideoUrl]
+      urlParsers
     });
     const width = useResizableValue('width');
     const provider = embed?.provider;
+    const hasElement = !!url;
+
+    if (!hasElement) {
+      return <MediaEmbedPlaceholder {...props} />;
+    }
 
     return (
       <MediaToolbar plugin={MediaEmbedPlugin}>
-        <PlateElement className="py-2.5" {...props}>
+        <PlateElement className="media-embed py-2.5" {...props}>
           <figure className="group relative m-0 w-full cursor-default" contentEditable={false}>
             <Resizable
               align={align}
@@ -94,7 +135,19 @@ export const MediaEmbedElement = withHOC(
                     />
                   </div>
                 )
-              ) : null}
+              ) : (
+                <div className="bg-gray-light/30 h-full min-h-16 w-full overflow-hidden rounded">
+                  <iframe
+                    className={cn(
+                      'absolute top-0 left-0 size-full min-h-16 rounded-sm',
+                      focused && selected && 'ring-ring ring-2 ring-offset-2'
+                    )}
+                    title="embed"
+                    src={embed?.url ?? url}
+                    allowFullScreen
+                  />
+                </div>
+              )}
 
               <ResizeHandle
                 className={mediaResizeHandleVariants({ direction: 'right' })}
@@ -113,3 +166,107 @@ export const MediaEmbedElement = withHOC(
     );
   }
 );
+
+export const MediaEmbedPlaceholder = (props: PlateElementProps<TMediaEmbedElement>) => {
+  const readOnly = useReadOnly();
+  const selected = useSelected();
+  const focused = useFocused();
+  const editor = useEditorRef();
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const popoverRef = React.useRef<HTMLDivElement>(null);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const { openInfoMessage } = useBusterNotifications();
+  const [forceOpen, setForceOpen] = React.useState(false);
+  const element = useElement();
+
+  const isFocused = focused && selected && !readOnly;
+
+  const onAddMedia = () => {
+    const url = inputRef.current?.value;
+    if (!url) {
+      openInfoMessage('Please enter a valid URL');
+      return;
+    }
+
+    // Check if the URL is from an accepted domain
+    const isAccepted = isUrlFromAcceptedDomain(url);
+
+    if (!isAccepted) {
+      openInfoMessage(
+        `Please enter a valid URL from an accepted domain: ${ACCEPTED_DOMAINS.join(', ')}`
+      );
+      return;
+    }
+
+    // Update the current node with the URL
+    editor.tf.setNodes({ url }, { at: editor.api.findPath(props.element) });
+
+    setForceOpen(false);
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      setForceOpen(true);
+    }
+  }, [isFocused]);
+
+  useClickAway(
+    (e) => {
+      setForceOpen(false);
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [popoverRef, anchorRef]
+  );
+
+  return (
+    <PlateElement className="media-embed py-2.5" {...props}>
+      <PopoverBase open={forceOpen}>
+        <PopoverAnchor>
+          <div
+            ref={anchorRef}
+            className={cn(
+              'bg-muted hover:bg-primary/10 flex cursor-pointer items-center rounded-sm p-3 pr-9 select-none'
+            )}
+            contentEditable={false}>
+            <div className="text-muted-foreground/80 relative mr-3 flex [&_svg]:size-6">
+              <NodeTypeIcons.embed />
+            </div>
+
+            <div className="text-muted-foreground text-sm whitespace-nowrap">Add a media embed</div>
+          </div>
+        </PopoverAnchor>
+
+        <PopoverContent
+          ref={popoverRef}
+          className="flex w-[300px] flex-col px-0 py-2"
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+          }}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+          }}>
+          <div className="px-3">
+            <Text>Add an embed link</Text>
+          </div>
+
+          <Separator className="my-2" />
+
+          <div className="flex flex-col space-y-2 px-3">
+            <Input
+              placeholder="Paste the link"
+              autoFocus
+              onPressEnter={onAddMedia}
+              ref={inputRef}
+            />
+            <Button block variant={'black'} onClick={onAddMedia}>
+              Add media
+            </Button>
+          </div>
+        </PopoverContent>
+      </PopoverBase>
+
+      {props.children}
+    </PlateElement>
+  );
+};

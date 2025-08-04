@@ -6,12 +6,15 @@ import {
   FontBackgroundColorPlugin,
   FontColorPlugin,
   FontFamilyPlugin,
-  FontSizePlugin
+  FontSizePlugin,
+  FontWeightPlugin
 } from '@platejs/basic-styles/react';
 import { KEYS } from 'platejs';
 
 const options = {
-  inject: { targetPlugins: [KEYS.p] }
+  inject: {
+    targetPlugins: [KEYS.p]
+  }
 } satisfies PlatePluginConfig;
 
 export const FontKit = [
@@ -25,5 +28,6 @@ export const FontKit = [
   }),
   FontBackgroundColorPlugin.configure(options),
   FontSizePlugin.configure(options),
-  FontFamilyPlugin.configure(options)
+  FontFamilyPlugin.configure(options),
+  FontWeightPlugin.configure(options)
 ];

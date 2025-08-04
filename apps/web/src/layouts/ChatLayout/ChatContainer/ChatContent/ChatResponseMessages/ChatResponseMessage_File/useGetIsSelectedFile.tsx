@@ -15,6 +15,7 @@ export const useGetIsSelectedFile = ({
   );
   const { selectedVersionNumber: metricVersionNumber } = useGetMetricVersionNumber();
   const { selectedVersionNumber: dashboardVersionNumber } = useGetDashboardVersionNumber();
+
   const versionNumber = responseMessage.version_number;
 
   switch (responseMessage.file_type) {
@@ -25,6 +26,10 @@ export const useGetIsSelectedFile = ({
     case 'dashboard': {
       const isSelectedVersion = versionNumber === dashboardVersionNumber;
       return { isSelectedFile: isSelectedFile && isSelectedVersion };
+    }
+    case 'report': {
+      // TODO: Add report version number???
+      return { isSelectedFile: isSelectedFile };
     }
     case 'reasoning': {
       return { isSelectedFile: false };

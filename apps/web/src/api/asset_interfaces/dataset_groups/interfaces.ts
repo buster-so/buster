@@ -8,6 +8,7 @@ export interface GetDatasetGroupUsersResponse {
   assigned: boolean;
   name: string;
   email: string;
+  avatar_url: string;
 }
 
 export interface GetDatasetGroupDatasetsResponse {

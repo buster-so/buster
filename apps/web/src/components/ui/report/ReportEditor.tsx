@@ -18,6 +18,7 @@ interface ReportEditorProps {
   className?: string;
   disabled?: boolean;
   style?: React.CSSProperties;
+  onValueChange?: (value: ReportElements) => void;
 }
 
 interface AppReportRef {
@@ -32,6 +33,7 @@ export const ReportEditor = React.memo(
       {
         value,
         placeholder,
+        onValueChange,
         variant = 'default',
         className,
         style,
@@ -50,11 +52,17 @@ export const ReportEditor = React.memo(
       // Optionally expose the editor instance to the parent via ref
       useImperativeHandle(ref, () => ({ editor, onReset }), [editor]);
 
+      const onValueChangePreflight = useMemoizedFn(
+        ({ value, editor }: { value: Value; editor: TPlateEditor<Value, AnyPluginConfig> }) => {
+          onValueChange?.(value as ReportElements);
+        }
+      );
+
       if (!editor) return null;
 
       return (
         <ThemeWrapper>
-          <Plate editor={editor} readOnly={readOnly}>
+          <Plate editor={editor} readOnly={readOnly} onValueChange={onValueChangePreflight}>
             <EditorContainer
               variant={variant}
               readonly={readOnly}

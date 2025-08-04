@@ -2,18 +2,8 @@
 
 import * as React from 'react';
 
-import {
-  TextBold,
-  Code2,
-  TextItalic,
-  TextStrikethrough,
-  TextUnderline,
-  WandSparkle,
-  ArrowUpToLine,
-  TextColor2,
-  BucketPaint,
-  TextHighlight2
-} from '@/components/ui/icons';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel } from '../config/labels';
 import { KEYS } from 'platejs';
 import { useEditorReadOnly } from 'platejs/react';
 
@@ -24,7 +14,7 @@ import { LinkToolbarButton } from './LinkToolbarButton';
 import { MarkToolbarButton } from './MarktoolbarButton';
 import { MoreToolbarButton } from './MoreToolbarButton';
 import { SuggestionToolbarButton } from './SuggestionToolbarButton';
-import { ToolbarGroup } from './Toolbar';
+import { ToolbarGroup } from '@/components/ui/toolbar/Toolbar';
 import { TurnIntoToolbarButton } from './TurnIntoToolbarButton';
 import { UndoToolbarButton, RedoToolbarButton } from './UndoToolbarButton';
 import { ExportToolbarButton } from './ExportToolbarButton';
@@ -46,7 +36,7 @@ import { LineHeightToolbarButton } from './LineHeightToolbarButton';
 import { IndentToolbarButton, OutdentToolbarButton } from './IndentToolbarButton';
 import { ModeToolbarButton } from './ModeToolbarButton';
 
-export function FixedToolbarButtons() {
+export const FixedToolbarButtons = React.memo(() => {
   const readOnly = useEditorReadOnly();
 
   return (
@@ -58,15 +48,15 @@ export function FixedToolbarButtons() {
             <RedoToolbarButton />
           </ToolbarGroup>
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <AIToolbarButton tooltip="AI commands">
               <WandSparkle />
             </AIToolbarButton>
-          </ToolbarGroup>
+          </ToolbarGroup> */}
 
           <ToolbarGroup>
             <ExportToolbarButton>
-              <ArrowUpToLine />
+              <NodeTypeIcons.export />
             </ExportToolbarButton>
 
             <ImportToolbarButton />
@@ -79,38 +69,39 @@ export function FixedToolbarButtons() {
           </ToolbarGroup>
 
           <ToolbarGroup>
-            <MarkToolbarButton nodeType={KEYS.bold} tooltip="Bold (⌘+B)">
-              <TextBold />
+            <MarkToolbarButton nodeType={KEYS.bold} tooltip={createLabel('bold')}>
+              <NodeTypeIcons.bold />
             </MarkToolbarButton>
 
-            <MarkToolbarButton nodeType={KEYS.italic} tooltip="Italic (⌘+I)">
-              <TextItalic />
+            <MarkToolbarButton nodeType={KEYS.italic} tooltip={createLabel('italic')}>
+              <NodeTypeIcons.italic />
             </MarkToolbarButton>
 
-            <MarkToolbarButton nodeType={KEYS.underline} tooltip="Underline (⌘+U)">
-              <TextUnderline />
+            <MarkToolbarButton nodeType={KEYS.underline} tooltip={createLabel('underline')}>
+              <NodeTypeIcons.underline />
             </MarkToolbarButton>
 
-            <MarkToolbarButton nodeType={KEYS.strikethrough} tooltip="Strikethrough (⌘+⇧+M)">
-              <TextStrikethrough />
+            <MarkToolbarButton nodeType={KEYS.strikethrough} tooltip={createLabel('strikethrough')}>
+              <NodeTypeIcons.strikethrough />
             </MarkToolbarButton>
 
-            <MarkToolbarButton nodeType={KEYS.code} tooltip="Code (⌘+E)">
-              <Code2 />
+            <MarkToolbarButton nodeType={KEYS.code} tooltip={createLabel('code')}>
+              <NodeTypeIcons.code />
             </MarkToolbarButton>
 
-            <FontColorToolbarButton nodeType={KEYS.color} tooltip="Text color">
-              <TextColor2 />
+            <FontColorToolbarButton nodeType={KEYS.color} tooltip={createLabel('textColor')}>
+              <NodeTypeIcons.textColor />
             </FontColorToolbarButton>
 
-            <FontColorToolbarButton nodeType={KEYS.backgroundColor} tooltip="Background color">
-              <BucketPaint />
+            <FontColorToolbarButton
+              nodeType={KEYS.backgroundColor}
+              tooltip={createLabel('backgroundColor')}>
+              <NodeTypeIcons.backgroundColor />
             </FontColorToolbarButton>
           </ToolbarGroup>
 
           <ToolbarGroup>
             <AlignToolbarButton />
-
             <NumberedListToolbarButton />
             <BulletedListToolbarButton />
             <TodoListToolbarButton />
@@ -123,12 +114,12 @@ export function FixedToolbarButtons() {
             <EmojiToolbarButton />
           </ToolbarGroup>
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <MediaToolbarButton nodeType={KEYS.img} />
             <MediaToolbarButton nodeType={KEYS.video} />
             <MediaToolbarButton nodeType={KEYS.audio} />
             <MediaToolbarButton nodeType={KEYS.file} />
-          </ToolbarGroup>
+          </ToolbarGroup> */}
 
           <ToolbarGroup>
             <LineHeightToolbarButton />
@@ -136,24 +127,28 @@ export function FixedToolbarButtons() {
             <IndentToolbarButton />
           </ToolbarGroup>
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <MoreToolbarButton />
-          </ToolbarGroup>
+          </ToolbarGroup> */}
         </>
       )}
 
       <div className="grow" />
 
-      <ToolbarGroup>
-        <MarkToolbarButton nodeType={KEYS.highlight} tooltip="Highlight">
-          <TextHighlight2 />
-        </MarkToolbarButton>
-        <CommentToolbarButton />
-      </ToolbarGroup>
+      {/* <ToolbarGroup> */}
+      <MarkToolbarButton nodeType={KEYS.highlight} tooltip={createLabel('highlight')}>
+        <NodeTypeIcons.highlight />
+      </MarkToolbarButton>
+      {/* <CommentToolbarButton /> */}
+      {/* </ToolbarGroup> */}
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <ModeToolbarButton />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
+
+      <div className="min-w-1" />
     </div>
   );
-}
+});
+
+FixedToolbarButtons.displayName = 'FixedToolbarButtons';

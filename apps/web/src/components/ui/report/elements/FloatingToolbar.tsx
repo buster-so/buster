@@ -15,7 +15,7 @@ import { useEditorId, useEventEditorValue, usePluginOption } from 'platejs/react
 
 import { cn } from '@/lib/utils';
 
-import { Toolbar } from './Toolbar';
+import { Toolbar } from '@/components/ui/toolbar/Toolbar';
 
 export function FloatingToolbar({
   children,

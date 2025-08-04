@@ -30,7 +30,7 @@
     "@buster/vitest-config": "workspace:*",
     "@buster/web-tools": "workspace:*",
     "@mastra/core": "catalog:",
-    "@trigger.dev/sdk": "catalog:",
+    "@trigger.dev/sdk": "4.0.0-v4-beta.26",
     "ai": "catalog:",
     "braintrust": "catalog:",
     "vitest": "catalog:",
@@ -38,6 +38,6 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "catalog:"
+    "@trigger.dev/build": "4.0.0-v4-beta.26"
   }
 }

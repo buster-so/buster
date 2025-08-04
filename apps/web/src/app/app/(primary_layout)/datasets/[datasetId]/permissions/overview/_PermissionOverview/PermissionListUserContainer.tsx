@@ -19,7 +19,7 @@ export const PermissionListUserContainer: React.FC<{
 }> = React.memo(({ className = '', filteredUsers }) => {
   const numberOfUsers = filteredUsers.length;
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<DatasetPermissionOverviewUser>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -39,14 +39,14 @@ export const PermissionListUserContainer: React.FC<{
 
   const { cannotQueryUsers, canQueryUsers } = useMemo(() => {
     const result: {
-      cannotQueryUsers: BusterListRowItem[];
-      canQueryUsers: BusterListRowItem[];
+      cannotQueryUsers: BusterListRowItem<DatasetPermissionOverviewUser>[];
+      canQueryUsers: BusterListRowItem<DatasetPermissionOverviewUser>[];
     } = filteredUsers.reduce<{
-      cannotQueryUsers: BusterListRowItem[];
-      canQueryUsers: BusterListRowItem[];
+      cannotQueryUsers: BusterListRowItem<DatasetPermissionOverviewUser>[];
+      canQueryUsers: BusterListRowItem<DatasetPermissionOverviewUser>[];
     }>(
       (acc, user) => {
-        const userRow: BusterListRowItem = {
+        const userRow: BusterListRowItem<DatasetPermissionOverviewUser> = {
           id: user.id,
           data: user,
           link: createBusterRoute({
@@ -63,18 +63,18 @@ export const PermissionListUserContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryUsers: [] as BusterListRowItem[],
-        canQueryUsers: [] as BusterListRowItem[]
+        cannotQueryUsers: [],
+        canQueryUsers: []
       }
     );
     return result;
   }, [filteredUsers]);
 
-  const rows: BusterListRowItem[] = useMemo(
+  const rows: BusterListRowItem<DatasetPermissionOverviewUser>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryUsers.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -84,7 +84,7 @@ export const PermissionListUserContainer: React.FC<{
       ...canQueryUsers,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryUsers.length === 0,
         rowSection: {
           title: 'Not assigned',

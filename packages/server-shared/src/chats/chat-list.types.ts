@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const ChatListItemSchema = z.object({
   id: z.string(),
-  title: z.string(),
+  name: z.string(),
   is_favorited: z.boolean(),
   updated_at: z.string(),
   created_at: z.string(),
@@ -15,6 +15,7 @@ export const ChatListItemSchema = z.object({
   latest_file_type: z.enum(['metric', 'dashboard']),
   latest_version_number: z.number().optional(),
   latest_file_name: z.string().nullable(),
+  is_shared: z.boolean(),
 });
 
 export type ChatListItem = z.infer<typeof ChatListItemSchema>;

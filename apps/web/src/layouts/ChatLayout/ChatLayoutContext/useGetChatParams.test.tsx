@@ -60,17 +60,7 @@ describe('useGetChatParams', () => {
     expect(result.current.chatId).toBe('chat-123');
     expect(result.current.messageId).toBe('msg-456');
   });
-  it('handles metric version number from path parameter', () => {
-    mockUseParams.mockReturnValue({
-      metricId: 'metric-123',
-      versionNumber: '42'
-    });
 
-    const { result } = renderHook(() => useGetChatParams());
-
-    expect(result.current.metricId).toBe('metric-123');
-    expect(result.current.metricVersionNumber).toBe(42);
-  });
   it('handles metric version number from query parameter', () => {
     mockUseParams.mockReturnValue({
       metricId: 'metric-123'
@@ -83,17 +73,7 @@ describe('useGetChatParams', () => {
 
     expect(result.current.metricVersionNumber).toBe(43);
   });
-  it('handles dashboard version number from path parameter', () => {
-    mockUseParams.mockReturnValue({
-      dashboardId: 'dashboard-123',
-      versionNumber: '44'
-    });
 
-    const { result } = renderHook(() => useGetChatParams());
-
-    expect(result.current.dashboardId).toBe('dashboard-123');
-    expect(result.current.dashboardVersionNumber).toBe(44);
-  });
   it('handles dashboard version number from query parameter', () => {
     mockUseParams.mockReturnValue({
       dashboardId: 'dashboard-123'

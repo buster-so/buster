@@ -1,3 +1,4 @@
+export { default as FileText } from './file-text';
 export { default as Accessibility } from './accessibility';
 export { default as AddAbove } from './add-above';
 export { default as I12_addAbove } from './add-above-I12px';

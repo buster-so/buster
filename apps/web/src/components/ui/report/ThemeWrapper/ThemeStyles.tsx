@@ -2,8 +2,9 @@
 
 import { useMounted } from '@/hooks/useMount';
 import { useThemesConfig } from './useThemesConfig';
+import React from 'react';
 
-export function ThemesStyle() {
+export const ThemesStyle = React.memo(() => {
   const { activeTheme } = useThemesConfig();
   const mounted = useMounted();
 
@@ -16,10 +17,11 @@ export function ThemesStyle() {
       {`
 .themes-wrapper,
 [data-chart] {
+  background-color: red;
+
   ${Object.entries(activeTheme.light)
     .map(([key, value]) => `${key}: hsl(${value});`)
     .join('\n')}
- 
 }
 
 .dark .themes-wrapper,
@@ -32,4 +34,6 @@ export function ThemesStyle() {
   `}
     </style>
   );
-}
+});
+
+ThemesStyle.displayName = 'ThemesStyle';

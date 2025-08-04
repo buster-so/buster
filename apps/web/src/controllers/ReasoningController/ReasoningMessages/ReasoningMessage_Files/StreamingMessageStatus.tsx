@@ -25,7 +25,7 @@ export const StreamingMessageStatus = React.memo(
         return null;
       }
 
-      const _typeCheck: 'metric' | 'dashboard' = fileType;
+      const _typeCheck: 'metric' | 'dashboard' | 'report' = fileType;
 
       if (status === 'loading')
         return (

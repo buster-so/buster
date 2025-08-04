@@ -31,7 +31,7 @@ export const UserTeamsListContainer: React.FC<{
     await updateUserTeams([params]);
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<BusterUserTeamListItem>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -39,9 +39,9 @@ export const UserTeamsListContainer: React.FC<{
       },
       {
         title: 'Role',
-        dataIndex: 'assigned',
+        dataIndex: 'role',
         width: 285,
-        render: (assigned: boolean, permissionGroup: BusterUserTeamListItem) => {
+        render: (_, permissionGroup) => {
           const { user_count, id, role } = permissionGroup;
           return (
             <div className="flex justify-end">
@@ -58,16 +58,16 @@ export const UserTeamsListContainer: React.FC<{
 
   const { managerTeams, memberTeams, notAMemberTeams } = useMemo(() => {
     const result: {
-      managerTeams: BusterListRowItem[];
-      memberTeams: BusterListRowItem[];
-      notAMemberTeams: BusterListRowItem[];
+      managerTeams: BusterListRowItem<BusterUserTeamListItem>[];
+      memberTeams: BusterListRowItem<BusterUserTeamListItem>[];
+      notAMemberTeams: BusterListRowItem<BusterUserTeamListItem>[];
     } = filteredTeams.reduce<{
-      managerTeams: BusterListRowItem[];
-      memberTeams: BusterListRowItem[];
-      notAMemberTeams: BusterListRowItem[];
+      managerTeams: BusterListRowItem<BusterUserTeamListItem>[];
+      memberTeams: BusterListRowItem<BusterUserTeamListItem>[];
+      notAMemberTeams: BusterListRowItem<BusterUserTeamListItem>[];
     }>(
       (acc, team) => {
-        const teamItem: BusterListRowItem = {
+        const teamItem: BusterListRowItem<BusterUserTeamListItem> = {
           id: team.id,
           data: team,
           link: createBusterRoute({
@@ -85,19 +85,19 @@ export const UserTeamsListContainer: React.FC<{
         return acc;
       },
       {
-        managerTeams: [] as BusterListRowItem[],
-        memberTeams: [] as BusterListRowItem[],
-        notAMemberTeams: [] as BusterListRowItem[]
+        managerTeams: [],
+        memberTeams: [],
+        notAMemberTeams: []
       }
     );
     return result;
   }, [filteredTeams]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<BusterUserTeamListItem>[] = useMemo(
     () => [
       {
         id: 'header-manager',
-        data: {},
+        data: null,
         hidden: managerTeams.length === 0,
         rowSection: {
           title: 'Manager',
@@ -107,7 +107,7 @@ export const UserTeamsListContainer: React.FC<{
       ...managerTeams,
       {
         id: 'header-member',
-        data: {},
+        data: null,
         hidden: memberTeams.length === 0,
         rowSection: {
           title: 'Member',
@@ -117,7 +117,7 @@ export const UserTeamsListContainer: React.FC<{
       ...memberTeams,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: notAMemberTeams.length === 0,
         rowSection: {
           title: 'Not a member',

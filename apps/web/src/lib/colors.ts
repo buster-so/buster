@@ -6,6 +6,10 @@ export const determineFontColorContrast = (color: string, threshold = TEXT_THRES
   return fontColorContrast(color, threshold);
 };
 
+export const isBrightColor = (color: string) => {
+  return determineFontColorContrast(color) === '#ffffff';
+};
+
 export const addOpacityToColor = (color: string, opacity: number): string => {
   if (opacity === 1) {
     return color;

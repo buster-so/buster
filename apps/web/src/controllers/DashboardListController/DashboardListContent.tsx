@@ -9,7 +9,7 @@ import { Avatar } from '@/components/ui/avatar';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRow,
+  type BusterListRowItem,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
 import { Text } from '@/components/ui/typography';
@@ -18,7 +18,7 @@ import { formatDate } from '@/lib';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { DashboardSelectedOptionPopup } from './DashboardSelectedPopup';
 
-const columns: BusterListColumn[] = [
+const columns: BusterListColumn<BusterDashboardListItem>[] = [
   {
     dataIndex: 'name',
     title: 'Title',
@@ -51,7 +51,7 @@ const columns: BusterListColumn[] = [
     render: (data) => formatDate({ date: data, format: 'lll' })
   },
   {
-    dataIndex: 'sharing',
+    dataIndex: 'status',
     title: 'Sharing',
     width: 65,
     render: (_, data) => getShareStatus(data)
@@ -82,7 +82,7 @@ export const DashboardListContent: React.FC<{
   }) => {
     const [selectedDashboardIds, setSelectedDashboardIds] = useState<string[]>([]);
 
-    const rows: BusterListRow[] = useMemo(() => {
+    const rows: BusterListRowItem<BusterDashboardListItem>[] = useMemo(() => {
       return dashboardsList.map((dashboard) => {
         return {
           id: dashboard.id,

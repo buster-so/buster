@@ -17,18 +17,8 @@ import { TablePlugin, useTableMergeState } from '@platejs/table/react';
 //   Ungroup,
 //   XIcon
 // } from 'lucide-react';
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  Merge,
-  Grid3X3,
-  Table,
-  Trash2,
-  Ungroup,
-  Xmark
-} from '@/components/ui/icons';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel } from '../config/labels';
 import { KEYS } from 'platejs';
 import { useEditorPlugin, useEditorSelector } from 'platejs/react';
 
@@ -44,7 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton } from '@/components/ui/toolbar/Toolbar';
 
 export function TableToolbarButton(props: DropdownMenuProps) {
   const tableSelected = useEditorSelector(
@@ -58,9 +48,9 @@ export function TableToolbarButton(props: DropdownMenuProps) {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false} {...props}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton pressed={open} tooltip="Table" isDropdown>
-          <Table />
+      <DropdownMenuTrigger>
+        <ToolbarButton pressed={open} tooltip={createLabel('table')} isDropdown>
+          <NodeTypeIcons.table />
         </ToolbarButton>
       </DropdownMenuTrigger>
 
@@ -69,7 +59,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="gap-2 data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
               <div className="size-4">
-                <Grid3X3 />
+                <NodeTypeIcons.tableGrid />
               </div>
               <span>Table</span>
             </DropdownMenuSubTrigger>
@@ -94,7 +84,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   editor.tf.focus();
                 }}>
                 <div className="size-4">
-                  <Merge />
+                  <NodeTypeIcons.tableMerge />
                 </div>
                 Merge cells
               </DropdownMenuItem>
@@ -105,7 +95,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   tf.table.split();
                   editor.tf.focus();
                 }}>
-                <Ungroup />
+                <NodeTypeIcons.tableUngroup />
                 Split cell
               </DropdownMenuItem>
             </DropdownMenuSubContent>
@@ -126,7 +116,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   tf.insert.tableRow({ before: true });
                   editor.tf.focus();
                 }}>
-                <ArrowUp />
+                <NodeTypeIcons.tableArrowUp />
                 Insert row before
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -136,7 +126,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   tf.insert.tableRow();
                   editor.tf.focus();
                 }}>
-                <ArrowDown />
+                <NodeTypeIcons.tableArrowDown />
                 Insert row after
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -147,7 +137,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   editor.tf.focus();
                 }}>
                 <div className="size-4">
-                  <Xmark />
+                  <NodeTypeIcons.tableRemove />
                 </div>
                 Delete row
               </DropdownMenuItem>
@@ -169,7 +159,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   tf.insert.tableColumn({ before: true });
                   editor.tf.focus();
                 }}>
-                <ArrowLeft />
+                <NodeTypeIcons.tableArrowLeft />
                 Insert column before
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -179,7 +169,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   tf.insert.tableColumn();
                   editor.tf.focus();
                 }}>
-                <ArrowRight />
+                <NodeTypeIcons.tableArrowRight />
                 Insert column after
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -190,7 +180,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
                   editor.tf.focus();
                 }}>
                 <div className="size-4">
-                  <Xmark />
+                  <NodeTypeIcons.tableRemove />
                 </div>
                 Delete column
               </DropdownMenuItem>
@@ -205,7 +195,7 @@ export function TableToolbarButton(props: DropdownMenuProps) {
               editor.tf.focus();
             }}>
             <div className="size-4">
-              <Trash2 />
+              <NodeTypeIcons.tableDelete />
             </div>
             Delete table
           </DropdownMenuItem>

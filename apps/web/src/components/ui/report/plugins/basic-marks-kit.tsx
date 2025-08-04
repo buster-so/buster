@@ -1,3 +1,5 @@
+'use client';
+
 import {
   BoldPlugin,
   CodePlugin,
@@ -9,6 +11,7 @@ import {
   SuperscriptPlugin,
   UnderlinePlugin
 } from '@platejs/basic-nodes/react';
+
 import { CodeLeaf } from '../elements/CodeNode';
 import { HighlightLeaf } from '../elements/HighlightNode';
 import { KbdLeaf } from '../elements/KbdNode';

@@ -45,6 +45,11 @@ const useBusterAssets = () => {
         queryKey: queryKeys.chatsGetChat(assetId).queryKey,
         refetchType: 'all'
       });
+    } else if (type === 'report') {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.reportsGetReport(assetId).queryKey,
+        refetchType: 'all'
+      });
     } else {
       const exhaustiveCheck: never = type;
     }

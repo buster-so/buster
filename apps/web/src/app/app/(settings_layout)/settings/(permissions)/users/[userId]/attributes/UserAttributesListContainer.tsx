@@ -12,7 +12,7 @@ export const UserAttributesListContainer: React.FC<{
   filteredAttributes: BusterUserAttribute[];
   userId: string;
 }> = React.memo(({ filteredAttributes, userId }) => {
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<BusterUserAttribute>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -27,7 +27,7 @@ export const UserAttributesListContainer: React.FC<{
     []
   );
 
-  const rows: BusterListRowItem[] = useMemo(
+  const rows: BusterListRowItem<BusterUserAttribute>[] = useMemo(
     () =>
       filteredAttributes.map((attribute) => ({
         id: attribute.name,

@@ -1,6 +1,6 @@
-import type { BusterListRow } from './interfaces';
+import type { BusterListRowItem } from './interfaces';
 
-export const getAllIdsInSection = (rows: BusterListRow[], sectionId: string) => {
+export const getAllIdsInSection = (rows: BusterListRowItem[], sectionId: string) => {
   const sectionIndex = rows.findIndex((row) => row.id === sectionId);
   if (sectionIndex === -1) return [];
 

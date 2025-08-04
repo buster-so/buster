@@ -3,7 +3,6 @@
 import * as React from 'react';
 
 import { formatCodeBlock, isLangSupported } from '@platejs/code-block';
-import { Check, Copy2, BracketsCurly } from '@/components/ui/icons';
 import { type TCodeBlockElement, type TCodeSyntaxLeaf, NodeApi } from 'platejs';
 import {
   type PlateElementProps,
@@ -12,6 +11,8 @@ import {
   PlateLeaf
 } from 'platejs/react';
 import { useEditorRef, useElement, useReadOnly } from 'platejs/react';
+import { NodeTypeIcons } from '../config/icons';
+import { NodeTypeLabels } from '../config/labels';
 
 import { Button } from '@/components/ui/buttons';
 import {
@@ -46,10 +47,10 @@ export function CodeBlockElement(props: PlateElementProps<TCodeBlockElement>) {
           {isLangSupported(element.lang) && (
             <Button
               variant="ghost"
-              className="size-6 text-xs"
+              size={'small'}
               onClick={() => formatCodeBlock(editor, { element })}
-              title="Format code"
-              prefix={<BracketsCurly />}></Button>
+              title={NodeTypeLabels.formatCode.label}
+              prefix={<NodeTypeIcons.formatCode />}></Button>
           )}
 
           <CodeBlockCombobox />
@@ -61,7 +62,7 @@ export function CodeBlockElement(props: PlateElementProps<TCodeBlockElement>) {
   );
 }
 
-function CodeBlockCombobox() {
+const CodeBlockCombobox = React.memo(() => {
   const [open, setOpen] = React.useState(false);
   const readOnly = useReadOnly();
   const editor = useEditorRef();
@@ -83,8 +84,9 @@ function CodeBlockCombobox() {
   return (
     <PopoverBase open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" aria-expanded={open} role="combobox">
-          {languages.find((language) => language.value === value)?.label ?? 'Plain Text'}
+        <Button variant="ghost" size={'small'} aria-expanded={open} role="combobox">
+          {languages.find((language) => language.value === value)?.label ??
+            NodeTypeLabels.plainText.label}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" onCloseAutoFocus={() => setSearchValue('')}>
@@ -93,9 +95,9 @@ function CodeBlockCombobox() {
             className="h-9"
             value={searchValue}
             onValueChange={(value) => setSearchValue(value)}
-            placeholder="Search language..."
+            placeholder={NodeTypeLabels.searchLanguage.label}
           />
-          <CommandEmpty>No language found.</CommandEmpty>
+          <CommandEmpty>{NodeTypeLabels.noLanguageFound.label}</CommandEmpty>
           <CommandList className="overflow-y-auto">
             <CommandGroup>
               {items.map((language) => (
@@ -109,7 +111,7 @@ function CodeBlockCombobox() {
                     setOpen(false);
                   }}>
                   <div className={cn(value === language.value ? 'opacity-100' : 'opacity-0')}>
-                    <Check />
+                    <NodeTypeIcons.check />
                   </div>
                   {language.label}
                 </CommandItem>
@@ -120,7 +122,9 @@ function CodeBlockCombobox() {
       </PopoverContent>
     </PopoverBase>
   );
-}
+});
+
+CodeBlockCombobox.displayName = 'CodeBlockCombobox';
 
 function CopyButton({
   value,
@@ -137,12 +141,13 @@ function CopyButton({
   return (
     <Button
       variant="ghost"
-      prefix={hasCopied ? <Check /> : <Copy2 />}
+      size={'small'}
+      prefix={hasCopied ? <NodeTypeIcons.check /> : <NodeTypeIcons.copy />}
       onClick={() => {
         void navigator.clipboard.writeText(typeof value === 'function' ? value() : value);
         setHasCopied(true);
       }}>
-      Copy
+      {NodeTypeLabels.copy.label}
     </Button>
   );
 }
@@ -159,7 +164,7 @@ export function CodeSyntaxLeaf(props: PlateLeafProps<TCodeSyntaxLeaf>) {
 
 const languages: { label: string; value: string }[] = [
   // { label: 'Auto', value: 'auto' },
-  { label: 'Plain Text', value: 'plaintext' },
+  { label: NodeTypeLabels.plainText.label, value: 'plaintext' },
   // { label: 'ABAP', value: 'abap' },
   // { label: 'Agda', value: 'agda' },
   // { label: 'Arduino', value: 'arduino' },

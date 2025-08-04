@@ -65,7 +65,9 @@ describe('useLayoutConfig', () => {
     metricVersionNumber: undefined,
     dashboardVersionNumber: undefined,
     currentRoute: BusterRoutes.APP_CHAT_ID,
-    secondaryView: undefined
+    secondaryView: undefined,
+    reportId: undefined,
+    reportVersionNumber: undefined
   };
 
   it('should initialize with correct file views', () => {

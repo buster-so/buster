@@ -1,18 +1,25 @@
 'use client';
 
 import type { AIChatPluginConfig } from '@platejs/ai/react';
+// import type { UseChatOptions } from 'ai/react';
 
 import { streamInsertChunk, withAIBatch } from '@platejs/ai';
 import { AIChatPlugin, AIPlugin, useChatChunk } from '@platejs/ai/react';
-import { KEYS, PathApi } from 'platejs';
+import { getPluginType, KEYS, PathApi } from 'platejs';
 import { usePluginOption } from 'platejs/react';
 
 import { AILoadingBar, AIMenu } from '../elements/AIMenu';
 import { AIAnchorElement, AILeaf } from '../elements/AINode';
 
+import { CursorOverlayKit } from './cursor-overlay-kit';
+import { MarkdownKit } from './markdown-kit';
+
 export const aiChatPlugin = AIChatPlugin.extend({
   options: {
-    chatOptions: {},
+    chatOptions: {
+      api: '/api/ai/command',
+      body: {}
+    },
     promptTemplate: ({ isBlockSelecting, isSelecting }) => {
       return isBlockSelecting
         ? PROMPT_TEMPLATES.userBlockSelecting
@@ -44,7 +51,7 @@ export const aiChatPlugin = AIChatPlugin.extend({
             editor.tf.insertNodes(
               {
                 children: [{ text: '' }],
-                type: KEYS.aiChat
+                type: getPluginType(editor, KEYS.aiChat)
               },
               {
                 at: PathApi.next(editor.selection!.focus.path.slice(0, 1))
@@ -62,7 +69,7 @@ export const aiChatPlugin = AIChatPlugin.extend({
               editor.tf.withScrolling(() => {
                 streamInsertChunk(editor, chunk, {
                   textProps: {
-                    ai: true
+                    [getPluginType(editor, KEYS.ai)]: true
                   }
                 });
               });
@@ -81,10 +88,10 @@ export const aiChatPlugin = AIChatPlugin.extend({
 });
 
 export const AIKit = [
-  // ...CursorOverlayKit,
-  // ...MarkdownKit,
-  // AIPlugin.withComponent(AILeaf),
-  // aiChatPlugin
+  ...CursorOverlayKit,
+  ...MarkdownKit,
+  AIPlugin.withComponent(AILeaf),
+  aiChatPlugin
 ];
 
 const systemCommon = `\
@@ -101,6 +108,18 @@ Rules:
 - CRITICAL: DO NOT remove or modify the following custom MDX tags: <u>, <callout>, <kbd>, <toc>, <sub>, <sup>, <mark>, <del>, <date>, <span>, <column>, <column_group>, <file>, <audio>, <video> in <Selection> unless the user explicitly requests this change.
 - CRITICAL: Distinguish between INSTRUCTIONS and QUESTIONS. Instructions typically ask you to modify or add content. Questions ask for information or clarification.
 - CRITICAL: when asked to write in markdown, do not start with \`\`\`markdown.
+- CRITICAL: When writing the column, such line breaks and indentation must be preserved.
+<column_group>
+  <column>
+    1
+  </column>
+  <column>
+    2
+  </column>
+  <column>
+    3
+  </column>
+</column_group>
 `;
 
 const systemDefault = `\

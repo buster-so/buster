@@ -107,7 +107,7 @@ export const addAssetToCollection = async ({
 }: {
   id: string;
   assets: {
-    type: 'metric' | 'dashboard' | 'chat';
+    type: Exclude<ShareAssetType, 'collection'>;
     id: string;
   }[];
 }) => {

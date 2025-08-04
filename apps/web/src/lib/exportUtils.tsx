@@ -57,9 +57,11 @@ type DomToImageModule = {
 };
 
 export async function exportElementToImage(element: HTMLElement) {
-  // @ts-expect-error -- dom-to-image is not typed, bummer
-  const domToImage = (await import('dom-to-image').then((m) => m.default)) as DomToImageModule;
-  const dataUrl = await domToImage.toPng(element);
+  const imageData = await import('html2canvas-pro').then((m) => m.default);
+  const canvas = await imageData(element, {
+    backgroundColor: '#ffffff'
+  });
+  const dataUrl = canvas.toDataURL();
   return dataUrl;
 }
 

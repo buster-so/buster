@@ -7,7 +7,7 @@ import { ArrowUpRight } from '@/components/ui/icons';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRow,
+  type BusterListRowItem,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
@@ -15,7 +15,7 @@ import { formatDate } from '@/lib';
 import { BUSTER_DOCS_QUICKSTART, BusterRoutes, createBusterRoute } from '@/routes';
 import { DatasetSelectedOptionPopup } from './DatasetSelectedPopup';
 
-const columns: BusterListColumn[] = [
+const columns: BusterListColumn<BusterDatasetListItem>[] = [
   {
     title: 'Title',
     dataIndex: 'name'
@@ -34,8 +34,9 @@ const columns: BusterListColumn[] = [
   },
   {
     title: 'Data source',
-    dataIndex: 'data_source.name',
-    width: 105
+    dataIndex: 'data_source',
+    width: 105,
+    render: (v) => v?.name
   },
   {
     title: 'Status',
@@ -45,7 +46,7 @@ const columns: BusterListColumn[] = [
   },
   {
     title: 'Owner',
-    dataIndex: 'created_by_name',
+    dataIndex: 'owner',
     width: 60,
     render: (_, dataset: BusterDatasetListItem) => (
       <div className="flex w-full justify-start">
@@ -63,7 +64,7 @@ export const DatasetListContent: React.FC<{
 }> = React.memo(({ datasetsList, isFetchedDatasets, isAdmin, setOpenNewDatasetModal }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const rows: BusterListRow[] = useMemo(() => {
+  const rows: BusterListRowItem<BusterDatasetListItem>[] = useMemo(() => {
     return datasetsList.map((dataset) => {
       return {
         id: dataset.id,

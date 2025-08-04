@@ -12,23 +12,31 @@ import {
 import { KEYS } from 'platejs';
 
 import { AudioElement } from '../elements/AudioNode';
-import { MediaEmbedElement } from '../elements/MediaEmbedNode';
+import { MediaEmbedElement, MediaEmbedPlaceholder } from '../elements/MediaEmbedNode';
 import { FileElement } from '../elements/MediaFileNode';
 import { ImageElement } from '../elements/MediaImageNode';
 import { PlaceholderElement } from '../elements/MediaPlaceholderElement';
-import { MediaUploadToast } from '../elements/MediaUploadToast';
-import { VideoElement } from '../elements/VideoNode';
 import { MediaPreviewDialog } from '../elements/MediaPreviewDialog';
+import { MediaUploadToast } from '../elements/MediaUploadToast';
+import { VideoElement } from '../elements/MediaVideoNode';
+import { MediaPluginOptions } from '@platejs/media';
 
 export const MediaKit = [
   ImagePlugin.configure({
     options: { disableUploadInsert: true },
     render: { afterEditable: MediaPreviewDialog, node: ImageElement }
   }),
-  MediaEmbedPlugin.withComponent(MediaEmbedElement),
+  MediaEmbedPlugin.configure({
+    node: {
+      component: MediaEmbedElement,
+      isSelectable: true,
+      isElement: true
+    },
+    options: {}
+  }),
 
   PlaceholderPlugin.configure({
-    options: { disableEmptyPlaceholder: true },
+    options: { disableEmptyPlaceholder: false },
     render: { afterEditable: MediaUploadToast, node: PlaceholderElement }
   }),
   CaptionPlugin.configure({

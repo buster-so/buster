@@ -1,14 +1,16 @@
 import type { SelectedFile } from '../../interfaces';
 
 export const createSelectedFile = (params: {
-  metricId?: string;
-  collectionId?: string;
-  datasetId?: string;
-  dashboardId?: string;
-  chatId?: string;
-  messageId?: string;
-  metricVersionNumber?: number;
-  dashboardVersionNumber?: number;
+  metricId: string | undefined;
+  collectionId: string | undefined;
+  datasetId: string | undefined;
+  dashboardId: string | undefined;
+  chatId: string | undefined;
+  messageId: string | undefined;
+  metricVersionNumber: number | undefined;
+  dashboardVersionNumber: number | undefined;
+  reportId: string | undefined;
+  reportVersionNumber: number | undefined;
 }): SelectedFile | null => {
   const {
     metricId,
@@ -18,7 +20,9 @@ export const createSelectedFile = (params: {
     chatId,
     messageId,
     metricVersionNumber,
-    dashboardVersionNumber
+    dashboardVersionNumber,
+    reportId,
+    reportVersionNumber
   } = params;
 
   if (metricId) {
@@ -42,6 +46,14 @@ export const createSelectedFile = (params: {
       id: messageId,
       type: 'reasoning',
       versionNumber: undefined
+    };
+  }
+
+  if (reportId) {
+    return {
+      id: reportId,
+      type: 'report',
+      versionNumber: reportVersionNumber
     };
   }
 

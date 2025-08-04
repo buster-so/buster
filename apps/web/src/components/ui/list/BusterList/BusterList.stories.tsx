@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React, { useMemo } from 'react';
 import type { ContextMenuProps } from '../../context-menu/ContextMenu';
 import { BusterList } from './index';
-import type { BusterListRow } from './interfaces';
+import type { BusterListColumn, BusterListRowItem } from './interfaces';
 
 const meta: Meta<typeof BusterList> = {
   title: 'UI/List/BusterList',
@@ -33,10 +33,19 @@ const meta: Meta<typeof BusterList> = {
 
 export default meta;
 
-type Story = StoryObj<typeof BusterList>;
+// Define the data type for our rows
+type SampleData = {
+  name: string;
+  age: number;
+  address?: string;
+  email?: string;
+  actions?: any; // For the actions column
+};
+
+type Story = StoryObj<typeof BusterList<SampleData>>;
 
 // Sample data for the stories
-const sampleColumns = [
+const sampleColumns: BusterListColumn<SampleData>[] = [
   {
     dataIndex: 'name',
     title: 'Name',
@@ -51,13 +60,15 @@ const sampleColumns = [
     dataIndex: 'actions',
     title: 'Actions',
     width: 100,
-    render: (_: any, record: any) => <button className="text-blue-500 hover:underline">View</button>
+    render: (_: any, record: SampleData) => (
+      <button className="text-blue-500 hover:underline">View</button>
+    )
   }
 ];
 
 // Generate sample rows using faker
-const generateSampleRows = (count: number): BusterListRow[] => {
-  const rows: BusterListRow[] = [];
+const generateSampleRows = (count: number): BusterListRowItem<SampleData>[] => {
+  const rows: BusterListRowItem<SampleData>[] = [];
 
   // Generate regular rows
   for (let i = 0; i < count; i++) {
@@ -98,7 +109,7 @@ const generateSampleRows = (count: number): BusterListRow[] => {
 };
 
 // Generate sample rows
-const sampleRows = generateSampleRows(5);
+const sampleRows: BusterListRowItem<SampleData>[] = generateSampleRows(5);
 
 const sampleContextMenu: ContextMenuProps = {
   items: [

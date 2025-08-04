@@ -5,17 +5,17 @@ import { cn } from '@/lib/classMerge';
 import { CheckboxColumn } from './CheckboxColumn';
 import { HEIGHT_OF_SECTION_ROW } from './config';
 import { getAllIdsInSection } from './helpers';
-import type { BusterListRow } from './interfaces';
+import type { BusterListRowItem } from './interfaces';
 
 export const BusterListSectionComponent = React.memo(
   React.forwardRef<
     HTMLDivElement,
     {
-      rowSection: NonNullable<BusterListRow['rowSection']>;
+      rowSection: NonNullable<BusterListRowItem['rowSection']>;
       onSelectSectionChange?: (v: boolean, id: string) => void;
       id: string;
       selectedRowKeys?: string[];
-      rows: BusterListRow[];
+      rows: BusterListRowItem[];
       style?: React.CSSProperties;
       rowClassName?: string;
     }

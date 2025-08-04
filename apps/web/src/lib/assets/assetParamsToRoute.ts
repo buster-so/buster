@@ -9,6 +9,7 @@ import { createMetricRoute, type MetricRouteParams } from './createMetricRoute';
 import { createDashboardRoute, type DashboardRouteParams } from './createDashboardRoute';
 import { createReasoningRoute } from './createReasoningRoute';
 import { createDatasetRoute } from './createDatasetRoute';
+import { createReportRoute } from './createReportRoute';
 
 type UnionOfFileTypes = FileType | ReasoningFileType | ReasoingMessage_ThoughtFileType;
 
@@ -22,7 +23,7 @@ type OtherRouteParams = {
   dashboardVersionNumber?: number; //if this is provided, it will be used instead of versionNumber
   page?: undefined;
   secondaryView?: undefined | null | string;
-  type: Exclude<UnionOfFileTypes, 'metric' | 'dashboard'>;
+  type: UnionOfFileTypes;
 };
 
 type BaseParams = MetricRouteParams | DashboardRouteParams | OtherRouteParams;
@@ -70,6 +71,13 @@ export const assetParamsToRoute = ({
       chatId,
       page,
       secondaryView: secondaryView as DashboardFileViewSecondary
+    });
+  }
+
+  if (type === 'report') {
+    return createReportRoute({
+      assetId,
+      chatId
     });
   }
 
