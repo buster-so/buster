@@ -7,10 +7,10 @@ import { BusterList, type BusterListProps } from '../list/BusterList';
 import { Text } from '../typography';
 import { BorderedModal, type BorderedModalProps } from './BorderedModal';
 
-export interface InputSelectModalProps extends Omit<BorderedModalProps, 'children'> {
+export interface InputSelectModalProps<T = unknown> extends Omit<BorderedModalProps, 'children'> {
   inputPlaceholder?: string;
-  columns: NonNullable<BusterListProps['columns']>;
-  rows: NonNullable<BusterListProps['rows']>;
+  columns: NonNullable<BusterListProps<T>['columns']>;
+  rows: NonNullable<BusterListProps<T>['rows']>;
   emptyState: BusterListProps['emptyState'];
   onSelectChange: NonNullable<BusterListProps['onSelectChange']>;
   selectedRowKeys: NonNullable<BusterListProps['selectedRowKeys']>;
@@ -19,70 +19,73 @@ export interface InputSelectModalProps extends Omit<BorderedModalProps, 'childre
   handleSearchChange: (searchText: string) => void;
 }
 
-export const InputSelectModal = React.memo(
-  ({
-    inputPlaceholder = 'Search...',
-    columns,
-    rows,
-    emptyState,
-    className,
-    onSelectChange,
-    selectedRowKeys,
-    searchText,
-    handleSearchChange,
-    showHeader = true,
-    ...props
-  }: InputSelectModalProps) => {
-    const memoizedHeader = useMemo(() => {
-      return (
-        <>
-          <InputSelecteHeader
-            searchText={searchText}
-            handleSearchChange={handleSearchChange}
-            inputPlaceholder={inputPlaceholder}
-          />
-          <VisuallyHidden>
-            <DialogTitle>Input Modal</DialogTitle>
-            <DialogDescription>
-              {rows.length} {rows.length === 1 ? 'item' : 'items'} found
-            </DialogDescription>
-          </VisuallyHidden>
-        </>
-      );
-    }, [searchText, handleSearchChange, inputPlaceholder, rows.length]);
-
+function InputSelectModalBase<T = unknown>({
+  inputPlaceholder = 'Search...',
+  columns,
+  rows,
+  emptyState,
+  className,
+  onSelectChange,
+  selectedRowKeys,
+  searchText,
+  handleSearchChange,
+  showHeader = true,
+  ...props
+}: InputSelectModalProps<T>) {
+  const memoizedHeader = useMemo(() => {
     return (
-      <BorderedModal
-        header={memoizedHeader}
-        className={cn(
-          'data-[state=closed]:slide-out-to-top-[5%]! data-[state=open]:slide-in-from-top-[5%]! top-28 translate-y-0',
-          className
-        )}
-        {...props}>
-        <div
-          className="max-h-[65vh]"
-          style={{
-            height: (rows.length || 1) * 48 + (showHeader ? 32 : 0) //32 is the height of the header
-          }}>
-          <BusterList
-            columns={columns}
-            rows={rows}
-            onSelectChange={onSelectChange}
-            emptyState={useMemo(
-              () => emptyState || <Text variant={'secondary'}>No items found</Text>,
-              [emptyState]
-            )}
-            showHeader={showHeader}
-            selectedRowKeys={selectedRowKeys}
-            useRowClickSelectChange={true}
-            hideLastRowBorder
-          />
-        </div>
-      </BorderedModal>
+      <>
+        <InputSelecteHeader
+          searchText={searchText}
+          handleSearchChange={handleSearchChange}
+          inputPlaceholder={inputPlaceholder}
+        />
+        <VisuallyHidden>
+          <DialogTitle>Input Modal</DialogTitle>
+          <DialogDescription>
+            {rows.length} {rows.length === 1 ? 'item' : 'items'} found
+          </DialogDescription>
+        </VisuallyHidden>
+      </>
     );
-  }
-);
-InputSelectModal.displayName = 'InputScrollableModal';
+  }, [searchText, handleSearchChange, inputPlaceholder, rows.length]);
+
+  return (
+    <BorderedModal
+      header={memoizedHeader}
+      className={cn(
+        'data-[state=closed]:slide-out-to-top-[5%]! data-[state=open]:slide-in-from-top-[5%]! top-28 translate-y-0',
+        className
+      )}
+      {...props}>
+      <div
+        className="max-h-[65vh]"
+        style={{
+          height: (rows.length || 1) * 48 + (showHeader ? 32 : 0) //32 is the height of the header
+        }}>
+        <BusterList
+          columns={columns}
+          rows={rows}
+          onSelectChange={onSelectChange}
+          emptyState={useMemo(
+            () => emptyState || <Text variant={'secondary'}>No items found</Text>,
+            [emptyState]
+          )}
+          showHeader={showHeader}
+          selectedRowKeys={selectedRowKeys}
+          useRowClickSelectChange={true}
+          hideLastRowBorder
+        />
+      </div>
+    </BorderedModal>
+  );
+}
+
+export const InputSelectModal = React.memo(InputSelectModalBase) as typeof InputSelectModalBase & {
+  displayName?: string;
+};
+
+InputSelectModal.displayName = 'InputSelectModal';
 
 const InputSelecteHeader: React.FC<{
   inputPlaceholder: string;

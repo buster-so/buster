@@ -10,6 +10,7 @@ export const SelectedFileSecondaryRecord: Record<
 > = {
   metric: MetricSecondaryRecord,
   dashboard: DashboardSecondaryRecord,
+  report: {},
   reasoning: {}
 };
 

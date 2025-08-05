@@ -28,7 +28,7 @@ export const PermissionGroupUsersListContainer: React.FC<{
     await updatePermissionGroupUsers([params]);
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<GetPermissionGroupUsersResponse>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -60,14 +60,14 @@ export const PermissionGroupUsersListContainer: React.FC<{
 
   const { cannotQueryPermissionUsers, canQueryPermissionUsers } = useMemo(() => {
     const result: {
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<GetPermissionGroupUsersResponse>[];
+      canQueryPermissionUsers: BusterListRowItem<GetPermissionGroupUsersResponse>[];
     } = filteredUsers.reduce<{
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<GetPermissionGroupUsersResponse>[];
+      canQueryPermissionUsers: BusterListRowItem<GetPermissionGroupUsersResponse>[];
     }>(
       (acc, user) => {
-        const userItem: BusterListRowItem = {
+        const userItem: BusterListRowItem<GetPermissionGroupUsersResponse> = {
           id: user.id,
           data: user,
           link: createBusterRoute({
@@ -83,18 +83,18 @@ export const PermissionGroupUsersListContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionUsers: [] as BusterListRowItem[],
-        canQueryPermissionUsers: [] as BusterListRowItem[]
+        cannotQueryPermissionUsers: [],
+        canQueryPermissionUsers: []
       }
     );
     return result;
   }, [filteredUsers]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<GetPermissionGroupUsersResponse>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -104,7 +104,7 @@ export const PermissionGroupUsersListContainer: React.FC<{
       ...canQueryPermissionUsers,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Not assigned',

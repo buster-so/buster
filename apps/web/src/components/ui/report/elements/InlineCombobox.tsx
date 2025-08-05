@@ -27,6 +27,7 @@ import { cva } from 'class-variance-authority';
 import { useComposedRef, useEditorRef } from 'platejs/react';
 
 import { cn } from '@/lib/utils';
+import { THEME_RESET_STYLE } from '@/styles/theme-reset';
 
 type FilterFn = (
   item: { value: string; group?: string; keywords?: string[]; label?: string },
@@ -227,7 +228,7 @@ const InlineComboboxInput = React.forwardRef<
 
 InlineComboboxInput.displayName = 'InlineComboboxInput';
 
-const InlineComboboxContent: typeof ComboboxPopover = ({ className, ...props }) => {
+const InlineComboboxContent: typeof ComboboxPopover = ({ className, style, ...props }) => {
   // Portal prevents CSS from leaking into popover
   return (
     <Portal>
@@ -237,6 +238,7 @@ const InlineComboboxContent: typeof ComboboxPopover = ({ className, ...props }) 
           className
         )}
         {...props}
+        style={{ ...THEME_RESET_STYLE, ...style }}
       />
     </Portal>
   );
@@ -338,7 +340,7 @@ function InlineComboboxGroupLabel({
   return (
     <ComboboxGroupLabel
       {...props}
-      className={cn('text-muted-foreground mt-1.5 mb-2 px-3 text-xs font-medium', className)}
+      className={cn('text-muted-foreground font-base mt-1.5 mb-2 px-3 text-xs', className)}
     />
   );
 }

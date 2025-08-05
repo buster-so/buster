@@ -6,8 +6,9 @@ import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { LineHeightPlugin } from '@platejs/basic-styles/react';
 import { DropdownMenuItemIndicator } from '@radix-ui/react-dropdown-menu';
-import { Check, TextTool2 } from '@/components/ui/icons';
 import { useEditorRef, useSelectionFragmentProp } from 'platejs/react';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel } from '../config/labels';
 
 import {
   DropdownMenu,
@@ -17,7 +18,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton } from '@/components/ui/toolbar/Toolbar';
 
 export function LineHeightToolbarButton(props: DropdownMenuProps) {
   const editor = useEditorRef();
@@ -33,10 +34,10 @@ export function LineHeightToolbarButton(props: DropdownMenuProps) {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false} {...props}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton pressed={open} tooltip="Line height" isDropdown>
+      <DropdownMenuTrigger>
+        <ToolbarButton pressed={open} tooltip={createLabel('lineHeight')} isDropdown>
           <div className="size-4">
-            <TextTool2 />
+            <NodeTypeIcons.lineHeight />
           </div>
         </ToolbarButton>
       </DropdownMenuTrigger>
@@ -55,7 +56,7 @@ export function LineHeightToolbarButton(props: DropdownMenuProps) {
               value={value}>
               <span className="pointer-events-none absolute right-2 flex size-3.5 items-center justify-center">
                 <DropdownMenuItemIndicator>
-                  <Check />
+                  <NodeTypeIcons.check />
                 </DropdownMenuItemIndicator>
               </span>
               {value}

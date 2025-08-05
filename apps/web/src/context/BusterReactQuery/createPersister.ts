@@ -42,7 +42,8 @@ export const persistOptions: PersistQueryClientProviderProps['persistOptions'] =
   maxAge: PERSIST_TIME,
   dehydrateOptions: {
     shouldDehydrateQuery: (query) => {
-      const isList = query.queryKey[1] === 'list';
+      const isList =
+        query.queryKey[1] === 'list' || query.queryKey[query.queryKey.length - 1] === 'list';
       return isList || ALL_PERSISTED_QUERIES.includes(query.queryHash);
     }
   },

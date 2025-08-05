@@ -6,13 +6,9 @@ import type { Alignment } from '@platejs/basic-styles';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { TextAlignPlugin } from '@platejs/basic-styles/react';
-import {
-  TextAlignCenter,
-  TextAlignJustify,
-  TextAlignLeft,
-  TextAlignRight
-} from '@/components/ui/icons';
 import { useEditorPlugin, useSelectionFragmentProp } from 'platejs/react';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel, NodeTypeLabels } from '../config/labels';
 
 import {
   DropdownMenu,
@@ -22,23 +18,28 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton } from '@/components/ui/toolbar/Toolbar';
+import { Tooltip } from '../../tooltip';
 
 const items = [
   {
-    icon: TextAlignLeft,
+    icon: NodeTypeIcons.alignLeft,
+    label: NodeTypeLabels.alignLeft.label,
     value: 'left'
   },
   {
-    icon: TextAlignCenter,
+    icon: NodeTypeIcons.alignCenter,
+    label: NodeTypeLabels.alignCenter.label,
     value: 'center'
   },
   {
-    icon: TextAlignRight,
+    icon: NodeTypeIcons.alignRight,
+    label: NodeTypeLabels.alignRight.label,
     value: 'right'
   },
   {
-    icon: TextAlignJustify,
+    icon: NodeTypeIcons.alignJustify,
+    label: NodeTypeLabels.alignJustify.label,
     value: 'justify'
   }
 ];
@@ -52,12 +53,12 @@ export function AlignToolbarButton(props: DropdownMenuProps) {
     }) ?? 'left';
 
   const [open, setOpen] = React.useState(false);
-  const IconValue = items.find((item) => item.value === value)?.icon ?? TextAlignLeft;
+  const IconValue = items.find((item) => item.value === value)?.icon ?? NodeTypeIcons.alignLeft;
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false} {...props}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton pressed={open} tooltip="Align" isDropdown>
+      <DropdownMenuTrigger>
+        <ToolbarButton pressed={open} tooltip={createLabel('align')} isDropdown>
           <IconValue />
         </ToolbarButton>
       </DropdownMenuTrigger>
@@ -69,13 +70,15 @@ export function AlignToolbarButton(props: DropdownMenuProps) {
             tf.textAlign.setNodes(value as Alignment);
             editor.tf.focus();
           }}>
-          {items.map(({ icon: Icon, value: itemValue }) => (
-            <DropdownMenuRadioItem
-              key={itemValue}
-              className="data-[state=checked]:bg-accent pl-2 *:first:[span]:hidden"
-              value={itemValue}>
-              <Icon />
-            </DropdownMenuRadioItem>
+          {items.map(({ icon: Icon, label, value: itemValue }) => (
+            <Tooltip key={itemValue} title={label} side="left">
+              <DropdownMenuRadioItem
+                key={itemValue}
+                className="data-[state=checked]:bg-accent pl-2 *:first:[span]:hidden"
+                value={itemValue}>
+                <Icon />
+              </DropdownMenuRadioItem>
+            </Tooltip>
           ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

@@ -1,19 +1,14 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import type {
-  BusterCollection,
-  BusterCollectionItemAsset,
-  BusterCollectionListItem
-} from '@/api/asset_interfaces';
-import { ShareAssetType } from '@buster/server-shared/share';
+import type { BusterCollection, BusterCollectionItemAsset } from '@/api/asset_interfaces';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { AddToCollectionModal } from '@/components/features/modal/AddToCollectionModal';
 import { Avatar } from '@/components/ui/avatar';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRow,
+  type BusterListRowItem,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
 import { Text } from '@/components/ui/typography';
@@ -63,11 +58,11 @@ export const CollectionIndividualContent: React.FC<{
 });
 CollectionIndividualContent.displayName = 'CollectionIndividualContent';
 
-const columns: BusterListColumn[] = [
+const columns: BusterListColumn<BusterCollectionItemAsset>[] = [
   {
     dataIndex: 'name',
     title: 'Title',
-    render: ({ asset_type, name }) => {
+    render: (_, { asset_type, name }) => {
       const Icon = CollectionIconRecord[asset_type];
       return (
         <div className="flex w-full items-center space-x-2 overflow-hidden">
@@ -95,7 +90,7 @@ const columns: BusterListColumn[] = [
     dataIndex: 'created_by',
     title: 'Owner',
     width: 50,
-    render: (created_by: BusterCollectionListItem['owner']) => {
+    render: (_, { created_by }) => {
       return (
         <Avatar image={created_by?.avatar_url || undefined} name={created_by?.name} size={18} />
       );
@@ -112,13 +107,14 @@ const CollectionList: React.FC<{
 }> = React.memo(({ setOpenAddTypeModal, selectedCollection, assetList, loadedAsset }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const items: BusterListRow[] = useMemo(() => {
+  const items: BusterListRowItem<BusterCollectionItemAsset>[] = useMemo(() => {
     return assetList.map((asset) => ({
       id: asset.id,
       link: createAssetLink(asset, selectedCollection.id),
       data: {
         ...asset,
-        name: { name: asset.name || `New ${asset.asset_type}`, asset_type: asset.asset_type }
+        name: asset.name || `New ${asset.asset_type}`,
+        asset_type: asset.asset_type
       }
     }));
   }, [assetList, selectedCollection.id]);

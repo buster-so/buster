@@ -8,7 +8,6 @@ import type { PlateElementProps } from 'platejs/react';
 
 import { useEquationElement, useEquationInput } from '@platejs/math/react';
 import { BlockSelectionPlugin } from '@platejs/selection/react';
-import { RectArrowDownLeft, MathFunction } from '@/components/ui/icons';
 
 import {
   createPrimitiveComponent,
@@ -19,10 +18,13 @@ import {
   useReadOnly,
   useSelected
 } from 'platejs/react';
+import { NodeTypeIcons } from '../config/icons';
+import { NodeTypeLabels } from '../config/labels';
 
 import { Button } from '@/components/ui/buttons';
 import { PopoverBase, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { Separator } from '../../separator';
 
 export function EquationElement(props: PlateElementProps<TEquationElement>) {
   const selected = useSelected();
@@ -61,10 +63,10 @@ export function EquationElement(props: PlateElementProps<TEquationElement>) {
               <span ref={katexRef} />
             ) : (
               <div className="text-muted-foreground flex h-7 w-full items-center gap-2 text-sm whitespace-nowrap">
-                <div className="text-muted-foreground/80 size-6">
-                  <MathFunction />
+                <div className="text-muted-foreground/80 size-6 text-xl">
+                  <NodeTypeIcons.mathFunction />
                 </div>
-                <div>Add a Tex equation</div>
+                <div>{NodeTypeLabels.addTexEquation.label}</div>
               </div>
             )}
           </div>
@@ -136,9 +138,9 @@ export function InlineEquationElement(props: PlateElementProps<TEquationElement>
             {element.texExpression.length === 0 && (
               <span>
                 <div className="mr-1 inline-block h-[19px] w-4 py-[1.5px] align-text-bottom">
-                  <MathFunction />
+                  <NodeTypeIcons.mathFunction />
                 </div>
-                New equation
+                {NodeTypeLabels.newEquation.label}
               </span>
             )}
           </div>
@@ -197,21 +199,27 @@ const EquationPopoverContent = ({
 
   return (
     <PopoverContent
-      className="flex gap-2"
+      className="flex w-[300px] flex-col p-0 py-2"
       onEscapeKeyDown={(e) => {
         e.preventDefault();
       }}
       contentEditable={false}>
-      <EquationInput
-        className={cn('max-h-[50vh] grow resize-none p-2 text-sm', className)}
-        state={{ isInline, open, onClose }}
-        autoFocus
-        {...props}
-      />
+      <div className="px-2">
+        <EquationInput
+          className={cn('max-h-[50vh] w-full grow resize-none p-2 text-sm', className)}
+          state={{ isInline, open, onClose }}
+          autoFocus
+          {...props}
+        />
+      </div>
 
-      <Button variant="outlined" className="px-3" suffix={<RectArrowDownLeft />} onClick={onClose}>
-        Done
-      </Button>
+      <Separator className="my-2" />
+
+      <div className="px-2">
+        <Button variant="outlined" block onClick={onClose}>
+          {NodeTypeLabels.done.label}
+        </Button>
+      </div>
     </PopoverContent>
   );
 };

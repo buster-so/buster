@@ -43,7 +43,7 @@ const TYPE_TEXT_MAP: Record<string, (node?: TElement) => string> = {
   [KEYS.audio]: () => 'Audio',
   [KEYS.blockquote]: () => 'Blockquote',
   [KEYS.callout]: () => 'Callout',
-  [KEYS.codeBlock]: () => 'Code Block',
+  [KEYS.codeBlock]: () => 'Code block',
   [KEYS.column]: () => 'Column',
   [KEYS.equation]: () => 'Equation',
   [KEYS.file]: () => 'File',
@@ -53,12 +53,12 @@ const TYPE_TEXT_MAP: Record<string, (node?: TElement) => string> = {
   [KEYS.h4]: () => `Heading 4`,
   [KEYS.h5]: () => `Heading 5`,
   [KEYS.h6]: () => `Heading 6`,
-  [KEYS.hr]: () => 'Horizontal Rule',
+  [KEYS.hr]: () => 'Horizontal rule',
   [KEYS.img]: () => 'Image',
   [KEYS.mediaEmbed]: () => 'Media',
   [KEYS.p]: (node) => {
-    if (node?.[KEYS.listType] === KEYS.listTodo) return 'Todo List';
-    if (node?.[KEYS.listType] === KEYS.ol) return 'Ordered List';
+    if (node?.[KEYS.listType] === KEYS.listTodo) return 'Todo list';
+    if (node?.[KEYS.listType] === KEYS.ol) return 'Ordered list';
     if (node?.[KEYS.listType] === KEYS.ul) return 'List';
 
     return 'Paragraph';

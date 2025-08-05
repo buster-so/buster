@@ -8,7 +8,7 @@ import { Avatar } from '@/components/ui/avatar';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRow,
+  type BusterListRowItem,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
 import { Text } from '@/components/ui/typography';
@@ -52,7 +52,7 @@ export const CollectionsListContent: React.FC<{
 );
 CollectionsListContent.displayName = 'CollectionsListContent';
 
-const columns: BusterListColumn[] = [
+const columns: BusterListColumn<BusterCollectionListItem>[] = [
   {
     dataIndex: 'name',
     title: 'Title',
@@ -100,7 +100,7 @@ const CollectionList: React.FC<{
 }> = React.memo(({ collectionsList, setOpenNewCollectionModal, loadedCollections }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const collections: BusterListRow[] = useMemo(() => {
+  const collections: BusterListRowItem<BusterCollectionListItem>[] = useMemo(() => {
     return collectionsList.map((collection) => {
       return {
         id: collection.id,

@@ -3,6 +3,7 @@ import {
   getCollectionTitle,
   getDashboardTitle,
   getMetricTitle,
+  getReportTitle,
   getUserOrganizationId,
 } from '@buster/database';
 import { GetTitleRequestSchema, type GetTitleResponse } from '@buster/server-shared/title';
@@ -35,6 +36,9 @@ const app = new Hono()
           break;
         case 'dashboard':
           title = await getDashboardTitle({ assetId, organizationId: userOrg?.organizationId });
+          break;
+        case 'report':
+          title = await getReportTitle({ assetId, organizationId: userOrg?.organizationId });
           break;
         default: {
           const _exhaustive: never = assetType;

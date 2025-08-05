@@ -61,8 +61,8 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
         id: assetId,
         params: {
           publicly_accessible: v === undefined ? true : !!v,
-          public_password: _password || null,
-          public_expiry_date: linkExp
+          public_password: _password || undefined,
+          public_expiry_date: linkExp || undefined
         }
       };
       if (assetType === 'metric') {

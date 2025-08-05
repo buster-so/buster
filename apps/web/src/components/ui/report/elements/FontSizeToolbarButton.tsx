@@ -13,7 +13,7 @@ import { useEditorPlugin, useEditorSelector } from 'platejs/react';
 import { PopoverBase, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton } from '@/components/ui/toolbar/Toolbar';
 
 const DEFAULT_FONT_SIZE = '16';
 

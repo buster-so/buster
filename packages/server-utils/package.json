@@ -1,0 +1,40 @@
+{
+  "name": "@buster/server-utils",
+  "description": "Server utilities for Buster that can be used in any server-side application",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./report": {
+      "types": "./dist/report/index.d.ts",
+      "default": "./dist/report/index.js"
+    }
+  },
+  "scripts": {
+    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
+    "build": "tsc",
+    "build:dry-run": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc --watch",
+    "lint": "biome check --write",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run **/*.int.test.ts **/*.integration.test.ts",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@buster/env-utils": "workspace:*",
+    "@buster/database": "workspace:*",
+    "zod": "catalog:",
+    "@platejs/autoformat": "catalog:",
+    "@platejs/basic-nodes": "catalog:",
+    "@platejs/markdown": "catalog:",
+    "platejs": "catalog:",
+    "remark-gfm": "catalog:",
+    "remark-math": "^6.0.0"
+  }
+}

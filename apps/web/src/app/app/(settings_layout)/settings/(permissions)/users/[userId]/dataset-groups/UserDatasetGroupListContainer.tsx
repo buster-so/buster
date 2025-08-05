@@ -31,7 +31,7 @@ export const UserDatasetGroupListContainer: React.FC<{
     await updateUserDatasetGroups([params]);
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<BusterUserDatasetGroup>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -62,14 +62,14 @@ export const UserDatasetGroupListContainer: React.FC<{
 
   const { cannotQueryPermissionUsers, canQueryPermissionUsers } = useMemo(() => {
     const result: {
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<BusterUserDatasetGroup>[];
+      canQueryPermissionUsers: BusterListRowItem<BusterUserDatasetGroup>[];
     } = filteredDatasetGroups.reduce<{
-      cannotQueryPermissionUsers: BusterListRowItem[];
-      canQueryPermissionUsers: BusterListRowItem[];
+      cannotQueryPermissionUsers: BusterListRowItem<BusterUserDatasetGroup>[];
+      canQueryPermissionUsers: BusterListRowItem<BusterUserDatasetGroup>[];
     }>(
       (acc, datasetGroup) => {
-        const user: BusterListRowItem = {
+        const user: BusterListRowItem<BusterUserDatasetGroup> = {
           id: datasetGroup.id,
           data: datasetGroup,
           link: createBusterRoute({
@@ -85,18 +85,18 @@ export const UserDatasetGroupListContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionUsers: [] as BusterListRowItem[],
-        canQueryPermissionUsers: [] as BusterListRowItem[]
+        cannotQueryPermissionUsers: [],
+        canQueryPermissionUsers: []
       }
     );
     return result;
   }, [filteredDatasetGroups]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<BusterUserDatasetGroup>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -106,7 +106,7 @@ export const UserDatasetGroupListContainer: React.FC<{
       ...canQueryPermissionUsers,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionUsers.length === 0,
         rowSection: {
           title: 'Not assigned',

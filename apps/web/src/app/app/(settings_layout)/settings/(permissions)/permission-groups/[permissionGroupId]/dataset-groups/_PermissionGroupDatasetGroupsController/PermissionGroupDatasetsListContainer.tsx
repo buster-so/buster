@@ -27,7 +27,7 @@ export const PermissionGroupDatasetGroupsListContainer: React.FC<{
     await updatePermissionGroupDatasetGroups([params]);
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<GetPermissionGroupDatasetGroupsResponse>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -56,21 +56,22 @@ export const PermissionGroupDatasetGroupsListContainer: React.FC<{
 
   const { cannotQueryPermissionDatasetGroups, canQueryPermissionDatasetGroups } = useMemo(() => {
     const result: {
-      cannotQueryPermissionDatasetGroups: BusterListRowItem[];
-      canQueryPermissionDatasetGroups: BusterListRowItem[];
+      cannotQueryPermissionDatasetGroups: BusterListRowItem<GetPermissionGroupDatasetGroupsResponse>[];
+      canQueryPermissionDatasetGroups: BusterListRowItem<GetPermissionGroupDatasetGroupsResponse>[];
     } = filteredDatasetGroups.reduce<{
-      cannotQueryPermissionDatasetGroups: BusterListRowItem[];
-      canQueryPermissionDatasetGroups: BusterListRowItem[];
+      cannotQueryPermissionDatasetGroups: BusterListRowItem<GetPermissionGroupDatasetGroupsResponse>[];
+      canQueryPermissionDatasetGroups: BusterListRowItem<GetPermissionGroupDatasetGroupsResponse>[];
     }>(
       (acc, permissionGroupDatasetGroup) => {
-        const permissionGroupDatasetGroupItem: BusterListRowItem = {
-          id: permissionGroupDatasetGroup.id,
-          data: permissionGroupDatasetGroup,
-          link: createBusterRoute({
-            route: BusterRoutes.SETTINGS_PERMISSION_GROUPS_ID_USERS,
-            permissionGroupId: permissionGroupId
-          })
-        };
+        const permissionGroupDatasetGroupItem: BusterListRowItem<GetPermissionGroupDatasetGroupsResponse> =
+          {
+            id: permissionGroupDatasetGroup.id,
+            data: permissionGroupDatasetGroup,
+            link: createBusterRoute({
+              route: BusterRoutes.SETTINGS_PERMISSION_GROUPS_ID_USERS,
+              permissionGroupId: permissionGroupId
+            })
+          };
         if (permissionGroupDatasetGroup.assigned) {
           acc.canQueryPermissionDatasetGroups.push(permissionGroupDatasetGroupItem);
         } else {
@@ -79,18 +80,18 @@ export const PermissionGroupDatasetGroupsListContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionDatasetGroups: [] as BusterListRowItem[],
-        canQueryPermissionDatasetGroups: [] as BusterListRowItem[]
+        cannotQueryPermissionDatasetGroups: [],
+        canQueryPermissionDatasetGroups: []
       }
     );
     return result;
   }, [filteredDatasetGroups]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<GetPermissionGroupDatasetGroupsResponse>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionDatasetGroups.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -100,7 +101,7 @@ export const PermissionGroupDatasetGroupsListContainer: React.FC<{
       ...canQueryPermissionDatasetGroups,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionDatasetGroups.length === 0,
         rowSection: {
           title: 'Not assigned',

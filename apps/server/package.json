@@ -31,17 +31,22 @@
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
+    "@buster/server-utils": "workspace:*",
     "@hono/zod-validator": "^0.7.2",
     "@supabase/supabase-js": "catalog:",
     "@trigger.dev/sdk": "catalog:",
-    "drizzle-orm": "catalog:",
     "ai": "catalog:",
+    "drizzle-orm": "catalog:",
     "hono": "catalog:",
     "hono-pino": "^0.10.1",
+    "lodash-es": "^4.17.21",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
-    "typescript": "5.8.3",
     "tsup": "catalog:",
+    "typescript": "5.8.3",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12"
   }
 }

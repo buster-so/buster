@@ -24,7 +24,7 @@ catalog:
   drizzle-orm: "^0.44.2"
   hono: "^4.8.0"
   pg: "^8.16.2"
-  platejs: "^49.1.13"
+  platejs: "^49.2.4"
   "remark-gfm":  "^4.0.1"
   tsup: "^8.5.0"
   tsx: "^4.20.0"

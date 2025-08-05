@@ -1,4 +1,4 @@
-import { markdownToPlatejs } from '@buster/server-shared/lib/report';
+import { markdownToPlatejs } from '@buster/server-utils/report';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';

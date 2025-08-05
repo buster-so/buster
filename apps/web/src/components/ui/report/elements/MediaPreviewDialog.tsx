@@ -7,9 +7,8 @@ import {
   useScaleInput
 } from '@platejs/media/react';
 import { cva } from 'class-variance-authority';
-//import { ArrowLeft, ArrowRight, Download, Minus, Plus, X } from 'lucide-react';
-import { Download, ArrowLeft, ArrowRight, Minus, Plus, Xmark } from '@/components/ui/icons';
 import { useEditorRef } from 'platejs/react';
+import { NodeTypeIcons } from '../config/icons';
 
 import { cn } from '@/lib/utils';
 import type { RefObject } from 'react';
@@ -74,7 +73,7 @@ export function MediaPreviewDialog() {
                   })
                 )}
                 type="button">
-                <ArrowLeft />
+                <NodeTypeIcons.arrowLeft />
               </button>
               {(currentUrlIndex ?? 0) + 1}
               <button
@@ -85,7 +84,7 @@ export function MediaPreviewDialog() {
                   })
                 )}
                 type="button">
-                <ArrowRight />
+                <NodeTypeIcons.arrowRight />
               </button>
             </div>
             <div className="flex">
@@ -98,7 +97,7 @@ export function MediaPreviewDialog() {
                 {...zommOutProps}
                 type="button">
                 <div className="size-4">
-                  <Minus />
+                  <NodeTypeIcons.remove />
                 </div>
               </button>
               <div className="mx-px">
@@ -120,19 +119,19 @@ export function MediaPreviewDialog() {
                 {...zoomInProps}
                 type="button">
                 <div className="size-4">
-                  <Plus />
+                  <NodeTypeIcons.add />
                 </div>
               </button>
             </div>
             {/* TODO: downLoad the image */}
             <button className={cn(buttonVariants())} type="button">
               <div className="size-4">
-                <Download />
+                <NodeTypeIcons.download />
               </div>
             </button>
             <button {...closeProps} className={cn(buttonVariants())} type="button">
               <div className="size-4">
-                <Xmark />
+                <NodeTypeIcons.close />
               </div>
             </button>
           </div>

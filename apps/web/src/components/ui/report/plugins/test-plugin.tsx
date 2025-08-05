@@ -7,14 +7,12 @@ export const MyTestPlugin = createPlatePlugin({
   // Define editor.tf.doc.format()
   .extendTransforms(({ editor, type }) => ({
     format: () => {
-      console.log('format', editor, type);
       editor.tf.normalize({ force: true });
     }
   }))
   // Define editor.api.doc.format()
   .extendApi(({ editor, type }) => ({
     save: async () => {
-      console.log('save', editor, type);
       // Save the document
       // await fetch(...);
     }

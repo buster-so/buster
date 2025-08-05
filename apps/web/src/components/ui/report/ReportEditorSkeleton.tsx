@@ -1,6 +1,6 @@
 import { cn } from '@/lib/classMerge';
 
-import ChartStackedBar from '../icons/NucleoIconOutlined/chart-stacked-bar';
+import ChartStackedBar from '@/components/ui/icons/NucleoIconFilled/chart-line-2';
 
 export type SkeletonElement =
   | 'toolbar'
@@ -112,8 +112,8 @@ export function ReportEditorSkeleton({
           {/* Chart placeholder */}
           {elements.includes('chart') && (
             <div className="bg-muted flex h-48 w-full items-center justify-center rounded-lg">
-              <div className="bg-muted-foreground/5 flex h-16 w-16 items-center justify-center rounded-lg">
-                <div className="text-muted-foreground/40 flex h-16 w-16 items-center justify-center text-4xl">
+              <div className="bg-muted-foreground/3 mx-5 flex h-40 w-full items-center justify-center rounded-lg">
+                <div className="text-muted-foreground/15 flex h-full w-full items-center justify-center text-[40px]">
                   <ChartStackedBar />
                 </div>
               </div>

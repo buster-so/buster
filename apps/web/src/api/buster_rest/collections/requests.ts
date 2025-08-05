@@ -1,11 +1,8 @@
 import type { ShareAssetType } from '@buster/server-shared/share';
 import type { BusterCollection, BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import type {
-  ShareDeleteRequest,
-  ShareUpdateRequest
-} from '@/api/asset_interfaces/shared_interfaces';
 import mainApi from '@/api/buster_rest/instances';
 import { SharePostRequest } from '@buster/server-shared/share';
+import type { ShareDeleteRequest, ShareUpdateRequest } from '@buster/server-shared/share';
 
 export const collectionsGetList = async (params: {
   /** Current page number (1-based indexing) */
@@ -107,7 +104,7 @@ export const addAssetToCollection = async ({
 }: {
   id: string;
   assets: {
-    type: 'metric' | 'dashboard' | 'chat';
+    type: Exclude<ShareAssetType, 'collection'>;
     id: string;
   }[];
 }) => {

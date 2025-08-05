@@ -6,23 +6,9 @@ import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import type { TElement } from 'platejs';
 
 import { DropdownMenuItemIndicator } from '@radix-ui/react-dropdown-menu';
-import {
-  Check,
-  ChevronRight,
-  GridLayoutCols3,
-  Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6,
-  UnorderedList,
-  OrderedList,
-  Pilcrow,
-  Quote,
-  SquareCode
-} from '@/components/ui/icons';
+import { Check } from '@/components/ui/icons';
+import { NodeTypeIcons } from '../config/icons';
+import { createLabel, NodeTypeLabels, createMenuItem } from '../config/labels';
 import { KEYS } from 'platejs';
 import { useEditorRef, useSelectionFragmentProp } from 'platejs/react';
 
@@ -34,92 +20,23 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getBlockType, setBlockType } from './transforms';
 
-import { ToolbarButton, ToolbarMenuGroup } from './Toolbar';
+import { ToolbarButton, ToolbarMenuGroup } from '@/components/ui/toolbar/Toolbar';
 
 const turnIntoItems = [
-  {
-    icon: <Pilcrow />,
-    keywords: ['paragraph'],
-    label: 'Text',
-    value: KEYS.p
-  },
-  {
-    icon: <Heading1 />,
-    keywords: ['title', 'h1'],
-    label: 'Heading 1',
-    value: 'h1'
-  },
-  {
-    icon: <Heading2 />,
-    keywords: ['subtitle', 'h2'],
-    label: 'Heading 2',
-    value: 'h2'
-  },
-  {
-    icon: <Heading3 />,
-    keywords: ['subtitle', 'h3'],
-    label: 'Heading 3',
-    value: 'h3'
-  },
-  {
-    icon: <Heading4 />,
-    keywords: ['subtitle', 'h4'],
-    label: 'Heading 4',
-    value: 'h4'
-  },
-  {
-    icon: <Heading5 />,
-    keywords: ['subtitle', 'h5'],
-    label: 'Heading 5',
-    value: 'h5'
-  },
-  {
-    icon: <Heading6 />,
-    keywords: ['subtitle', 'h6'],
-    label: 'Heading 6',
-    value: 'h6'
-  },
-  {
-    icon: <UnorderedList />,
-    keywords: ['unordered', 'ul', '-'],
-    label: 'Bulleted list',
-    value: KEYS.ul
-  },
-  {
-    icon: <OrderedList />,
-    keywords: ['ordered', 'ol', '1'],
-    label: 'Numbered list',
-    value: KEYS.ol
-  },
-  {
-    icon: <SquareCode />,
-    keywords: ['checklist', 'task', 'checkbox', '[]'],
-    label: 'To-do list',
-    value: KEYS.listTodo
-  },
-  {
-    icon: <ChevronRight />,
-    keywords: ['collapsible', 'expandable'],
-    label: 'Toggle list',
-    value: KEYS.toggle
-  },
-  {
-    icon: <Code />,
-    keywords: ['```'],
-    label: 'Code',
-    value: KEYS.codeBlock
-  },
-  {
-    icon: <Quote />,
-    keywords: ['citation', 'blockquote', '>'],
-    label: 'Quote',
-    value: KEYS.blockquote
-  },
-  {
-    icon: <GridLayoutCols3 />,
-    label: '3 columns',
-    value: 'action_three_columns'
-  }
+  createMenuItem('paragraph', KEYS.p, <NodeTypeIcons.paragraph />),
+  createMenuItem('h1', 'h1', <NodeTypeIcons.h1 />),
+  createMenuItem('h2', 'h2', <NodeTypeIcons.h2 />),
+  createMenuItem('h3', 'h3', <NodeTypeIcons.h3 />),
+  createMenuItem('h4', 'h4', <NodeTypeIcons.h4 />),
+  createMenuItem('h5', 'h5', <NodeTypeIcons.h5 />),
+  createMenuItem('h6', 'h6', <NodeTypeIcons.h6 />),
+  createMenuItem('bulletedList', KEYS.ul, <NodeTypeIcons.bulletedList />),
+  createMenuItem('numberedList', KEYS.ol, <NodeTypeIcons.numberedList />),
+  createMenuItem('todoList', KEYS.listTodo, <NodeTypeIcons.checkList />),
+  createMenuItem('toggleList', KEYS.toggle, <NodeTypeIcons.toggle />),
+  createMenuItem('codeBlock', KEYS.codeBlock, <NodeTypeIcons.codeBlock />),
+  createMenuItem('blockquote', KEYS.blockquote, <NodeTypeIcons.quote />),
+  createMenuItem('columnsThree', 'action_three_columns', <NodeTypeIcons.columnsThree />)
 ];
 
 export function TurnIntoToolbarButton(props: DropdownMenuProps) {
@@ -137,8 +54,12 @@ export function TurnIntoToolbarButton(props: DropdownMenuProps) {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false} {...props}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton className="min-w-[125px]" pressed={open} tooltip="Turn into" isDropdown>
+      <DropdownMenuTrigger>
+        <ToolbarButton
+          className="min-w-[125px]"
+          pressed={open}
+          tooltip={createLabel('turnInto')}
+          isDropdown>
           {selectedItem.label}
         </ToolbarButton>
       </DropdownMenuTrigger>
@@ -155,7 +76,7 @@ export function TurnIntoToolbarButton(props: DropdownMenuProps) {
           onValueChange={(type) => {
             setBlockType(editor, type);
           }}
-          label="Turn into">
+          label={NodeTypeLabels.turnInto.label}>
           {turnIntoItems.map(({ icon, label, value: itemValue }) => (
             <DropdownMenuRadioItem
               key={itemValue}

@@ -43,7 +43,7 @@ export const ImageElement = withHOC(
               <Image
                 ref={handleRef}
                 className={cn(
-                  'block w-full max-w-full cursor-pointer object-cover px-0',
+                  'bg-item-hover-active block w-full max-w-full cursor-pointer object-cover px-0',
                   'rounded-sm',
                   focused && selected && 'ring-ring ring-2 ring-offset-2',
                   isDragging && 'opacity-50'

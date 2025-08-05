@@ -32,7 +32,7 @@ export const ShareMenuInvite: React.FC<ShareMenuInviteProps> = React.memo(
     const [inputValue, setInputValue] = React.useState<string>('');
 
     const [defaultPermissionLevel, setDefaultPermissionLevel] =
-      React.useState<ShareRole>('canView');
+      React.useState<ShareRole>('can_view');
 
     const debouncedInputValue = useDebounce(inputValue, { wait: 100 });
     const { data: usersData } = useGetUserToOrganization({

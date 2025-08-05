@@ -1,13 +1,18 @@
+'use client';
+
 import {
+  BlockquotePlugin,
   H1Plugin,
   H2Plugin,
   H3Plugin,
   H4Plugin,
   H5Plugin,
   H6Plugin,
-  BlockquotePlugin,
   HorizontalRulePlugin
 } from '@platejs/basic-nodes/react';
+import { ParagraphPlugin } from 'platejs/react';
+
+import { BlockquoteElement } from '../elements/BlockquoteNode';
 import {
   H1Element,
   H2Element,
@@ -16,12 +21,11 @@ import {
   H5Element,
   H6Element
 } from '../elements/HeadingNode';
-import { ParagraphPlugin } from 'platejs/react';
-import { ParagraphElement } from '../elements/ParagraphNode';
-import { BlockquoteElement } from '../elements/BlockquoteNode';
 import { HrElement } from '../elements/HrNode';
+import { ParagraphElement } from '../elements/ParagraphNode';
 
 export const BasicBlocksKit = [
+  ParagraphPlugin.withComponent(ParagraphElement),
   H1Plugin.configure({
     node: {
       component: H1Element
@@ -76,7 +80,9 @@ export const BasicBlocksKit = [
     },
     shortcuts: { toggle: { keys: 'mod+alt+6' } }
   }),
-  ParagraphPlugin.withComponent(ParagraphElement),
-  BlockquotePlugin.withComponent(BlockquoteElement),
+  BlockquotePlugin.configure({
+    node: { component: BlockquoteElement },
+    shortcuts: { toggle: { keys: 'mod+shift+period' } }
+  }),
   HorizontalRulePlugin.withComponent(HrElement)
 ];

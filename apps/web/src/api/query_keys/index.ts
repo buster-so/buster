@@ -12,6 +12,7 @@ import { userQueryKeys } from './users';
 import { securityQueryKeys } from './security';
 import { slackQueryKeys } from './slack';
 import { dictionariesQueryKeys } from './dictionaries';
+import { reportsQueryKeys } from './reports';
 
 export const queryKeys = {
   ...datasetQueryKeys,
@@ -27,5 +28,6 @@ export const queryKeys = {
   ...permissionGroupQueryKeys,
   ...securityQueryKeys,
   ...slackQueryKeys,
-  ...dictionariesQueryKeys
+  ...dictionariesQueryKeys,
+  ...reportsQueryKeys
 };

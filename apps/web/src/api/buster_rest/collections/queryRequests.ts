@@ -26,6 +26,7 @@ import {
   unshareCollection,
   updateCollectionShare
 } from './requests';
+import type { ShareAssetType } from '@buster/server-shared/share';
 
 export const useGetCollectionsList = (
   filters: Omit<Parameters<typeof collectionsGetList>[0], 'page_token' | 'page_size'>,
@@ -309,7 +310,7 @@ export const useAddAndRemoveAssetsFromCollection = () => {
     async (variables: {
       collectionId: string;
       assets: {
-        type: 'metric' | 'dashboard';
+        type: Exclude<ShareAssetType, 'collection'>;
         id: string;
       }[];
     }) => {
@@ -330,7 +331,7 @@ export const useAddAndRemoveAssetsFromCollection = () => {
         currentCollection.assets
           ?.filter((a) => !variables.assets.some((b) => b.id === a.id))
           .map((a) => ({
-            type: a.asset_type as 'metric' | 'dashboard',
+            type: a.asset_type as Exclude<ShareAssetType, 'collection'>,
             id: a.id
           })) || [];
       const addedAssets = variables.assets.filter(

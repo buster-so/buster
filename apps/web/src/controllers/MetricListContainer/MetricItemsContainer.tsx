@@ -7,7 +7,7 @@ import {
   StatusBadgeIndicator
 } from '@/components/features/metrics/StatusBadgeIndicator';
 import { Avatar } from '@/components/ui/avatar';
-import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
+import type { BusterListColumn, BusterListRowItem } from '@/components/ui/list';
 import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
 import { useCreateListByDate } from '@/components/ui/list/useCreateListByDate';
 import { Text } from '@/components/ui/typography';
@@ -32,35 +32,37 @@ export const MetricItemsContainer: React.FC<{
 
   const logsRecord = useCreateListByDate({ data: metrics });
 
-  const metricsByDate: BusterListRow[] = useMemo(() => {
-    return Object.entries(logsRecord).flatMap(([key, metrics]) => {
-      const records = metrics.map((metric) => ({
-        id: metric.id,
-        data: metric,
-        link: createBusterRoute({
-          route: BusterRoutes.APP_METRIC_ID_CHART,
-          metricId: metric.id
-        })
-      }));
-      const hasRecords = records.length > 0;
-      if (!hasRecords) {
-        return [];
+  const metricsByDate: BusterListRowItem<BusterMetricListItem>[] = useMemo(() => {
+    return Object.entries(logsRecord).flatMap<BusterListRowItem<BusterMetricListItem>>(
+      ([key, metrics]) => {
+        const records = metrics.map((metric) => ({
+          id: metric.id,
+          data: metric,
+          link: createBusterRoute({
+            route: BusterRoutes.APP_METRIC_ID_CHART,
+            metricId: metric.id
+          })
+        }));
+        const hasRecords = records.length > 0;
+        if (!hasRecords) {
+          return [];
+        }
+        return [
+          {
+            id: key,
+            data: null,
+            rowSection: {
+              title: makeHumanReadble(key),
+              secondaryTitle: String(records.length)
+            }
+          },
+          ...records
+        ];
       }
-      return [
-        {
-          id: key,
-          data: {},
-          rowSection: {
-            title: makeHumanReadble(key),
-            secondaryTitle: String(records.length)
-          }
-        },
-        ...records
-      ];
-    });
+    );
   }, [logsRecord]);
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<BusterMetricListItem>[] = useMemo(
     () => [
       {
         dataIndex: 'name',

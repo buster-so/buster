@@ -8,7 +8,7 @@ import {
 
 describe('ShareRoleSchema', () => {
   it('should accept valid role values', () => {
-    const validRoles = ['owner', 'fullAccess', 'canEdit', 'canView'];
+    const validRoles = ['owner', 'full_access', 'can_edit', 'can_view'];
 
     for (const role of validRoles) {
       const result = ShareRoleSchema.safeParse(role);
@@ -52,7 +52,7 @@ describe('ShareAssetTypeSchema', () => {
   });
 
   it('should reject invalid asset type values', () => {
-    const invalidTypes = ['report', 'query', 'table', '', 'METRIC'];
+    const invalidTypes = ['report-id', 'query', 'table', '', 'METRIC'];
 
     for (const type of invalidTypes) {
       const result = ShareAssetTypeSchema.safeParse(type);
@@ -74,8 +74,9 @@ describe('ShareIndividualSchema', () => {
   it('should parse valid individual sharing configuration', () => {
     const validIndividual = {
       email: 'user@example.com',
-      role: 'canEdit',
+      role: 'can_edit',
       name: 'John Doe',
+      avatar_url: null,
     };
 
     const result = ShareIndividualSchema.safeParse(validIndividual);
@@ -83,7 +84,7 @@ describe('ShareIndividualSchema', () => {
 
     if (result.success) {
       expect(result.data.email).toBe('user@example.com');
-      expect(result.data.role).toBe('canEdit');
+      expect(result.data.role).toBe('can_edit');
       expect(result.data.name).toBe('John Doe');
     }
   });
@@ -91,7 +92,8 @@ describe('ShareIndividualSchema', () => {
   it('should handle optional name field', () => {
     const individualWithoutName = {
       email: 'test@example.com',
-      role: 'canView',
+      role: 'can_view',
+      avatar_url: null,
     };
 
     const result = ShareIndividualSchema.safeParse(individualWithoutName);
@@ -99,7 +101,7 @@ describe('ShareIndividualSchema', () => {
 
     if (result.success) {
       expect(result.data.email).toBe('test@example.com');
-      expect(result.data.role).toBe('canView');
+      expect(result.data.role).toBe('can_view');
       expect(result.data.name).toBeUndefined();
     }
   });
@@ -110,7 +112,7 @@ describe('ShareIndividualSchema', () => {
     for (const email of invalidEmails) {
       const individual = {
         email,
-        role: 'canView',
+        role: 'can_view',
       };
 
       const result = ShareIndividualSchema.safeParse(individual);
@@ -131,7 +133,7 @@ describe('ShareIndividualSchema', () => {
 
   it('should require email and role fields', () => {
     const missingEmail = {
-      role: 'canEdit',
+      role: 'can_edit',
       name: 'John Doe',
     };
 
@@ -148,7 +150,7 @@ describe('ShareIndividualSchema', () => {
   });
 
   it('should handle all valid role combinations', () => {
-    const validRoles = ['owner', 'fullAccess', 'canEdit', 'canView'];
+    const validRoles = ['owner', 'full_access', 'can_edit', 'can_view'];
 
     for (const role of validRoles) {
       const individual = {
@@ -172,12 +174,12 @@ describe('ShareConfigSchema', () => {
       individual_permissions: [
         {
           email: 'user1@example.com',
-          role: 'canEdit',
+          role: 'can_edit',
           name: 'User One',
         },
         {
           email: 'user2@example.com',
-          role: 'canView',
+          role: 'can_view',
         },
       ],
       public_expiry_date: '2024-12-31T23:59:59Z',
@@ -195,7 +197,7 @@ describe('ShareConfigSchema', () => {
     if (result.success) {
       expect(result.data.individual_permissions).toHaveLength(2);
       expect(result.data.individual_permissions?.[0]?.email).toBe('user1@example.com');
-      expect(result.data.individual_permissions?.[0]?.role).toBe('canEdit');
+      expect(result.data.individual_permissions?.[0]?.role).toBe('can_edit');
       expect(result.data.publicly_accessible).toBe(true);
       expect(result.data.permission).toBe('owner');
     }
@@ -208,7 +210,7 @@ describe('ShareConfigSchema', () => {
       public_enabled_by: null,
       publicly_accessible: false,
       public_password: null,
-      permission: 'canView',
+      permission: 'can_view',
       workspace_sharing: null,
       workspace_member_count: null,
     };
@@ -222,7 +224,7 @@ describe('ShareConfigSchema', () => {
       expect(result.data.public_enabled_by).toBeNull();
       expect(result.data.publicly_accessible).toBe(false);
       expect(result.data.public_password).toBeNull();
-      expect(result.data.permission).toBe('canView');
+      expect(result.data.permission).toBe('can_view');
     }
   });
 
@@ -233,7 +235,7 @@ describe('ShareConfigSchema', () => {
       public_enabled_by: 'system',
       publicly_accessible: true,
       public_password: null,
-      permission: 'fullAccess',
+      permission: 'full_access',
       workspace_sharing: null,
       workspace_member_count: null,
     };
@@ -244,12 +246,12 @@ describe('ShareConfigSchema', () => {
     if (result.success) {
       expect(result.data.individual_permissions).toEqual([]);
       expect(result.data.publicly_accessible).toBe(true);
-      expect(result.data.permission).toBe('fullAccess');
+      expect(result.data.permission).toBe('full_access');
     }
   });
 
   it('should validate all permission field values', () => {
-    const validPermissions = ['owner', 'fullAccess', 'canEdit', 'canView'];
+    const validPermissions = ['owner', 'full_access', 'can_edit', 'can_view'];
 
     for (const permission of validPermissions) {
       const config = {
@@ -334,7 +336,7 @@ describe('ShareConfigSchema', () => {
       individual_permissions: [
         {
           email: 'invalid-email', // Invalid email format
-          role: 'canEdit',
+          role: 'can_edit',
         },
       ],
       public_expiry_date: null,
@@ -361,12 +363,12 @@ describe('ShareConfigSchema', () => {
         },
         {
           email: 'editor@company.com',
-          role: 'canEdit',
+          role: 'can_edit',
           name: 'Editor User',
         },
         {
           email: 'viewer@external.com',
-          role: 'canView',
+          role: 'can_view',
           // name is optional
         },
       ],
@@ -374,7 +376,7 @@ describe('ShareConfigSchema', () => {
       public_enabled_by: 'admin@company.com',
       publicly_accessible: true,
       public_password: 'complex_password_123!',
-      permission: 'fullAccess',
+      permission: 'full_access',
       workspace_sharing: null,
       workspace_member_count: null,
     };
@@ -385,8 +387,8 @@ describe('ShareConfigSchema', () => {
     if (result.success) {
       expect(result.data.individual_permissions).toHaveLength(3);
       expect(result.data.individual_permissions?.[0]?.role).toBe('owner');
-      expect(result.data.individual_permissions?.[1]?.role).toBe('canEdit');
-      expect(result.data.individual_permissions?.[2]?.role).toBe('canView');
+      expect(result.data.individual_permissions?.[1]?.role).toBe('can_edit');
+      expect(result.data.individual_permissions?.[2]?.role).toBe('can_view');
       expect(result.data.individual_permissions?.[2]?.name).toBeUndefined();
     }
   });

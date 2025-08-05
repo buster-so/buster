@@ -1,25 +1,16 @@
 {
   "name": "@buster/server-shared",
   "version": "0.0.1",
-  "type": "module",
-  "module": "src/index.ts",
   "private": false,
-  "scripts": {
-    "prebuild": "tsx scripts/type-import-check.ts",
-    "build": "tsc --build",
-    "build:dry-run": "tsc --build",
-    "dev": "tsc --watch",
-    "lint": "biome check --write",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
-    "test:integration": "vitest run **/*.int.test.ts **/*.integration.test.ts",
-    "test:watch": "vitest"
-  },
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./assets": {
+      "types": "./dist/assets/index.d.ts",
+      "default": "./dist/assets/index.js"
     },
     "./chats": {
       "types": "./dist/chats/index.d.ts",
@@ -78,16 +69,23 @@
       "default": "./dist/lib/report/index.js"
     }
   },
+  "module": "src/index.ts",
+  "scripts": {
+    "prebuild": "tsx scripts/type-import-check.ts",
+    "build": "tsc --build",
+    "build:dry-run": "tsc --build",
+    "dev": "tsc --watch",
+    "lint": "biome check --write",
+    "test": "vitest run",
+    "test:integration": "vitest run **/*.int.test.ts **/*.integration.test.ts",
+    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@buster/database": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@platejs/autoformat": "catalog:",
-    "@platejs/basic-nodes": "catalog:",
-    "@platejs/markdown": "catalog:",
-    "platejs": "catalog:",
-    "remark-gfm": "catalog:",
-    "remark-math": "^6.0.0",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -35,6 +35,12 @@ export const CreateChatButton = React.memo(
             dashboardId: assetId,
             chatId: result.id
           });
+        } else if (assetType === 'report') {
+          await onChangePage({
+            route: BusterRoutes.APP_CHAT_ID_REPORT_ID,
+            reportId: assetId,
+            chatId: result.id
+          });
         } else {
           const _exhaustiveCheck: never = assetType;
         }

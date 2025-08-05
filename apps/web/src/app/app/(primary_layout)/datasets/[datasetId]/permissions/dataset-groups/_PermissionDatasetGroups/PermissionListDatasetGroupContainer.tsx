@@ -31,7 +31,7 @@ export const PermissionListDatasetGroupContainer: React.FC<{
     });
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<ListDatasetGroupsResponse>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -59,11 +59,11 @@ export const PermissionListDatasetGroupContainer: React.FC<{
 
   const { cannotQueryPermissionGroups, canQueryPermissionGroups } = useMemo(() => {
     const result: {
-      cannotQueryPermissionGroups: BusterListRowItem[];
-      canQueryPermissionGroups: BusterListRowItem[];
+      cannotQueryPermissionGroups: BusterListRowItem<ListDatasetGroupsResponse>[];
+      canQueryPermissionGroups: BusterListRowItem<ListDatasetGroupsResponse>[];
     } = filteredDatasetGroups.reduce<{
-      cannotQueryPermissionGroups: BusterListRowItem[];
-      canQueryPermissionGroups: BusterListRowItem[];
+      cannotQueryPermissionGroups: BusterListRowItem<ListDatasetGroupsResponse>[];
+      canQueryPermissionGroups: BusterListRowItem<ListDatasetGroupsResponse>[];
     }>(
       (acc, datasetGroup) => {
         if (datasetGroup.assigned) {
@@ -80,18 +80,18 @@ export const PermissionListDatasetGroupContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionGroups: [] as BusterListRowItem[],
-        canQueryPermissionGroups: [] as BusterListRowItem[]
+        cannotQueryPermissionGroups: [],
+        canQueryPermissionGroups: []
       }
     );
     return result;
   }, [filteredDatasetGroups]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<ListDatasetGroupsResponse>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionGroups.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -101,7 +101,7 @@ export const PermissionListDatasetGroupContainer: React.FC<{
       ...canQueryPermissionGroups,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionGroups.length === 0,
         rowSection: {
           title: 'Not assigned',

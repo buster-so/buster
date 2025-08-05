@@ -3,10 +3,7 @@ import type {
   BusterDashboardResponse,
   DashboardConfig
 } from '@/api/asset_interfaces/dashboard';
-import type {
-  ShareDeleteRequest,
-  ShareUpdateRequest
-} from '@/api/asset_interfaces/shared_interfaces';
+import type { ShareDeleteRequest, ShareUpdateRequest } from '@buster/server-shared/share';
 import mainApi from '@/api/buster_rest/instances';
 import { serverFetch } from '@/api/createServerInstance';
 import { SharePostRequest } from '@buster/server-shared/share';

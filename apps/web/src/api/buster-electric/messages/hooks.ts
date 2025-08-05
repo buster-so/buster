@@ -13,6 +13,7 @@ import { dashboardQueryKeys } from '../../query_keys/dashboard';
 import isEmpty from 'lodash/isEmpty';
 import { metricsQueryKeys } from '../../query_keys/metric';
 import { chatQueryKeys } from '../../query_keys/chat';
+import { reportsQueryKeys } from '@/api/query_keys/reports';
 
 export const useGetMessage = ({ chatId, messageId }: { chatId: string; messageId: string }) => {
   const shape = useMemo(() => messageShape({ chatId, messageId }), [chatId, messageId]);
@@ -125,6 +126,9 @@ const useCheckIfWeHaveAFollowupDashboard = (messageId: string) => {
             queryClient.invalidateQueries({ queryKey });
           } else if (fileType === 'metric') {
             const { queryKey } = metricsQueryKeys.metricsGetMetric(file.id, file.version_number);
+            queryClient.invalidateQueries({ queryKey });
+          } else if (fileType === 'report') {
+            const { queryKey } = reportsQueryKeys.reportsGetReport(file.id, file.version_number);
             queryClient.invalidateQueries({ queryKey });
           } else {
             const _exhaustiveCheck: 'reasoning' = fileType;

@@ -5,7 +5,7 @@
 @import './tailwindAnimations.css';
 @plugin 'tailwind-scrollbar';
 @plugin 'tailwind-scrollbar-hide';
-@import 'shadcn-prose';
+/* @import 'shadcn-prose'; */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -23,8 +23,8 @@
   --secondary-foreground: #000000;
   --muted: #f8f8f8;
   --muted-foreground: #575859;
-  --accent: #7c3aed;
-  --accent-foreground: #7c3aed;
+  --accent: #f8f8f8;
+  --accent-foreground: #575859;
   --destructive: #c4242a;
   --destructive-foreground: #c4242a;
   --border: #e0e0e0;
@@ -194,14 +194,14 @@
 
   /* Font families */
   --font-heading:
-    'var(--font-heading)', 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
+    var(--font-heading), var(--font-sans), 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
     'Segoe UI Variable Display', 'Segoe UI', 'Helvetica', 'Apple Color Emoji', 'Arial',
     'sans-serif', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-mono:
-    'var(--font-mono)', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     'Courier New', monospace;
   --font-sans:
-    'var(--font-sans)', 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
+    var(--font-sans), 'ui-sans-serif', '-apple-system', 'BlinkMacSystemFont',
     'Segoe UI Variable Display', 'Segoe UI', 'Helvetica', 'Apple Color Emoji', 'Arial',
     'sans-serif', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 

@@ -6,7 +6,8 @@ import {
   GridPlus,
   Messages,
   SquareChart,
-  Table
+  Table,
+  FileText
 } from '@/components/ui/icons';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 
@@ -17,7 +18,8 @@ export const ASSET_ICONS = {
   collections: Folder5,
   dashboardAdd: GridPlus,
   collectionAdd: FolderPlus,
-  table: Table
+  table: Table,
+  reports: FileText
 };
 
 export const assetTypeToIcon = (assetType: ShareAssetType) => {
@@ -30,6 +32,8 @@ export const assetTypeToIcon = (assetType: ShareAssetType) => {
       return ASSET_ICONS.collections;
     case 'chat':
       return ASSET_ICONS.chats;
+    case 'report':
+      return ASSET_ICONS.reports;
     default: {
       const _result: never = assetType;
       return ASSET_ICONS.metrics;

@@ -31,7 +31,7 @@ export const PermissionListPermissionGroupContainer: React.FC<{
     });
   });
 
-  const columns: BusterListColumn[] = useMemo(
+  const columns: BusterListColumn<ListPermissionGroupsResponse>[] = useMemo(
     () => [
       {
         title: 'Name',
@@ -56,11 +56,11 @@ export const PermissionListPermissionGroupContainer: React.FC<{
 
   const { cannotQueryPermissionGroups, canQueryPermissionGroups } = useMemo(() => {
     const result: {
-      cannotQueryPermissionGroups: BusterListRowItem[];
-      canQueryPermissionGroups: BusterListRowItem[];
+      cannotQueryPermissionGroups: BusterListRowItem<ListPermissionGroupsResponse>[];
+      canQueryPermissionGroups: BusterListRowItem<ListPermissionGroupsResponse>[];
     } = filteredPermissionGroups.reduce<{
-      cannotQueryPermissionGroups: BusterListRowItem[];
-      canQueryPermissionGroups: BusterListRowItem[];
+      cannotQueryPermissionGroups: BusterListRowItem<ListPermissionGroupsResponse>[];
+      canQueryPermissionGroups: BusterListRowItem<ListPermissionGroupsResponse>[];
     }>(
       (acc, permissionGroup) => {
         if (permissionGroup.assigned) {
@@ -77,18 +77,18 @@ export const PermissionListPermissionGroupContainer: React.FC<{
         return acc;
       },
       {
-        cannotQueryPermissionGroups: [] as BusterListRowItem[],
-        canQueryPermissionGroups: [] as BusterListRowItem[]
+        cannotQueryPermissionGroups: [],
+        canQueryPermissionGroups: []
       }
     );
     return result;
   }, [filteredPermissionGroups]);
 
-  const rows = useMemo(
+  const rows: BusterListRowItem<ListPermissionGroupsResponse>[] = useMemo(
     () => [
       {
         id: 'header-assigned',
-        data: {},
+        data: null,
         hidden: canQueryPermissionGroups.length === 0,
         rowSection: {
           title: 'Assigned',
@@ -98,7 +98,7 @@ export const PermissionListPermissionGroupContainer: React.FC<{
       ...canQueryPermissionGroups,
       {
         id: 'header-not-assigned',
-        data: {},
+        data: null,
         hidden: cannotQueryPermissionGroups.length === 0,
         rowSection: {
           title: 'Not assigned',

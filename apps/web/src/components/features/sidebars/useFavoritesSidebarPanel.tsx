@@ -16,11 +16,12 @@ export const useFavoriteSidebarPanel = () => {
   const { mutateAsync: updateUserFavorites } = useUpdateUserFavorites();
   const { mutateAsync: deleteUserFavorite } = useDeleteUserFavorite();
 
-  const { chatId, metricId, dashboardId, collectionId } = useParams() as {
+  const { chatId, metricId, dashboardId, collectionId, reportId } = useParams() as {
     chatId: string | undefined;
     metricId: string | undefined;
     dashboardId: string | undefined;
     collectionId: string | undefined;
+    reportId: string | undefined;
   };
 
   const onFavoritesReorder = useMemoizedFn((itemIds: string[]) => {
@@ -40,6 +41,8 @@ export const useFavoriteSidebarPanel = () => {
         return id === dashboardId;
       case 'collection':
         return id === collectionId;
+      case 'report':
+        return id === reportId;
       default: {
         const _exhaustiveCheck: never = assetType;
         return false;
@@ -68,8 +71,12 @@ export const useFavoriteSidebarPanel = () => {
       return 'collection';
     }
 
+    if (reportId && favorites.some((f) => f.id === reportId)) {
+      return 'report';
+    }
+
     return null;
-  }, [favorites, chatId, metricId, dashboardId, collectionId]);
+  }, [favorites, chatId, metricId, dashboardId, collectionId, reportId]);
 
   const favoritesDropdownItems: ISidebarGroup | null = useMemo(() => {
     if (!favorites || favorites.length === 0) return null;

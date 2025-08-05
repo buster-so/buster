@@ -1,8 +1,6 @@
 import type {
   BulkUpdateMetricVerificationStatusRequest,
   BulkUpdateMetricVerificationStatusResponse,
-  ShareDeleteRequest,
-  ShareUpdateRequest,
   DeleteMetricRequest,
   DeleteMetricResponse,
   DuplicateMetricRequest,
@@ -18,6 +16,7 @@ import type {
   UpdateMetricResponse,
   ShareUpdateResponse
 } from '@buster/server-shared/metrics';
+import type { ShareDeleteRequest, ShareUpdateRequest } from '@buster/server-shared/share';
 import { serverFetch } from '@/api/createServerInstance';
 import { mainApi } from '../instances';
 import { SharePostRequest } from '@buster/server-shared/share';

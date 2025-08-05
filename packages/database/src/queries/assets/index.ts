@@ -11,3 +11,8 @@ export {
 } from './assets';
 
 export type { DatabaseAssetType } from './assets';
+
+export {
+  getAssetPermission,
+  type GetAssetPermissionInput,
+} from './asset-permission-check';

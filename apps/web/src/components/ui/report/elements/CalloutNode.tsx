@@ -57,7 +57,7 @@ export function CalloutElement({
           }>
           <EmojiPicker {...emojiPickerState} {...calloutProps} />
         </EmojiPopover>
-        <div className="mt-1.5 w-full">{children}</div>
+        <div className="mt-0.5 w-full">{children}</div>
       </div>
     </PlateElement>
   );

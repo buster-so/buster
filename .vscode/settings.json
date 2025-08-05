@@ -9,7 +9,7 @@
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
 
-  "vitest.maximumConfigs": 25,
+  "vitest.maximumConfigs": 35,
 
   // CRITICAL: Enable TypeScript build mode for project references
   "typescript.enablePromptUseWorkspaceTsdk": true,
@@ -26,7 +26,7 @@
     "watchDirectory": "dynamicPriorityPolling", 
     "fallbackPolling": "dynamicPriorityPolling",
     "synchronousWatchDirectory": true,
-    "excludeDirectories": ["**/node_modules", "**/target", "**/.turbo"],
+    "excludeDirectories": ["**/node_modules", "**/target", "**/.turbo", "**/dist", "**/.next", "**/.git"],
     "excludeFiles": []
   },
 
@@ -34,27 +34,24 @@
   "typescript.tsc.autoDetect": "on",
   
   // Force TypeScript to track all project references
-  "typescript.tsserver.includeCompletionsForModuleExports": true,
-  "typescript.tsserver.includePackageJsonAutoImports": "on",
+
+  "json.schemaDownload.enable": true,
   // CRITICAL: Disable syntax-only mode to get full type checking
     
   // Increase memory for large monorepo
-  "typescript.tsserver.maxTsServerMemory": 16384,
+  "typescript.tsserver.maxTsServerMemory": 4096,
   
-  // Force restart on config changes
-  "typescript.tsserver.restartOnConfigChange": true,
-
-  // Ensure dist folders are NEVER excluded from file watching
+  // Exclude build artifacts and dependencies from file watching
   "files.watcherExclude": {
     "**/node_modules/**": true,
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/target/**": true,
-    "**/.turbo/**": true
-    // NOTE: We explicitly DO NOT exclude dist folders from watching
+    "**/.turbo/**": true,
+    "**/dist/**": true
   },
 
-  // Exclude dist folders from file explorer (but keep them in watcher)
+  // Exclude build artifacts and dependencies from file explorer
   "files.exclude": {
     "**/.git": true,
     "**/node_modules": false,
@@ -62,12 +59,13 @@
     "**/dist": true
   },
 
-  // Exclude dist folders from search (but keep them in watcher)
+  // Exclude build artifacts and dependencies from search
   "search.exclude": {
     "**/node_modules": true,
     "**/.git": true,
     "**/.turbo": true,
-    "**/dist": true
+    "**/dist": true,
+    "**/build": true
   },
 
   // Enhanced TypeScript settings for monorepo cross-package type checking

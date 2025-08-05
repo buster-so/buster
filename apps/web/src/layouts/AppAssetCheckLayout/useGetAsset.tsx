@@ -6,8 +6,8 @@ import { useGetCollection } from '@/api/buster_rest/collections';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import type { RustApiError } from '@/api/buster_rest/errors';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
-
-type AssetType = 'metric' | 'dashboard' | 'collection';
+import type { AssetType } from '@buster/server-shared/assets';
+import { useGetReport } from '@/api/buster_rest/reports';
 
 interface BaseGetAssetProps {
   assetId: string;
@@ -81,6 +81,7 @@ export const useGetAsset = (
   const isMetric = props.type === 'metric';
   const isDashboard = props.type === 'dashboard';
   const isCollection = props.type === 'collection';
+  const isReport = props.type === 'report';
 
   // Always call hooks at the top level with appropriate enabled flags
   const {
@@ -118,6 +119,18 @@ export const useGetAsset = (
   );
 
   const {
+    isFetched: reportIsFetched,
+    error: reportError,
+    isError: reportIsError,
+    data: reportTitle
+  } = useGetReport(
+    { reportId: isReport ? props.assetId : undefined, versionNumber },
+    {
+      select: (x) => x?.name
+    }
+  );
+
+  const {
     isFetched: collectionIsFetched,
     error: collectionError,
     isError: collectionIsError,
@@ -149,6 +162,17 @@ export const useGetAsset = (
           isError: collectionIsError,
           showLoader: !collectionIsFetched && !collectionIsError
         };
+
+      case 'report':
+        return {
+          isFetched: reportIsFetched,
+          error: reportError,
+          isError: reportIsError,
+          showLoader: !reportIsFetched && !reportIsError
+        };
+      case 'chat':
+        // Chat type is not supported in this hook
+        return { isFetched: true, error: null, isError: false, showLoader: false };
       default: {
         const exhaustiveCheck: never = props.type;
         return { isFetched: false, error: null, isError: false, showLoader: false };
@@ -164,15 +188,28 @@ export const useGetAsset = (
     dashboardIsError,
     collectionIsFetched,
     collectionError,
-    collectionIsError
+    collectionIsError,
+    reportIsFetched,
+    reportError,
+    reportIsError
   ]);
 
   const title = useMemo(() => {
     if (isMetric) return metricTitle;
     if (isDashboard) return dashboardTitle;
     if (isCollection) return collectionTitle;
+    if (isReport) return reportTitle;
     return undefined;
-  }, [isMetric, isDashboard, isCollection, metricTitle, dashboardTitle, collectionTitle]);
+  }, [
+    isMetric,
+    isDashboard,
+    isCollection,
+    isReport,
+    metricTitle,
+    dashboardTitle,
+    collectionTitle,
+    reportTitle
+  ]);
 
   const { hasAccess, passwordRequired, isPublic } = getAssetAccess(currentQuery.error);
 

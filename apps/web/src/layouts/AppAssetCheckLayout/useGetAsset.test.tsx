@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGetCollection } from '@/api/buster_rest/collections';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { useGetReport } from '@/api/buster_rest/reports';
 import { useGetAsset } from './useGetAsset';
 
 // Mock the dependencies
@@ -18,6 +19,10 @@ vi.mock('@/api/buster_rest/dashboards', () => ({
 
 vi.mock('@/api/buster_rest/collections', () => ({
   useGetCollection: vi.fn()
+}));
+
+vi.mock('@/api/buster_rest/reports', () => ({
+  useGetReport: vi.fn()
 }));
 
 vi.mock('next/navigation', () => ({
@@ -42,6 +47,12 @@ describe('useGetAsset', () => {
       isFetched: true,
       isError: false
     });
+    (useGetReport as any).mockReturnValue({
+      error: null,
+      isFetched: true,
+      isError: false,
+      data: 'Test Report'
+    });
   });
   it('should properly handle metric asset type', () => {
     (useGetMetric as any).mockReturnValue({ error: null, isFetched: true });
@@ -60,7 +71,8 @@ describe('useGetAsset', () => {
       hasAccess: true,
       passwordRequired: false,
       isPublic: false,
-      showLoader: false
+      showLoader: false,
+      title: undefined
     });
   });
   it('should properly handle dashboard asset type', () => {
@@ -84,7 +96,8 @@ describe('useGetAsset', () => {
       hasAccess: true,
       passwordRequired: false,
       isPublic: false,
-      showLoader: false
+      showLoader: false,
+      title: undefined
     });
   });
   it('should properly handle collection asset type', () => {
@@ -107,7 +120,35 @@ describe('useGetAsset', () => {
       hasAccess: true,
       passwordRequired: false,
       isPublic: false,
-      showLoader: false
+      showLoader: false,
+      title: undefined
+    });
+  });
+
+  it('should properly handle report asset type', () => {
+    (useGetReport as any).mockReturnValue({
+      error: null,
+      isFetched: true,
+      isError: false,
+      data: 'Test Report'
+    });
+
+    const { result } = renderHook(() => useGetAsset({ assetId: 'report-123', type: 'report' }));
+
+    expect(useGetReport).toHaveBeenCalledWith(
+      { reportId: 'report-123', versionNumber: undefined },
+      {
+        select: expect.any(Function)
+      }
+    );
+    expect(result.current).toEqual({
+      isFetched: true,
+      error: null,
+      hasAccess: true,
+      passwordRequired: false,
+      isPublic: false,
+      showLoader: false,
+      title: 'Test Report'
     });
   });
   it('should use version number from props if provided', () => {
@@ -145,7 +186,8 @@ describe('useGetAsset', () => {
       hasAccess: false,
       passwordRequired: true,
       isPublic: true,
-      showLoader: false
+      showLoader: false,
+      title: undefined
     });
   });
   it('should handle deleted asset error (410)', () => {
@@ -160,7 +202,8 @@ describe('useGetAsset', () => {
       hasAccess: false,
       passwordRequired: false,
       isPublic: false,
-      showLoader: false
+      showLoader: false,
+      title: undefined
     });
   });
   it('should handle other errors', () => {
@@ -175,7 +218,8 @@ describe('useGetAsset', () => {
       hasAccess: false,
       passwordRequired: false,
       isPublic: false,
-      showLoader: false
+      showLoader: false,
+      title: undefined
     });
   });
   it('should show loader for metrics when data is loading', () => {

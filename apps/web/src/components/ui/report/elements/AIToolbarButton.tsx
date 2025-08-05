@@ -5,7 +5,7 @@ import * as React from 'react';
 import { AIChatPlugin } from '@platejs/ai/react';
 import { useEditorPlugin } from 'platejs/react';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton } from '@/components/ui/toolbar/Toolbar';
 
 export function AIToolbarButton(props: React.ComponentProps<typeof ToolbarButton>) {
   const { api } = useEditorPlugin(AIChatPlugin);

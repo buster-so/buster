@@ -5,11 +5,12 @@ import * as React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { PlaceholderPlugin } from '@platejs/media/react';
-import { VolumeUp, FileCloud, Film, Image as ImageIcon, Link } from '@/components/ui/icons';
 import { isUrl, KEYS } from 'platejs';
 import { useEditorRef } from 'platejs/react';
 import { toast } from 'sonner';
 import { useFilePicker } from 'use-file-picker';
+import { NodeTypeIcons } from '../config/icons';
+import { NodeTypeLabels } from '../config/labels';
 
 import {
   AlertDialog,
@@ -34,7 +35,8 @@ import {
   ToolbarSplitButton,
   ToolbarSplitButtonPrimary,
   ToolbarSplitButtonSecondary
-} from './Toolbar';
+} from '@/components/ui/toolbar/Toolbar';
+import type { SelectedFilesOrErrors } from 'use-file-picker/types';
 
 const MEDIA_CONFIG: Record<
   string,
@@ -49,41 +51,41 @@ const MEDIA_CONFIG: Record<
     accept: ['audio/*'],
     icon: (
       <div className="size-4">
-        <VolumeUp />
+        <NodeTypeIcons.audio />
       </div>
     ),
-    title: 'Insert Audio',
-    tooltip: 'Audio'
+    title: NodeTypeLabels.insertAudio.label,
+    tooltip: NodeTypeLabels.audio.label
   },
   [KEYS.file]: {
     accept: ['*'],
     icon: (
       <div className="size-4">
-        <FileCloud />
+        <NodeTypeIcons.file />
       </div>
     ),
-    title: 'Insert File',
-    tooltip: 'File'
+    title: NodeTypeLabels.insertFile.label,
+    tooltip: NodeTypeLabels.file.label
   },
   [KEYS.img]: {
     accept: ['image/*'],
     icon: (
       <div className="size-4">
-        <ImageIcon />
+        <NodeTypeIcons.image />
       </div>
     ),
-    title: 'Insert Image',
-    tooltip: 'Image'
+    title: NodeTypeLabels.insertImage.label,
+    tooltip: NodeTypeLabels.image.label
   },
   [KEYS.video]: {
     accept: ['video/*'],
     icon: (
       <div className="size-4">
-        <Film />
+        <NodeTypeIcons.video />
       </div>
     ),
-    title: 'Insert Video',
-    tooltip: 'Video'
+    title: NodeTypeLabels.insertVideo.label,
+    tooltip: NodeTypeLabels.video.label
   }
 };
 
@@ -100,8 +102,9 @@ export function MediaToolbarButton({
   const { openFilePicker } = useFilePicker({
     accept: currentConfig.accept,
     multiple: true,
-    onFilesSelected: ({ plainFiles: updatedFiles }) => {
-      editor.getTransforms(PlaceholderPlugin).insert.media(updatedFiles);
+    onFilesSelected: ({ plainFiles: updatedFiles }: SelectedFilesOrErrors<unknown, unknown>) => {
+      if (!updatedFiles) return;
+      editor.getTransforms(PlaceholderPlugin).insert.media(updatedFiles as unknown as FileList);
     }
   });
 
@@ -121,7 +124,7 @@ export function MediaToolbarButton({
         <ToolbarSplitButtonPrimary>{currentConfig.icon}</ToolbarSplitButtonPrimary>
 
         <DropdownMenu open={open} onOpenChange={setOpen} modal={false} {...props}>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <ToolbarSplitButtonSecondary />
           </DropdownMenuTrigger>
 
@@ -129,13 +132,13 @@ export function MediaToolbarButton({
             <DropdownMenuGroup>
               <DropdownMenuItem onSelect={() => openFilePicker()}>
                 {currentConfig.icon}
-                Upload from computer
+                {NodeTypeLabels.uploadFromComputer.label}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setDialogOpen(true)}>
                 <div className="size-4">
-                  <Link />
+                  <NodeTypeIcons.linkIcon />
                 </div>
-                Insert via URL
+                {NodeTypeLabels.insertViaUrl.label}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

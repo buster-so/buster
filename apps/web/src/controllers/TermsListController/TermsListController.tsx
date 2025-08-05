@@ -7,7 +7,7 @@ import { Avatar } from '@/components/ui/avatar';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRow,
+  type BusterListRowItem,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
 import { useUserConfigContextSelector } from '@/context/Users';
@@ -16,7 +16,7 @@ import { formatDate } from '@/lib/date';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { TermListSelectedOptionPopup } from './TermListSelectedPopup';
 
-const columns: BusterListColumn[] = [
+const columns: BusterListColumn<BusterTermListItem>[] = [
   {
     dataIndex: 'name',
     title: 'Term'
@@ -28,13 +28,13 @@ const columns: BusterListColumn[] = [
     render: (data) => formatDate({ date: data, format: 'lll' })
   },
   {
-    dataIndex: 'created_at',
-    title: 'Created at',
+    dataIndex: 'last_edited',
+    title: 'Last edited',
     width: 140,
     render: (data) => formatDate({ date: data, format: 'lll' })
   },
   {
-    dataIndex: 'owner',
+    dataIndex: 'created_by',
     title: 'Owner',
     width: 60,
     render: (_, data: BusterTermListItem) => <Avatar name={data.created_by.name} size={18} />
@@ -49,7 +49,7 @@ export const TermsListController: React.FC<{
 
   const [selectedTermIds, setSelectedTermIds] = useState<string[]>([]);
 
-  const rows: BusterListRow[] = useMemo(() => {
+  const rows: BusterListRowItem<BusterTermListItem>[] = useMemo(() => {
     return termsList.map((term) => ({
       id: term.id,
       data: term,

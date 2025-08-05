@@ -18,13 +18,13 @@ const mockShareConfig: ShareConfig = {
   individual_permissions: [
     {
       email: 'test_with_a_long_name_like_super_long_name@test.com',
-      role: 'canView',
+      role: 'can_view',
       name: 'Test User',
       avatar_url: null
     },
     {
       email: 'test2@test.com',
-      role: 'fullAccess',
+      role: 'full_access',
       name: 'Test User 2 with a long name like super long name',
       avatar_url: null
     }
@@ -79,7 +79,7 @@ export const ViewerPermission: Story = {
     assetType: 'metric',
     shareAssetConfig: {
       ...mockShareConfig,
-      permission: 'canView'
+      permission: 'can_view'
     }
   }
 };
