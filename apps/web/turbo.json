@@ -6,6 +6,8 @@
       "dependsOn": ["^build", "@buster/server-shared#build", "@buster/typescript-config#build"],
       "inputs": [
         "src/**/*",
+        "!src/**/*.test.{ts,tsx,js,jsx}",
+        "!src/**/*.spec.{ts,tsx,js,jsx}",
         "public/**/*",
         "next.config.mjs",
         "tailwind.config.ts",
@@ -28,6 +30,8 @@
       "dependsOn": ["@buster/server-shared#build"],
       "inputs": [
         "src/**/*",
+        "!src/**/*.test.{ts,tsx,js,jsx}",
+        "!src/**/*.spec.{ts,tsx,js,jsx}",
         "next.config.mjs",
         "tailwind.config.ts",
         "tsconfig.json",

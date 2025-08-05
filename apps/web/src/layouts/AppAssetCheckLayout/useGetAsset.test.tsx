@@ -135,9 +135,12 @@ describe('useGetAsset', () => {
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'report-123', type: 'report' }));
 
-    expect(useGetReport).toHaveBeenCalledWith('report-123', {
-      select: expect.any(Function)
-    });
+    expect(useGetReport).toHaveBeenCalledWith(
+      { reportId: 'report-123', versionNumber: undefined },
+      {
+        select: expect.any(Function)
+      }
+    );
     expect(result.current).toEqual({
       isFetched: true,
       error: null,

@@ -1,7 +1,6 @@
+import type { ReportElements } from '@buster/database';
 import { z } from 'zod';
 import { PaginatedRequestSchema } from '../type-utilities/pagination';
-import type { ReportElement, ReportElements } from './report-elements';
-import { ReportElementSchema } from './report-elements';
 
 export const GetReportsListRequestSchema = PaginatedRequestSchema;
 
@@ -9,11 +8,8 @@ export const GetReportsListRequestSchema = PaginatedRequestSchema;
 export const UpdateReportRequestSchema = z
   .object({
     name: z.string().optional(),
-    description: z.string().optional(),
-    publicly_accessible: z.boolean().optional(),
-    content: z.lazy(() => z.array(ReportElementSchema)).optional() as z.ZodOptional<
-      z.ZodType<ReportElements>
-    >,
+    update_version: z.boolean().optional(),
+    content: z.any().optional() as z.ZodOptional<z.ZodType<ReportElements>>, //we use any here because we don't know the type of the content, will be validated in the database
   })
   .partial();
 

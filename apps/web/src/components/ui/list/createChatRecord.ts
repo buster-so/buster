@@ -1,12 +1,16 @@
 import { getNow, isDateAfter, isDateBefore, isDateSame } from '@/lib/date';
 
-type ListItem = {
-  id: string;
-  last_edited: string;
+// Constraint type to ensure the date field contains a string value
+type WithDateField<K extends string> = {
+  [P in K]: string;
 };
 
-export const createChatRecord = <T extends ListItem>(
-  data: T[]
+export const createChatRecord = <
+  K extends string = 'last_edited',
+  T extends WithDateField<K> = WithDateField<K>
+>(
+  data: T[],
+  dateKey: K = 'last_edited' as K
 ): {
   TODAY: T[];
   YESTERDAY: T[];
@@ -27,7 +31,7 @@ export const createChatRecord = <T extends ListItem>(
   for (const item of data) {
     if (
       isDateSame({
-        date: item.last_edited,
+        date: item[dateKey] as string,
         compareDate: today,
         interval: 'day'
       })
@@ -35,7 +39,7 @@ export const createChatRecord = <T extends ListItem>(
       TODAY.push(item);
     } else if (
       isDateSame({
-        date: item.last_edited,
+        date: item[dateKey] as string,
         compareDate: yesterday,
         interval: 'day'
       })
@@ -43,12 +47,12 @@ export const createChatRecord = <T extends ListItem>(
       YESTERDAY.push(item);
     } else if (
       isDateAfter({
-        date: item.last_edited,
+        date: item[dateKey] as string,
         compareDate: weekStartDate,
         interval: 'day'
       }) &&
       isDateBefore({
-        date: item.last_edited,
+        date: item[dateKey] as string,
         compareDate: twoDaysAgo,
         interval: 'day'
       })

@@ -9,7 +9,7 @@ import { createMetricRoute, type MetricRouteParams } from './createMetricRoute';
 import { createDashboardRoute, type DashboardRouteParams } from './createDashboardRoute';
 import { createReasoningRoute } from './createReasoningRoute';
 import { createDatasetRoute } from './createDatasetRoute';
-import { createReportRoute } from './createReportRoute';
+import { createReportRoute, type ReportRouteParams } from './createReportRoute';
 
 type UnionOfFileTypes = FileType | ReasoningFileType | ReasoingMessage_ThoughtFileType;
 
@@ -21,12 +21,13 @@ type OtherRouteParams = {
   versionNumber?: number; //will first try and use metricVersionNumber assuming it is a metric, then dashboardVersionNumber assuming it is a dashboard, then versionNumber
   metricVersionNumber?: number; //if this is provided, it will be used instead of versionNumber
   dashboardVersionNumber?: number; //if this is provided, it will be used instead of versionNumber
+  reportVersionNumber?: number; //if this is provided, it will be used instead of versionNumber
   page?: undefined;
   secondaryView?: undefined | null | string;
   type: UnionOfFileTypes;
 };
 
-type BaseParams = MetricRouteParams | DashboardRouteParams | OtherRouteParams;
+type BaseParams = MetricRouteParams | DashboardRouteParams | OtherRouteParams | ReportRouteParams;
 
 export const assetParamsToRoute = ({
   chatId,
@@ -75,9 +76,12 @@ export const assetParamsToRoute = ({
   }
 
   if (type === 'report') {
+    const { reportVersionNumber } = rest as ReportRouteParams;
     return createReportRoute({
       assetId,
-      chatId
+      chatId,
+      page,
+      reportVersionNumber: reportVersionNumber || versionNumber
     });
   }
 

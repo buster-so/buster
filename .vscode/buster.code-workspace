@@ -19,7 +19,8 @@
     { "path": "../packages/vitest-config" },
     { "path": "../packages/web-tools" },
     { "path": "../packages/sandbox" },
-    { "path": "../packages/env-utils" }
+    { "path": "../packages/env-utils" },
+    { "path": "../packages/server-utils" }
   ],
   "settings": {
     "editor.defaultFormatter": "biomejs.biome",

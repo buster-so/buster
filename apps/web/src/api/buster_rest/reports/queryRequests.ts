@@ -10,7 +10,6 @@ import { useMemoizedFn } from '@/hooks';
 import { queryKeys } from '@/api/query_keys';
 import type { RustApiError } from '../errors';
 import type {
-  GetReportsListResponse,
   GetReportIndividualResponse,
   UpdateReportRequest,
   UpdateReportResponse
@@ -66,7 +65,7 @@ export const prefetchGetReportsList = async (
  * Hook to get an individual report by ID
  */
 export const useGetReport = <T = GetReportIndividualResponse>(
-  reportId: string | undefined,
+  { reportId, versionNumber }: { reportId: string | undefined; versionNumber?: number },
   options?: Omit<
     UseQueryOptions<GetReportIndividualResponse, RustApiError, T>,
     'queryKey' | 'queryFn'
@@ -77,7 +76,7 @@ export const useGetReport = <T = GetReportIndividualResponse>(
   });
 
   return useQuery({
-    ...queryKeys.reportsGetReport(reportId!),
+    ...queryKeys.reportsGetReport(reportId!, versionNumber),
     queryFn,
     enabled: !!reportId,
     select: options?.select,
@@ -129,9 +128,6 @@ export const useUpdateReport = () => {
           queryKeys.reportsGetReport(reportId).queryKey,
           create(previousReport, (draft) => {
             if (data.name !== undefined) draft.name = data.name;
-            if (data.description !== undefined) draft.description = data.description;
-            if (data.publicly_accessible !== undefined)
-              draft.publicly_accessible = data.publicly_accessible;
             if (data.content !== undefined) draft.content = data.content;
           })
         );

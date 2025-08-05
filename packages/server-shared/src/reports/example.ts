@@ -1,4 +1,4 @@
-import type { ReportElement } from './report-elements';
+import type { ReportElement } from '@buster/database';
 
 export const SAMPLE_REPORT_ELEMENTS = [
   {

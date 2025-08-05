@@ -10,3 +10,5 @@ export {
 } from './organizations';
 
 export { updateOrganization, type DEFAULT_COLOR_PALETTE_ID } from './update-organization';
+
+export { getOrganizationMemberCount } from './organization-member-count';

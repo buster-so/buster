@@ -5,12 +5,13 @@ import type { FileContainerButtonsProps, FileContainerSegmentProps } from './int
 import { MetricContainerHeaderButtons } from './MetricContainerHeaderButtons';
 import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
 import { ReasoningContainerHeaderSegment } from './ReasoningContainerHeaderSegment';
+import { ReportContainerHeaderSegment } from './ReportContainerHeaderSegment';
 
 export const SelectedFileSegmentRecord: Record<FileType, React.FC<FileContainerSegmentProps>> = {
   metric: MetricContainerHeaderSegment,
   dashboard: DashboardContainerHeaderSegment,
   reasoning: ReasoningContainerHeaderSegment,
-  report: () => <div>TODO: Report</div>
+  report: ReportContainerHeaderSegment
   // value: ValueContainerHeaderSegment,
   // term: TermContainerHeaderSegment,
   // dataset: DatasetContainerHeaderSegment,

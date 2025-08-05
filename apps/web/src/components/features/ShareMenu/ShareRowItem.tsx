@@ -4,7 +4,7 @@ import { AvatarUserButton } from '../../ui/avatar/AvatarUserButton';
 import { AccessDropdown } from './AccessDropdown';
 
 type ShareRowItemBaseProps = {
-  primary: string | undefined;
+  primary: string | null | undefined;
   secondary: string | undefined;
   avatar?: string | null | React.ReactNode;
   disabled?: boolean;

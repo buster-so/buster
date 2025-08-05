@@ -1,3 +1,4 @@
+import { ReportElementsSchema } from '@buster/database';
 import { AutoformatPlugin } from '@platejs/autoformat';
 import {
   BaseBasicBlocksPlugin,
@@ -22,7 +23,6 @@ import {
   BaseUnderlinePlugin,
 } from '@platejs/basic-nodes';
 import { createSlateEditor } from 'platejs';
-import { ReportElementsSchema } from '../../reports/report-elements';
 import { MarkdownPlugin } from './MarkdownPlugin';
 
 const serverNode = [

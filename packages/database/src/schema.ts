@@ -19,7 +19,7 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
-import type { OrganizationColorPalettes } from './schema-types';
+import type { OrganizationColorPalettes, ReportElements } from './schema-types';
 
 export const assetPermissionRoleEnum = pgEnum('asset_permission_role_enum', [
   'owner',
@@ -36,7 +36,9 @@ export const assetTypeEnum = pgEnum('asset_type_enum', [
   'chat',
   'metric_file',
   'dashboard_file',
+  'report_file',
 ]);
+// Asset type enum removed - now using text for all asset_type columns
 export const dataSourceOnboardingStatusEnum = pgEnum('data_source_onboarding_status_enum', [
   'notStarted',
   'inProgress',
@@ -469,6 +471,7 @@ export const assetSearch = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     assetId: uuid('asset_id').notNull(),
+    // The assetType column is a plain string (text), not an enum.
     assetType: text('asset_type').notNull(),
     content: text().notNull(),
     organizationId: uuid('organization_id').notNull(),
@@ -931,7 +934,7 @@ export const dashboardFiles = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: varchar().notNull(),
     fileName: varchar('file_name').notNull(),
-    content: jsonb().notNull(),
+    content: jsonb().notNull().default([]),
     filter: varchar(),
     organizationId: uuid('organization_id').notNull(),
     createdBy: uuid('created_by').notNull(),
@@ -984,6 +987,84 @@ export const dashboardFiles = pgTable(
       columns: [table.workspaceSharingEnabledBy],
       foreignColumns: [users.id],
       name: 'dashboard_files_workspace_sharing_enabled_by_fkey',
+    }).onUpdate('cascade'),
+  ]
+);
+
+export const reportFiles = pgTable(
+  'report_files',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    name: varchar().notNull(),
+    content: jsonb('content').$type<ReportElements>().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+    publiclyAccessible: boolean('publicly_accessible').default(false).notNull(),
+    publiclyEnabledBy: uuid('publicly_enabled_by'),
+    publicExpiryDate: timestamp('public_expiry_date', {
+      withTimezone: true,
+      mode: 'string',
+    }),
+    versionHistory: jsonb('version_history')
+      .$type<
+        Record<
+          string, //version number as a string
+          {
+            content: ReportElements;
+            updated_at: string;
+            version_number: number;
+          }
+        >
+      >()
+      .default({})
+      .notNull(),
+    publicPassword: text('public_password'),
+    workspaceSharing: workspaceSharingEnum('workspace_sharing').default('none').notNull(),
+    workspaceSharingEnabledBy: uuid('workspace_sharing_enabled_by'),
+    workspaceSharingEnabledAt: timestamp('workspace_sharing_enabled_at', {
+      withTimezone: true,
+      mode: 'string',
+    }),
+  },
+  (table) => [
+    index('report_files_created_by_idx').using(
+      'btree',
+      table.createdBy.asc().nullsLast().op('uuid_ops')
+    ),
+    index('report_files_deleted_at_idx').using(
+      'btree',
+      table.deletedAt.asc().nullsLast().op('timestamptz_ops')
+    ),
+    index('report_files_organization_id_idx').using(
+      'btree',
+      table.organizationId.asc().nullsLast().op('uuid_ops')
+    ),
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [users.id],
+      name: 'report_files_created_by_fkey',
+    }).onUpdate('cascade'),
+    foreignKey({
+      columns: [table.publiclyEnabledBy],
+      foreignColumns: [users.id],
+      name: 'report_files_publicly_enabled_by_fkey',
+    }).onUpdate('cascade'),
+    foreignKey({
+      columns: [table.workspaceSharingEnabledBy],
+      foreignColumns: [users.id],
+      name: 'report_files_workspace_sharing_enabled_by_fkey',
+    }).onUpdate('cascade'),
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'report_files_organization_id_fkey',
     }).onUpdate('cascade'),
   ]
 );

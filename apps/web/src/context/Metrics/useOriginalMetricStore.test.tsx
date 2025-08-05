@@ -33,7 +33,7 @@ describe('useOriginalMetricStore', () => {
       updated_at: '2024-01-01T00:00:00Z',
       sent_by_id: 'user-1',
       sent_by_name: 'Test User',
-      permission: 'canView',
+      permission: 'can_view',
       sent_by_avatar_url: null,
       dashboards: [],
       collections: [],

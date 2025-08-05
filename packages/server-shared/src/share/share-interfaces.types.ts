@@ -1,21 +1,43 @@
+import type { assetPermissionRoleEnum, workspaceSharingEnum } from '@buster/database';
 import { z } from 'zod';
 import { AssetTypeSchema } from '../assets/asset-types.types';
 
-export const ShareRoleSchema = z.enum([
-  'owner', //owner of the asset
-  'fullAccess', //same as owner, can share with others
-  'canEdit', //can edit, cannot share
-  'canView', //can view asset
-]);
+type ShareRoleBase = (typeof assetPermissionRoleEnum.enumValues)[number];
+export const ShareRoleEnumsConversions: Record<ShareRoleBase, ShareRoleBase> = Object.freeze({
+  owner: 'owner',
+  full_access: 'full_access',
+  can_edit: 'can_edit',
+  can_view: 'can_view',
+  viewer: 'viewer',
+  can_filter: 'can_filter',
+});
 
-export const WorkspaceShareRoleSchema = z.enum([...ShareRoleSchema.options, 'none']);
+export const ShareRoleSchema = z.enum(
+  Object.values(ShareRoleEnumsConversions) as [ShareRoleBase, ...ShareRoleBase[]]
+);
 
+//type TeamRoleBase = (typeof teamRoleEnum.enumValues)[number] | 'none';
+type WorkspaceShareRoleBase = (typeof workspaceSharingEnum.enumValues)[number];
+const WorkspaceShareRoleEnumsConversions: Record<WorkspaceShareRoleBase, WorkspaceShareRoleBase> =
+  Object.freeze({
+    full_access: 'full_access',
+    can_edit: 'can_edit',
+    can_view: 'can_view',
+    none: 'none',
+  });
+
+export const WorkspaceShareRoleSchema = z.enum(
+  Object.values(WorkspaceShareRoleEnumsConversions) as [
+    WorkspaceShareRoleBase,
+    ...WorkspaceShareRoleBase[],
+  ]
+);
 export const ShareAssetTypeSchema = AssetTypeSchema;
 
 export const ShareIndividualSchema = z.object({
   email: z.string(),
   role: ShareRoleSchema,
-  name: z.string().optional(),
+  name: z.string().nullable().optional(),
   avatar_url: z.string().nullable().optional(),
 });
 

@@ -3,6 +3,7 @@ import {
   getCollectionTitle,
   getDashboardTitle,
   getMetricTitle,
+  getReportTitle,
   getUserOrganizationId,
 } from '@buster/database';
 import { GetTitleRequestSchema, type GetTitleResponse } from '@buster/server-shared/title';
@@ -37,7 +38,8 @@ const app = new Hono()
           title = await getDashboardTitle({ assetId, organizationId: userOrg?.organizationId });
           break;
         case 'report':
-          throw new HTTPException(400, { message: 'Report titles are not supported yet' });
+          title = await getReportTitle({ assetId, organizationId: userOrg?.organizationId });
+          break;
         default: {
           const _exhaustive: never = assetType;
           throw new HTTPException(400, { message: `Unsupported asset type: ${assetType}` });

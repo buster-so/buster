@@ -11,7 +11,7 @@ export const GetMetricTitleInputSchema = z.object({
 export type GetMetricTitleInput = z.infer<typeof GetMetricTitleInputSchema>;
 
 // Updated return type to remove null since we now throw an error instead
-export async function getMetricTitle(input: GetMetricTitleInput): Promise<string> {
+export async function getMetricTitle(input: GetMetricTitleInput, isAdmin = false): Promise<string> {
   const validated = GetMetricTitleInputSchema.parse(input);
 
   const [metric] = await db
@@ -30,7 +30,11 @@ export async function getMetricTitle(input: GetMetricTitleInput): Promise<string
   }
 
   // Throw error for permission failure instead of returning null
-  if (!metric.publiclyAccessible && metric.organizationId !== validated.organizationId) {
+  if (
+    !isAdmin &&
+    !metric.publiclyAccessible &&
+    metric.organizationId !== validated.organizationId
+  ) {
     throw new Error(
       `Access denied: Metric with ID ${validated.assetId} is not publicly accessible and does not belong to the specified organization`
     );

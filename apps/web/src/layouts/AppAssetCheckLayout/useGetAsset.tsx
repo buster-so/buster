@@ -119,20 +119,23 @@ export const useGetAsset = (
   );
 
   const {
+    isFetched: reportIsFetched,
+    error: reportError,
+    isError: reportIsError,
+    data: reportTitle
+  } = useGetReport(
+    { reportId: isReport ? props.assetId : undefined, versionNumber },
+    {
+      select: (x) => x?.name
+    }
+  );
+
+  const {
     isFetched: collectionIsFetched,
     error: collectionError,
     isError: collectionIsError,
     data: collectionTitle
   } = useGetCollection(isCollection ? props.assetId : undefined, {
-    select: (x) => x?.name
-  });
-
-  const {
-    isFetched: reportIsFetched,
-    error: reportError,
-    isError: reportIsError,
-    data: reportTitle
-  } = useGetReport(isReport ? props.assetId : undefined, {
     select: (x) => x?.name
   });
 

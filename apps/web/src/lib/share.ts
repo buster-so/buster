@@ -5,17 +5,17 @@ export const getIsOwner = (role: ShareRole | null | undefined) => {
 };
 
 export const getIsEffectiveOwner = (role: ShareRole | null | undefined) => {
-  return role === 'fullAccess' || role === 'owner';
+  return role === 'full_access' || role === 'owner';
 };
 
 export const canEdit = (role: ShareRole | null | undefined) => {
-  return role === 'canEdit' || role === 'fullAccess' || role === 'owner';
+  return role === 'can_edit' || role === 'full_access' || role === 'owner';
 };
 
 export const canShare = (role: ShareRole | null | undefined) => {
-  return role === 'fullAccess' || role === 'owner';
+  return role === 'full_access' || role === 'owner';
 };
 
 export const canFilter = (role: ShareRole | null | undefined) => {
-  return role === 'fullAccess' || role === 'owner' || role === 'canEdit';
+  return role === 'full_access' || role === 'owner' || role === 'can_edit';
 };

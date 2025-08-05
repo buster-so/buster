@@ -28,12 +28,12 @@ export const ReportItemsContainer: React.FC<{
   });
   const hasSelected = selectedRowKeys.length > 0;
 
-  const reportsRecord = useCreateListByDate({ data: reports });
+  const reportsRecord = useCreateListByDate({ data: reports, dateKey: 'updated_at' });
 
   const reportsByDate: BusterListRowItem<ReportListItem>[] = useMemo(() => {
     return Object.entries(reportsRecord).flatMap<BusterListRowItem<ReportListItem>>(
       ([key, reports]) => {
-        const records = reports.map((report) => ({
+        const records = reports.map<BusterListRowItem<ReportListItem>>((report) => ({
           id: report.id,
           data: report,
           link: createBusterRoute({ route: BusterRoutes.APP_REPORTS_ID, reportId: report.id })
@@ -65,7 +65,7 @@ export const ReportItemsContainer: React.FC<{
         render: (name, record) => <TitleCell name={name} chatId={record?.id} />
       },
       {
-        dataIndex: 'last_edited',
+        dataIndex: 'updated_at',
         title: 'Last updated',
         width: 132,
         render: (v) => {
@@ -79,10 +79,10 @@ export const ReportItemsContainer: React.FC<{
         }
       },
       {
-        dataIndex: 'is_shared',
+        dataIndex: 'publicly_accessible',
         title: 'Sharing',
         width: 65,
-        render: (v, record) => getShareStatus({ is_shared: record.is_shared })
+        render: (v, record) => getShareStatus({ is_shared: record.publicly_accessible })
       },
       {
         dataIndex: 'created_by_name',
@@ -136,7 +136,7 @@ const EmptyState: React.FC<{
   return (
     <ListEmptyStateWithButton
       title={"You don't have any reports yet."}
-      description={'As soon as you create a report, it will start to appear here.'}
+      description={'As soon as you create a report (via a chat), it will start to appear here.'}
       buttonText="New chat"
       linkButton={createBusterRoute({ route: BusterRoutes.APP_HOME })}
     />

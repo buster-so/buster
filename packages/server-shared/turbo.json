@@ -3,6 +3,13 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "inputs": [
+        "src/**/*",
+        "!src/**/*.test.{ts,tsx,js,jsx}",
+        "!src/**/*.spec.{ts,tsx,js,jsx}",
+        "package.json",
+        "tsconfig.json"
+      ],
       "outputs": ["dist/**/*"]
     },
     "dev": {

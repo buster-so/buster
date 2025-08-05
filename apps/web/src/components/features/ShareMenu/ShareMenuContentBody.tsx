@@ -124,7 +124,7 @@ const ShareMenuContentShare: React.FC<ShareMenuContentBodyProps> = React.memo(
       const payload: Parameters<typeof onUpdateMetricShare>[0] = {
         id: assetId,
         params: {
-          workspace_sharing: role
+          workspace_sharing: role || 'none'
         }
       };
 

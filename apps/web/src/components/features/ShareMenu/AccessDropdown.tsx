@@ -64,16 +64,20 @@ export const AccessDropdown: React.FC<AccessDropdownProps> = React.memo(
 
       // Using a type-safe switch to handle all ShareRole values
       switch (value) {
-        case 'fullAccess':
+        case 'full_access':
           return 'Full access';
-        case 'canEdit':
+        case 'can_edit':
           return 'Can edit';
-        case 'canView':
+        case 'can_view':
           return 'Can view';
         case 'owner':
           return 'Owner';
         case 'remove':
           return 'Remove';
+        case 'viewer':
+          return 'Viewer';
+        case 'can_filter':
+          return 'Can filter';
         case 'none':
           return 'Not shared';
         default:
@@ -86,7 +90,13 @@ export const AccessDropdown: React.FC<AccessDropdownProps> = React.memo(
       if (value === 'remove' || value === 'notShared') {
         onChangeShareLevel?.(null);
       } else {
-        onChangeShareLevel?.(value as ShareRole);
+        if (props.type === 'workspace') {
+          (onChangeShareLevel as (level: WorkspaceShareRole | null) => void)?.(
+            value as WorkspaceShareRole
+          );
+        } else {
+          (onChangeShareLevel as (level: ShareRole | null) => void)?.(value as ShareRole);
+        }
       }
     });
 
@@ -122,17 +132,17 @@ AccessDropdown.displayName = 'AccessDropdown';
 
 const metricItems: DropdownItem<ShareRole>[] = [
   {
-    value: 'fullAccess',
+    value: 'full_access',
     label: 'Full access',
     secondaryLabel: 'Can edit and share with others.'
   },
   {
-    value: 'canEdit',
+    value: 'can_edit',
     label: 'Can edit',
     secondaryLabel: 'Can edit but not share with others.'
   },
   {
-    value: 'canView',
+    value: 'can_view',
     label: 'Can view',
     secondaryLabel: 'Can view asset but not edit.'
   }
@@ -140,17 +150,17 @@ const metricItems: DropdownItem<ShareRole>[] = [
 
 const dashboardItems: DropdownItem<ShareRole>[] = [
   {
-    value: 'fullAccess',
+    value: 'full_access',
     label: 'Full access',
     secondaryLabel: 'Can edit and share with others.'
   },
   {
-    value: 'canEdit',
+    value: 'can_edit',
     label: 'Can edit',
     secondaryLabel: 'Can edit but not share with others.'
   },
   {
-    value: 'canView',
+    value: 'can_view',
     label: 'Can view',
     secondaryLabel: 'Can view dashboard and metrics but not edit.'
   }
@@ -158,17 +168,17 @@ const dashboardItems: DropdownItem<ShareRole>[] = [
 
 const collectionItems: DropdownItem<ShareRole>[] = [
   {
-    value: 'fullAccess',
+    value: 'full_access',
     label: 'Full access',
     secondaryLabel: 'Can edit and share with others.'
   },
   {
-    value: 'canEdit',
+    value: 'can_edit',
     label: 'Can edit',
     secondaryLabel: 'Can edit but not share with others.'
   },
   {
-    value: 'canView',
+    value: 'can_view',
     label: 'Can view',
     secondaryLabel: 'Can view assets but not edit.'
   }
@@ -176,17 +186,17 @@ const collectionItems: DropdownItem<ShareRole>[] = [
 
 const reportItems: DropdownItem<ShareRole>[] = [
   {
-    value: 'fullAccess',
+    value: 'full_access',
     label: 'Full access',
     secondaryLabel: 'Can edit and share with others.'
   },
   {
-    value: 'canEdit',
+    value: 'can_edit',
     label: 'Can edit',
     secondaryLabel: 'Can edit but not share with others.'
   },
   {
-    value: 'canView',
+    value: 'can_view',
     label: 'Can view',
     secondaryLabel: 'Can view asset but not edit.'
   }
@@ -194,17 +204,17 @@ const reportItems: DropdownItem<ShareRole>[] = [
 
 const workspaceItems: DropdownItem<WorkspaceShareRole>[] = [
   {
-    value: 'fullAccess',
+    value: 'full_access',
     label: 'Full access',
     secondaryLabel: 'Can edit and share with others.'
   },
   {
-    value: 'canEdit',
+    value: 'can_edit',
     label: 'Can edit',
     secondaryLabel: 'Can edit, but not share with others.'
   },
   {
-    value: 'canView',
+    value: 'can_view',
     label: 'Can view',
     secondaryLabel: 'Cannot edit or share with others.'
   },

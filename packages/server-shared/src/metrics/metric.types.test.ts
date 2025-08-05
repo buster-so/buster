@@ -113,7 +113,7 @@ describe('MetricSchema', () => {
       public_enabled_by: null,
       publicly_accessible: false,
       public_password: null,
-      permission: 'canView',
+      permission: 'can_view',
       workspace_sharing: null,
       workspace_member_count: null,
       // chart_config is omitted, should get default
@@ -194,7 +194,7 @@ describe('MetricSchema', () => {
       public_enabled_by: null,
       publicly_accessible: false,
       public_password: null,
-      permission: 'canEdit',
+      permission: 'can_edit',
       workspace_sharing: null,
       workspace_member_count: null,
     };
@@ -282,7 +282,7 @@ describe('MetricSchema', () => {
       public_enabled_by: 'admin-1',
       publicly_accessible: true,
       public_password: 'secret123',
-      permission: 'canEdit',
+      permission: 'can_edit',
       workspace_sharing: null,
       workspace_member_count: null,
     };
@@ -356,7 +356,7 @@ describe('MetricSchema', () => {
       public_enabled_by: null, // nullable
       publicly_accessible: false,
       public_password: null, // nullable
-      permission: 'canView',
+      permission: 'can_view',
       workspace_sharing: null,
       workspace_member_count: null,
     };
