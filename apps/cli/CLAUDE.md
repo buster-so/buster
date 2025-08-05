@@ -25,10 +25,11 @@ apps/cli/
 │   │   ├── init/
 │   │   ├── deploy/
 │   │   └── ...
-│   ├── components/        # Reusable Ink UI components
-│   │   ├── forms/        # Form components
+│   ├── components/        # Shared, reusable Ink UI components
+│   │   ├── common/       # Common UI patterns (ErrorBox, SuccessBox)
+│   │   ├── forms/        # Reusable form components
 │   │   ├── tables/       # Table display components
-│   │   ├── progress/     # Progress indicators
+│   │   ├── progress/     # Progress indicators (ProgressBar, Spinner)
 │   │   ├── prompts/      # Input prompts
 │   │   └── status/       # Status displays
 │   ├── utils/            # Shared utilities
@@ -246,7 +247,34 @@ export class ApiClient {
 }
 ```
 
-## Ink UI Components Guidelines
+## Ink UI Components Guidelines (Hybrid Approach)
+
+### Component Organization Strategy
+
+We use a **hybrid approach** for organizing Ink components:
+
+1. **Command-Specific Components** (`commands/*/components.tsx`):
+   - UI that's unique to a specific command
+   - Tightly coupled to command logic
+   - Examples: `AuthUI`, `InitWizard`, `DeployProgress`
+
+2. **Shared Components** (`components/*`):
+   - Reusable UI patterns used across multiple commands
+   - Consistent look and feel
+   - Examples: `ErrorBox`, `SuccessBox`, `ProgressBar`, `Table`
+
+### When to Create Shared Components
+
+Create a shared component when:
+- The UI pattern is used in 2+ commands
+- The component provides consistent UX (errors, success, loading)
+- The component is generic and configurable via props
+- You want to ensure UI consistency across the CLI
+
+Keep components command-specific when:
+- The UI flow is unique to that command
+- The component has complex state tied to command logic
+- It wouldn't make sense in other contexts
 
 ### 1. Component Organization
 

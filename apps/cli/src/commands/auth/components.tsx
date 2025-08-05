@@ -3,6 +3,7 @@ import { Box, Text } from 'ink';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
 import Spinner from 'ink-spinner';
+import { ErrorBox, SuccessBox } from '../../components/common/index.js';
 import type { AuthArgs, Credentials } from './types.js';
 import { validateAndSaveCredentials } from './helpers.js';
 
@@ -69,19 +70,11 @@ export const AuthUI: React.FC<AuthUIProps> = ({ args }) => {
   }
 
   if (step === 'complete') {
-    return (
-      <Box borderStyle="round" borderColor="green" padding={1}>
-        <Text color="green">✓ Successfully authenticated with Buster!</Text>
-      </Box>
-    );
+    return <SuccessBox message="Successfully authenticated with Buster!" />;
   }
 
   if (step === 'error') {
-    return (
-      <Box borderStyle="round" borderColor="red" padding={1}>
-        <Text color="red">❌ {error}</Text>
-      </Box>
-    );
+    return <ErrorBox error={error || 'Authentication failed'} />;
   }
 
   return null;

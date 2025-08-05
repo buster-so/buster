@@ -6,7 +6,7 @@
 - Project structure created at `/apps/cli/`
 - TypeScript/build configuration (tsup, tsconfig.json, package.json)
 - All command file structures created in `/apps/cli/src/commands/`
-- Basic Ink component files stubbed in `/apps/cli/src/components/`
+- ✅ COMPLETED: Hybrid component structure implemented with shared components in `/apps/cli/src/components/` and command-specific components in command folders
 - Utils directory structure created (renamed from lib to utils)
 - CLAUDE.md and README.md created
 - Package.json with all dependencies configured
@@ -17,8 +17,11 @@
 - API client with basic structure at `/apps/cli/src/utils/api-client.ts`
 - Configuration management at `/apps/cli/src/utils/config.ts`
 - Error handling classes at `/apps/cli/src/utils/errors.ts`
-- Basic Ink UI components (forms, tables, progress, prompts, status)
-- YAML validation utilities at `/apps/cli/src/utils/yaml.ts`
+- 🚧 STUBBED: Basic shared components (ErrorBox, SuccessBox, ProgressBar) in `/components/common/`
+- 🚧 STUBBED: Command-specific component structure in all command folders (components.tsx files)
+- 🚧 STUBBED: Shared component categories (forms, tables, progress, prompts, status)
+- ✅ COMPLETED: Validation utilities at `/apps/cli/src/utils/validation.ts`
+- ✅ COMPLETED: YAML utilities at `/apps/cli/src/utils/yaml.ts`
 - Credential encryption at `/apps/cli/src/utils/credentials.ts`
 
 ### Pending Items ⏳ (Not yet started)
@@ -37,9 +40,184 @@
 - **Renamed lib to utils directory**: Better alignment with CLI patterns
 - **Confirmed Ink/React for all UI**: All user interface components use Ink framework
 - **Simplified scope**: Focus on file system operations and API client functionality
+- **✅ COMPLETED: Hybrid component structure implemented**: Command-specific components stay local, shared components in `/components/`
+- **✅ COMPLETED: Hybrid schema organization implemented**: Command-specific schemas in command types.ts, shared schemas in `/schemas/`
+- **✅ COMPLETED: All commands have types.ts and components.tsx files**
 
 ### Current State
 The CLI has a complete project structure with TypeScript configuration and all file stubs in place. The foundation is ready for implementation of the actual command logic, API integration, and Ink UI components. All major architectural decisions have been made and reflected in the file structure.
+
+## Ink Component Organization Strategy
+
+### Hybrid Component Architecture
+
+We've implemented a **hybrid approach** to Ink component organization that balances locality with reusability:
+
+#### Command-Specific Components (Local)
+- **Location**: `/apps/cli/src/commands/[command]/components.tsx`
+- **Purpose**: UI components that are specific to a single command
+- **Benefits**: 
+  - **Discoverability**: Components are co-located with the command logic
+  - **Context**: Direct access to command-specific types and helpers
+  - **Isolation**: Changes don't affect other commands
+
+#### Shared Components (Global)
+- **Location**: `/apps/cli/src/components/`
+- **Purpose**: Reusable UI patterns used across multiple commands
+- **Organization**: Grouped by functionality (common/, forms/, tables/, etc.)
+- **Benefits**:
+  - **Reusability**: Single implementation used across commands
+  - **Consistency**: Unified look and feel across the CLI
+  - **Maintainability**: Centralized updates for common patterns
+
+### Directory Structure
+
+```
+src/
+├── commands/
+│   ├── auth/
+│   │   ├── index.ts           # Command implementation
+│   │   ├── components.tsx     # Auth-specific UI components
+│   │   ├── types.ts           # Command-specific types
+│   │   └── helpers.ts         # Command utilities
+│   ├── init/
+│   │   ├── index.ts
+│   │   ├── components.tsx     # Init-specific UI components
+│   │   ├── types.ts
+│   │   └── helpers.ts
+│   └── ...
+├── components/                # Shared, reusable Ink components
+│   ├── common/               # Common UI patterns
+│   │   ├── ErrorBox.tsx      # 🚧 STUBBED - Error display component
+│   │   ├── SuccessBox.tsx    # 🚧 STUBBED - Success message component
+│   │   └── index.ts          # Exports for common components
+│   ├── forms/                # Reusable form components
+│   │   ├── TextInput.tsx     # Enhanced text input with validation
+│   │   ├── SelectInput.tsx   # Selection component with options
+│   │   ├── ConfirmPrompt.tsx # Yes/no confirmation prompts
+│   │   └── index.ts
+│   ├── tables/               # Table display components
+│   │   ├── DataTable.tsx     # Structured data display
+│   │   ├── ConfigTable.tsx   # Configuration key-value display
+│   │   └── index.ts
+│   ├── progress/             # Progress indicators
+│   │   ├── ProgressBar.tsx   # 🚧 STUBBED - Progress bar component
+│   │   ├── Spinner.tsx       # Loading spinner
+│   │   ├── StepProgress.tsx  # Multi-step progress indicator
+│   │   └── index.ts
+│   ├── prompts/              # Input prompts
+│   │   ├── PasswordPrompt.tsx # Secure password input
+│   │   ├── MultiSelect.tsx    # Multiple selection prompt
+│   │   └── index.ts
+│   └── status/               # Status displays
+│       ├── StatusBadge.tsx   # Status indicator badges
+│       ├── ServiceStatus.tsx # Service health display
+│       └── index.ts
+```
+
+### Component Decision Matrix
+
+| Component Type | Where to Place | Examples |
+|----------------|----------------|----------|
+| Command-specific logic display | Command folder | Auth credential form, Init project setup wizard |
+| Reusable UI patterns | Shared components | Error boxes, progress bars, confirmation prompts |
+| Data formatting specific to command | Command folder | Deploy validation results, Parse error display |
+| Common interaction patterns | Shared components | Text inputs, tables, spinners |
+| Command workflow orchestration | Command folder | Multi-step auth flow, Service startup sequence |
+| Generic utility components | Shared components | Success/error messages, loading indicators |
+
+### Best Practices for Ink Components
+
+#### When to Create Shared vs Command-Specific Components
+
+**Create Shared Components When**:
+- The component will be used by 2+ commands
+- It represents a common UI pattern (errors, success, loading)
+- It handles generic data types (strings, numbers, basic objects)
+- The component has no command-specific business logic
+
+**Create Command-Specific Components When**:
+- The component is unique to one command's workflow
+- It handles command-specific data structures or types
+- The component contains command-specific business logic
+- The UI is highly customized for a specific use case
+
+#### Component Props Design for Reusability
+
+```typescript
+// Good: Generic, reusable props
+interface ErrorBoxProps {
+  title: string;
+  message: string;
+  details?: string[];
+  onDismiss?: () => void;
+}
+
+// Good: Command-specific props
+interface AuthFormProps {
+  initialCredentials?: Partial<Credentials>;
+  onSubmit: (credentials: Credentials) => Promise<void>;
+  validationErrors?: AuthValidationErrors;
+}
+```
+
+#### State Management Within Ink Components
+
+- **Local State**: Use React hooks (useState, useEffect) for component-specific state
+- **Command State**: Pass state and handlers down from command implementation
+- **Global State**: Use React Context for cross-component state (sparingly)
+- **Validation State**: Handle validation errors through props, not internal state
+
+#### Testing Strategies
+
+**Shared Component Testing**:
+- Unit tests for each shared component in isolation
+- Test all prop combinations and edge cases
+- Mock external dependencies (API calls, file system)
+- Test keyboard navigation and accessibility
+
+**Command Component Testing**:
+- Integration tests with command logic
+- Test component interaction with command state
+- Mock command-specific dependencies
+- Test complete user workflows
+
+**Example Test Structure**:
+```
+/components/common/ErrorBox.test.tsx     # Shared component unit tests
+/commands/auth/components.test.tsx       # Command component integration tests
+/tests/components/                       # Cross-component integration tests
+```
+
+### Implementation Status
+
+#### ✅ COMPLETED: Hybrid Component Structure Implemented
+- Hybrid directory structure created with command-specific and shared component areas
+- Command folders with components.tsx files stubbed for all commands
+- Shared components directory organized by functionality (common/, forms/, tables/, progress/, prompts/, status/)
+- Index files for proper exports and discoverability
+- Clear decision matrix for component placement established
+
+#### 🚧 STUBBED: Basic Components Ready for Implementation
+- Basic shared components (ErrorBox, SuccessBox, ProgressBar) stubbed in `/components/common/`
+- Command-specific components structure in place in each command folder
+- Export patterns established for both shared and command-specific components
+- Component testing patterns defined
+
+#### ⏳ PENDING: Full Implementation
+- Full implementation of shared component library with proper props interfaces
+- Command-specific component implementations with business logic integration
+- Comprehensive component testing strategies (unit tests for shared, integration tests for command-specific)
+- Props interface standardization and reusability optimization
+
+### Benefits of Hybrid Approach
+
+1. **Discoverability**: Developers can find command-specific UI alongside the command logic
+2. **Reusability**: Common patterns are shared and consistent across commands
+3. **Maintainability**: Shared components can be updated once, command-specific components remain isolated
+4. **Testing**: Clear separation allows for focused unit tests (shared) and integration tests (command-specific)
+5. **Performance**: Components can be optimized for their specific use cases
+6. **Developer Experience**: Clear guidelines on where to place new components
 
 ## Overview
 
@@ -136,24 +314,24 @@ All CLI types will be defined as Zod schemas first, then exported as TypeScript 
 5. **Environment Validation**: Environment variables validated with Zod schemas
 6. **File System Operations**: File content validation before processing
 
-### Dependencies Mapping - SIMPLIFIED
+### Dependencies Mapping - WITH INK UI
 
 | Rust Dependency | TypeScript Equivalent | Purpose | CLI Usage Priority |
 |----------------|----------------------|---------|-------------------|
 | `clap` | `commander` + **Zod validation** | CLI argument parsing + validation | **HIGH** |
-| ~~`ratatui` + `crossterm`~~ | ~~**Ink ecosystem**~~ | ~~Terminal UI framework~~ | **REMOVED** |
-| ~~- ratatui widgets~~ | ~~`ink-text-input`~~ | ~~Text input components~~ | **REMOVED** |
-| ~~- ratatui selectable~~ | ~~`ink-select-input`~~ | ~~Selection components~~ | **REMOVED** |
-| ~~- ratatui table~~ | ~~`ink-table`~~ | ~~Table display~~ | **REMOVED** |
-| ~~- ratatui progress~~ | ~~Custom Ink progress bars~~ | ~~Progress indicators~~ | **REMOVED** |
-| ~~- ratatui spinner~~ | ~~`ink-spinner`~~ | ~~Loading indicators~~ | **REMOVED** |
+| `ratatui` + `crossterm` | **Ink ecosystem** | Terminal UI framework | **HIGH** |
+| - ratatui widgets | `ink-text-input` | Text input components | **HIGH** |
+| - ratatui selectable | `ink-select-input` | Selection components | **HIGH** |
+| - ratatui table | `ink-table` | Table display | **HIGH** |
+| - ratatui progress | Custom Ink progress bars | Progress indicators | **HIGH** |
+| - ratatui spinner | `ink-spinner` | Loading indicators | **HIGH** |
 | `tokio` | Native Node.js async | Async runtime | **HIGH** |
 | `reqwest` | Native `fetch` + **Zod response validation** | HTTP client | **HIGH** |
 | `serde` + `serde_yaml` | `js-yaml` + **Zod schemas** | YAML parsing + validation | **HIGH** |
 | `serde_json` | Native JSON + **Zod schemas** | JSON handling + validation | **HIGH** |
-| `inquire` | Simple `readline` + **Zod validation** | Basic interactive prompts | **MEDIUM** |
-| ~~`indicatif`~~ | ~~**Ink progress components**~~ | ~~Progress indicators~~ | **REMOVED** |
-| ~~`colored`~~ | ~~**Ink color props**~~ | ~~Terminal colors~~ | **REMOVED** |
+| `inquire` | **Ink input components** + **Zod validation** | Interactive prompts with rich UI | **HIGH** |
+| `indicatif` | **Ink progress components** | Progress indicators | **HIGH** |
+| `colored` | **Ink color props** | Terminal colors | **HIGH** |
 | `glob` | `fast-glob` | File pattern matching | **MEDIUM** |
 | `tempfile` | `tmp` | Temporary files | **LOW** |
 | `regex` | Native RegExp | Regular expressions | **MEDIUM** |
@@ -161,35 +339,73 @@ All CLI types will be defined as Zod schemas first, then exported as TypeScript 
 | `dirs` | `os.homedir()` | Directory utilities | **HIGH** |
 | `confy` | **Zod-validated config management** | Configuration | **HIGH** |
 | `zip` | `yauzl`/`yazl` | Archive handling | **MEDIUM** |
-| ~~`rustyline`~~ | ~~**Ink chat interface**~~ | ~~Line editing~~ | **REMOVED** |
 
-### Zod Schema Organization - SIMPLIFIED
+### Hybrid Schema Organization - IMPLEMENTED
+
+We've implemented a **hybrid approach** to schema organization that balances locality with reusability:
+
+#### Command-Specific Schemas (Local)
+- **Location**: `/apps/cli/src/commands/[command]/types.ts`
+- **Purpose**: Zod schemas and types specific to a single command
+- **Examples**: AuthArgsSchema, DeployArgsSchema, InitArgsSchema
+- **Benefits**: Co-located with command logic, easy to find and modify
+
+#### Shared Schemas (Global)
+- **Location**: `/apps/cli/src/schemas/`
+- **Purpose**: Schemas used by multiple commands or shared data structures
+- **Organization**: Grouped by functionality (config/, models/, api/)
+- **Benefits**: Single source of truth, consistent validation across commands
 
 ```
-apps/cli/src/schemas/
-├── commands/              # Command-specific schemas (simplified)
-│   ├── auth.ts           # Auth command validation
-│   ├── init.ts           # Init command validation (folder creation only)
-│   ├── deploy.ts         # Deploy command validation (API calls only)
-│   ├── parse.ts          # Parse command validation
-│   ├── config.ts         # Config command validation
-│   ├── start.ts          # Service start command
-│   ├── stop.ts           # Service stop command
-│   ├── reset.ts          # Service reset command
-│   └── update.ts         # Update command validation
-├── config/               # Configuration schemas
-│   ├── buster-yml.ts     # buster.yml file schema (simplified)
-│   ├── cli-config.ts     # CLI configuration schema
-│   ├── credentials.ts    # Credential storage schema
-│   └── environment.ts    # Environment variable schema
-├── models/               # Model schemas (minimal)
-│   └── model-validation.ts # Basic model YAML validation only
-├── api/                  # API integration schemas
-│   ├── requests.ts       # API request schemas
-│   ├── responses.ts      # API response schemas
-│   └── shared.ts         # Re-exports from @buster/server-shared
-└── index.ts              # Central schema exports
+src/
+├── commands/
+│   ├── auth/
+│   │   ├── index.ts
+│   │   ├── types.ts         # AuthArgsSchema (command-specific)
+│   │   └── components.tsx
+│   ├── deploy/
+│   │   ├── index.ts
+│   │   ├── types.ts         # DeployArgsSchema (command-specific)
+│   │   └── components.tsx
+│   └── ...
+├── schemas/                 # Shared schemas only
+│   ├── config.ts           # BusterYmlSchema, CLIConfigSchema
+│   ├── models.ts           # SemanticModelSchema
+│   ├── api.ts              # ApiErrorSchema, shared API schemas
+│   └── index.ts            # Central exports
 ```
+
+#### Schema Placement Guidelines
+
+**Command-Specific Schemas (commands/*/types.ts)**:
+- Command argument and option schemas
+- Command-specific validation rules
+- Types that are only used by one command
+- Examples: `AuthArgsSchema`, `InitOptionsSchema`, `DeployValidationSchema`
+
+**Shared Schemas (schemas/)**:
+- Configuration file schemas (buster.yml, CLI config)
+- Data model schemas used across commands
+- API request/response schemas
+- Common validation patterns
+- Examples: `BusterYmlSchema`, `SemanticModelSchema`, `ApiErrorSchema`
+
+### Decision Matrix for Schema Placement
+
+| Schema Type | Where to Place | Reasoning |
+|-------------|----------------|-----------|
+| Command argument validation | Command's types.ts | Used only by that command, co-located with logic |
+| Configuration file formats | schemas/config.ts | Used across multiple commands for parsing/validation |
+| API request/response types | schemas/api.ts | Shared across commands that make API calls |
+| Data model structures | schemas/models.ts | Used by parse, deploy, and validation commands |
+| Error handling types | schemas/api.ts | Common error patterns across all API interactions |
+
+### Implementation Status
+
+- ✅ **COMPLETED**: Hybrid schema organization implemented
+- ✅ **COMPLETED**: All commands have types.ts files with command-specific schemas
+- ✅ **COMPLETED**: Shared schemas organized in /schemas/ directory
+- ✅ **COMPLETED**: Clear separation between local and shared validation logic
 
 ## Monorepo Integration Strategy
 
@@ -202,8 +418,7 @@ apps/
 │   │   ├── commands/          # Command-specific folders (simplified)
 │   │   │   ├── auth/
 │   │   │   │   ├── index.ts       # Command implementation
-│   │   │   │   ├── schemas.ts     # Command-specific Zod schemas
-│   │   │   │   ├── types.ts       # Types exported from schemas
+│   │   │   │   ├── types.ts       # Command-specific Zod schemas and exported types
 │   │   │   │   ├── helpers.ts     # Command helpers
 │   │   │   │   └── auth.test.ts   # Command tests
 │   │   │   ├── init/              # SIMPLIFIED - folder creation only
@@ -214,11 +429,10 @@ apps/
 │   │   │   ├── stop/              # Service stop
 │   │   │   ├── reset/             # Service reset
 │   │   │   └── update/            # Auto-update
-│   │   ├── schemas/           # Centralized Zod schemas (simplified)
-│   │   │   ├── commands/      # Command validation schemas
-│   │   │   ├── config/        # Configuration schemas
-│   │   │   ├── models/        # Basic model schemas
-│   │   │   ├── api/           # API integration schemas
+│   │   ├── schemas/           # Shared Zod schemas only
+│   │   │   ├── config.ts      # Configuration schemas (buster.yml, CLI config)
+│   │   │   ├── models.ts      # Basic model schemas
+│   │   │   ├── api.ts         # API integration schemas
 │   │   │   └── index.ts       # Schema exports
 │   │   ├── lib/               # Shared CLI utilities
 │   │   │   ├── api-client.ts      # Server API client + Zod validation
@@ -259,7 +473,7 @@ apps/
 
 ```typescript
 // CLI schemas extend and re-export server-shared schemas
-// apps/cli/src/schemas/api/shared.ts
+// apps/cli/src/schemas/api.ts - Shared API schemas
 export { 
   // Re-export server-shared schemas for CLI use
   CreateDataSourceRequestSchema,
@@ -268,14 +482,14 @@ export {
   ValidateModelResponseSchema 
 } from '@buster/server-shared';
 
-// Add CLI-specific extensions
-export const CliAuthOptionsSchema = z.object({
-  host: z.string().url().optional(),
-  apiKey: z.string().optional(),
-  interactive: z.boolean().default(true),
+// Add CLI-specific API error handling
+export const ApiErrorSchema = z.object({
+  error: z.string(),
+  code: z.string(),
+  details: z.record(z.any()).optional(),
 });
 
-export type CliAuthOptions = z.infer<typeof CliAuthOptionsSchema>;
+export type ApiError = z.infer<typeof ApiErrorSchema>;
 ```
 
 ## YAML Validation Strategy with Zod
@@ -330,10 +544,10 @@ export const parseSemanticModel = (filePath: string) =>
   parseAndValidateYaml(filePath, SemanticModelSchema);
 ```
 
-### Buster.yml Schema Definition
+### Buster.yml Schema Definition (Shared Schema)
 
 ```typescript
-// apps/cli/src/schemas/config/buster-yml.ts
+// apps/cli/src/schemas/config.ts - Shared schemas used by multiple commands
 import { z } from 'zod';
 
 const DatabaseTypeSchema = z.enum([
@@ -353,17 +567,24 @@ export const BusterYmlSchema = z.object({
   }).optional(),
 });
 
+export const CLIConfigSchema = z.object({
+  defaultHost: z.string().url().optional(),
+  autoUpdate: z.boolean().default(true),
+  logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+});
+
 export type BusterYmlConfig = z.infer<typeof BusterYmlSchema>;
+export type CLIConfig = z.infer<typeof CLIConfigSchema>;
 ```
 
-### Basic Model Validation Schema - SIMPLIFIED
+### Basic Model Validation Schema - SIMPLIFIED (Shared Schema)
 
 ```typescript
-// apps/cli/src/schemas/models/model-validation.ts
+// apps/cli/src/schemas/models.ts - Shared schemas for model validation
 import { z } from 'zod';
 
 // Basic YAML validation only - no complex model structure since server handles introspection
-export const BasicModelSchema = z.object({
+export const SemanticModelSchema = z.object({
   version: z.string(),
   model: z.object({
     name: z.string(),
@@ -371,15 +592,16 @@ export const BasicModelSchema = z.object({
   }),
 });
 
-export type BasicModel = z.infer<typeof BasicModelSchema>;
+export type SemanticModel = z.infer<typeof SemanticModelSchema>;
 ```
 
 ### Command Input Validation Patterns
 
 ```typescript
-// Example: apps/cli/src/commands/init/schemas.ts - SIMPLIFIED
+// Example: apps/cli/src/commands/init/types.ts - HYBRID APPROACH
 import { z } from 'zod';
 
+// Command-specific schemas stay in command's types.ts
 export const InitCommandArgsSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
   outputDir: z.string().default('./'),
@@ -659,7 +881,7 @@ export default defineConfig({
 - `/apps/cli/tsconfig.json` - Extends @buster/typescript-config
 
 **Zod and Ink Integration**:
-- Set up schema organization structure (commands/, config/, models/, api/)
+- Set up hybrid schema organization (command-specific in types.ts, shared in schemas/)
 - Create validation utilities for CLI arguments and options
 - Implement detailed error reporting for validation failures with Ink error components
 - Set up Ink component library with forms, tables, progress indicators
@@ -673,11 +895,12 @@ export default defineConfig({
 
 **Test Requirements**:
 - Unit tests for command parsing with Zod validation (*.test.ts)
-- Ink component rendering tests (*.test.tsx)
+- Shared Ink component rendering tests (components/**/*.test.tsx)
+- Command-specific component integration tests (commands/**/components.test.tsx)
 - Schema validation tests
 - CLI help system verification with Ink components
 - Command registration tests
-- Zod error handling tests with Ink error display components
+- Zod error handling tests with shared ErrorBox component
 - Ink user interaction simulation tests
 
 #### Ticket 1.2: Server API Client Integration with Zod Validation 🚧 STUBBED
@@ -696,9 +919,9 @@ export default defineConfig({
 - `/apps/cli/src/lib/api-client.ts` - Main API client with Zod validation
 - `/apps/cli/src/lib/http-client.ts` - HTTP wrapper with auth + validation
 - `/apps/cli/src/lib/auth.ts` - Authentication helpers with Zod schemas
-- `/apps/cli/src/schemas/api/shared.ts` - Re-exports from @buster/server-shared
-- `/apps/cli/src/schemas/api/requests.ts` - CLI-specific request schemas
-- `/apps/cli/src/schemas/api/responses.ts` - CLI-specific response schemas
+- `/apps/cli/src/schemas/api.ts` - API schemas and server-shared re-exports
+- `/apps/cli/src/schemas/config.ts` - Configuration file schemas
+- `/apps/cli/src/schemas/models.ts` - Model validation schemas
 
 **Zod Server-Shared Integration**:
 ```typescript
@@ -710,7 +933,7 @@ export {
   ValidateModelResponseSchema 
 } from '@buster/server-shared';
 
-// CLI-specific API error schema
+// CLI-specific API error schema (shared across commands)
 export const ApiErrorResponseSchema = z.object({
   error: z.string(),
   code: z.string(),
@@ -742,11 +965,12 @@ export const ApiErrorResponseSchema = z.object({
 - `/apps/cli/src/lib/yaml.ts` - YAML parsing and validation utilities
 - `/apps/cli/src/lib/credentials.ts` - Secure credential storage with schemas
 - `/apps/cli/src/lib/environment.ts` - Environment variable handling with Zod
-- `/apps/cli/src/components/forms/ConfigForm.tsx` - Ink configuration form component
-- `/apps/cli/src/schemas/config/buster-yml.ts` - buster.yml schema definition
-- `/apps/cli/src/schemas/config/cli-config.ts` - CLI configuration schema
-- `/apps/cli/src/schemas/config/credentials.ts` - Credential schema
-- `/apps/cli/src/schemas/config/environment.ts` - Environment variable schema
+- `/apps/cli/src/commands/config/components.tsx` - Config-specific Ink components
+- `/apps/cli/src/components/forms/TextInput.tsx` - Shared text input component
+- `/apps/cli/src/schemas/config.ts` - Configuration schemas (buster.yml, CLI config)
+- `/apps/cli/src/schemas/api.ts` - API schemas and error handling
+- `/apps/cli/src/schemas/models.ts` - Semantic model schemas
+- `/apps/cli/src/schemas/index.ts` - Central exports
 
 **Zod YAML Integration**:
 ```typescript
@@ -778,7 +1002,7 @@ export async function parseAndValidateYaml<T>(
 - Comprehensive schema validation error testing
 - buster.yml schema compatibility tests
 - Ink form component tests for configuration management
-- Ink table component tests for configuration display
+- Shared component unit tests for reusable patterns
 
 ### Phase 2: Core Commands - SIMPLIFIED (Week 3-4)
 
@@ -794,16 +1018,15 @@ export async function parseAndValidateYaml<T>(
 
 **Key Files**:
 - `/apps/cli/src/commands/auth/index.ts` - Command implementation with Zod validation
-- `/apps/cli/src/commands/auth/AuthForm.tsx` - Ink form component for authentication
-- `/apps/cli/src/commands/auth/schemas.ts` - Auth-specific Zod schemas
-- `/apps/cli/src/commands/auth/types.ts` - Types exported from schemas
+- `/apps/cli/src/commands/auth/components.tsx` - Auth-specific Ink components
+- `/apps/cli/src/commands/auth/types.ts` - Auth-specific Zod schemas and exported types
 - `/apps/cli/src/commands/auth/helpers.ts` - Auth utilities with validation
 - `/apps/cli/src/commands/auth/auth.test.ts` - Command tests with schema testing
-- `/apps/cli/src/commands/auth/AuthForm.test.tsx` - Ink component tests
+- `/apps/cli/src/components/common/ErrorBox.tsx` - Shared error display component
 
 **Zod Auth Schemas**:
 ```typescript
-// apps/cli/src/commands/auth/schemas.ts
+// apps/cli/src/commands/auth/types.ts
 export const AuthCommandOptionsSchema = z.object({
   host: z.string().url().optional(),
   apiKey: z.string().min(1).optional(),
@@ -820,18 +1043,19 @@ export type AuthCommandOptions = z.infer<typeof AuthCommandOptionsSchema>;
 export type CredentialInput = z.infer<typeof CredentialInputSchema>;
 ```
 
-**Simple Prompts Used**:
-- readline for API key entry with Zod validation
-- Simple console output for status messages
-- Zod validation error display in console
+**Ink UI Components Used**:
+- Ink text input for API key entry with Zod validation
+- Rich Ink components for status messages and progress
+- Beautiful error display using Ink error components
 
 **Test Requirements**:
 - Unit tests for auth logic with Zod validation (*.test.ts)
-- Ink component tests for auth forms (*.test.tsx)
+- Command-specific component tests (components.test.tsx)
+- Shared component unit tests (components/common/ErrorBox.test.tsx)
 - Mocked server API responses with schema validation
 - Credential validation tests with Zod schemas
 - Environment variable precedence tests with schema validation
-- Comprehensive Zod error handling tests
+- Comprehensive Zod error handling tests with shared ErrorBox
 - Ink form interaction and validation display tests
 
 #### Ticket 2.2: Configuration Command - SIMPLIFIED 🚧 STUBBED
@@ -850,10 +1074,10 @@ export type CredentialInput = z.infer<typeof CredentialInputSchema>;
 - `/apps/cli/src/commands/config/helpers.ts` - Config utilities
 - `/apps/cli/src/commands/config/config.test.ts` - Tests
 
-**Simple Interface Used**:
-- Console table output for configuration display
-- readline for option selection
-- Simple confirmation prompts for destructive actions
+**Ink UI Components Used**:
+- Ink table components for rich configuration display
+- Ink select input for option selection
+- Rich Ink confirmation prompts for destructive actions
 
 **Test Requirements**:
 - Configuration update tests
@@ -877,10 +1101,10 @@ export type CredentialInput = z.infer<typeof CredentialInputSchema>;
 - `/apps/cli/src/lib/docker-compose.ts` - Docker integration
 - `/apps/cli/src/lib/assets.ts` - Asset management
 
-**Simple Interface Used**:
-- Basic console logging for status
-- Simple progress dots for loading states
-- Text-based service status display
+**Ink UI Components Used**:
+- Rich Ink status displays with colors and formatting
+- Animated Ink progress bars and spinners for loading states
+- Professional Ink service status components
 
 **Test Requirements**:
 - Docker Compose execution tests
@@ -911,7 +1135,7 @@ export type CredentialInput = z.infer<typeof CredentialInputSchema>;
 - Create project directory structure
 - Generate basic buster.yml with project name only
 - Create empty docs/ and metadata/ folders
-- Simple console output for confirmation
+- Rich Ink progress display and confirmation messages
 
 **Test Requirements**:
 - File system creation tests
@@ -942,11 +1166,11 @@ export type CredentialInput = z.infer<typeof CredentialInputSchema>;
 - Use types from @buster/server-shared
 - All business logic handled by server
 
-**Simple Interface Used**:
-- Console table for validation results
-- Simple error/warning display in console
-- Basic confirmation prompts for deployment
-- Text-based progress indicators
+**Ink UI Components Used**:
+- Rich Ink tables for validation results
+- Beautiful error/warning display with Ink components
+- Professional Ink confirmation prompts for deployment
+- Animated Ink progress indicators
 
 **Test Requirements**:
 - Deployment validation API tests
@@ -973,10 +1197,10 @@ export type CredentialInput = z.infer<typeof CredentialInputSchema>;
 - `/apps/cli/src/lib/github-releases.ts` - GitHub integration
 - `/apps/cli/src/lib/auto-update.ts` - Auto-update functionality
 
-**Simple Interface Used**:
-- Console-based update progress
-- Simple confirmation prompts
-- Basic version comparison display
+**Ink UI Components Used**:
+- Rich Ink progress bars for update progress
+- Professional Ink confirmation prompts
+- Beautiful version comparison display with Ink components
 
 **Test Requirements**:
 - Update mechanism tests
