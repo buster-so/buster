@@ -38,6 +38,7 @@ const CREATE_TODO_LIST_PROMPT = `### Overview
 - The Documentation Agent is tasked with creating, managing, and updating the data team's data catalog & dbt model documentation - stored and managed as files within the dbt repository.
 - The Documentation Agent will use your TODO list as a step-by-step guide to help it fulfill the user request and make the required changes or updates to the dbt repository.
 - Your role is to intepret a user's request-which may include a task overview, detailed workflow, guidelines, or a simple instruction-and generate a comprehensive TODO list that breaks down the task into phased, actionable items.
+- Focus on documentation tasks only - do not include git operations, pull requests, or code deployment steps in the TODO lists.
 **Important**: Pay close attention to the conversation history. If this is a follow-up question, leverage the context from previous turns (e.g., existing data context, previous plans or results) to identify what aspects of the most recent user request needs need to be interpreted.
 ---
 ### Repository Structure Guidelines
@@ -73,6 +74,7 @@ You have access to various tools to complete tasks. Adhere to these rules:
 2. **Granularity**: Break down each phase into sub-tasks. Include:
   - Data gathering or exploration steps (e.g., reviewing files, metadata).
   - Core actions (e.g., updating descriptions, verifying with queries).
+  - When documenting models and columns, combine them in the same phase but as separate todos for each model (e.g., "Document model X description and all its columns").
   - Verification or confirmation steps (e.g., "Confirm all affected columns were updated").
   - Review steps for completeness, clarity, or analyst-friendliness.
   - Cover the entire request without skipping elements. 
@@ -85,6 +87,18 @@ You have access to various tools to complete tasks. Adhere to these rules:
 
 ### How to Use the createTodoList Tool
 **IMPORTANT**: When you are ready to create the TODO list, you must call the createTodoList tool with a single parameter called "todos" that contains your entire markdown-formatted TODO list as a string. The markdown should follow the exact format shown in the examples below.
+
+For simple requests like "Document all models", create a basic TODO list:
+\`\`\`
+# DBT Documentation Todo
+
+## Phase 1: Document Models
+- [ ] Review all models in the project
+- [ ] For each model, add comprehensive model description
+- [ ] For each model, document all columns with descriptions and metadata
+- [ ] Create relationships where applicable
+- [ ] Review all documentation for completeness
+\`\`\`
 
 ### Examples
 #### User Request: "can you update the docs to clarify that deal amount fields in ‘customers’ table actually originate from HubSpot and the closed won amount field should be used when calculating the primary deal value"
@@ -248,6 +262,10 @@ const createDocsTodosExecution = async ({
     // Fallback: if we still don't have todos, try to extract from the text
     if (!todosString && result.text) {
       todosString = result.text;
+    }
+
+    if (!todosString) {
+      throw new Error('Failed to extract todos from agent response');
     }
 
     // Update the runtime context with the new todo list

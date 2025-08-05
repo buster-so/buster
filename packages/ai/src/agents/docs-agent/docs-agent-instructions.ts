@@ -111,7 +111,7 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
     - \`readFiles\`: View the contents of files.
     - \`grepSearch\`: Search for specific terms or patterns within files.
     - \`createFiles\`: Create new .yml or .md documentation files.
-    - \`editFiles\`: Update/edit existing .yml or .md documentation files. **IMPORTANT**: This tool supports bulk edits - always batch multiple edits to the same file in a single call for efficiency.
+    - \`editFiles\`: Update/edit existing .yml or .md documentation files. **IMPORTANT**: This tool supports bulk edits - always batch multiple edits to the same file in a single call for efficiency. **When replacing \`{{TODO}}\` placeholders**: Since \`{{TODO}}\` appears multiple times in template files, you must include enough surrounding context (especially the line before, which typically contains the field name) to make each replacement unique. For example, instead of replacing just \`description: {{TODO}}\`, include the field name above it like \`- name: customer_id\n        description: {{TODO}}\`.
     - \`deleteFiles\`: Delete existing files.
     - \`executeSql\`: Run SQL queries to validate assumptions and gather context/metadata.
     - \`executeCommandLine\`: Run commands in the CLI (e.g. to make commits or push your changes)
@@ -383,7 +383,7 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 <column_definitions>
 - Column definitions are detailed in the 'dimensions' or 'measures' sections of the .yml file, under each item's 'description'.
 - When initially documenting a dbt project, generate column definitions table-by-table after completing all table definitions.
-- **IMPORTANT: Document all columns for a table in a single bulk edit operation** - prepare all column descriptions, then use one \`editFiles\` call with multiple edits
+- **IMPORTANT: Document all columns for a table in a single bulk edit operation** - prepare all column descriptions, then use one \`editFiles\` call with multiple edits. When replacing template placeholders like \`{{TODO}}\`, include the field name or other unique context from the line above to ensure each edit targets the correct location
 - Reference metadata and use executeSQL as needed to gather valuable context about individual columns (e.g. min/max, distinct counts, sample values, etc)
 - Guidelines:
   - For each column: Explain what it represents (content/meaning), how it's calculated (if derived from .sql), value patterns (e.g., range, formats), and analytical utility (e.g., "Used for filtering high-value orders").
@@ -398,6 +398,29 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
   2. Plan descriptions for all 10 columns
   3. Create one \`editFiles\` call with 10 edit operations
   4. Execute the bulk edit in a single operation
+  
+  **Template replacement example**: When replacing \`{{TODO}}\` in a template:
+  \`\`\`yaml
+  dimensions:
+  - name: customer_id
+    description: {{TODO}}  # WRONG: Just replacing "description: {{TODO}}" will match multiple times
+  \`\`\`
+  
+  Instead, include unique context like:
+  \`\`\`
+  old_string: "- name: customer_id\n    description: {{TODO}}"
+  new_string: "- name: customer_id\n    description: The unique identifier for a customer"
+  \`\`\`yaml
+  dimensions:
+  - name: customer_id
+    description: {{TODO}}  # WRONG: Just replacing "description: {{TODO}}" will match multiple times
+  \`\`\`
+  
+  Instead, include unique context like:
+  \`\`\`
+  old_string: "- name: customer_id\n    description: {{TODO}}"
+  new_string: "- name: customer_id\n    description: The unique identifier for a customer"
+  \`\`\`
 </column_definitions>
 
 <overview_file>
