@@ -1,22 +1,27 @@
 import {
   type MdNodeParser,
   convertChildrenDeserialize,
-  convertNodesSerialize,
   parseAttributes,
+  serializeMd,
 } from '@platejs/markdown';
 
 export const calloutSerializer: MdNodeParser<'callout'> = {
   serialize: (node, options) => {
     // Extract the icon from the node (assuming it's stored as an attribute)
     const icon = node.icon || '💡';
-    const content = convertNodesSerialize(node.children, options);
 
-    // Return the markdown representation
+    if (!options.editor) {
+      throw new Error('Editor is required');
+    }
+
+    const content = serializeMd(options.editor, {
+      ...options,
+      value: node.children,
+    });
+
     return {
-      attributes: {
-        icon,
-      },
-      children: content,
+      type: 'html',
+      value: `<callout icon="${icon}">${content}</callout>`,
     };
   },
   deserialize: (node, deco, options) => {
