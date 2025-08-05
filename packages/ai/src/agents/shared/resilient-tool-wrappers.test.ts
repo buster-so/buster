@@ -2,22 +2,22 @@
  * Tests for Resilient Tool Wrappers
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
 import {
+  ResilientToolRegistry,
   createResilientBashTool,
   createResilientFileCreationTool,
-  createResilientFileReadingTool,
   createResilientFileEditingTool,
   createResilientFileListingTool,
+  createResilientFileReadingTool,
   executeSafelyInSandbox,
   executeSandboxCommandSafely,
-  parseSandboxResultSafely,
-  validateToolInput,
   makeCompletelysafe,
-  ResilientToolRegistry,
+  parseSandboxResultSafely,
   resilientTools,
+  validateToolInput,
 } from './resilient-tool-wrappers';
-import { z } from 'zod';
 
 describe('Resilient Tool Wrappers', () => {
   beforeEach(() => {
@@ -28,9 +28,9 @@ describe('Resilient Tool Wrappers', () => {
     it('should execute operation successfully', async () => {
       const operation = vi.fn().mockResolvedValue('success');
       const fallback = vi.fn().mockReturnValue('fallback');
-      
+
       const result = await executeSafelyInSandbox(operation, fallback, 'test');
-      
+
       expect(result).toBe('success');
       expect(operation).toHaveBeenCalled();
       expect(fallback).not.toHaveBeenCalled();
@@ -39,9 +39,9 @@ describe('Resilient Tool Wrappers', () => {
     it('should use fallback when operation fails', async () => {
       const operation = vi.fn().mockRejectedValue(new Error('Failed'));
       const fallback = vi.fn().mockReturnValue('fallback result');
-      
+
       const result = await executeSafelyInSandbox(operation, fallback, 'test');
-      
+
       expect(result).toBe('fallback result');
       expect(fallback).toHaveBeenCalled();
     });
@@ -57,13 +57,9 @@ describe('Resilient Tool Wrappers', () => {
           }),
         },
       };
-      
-      const result = await executeSandboxCommandSafely(
-        mockSandbox,
-        'test command',
-        'test context'
-      );
-      
+
+      const result = await executeSandboxCommandSafely(mockSandbox, 'test command', 'test context');
+
       expect(result.success).toBe(true);
       expect(result.output).toBe('command output');
       expect(result.exitCode).toBe(0);
@@ -79,13 +75,13 @@ describe('Resilient Tool Wrappers', () => {
           }),
         },
       };
-      
+
       const result = await executeSandboxCommandSafely(
         mockSandbox,
         'failing command',
         'test context'
       );
-      
+
       expect(result.success).toBe(false);
       expect(result.output).toBe('error output');
       expect(result.exitCode).toBe(1);
@@ -97,13 +93,9 @@ describe('Resilient Tool Wrappers', () => {
           executeCommand: vi.fn().mockRejectedValue(new Error('Sandbox error')),
         },
       };
-      
-      const result = await executeSandboxCommandSafely(
-        mockSandbox,
-        'test command',
-        'test context'
-      );
-      
+
+      const result = await executeSandboxCommandSafely(mockSandbox, 'test command', 'test context');
+
       expect(result.success).toBe(false);
       expect(result.exitCode).toBe(1);
       expect(result.error).toContain('Sandbox command execution failed');
@@ -112,30 +104,24 @@ describe('Resilient Tool Wrappers', () => {
 
   describe('parseSandboxResultSafely', () => {
     it('should parse valid JSON', () => {
-      const result = parseSandboxResultSafely(
-        '{"success": true}',
-        'test parse',
-        { success: false }
-      );
-      
+      const result = parseSandboxResultSafely('{"success": true}', 'test parse', {
+        success: false,
+      });
+
       expect(result).toEqual({ success: true });
     });
 
     it('should use fallback for invalid JSON', () => {
       const fallback = { success: false, error: 'fallback' };
-      const result = parseSandboxResultSafely(
-        'invalid json',
-        'test parse',
-        fallback
-      );
-      
+      const result = parseSandboxResultSafely('invalid json', 'test parse', fallback);
+
       expect(result).toEqual(fallback);
     });
 
     it('should handle empty string', () => {
       const fallback = { empty: true };
       const result = parseSandboxResultSafely('', 'test parse', fallback);
-      
+
       expect(result).toEqual(fallback);
     });
   });
@@ -149,13 +135,13 @@ describe('Resilient Tool Wrappers', () => {
     it('should validate correct input', () => {
       const input = { name: 'test', count: 5 };
       const result = validateToolInput(testSchema, input, 'test-tool');
-      
+
       expect(result).toEqual(input);
     });
 
     it('should throw validation error for invalid input', () => {
       const input = { name: 'test', count: 'not-a-number' };
-      
+
       expect(() => {
         validateToolInput(testSchema, input, 'test-tool');
       }).toThrow('[test-tool] Invalid input');
@@ -163,7 +149,7 @@ describe('Resilient Tool Wrappers', () => {
 
     it('should throw validation error for missing fields', () => {
       const input = { name: 'test' };
-      
+
       expect(() => {
         validateToolInput(testSchema, input, 'test-tool');
       }).toThrow('[test-tool] Invalid input');
@@ -175,9 +161,9 @@ describe('Resilient Tool Wrappers', () => {
       const fn = vi.fn().mockResolvedValue('success');
       const safeDefault = vi.fn().mockReturnValue('default');
       const safeFn = makeCompletelysafe(fn, safeDefault, 'test-fn');
-      
+
       const result = await safeFn('input');
-      
+
       expect(result).toBe('success');
       expect(fn).toHaveBeenCalledWith('input');
       expect(safeDefault).not.toHaveBeenCalled();
@@ -187,9 +173,9 @@ describe('Resilient Tool Wrappers', () => {
       const fn = vi.fn().mockRejectedValue(new Error('Function failed'));
       const safeDefault = vi.fn().mockReturnValue('safe result');
       const safeFn = makeCompletelysafe(fn, safeDefault, 'test-fn');
-      
+
       const result = await safeFn('input');
-      
+
       expect(result).toBe('safe result');
       expect(safeDefault).toHaveBeenCalledWith('input', 'Function failed');
     });
@@ -200,9 +186,9 @@ describe('Resilient Tool Wrappers', () => {
       });
       const safeDefault = vi.fn().mockReturnValue('safe result');
       const safeFn = makeCompletelysafe(fn, safeDefault, 'test-fn');
-      
+
       const result = await safeFn('input');
-      
+
       expect(result).toBe('safe result');
       expect(safeDefault).toHaveBeenCalled();
     });
@@ -218,9 +204,9 @@ describe('Resilient Tool Wrappers', () => {
     it('should register and retrieve tools', () => {
       const tool = vi.fn().mockResolvedValue('result');
       const safeDefault = vi.fn().mockReturnValue('default');
-      
+
       registry.register('test-tool', tool, safeDefault);
-      
+
       const retrievedTool = registry.get('test-tool');
       expect(retrievedTool).toBeDefined();
       expect(typeof retrievedTool).toBe('function');
@@ -230,10 +216,10 @@ describe('Resilient Tool Wrappers', () => {
       const tool1 = vi.fn();
       const tool2 = vi.fn();
       const safeDefault = vi.fn();
-      
+
       registry.register('tool1', tool1, safeDefault);
       registry.register('tool2', tool2, safeDefault);
-      
+
       const tools = registry.list();
       expect(tools).toContain('tool1');
       expect(tools).toContain('tool2');
@@ -248,12 +234,12 @@ describe('Resilient Tool Wrappers', () => {
     it('should execute registered tool safely', async () => {
       const tool = vi.fn().mockResolvedValue('success');
       const safeDefault = vi.fn().mockReturnValue('default');
-      
+
       registry.register('test-tool', tool, safeDefault);
-      
+
       const retrievedTool = registry.get('test-tool');
       const result = await retrievedTool!('test input');
-      
+
       expect(result).toBe('success');
       expect(tool).toHaveBeenCalledWith('test input');
     });
@@ -261,12 +247,12 @@ describe('Resilient Tool Wrappers', () => {
     it('should use safe default when registered tool fails', async () => {
       const tool = vi.fn().mockRejectedValue(new Error('Tool failed'));
       const safeDefault = vi.fn().mockReturnValue('safe result');
-      
+
       registry.register('test-tool', tool, safeDefault);
-      
+
       const retrievedTool = registry.get('test-tool');
       const result = await retrievedTool!('test input');
-      
+
       expect(result).toBe('safe result');
       expect(safeDefault).toHaveBeenCalledWith('test input', 'Tool failed');
     });

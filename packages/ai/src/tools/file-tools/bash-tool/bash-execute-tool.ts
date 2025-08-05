@@ -2,13 +2,13 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import type { DocsAgentContext } from '../../../context/docs-agent-context';
-import { DocsAgentContextKeys } from '../../../context/docs-agent-context';
-import { 
-  makeCompletelysafe,
+import {
   executeSandboxCommandSafely,
+  makeCompletelysafe,
   validateToolInput,
 } from '../../../agents/shared/resilient-tool-wrappers';
+import type { DocsAgentContext } from '../../../context/docs-agent-context';
+import { DocsAgentContextKeys } from '../../../context/docs-agent-context';
 
 const bashCommandSchema = z.object({
   command: z.string().describe('The bash command to execute'),
@@ -93,7 +93,7 @@ async function executeBashCommandsCore(
 /**
  * Fallback function for when everything fails
  */
-function createBashFallback(input: BashInput, error: string): BashOutput {  
+function createBashFallback(input: BashInput, error: string): BashOutput {
   return {
     results: input.commands.map((cmd) => ({
       command: cmd.command,
@@ -109,7 +109,10 @@ function createBashFallback(input: BashInput, error: string): BashOutput {
 /**
  * Wrapper to make executeBashCommandsCore compatible with makeCompletelysafe
  */
-const wrappedBashExecution = (params: { input: BashInput; runtimeContext: RuntimeContext<DocsAgentContext> }): Promise<BashOutput> => {
+const wrappedBashExecution = (params: {
+  input: BashInput;
+  runtimeContext: RuntimeContext<DocsAgentContext>;
+}): Promise<BashOutput> => {
   return executeBashCommandsCore(params.input, params.runtimeContext);
 };
 
@@ -118,7 +121,8 @@ const wrappedBashExecution = (params: { input: BashInput; runtimeContext: Runtim
  */
 const safeBashExecution = makeCompletelysafe(
   wrappedBashExecution,
-  (params: { input: BashInput; runtimeContext: RuntimeContext<DocsAgentContext> }, error: string) => createBashFallback(params.input, error),
+  (params: { input: BashInput; runtimeContext: RuntimeContext<DocsAgentContext> }, error: string) =>
+    createBashFallback(params.input, error),
   'bash-execute-tool'
 );
 
@@ -132,10 +136,9 @@ const executeBashCommands = wrapTraced(
       validateToolInput(inputSchema, input, 'execute-bash');
     } catch (validationError) {
       // Even validation errors are handled gracefully
-      const errorMessage = validationError instanceof Error 
-        ? validationError.message 
-        : String(validationError);
-      
+      const errorMessage =
+        validationError instanceof Error ? validationError.message : String(validationError);
+
       return createBashFallback(
         { commands: [] }, // Safe default
         `Input validation failed: ${errorMessage}`

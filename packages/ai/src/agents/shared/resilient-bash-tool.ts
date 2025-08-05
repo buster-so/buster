@@ -1,6 +1,6 @@
 /**
  * Resilient Bash Tool Implementation
- * 
+ *
  * This provides an extremely resilient version of the bash execution tool
  * that never throws exceptions and always returns a valid response.
  */
@@ -11,9 +11,9 @@ import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import type { DocsAgentContext } from '../../context/docs-agent-context';
 import { DocsAgentContextKeys } from '../../context/docs-agent-context';
-import { 
-  makeCompletelysafe,
+import {
   executeSandboxCommandSafely,
+  makeCompletelysafe,
   validateToolInput,
   withErrorRecovery,
 } from './resilient-tool-wrappers';
@@ -21,7 +21,10 @@ import {
 const bashCommandSchema = z.object({
   command: z.string().describe('The bash command to execute'),
   description: z.string().optional().describe('Description of what this command does'),
-  timeout: z.number().optional().describe('Timeout in milliseconds (currently not supported in sandbox)'),
+  timeout: z
+    .number()
+    .optional()
+    .describe('Timeout in milliseconds (currently not supported in sandbox)'),
 });
 
 const inputSchema = z.object({
@@ -94,12 +97,11 @@ async function executeBashCommandsCore(
 
     const results = await Promise.all(resultPromises);
     return { results };
-
   } catch (error) {
     // Fallback error handling - should never reach here due to safe wrappers
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ResilientBash] Unexpected error in core execution:', errorMessage);
-    
+
     return {
       results: commands.map((cmd) => ({
         command: cmd.command,
@@ -118,7 +120,7 @@ async function executeBashCommandsCore(
  */
 function createBashFallback(input: BashInput, error: string): BashOutput {
   console.warn('[ResilientBash] Using fallback due to error:', error);
-  
+
   return {
     results: input.commands.map((cmd) => ({
       command: cmd.command,
@@ -134,7 +136,10 @@ function createBashFallback(input: BashInput, error: string): BashOutput {
 /**
  * Wrapper to make executeBashCommandsCore compatible with makeCompletelysafe
  */
-const wrappedBashExecution = (params: { input: BashInput; runtimeContext: RuntimeContext<DocsAgentContext> }): Promise<BashOutput> => {
+const wrappedBashExecution = (params: {
+  input: BashInput;
+  runtimeContext: RuntimeContext<DocsAgentContext>;
+}): Promise<BashOutput> => {
   return executeBashCommandsCore(params.input, params.runtimeContext);
 };
 
@@ -143,7 +148,8 @@ const wrappedBashExecution = (params: { input: BashInput; runtimeContext: Runtim
  */
 const safeBashExecution = makeCompletelysafe(
   wrappedBashExecution,
-  (params: { input: BashInput; runtimeContext: RuntimeContext<DocsAgentContext> }, error: string) => createBashFallback(params.input, error),
+  (params: { input: BashInput; runtimeContext: RuntimeContext<DocsAgentContext> }, error: string) =>
+    createBashFallback(params.input, error),
   'resilient-bash'
 );
 
@@ -160,10 +166,9 @@ const executeResilientBashCommands = wrapTraced(
       validateToolInput(inputSchema, input, 'resilient-bash');
     } catch (validationError) {
       // Even validation errors are handled gracefully
-      const errorMessage = validationError instanceof Error 
-        ? validationError.message 
-        : String(validationError);
-      
+      const errorMessage =
+        validationError instanceof Error ? validationError.message : String(validationError);
+
       return createBashFallback(
         { commands: [] }, // Safe default
         `Input validation failed: ${errorMessage}`

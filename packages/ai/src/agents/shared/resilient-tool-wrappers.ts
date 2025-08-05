@@ -1,6 +1,6 @@
 /**
  * Resilient Tool Wrappers
- * 
+ *
  * This module provides wrapper functions that make tools extremely resilient
  * by ensuring they never throw exceptions that could terminate the agent.
  * Instead, tools return graceful error responses and continue operation.
@@ -9,13 +9,13 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
 import type { DocsAgentContext } from '../../context/docs-agent-context';
-import { 
+import {
+  type ResilientResult,
   createResilientWrapper,
-  withErrorRecovery,
+  safeJsonParse,
   sandboxCircuitBreaker,
   validateWithRecovery,
-  safeJsonParse,
-  type ResilientResult,
+  withErrorRecovery,
 } from './error-recovery';
 
 // Re-export withErrorRecovery for use in other files
@@ -66,7 +66,7 @@ export function createResilientBashTool() {
     {
       toolName: 'execute-bash',
       gracefulError: (input: BashInput, error: string): BashOutput => ({
-        results: input.commands.map(cmd => ({
+        results: input.commands.map((cmd) => ({
           command: cmd.command,
           stdout: '',
           stderr: `Tool error: ${error}`,
@@ -102,12 +102,14 @@ export function createResilientFileCreationTool() {
         }),
       ])
     ),
-    gitCommit: z.object({
-      attempted: z.boolean(),
-      success: z.boolean(),
-      commitHash: z.string().optional(),
-      errorMessage: z.string().optional(),
-    }).optional(),
+    gitCommit: z
+      .object({
+        attempted: z.boolean(),
+        success: z.boolean(),
+        commitHash: z.string().optional(),
+        errorMessage: z.string().optional(),
+      })
+      .optional(),
   });
 
   type FileCreationOutput = z.infer<typeof fileCreationOutputSchema>;
@@ -127,16 +129,18 @@ export function createResilientFileCreationTool() {
     {
       toolName: 'create-files',
       gracefulError: (input: FileCreationInput, error: string): FileCreationOutput => ({
-        results: input.files.map(file => ({
+        results: input.files.map((file) => ({
           status: 'error' as const,
           filePath: file.path,
           errorMessage: `File creation failed: ${error}`,
         })),
-        gitCommit: input.what_i_did ? {
-          attempted: false,
-          success: false,
-          errorMessage: `Git commit skipped due to file creation failure: ${error}`,
-        } : undefined,
+        gitCommit: input.what_i_did
+          ? {
+              attempted: false,
+              success: false,
+              errorMessage: `Git commit skipped due to file creation failure: ${error}`,
+            }
+          : undefined,
       }),
       retryOptions: {
         maxRetries: 2,
@@ -181,7 +185,7 @@ export function createResilientFileReadingTool() {
     {
       toolName: 'read-files',
       gracefulError: (input: FileReadingInput, error: string): FileReadingOutput => ({
-        results: input.filePaths.map(filePath => ({
+        results: input.filePaths.map((filePath) => ({
           status: 'error' as const,
           filePath,
           errorMessage: `File reading failed: ${error}`,
@@ -238,12 +242,14 @@ export function createResilientFileEditingTool() {
         }),
       ])
     ),
-    gitCommit: z.object({
-      attempted: z.boolean(),
-      success: z.boolean(),
-      commitHash: z.string().optional(),
-      errorMessage: z.string().optional(),
-    }).optional(),
+    gitCommit: z
+      .object({
+        attempted: z.boolean(),
+        success: z.boolean(),
+        commitHash: z.string().optional(),
+        errorMessage: z.string().optional(),
+      })
+      .optional(),
   });
 
   type FileEditingOutput = z.infer<typeof fileEditingOutputSchema>;
@@ -267,16 +273,18 @@ export function createResilientFileEditingTool() {
     {
       toolName: 'edit-files',
       gracefulError: (input: FileEditingInput, error: string): FileEditingOutput => ({
-        results: input.fileEdits.map(fileEdit => ({
+        results: input.fileEdits.map((fileEdit) => ({
           status: 'error' as const,
           filePath: fileEdit.filePath,
           errorMessage: `File editing failed: ${error}`,
         })),
-        gitCommit: input.what_i_did ? {
-          attempted: false,
-          success: false,
-          errorMessage: `Git commit skipped due to file editing failure: ${error}`,
-        } : undefined,
+        gitCommit: input.what_i_did
+          ? {
+              attempted: false,
+              success: false,
+              errorMessage: `Git commit skipped due to file editing failure: ${error}`,
+            }
+          : undefined,
       }),
       retryOptions: {
         maxRetries: 2,
@@ -324,7 +332,7 @@ export function createResilientFileListingTool() {
     {
       toolName: 'list-files',
       gracefulError: (input: FileListingInput, error: string): FileListingOutput => ({
-        results: input.directories.map(directory => ({
+        results: input.directories.map((directory) => ({
           status: 'error' as const,
           directory,
           errorMessage: `File listing failed: ${error}`,
@@ -340,7 +348,7 @@ export function createResilientFileListingTool() {
               return {
                 status: 'success' as const,
                 directory,
-                files: files.filter(f => !f.startsWith('.')), // Basic filtering
+                files: files.filter((f) => !f.startsWith('.')), // Basic filtering
                 totalFiles: files.length,
               };
             } catch (err) {
@@ -373,11 +381,11 @@ export async function executeSafelyInSandbox<T>(
 ): Promise<T> {
   // Use circuit breaker for sandbox operations
   const result = await sandboxCircuitBreaker.execute(operation);
-  
+
   if (result.success && result.data !== undefined) {
     return result.data;
   }
-  
+
   console.warn(`[SafeSandbox] ${context} failed: ${result.error}, using fallback`);
   return fallback();
 }
@@ -412,17 +420,13 @@ export async function executeSandboxCommandSafely(
 /**
  * Safe JSON parsing for sandbox results
  */
-export function parseSandboxResultSafely<T>(
-  result: string,
-  context: string,
-  fallback: T
-): T {
+export function parseSandboxResultSafely<T>(result: string, context: string, fallback: T): T {
   const parseResult = safeJsonParse<T>(result.trim());
-  
+
   if (parseResult.success && parseResult.data !== undefined) {
     return parseResult.data;
   }
-  
+
   console.warn(`[SafeParse] Failed to parse ${context}: ${parseResult.error}, using fallback`);
   return fallback;
 }
@@ -430,17 +434,13 @@ export function parseSandboxResultSafely<T>(
 /**
  * Validates tool input with recovery
  */
-export function validateToolInput<T>(
-  schema: z.ZodSchema<T>,
-  input: unknown,
-  toolName: string
-): T {
+export function validateToolInput<T>(schema: z.ZodSchema<T>, input: unknown, toolName: string): T {
   const validation = validateWithRecovery(schema, input, `${toolName} input`);
-  
+
   if (validation.success && validation.data !== undefined) {
     return validation.data;
   }
-  
+
   // Instead of throwing, return a safe default or throw a recoverable error
   const error = new Error(`[${toolName}] Invalid input: ${validation.error}`);
   error.name = 'ValidationError';
@@ -458,16 +458,12 @@ export function makeCompletelysafe<TInput, TOutput>(
 ): (input: TInput) => Promise<TOutput> {
   return async (input: TInput): Promise<TOutput> => {
     try {
-      const result = await withErrorRecovery(
-        () => fn(input),
-        undefined,
-        name
-      );
-      
+      const result = await withErrorRecovery(() => fn(input), undefined, name);
+
       if (result.success && result.data !== undefined) {
         return result.data;
       }
-      
+
       console.error(`[${name}] All recovery attempts failed: ${result.error}`);
       return safeDefault(input, result.error || 'Unknown error');
     } catch (error) {
@@ -484,7 +480,7 @@ export function makeCompletelysafe<TInput, TOutput>(
  */
 export class ResilientToolRegistry {
   private tools = new Map<string, any>();
-  
+
   register<TInput, TOutput>(
     name: string,
     originalTool: (input: TInput) => Promise<TOutput>,
@@ -493,11 +489,11 @@ export class ResilientToolRegistry {
     const safeTool = makeCompletelysafe(originalTool, safeDefault, name);
     this.tools.set(name, safeTool);
   }
-  
+
   get<TInput, TOutput>(name: string): ((input: TInput) => Promise<TOutput>) | undefined {
     return this.tools.get(name);
   }
-  
+
   list(): string[] {
     return Array.from(this.tools.keys());
   }

@@ -30,7 +30,14 @@ describe('getRepositoryTreeStep', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRuntimeContext = new RuntimeContext();
-    mockSandbox = { id: 'test-sandbox' } as Sandbox;
+    mockSandbox = {
+      id: 'test-sandbox',
+      process: {
+        executeCommand: vi.fn().mockResolvedValue({
+          result: '/test/directory',
+        }),
+      },
+    } as unknown as Sandbox;
   });
 
   it('should generate repository tree when sandbox is available', async () => {
@@ -75,17 +82,19 @@ describe('getRepositoryTreeStep', () => {
 
     const result = await getRepositoryTreeStep.execute(mockContext as any);
 
+    const expectedTreeOutput = `<YOU ARE HERE: /test/directory>\n\n${mockTreeOutput}`;
+    
     expect(result).toEqual({
       ...inputData,
-      repositoryTree: mockTreeOutput,
+      repositoryTree: expectedTreeOutput,
     });
 
     expect(getRepositoryTree).toHaveBeenCalledWith(mockSandbox, '.', {
       gitignore: true,
-      maxDepth: 5,
+      maxDepth: 10,
     });
 
-    expect(mockRuntimeContext.get('repositoryTree')).toBe(mockTreeOutput);
+    expect(mockRuntimeContext.get('repositoryTree')).toBe(expectedTreeOutput);
   });
 
   it('should return empty string when sandbox is not available', async () => {
@@ -230,9 +239,11 @@ describe('getRepositoryTreeStep', () => {
 
     const result = await getRepositoryTreeStep.execute(mockContext as any);
 
+    const expectedTreeOutput = `<YOU ARE HERE: /test/directory>\n\ntree output`;
+    
     expect(result).toEqual({
       ...inputData,
-      repositoryTree: 'tree output',
+      repositoryTree: expectedTreeOutput,
     });
 
     // Ensure all input data is preserved

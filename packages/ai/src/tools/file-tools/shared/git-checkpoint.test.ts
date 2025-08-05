@@ -11,6 +11,10 @@ vi.mock('@buster/sandbox', () => ({
 import { runTypescript } from '@buster/sandbox';
 
 describe('git-checkpoint', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   describe('hasSuccessfulOperations', () => {
     it('should return true if any operation has success status', () => {
       const results = [{ status: 'error' }, { status: 'success' }, { status: 'error' }];
@@ -98,6 +102,13 @@ describe('git-checkpoint', () => {
       mockRunTypescript.mockResolvedValueOnce({
         exitCode: 0,
         result: JSON.stringify({ success: true, commitHash: 'abc12345' }),
+        stderr: '',
+      });
+
+      // Mock git push
+      mockRunTypescript.mockResolvedValueOnce({
+        exitCode: 0,
+        result: JSON.stringify({ success: true, pushed: true, branch: 'main' }),
         stderr: '',
       });
 

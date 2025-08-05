@@ -2,18 +2,18 @@
  * Tests for Error Recovery Utilities
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  classifyError,
-  withRetry,
-  withErrorRecovery,
-  createResilientWrapper,
-  validateWithRecovery,
-  safeJsonParse,
   CircuitBreaker,
-  SafeOperations,
   type ErrorType,
   type ResilientResult,
+  SafeOperations,
+  classifyError,
+  createResilientWrapper,
+  safeJsonParse,
+  validateWithRecovery,
+  withErrorRecovery,
+  withRetry,
 } from './error-recovery';
 
 describe('Error Recovery Utilities', () => {
@@ -29,7 +29,7 @@ describe('Error Recovery Utilities', () => {
     it('should classify network errors correctly', () => {
       const error = new Error('ECONNREFUSED: Connection refused');
       const classification = classifyError(error);
-      
+
       expect(classification.type).toBe('NETWORK_ERROR');
       expect(classification.recoverable).toBe(true);
       expect(classification.strategy).toBe('RETRY_WITH_BACKOFF');
@@ -39,7 +39,7 @@ describe('Error Recovery Utilities', () => {
     it('should classify filesystem errors correctly', () => {
       const error = new Error('ENOENT: No such file or directory');
       const classification = classifyError(error);
-      
+
       expect(classification.type).toBe('FILESYSTEM_ERROR');
       expect(classification.recoverable).toBe(true);
       expect(classification.strategy).toBe('GRACEFUL_DEGRADATION');
@@ -48,7 +48,7 @@ describe('Error Recovery Utilities', () => {
     it('should classify sandbox errors correctly', () => {
       const error = new Error('Command failed with exit code 127');
       const classification = classifyError(error);
-      
+
       expect(classification.type).toBe('SANDBOX_ERROR');
       expect(classification.recoverable).toBe(true);
       expect(classification.strategy).toBe('RETRY_WITH_BACKOFF');
@@ -57,7 +57,7 @@ describe('Error Recovery Utilities', () => {
     it('should handle unknown errors with default classification', () => {
       const error = new Error('Unknown mysterious error');
       const classification = classifyError(error);
-      
+
       expect(classification.type).toBe('UNKNOWN_ERROR');
       expect(classification.recoverable).toBe(true);
       expect(classification.strategy).toBe('RETRY_WITH_BACKOFF');
@@ -66,7 +66,7 @@ describe('Error Recovery Utilities', () => {
 
     it('should handle string errors', () => {
       const classification = classifyError('ETIMEDOUT connection timeout');
-      
+
       expect(classification.type).toBe('TIMEOUT_ERROR');
       expect(classification.recoverable).toBe(true);
     });
@@ -75,9 +75,9 @@ describe('Error Recovery Utilities', () => {
   describe('withRetry', () => {
     it('should succeed on first attempt', async () => {
       const operation = vi.fn().mockResolvedValue('success');
-      
+
       const result = await withRetry(operation);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('success');
       expect(result.attemptCount).toBe(1);
@@ -85,13 +85,14 @@ describe('Error Recovery Utilities', () => {
     });
 
     it('should retry on failure and eventually succeed', async () => {
-      const operation = vi.fn()
+      const operation = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Temporary failure'))
         .mockRejectedValueOnce(new Error('Another failure'))
         .mockResolvedValue('success');
-      
+
       const result = await withRetry(operation, { maxRetries: 3 });
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('success');
       expect(result.attemptCount).toBe(3);
@@ -100,9 +101,9 @@ describe('Error Recovery Utilities', () => {
 
     it('should fail after max retries', async () => {
       const operation = vi.fn().mockRejectedValue(new Error('Persistent failure'));
-      
+
       const result = await withRetry(operation, { maxRetries: 2 });
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Persistent failure');
       expect(result.attemptCount).toBe(3); // Initial attempt + 2 retries
@@ -110,27 +111,29 @@ describe('Error Recovery Utilities', () => {
     });
 
     it('should call onRetry callback', async () => {
-      const operation = vi.fn()
+      const operation = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Failure'))
         .mockResolvedValue('success');
       const onRetry = vi.fn();
-      
+
       await withRetry(operation, { maxRetries: 2, onRetry });
-      
+
       expect(onRetry).toHaveBeenCalledTimes(1);
       expect(onRetry).toHaveBeenCalledWith(1, expect.any(Error));
     });
 
     it('should handle onRetry callback errors gracefully', async () => {
-      const operation = vi.fn()
+      const operation = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Failure'))
         .mockResolvedValue('success');
       const onRetry = vi.fn().mockImplementation(() => {
         throw new Error('Callback error');
       });
-      
+
       const result = await withRetry(operation, { maxRetries: 2, onRetry });
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('success');
     });
@@ -140,9 +143,9 @@ describe('Error Recovery Utilities', () => {
     it('should succeed with primary operation', async () => {
       const operation = vi.fn().mockResolvedValue('primary success');
       const fallback = vi.fn().mockResolvedValue('fallback success');
-      
+
       const result = await withErrorRecovery(operation, fallback, 'test-op');
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('primary success');
       expect(result.fallbackUsed).toBeUndefined();
@@ -152,9 +155,9 @@ describe('Error Recovery Utilities', () => {
     it('should use fallback when primary fails', async () => {
       const operation = vi.fn().mockRejectedValue(new Error('Primary failed'));
       const fallback = vi.fn().mockResolvedValue('fallback success');
-      
+
       const result = await withErrorRecovery(operation, fallback, 'test-op');
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('fallback success');
       expect(result.fallbackUsed).toBe(true);
@@ -164,18 +167,18 @@ describe('Error Recovery Utilities', () => {
     it('should fail when both primary and fallback fail', async () => {
       const operation = vi.fn().mockRejectedValue(new Error('Primary failed'));
       const fallback = vi.fn().mockRejectedValue(new Error('Fallback failed'));
-      
+
       const result = await withErrorRecovery(operation, fallback, 'test-op');
-      
+
       expect(result.success).toBe(false);
       expect(result.warnings).toContain('Fallback also failed: Fallback failed');
     });
 
     it('should work without fallback', async () => {
       const operation = vi.fn().mockRejectedValue(new Error('Operation failed'));
-      
+
       const result = await withErrorRecovery(operation, undefined, 'test-op');
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Operation failed');
     });
@@ -188,9 +191,9 @@ describe('Error Recovery Utilities', () => {
         toolName: 'test-tool',
         gracefulError: (input, error) => `error: ${error}`,
       });
-      
+
       const result = await wrapper('test input');
-      
+
       expect(result).toBe('tool result');
       expect(toolFunction).toHaveBeenCalledWith('test input');
     });
@@ -202,9 +205,9 @@ describe('Error Recovery Utilities', () => {
         toolName: 'test-tool',
         gracefulError,
       });
-      
+
       const result = await wrapper('test input');
-      
+
       expect(result).toBe('graceful result');
       expect(gracefulError).toHaveBeenCalledWith('test input', 'Tool failed');
     });
@@ -217,9 +220,9 @@ describe('Error Recovery Utilities', () => {
         fallback,
         gracefulError: (input, error) => `error: ${error}`,
       });
-      
+
       const result = await wrapper('test input');
-      
+
       expect(result).toBe('fallback result');
       expect(fallback).toHaveBeenCalledWith('test input');
     });
@@ -229,7 +232,7 @@ describe('Error Recovery Utilities', () => {
       const wrapper = createResilientWrapper(toolFunction, {
         toolName: 'test-tool',
       });
-      
+
       await expect(wrapper('test input')).rejects.toThrow('[test-tool] Operation failed');
     });
   });
@@ -239,10 +242,10 @@ describe('Error Recovery Utilities', () => {
       const mockSchema = {
         parse: vi.fn().mockReturnValue('parsed data'),
       };
-      
+
       const result = validateWithRecovery(mockSchema as any, { valid: 'data' }, 'test');
-      
-      expect(result.success).toBe(true);  
+
+      expect(result.success).toBe(true);
       expect(result.data).toBe('parsed data');
     });
 
@@ -252,9 +255,9 @@ describe('Error Recovery Utilities', () => {
           throw new Error('Validation failed');
         }),
       };
-      
+
       const result = validateWithRecovery(mockSchema as any, { invalid: 'data' }, 'test');
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toContain('Validation error');
       expect(result.errorType).toBe('INVALID_INPUT');
@@ -264,14 +267,14 @@ describe('Error Recovery Utilities', () => {
   describe('safeJsonParse', () => {
     it('should parse valid JSON', () => {
       const result = safeJsonParse('{"key": "value"}');
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toEqual({ key: 'value' });
     });
 
     it('should handle invalid JSON gracefully', () => {
       const result = safeJsonParse('invalid json');
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toContain('JSON parse failed');
       expect(result.errorType).toBe('INVALID_INPUT');
@@ -279,7 +282,7 @@ describe('Error Recovery Utilities', () => {
 
     it('should handle empty string', () => {
       const result = safeJsonParse('');
-      
+
       expect(result.success).toBe(false);
       expect(result.errorType).toBe('INVALID_INPUT');
     });
@@ -289,9 +292,9 @@ describe('Error Recovery Utilities', () => {
     it('should allow operations when closed', async () => {
       const breaker = new CircuitBreaker(3, 1000);
       const operation = vi.fn().mockResolvedValue('success');
-      
+
       const result = await breaker.execute(operation);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('success');
     });
@@ -299,14 +302,14 @@ describe('Error Recovery Utilities', () => {
     it('should open after threshold failures', async () => {
       const breaker = new CircuitBreaker(2, 1000);
       const operation = vi.fn().mockRejectedValue(new Error('Failed'));
-      
+
       // First two failures
       await breaker.execute(operation);
       await breaker.execute(operation);
-      
+
       // Third call should be blocked
       const result = await breaker.execute(operation);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toContain('Circuit breaker is OPEN');
       expect(operation).toHaveBeenCalledTimes(2);
@@ -314,19 +317,20 @@ describe('Error Recovery Utilities', () => {
 
     it('should transition to half-open after recovery time', async () => {
       const breaker = new CircuitBreaker(1, 10); // 10ms recovery time
-      const operation = vi.fn()
+      const operation = vi
+        .fn()
         .mockRejectedValueOnce(new Error('Failed'))
         .mockResolvedValue('success');
-      
+
       // Cause failure to open circuit
       await breaker.execute(operation);
-      
+
       // Wait for recovery time
-      await new Promise(resolve => setTimeout(resolve, 20));
-      
+      await new Promise((resolve) => setTimeout(resolve, 20));
+
       // Should now allow operation
       const result = await breaker.execute(operation);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toBe('success');
     });
