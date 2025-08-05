@@ -60,17 +60,72 @@ This is a pnpm-based monorepo using Turborepo with the following structure:
 - **Run quality checks while working**: Periodically run `turbo build:dry-run` and `turbo lint` to catch issues early
 - **Your primary job is the functional implementation**: Focus on accomplishing the task; the QA engineer specializes in comprehensive testing
 
+## Unit Testing Philosophy
+
+### Importance of Unit Tests
+- **Unit tests are critical** - Every function should be testable in isolation
+- **Small, focused tests** - Each test should verify one specific behavior
+- **Test file naming**: Unit tests use `.test.ts` extension, integration tests use `.int.test.ts`
+- **Default to unit tests** - Always write unit tests unless specifically asked for integration tests
+- **100% testability goal** - All code should be written to be testable in small chunks
+
+### Writing Testable Code
+- **Pure functions first** - Functions should have clear inputs and outputs
+- **Dependency injection** - Pass dependencies as parameters instead of importing directly
+- **Avoid side effects** - Separate business logic from I/O operations
+- **Small functions** - If a function is hard to test, it's probably doing too much
+- **Mockable boundaries** - Design interfaces that can be easily mocked in tests
+
+### Test Structure
+```typescript
+// Example of testable function design
+// Bad: Hard to test
+async function sendNotification(userId: string) {
+  const user = await db.getUser(userId); // Direct database dependency
+  const message = createMessage(user);
+  await emailService.send(message); // Direct service dependency
+}
+
+// Good: Easily testable
+async function sendNotification(
+  userId: string,
+  getUser: (id: string) => Promise<User>,
+  sendEmail: (message: Message) => Promise<void>
+) {
+  const user = await getUser(userId);
+  const message = createMessage(user);
+  await sendEmail(message);
+}
+
+// Unit test example (*.test.ts)
+describe('sendNotification', () => {
+  it('should send email with correct message', async () => {
+    const mockUser = { id: '123', name: 'Test User' };
+    const mockGetUser = vi.fn().mockResolvedValue(mockUser);
+    const mockSendEmail = vi.fn().mockResolvedValue(undefined);
+    
+    await sendNotification('123', mockGetUser, mockSendEmail);
+    
+    expect(mockGetUser).toHaveBeenCalledWith('123');
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: mockUser.email })
+    );
+  });
+});
+```
+
 ## Development Workflow
 
 When writing code, follow this workflow to ensure code quality:
 
 ### 1. Write Modular, Testable Functions
-- Create small, focused functions with single responsibilities
-- Design functions to be easily testable with clear inputs/outputs
-- Use dependency injection for external dependencies
+- **Create small, focused functions** with single responsibilities that can be unit tested effectively
+- **Design for testability** - Every function should have clear inputs/outputs and be testable in isolation
+- **Use dependency injection** - Pass dependencies as parameters to enable easy mocking in unit tests
 - **IMPORTANT: Write functional, composable code - avoid classes**
-- All features should be composed of testable functions
-- Follow existing patterns in the codebase
+- **All features must be composed of testable functions** - If you can't write a unit test for it, refactor it
+- **Follow existing patterns** in the codebase for consistency
+- **Remember**: Unit tests use `.test.ts`, integration tests use `.int.test.ts`
 
 ### 2. Build Features by Composing Functions
 - Combine modular functions to create complete features
@@ -287,16 +342,138 @@ export async function getWorkspaceSettingsHandler(
 - For update operations, we should almost always perform an upsert unless otherwise specified
 
 ## Test Running Guidelines
+- **Always default to unit tests** unless specifically asked for integration tests
+- **Test file naming conventions**:
+  - Unit tests: `*.test.ts` (e.g., `user.test.ts`)
+  - Integration tests: `*.int.test.ts` (e.g., `user.int.test.ts`)
 - When running tests, use the following Turbo commands:
-  - `turbo test:unit` for unit tests
-  - `turbo test:integration` for integration tests
+  - `turbo test:unit` for unit tests (run these frequently during development)
+  - `turbo test:integration` for integration tests (run sparingly, only when needed)
   - `turbo test` for running all tests
+- **Unit tests should be fast** - If a test takes more than a few milliseconds, it might be an integration test
 
 ## Pre-Completion Workflow
 - Run `turbo build:dry-run lint` during development to ensure type safety and code quality
 - The qa-test-engineer agent will handle comprehensive testing before PRs
 - Update task status and documentation in `.claude/tasks/` files
 - Coordinate with the monorepo-task-planner for any requirement changes
+
+## Ink CLI Component Development
+
+### Overview
+Ink is a React-based framework for building command-line interfaces. We use Ink v6.1.0 (latest stable) which requires Node.js 20+ and React 19.
+
+### Core Concepts
+- **React for CLIs**: Build CLI output using React components
+- **Flexbox Layout**: Uses Yoga layout engine for terminal layouts
+- **Component-based**: All UI is built with components like `<Box>` and `<Text>`
+
+### Component Structure
+- **All text must be wrapped in `<Text>` components**
+- **`<Box>` is the fundamental container** - works like a flex container
+- **Use flexbox properties** for layout (flexDirection, justifyContent, alignItems)
+- **Style through props** - color, backgroundColor, bold, italic, etc.
+
+### Key APIs and Hooks
+- `render()` - Display components in the terminal
+- `useState()` - Manage component state
+- `useEffect()` - Handle side effects and lifecycle
+- `useInput()` - Capture and handle user keyboard input
+- `useFocus()` - Manage focus between components
+- `useStdout()` - Direct access to stdout stream
+- `useStderr()` - Direct access to stderr stream
+
+### Component Best Practices
+```typescript
+import React, { useState, useEffect } from 'react';
+import { render, Box, Text } from 'ink';
+
+// Example: Progress indicator component
+const ProgressIndicator = ({ total, current }: { total: number; current: number }) => {
+  const percentage = Math.round((current / total) * 100);
+  
+  return (
+    <Box flexDirection="column">
+      <Text color="green">Progress: {percentage}%</Text>
+      <Box width={50}>
+        <Text>{`[${'='.repeat(percentage / 2).padEnd(50, ' ')}]`}</Text>
+      </Box>
+    </Box>
+  );
+};
+
+// Example: Interactive menu component
+const Menu = ({ items }: { items: string[] }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  useInput((input, key) => {
+    if (key.upArrow && selectedIndex > 0) {
+      setSelectedIndex(selectedIndex - 1);
+    }
+    if (key.downArrow && selectedIndex < items.length - 1) {
+      setSelectedIndex(selectedIndex + 1);
+    }
+  });
+  
+  return (
+    <Box flexDirection="column">
+      {items.map((item, index) => (
+        <Text key={item} color={index === selectedIndex ? 'green' : 'white'}>
+          {index === selectedIndex ? '> ' : '  '}{item}
+        </Text>
+      ))}
+    </Box>
+  );
+};
+```
+
+### Styling Guidelines
+- **Text formatting**: Use props like `bold`, `italic`, `underline`, `strikethrough`
+- **Colors**: Use `color` prop with color names or hex values
+- **Background**: Use `backgroundColor` prop on Box components (v6.1.0+)
+- **Dimensions**: Control with `width`, `height`, `minWidth`, `minHeight`
+- **Spacing**: Use `margin`, `padding`, `gap` props
+- **Text wrapping**: Use `wrap` prop on Text components
+
+### TypeScript Support
+```typescript
+import type { FC } from 'react';
+import { Box, Text } from 'ink';
+
+interface StatusMessageProps {
+  status: 'success' | 'error' | 'warning';
+  message: string;
+}
+
+const StatusMessage: FC<StatusMessageProps> = ({ status, message }) => {
+  const colors = {
+    success: 'green',
+    error: 'red',
+    warning: 'yellow'
+  };
+  
+  return (
+    <Box>
+      <Text color={colors[status]} bold>
+        {status.toUpperCase()}:
+      </Text>
+      <Text> {message}</Text>
+    </Box>
+  );
+};
+```
+
+### Testing Ink Components
+- Use `ink-testing-library` for testing
+- Test component output and interactions
+- Mock terminal dimensions for consistent tests
+
+### Common Patterns
+1. **Loading states**: Use spinners from `ink-spinner`
+2. **Forms**: Use `ink-text-input` for text input
+3. **Tables**: Use `ink-table` for tabular data
+4. **Links**: Use `ink-link` for clickable URLs
+5. **Progress**: Use `ink-progress-bar` for progress indicators
 
 ## Local Development
 
