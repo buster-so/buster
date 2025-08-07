@@ -1,4 +1,3 @@
-import { ReportElementsSchema } from '@buster/database';
 import { AutoformatPlugin } from '@platejs/autoformat';
 import {
   BaseBasicBlocksPlugin,
@@ -50,19 +49,6 @@ const serverNode = [
   MarkdownPlugin,
 ];
 
-const SERVER_EDITOR = createSlateEditor({
+export const SERVER_EDITOR = createSlateEditor({
   plugins: serverNode,
 });
-
-export const markdownToPlatejs = async (markdown: string) => {
-  const descendants = SERVER_EDITOR.api.markdown.deserialize(markdown);
-
-  const safeParsedElements = ReportElementsSchema.safeParse(descendants);
-
-  return {
-    error: safeParsedElements.error,
-    elements: safeParsedElements.data,
-    descendants,
-    markdown,
-  };
-};

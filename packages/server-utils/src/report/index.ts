@@ -1,2 +1,2 @@
-export { markdownToPlatejs } from './markdown-to-platejs';
+export { markdownToPlatejs } from './platejs-conversions';
 export { MarkdownPlugin } from './MarkdownPlugin';

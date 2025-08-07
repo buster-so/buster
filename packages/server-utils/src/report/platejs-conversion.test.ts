@@ -1,5 +1,6 @@
+import type { ReportElements } from '@buster/database';
 import { describe, expect, it } from 'vitest';
-import { markdownToPlatejs } from './markdown-to-platejs';
+import { markdownToPlatejs, platejsToMarkdown } from './platejs-conversions';
 
 describe('markdownToPlatejs', () => {
   it('should convert elaborate markdown to platejs', async () => {
@@ -69,5 +70,78 @@ Here's an unordered list:
 * Nested item 2`;
     const platejs = await markdownToPlatejs(markdown);
     expect(platejs).toBeDefined();
+  });
+});
+
+describe('platejsToMarkdown', () => {
+  it('should convert platejs to markdown', async () => {
+    const markdown = `This is a simple paragraph.\n`;
+    const elements: ReportElements = [
+      {
+        type: 'p',
+        children: [
+          {
+            text: 'This is a simple paragraph.',
+          },
+        ],
+      },
+    ];
+    const markdown2 = await platejsToMarkdown(elements);
+    expect(markdown2).toBe(markdown);
+  });
+
+  it('should convert callout platejs element to markdown', async () => {
+    const elements: ReportElements = [
+      {
+        type: 'h1',
+        children: [
+          {
+            text: 'Main Title',
+          },
+        ],
+      },
+      {
+        type: 'p',
+        children: [
+          {
+            text: 'This paragraph has ',
+          },
+          {
+            text: 'bold text',
+            bold: true,
+          },
+          {
+            text: ' in it.',
+          },
+        ],
+      },
+    ];
+    const markdown2 = await platejsToMarkdown(elements);
+    const markdown = `# Main Title\n\nThis paragraph has **bold text** in it.\n`;
+    expect(markdown2).toBe(markdown);
+  });
+
+  it('should convert callout platejs element to markdown', async () => {
+    const elements: ReportElements = [
+      {
+        type: 'callout',
+        icon: '⚠️',
+        variant: 'warning',
+        children: [
+          {
+            type: 'p' as const,
+            children: [
+              {
+                text: 'This is a simple paragraph.',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const markdownFromPlatejs = await platejsToMarkdown(elements);
+
+    const expectedMarkdown = `<callout icon="⚠️">This is a simple paragraph.\n</callout>\n`;
+    expect(markdownFromPlatejs).toBe(expectedMarkdown);
   });
 });

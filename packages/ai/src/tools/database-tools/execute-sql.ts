@@ -377,10 +377,10 @@ async function executeSingleStatement(
     };
   }
 
-  // Attempt execution with retries
+  // Attempt execution with retries and cancellation support
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      // Execute the SQL query using the DataSource with timeout
+      // Execute the SQL query using the DataSource with timeout and cancellation
       // Pass maxRows to the adapter instead of modifying the SQL
       const result = await dataSource.execute({
         sql: sqlStatement,
@@ -397,11 +397,21 @@ async function executeSingleStatement(
         };
       }
 
-      // Check if error is timeout-related
+      // Check if error is timeout-related or cancellation-related
       const errorMessage = result.error?.message || 'Query execution failed';
       const isTimeout =
         errorMessage.toLowerCase().includes('timeout') ||
         errorMessage.toLowerCase().includes('timed out');
+      const isCancelled =
+        errorMessage.toLowerCase().includes('cancel') ||
+        errorMessage.toLowerCase().includes('cancelled');
+
+      if (isCancelled) {
+        return {
+          success: false,
+          error: 'Query was cancelled',
+        };
+      }
 
       if (isTimeout && attempt < MAX_RETRIES) {
         // Wait before retry
@@ -428,6 +438,16 @@ async function executeSingleStatement(
       const isTimeout =
         errorMessage.toLowerCase().includes('timeout') ||
         errorMessage.toLowerCase().includes('timed out');
+      const isCancelled =
+        errorMessage.toLowerCase().includes('cancel') ||
+        errorMessage.toLowerCase().includes('cancelled');
+
+      if (isCancelled) {
+        return {
+          success: false,
+          error: 'Query was cancelled',
+        };
+      }
 
       if (isTimeout && attempt < MAX_RETRIES) {
         // Wait before retry
