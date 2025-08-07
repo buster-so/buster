@@ -16,7 +16,11 @@ import { configureMonacoToUseYaml } from './yamlHelper';
 //import NightOwnTheme from 'monaco-themes/themes/Night Owl.json';
 //https://github.com/brijeshb42/monaco-ace-tokenizer
 
-import { Editor } from '@monaco-editor/react';
+import dynamic from 'next/dynamic';
+const Editor = dynamic(() => import('@monaco-editor/react').then((m) => m.Editor), {
+  ssr: false,
+  loading: () => null
+});
 import { useTheme } from 'next-themes';
 
 interface AppCodeEditorProps {

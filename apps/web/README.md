@@ -34,3 +34,25 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Profiling memory and bundles
+
+- Development without Turbopack (can reduce baseline RAM):
+
+```bash
+pnpm --filter @buster-app/web dev:no-turbo
+```
+
+- Start with Node inspector and higher old space to capture heap snapshots:
+
+```bash
+pnpm --filter @buster-app/web build && pnpm --filter @buster-app/web start:inspect
+# open chrome://inspect and take heap snapshots at startup and after actions
+```
+
+- Analyze client/server bundles:
+
+```bash
+pnpm --filter @buster-app/web build:analyze
+# then open .next/analyze/client.html and server.html
+```

@@ -72,12 +72,8 @@ export const getCodeTokens = async (
   });
 };
 
-// Pre-initialize highlighter on module load for better performance
-if (typeof window !== 'undefined') {
-  initializeHighlighter().catch((error) => {
-    console.warn('Failed to pre-initialize syntax highlighter:', error);
-  });
-}
+// Note: Do not pre-initialize on module load to keep initial memory low. Highlighter will
+// initialize on first use via getHighlightedCode/getCodeTokens.
 
 export const getFallbackStyle = (isDarkMode: boolean) => {
   return {

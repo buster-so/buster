@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbo",
+    "dev:no-turbo": "NEXT_TELEMETRY_DISABLED=1 next dev",
     "build": "next build",
     "start": "next start",
+    "start:inspect": "NODE_OPTIONS='--inspect --max-old-space-size=4096' next start",
+    "build:analyze": "ANALYZE=true next build",
     "lint": "next lint && npx prettier --write . '!src/components/ui/icons/**' --log-level error",
     "lint:eslint": "eslint .",
     "lint:ci": "npm run lint && npm run typecheck",

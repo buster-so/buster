@@ -5,7 +5,6 @@ import type { UseSupabaseUserContextType } from '@/lib/supabase';
 import { BusterAssetsProvider } from './Assets/BusterAssetsProvider';
 import { AppLayoutProvider } from './BusterAppLayout';
 import { BusterReactQueryProvider } from './BusterReactQuery/BusterReactQueryAndApi';
-import { BusterWebSocketProvider } from './BusterWebSocket';
 import { BusterNewChatProvider } from './Chats';
 import { BusterPosthogProvider } from './Posthog';
 import { RoutePrefetcher } from './RoutePrefetcher';
@@ -24,6 +23,7 @@ export const AppProviders: React.FC<
     queryClient: QueryClient;
   }>
 > = ({ children, queryClient, supabaseContext }) => {
+  const enableRoutePrefetch = process.env.NEXT_PUBLIC_ENABLE_ROUTE_PREFETCH !== 'false';
   return (
     <SupabaseContextProvider supabaseContext={supabaseContext}>
       <BusterReactQueryProvider>
@@ -33,7 +33,7 @@ export const AppProviders: React.FC<
               <BusterAssetsProvider>
                 <BusterNewChatProvider>
                   <BusterPosthogProvider>{children}</BusterPosthogProvider>
-                  <RoutePrefetcher />
+                  {enableRoutePrefetch && <RoutePrefetcher />}
                 </BusterNewChatProvider>
               </BusterAssetsProvider>
             </BusterUserConfigProvider>
