@@ -46,7 +46,11 @@ export const RoutePrefetcher: React.FC = React.memo(() => {
   const isPreFetchedHighPriorityRef = useRef(false);
   const isPreFetchedLowPriorityRef = useRef(false);
 
+  const ENABLE_PREFETCH = process.env.NEXT_PUBLIC_ENABLE_PREFETCH === 'true';
+
   useAsyncEffect(async () => {
+    if (!ENABLE_PREFETCH) return;
+
     const prefetchRoutes = async (
       routes: BusterRoutes[],
       prefetchFns: typeof LOW_PRIORITY_PREFETCH,
@@ -71,11 +75,18 @@ export const RoutePrefetcher: React.FC = React.memo(() => {
       }
     };
 
+    await new Promise((resolve) => {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(resolve, { timeout: 2000 });
+      } else {
+        setTimeout(resolve, 1500);
+      }
+    });
+
     if (!isPreFetchedHighPriorityRef.current) {
       prefetchRoutes(HIGH_PRIORITY_ROUTES, [], 'high');
     }
 
-    // Wait for page load
     if (document.readyState !== 'complete') {
       await Promise.race([
         new Promise((resolve) => {
@@ -85,37 +96,31 @@ export const RoutePrefetcher: React.FC = React.memo(() => {
       ]);
     }
 
-    // Setup network activity monitoring
+    const scheduleLow = () => prefetchRoutes(LOW_PRIORITY_ROUTES, LOW_PRIORITY_PREFETCH, 'low');
+
     let fallbackTimer: NodeJS.Timeout;
-    const observer = new PerformanceObserver((list) => {
-      // Clear any existing debounce timer
+    const observer = new PerformanceObserver(() => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-
-      // Set a new debounce timer - will trigger if no network activity for 1500ms
       debounceTimerRef.current = setTimeout(() => {
-        prefetchRoutes(LOW_PRIORITY_ROUTES, LOW_PRIORITY_PREFETCH, 'low');
+        scheduleLow();
         observer.disconnect();
       }, 1000);
     });
 
     try {
       observer.observe({ entryTypes: ['resource'] });
-
-      // Fallback - ensure prefetch happens even if network is already quiet
-      fallbackTimer = setTimeout(() => {
-        prefetchRoutes(LOW_PRIORITY_ROUTES, LOW_PRIORITY_PREFETCH, 'low');
-        observer.disconnect();
-      }, 3000);
-    } catch (error) {
-      console.error('Failed to setup PerformanceObserver:', error);
-      observer.disconnect();
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(scheduleLow, { timeout: 4000 });
+      } else {
+        fallbackTimer = setTimeout(scheduleLow, 4000);
+      }
+    } catch {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-      // Still prefetch low priority routes as fallback
-      prefetchRoutes(LOW_PRIORITY_ROUTES, LOW_PRIORITY_PREFETCH, 'low');
+      scheduleLow();
     }
 
     return () => {

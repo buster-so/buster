@@ -72,12 +72,6 @@ export const getCodeTokens = async (
   });
 };
 
-// Pre-initialize highlighter on module load for better performance
-if (typeof window !== 'undefined') {
-  initializeHighlighter().catch((error) => {
-    console.warn('Failed to pre-initialize syntax highlighter:', error);
-  });
-}
 
 export const getFallbackStyle = (isDarkMode: boolean) => {
   return {

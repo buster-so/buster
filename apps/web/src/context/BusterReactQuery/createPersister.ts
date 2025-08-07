@@ -6,7 +6,7 @@ import packageJson from '../../../package.json';
 
 const buster = packageJson.version;
 
-export const PERSIST_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
+export const PERSIST_TIME = 1000 * 60 * 60 * 24; // 1 day
 
 export const PERSISTED_QUERIES = [queryKeys.slackGetChannels.queryKey].map(hashKey);
 
@@ -42,9 +42,8 @@ export const persistOptions: PersistQueryClientProviderProps['persistOptions'] =
   maxAge: PERSIST_TIME,
   dehydrateOptions: {
     shouldDehydrateQuery: (query) => {
-      const isList =
-        query.queryKey[1] === 'list' || query.queryKey[query.queryKey.length - 1] === 'list';
-      return isList || ALL_PERSISTED_QUERIES.includes(query.queryHash);
+      const isAllowed = ALL_PERSISTED_QUERIES.includes(query.queryHash);
+      return isAllowed;
     }
   },
   hydrateOptions: {
