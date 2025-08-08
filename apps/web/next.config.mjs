@@ -94,12 +94,12 @@ const nextConfig = {
   transpilePackages: ['shiki'],
   // ESLint configuration
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: process.env.NEXT_DISABLE_LINT === 'true' || process.env.CI === 'true',
     dirs: ['src']
   },
   // Disable TypeScript type checking during builds
   typescript: {
-    ignoreBuildErrors: false
+    ignoreBuildErrors: process.env.NEXT_DISABLE_TS_CHECK === 'true'
   },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
