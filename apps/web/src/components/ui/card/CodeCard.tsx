@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
+import { DynamicAppCodeEditor as AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor/DynamicAppCodeEditor';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import { Button } from '../buttons/Button';

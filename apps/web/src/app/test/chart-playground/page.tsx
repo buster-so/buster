@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
+import { DynamicAppCodeEditor as AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor/DynamicAppCodeEditor';
 import { yamlToJson } from '@/lib/yaml-to-json';
 import { useRunSQL } from '@/api/buster_rest/sql/queryRequests';
-import { BusterChart } from '@/components/ui/charts/BusterChart';
+import { BusterChartDynamic } from '@/components/ui/charts/BusterChartDynamic';
 import {
   ChartConfigPropsSchema,
   type ChartConfigProps,
@@ -232,7 +232,7 @@ export default function ChartPlayground() {
               <h4 className="text-sm font-semibold text-green-800">Chart Ready</h4>
             </div>
             <div className="rounded-lg bg-white p-4 shadow-sm">
-              <BusterChart {...chartConfig} data={data} columnMetadata={columnMetadata} />
+              <BusterChartDynamic {...chartConfig} data={data} columnMetadata={columnMetadata} />
             </div>
           </div>
         )}

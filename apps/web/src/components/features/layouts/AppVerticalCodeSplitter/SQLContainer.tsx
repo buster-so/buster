@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/buttons/Button';
 import { FileCard } from '@/components/ui/card/FileCard';
 import { ErrorClosableContainer } from '@/components/ui/error/ErrorClosableContainer';
 import { Command, ReturnKey } from '@/components/ui/icons';
-import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
+import { DynamicAppCodeEditor as AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor/DynamicAppCodeEditor';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import type { AppVerticalCodeSplitterProps } from './AppVerticalCodeSplitter';

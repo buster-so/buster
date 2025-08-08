@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/buttons';
 import { Card, CardContent, CardHeader } from '@/components/ui/card/CardBase';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { CircleQuestion, Dots, EditSquare, Trash } from '@/components/ui/icons';
-import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
+import { DynamicAppCodeEditor as AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor/DynamicAppCodeEditor';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
 import { Text } from '@/components/ui/typography';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
