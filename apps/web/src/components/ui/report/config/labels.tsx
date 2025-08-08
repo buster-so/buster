@@ -312,6 +312,11 @@ export const NodeTypeLabels = {
     keyboard: undefined,
     keywords: []
   },
+  editMetric: {
+    label: 'Edit metric',
+    keyboard: undefined,
+    keywords: []
+  },
   caption: {
     label: 'Caption',
     keyboard: undefined,
