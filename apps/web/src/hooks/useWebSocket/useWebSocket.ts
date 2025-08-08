@@ -22,6 +22,7 @@ interface QueuedMessage {
 }
 
 const BASE_DELAY = 3000;
+const MAX_QUEUE_LENGTH = 5000;
 
 const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSocketHookProps) => {
   const { online } = useNetwork();
@@ -116,6 +117,11 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
       };
 
       messageQueue.current.push(queuedMessage);
+
+      // Bound the queue length to prevent unbounded memory growth
+      if (messageQueue.current.length > MAX_QUEUE_LENGTH) {
+        messageQueue.current.splice(0, messageQueue.current.length - MAX_QUEUE_LENGTH);
+      }
 
       if (!processing.current) {
         processQueue();
@@ -223,6 +229,15 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
   useWindowFocus(() => {
     handleVisibilityChange();
   });
+
+  // Cleanup on unmount: close socket and clear queues
+  useEffect(() => {
+    return () => {
+      disconnect();
+      messageQueue.current = [];
+      sendQueue.current = [];
+    };
+  }, [disconnect]);
 
   return {
     sendJSONMessage,
