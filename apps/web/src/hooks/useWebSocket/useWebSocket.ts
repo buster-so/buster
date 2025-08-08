@@ -221,6 +221,16 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
   });
 
   useWindowFocus(() => {
+  useEffect(() => {
+    return () => {
+      try {
+        ws.current?.close();
+      } catch {}
+      messageQueue.current = [];
+      sendQueue.current = [];
+      processing.current = false;
+    };
+  }, []);
     handleVisibilityChange();
   });
 
