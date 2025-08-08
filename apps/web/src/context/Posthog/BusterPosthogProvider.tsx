@@ -12,13 +12,13 @@ import type { Team } from '@buster/server-shared/teams';
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const DEBUG_POSTHOG = false;
 
-export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {
+export const BusterPosthogProvider: React.FC<PropsWithChildren> = ({ children }) => {
   if ((isDev && !DEBUG_POSTHOG) || !POSTHOG_KEY) {
     return <>{children}</>;
   }
 
   return <PosthogWrapper>{children}</PosthogWrapper>;
-});
+};
 BusterPosthogProvider.displayName = 'BusterPosthogProvider';
 
 const options: Partial<PostHogConfig> = {

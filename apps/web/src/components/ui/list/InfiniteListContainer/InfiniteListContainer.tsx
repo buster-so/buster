@@ -5,7 +5,7 @@ export const InfiniteListContainer: React.FC<{
   children: React.ReactNode;
   popupNode?: React.ReactNode;
   showContainerBorder?: boolean;
-}> = React.memo(({ children, popupNode, showContainerBorder = true }) => {
+}> = ({ children, popupNode, showContainerBorder = true }) => {
   return (
     <div className={cn('overflow-hidden', showContainerBorder && 'border-border rounded border')}>
       {children}
@@ -17,6 +17,6 @@ export const InfiniteListContainer: React.FC<{
       )}
     </div>
   );
-});
+};
 
 InfiniteListContainer.displayName = 'InfiniteListContainer';

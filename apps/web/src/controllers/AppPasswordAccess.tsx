@@ -13,7 +13,7 @@ export const AppPasswordAccess: React.FC<{
   assetId: string;
   type: ShareAssetType;
   children: React.ReactNode;
-}> = React.memo(({ children, assetId, type }) => {
+}> = ({ children, assetId, type }) => {
   const getAssetPassword = useBusterAssetsContextSelector((state) => state.getAssetPassword);
   const { password, error } = getAssetPassword(assetId);
 
@@ -24,7 +24,7 @@ export const AppPasswordAccess: React.FC<{
   return (
     <AppPasswordInputComponent password={password} error={error} assetId={assetId} type={type} />
   );
-});
+};
 
 AppPasswordAccess.displayName = 'AppPasswordAccess';
 

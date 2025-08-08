@@ -20,49 +20,44 @@ export interface TooltipProps
   contentClassName?: string;
 }
 
-export const Tooltip = React.memo(
-  React.forwardRef<HTMLSpanElement, TooltipProps>(
-    (
-      {
-        children,
-        title,
-        sideOffset,
-        shortcuts,
-        delayDuration = 0,
-        skipDelayDuration,
-        align,
-        side,
-        open,
-        triggerClassName,
-        contentClassName
-      },
-      ref
-    ) => {
-      if (!title || (!title && !shortcuts?.length)) return children;
+export const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(
+  (
+    {
+      children,
+      title,
+      sideOffset,
+      shortcuts,
+      delayDuration = 0,
+      skipDelayDuration,
+      align,
+      side,
+      open,
+      triggerClassName,
+      contentClassName
+    },
+    ref
+  ) => {
+    if (!title || (!title && !shortcuts?.length)) return children;
 
-      return (
-        <TooltipBase
-          open={open}
-          delayDuration={delayDuration}
-          skipDelayDuration={skipDelayDuration}>
-          <TooltipTrigger asChild>
-            <span ref={ref} className={triggerClassName}>
-              {children}
-            </span>
-          </TooltipTrigger>
-          <TooltipContentBase
-            align={align}
-            side={side}
-            sideOffset={sideOffset}
-            className={contentClassName}>
-            <TooltipContent title={title} shortcut={shortcuts} />
-          </TooltipContentBase>
-        </TooltipBase>
-      );
-    }
-  ),
-  (prevProps, nextProps) => {
-    return omit(prevProps, 'shortcut') === omit(nextProps, 'shortcut');
+    return (
+      <TooltipBase
+        open={open}
+        delayDuration={delayDuration}
+        skipDelayDuration={skipDelayDuration}>
+        <TooltipTrigger asChild>
+          <span ref={ref} className={triggerClassName}>
+            {children}
+          </span>
+        </TooltipTrigger>
+        <TooltipContentBase
+          align={align}
+          side={side}
+          sideOffset={sideOffset}
+          className={contentClassName}>
+          <TooltipContent title={title} shortcut={shortcuts} />
+        </TooltipContentBase>
+      </TooltipBase>
+    );
   }
 );
 

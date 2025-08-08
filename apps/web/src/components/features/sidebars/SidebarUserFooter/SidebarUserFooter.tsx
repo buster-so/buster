@@ -86,7 +86,7 @@ const topItems: DropdownProps['items'] = [
 const SidebarUserDropdown: React.FC<{
   children: React.ReactNode;
   signOut: () => void;
-}> = React.memo(({ children, signOut }) => {
+}> = ({ children, signOut }) => {
   const onOpenContactSupportModal = useContactSupportModalStore((s) => s.onOpenContactSupportModal);
 
   const allItems: DropdownProps['items'] = useMemo(() => {
@@ -127,6 +127,6 @@ const SidebarUserDropdown: React.FC<{
       {children}
     </Dropdown>
   );
-});
+};
 
 SidebarUserDropdown.displayName = 'SidebarUserDropdown';

@@ -15,7 +15,7 @@ import { CHAT_HEADER_TITLE_ID } from '../ChatHeaderTitle';
 
 export const ChatContainerHeaderDropdown: React.FC<{
   children: React.ReactNode;
-}> = React.memo(({ children }) => {
+}> = ({ children }) => {
   const { openSuccessMessage } = useBusterNotifications();
   const chatId = useChatIndividualContextSelector((state) => state.chatId);
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
@@ -117,6 +117,6 @@ export const ChatContainerHeaderDropdown: React.FC<{
       {chatId ? children : null}
     </Dropdown>
   );
-});
+};
 
 ChatContainerHeaderDropdown.displayName = 'ChatContainerHeaderDropdown';

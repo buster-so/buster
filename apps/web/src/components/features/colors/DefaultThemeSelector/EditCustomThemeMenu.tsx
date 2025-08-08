@@ -5,7 +5,7 @@ import { NewThemePopup } from './NewThemePopup';
 import { useAddTheme } from './AddThemeProviderWrapper';
 
 export const EditCustomThemeMenu: React.FC<PropsWithChildren<{ theme: IColorPalette }>> =
-  React.memo(({ theme, children }) => {
+  ({ theme, children }) => {
     const { deleteCustomTheme, modifyCustomTheme } = useAddTheme();
 
     const onSave = useMemoizedFn((theme: IColorPalette) => {
@@ -25,6 +25,6 @@ export const EditCustomThemeMenu: React.FC<PropsWithChildren<{ theme: IColorPale
         {children}
       </NewThemePopup>
     );
-  });
+  };
 
 EditCustomThemeMenu.displayName = 'EditCustomThemeMenu';

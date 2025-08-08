@@ -11,12 +11,12 @@ const displayAnimation = {
 export const HideButtonContainer: React.FC<{
   children: React.ReactNode;
   show: boolean;
-}> = React.memo(({ children, show }) => {
+}> = ({ children, show }) => {
   return (
     <AnimatePresence mode="wait" initial={false}>
       {show && <motion.div {...displayAnimation}>{children}</motion.div>}
     </AnimatePresence>
   );
-});
+};
 
 HideButtonContainer.displayName = 'HideButtonContainer';

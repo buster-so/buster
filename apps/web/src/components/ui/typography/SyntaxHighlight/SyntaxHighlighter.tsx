@@ -8,7 +8,7 @@ import { animations, type MarkdownAnimation } from '../animation-common';
 import type { ThemedToken } from 'shiki';
 import { useCodeTokens } from './useCodeTokens';
 
-export const SyntaxHighlighter = React.memo(
+export const SyntaxHighlighter = (
   ({
     children,
     language = 'sql',

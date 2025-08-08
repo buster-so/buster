@@ -29,7 +29,7 @@ export const PermissionAssignedCell: React.FC<{
   assigned: boolean;
   onSelect: (params: { id: string; assigned: boolean }) => Promise<void>;
   children?: React.ReactNode;
-}> = React.memo(({ id, text = 'included', assigned, onSelect, children }) => {
+}> = ({ id, text = 'included', assigned, onSelect, children }) => {
   const assignedValue = assigned ? 'true' : 'false';
 
   return (
@@ -50,6 +50,6 @@ export const PermissionAssignedCell: React.FC<{
       />
     </div>
   );
-});
+};
 
 PermissionAssignedCell.displayName = 'PermissionAssignedCell';

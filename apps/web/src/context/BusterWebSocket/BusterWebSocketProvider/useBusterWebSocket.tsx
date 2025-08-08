@@ -200,7 +200,7 @@ const BusterWebSocket = createContext<ReturnType<typeof useBusterWebSocketHook>>
 
 export const BusterWebSocketProvider: React.FC<{
   children: React.ReactNode;
-}> = React.memo(({ children }) => {
+}> = ({ children }) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const isAnonymousUser = useSupabaseContext((x) => x.isAnonymousUser);
   const checkTokenValidity = useSupabaseContext((state) => state.checkTokenValidity);
@@ -212,7 +212,7 @@ export const BusterWebSocketProvider: React.FC<{
   });
 
   return <BusterWebSocket.Provider value={busterSocketHook}>{children}</BusterWebSocket.Provider>;
-});
+};
 BusterWebSocketProvider.displayName = 'BusterWebSocketProvider';
 
 const useBusterWebSocketSelector = <T,>(

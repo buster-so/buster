@@ -139,11 +139,11 @@ export const SupabaseContextProvider: React.FC<
   PropsWithChildren<{
     supabaseContext: UseSupabaseUserContextType;
   }>
-> = React.memo(({ supabaseContext, children }) => {
+> = ({ supabaseContext, children }) => {
   const value = useSupabaseContextInternal({ supabaseContext });
 
   return <SupabaseContext.Provider value={value}>{children}</SupabaseContext.Provider>;
-});
+};
 SupabaseContextProvider.displayName = 'SupabaseContextProvider';
 
 export type SupabaseContextReturnType = ReturnType<typeof useSupabaseContextInternal>;

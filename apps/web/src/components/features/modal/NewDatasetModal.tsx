@@ -168,7 +168,7 @@ DatasetNameInput.displayName = 'DatasetNameInput';
 const FormWrapper: React.FC<{
   title: string;
   children: React.ReactNode;
-}> = React.memo(({ title, children }) => {
+}> = ({ title, children }) => {
   return (
     <div className="grid grid-cols-[minmax(150px,auto)_1fr] gap-4">
       <div>
@@ -177,5 +177,5 @@ const FormWrapper: React.FC<{
       <div>{children}</div>
     </div>
   );
-});
+};
 FormWrapper.displayName = 'FormWrapper';

@@ -14,7 +14,7 @@ export const ShareMenu: React.FC<
     assetId: string;
     assetType: ShareAssetType;
   }>
-> = React.memo(({ children, shareAssetConfig, assetId, assetType }) => {
+> = ({ children, shareAssetConfig, assetId, assetType }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const onOpenChange = useMemoizedFn((v: boolean) => {
@@ -47,5 +47,5 @@ export const ShareMenu: React.FC<
       </AppTooltip>
     </Popover>
   );
-});
+};
 ShareMenu.displayName = 'ShareMenu';

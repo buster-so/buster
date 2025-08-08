@@ -135,7 +135,7 @@ const MetricViewChartCard: React.FC<{
   errorData: boolean;
   isTable: boolean;
   className?: string;
-}> = React.memo(({ children, loadingData, hasData, errorData, isTable, className }) => {
+}> = ({ children, loadingData, hasData, errorData, isTable, className }) => {
   const cardClass = useMemo(() => {
     if (loadingData || errorData || !hasData) return 'h-full max-h-[600px]';
     if (isTable) return '';
@@ -152,7 +152,7 @@ const MetricViewChartCard: React.FC<{
       {children}
     </div>
   );
-});
+};
 
 MetricViewChartCard.displayName = 'MetricViewChartCard';
 

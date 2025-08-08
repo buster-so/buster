@@ -12,7 +12,7 @@ export const BarContainer: React.FC<{
   children?: React.ReactNode;
   title: string;
   secondaryTitle?: string;
-}> = React.memo(({ showBar, isStreamFinished, status, children, title, secondaryTitle }) => {
+}> = ({ showBar, isStreamFinished, status, children, title, secondaryTitle }) => {
   return (
     <div className={'relative flex space-x-1.5 overflow-visible'}>
       <VerticalBarContainer showBar={showBar} status={status} isStreamFinished={isStreamFinished} />
@@ -27,7 +27,7 @@ export const BarContainer: React.FC<{
       </div>
     </div>
   );
-});
+};
 
 BarContainer.displayName = 'BarContainer';
 

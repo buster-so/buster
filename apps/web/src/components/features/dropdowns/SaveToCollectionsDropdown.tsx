@@ -14,7 +14,7 @@ export const SaveToCollectionsDropdown: React.FC<{
   selectedCollections: string[];
   onSaveToCollection: (collectionId: string[]) => Promise<void>;
   onRemoveFromCollection: (collectionId: string) => Promise<void>;
-}> = React.memo(({ children, onRemoveFromCollection, onSaveToCollection, selectedCollections }) => {
+}> = ({ children, onRemoveFromCollection, onSaveToCollection, selectedCollections }) => {
   const { ModalComponent, selectType, footerContent, menuHeader, items } =
     useSaveToCollectionsDropdownContent({
       selectedCollections,
@@ -38,7 +38,7 @@ export const SaveToCollectionsDropdown: React.FC<{
       {ModalComponent}
     </>
   );
-});
+};
 
 SaveToCollectionsDropdown.displayName = 'SaveToCollectionsDropdown';
 

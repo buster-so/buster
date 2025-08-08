@@ -16,7 +16,7 @@ const routeToApp: Record<string, PermissionApps> = {
 
 export const PermissionsAppContainer: React.FC<{
   children: React.ReactNode;
-}> = React.memo(({ children }) => {
+}> = ({ children }) => {
   const { datasetId } = useParams();
   const currentRoute = useAppLayoutContextSelector((x) => x.currentRoute);
   const [selectedApp, setSelectedApp] = useState<PermissionApps>(PermissionApps.OVERVIEW);
@@ -32,6 +32,6 @@ export const PermissionsAppContainer: React.FC<{
       {children}
     </>
   );
-});
+};
 
 PermissionsAppContainer.displayName = 'PermissionsAppContainer';

@@ -59,7 +59,7 @@ ChatContent.displayName = 'ChatContent';
 
 const ChatInputWrapper: React.FC<{
   children?: React.ReactNode;
-}> = React.memo(({ children }) => {
+}> = ({ children }) => {
   return (
     <div className="bg-page-background absolute bottom-0 w-full overflow-visible">
       <div className="from-page-background pointer-events-none absolute -top-16 h-16 w-full bg-gradient-to-t to-transparent" />
@@ -69,6 +69,6 @@ const ChatInputWrapper: React.FC<{
       </div>
     </div>
   );
-});
+};
 
 ChatInputWrapper.displayName = 'ChatInputWrapper';

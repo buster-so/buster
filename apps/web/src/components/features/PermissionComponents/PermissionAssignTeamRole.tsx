@@ -22,7 +22,7 @@ export const PermissionAssignTeamRole: React.FC<{
   id: string;
   onRoleChange: (data: { id: string; role: TeamRole }) => void;
   children?: React.ReactNode;
-}> = React.memo(({ role, id, onRoleChange, children }) => {
+}> = ({ role, id, onRoleChange, children }) => {
   return (
     <div
       className="flex items-center space-x-5"
@@ -40,6 +40,6 @@ export const PermissionAssignTeamRole: React.FC<{
       />
     </div>
   );
-});
+};
 
 PermissionAssignTeamRole.displayName = 'PermissionAssignTeamRole';

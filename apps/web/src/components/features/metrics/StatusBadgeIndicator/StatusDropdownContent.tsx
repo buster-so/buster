@@ -9,7 +9,7 @@ export const StatusDropdownContent: React.FC<{
   children: React.ReactNode;
   onChangeStatus: (status: VerificationStatus) => void;
   onOpenChange?: (open: boolean) => void;
-}> = React.memo(({ isAdmin, status, onChangeStatus, children, onOpenChange }) => {
+}> = ({ isAdmin, status, onChangeStatus, children, onOpenChange }) => {
   const dropdownProps = useStatusDropdownContent({
     isAdmin,
     selectedStatus: status,
@@ -23,5 +23,5 @@ export const StatusDropdownContent: React.FC<{
       {children}
     </Dropdown>
   );
-});
+};
 StatusDropdownContent.displayName = 'StatusDropdownContent';

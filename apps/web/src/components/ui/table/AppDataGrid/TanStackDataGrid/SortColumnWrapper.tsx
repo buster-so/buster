@@ -31,7 +31,7 @@ export const SortColumnWrapper: React.FC<{
   colOrder: string[];
   setColOrder: (colOrder: string[]) => void;
   onReorderColumns?: ((columnIds: string[]) => void) | undefined;
-}> = React.memo(({ table, draggable, children, colOrder, setColOrder, onReorderColumns }) => {
+}> = ({ table, draggable, children, colOrder, setColOrder, onReorderColumns }) => {
   // Track active drag item and over target
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overTargetId, setOverTargetId] = useState<string | null>(null);
@@ -153,7 +153,7 @@ export const SortColumnWrapper: React.FC<{
       </SortColumnContext.Provider>
     </DndContext>
   );
-});
+};
 
 SortColumnWrapper.displayName = 'SortColumnWrapper';
 

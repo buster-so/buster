@@ -19,7 +19,7 @@ export const AppAssetCheckLayout: React.FC<
   {
     children: React.ReactNode;
   } & AppAssetCheckLayoutProps
-> = React.memo(({ children, type, assetId, versionNumber }) => {
+> = ({ children, type, assetId, versionNumber }) => {
   const {
     hasAccess,
     passwordRequired,
@@ -65,6 +65,6 @@ export const AppAssetCheckLayout: React.FC<
       {Component}
     </>
   );
-});
+};
 
 AppAssetCheckLayout.displayName = 'AppAssetCheckLayout';

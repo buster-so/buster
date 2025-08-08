@@ -8,7 +8,7 @@ export const BusterSortableItemDragContainer: React.FC<{
   itemId: string;
   allowEdit?: boolean;
   children: React.ReactNode;
-}> = React.memo(({ itemId, allowEdit = true, children }) => {
+}> = ({ itemId, allowEdit = true, children }) => {
   const {
     attributes,
     isDragging,
@@ -55,6 +55,6 @@ export const BusterSortableItemDragContainer: React.FC<{
       </BusterSortableItemContent>
     </SortableItemContext.Provider>
   );
-});
+};
 
 BusterSortableItemDragContainer.displayName = 'BusterSortableItemDragContainer';
