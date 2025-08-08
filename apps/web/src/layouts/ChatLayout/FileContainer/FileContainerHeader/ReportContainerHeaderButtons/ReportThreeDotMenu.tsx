@@ -320,7 +320,7 @@ const useDownloadPdfSelectMenu = ({ reportId }: { reportId: string }): DropdownI
 
   const onClick = async () => {
     try {
-      const html = await buildExportHtml2({ reportId });
+      const html = await buildExportHtml2({ reportId, filename: reportName, triggerPrint: true });
       console.log('html', html);
       // const editor = getReportEditor(reportId);
 
