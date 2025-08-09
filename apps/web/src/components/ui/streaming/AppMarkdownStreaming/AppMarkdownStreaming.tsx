@@ -8,6 +8,7 @@ import type {
   MarkdownAnimation,
   MarkdownAnimationTimingFunction
 } from '../../typography/animation-common';
+import AnimatedMarkdown from '../../typography/AnimatedMarkdown/AnimatedMarkdown';
 
 const AppMarkdownStreaming = ({
   content,
@@ -30,6 +31,23 @@ const AppMarkdownStreaming = ({
     content,
     isStreamFinished
   });
+
+  // When the upstream stream and the throttled streaming are finished, render a single
+  // non-streaming markdown to unmount streaming components and release memory.
+  if (isStreamFinished && isFinished) {
+    return (
+      <div className={cn('flex flex-col space-y-2.5', className)}>
+        <AnimatedMarkdown
+          content={content}
+          isStreamFinished={true}
+          animation={animation}
+          animationDuration={animationDuration}
+          animationTimingFunction={animationTimingFunction}
+          stripFormatting={stripFormatting}
+        />
+      </div>
+    );
+  }
 
   return (
     <AppMarkdownStreamingContext.Provider

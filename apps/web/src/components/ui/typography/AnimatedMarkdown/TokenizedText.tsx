@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useCallback } from 'react';
+import React, { useMemo, useRef, useCallback, useEffect } from 'react';
 import { type MarkdownAnimation } from '../animation-common';
 import { createAnimationStyle } from '../animation-common';
 
@@ -22,6 +22,22 @@ const TokenizedText: React.FC<TokenizedTextProps> = React.memo(
     const previousTextRef = useRef<string>('');
     const animatedChunksRef = useRef<string[]>([]);
 
+    // Reset memoized chunks once streaming is finished to free references
+    useEffect(() => {
+      if (isStreamFinished) {
+        animatedChunksRef.current = [];
+        previousTextRef.current = text;
+      }
+    }, [isStreamFinished, text]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+      return () => {
+        animatedChunksRef.current = [];
+        previousTextRef.current = '';
+      };
+    }, []);
+
     // Memoize the animation style to avoid recreating it on every render
     const animationStyle = useMemo(
       () =>
@@ -31,7 +47,7 @@ const TokenizedText: React.FC<TokenizedTextProps> = React.memo(
           animationTimingFunction,
           isStreamFinished
         }),
-      [animation, animationDuration, animationTimingFunction]
+      [animation, animationDuration, animationTimingFunction, isStreamFinished]
     );
 
     // Memoize the span creation function to avoid recreating it on every render
