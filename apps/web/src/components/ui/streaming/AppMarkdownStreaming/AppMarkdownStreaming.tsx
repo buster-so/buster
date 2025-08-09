@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { createContext } from 'react';
 import { cn } from '@/lib/classMerge';
 import { useMarkdownStreaming } from './useMarkdownStreaming';
@@ -31,16 +31,20 @@ const AppMarkdownStreaming = ({
     isStreamFinished
   });
 
+  const contextValue = useMemo(
+    () => ({
+      animation,
+      animationDuration,
+      animationTimingFunction,
+      isStreamFinished,
+      isThrottleStreamingFinished: isFinished,
+      stripFormatting
+    }),
+    [animation, animationDuration, animationTimingFunction, isStreamFinished, isFinished, stripFormatting]
+  );
+
   return (
-    <AppMarkdownStreamingContext.Provider
-      value={{
-        animation,
-        animationDuration,
-        animationTimingFunction,
-        isStreamFinished,
-        isThrottleStreamingFinished: isFinished,
-        stripFormatting
-      }}>
+    <AppMarkdownStreamingContext.Provider value={contextValue}>
       <div className={cn('flex flex-col space-y-2.5', className)}>
         {blockMatches.map((blockMatch, index) => {
           const Component = blockMatch.block.component;
