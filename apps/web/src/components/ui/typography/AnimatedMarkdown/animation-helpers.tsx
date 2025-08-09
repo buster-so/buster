@@ -1,5 +1,5 @@
 import type { AnimatedMarkdownProps } from './AnimatedMarkdown';
-import React from 'react';
+import React, { useMemo } from 'react';
 import TokenizedText from './TokenizedText';
 import { createAnimationStyle } from '../animation-common';
 
@@ -52,12 +52,17 @@ export const animateTokenizedText = (
       // This else block might still wrap elements if they are not explicitly handled
       // by the ReactMarkdown components mapping (e.g. custom components not passing animateText to children)
       // For standard HTML elements, the `components` mapping should handle animation of children.
+      const animationStyle = useMemo(
+        () => createAnimationStyle(animationsProps),
+        [animationsProps.animation, animationsProps.animationDuration, animationsProps.animationTimingFunction, animationsProps.isStreamFinished]
+      );
+
       return (
         <span
           key={`react-element-${index}`}
           data-testid="other-markdown-element"
           style={{
-            ...createAnimationStyle(animationsProps),
+            ...animationStyle,
             whiteSpace: 'pre-wrap',
             display: isInlineElement ? 'inline' : 'inline-block'
           }}>
@@ -65,12 +70,17 @@ export const animateTokenizedText = (
         </span>
       );
     }
+    const animationStyle = useMemo(
+      () => createAnimationStyle(animationsProps),
+      [animationsProps.animation, animationsProps.animationDuration, animationsProps.animationTimingFunction, animationsProps.isStreamFinished]
+    );
+
     return (
       <span
         key={`unknown-element-${index}`}
         data-testid="animated-markdown-element"
         style={{
-          ...createAnimationStyle(animationsProps),
+          ...animationStyle,
           whiteSpace: 'pre-wrap',
           display: 'inline'
         }}>
