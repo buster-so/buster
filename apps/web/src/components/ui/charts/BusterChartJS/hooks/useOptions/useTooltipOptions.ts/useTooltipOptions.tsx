@@ -149,15 +149,14 @@ export const useTooltipOptions = ({
   }, [selectedAxis, selectedChartType, disableTooltip, columnLabelFormats, columnSettings]);
 
   useUnmount(() => {
-    const tooltipEl = document.getElementById('buster-chartjs-tooltip');
-    if (tooltipEl) {
-      // Remove all event listeners before removing the element
-      const clonedEl = tooltipEl.cloneNode(true) as HTMLElement;
-      tooltipEl.parentNode?.replaceChild(clonedEl, tooltipEl);
-      clonedEl.remove();
-    }
     // Clear the cache to prevent memory leaks
     tooltipCache.current = {};
+    
+    // Remove tooltip element if it exists
+    const tooltipEl = document.getElementById('buster-chartjs-tooltip');
+    if (tooltipEl && tooltipEl.parentNode) {
+      tooltipEl.parentNode.removeChild(tooltipEl);
+    }
   });
 
   return tooltipOptions;

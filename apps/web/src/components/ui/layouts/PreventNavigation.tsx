@@ -122,12 +122,14 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
     });
 
     useEffect(() => {
-      /* *************************** Open listeners ************************** */
-      for (const link of document.querySelectorAll('a')) {
-        link.addEventListener('click', handleClick);
+      if (isDirty) {
+        /* *************************** Open listeners ************************** */
+        for (const link of document.querySelectorAll('a')) {
+          link.addEventListener('click', handleClick);
+        }
+        window.addEventListener('popstate', handlePopState);
+        window.addEventListener('beforeunload', handleBeforeUnload);
       }
-      window.addEventListener('popstate', handlePopState);
-      window.addEventListener('beforeunload', handleBeforeUnload);
 
       /* ************** Return from useEffect closing listeners ************** */
       return () => {
@@ -137,7 +139,7 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
         window.removeEventListener('popstate', handlePopState);
         window.removeEventListener('beforeunload', handleBeforeUnload);
       };
-    }, [isDirty]);
+    }, [isDirty, handleClick, handlePopState, handleBeforeUnload]);
 
     const onClose = useMemoizedFn(async () => {
       setLeavingPage(false);

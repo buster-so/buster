@@ -135,6 +135,12 @@ const DotPattern = ({ children, isDark }: DotPatternProps) => {
         ctx.fill();
       }
     }
+
+    return () => {
+      if (ctx && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    };
   }, [isDark]);
 
   return (

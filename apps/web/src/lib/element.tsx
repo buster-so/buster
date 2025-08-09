@@ -36,17 +36,19 @@ export const getTextWidth = (
     return 0;
   }
 
-  // Set the font style for the text
-  context.font = `${fontSize}px ${fontFamily}`;
+  try {
+    // Set the font style for the text
+    context.font = `${fontSize}px ${fontFamily}`;
 
-  // Measure the width of the string
-  const width = context.measureText(text).width;
+    // Measure the width of the string
+    const width = context.measureText(text).width;
 
-  // Clean up the temporary canvas
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  canvas.remove();
-
-  return width;
+    return width;
+  } finally {
+    canvas.width = 0;
+    canvas.height = 0;
+    canvas.remove();
+  }
 };
 
 export const getBase64 = (file: File): Promise<string> => {
