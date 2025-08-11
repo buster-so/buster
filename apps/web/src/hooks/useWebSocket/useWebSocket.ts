@@ -134,7 +134,16 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic data type for WebSocket messages
   const sendJSONMessage = useMemoizedFn(async (data: Record<string, any>, isFromQueue = false) => {
-    await checkTokenValidity(); //needed! This will refresh the token if it is expired. All other messages will be queued until the token is refreshed.
+    try {
+      await checkTokenValidity(); //needed! This will refresh the token if it is expired. All other messages will be queued until the token is refreshed.
+    } catch (error) {
+      console.error('Token validation failed before sending WebSocket message:', error);
+      if (!isFromQueue) {
+        sendQueue.current.push(data); // Queue the message for retry
+      }
+      return;
+    }
+    
     if (ws.current?.readyState === ReadyState.Closed) {
       connectWebSocket();
     }
@@ -165,7 +174,11 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
       // Use fetch to check connection first and get headers
       checkTokenValidity()
         .then(({ access_token, isTokenValid }) => {
-          if (!isTokenValid) return;
+          if (!isTokenValid) {
+            console.warn('Token is invalid, skipping WebSocket connection');
+            setConnectionError('Invalid authentication token');
+            return;
+          }
           // If fetch succeeds, establish WebSocket connection
           const socketURLWithAuth = `${url}?authentication=${access_token}`;
           ws.current = new WebSocket(socketURLWithAuth);
@@ -173,7 +186,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
         })
         .catch((error) => {
           console.error('Connection error:', error);
-          setConnectionError(error.message);
+          setConnectionError(error.message || 'Authentication failed');
         });
     }),
     { wait: BASE_DELAY }

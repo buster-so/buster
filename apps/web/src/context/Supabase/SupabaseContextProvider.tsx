@@ -20,6 +20,7 @@ const useSupabaseContextInternal = ({
   supabaseContext: UseSupabaseUserContextType;
 }) => {
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const backgroundRefreshRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const { openErrorNotification, openInfoMessage } = useBusterNotifications();
   const [accessToken, setAccessToken] = useState(supabaseContext.accessToken || '');
 
@@ -42,7 +43,7 @@ const useSupabaseContextInternal = ({
       if (isAnonymousUser) {
         return {
           access_token: accessToken,
-          isTokenValid: isTokenExpired
+          isTokenValid: !isTokenExpired
         };
       }
 
@@ -121,6 +122,26 @@ const useSupabaseContextInternal = ({
       }
     };
   }, [accessToken, checkTokenValidity]);
+
+  useEffect(() => {
+    if (isAnonymousUser) return;
+    
+    const BACKGROUND_CHECK_INTERVAL = 4 * 60 * 1000;
+    
+    backgroundRefreshRef.current = setInterval(async () => {
+      try {
+        await checkTokenValidity();
+      } catch (error) {
+        console.error('Background token refresh failed:', error);
+      }
+    }, BACKGROUND_CHECK_INTERVAL);
+
+    return () => {
+      if (backgroundRefreshRef.current) {
+        clearInterval(backgroundRefreshRef.current);
+      }
+    };
+  }, [isAnonymousUser, checkTokenValidity]);
 
   return {
     isAnonymousUser,
