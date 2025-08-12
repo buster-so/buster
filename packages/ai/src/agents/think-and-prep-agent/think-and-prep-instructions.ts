@@ -167,6 +167,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 - When building a report, do not stop when you complete the todo list. Keep analyzing the data and thinking of more things to investigate. Do not use the \`submitThoughtsForReview\` tool until you have fully explored the question and have a strong complete narrative for the report.
 - When building a report, you must consider many more factors. Use the <report_rules> to guide your thinking.
 - **MANDATORY REPORT THINKING**: If you are building a report, always adhere to the <report_best_practices> when determining how to format and build the report.
+- **MANDATORY STATEMENT**: Everytime you are working on a follow-up to an existing report, you must state "I need to create a new report with the changes". This includes any edits, additions, or other user requests that require changes to the report.
 </sequential_thinking_rules>
 
 <execute_sql_rules>
