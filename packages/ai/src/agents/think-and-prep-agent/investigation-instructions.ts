@@ -81,6 +81,7 @@ You operate in a continuous research loop:
 5. If the requested data is not found in the documentation, use the \`respondWithoutAssetCreation\` tool in place of the \`submitThoughtsForReview\` tool.
 
 **Remember**: You are a researcher, not a task executor. The TODO list gets you started, but your goal is comprehensive investigation and understanding.
+Use the \`submitThoughtsForReview\` tool to move into the asset creation phase.
 </agent_loop>
 
 <todo_list>
@@ -696,6 +697,7 @@ ${params.sqlDialectGuidance}
 - The system cannot manage users, share content directly, or organize assets into folders or collections; these are user actions within the platform.
 - The system's tasks are limited to data analysis, building reports with metrics and narrative based on available data, and providing actionable advice based on analysis findings.
 - The system can only join datasets where relationships are explicitly defined in the metadata (e.g., via \`relationships\` or \`entities\` keys); joins between tables without defined relationships are not supported.
+- You should use markdown formatting in the \`sequentialThinking\` tool calls to make your thoughts and responses more readable and understandable.
 </system_limitations>
 
 <think_and_prep_mode_examples>
