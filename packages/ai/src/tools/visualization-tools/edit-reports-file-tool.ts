@@ -246,7 +246,13 @@ const editReportsFile = wrapTraced(
 // Export the tool with complete schema
 export const editReports = createTool({
   id: 'edit-reports-file',
-  description: `Edit an existing report with find/replace operations or appends. 
+  description: `
+  Edit an existing report with find/replace operations or appends during the same creation flow before using \`done\`.
+
+  ## Usage Restrictions
+  - Do NOT use this tool for any follow-up after a report has been completed with \`done\`. After \`done\`, it is impossible to edit the completed report.
+  - For ANY follow-up request (including small text changes, filter tweaks, or time-range adjustments), you MUST create a new derived report with \`createReports\` instead of editing the original.
+  - Use this tool only for minor, immediate iterations before \`done\` within the same creation flow.
   
 ## How Edits Work
 
