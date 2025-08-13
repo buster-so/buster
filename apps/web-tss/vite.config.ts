@@ -5,27 +5,29 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 
-const config = defineConfig({
-  server: {
-    port: 3000,
-  },
-  plugins: [
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    tailwindcss(),
-    tanstackStart({
-      customViteReactPlugin: true,
-    }),
-    viteReact(),
-    !process.env.VITEST
-      ? checker({
-          typescript: true,
-          biome: true,
-        })
-      : undefined,
-  ],
-});
+export default defineConfig(({ command }) => {
+  const isServe = command === 'serve';
 
-export default config;
+  return {
+    server: {
+      port: 3000,
+    },
+    plugins: [
+      // this is the plugin that enables path aliases
+      viteTsConfigPaths({
+        projects: ['./tsconfig.json'],
+      }),
+      tailwindcss(),
+      tanstackStart({
+        customViteReactPlugin: true,
+      }),
+      viteReact(),
+      isServe
+        ? checker({
+            typescript: true,
+            biome: true,
+          })
+        : undefined,
+    ],
+  };
+});

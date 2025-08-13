@@ -64,6 +64,12 @@
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "overrides": {
+      "@buster-app/web>react": "18.3.1",
+      "@buster-app/web>react-dom": "18.3.1",
+      "@buster-app/web>@types/react": "^18.3.23",
+      "@buster-app/web>@types/react-dom": "^18.3.7",
+      "@buster-app/web-tss>react": "^19.1.1",
+      "@buster-app/web-tss>react-dom": "^19.1.1",
       "@buster-app/web-tss>@types/react": "^19.1.10",
       "@buster-app/web-tss>@types/react-dom": "^19.1.7"
     },

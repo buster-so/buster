@@ -2,7 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "node_modules/vite/client.d.ts"
   ],
   "exclude": ["node_modules", "dist", "**/*.stories.ts", "**/*.stories.tsx"],
   "compilerOptions": {
@@ -10,7 +11,7 @@
     "jsx": "react-jsx",
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "typeRoots": ["./node_modules/@types"],
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -24,7 +25,8 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "vite/client": ["./node_modules/vite/client.d.ts"]
     }
   },
   "references": [
