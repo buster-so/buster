@@ -30,6 +30,7 @@ interface Options<T> {
   bustStorageOnInit?: boolean | ((layout: T) => boolean);
   expirationTime?: number;
   cookieOptions?: CookieOptions;
+  initialValue?: T;
 }
 
 // Helper function to parse cookies
@@ -98,7 +99,8 @@ export function useCookieState<T>(
     onError,
     bustStorageOnInit = false,
     expirationTime = DEFAULT_EXPIRATION_TIME,
-    cookieOptions = {}
+    cookieOptions = {},
+    initialValue
   } = options || {};
 
   const executeBustStorage = useMemoizedFn(() => {
@@ -111,6 +113,14 @@ export function useCookieState<T>(
     // If bustStorageOnInit is true, ignore cookies and use default value
     if (bustStorageOnInit === true) {
       return executeBustStorage();
+    }
+
+    // If an explicit initialValue is provided, prefer it (subject to bust logic)
+    if (initialValue !== undefined) {
+      if (typeof bustStorageOnInit === 'function' && bustStorageOnInit(initialValue)) {
+        return executeBustStorage();
+      }
+      return initialValue;
     }
 
     try {
