@@ -1039,6 +1039,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             typedEntry.title = 'Broke down your request';
             break;
 
+          case 'updateInvestigationPlan':
+          case 'update-investigation-plan':
+            typedEntry.title = 'Updated investigation plan';
+            break;
+
           case 'executeSql':
           case 'execute-sql':
             // Count the number of queries
@@ -1496,6 +1501,80 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
         break;
       }
+
+      case 'updateInvestigationPlan':
+      case 'update-investigation-plan': {
+        // Build a markdown plan from structured fields if provided, otherwise use the plan string
+        const planString = getOptimisticValue<string>(parseResult.extractedValues, 'plan', '');
+        const rawHypotheses = getOptimisticValue<unknown>(
+          parseResult.extractedValues,
+          'hypotheses',
+          []
+        );
+        const rawQuestions = getOptimisticValue<unknown>(
+          parseResult.extractedValues,
+          'questions',
+          []
+        );
+        const rawData =
+          (getOptimisticValue<unknown>(
+            parseResult.extractedValues,
+            'dataToInvestigate',
+            []
+          ) as unknown) ||
+          getOptimisticValue<unknown>(parseResult.extractedValues, 'data_to_investigate', []);
+        const rawNextSteps = getOptimisticValue<unknown>(
+          parseResult.extractedValues,
+          'nextSteps',
+          []
+        );
+
+        const hypotheses: string[] = Array.isArray(rawHypotheses)
+          ? rawHypotheses.filter((v): v is string => typeof v === 'string')
+          : [];
+        const questions: string[] = Array.isArray(rawQuestions)
+          ? rawQuestions.filter((v): v is string => typeof v === 'string')
+          : [];
+        const dataToInvestigate: string[] = Array.isArray(rawData)
+          ? rawData.filter((v): v is string => typeof v === 'string')
+          : [];
+        const nextSteps: string[] = Array.isArray(rawNextSteps)
+          ? rawNextSteps.filter((v): v is string => typeof v === 'string')
+          : [];
+
+        let composed = '';
+        if (planString && planString.trim().length > 0) {
+          composed = planString.trim();
+        } else {
+          const sections: string[] = [];
+          if (hypotheses.length > 0) {
+            sections.push(['### Hypotheses', ...hypotheses.map((h) => `- ${h}`)].join('\n'));
+          }
+          if (questions.length > 0) {
+            sections.push(['### Questions', ...questions.map((q) => `- ${q}`)].join('\n'));
+          }
+          if (dataToInvestigate.length > 0) {
+            sections.push(
+              ['### Data to Investigate', ...dataToInvestigate.map((d) => `- ${d}`)].join('\n')
+            );
+          }
+          if (nextSteps.length > 0) {
+            sections.push(['### Next Steps', ...nextSteps.map((s) => `- ${s}`)].join('\n'));
+          }
+          composed = sections.join('\n\n');
+        }
+
+        if (composed && entry.type === 'files') {
+          const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
+          if (fileIds && fileIds.length > 0) {
+            const fileId = fileIds[0];
+            if (fileId && entry.files[fileId]?.file) {
+              entry.files[fileId].file.text = composed;
+            }
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -1728,6 +1807,34 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               status: 'loading',
               file: {
                 text: '', // Will be populated during streaming
+              },
+            },
+          },
+        } as ReasoningEntry;
+      }
+
+      case 'updateInvestigationPlan':
+      case 'update-investigation-plan': {
+        // Create a file entry for the investigation plan to enable streaming updates
+        const fileId = `investigation-plan-${Date.now()}-${Math.random()
+          .toString(36)
+          .substr(2, 11)}`;
+        return {
+          id: toolCallId,
+          type: 'files',
+          title: 'Updating investigation plan...',
+          status: 'loading',
+          secondary_title: undefined,
+          file_ids: [fileId],
+          files: {
+            [fileId]: {
+              id: fileId,
+              file_type: 'reasoning',
+              file_name: 'Investigation Plan',
+              version_number: 1,
+              status: 'loading',
+              file: {
+                text: '',
               },
             },
           },

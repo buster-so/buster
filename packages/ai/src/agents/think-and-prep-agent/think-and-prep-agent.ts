@@ -1,11 +1,11 @@
 import { Agent } from '@mastra/core';
 import {
   executeSql,
-  investigationPlan,
   messageUserClarifyingQuestion,
   respondWithoutAssetCreation,
   sequentialThinking,
   submitThoughts,
+  updateInvestigationPlan,
 } from '../../tools';
 import { GPT5 } from '../../utils';
 import { Sonnet4 } from '../../utils/models/sonnet-4';
@@ -32,11 +32,11 @@ export const thinkAndPrepAgent = new Agent({
   model: GPT5,
   tools: {
     sequentialThinking,
-    investigationPlan,
     executeSql,
     respondWithoutAssetCreation,
     submitThoughts,
     messageUserClarifyingQuestion,
+    updateInvestigationPlan,
   },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
