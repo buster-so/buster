@@ -4,6 +4,8 @@ export { respondWithoutAssetCreation } from './communication-tools/respond-witho
 export { submitThoughts } from './communication-tools/submit-thoughts-tool';
 export { messageUserClarifyingQuestion } from './communication-tools/message-user-clarifying-question';
 export { sequentialThinking } from './planning-thinking-tools/sequential-thinking-tool';
+export { selfReview } from './planning-thinking-tools/self-review-tool';
+export { investigationPlan } from './planning-thinking-tools/investigation-plan-tool';
 export { createMetrics } from './visualization-tools/create-metrics-file-tool';
 export { modifyMetrics } from './visualization-tools/modify-metrics-file-tool';
 export { createDashboards } from './visualization-tools/create-dashboards-file-tool';

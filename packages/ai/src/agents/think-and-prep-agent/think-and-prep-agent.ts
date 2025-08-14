@@ -1,6 +1,7 @@
 import { Agent } from '@mastra/core';
 import {
   executeSql,
+  investigationPlan,
   messageUserClarifyingQuestion,
   respondWithoutAssetCreation,
   sequentialThinking,
@@ -31,6 +32,7 @@ export const thinkAndPrepAgent = new Agent({
   model: GPT5,
   tools: {
     sequentialThinking,
+    investigationPlan,
     executeSql,
     respondWithoutAssetCreation,
     submitThoughts,

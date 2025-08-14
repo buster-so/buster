@@ -51,5 +51,14 @@ Respond only with JSON:
 {
   "choice": "standard" or "investigation",
   "reasoning": "1-2 sentences explaining the decision"
-}`;
+}
+
+Example:
+{
+  "choice": "standard",
+  "reasoning": "This is a standard question about finding the MAU for a specific product. This is a simple find and report question, and does not require any investigation."
+}
+
+Output should always be in the same format as the example.
+`;
 }

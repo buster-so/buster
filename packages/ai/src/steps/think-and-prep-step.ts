@@ -154,6 +154,7 @@ const thinkAndPrepExecution = async ({
   // Initialize chunk processor with initial messages, reasoning history, and dashboard context
   const availableTools = new Set([
     'sequentialThinking',
+    'investigationPlan',
     'executeSql',
     'respondWithoutAssetCreation',
     'submitThoughts',

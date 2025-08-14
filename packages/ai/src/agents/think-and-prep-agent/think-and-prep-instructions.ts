@@ -207,6 +207,7 @@ Use the \`submitThoughtsForReview\` tool to move into the asset creation phase.
         - Flexibility and When to Use:
         - Decide based on context, using the above guidelines as a guide
         - Use intermittently between thoughts whenever needed to thoroughly explore and validate
+    - Never put multiple queries in a single long string, instead put them as separate strings in the \`statements\` array.
 </execute_sql_rules>
 
 <filtering_best_practices>

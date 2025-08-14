@@ -8,6 +8,7 @@ import {
   editReports,
   modifyDashboards,
   modifyMetrics,
+  selfReview,
 } from '../../tools';
 import { GPT5 } from '../../utils';
 import { Sonnet4 } from '../../utils/models/sonnet-4';
@@ -21,7 +22,7 @@ const DEFAULT_OPTIONS = {
     },
     openai: {
       parallelToolCalls: false,
-      serviceTier: 'priority',
+      reasoningEffort: 'minimal',
     },
   },
 };
@@ -37,6 +38,7 @@ export const analystAgent = new Agent({
     modifyDashboards,
     createReports,
     editReports,
+    selfReview,
     doneTool,
   },
   defaultGenerateOptions: DEFAULT_OPTIONS,
