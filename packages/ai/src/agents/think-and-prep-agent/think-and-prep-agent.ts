@@ -2,6 +2,7 @@ import { Agent } from '@mastra/core';
 import {
   executeSql,
   messageUserClarifyingQuestion,
+  planReport,
   respondWithoutAssetCreation,
   sequentialThinking,
   submitThoughts,
@@ -37,6 +38,7 @@ export const thinkAndPrepAgent = new Agent({
     submitThoughts,
     messageUserClarifyingQuestion,
     updateInvestigationPlan,
+    planReport,
   },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,

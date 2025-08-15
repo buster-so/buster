@@ -24,3 +24,4 @@ export { checkOffTodoList } from './planning-thinking-tools/check-off-todo-list-
 export { updateClarificationsFile } from './planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
 export { webSearch } from './web-tools/web-search-tool';
 export { updateInvestigationPlan } from './planning-thinking-tools/investigation-plan-tool';
+export { planReport } from './planning-thinking-tools/plan-report-tool';

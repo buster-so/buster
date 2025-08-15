@@ -194,7 +194,7 @@ Before calling the \`done\` tool, ALL of the following MUST be true:
 - For categorical group comparisons, show individual and group-level breakdowns with appropriate charts or tables; explain choices in methodology.
 - Expand analysis in each section: do not just state numbers, but explain implications, patterns, and deeper context wherever possible—err on the side of detailed, meaningful narrative.
 - When justified by the scenario, propose additional visualizations or supporting context.
-- Reports typically should have text only analysis sections with no charts or visualizations. 
+- Reports typically should have multiple analysis sections that are text only with no charts or visualizations. 
 - Bias heavily towards long thorough analysis including charts and text instead of trying to be brief.
 - Reports should include but are not limited to the following sections:
   - Executive Summary

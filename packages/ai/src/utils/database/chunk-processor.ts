@@ -1044,6 +1044,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             typedEntry.title = 'Updated investigation plan';
             break;
 
+          case 'planReport':
+          case 'plan-report':
+            typedEntry.title = 'Planned report structure';
+            break;
+
           case 'executeSql':
           case 'execute-sql':
             // Count the number of queries
@@ -1575,6 +1580,44 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
         break;
       }
+
+      case 'planReport':
+      case 'plan-report': {
+        // Build a markdown report plan from structured fields
+        const rawReportSections = getOptimisticValue<unknown>(
+          parseResult.extractedValues,
+          'reportSections',
+          []
+        );
+        const keyIdeas = getOptimisticValue<string>(parseResult.extractedValues, 'keyIdeas', '');
+
+        const reportSections: string[] = Array.isArray(rawReportSections)
+          ? rawReportSections.filter((v): v is string => typeof v === 'string')
+          : [];
+
+        const sections: string[] = [];
+
+        if (reportSections.length > 0) {
+          sections.push(['### Report Sections', ...reportSections.map((s) => `- ${s}`)].join('\n'));
+        }
+
+        if (keyIdeas && keyIdeas.trim().length > 0) {
+          sections.push(['### Key Ideas', keyIdeas.trim()].join('\n'));
+        }
+
+        const composed = sections.join('\n\n');
+
+        if (composed && entry.type === 'files') {
+          const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
+          if (fileIds && fileIds.length > 0) {
+            const fileId = fileIds[0];
+            if (fileId && entry.files[fileId]?.file) {
+              entry.files[fileId].file.text = composed;
+            }
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -1831,6 +1874,32 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               id: fileId,
               file_type: 'reasoning',
               file_name: 'Investigation Plan',
+              version_number: 1,
+              status: 'loading',
+              file: {
+                text: '',
+              },
+            },
+          },
+        } as ReasoningEntry;
+      }
+
+      case 'planReport':
+      case 'plan-report': {
+        // Create a file entry for the report plan to enable streaming updates
+        const fileId = `report-plan-${Date.now()}-${Math.random().toString(36).substr(2, 11)}`;
+        return {
+          id: toolCallId,
+          type: 'files',
+          title: 'Planning report structure...',
+          status: 'loading',
+          secondary_title: undefined,
+          file_ids: [fileId],
+          files: {
+            [fileId]: {
+              id: fileId,
+              file_type: 'reasoning',
+              file_name: 'Report Plan',
               version_number: 1,
               status: 'loading',
               file: {
