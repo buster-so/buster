@@ -7,6 +7,7 @@ import {
   submitThoughts,
 } from '../../tools';
 import { GPT5 } from '../../utils';
+import { GPT5Mini } from '../../utils/models/gpt-5-mini';
 import { Sonnet4 } from '../../utils/models/sonnet-4';
 
 const DEFAULT_OPTIONS = {
@@ -19,8 +20,7 @@ const DEFAULT_OPTIONS = {
     },
     openai: {
       parallelToolCalls: false,
-      reasoningEffort: 'minimal',
-      verbosity: 'low',
+      reasoningEffort: 'high',
     },
   },
 };
@@ -28,13 +28,11 @@ const DEFAULT_OPTIONS = {
 export const thinkAndPrepAgent = new Agent({
   name: 'Think and Prep Agent',
   instructions: '', // We control the system messages in the step at stream instantiation
-  model: GPT5,
+  model: GPT5Mini,
   tools: {
     sequentialThinking,
     executeSql,
-    respondWithoutAssetCreation,
     submitThoughts,
-    messageUserClarifyingQuestion,
   },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
