@@ -7,6 +7,7 @@ import {
   submitThoughts,
 } from '../../tools';
 import { GPT5 } from '../../utils';
+import { GPT5Mini } from '../../utils/models/gpt-5-mini';
 import { Sonnet4 } from '../../utils/models/sonnet-4';
 
 const DEFAULT_OPTIONS = {

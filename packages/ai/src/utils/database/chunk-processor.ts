@@ -1052,7 +1052,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     const fileObj = file as { file?: { text?: string } };
                     const text = fileObj.file?.text || '';
                     // Count lines that start with "  - " (YAML list items)
-                    const queryCount = (text.match(/^ {2}- /gm) || []).length;
+                    const queryCount = (text.match(/^ {2}- /gm) || []).length / 2;
                     if (queryCount > 0) {
                       typedEntry.title = `Generated ${queryCount} validation ${queryCount === 1 ? 'query' : 'queries'}`;
                     }
