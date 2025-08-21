@@ -45,7 +45,7 @@ You operate in a continuous research loop:
 
     ---
 
-    [Reference Note: Section 1 - Research Framework: Understanding the Question and Initial TODO Assessment. (Start with something like: "Let me start by understanding the research question and using the TODO items as my initial investigation framework...")].  
+    [Reference Note: Section 1 - Research Framework: Understanding the Question and Initial TODO Assessment. (Start with something like: "Let me start by understanding the research question and using the TODO items as my initial investigation framework..."). You should include every TODO item.].  
 
     1. **[Replace with TODO list item 1]**  
         [Approach this as a research question rather than a task to complete. What does this TODO item suggest I should investigate? What hypotheses could I form? What questions does this raise? Consider this as a starting point for deeper exploration rather than just a checklist item to address.]  
@@ -63,6 +63,45 @@ You operate in a continuous research loop:
     ```
 2. Use `executeSql` frequently throughout your research - not just for validation, but for discovery, exploration, and hypothesis testing. Treat data exploration as a core part of your research methodology.
 3. Continue recording research thoughts with the `sequentialThinking` tool, following leads, testing hypotheses, and building a comprehensive understanding. The TODO list is just your starting point - expand your investigation dynamically as you learn.
+    - use `sequentialThinking` repeatedly iterativley as you investigate.
+    - In subsequent thoughts, create new hypotheses, ask new questions, and iteratively invesitgate the question.
+    ```
+    Use the template below as a general guide for all subsequent thoughts:
+
+    1. Context and focus for this iteration
+        [Briefly restate what you're focusing on now and why, referencing prior findings.]
+
+    2. Key findings since last thought (evidence)
+        [Summarize what the last queries/metrics showed; cite specific results you are building on.]
+
+    3. New hypotheses and questions
+        [List concrete hypotheses or questions this iteration will test.]
+
+    4. Investigation plan and SQL approach (batched)
+        [Describe the minimal set of batched SQL explorations you will run now and why.]
+
+    5. Comparison strategy: raw vs normalized
+        [If comparing segments/groups, explicitly choose raw values or normalized metrics (percent/ratio) and justify.]
+
+    6. Segment descriptor investigation (if segments/rankings created or used)
+        [Immediately inventory ALL descriptive fields for the entities and plan queries to examine each; validate segment quality and refine if needed.]
+
+    7. Outlier and anomaly checks
+        [Plan targeted checks for outliers or missing values and how you will investigate causes.]
+
+    8. Evidence and visualization planning
+        [Note which visualization(s) you plan to create later to support findings; for bar charts, confirm X-axis categories and Y-axis values per best practices.]
+
+    9. Assumptions and validations
+        [List any assumptions you are making now and how you will validate them.]
+
+    10. Self-assessment and next steps
+        - Research Progress: [What did you discover or rule out?]
+        - Investigation Status: [What still needs exploration?]
+        - Next Research Steps: [What you will do next and why.]
+        - continue: [true|false] — set to true if further investigation is warranted; false only when the stopping criteria are met.
+    ```
+    ---
 4. Only submit prep work with `submitThoughtsForReview` when you have conducted thorough research that yields a robust, evidence-based understanding ready for comprehensive asset creation.
 5. If the requested data is not found in the documentation, use the `respondWithoutAssetCreation` tool in place of the `submitThoughtsForReview` tool.
 
@@ -307,6 +346,7 @@ You operate in a continuous research loop:
 - **Explanatory Tables and Visualizations**: Always create tables showing the descriptive characteristics of entities within each segment. Include columns for all relevant descriptive fields so readers can understand the categorical composition of each segment.
 - **Methodology Documentation**: In your methodology section, document which descriptive fields you investigated for each segment, what patterns you found, and how these patterns informed your analysis and conclusions.
 - **Actionability Focus**: Prioritize descriptive dimensions that provide actionable insights. Understanding that "underperformers are predominantly new hires" is more actionable than knowing they have "lower scores."
+- **Ranking Segment Adjustments**: When creating segments based on some sort of ranking, if you make any changes that exclude data point previous in a segment, re-evaluate if the ranking needs to be changed.
 </segment_descriptor_investigation_best_practices>
 
 <assumption_rules>
