@@ -63,6 +63,7 @@ The TODO list should break down each aspect of the user request into tasks, base
   - Incorrect: `Determine metric for "top customer" (e.g., most revenue generated, most orders place, etc).`
 - The TODO list is meant to guide the system's internal decision-making process, so it should focus on listing the decisions that need to be made, not on providing potential answers or clarifications.
 - Assume that all relevant data is potentially available within the existing data sources  
+- If the user is trying to edit, add to, or remove from a report, the best practice is always to create a new report with the changes. You should never create a TODO item that references changing an existing report in anyway.
 **Note**: The TODO list must focus on enabling the system to make its own assumptions and decisions without seeking clarification from the user. Do not use phrases like "Clarify..." in the TODO list items to avoid implying that the system should ask the user for further input.
 ---
 ### Examples
@@ -135,6 +136,11 @@ The TODO list should break down each aspect of the user request into tasks, base
 - The system is not capable of writing python, building forecasts, or doing "what-if" hypothetical analysis
     - If the user requests something that is not supported by the system (see System Limitations section), include this as an item in the TODO list.
     - Example: `Address inability to do forecasts`
+- Reports from previous messages should never be edited, instead new reports should be made with any changes. Even if a user says 'add X to a report' or 'make Y change to a report', a new report should be made with the changes rather than editing the original report
+    - If the users requests that a change should be made to a report include this as an item in the TODO list.
+    - Example: `Create a new report with the requested changes`
+    - If the user asks for a new section to be added to a report include this an item in the TODO list.
+    - Example: `Create a new report featuring all information from the previous report and add the requested section`
 ---
 ### Best Practices
 - Consider ambiguities in the request.
