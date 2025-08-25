@@ -80,8 +80,6 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
       return;
     }
 
-    // Set required env vars if not already set (for testing)
-    process.env.SLACK_INTEGRATION_ENABLED = 'true';
     // Ensure all required env vars are set for the service
     process.env.SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID || 'test-client-id';
     process.env.SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET || 'test-client-secret';
@@ -140,52 +138,6 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
   });
 
   describe.sequential('POST /api/v2/slack/auth/init', () => {
-    it('should return 503 when integration is disabled', async () => {
-      // Temporarily disable the integration
-      const originalEnabled = process.env.SLACK_INTEGRATION_ENABLED;
-      process.env.SLACK_INTEGRATION_ENABLED = 'false';
-
-      // Need to clear the module cache and re-import to pick up the env change
-      vi.resetModules();
-
-      // Re-import the handler to get a fresh instance with disabled integration
-      const { slackHandler: disabledHandler } = await import('./handler');
-      const { default: freshRoutes } = await import('./index');
-
-      // Create a fresh app instance with the new routes
-      const testApp = new Hono();
-      testApp.use('*', async (c, next) => {
-        if (c.req.path.includes('/auth/init')) {
-          (c as Context).set('busterUser', {
-            id: testUserId,
-            name: 'Test User',
-            email: 'test@example.com',
-            avatarUrl: 'https://example.com/avatar.png',
-          });
-          (c as Context).set('organizationId', testOrganizationId);
-        }
-        await next();
-      });
-      testApp.route('/api/v2/slack', freshRoutes);
-
-      const response = await testApp.request('/api/v2/slack/auth/init', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ metadata: { returnUrl: '/dashboard' } }),
-      });
-
-      expect(response.status).toBe(503);
-      const data = (await response.json()) as SlackErrorResponse;
-      expect(data.error).toBe('Slack integration is not enabled');
-      expect(data.code).toBe('INTEGRATION_DISABLED');
-
-      // Restore original value and reset modules again
-      process.env.SLACK_INTEGRATION_ENABLED = originalEnabled;
-      vi.resetModules();
-    });
-
     it('should return 401 when user is not authenticated', async () => {
       // Create app without auth middleware but mock requireAuth to fail
       const unauthApp = new Hono();

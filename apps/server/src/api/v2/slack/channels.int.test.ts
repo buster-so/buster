@@ -224,45 +224,6 @@ describe.skipIf(skipIfNoEnv)('Slack Channels Integration Tests', () => {
       );
     });
 
-    it('should return 503 when integration is disabled', async () => {
-      // Temporarily disable the integration
-      const originalEnabled = process.env.SLACK_INTEGRATION_ENABLED;
-      process.env.SLACK_INTEGRATION_ENABLED = 'false';
-
-      // Need to clear the module cache and re-import
-      vi.resetModules();
-      const { default: freshRoutes } = await import('./index');
-
-      // Create a fresh app instance
-      const testApp = new Hono();
-      testApp.use('*', async (c, next) => {
-        if (c.req.path.includes('/channels')) {
-          (c as Context).set('busterUser', {
-            id: testUserId,
-            name: 'Test User',
-            email: 'test@example.com',
-            avatarUrl: 'https://example.com/avatar.png',
-          });
-          (c as Context).set('organizationId', testOrganizationId);
-        }
-        await next();
-      });
-      testApp.route('/api/v2/slack', freshRoutes);
-
-      const response = await testApp.request('/api/v2/slack/channels', {
-        method: 'GET',
-      });
-
-      expect(response.status).toBe(503);
-      const data = (await response.json()) as SlackErrorResponse;
-      expect(data.error).toBe('Slack integration is not configured');
-      expect(data.code).toBe('INTEGRATION_NOT_CONFIGURED');
-
-      // Restore original value
-      process.env.SLACK_INTEGRATION_ENABLED = originalEnabled;
-      vi.resetModules();
-    });
-
     it('should handle token retrieval errors', async () => {
       // Create an integration with a non-existent token key
       const [integration] = await db

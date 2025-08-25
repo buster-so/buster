@@ -25,6 +25,23 @@ vi.mock('@buster/database', () => ({
   deleteSecret: vi.fn(),
 }));
 
+// Mock secrets manager before importing
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn().mockImplementation(async (key: string) => {
+    const secrets: Record<string, string> = {
+      SLACK_CLIENT_ID: 'test-client-id',
+      SLACK_CLIENT_SECRET: 'test-client-secret',
+      SERVER_URL: 'https://test.com',
+    };
+    return secrets[key] || '';
+  }),
+  SERVER_KEYS: {
+    SLACK_CLIENT_ID: 'SLACK_CLIENT_ID',
+    SLACK_CLIENT_SECRET: 'SLACK_CLIENT_SECRET',
+    SERVER_URL: 'SERVER_URL',
+  },
+}));
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as slackHelpers from './slack-helpers';
 
@@ -37,13 +54,7 @@ vi.mock('@buster/slack', () => ({
   })),
 }));
 
-// Mock environment variables before importing
-vi.stubEnv('SLACK_CLIENT_ID', 'test-client-id');
-vi.stubEnv('SLACK_CLIENT_SECRET', 'test-client-secret');
-vi.stubEnv('SERVER_URL', 'https://test.com');
-vi.stubEnv('SLACK_INTEGRATION_ENABLED', 'true');
-
-// Import after mocking env vars
+// Import after mocking
 import { SlackOAuthService } from './slack-oauth-service';
 
 describe('SlackOAuthService', () => {
@@ -55,40 +66,17 @@ describe('SlackOAuthService', () => {
     vi.stubEnv('SLACK_CLIENT_ID', 'test-client-id');
     vi.stubEnv('SLACK_CLIENT_SECRET', 'test-client-secret');
     vi.stubEnv('SERVER_URL', 'https://test.com');
-    vi.stubEnv('SLACK_INTEGRATION_ENABLED', 'true');
     service = new SlackOAuthService();
   });
 
   describe('isEnabled', () => {
-    it('should return true when integration is enabled', () => {
+    it('should always return true as integration is permanently enabled', () => {
       expect(service.isEnabled()).toBe(true);
-    });
-
-    it('should return false when integration is disabled', () => {
-      vi.stubEnv('SLACK_INTEGRATION_ENABLED', 'false');
-      const disabledService = new SlackOAuthService();
-      expect(disabledService.isEnabled()).toBe(false);
     });
   });
 
   describe('initiateOAuth', () => {
-    it('should throw error when integration is disabled', async () => {
-      vi.stubEnv('SLACK_INTEGRATION_ENABLED', 'false');
-      const disabledService = new SlackOAuthService();
-
-      await expect(
-        disabledService.initiateOAuth({
-          organizationId: 'org-123',
-          userId: 'user-123',
-        })
-      ).rejects.toThrow('Slack integration is not enabled');
-    });
-
     it('should throw error when active integration exists', async () => {
-      // Ensure integration is enabled for this test
-      vi.stubEnv('SLACK_INTEGRATION_ENABLED', 'true');
-      const enabledService = new SlackOAuthService();
-
       vi.mocked(slackHelpers.getActiveIntegration).mockResolvedValue({
         id: 'existing-integration',
         organizationId: 'org-123',
@@ -98,7 +86,7 @@ describe('SlackOAuthService', () => {
       } as any);
 
       await expect(
-        enabledService.initiateOAuth({
+        service.initiateOAuth({
           organizationId: 'org-123',
           userId: 'user-123',
         })

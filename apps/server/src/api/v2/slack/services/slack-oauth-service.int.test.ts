@@ -70,9 +70,6 @@ describe.skipIf(skipIfNoEnv)('SlackOAuthService Integration Tests', () => {
       return;
     }
 
-    // Set required env vars if not already set (for testing)
-    process.env.SLACK_INTEGRATION_ENABLED = 'true';
-
     // Create unique test organization and user
     const { organizationId, userId } = await createTestOrgAndUser();
     testOrganizationId = organizationId;

@@ -78,14 +78,11 @@ export async function updateMessageEntries({
       updateData.rawLlmMessages = mergedEntries.rawLlmMessages;
     }
 
-    // Non-blocking DB update - don't await
-    db.update(messages)
+    // Update database for persistence
+    await db
+      .update(messages)
       .set(updateData)
-      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
-      .catch((error) => {
-        // Log but don't fail - cache has the truth
-        console.error('Background DB update failed (cache still valid):', error);
-      });
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
 
     return { success: true };
   } catch (error) {

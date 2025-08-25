@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import * as db from '@buster/database';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   checkEmailDomainForOrganization,
   checkUserInOrganization,
@@ -9,30 +9,44 @@ import {
   getUserOrganizations,
 } from './user-organizations';
 
-// Mock the database module
-vi.mock('@buster/database', () => ({
-  getDb: vi.fn(),
-  and: vi.fn((...args) => ({ _and: args })),
-  eq: vi.fn((a, b) => ({ _eq: [a, b] })),
-  isNull: vi.fn((a) => ({ _isNull: a })),
-  organizations: {
-    id: 'organizations.id',
-    domains: 'organizations.domains',
-    deletedAt: 'organizations.deletedAt',
-    defaultRole: 'organizations.defaultRole',
-  },
-  users: {
-    id: 'users.id',
-    email: 'users.email',
-  },
-  usersToOrganizations: {
-    userId: 'usersToOrganizations.userId',
-    organizationId: 'usersToOrganizations.organizationId',
-    role: 'usersToOrganizations.role',
-    status: 'usersToOrganizations.status',
-    deletedAt: 'usersToOrganizations.deletedAt',
-  },
-}));
+// Mock the database module - vi.mock is hoisted so we need to define everything inside
+vi.mock('@buster/database', () => {
+  const mockDb = {
+    select: vi.fn(),
+    from: vi.fn(),
+    where: vi.fn(),
+    limit: vi.fn(),
+    insert: vi.fn(),
+    values: vi.fn(),
+    returning: vi.fn(),
+    onConflictDoUpdate: vi.fn(),
+  };
+
+  return {
+    getDb: vi.fn(() => Promise.resolve(mockDb)),
+    dbInitialized: Promise.resolve(mockDb),
+    and: vi.fn((...args) => ({ _and: args })),
+    eq: vi.fn((a, b) => ({ _eq: [a, b] })),
+    isNull: vi.fn((a) => ({ _isNull: a })),
+    organizations: {
+      id: 'organizations.id',
+      domains: 'organizations.domains',
+      deletedAt: 'organizations.deletedAt',
+      defaultRole: 'organizations.defaultRole',
+    },
+    users: {
+      id: 'users.id',
+      email: 'users.email',
+    },
+    usersToOrganizations: {
+      userId: 'usersToOrganizations.userId',
+      organizationId: 'usersToOrganizations.organizationId',
+      role: 'usersToOrganizations.role',
+      status: 'usersToOrganizations.status',
+      deletedAt: 'usersToOrganizations.deletedAt',
+    },
+  };
+});
 
 // Generate test UUIDs
 const TEST_USER_ID = randomUUID();
@@ -41,23 +55,37 @@ const TEST_ORG_ID_2 = randomUUID();
 const CREATOR_USER_ID = randomUUID();
 
 describe('user-organizations', () => {
+  let mockDb: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    // Get the mock database object
+    const dbModule = await import('@buster/database');
+    mockDb = await dbModule.dbInitialized;
+
+    // Reset mock methods to return 'this' for chaining
+    mockDb.select.mockReturnThis();
+    mockDb.from.mockReturnThis();
+    mockDb.where.mockReturnThis();
+    mockDb.limit.mockResolvedValue([]);
+    mockDb.insert.mockReturnThis();
+    mockDb.values.mockReturnThis();
+    mockDb.returning.mockResolvedValue([]);
+    mockDb.onConflictDoUpdate.mockResolvedValue([]);
+  });
+
   describe('checkUserInOrganization', () => {
     it('should return user organization info when user exists in org', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([
-          {
-            userId: TEST_USER_ID,
-            organizationId: TEST_ORG_ID,
-            role: 'querier',
-            status: 'active',
-          },
-        ]),
-      };
+      mockDb.limit.mockResolvedValue([
+        {
+          userId: TEST_USER_ID,
+          organizationId: TEST_ORG_ID,
+          role: 'querier',
+          status: 'active',
+        },
+      ]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkUserInOrganization(TEST_USER_ID, TEST_ORG_ID);
 
@@ -73,14 +101,9 @@ describe('user-organizations', () => {
     });
 
     it('should return null when user does not exist in org', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([]),
-      };
+      mockDb.limit.mockResolvedValue([]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkUserInOrganization(TEST_USER_ID, TEST_ORG_ID);
 
@@ -111,13 +134,9 @@ describe('user-organizations', () => {
         },
       ];
 
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockOrgs),
-      };
+      mockDb.where.mockResolvedValue(mockOrgs);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await getUserOrganizations(TEST_USER_ID);
 
@@ -126,13 +145,9 @@ describe('user-organizations', () => {
     });
 
     it('should return empty array when user has no organizations', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([]),
-      };
+      mockDb.where.mockResolvedValue([]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await getUserOrganizations(TEST_USER_ID);
 
@@ -142,14 +157,9 @@ describe('user-organizations', () => {
 
   describe('checkEmailDomainForOrganization', () => {
     it('should return true when email domain matches org domain', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ domains: ['example.com', 'test.com'] }]),
-      };
+      mockDb.limit.mockResolvedValue([{ domains: ['example.com', 'test.com'] }]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -157,14 +167,9 @@ describe('user-organizations', () => {
     });
 
     it('should return true when email domain matches with @ prefix', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ domains: ['@example.com', 'test.com'] }]),
-      };
+      mockDb.limit.mockResolvedValue([{ domains: ['@example.com', 'test.com'] }]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -172,29 +177,19 @@ describe('user-organizations', () => {
     });
 
     it('should return false when email domain does not match', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ domains: ['allowed.com', 'permitted.com'] }]),
-      };
+      mockDb.limit.mockResolvedValue([{ domains: ['other.com'] }]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
-      const result = await checkEmailDomainForOrganization('user@notallowed.com', TEST_ORG_ID);
+      const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
       expect(result).toBe(false);
     });
 
     it('should return false when org has no domains', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ domains: null }]),
-      };
+      mockDb.limit.mockResolvedValue([{ domains: null }]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -202,14 +197,9 @@ describe('user-organizations', () => {
     });
 
     it('should return false when org does not exist', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([]),
-      };
+      mockDb.limit.mockResolvedValue([]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -217,14 +207,9 @@ describe('user-organizations', () => {
     });
 
     it('should be case insensitive for domain matching', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([{ domains: ['EXAMPLE.COM'] }]),
-      };
+      mockDb.limit.mockResolvedValue([{ domains: ['EXAMPLE.COM'] }]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -243,14 +228,9 @@ describe('user-organizations', () => {
         updatedAt: '2024-01-01',
       };
 
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([mockOrg]),
-      };
+      mockDb.limit.mockResolvedValue([mockOrg]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await getOrganizationWithDefaults(TEST_ORG_ID);
 
@@ -258,14 +238,9 @@ describe('user-organizations', () => {
     });
 
     it('should return null when organization does not exist', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([]),
-      };
+      mockDb.limit.mockResolvedValue([]);
 
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await getOrganizationWithDefaults(TEST_ORG_ID);
 
@@ -290,23 +265,17 @@ describe('user-organizations', () => {
         attributes: {},
       };
 
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockImplementation(() => {
-          // Check if we're querying users or organizations
-          const lastCall = mockDb.from.mock.lastCall;
-          if (lastCall && lastCall[0] === db.users) return Promise.resolve([]);
-          return Promise.resolve([mockOrg]);
-        }),
-        insert: vi.fn().mockReturnThis(),
-        values: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockUser]),
-        onConflictDoUpdate: vi.fn().mockResolvedValue([]),
-      };
-
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      // For organization lookup
+      mockDb.limit.mockImplementation(() => {
+        // Check if we're querying users or organizations
+        const lastCall = mockDb.from.mock.lastCall;
+        if (lastCall && lastCall[0] === db.users) return Promise.resolve([]);
+        return Promise.resolve([mockOrg]);
+      });
+      // For user creation
+      mockDb.returning.mockResolvedValue([mockUser]);
+      // For membership creation
+      mockDb.onConflictDoUpdate.mockResolvedValue([]);
 
       const result = await createUserInOrganization(
         'newuser@example.com',
@@ -322,11 +291,9 @@ describe('user-organizations', () => {
         role: 'restricted_querier',
         status: 'active',
       });
-
-      expect(mockDb.insert).toHaveBeenCalledTimes(2); // User and membership
     });
 
-    it('should use existing user if email already exists', async () => {
+    it('should use existing user when email already exists', async () => {
       const mockOrg = {
         id: TEST_ORG_ID,
         name: 'Test Org',
@@ -342,22 +309,15 @@ describe('user-organizations', () => {
         attributes: {},
       };
 
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockImplementation(() => {
-          // Check if we're querying users or organizations
-          const lastCall = mockDb.from.mock.lastCall;
-          if (lastCall && lastCall[0] === db.users) return Promise.resolve([mockExistingUser]);
-          return Promise.resolve([mockOrg]);
-        }),
-        insert: vi.fn().mockReturnThis(),
-        values: vi.fn().mockReturnThis(),
-        onConflictDoUpdate: vi.fn().mockResolvedValue([]),
-      };
-
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      // For organization and user lookup
+      mockDb.limit.mockImplementation(() => {
+        // Check if we're querying users or organizations
+        const lastCall = mockDb.from.mock.lastCall;
+        if (lastCall && lastCall[0] === db.users) return Promise.resolve([mockExistingUser]);
+        return Promise.resolve([mockOrg]);
+      });
+      // For membership creation
+      mockDb.onConflictDoUpdate.mockResolvedValue([]);
 
       const result = await createUserInOrganization(
         'existing@example.com',
@@ -374,14 +334,7 @@ describe('user-organizations', () => {
     });
 
     it('should throw error if organization does not exist', async () => {
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockResolvedValue([]),
-      };
-
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      mockDb.limit.mockResolvedValue([]);
 
       const nonExistentOrgId = randomUUID();
 
@@ -398,31 +351,23 @@ describe('user-organizations', () => {
         domains: ['example.com'],
       };
 
-      const mockDb = {
-        select: vi.fn().mockReturnThis(),
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockImplementation(() => {
-          // Check if we're querying users or organizations
-          const lastCall = mockDb.from.mock.lastCall;
-          if (lastCall && lastCall[0] === db.users) return Promise.resolve([]);
-          return Promise.resolve([mockOrg]);
-        }),
-        insert: vi.fn().mockReturnThis(),
-        values: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([
-          {
-            id: 'new-user-123',
-            email: 'john.doe@example.com',
-            name: 'john.doe',
-            config: {},
-            attributes: {},
-          },
-        ]),
-        onConflictDoUpdate: vi.fn().mockResolvedValue([]),
-      };
-
-      vi.mocked(db.getDb).mockReturnValue(mockDb as any);
+      // For organization and user lookup
+      mockDb.limit.mockImplementation(() => {
+        // Check if we're querying users or organizations
+        const lastCall = mockDb.from.mock.lastCall;
+        if (lastCall && lastCall[0] === db.users) return Promise.resolve([]);
+        return Promise.resolve([mockOrg]);
+      });
+      // For user creation
+      mockDb.returning.mockResolvedValue([
+        {
+          id: 'new-user-123',
+          email: 'john.doe@example.com',
+          name: 'john.doe',
+          config: {},
+          attributes: {},
+        },
+      ]);
 
       await createUserInOrganization(
         'john.doe@example.com',

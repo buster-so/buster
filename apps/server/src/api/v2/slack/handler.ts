@@ -1,4 +1,5 @@
 import { getUserOrganizationId } from '@buster/database';
+import { getSecret, SERVER_KEYS } from '@buster/secrets';
 import {
   type GetChannelsResponse,
   type GetIntegrationResponse,
@@ -135,7 +136,7 @@ export class SlackHandler {
    */
   async handleOAuthCallback(c: Context): Promise<Response> {
     // Get base URL from environment
-    const baseUrl = process.env.BUSTER_URL || '';
+    const baseUrl = (await getSecret(SERVER_KEYS.BUSTER_URL)) || '';
 
     try {
       // Get service instance (lazy initialization)

@@ -8,13 +8,16 @@ import { SnowflakeAdapter } from './snowflake';
 vi.mock('snowflake-sdk');
 const mockedSnowflake = vi.mocked(snowflake);
 
-describe('SnowflakeAdapter', () => {
+// Set a reasonable timeout for unit tests
+describe('SnowflakeAdapter', { timeout: 5000 }, () => {
   let adapter: SnowflakeAdapter;
   let mockConnection: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
+    // Ensure we start with a clean state
+    vi.useRealTimers();
     await SnowflakeAdapter.cleanup();
 
     adapter = new SnowflakeAdapter();
@@ -35,6 +38,8 @@ describe('SnowflakeAdapter', () => {
     // Clean up warm connections after each test
     await SnowflakeAdapter.cleanup();
     vi.restoreAllMocks();
+    // Ensure timers are reset to real timers in case any test left them fake
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -365,20 +370,23 @@ describe('SnowflakeAdapter', () => {
     });
 
     it('should handle query timeout', async () => {
-      vi.useFakeTimers();
+      // Use real timers with a short timeout for more reliable testing
+      const mockExecute = vi.fn();
+      mockConnection.execute = mockExecute;
 
-      mockConnection.execute.mockImplementation(() => {
-        // Never call complete to simulate timeout
+      // Mock execute to never complete
+      mockExecute.mockImplementation(() => {
+        // Never call complete callback to simulate a hanging query
       });
 
-      const queryPromise = adapter.query('SELECT 1', [], undefined, 100);
+      // Query with a very short timeout
+      const queryPromise = adapter.query('SELECT 1', [], undefined, 50);
 
-      // Fast-forward past the timeout
-      vi.advanceTimersByTime(150);
-
+      // Expect the query to reject with timeout error
       await expect(queryPromise).rejects.toThrow(/timeout/i);
 
-      vi.useRealTimers();
+      // Verify execute was called
+      expect(mockExecute).toHaveBeenCalled();
     });
   });
 

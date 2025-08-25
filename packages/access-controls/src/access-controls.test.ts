@@ -3,56 +3,61 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccessControlsError } from './types';
 import { buildAccessQuery, formatPermissionName, isValidUuid } from './utils';
 
-// Create a proper chainable mock
-const createChainableMock = () => {
-  const mock: any = {};
+// Mock the database module - vi.mock is hoisted so we need to define everything inside
+vi.mock('@buster/database', () => {
+  // Create a proper chainable mock inside the factory
+  const createChainableMock = () => {
+    const mock: any = {};
 
-  const methods = [
-    'select',
-    'from',
-    'where',
-    'limit',
-    'offset',
-    'orderBy',
-    'innerJoin',
-    'selectDistinct',
-  ];
+    const methods = [
+      'select',
+      'from',
+      'where',
+      'limit',
+      'offset',
+      'orderBy',
+      'innerJoin',
+      'selectDistinct',
+    ];
 
-  for (const method of methods) {
-    mock[method] = vi.fn().mockReturnValue(mock);
-  }
+    for (const method of methods) {
+      mock[method] = vi.fn().mockReturnValue(mock);
+    }
 
-  // Override specific methods that should return data
-  mock._resolveWith = (data: any) => {
-    mock.limit.mockResolvedValue(data);
-    mock.where.mockResolvedValue(data);
-    mock.offset.mockResolvedValue(data);
-    // Also make sure the chainable methods return promises when needed
-    mock.limit.mockReturnValue(Promise.resolve(data));
-    mock.where.mockReturnValue(Promise.resolve(data));
-    mock.offset.mockReturnValue(Promise.resolve(data));
+    // Override specific methods that should return data
+    mock._resolveWith = (data: any) => {
+      mock.limit.mockResolvedValue(data);
+      mock.where.mockResolvedValue(data);
+      mock.offset.mockResolvedValue(data);
+      // Also make sure the chainable methods return promises when needed
+      mock.limit.mockReturnValue(Promise.resolve(data));
+      mock.where.mockReturnValue(Promise.resolve(data));
+      mock.offset.mockReturnValue(Promise.resolve(data));
+      return mock;
+    };
+
     return mock;
   };
 
-  return mock;
-};
+  const mockDbInstance = createChainableMock();
 
-// Mock the database module
-vi.mock('@buster/database', () => ({
-  getDb: vi.fn(() => createChainableMock()),
-  and: vi.fn((...args) => ({ type: 'and', args })),
-  eq: vi.fn((a, b) => ({ type: 'eq', a, b })),
-  isNull: vi.fn((field) => ({ type: 'isNull', field })),
-  inArray: vi.fn((field, array) => ({ type: 'inArray', field, array })),
-  count: vi.fn(() => ({ type: 'count' })),
-  usersToOrganizations: {},
-  datasets: {},
-  permissionGroups: {},
-  datasetsToPermissionGroups: {},
-  datasetPermissions: {},
-  permissionGroupsToIdentities: {},
-  teamsToUsers: {},
-}));
+  return {
+    getDb: vi.fn(() => Promise.resolve(mockDbInstance)),
+    dbInitialized: Promise.resolve(mockDbInstance),
+    and: vi.fn((...args) => ({ type: 'and', args })),
+    eq: vi.fn((a, b) => ({ type: 'eq', a, b })),
+    isNull: vi.fn((field) => ({ type: 'isNull', field })),
+    inArray: vi.fn((field, array) => ({ type: 'inArray', field, array })),
+    count: vi.fn(() => ({ type: 'count' })),
+    usersToOrganizations: {},
+    datasets: {},
+    permissionGroups: {},
+    datasetsToPermissionGroups: {},
+    datasetPermissions: {},
+    permissionGroupsToIdentities: {},
+    teamsToUsers: {},
+  };
+});
 
 describe('Access Controls Unit Tests - Organization Default Permission Group', () => {
   const testUserId = uuidv4();
@@ -83,14 +88,14 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return empty array when user has no organization', async () => {
-      const mockDb = createChainableMock();
+      // Get the dbInitialized mock
+      const dbModule = await import('@buster/database');
+      const mockDb = await dbModule.dbInitialized;
 
       // Mock for user organization query (returns empty)
       mockDb.select.mockReturnValueOnce(mockDb);
       mockDb.from.mockReturnValueOnce(mockDb);
       mockDb.where.mockResolvedValueOnce([]);
-
-      vi.mocked(await import('@buster/database')).getDb.mockReturnValue(mockDb);
 
       const { getPermissionedDatasets } = await import('./access-controls');
       const result = await getPermissionedDatasets(testUserId, 0, 10);
@@ -100,7 +105,9 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return datasets for admin users', async () => {
-      const mockDb = createChainableMock();
+      // Get the dbInitialized mock
+      const dbModule = await import('@buster/database');
+      const mockDb = await dbModule.dbInitialized;
 
       // Mock for user organization query - returns admin user
       mockDb.select.mockReturnValueOnce(mockDb);
@@ -132,8 +139,6 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
       mockDb.limit.mockReturnValueOnce(mockDb);
       mockDb.offset.mockResolvedValueOnce(mockDatasets);
 
-      vi.mocked(await import('@buster/database')).getDb.mockReturnValue(mockDb);
-
       const { getPermissionedDatasets } = await import('./access-controls');
       const result = await getPermissionedDatasets(testUserId, 0, 10);
 
@@ -150,17 +155,17 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return false when dataset is deleted', async () => {
-      const { getDb } = await import('@buster/database');
+      // Get the dbInitialized mock
+      const dbModule = await import('@buster/database');
+      const mockDb = await dbModule.dbInitialized;
 
-      vi.resetModules();
+      // Clear previous mock calls
       vi.clearAllMocks();
 
-      const mockDb = createChainableMock();
-      vi.mocked(await import('@buster/database')).getDb.mockReturnValue(mockDb);
-
-      const { hasDatasetAccess } = await import('./access-controls');
-
       // Mock dataset query to return deleted dataset
+      mockDb.select.mockReturnValueOnce(mockDb);
+      mockDb.from.mockReturnValueOnce(mockDb);
+      mockDb.where.mockReturnValueOnce(mockDb);
       mockDb.limit.mockResolvedValueOnce([
         {
           organizationId: testOrgId,
@@ -168,6 +173,7 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
         },
       ]);
 
+      const { hasDatasetAccess } = await import('./access-controls');
       const result = await hasDatasetAccess(testUserId, testDatasetId1);
 
       expect(result).toBe(false);
@@ -192,17 +198,17 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return false when not all datasets exist', async () => {
-      const { getDb } = await import('@buster/database');
+      // Get the dbInitialized mock
+      const dbModule = await import('@buster/database');
+      const mockDb = await dbModule.dbInitialized;
 
-      vi.resetModules();
+      // Clear previous mock calls
       vi.clearAllMocks();
 
-      const mockDb = createChainableMock();
-      vi.mocked(await import('@buster/database')).getDb.mockReturnValue(mockDb);
-
-      const { hasAllDatasetsAccess } = await import('./access-controls');
-
       // Mock dataset query to return fewer datasets than requested
+      mockDb.select.mockReturnValueOnce(mockDb);
+      mockDb.from.mockReturnValueOnce(mockDb);
+      mockDb.where.mockReturnValueOnce(mockDb);
       mockDb.limit.mockResolvedValueOnce([
         {
           id: testDatasetId1,
@@ -211,6 +217,7 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
         },
       ]);
 
+      const { hasAllDatasetsAccess } = await import('./access-controls');
       const result = await hasAllDatasetsAccess(testUserId, [testDatasetId1, testDatasetId2]);
 
       expect(result).toBe(false);
@@ -219,14 +226,15 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
 
   describe('Edge Cases', () => {
     it('should handle database connection errors gracefully', async () => {
-      const { getDb } = await import('@buster/database');
+      // Get the dbInitialized mock
+      const dbModule = await import('@buster/database');
+      const mockDb = await dbModule.dbInitialized;
 
-      vi.resetModules();
+      // Clear previous mock calls
       vi.clearAllMocks();
 
-      const mockDb = createChainableMock();
+      // Mock database error
       mockDb.select.mockRejectedValueOnce(new Error('Database connection failed'));
-      vi.mocked(await import('@buster/database')).getDb.mockReturnValue(mockDb);
 
       const { getPermissionedDatasets } = await import('./access-controls');
 
