@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, it } from 'vitest';
 import { getSecretSync } from '@buster/secrets';
+import { beforeAll, describe, expect, it } from 'vitest';
 import type {
   ISlackOAuthStateStorage,
   ISlackTokenStorage,

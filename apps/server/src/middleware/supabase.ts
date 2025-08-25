@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { getSecret } from '@buster/secrets';
+import { createClient } from '@supabase/supabase-js';
 
 export const createSupabaseClient = async () => {
   const supabaseUrl = await getSecret('SUPABASE_URL');

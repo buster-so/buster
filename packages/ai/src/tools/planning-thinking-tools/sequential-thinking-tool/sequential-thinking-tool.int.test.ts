@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { db, messages, chats, organizations, users } from '@buster/database';
-import { v4 as uuidv4 } from 'uuid';
+import { chats, db, messages, organizations, users } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
 import { and, eq, isNull } from 'drizzle-orm';
+import { v4 as uuidv4 } from 'uuid';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import type {
   SequentialThinkingContext,

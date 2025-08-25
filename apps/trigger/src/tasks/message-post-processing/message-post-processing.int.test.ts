@@ -1,6 +1,6 @@
-import { eq, getDb, messages, chats, db as dbImport, organizations, users } from '@buster/database';
-import { v4 as uuidv4 } from 'uuid';
+import { chats, db as dbImport, eq, getDb, messages, organizations, users } from '@buster/database';
 import { runs, tasks } from '@trigger.dev/sdk';
+import { v4 as uuidv4 } from 'uuid';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { messagePostProcessingTask } from './message-post-processing';
 

@@ -1,15 +1,24 @@
-import { asc, chats, db, eq, messages, organizations, users, usersToOrganizations } from '@buster/database';
+import {
+  asc,
+  chats,
+  db,
+  eq,
+  messages,
+  organizations,
+  users,
+  usersToOrganizations,
+} from '@buster/database';
 import {
   ChatCreateRequestSchema,
   ChatError,
   type ChatWithMessages,
   ChatWithMessagesSchema,
 } from '@buster/server-shared/chats';
-import { v4 as uuidv4 } from 'uuid';
 import { zValidator } from '@hono/zod-validator';
 import type { User } from '@supabase/supabase-js';
 import { tasks } from '@trigger.dev/sdk/v3';
 import { Hono } from 'hono';
+import { v4 as uuidv4 } from 'uuid';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createChatHandler } from './handler';
 

@@ -1,7 +1,7 @@
+import { getSecretSync } from '@buster/secrets';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { getSecretSync } from '@buster/secrets';
 
 // Global pool instance
 let globalPool: postgres.Sql | null = null;

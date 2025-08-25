@@ -1,6 +1,6 @@
+import { getSecretSync } from '@buster/secrets';
 import { pinoLogger } from 'hono-pino';
 import pino from 'pino';
-import { getSecretSync } from '@buster/secrets';
 
 const getEnvValue = (key: string, defaultValue?: string): string | undefined => {
   try {

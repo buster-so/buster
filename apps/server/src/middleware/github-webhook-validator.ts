@@ -25,7 +25,7 @@ export function githubWebhookValidator(): MiddlewareHandler {
       }
 
       // Get webhook secret from secrets
-      const webhookSecret = await getSecret('GITHUB_WEBHOOK_SECRET').catch(() => {
+      const _webhookSecret = await getSecret('GITHUB_WEBHOOK_SECRET').catch(() => {
         throw new HTTPException(500, {
           message: 'GITHUB_WEBHOOK_SECRET not configured',
         });

@@ -1,7 +1,7 @@
-import { db, eq, messages, chats, organizations, users } from '@buster/database';
-import { v4 as uuidv4 } from 'uuid';
+import { chats, db, eq, messages, organizations, users } from '@buster/database';
 import { runs, tasks } from '@trigger.dev/sdk';
 import { initLogger, wrapTraced } from 'braintrust';
+import { v4 as uuidv4 } from 'uuid';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import type { analystAgentTask } from '../../src/tasks/analyst-agent-task';
 

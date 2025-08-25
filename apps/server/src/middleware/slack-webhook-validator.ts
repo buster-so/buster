@@ -1,10 +1,10 @@
+import { getSecret } from '@buster/secrets';
 import {
   type SlackWebhookPayload,
   handleUrlVerification,
   parseSlackWebhookPayload,
   verifySlackRequest,
 } from '@buster/slack';
-import { getSecret } from '@buster/secrets';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 

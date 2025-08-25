@@ -1,6 +1,6 @@
+import { getSecret } from '@buster/secrets';
 import type { GitHubOperationError } from '@buster/server-shared/github';
 import { GitHubErrorCode } from '@buster/server-shared/github';
-import { getSecret } from '@buster/secrets';
 import { App } from 'octokit';
 
 /**
@@ -17,7 +17,7 @@ export async function getGitHubAppCredentials(): Promise<{
 
   try {
     appId = await getSecret('GITHUB_APP_ID');
-  } catch (error) {
+  } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
       'GITHUB_APP_ID not found in environment or Infisical'
@@ -26,7 +26,7 @@ export async function getGitHubAppCredentials(): Promise<{
 
   try {
     privateKeyBase64 = await getSecret('GITHUB_APP_PRIVATE_KEY_BASE64');
-  } catch (error) {
+  } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
       'GITHUB_APP_PRIVATE_KEY_BASE64 not found in environment or Infisical'
@@ -35,7 +35,7 @@ export async function getGitHubAppCredentials(): Promise<{
 
   try {
     webhookSecret = await getSecret('GITHUB_WEBHOOK_SECRET');
-  } catch (error) {
+  } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
       'GITHUB_WEBHOOK_SECRET not found in environment or Infisical'

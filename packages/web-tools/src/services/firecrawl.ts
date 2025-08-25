@@ -1,5 +1,5 @@
-import FirecrawlApp from '@mendable/firecrawl-js';
 import { getSecretSync } from '@buster/secrets';
+import FirecrawlApp from '@mendable/firecrawl-js';
 import { CompanyResearchError } from '../deep-research/types';
 
 export interface FirecrawlConfig {
@@ -75,13 +75,15 @@ export class FirecrawlService {
   private app: FirecrawlApp;
 
   constructor(config?: FirecrawlConfig) {
-    const apiKey = config?.apiKey || (() => {
-      try {
-        return getSecretSync('FIRECRAWL_API_KEY');
-      } catch {
-        return undefined;
-      }
-    })();
+    const apiKey =
+      config?.apiKey ||
+      (() => {
+        try {
+          return getSecretSync('FIRECRAWL_API_KEY');
+        } catch {
+          return undefined;
+        }
+      })();
 
     if (!apiKey) {
       throw new CompanyResearchError(

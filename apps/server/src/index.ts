@@ -1,6 +1,6 @@
+import { getSecret } from '@buster/secrets';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { getSecret } from '@buster/secrets';
 
 // Import custom middleware
 import { corsMiddleware } from './middleware/cors';

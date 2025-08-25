@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { db, messages, updateMessageEntries, chats, organizations, users } from '@buster/database';
-import { v4 as uuidv4 } from 'uuid';
+import { chats, db, messages, organizations, updateMessageEntries, users } from '@buster/database';
 import type { ModelMessage, ToolCallOptions } from 'ai';
 import { and, eq, isNull } from 'drizzle-orm';
+import { v4 as uuidv4 } from 'uuid';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import type { DoneToolContext, DoneToolInput, DoneToolState } from './done-tool';
 import { createDoneToolDelta } from './done-tool-delta';

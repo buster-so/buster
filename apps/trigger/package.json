@@ -35,10 +35,12 @@
     "ai": "catalog:",
     "braintrust": "catalog:",
     "drizzle-orm": "catalog:",
+    "uuid": "^11.1.0",
     "vitest": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "catalog:"
+    "@trigger.dev/build": "catalog:",
+    "@types/uuid": "^10.0.0"
   }
 }

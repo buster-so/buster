@@ -1,4 +1,5 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider';
+import { AI_KEYS, getSecretSync } from '@buster/secrets';
 import { createFallback } from './ai-fallback';
 import { anthropicModel } from './providers/anthropic';
 import { vertexModel } from './providers/vertex';
@@ -15,23 +16,30 @@ function initializeHaiku35() {
   const models: LanguageModelV2[] = [];
 
   // Only include Anthropic if API key is available
-  if (process.env.ANTHROPIC_API_KEY) {
+  try {
+    getSecretSync(AI_KEYS.ANTHROPIC_API_KEY);
     try {
       models.push(anthropicModel('claude-3-5-haiku-20241022'));
       console.info('Haiku35: Anthropic model added to fallback chain');
     } catch (error) {
       console.warn('Haiku35: Failed to initialize Anthropic model:', error);
     }
+  } catch {
+    // API key not available, skip Anthropic model
   }
 
   // Only include Vertex if credentials are available
-  if (process.env.VERTEX_CLIENT_EMAIL && process.env.VERTEX_PRIVATE_KEY) {
+  try {
+    getSecretSync(AI_KEYS.VERTEX_CLIENT_EMAIL);
+    getSecretSync(AI_KEYS.VERTEX_PRIVATE_KEY);
     try {
       models.push(vertexModel('claude-3-5-haiku@20241022'));
       console.info('Haiku35: Vertex AI model added to fallback chain');
     } catch (error) {
       console.warn('Haiku35: Failed to initialize Vertex AI model:', error);
     }
+  } catch {
+    // Vertex credentials not available, skip Vertex model
   }
 
   // Ensure we have at least one model

@@ -1,10 +1,11 @@
 import { createOpenAI } from '@ai-sdk/openai';
+import { AI_KEYS, getSecretSync } from '@buster/secrets';
 import { wrapLanguageModel } from 'ai';
 import { BraintrustMiddleware } from 'braintrust';
 
 export const openaiModel = (modelId: string) => {
   const openai = createOpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: getSecretSync(AI_KEYS.OPENAI_API_KEY),
   });
 
   // Wrap the model with Braintrust middleware

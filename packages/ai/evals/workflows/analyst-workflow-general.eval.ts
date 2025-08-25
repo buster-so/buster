@@ -1,3 +1,4 @@
+import { AI_KEYS, getSecretSync } from '@buster/secrets';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { Eval, initDataset, initLogger } from 'braintrust';
 import analystWorkflow, {
@@ -5,7 +6,7 @@ import analystWorkflow, {
 } from '../../src/workflows/analyst-agent-workflow/analyst-workflow';
 
 initLogger({
-  apiKey: process.env.BRAINTRUST_KEY,
+  apiKey: getSecretSync(AI_KEYS.BRAINTRUST_KEY),
   projectName: 'ANALYST-WORKFLOW',
 });
 

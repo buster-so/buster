@@ -1,4 +1,5 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider';
+import { AI_KEYS, getSecretSync } from '@buster/secrets';
 import { createFallback } from './ai-fallback';
 import { openaiModel } from './providers/openai';
 
@@ -14,13 +15,16 @@ function initializeGPT5() {
   const models: LanguageModelV2[] = [];
 
   // Only include OpenAI if API key is available
-  if (process.env.OPENAI_API_KEY) {
+  try {
+    getSecretSync(AI_KEYS.OPENAI_API_KEY);
     try {
       models.push(openaiModel('gpt-5-mini-2025-08-07'));
       console.info('GPT5: OpenAI model added to fallback chain');
     } catch (error) {
       console.warn('GPT5: Failed to initialize OpenAI model:', error);
     }
+  } catch {
+    // API key not available, skip OpenAI model
   }
 
   // Ensure we have at least one model

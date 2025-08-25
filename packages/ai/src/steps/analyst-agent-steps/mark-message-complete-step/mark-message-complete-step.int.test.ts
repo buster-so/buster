@@ -1,6 +1,6 @@
 import { chats, db, messages, organizations, users } from '@buster/database';
-import { v4 as uuidv4 } from 'uuid';
 import { eq } from 'drizzle-orm';
+import { v4 as uuidv4 } from 'uuid';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Helper functions for test data creation

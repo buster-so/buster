@@ -1,5 +1,6 @@
 import { createVertexAnthropic } from '@ai-sdk/google-vertex/anthropic';
 import type { LanguageModelV2 } from '@ai-sdk/provider';
+import { AI_KEYS, getSecretSync } from '@buster/secrets';
 import { wrapLanguageModel } from 'ai';
 import { BraintrustMiddleware } from 'braintrust';
 
@@ -9,9 +10,9 @@ export const vertexModel = (modelId: string): LanguageModelV2 => {
 
   const getActualModel = () => {
     if (!actualModel) {
-      const clientEmail = process.env.VERTEX_CLIENT_EMAIL;
-      let privateKey = process.env.VERTEX_PRIVATE_KEY;
-      const project = process.env.VERTEX_PROJECT;
+      const clientEmail = getSecretSync(AI_KEYS.VERTEX_CLIENT_EMAIL);
+      let privateKey = getSecretSync(AI_KEYS.VERTEX_PRIVATE_KEY);
+      const project = getSecretSync(AI_KEYS.VERTEX_PROJECT);
 
       if (!clientEmail || !privateKey || !project) {
         throw new Error(

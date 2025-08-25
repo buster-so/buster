@@ -1,9 +1,11 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { AI_KEYS, getSecretSync } from '@buster/secrets';
 import { wrapLanguageModel } from 'ai';
 import { BraintrustMiddleware } from 'braintrust';
 
 export const anthropicModel = (modelId: string) => {
   const anthropic = createAnthropic({
+    apiKey: getSecretSync(AI_KEYS.ANTHROPIC_API_KEY),
     headers: {
       'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
     },
