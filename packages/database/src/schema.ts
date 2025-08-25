@@ -88,6 +88,7 @@ export const verificationEnum = pgEnum('verification_enum', [
   'requested',
   'notRequested',
 ]);
+export const storageProviderEnum = pgEnum('storage_provider_enum', ['s3', 'r2', 'gcs']);
 export const tableTypeEnum = pgEnum('table_type_enum', [
   'TABLE',
   'VIEW',
@@ -1217,6 +1218,34 @@ export const organizations = pgTable(
       .notNull(),
   },
   (table) => [unique('organizations_name_key').on(table.name)]
+);
+
+export const s3Integrations = pgTable(
+  's3_integrations',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    provider: storageProviderEnum().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 's3_integrations_organization_id_fkey',
+    }).onDelete('cascade'),
+    index('idx_s3_integrations_organization_id').using(
+      'btree',
+      table.organizationId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_s3_integrations_deleted_at').using('btree', table.deletedAt.asc().nullsLast()),
+  ]
 );
 
 export const storedValuesSyncJobs = pgTable(

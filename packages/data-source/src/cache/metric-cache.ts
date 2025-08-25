@@ -1,33 +1,6 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
+import { getProviderForOrganization } from '../storage';
 
-// Initialize R2 client (S3-compatible)
-let r2Client: S3Client | null = null;
-
-function getR2Client(): S3Client {
-  if (!r2Client) {
-    const accountId = process.env.R2_ACCOUNT_ID;
-    const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-
-    if (!accountId || !accessKeyId || !secretAccessKey) {
-      throw new Error('R2 credentials not configured');
-    }
-
-    r2Client = new S3Client({
-      region: 'auto',
-      endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-    });
-  }
-
-  return r2Client;
-}
-
-const R2_BUCKET = process.env.R2_BUCKET || 'metric-exports';
 const CACHE_PREFIX = 'static-report-assets';
 
 /**
@@ -67,29 +40,19 @@ export async function checkCacheExists(
   reportId: string
 ): Promise<boolean> {
   try {
-    const client = getR2Client();
+    const storageProvider = await getProviderForOrganization(organizationId);
     const key = generateCacheKey(organizationId, metricId, reportId);
 
-    const command = new GetObjectCommand({
-      Bucket: R2_BUCKET,
-      Key: key,
-      Range: 'bytes=0-0', // Just check if object exists by requesting first byte
-    });
-
-    await client.send(command);
-    return true;
+    const exists = await storageProvider.exists(key);
+    return exists;
   } catch (error: unknown) {
-    // Object doesn't exist or other error
-    if (error && typeof error === 'object' && 'name' in error && error.name === 'NoSuchKey') {
-      return false;
-    }
-    console.error('[r2-metric-cache] Error checking cache existence:', error);
+    console.error('[metric-cache] Error checking cache existence:', error);
     return false;
   }
 }
 
 /**
- * Get cached metric data from R2
+ * Get cached metric data from storage
  */
 export async function getCachedMetricData(
   organizationId: string,
@@ -97,41 +60,32 @@ export async function getCachedMetricData(
   reportId: string
 ): Promise<MetricDataResponse | null> {
   try {
-    const client = getR2Client();
+    const storageProvider = await getProviderForOrganization(organizationId);
     const key = generateCacheKey(organizationId, metricId, reportId);
 
-    console.info('[r2-metric-cache] Fetching cached data', {
+    console.info('[metric-cache] Fetching cached data', {
       organizationId,
       metricId,
       reportId,
       key,
     });
 
-    const command = new GetObjectCommand({
-      Bucket: R2_BUCKET,
-      Key: key,
-    });
+    const downloadResult = await storageProvider.download(key);
 
-    const response = await client.send(command);
-
-    if (!response.Body) {
-      console.warn('[r2-metric-cache] No body in cache response');
+    if (!downloadResult.success || !downloadResult.data) {
+      console.info('[metric-cache] Cache miss', {
+        organizationId,
+        metricId,
+        reportId,
+      });
       return null;
     }
 
-    // Convert stream to buffer
-    const chunks: Uint8Array[] = [];
-    const stream = response.Body as AsyncIterable<Uint8Array>;
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-
     // Convert JSON to metric data
-    const data = jsonToData(buffer);
+    const data = jsonToData(downloadResult.data);
     data.metricId = metricId;
 
-    console.info('[r2-metric-cache] Cache hit', {
+    console.info('[metric-cache] Cache hit', {
       organizationId,
       metricId,
       reportId,
@@ -140,22 +94,13 @@ export async function getCachedMetricData(
 
     return data;
   } catch (error: unknown) {
-    if (error && typeof error === 'object' && 'name' in error && error.name === 'NoSuchKey') {
-      console.info('[r2-metric-cache] Cache miss', {
-        organizationId,
-        metricId,
-        reportId,
-      });
-      return null;
-    }
-
-    console.error('[r2-metric-cache] Error fetching cached data:', error);
+    console.error('[metric-cache] Error fetching cached data:', error);
     return null;
   }
 }
 
 /**
- * Set cached metric data in R2
+ * Set cached metric data in storage
  */
 export async function setCachedMetricData(
   organizationId: string,
@@ -164,10 +109,10 @@ export async function setCachedMetricData(
   data: MetricDataResponse
 ): Promise<void> {
   try {
-    const client = getR2Client();
+    const storageProvider = await getProviderForOrganization(organizationId);
     const key = generateCacheKey(organizationId, metricId, reportId);
 
-    console.info('[r2-metric-cache] Caching metric data', {
+    console.info('[metric-cache] Caching metric data', {
       organizationId,
       metricId,
       reportId,
@@ -178,12 +123,9 @@ export async function setCachedMetricData(
     // Convert data to JSON format
     const jsonBuffer = dataToJson(data);
 
-    const command = new PutObjectCommand({
-      Bucket: R2_BUCKET,
-      Key: key,
-      Body: jsonBuffer,
-      ContentType: 'application/json',
-      Metadata: {
+    const uploadResult = await storageProvider.upload(key, jsonBuffer, {
+      contentType: 'application/json',
+      metadata: {
         'organization-id': organizationId,
         'metric-id': metricId,
         'report-id': reportId,
@@ -192,16 +134,18 @@ export async function setCachedMetricData(
       },
     });
 
-    await client.send(command);
-
-    console.info('[r2-metric-cache] Successfully cached metric data', {
-      organizationId,
-      metricId,
-      reportId,
-      sizeBytes: jsonBuffer.length,
-    });
+    if (uploadResult.success) {
+      console.info('[metric-cache] Successfully cached metric data', {
+        organizationId,
+        metricId,
+        reportId,
+        sizeBytes: jsonBuffer.length,
+      });
+    } else {
+      console.error('[metric-cache] Failed to cache metric data:', uploadResult.error);
+    }
   } catch (error) {
-    console.error('[r2-metric-cache] Error caching metric data:', error);
+    console.error('[metric-cache] Error caching metric data:', error);
     // Don't throw - caching failures shouldn't break the main flow
   }
 }

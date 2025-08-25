@@ -67,6 +67,106 @@ interface ReportInfo {
 }
 
 /**
+ * Extract ALL files from tool calls for updating the chat's most recent file
+ * This includes reports that would normally be filtered out
+ */
+export function extractAllFilesForChatUpdate(messages: ModelMessage[]): ExtractedFile[] {
+  const files: ExtractedFile[] = [];
+
+  console.info('[done-tool-file-selection] Extracting ALL files for chat update', {
+    messageCount: messages.length,
+  });
+
+  // First pass: extract create report content from assistant messages
+  const createReportContents: Map<string, string> = new Map();
+
+  for (const message of messages) {
+    if (message.role === 'assistant' && Array.isArray(message.content)) {
+      for (const content of message.content) {
+        if (
+          content &&
+          typeof content === 'object' &&
+          'type' in content &&
+          content.type === 'tool-call' &&
+          'toolName' in content &&
+          content.toolName === CREATE_REPORTS_TOOL_NAME
+        ) {
+          const contentObj = content as { toolCallId?: string; input?: unknown };
+          const toolCallId = contentObj.toolCallId;
+          const input = contentObj.input as {
+            files?: Array<{ yml_content?: string; content?: string }>;
+          };
+          if (toolCallId && input && input.files && Array.isArray(input.files)) {
+            for (const file of input.files) {
+              const reportContent = file.yml_content || file.content;
+              if (reportContent) {
+                createReportContents.set(toolCallId, reportContent);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Second pass: process tool results
+  for (const message of messages) {
+    if (message.role === 'tool') {
+      const toolContent = message.content;
+
+      if (Array.isArray(toolContent)) {
+        for (const content of toolContent) {
+          if (content && typeof content === 'object') {
+            if ('type' in content && content.type === 'tool-result') {
+              const toolName = (content as unknown as Record<string, unknown>).toolName;
+              const output = (content as unknown as Record<string, unknown>).output;
+              const contentWithCallId = content as { toolCallId?: string };
+              const toolCallId = contentWithCallId.toolCallId;
+
+              const outputObj = output as Record<string, unknown>;
+              if (outputObj && outputObj.type === 'json' && outputObj.value) {
+                try {
+                  const parsedOutput =
+                    typeof outputObj.value === 'string'
+                      ? JSON.parse(outputObj.value)
+                      : outputObj.value;
+
+                  processToolOutput(
+                    toolName as string,
+                    parsedOutput,
+                    files,
+                    toolCallId,
+                    createReportContents
+                  );
+                } catch (error) {
+                  console.warn('[done-tool-file-selection] Failed to parse JSON output', {
+                    error,
+                  });
+                }
+              }
+            } else if ('files' in content || 'file' in content) {
+              processDirectFileContent(content, files);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Deduplicate files by ID, keeping highest version
+  const deduplicatedFiles = deduplicateFilesByVersion(files);
+
+  console.info('[done-tool-file-selection] All extracted files for chat update', {
+    totalFiles: deduplicatedFiles.length,
+    metrics: deduplicatedFiles.filter((f) => f.fileType === 'metric').length,
+    dashboards: deduplicatedFiles.filter((f) => f.fileType === 'dashboard').length,
+    reports: deduplicatedFiles.filter((f) => f.fileType === 'report').length,
+  });
+
+  return deduplicatedFiles;
+}
+
+/**
  * Extract files from tool call responses in the conversation messages
  * Focuses on tool result messages that contain file information
  */

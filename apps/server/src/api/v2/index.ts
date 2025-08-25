@@ -8,6 +8,7 @@ import githubRoutes from './github';
 import metricFilesRoutes from './metric_files';
 import organizationRoutes from './organization';
 import reportsRoutes from './reports';
+import s3IntegrationsRoutes from './s3-integrations';
 import securityRoutes from './security';
 import slackRoutes from './slack';
 import supportRoutes from './support';
@@ -27,6 +28,7 @@ const app = new Hono()
   .route('/organizations', organizationRoutes)
   .route('/dictionaries', dictionariesRoutes)
   .route('/title', titleRoutes)
-  .route('/reports', reportsRoutes);
+  .route('/reports', reportsRoutes)
+  .route('/s3-integrations', s3IntegrationsRoutes);
 
 export default app;

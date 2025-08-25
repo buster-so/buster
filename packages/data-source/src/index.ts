@@ -99,3 +99,6 @@ export {
   batchCheckCacheExists,
   generateCacheKey,
 } from './cache';
+
+// Storage abstraction layer
+export * from './storage';

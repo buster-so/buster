@@ -26,6 +26,7 @@ import {
   permissionGroups,
   permissionGroupsToIdentities,
   permissionGroupsToUsers,
+  s3Integrations,
   schemaMetadata,
   storedValuesSyncJobs,
   tableMetadata,
@@ -66,6 +67,14 @@ export const organizationsRelations = relations(organizations, ({ many }) => ({
   datasets: many(datasets),
   chats: many(chats),
   usersToOrganizations: many(usersToOrganizations),
+  s3Integrations: many(s3Integrations),
+}));
+
+export const s3IntegrationsRelations = relations(s3Integrations, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [s3Integrations.organizationId],
+    references: [organizations.id],
+  }),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({

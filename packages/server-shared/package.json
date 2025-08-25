@@ -75,6 +75,10 @@
     "./access-controls": {
       "types": "./dist/access-controls/index.d.ts",
       "default": "./dist/access-controls/index.js"
+    },
+    "./s3-integrations": {
+      "types": "./dist/s3-integrations/index.d.ts",
+      "default": "./dist/s3-integrations/index.js"
     }
   },
   "module": "src/index.ts",

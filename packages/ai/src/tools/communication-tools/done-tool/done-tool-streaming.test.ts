@@ -8,11 +8,13 @@ import { createDoneToolStart } from './done-tool-start';
 vi.mock('@buster/database', () => ({
   updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
   updateMessage: vi.fn().mockResolvedValue({ success: true }),
+  updateChat: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 describe('Done Tool Streaming Tests', () => {
   const mockContext: DoneToolContext = {
     messageId: 'test-message-id-123',
+    chatId: 'test-chat-id-456',
     workflowStartTime: Date.now(),
   };
 
@@ -112,6 +114,7 @@ describe('Done Tool Streaming Tests', () => {
     test('should handle context without messageId', async () => {
       const contextWithoutMessageId: DoneToolContext = {
         messageId: '',
+        chatId: 'test-chat-id-456',
         workflowStartTime: Date.now(),
       };
       const state: DoneToolState = {
@@ -364,11 +367,13 @@ The following items were processed:
     test('should enforce DoneToolContext type requirements', () => {
       const validContext: DoneToolContext = {
         messageId: 'message-123',
+        chatId: 'test-chat-id-456',
         workflowStartTime: Date.now(),
       };
 
       const extendedContext = {
         messageId: 'message-456',
+        chatId: 'test-chat-id-456',
         workflowStartTime: Date.now(),
         additionalField: 'extra-data',
       };

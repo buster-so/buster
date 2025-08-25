@@ -2,6 +2,8 @@ export enum BusterSettingsRoutes {
   SETTINGS = '/app/settings',
   SETTINGS_PERMISSIONS = '/app/settings/permissions',
   SETTINGS_STORAGE = '/app/settings/storage',
+  SETTINGS_STORAGE_ADD = '/app/settings/storage/add',
+  SETTINGS_STORAGE_PROVIDER = '/app/settings/storage/:storageId',
   SETTINGS_DATASOURCES = '/app/settings/datasources',
   SETTINGS_DATASOURCES_ID = '/app/settings/datasources/:datasourceId',
   SETTINGS_DATASOURCES_ADD = '/app/settings/datasources/add',
@@ -38,6 +40,11 @@ export type BusterSettingsRoutesWithArgs = {
   [BusterSettingsRoutes.SETTINGS]: { route: BusterSettingsRoutes.SETTINGS };
   [BusterSettingsRoutes.SETTINGS_PERMISSIONS]: { route: BusterSettingsRoutes.SETTINGS_PERMISSIONS };
   [BusterSettingsRoutes.SETTINGS_STORAGE]: { route: BusterSettingsRoutes.SETTINGS_STORAGE };
+  [BusterSettingsRoutes.SETTINGS_STORAGE_ADD]: { route: BusterSettingsRoutes.SETTINGS_STORAGE_ADD };
+  [BusterSettingsRoutes.SETTINGS_STORAGE_PROVIDER]: {
+    route: BusterSettingsRoutes.SETTINGS_STORAGE_PROVIDER;
+    storageId: string;
+  };
   [BusterSettingsRoutes.SETTINGS_DATASOURCES]: { route: BusterSettingsRoutes.SETTINGS_DATASOURCES };
   [BusterSettingsRoutes.SETTINGS_INTEGRATIONS]: {
     route: BusterSettingsRoutes.SETTINGS_INTEGRATIONS;

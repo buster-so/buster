@@ -1,4 +1,5 @@
 import { SlackIntegrations } from '@/components/features/integrations/SlackIntegrations';
+import { StorageIntegrations } from '@/components/features/integrations/StorageIntegrations';
 import { SettingsPageHeader } from '@/components/features/settings';
 
 export default function IntegrationsPage() {
@@ -11,6 +12,7 @@ export default function IntegrationsPage() {
 
       <div className="flex flex-col space-y-6">
         <SlackIntegrations />
+        <StorageIntegrations />
       </div>
     </>
   );

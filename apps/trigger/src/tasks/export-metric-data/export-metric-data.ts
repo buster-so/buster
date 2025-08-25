@@ -1,8 +1,6 @@
 import { randomBytes } from 'node:crypto';
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { type AssetPermissionCheck, checkPermission } from '@buster/access-controls';
-import { createAdapter } from '@buster/data-source';
+import { createAdapter, getProviderForOrganization } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
 import { getDataSourceCredentials, getMetricForExport } from '@buster/database';
 import { logger, schemaTask } from '@trigger.dev/sdk';
@@ -12,29 +10,6 @@ import {
   ExportMetricDataInputSchema,
   type ExportMetricDataOutput,
 } from './interfaces';
-
-// Validate required environment variables
-if (!process.env.R2_ACCOUNT_ID) {
-  throw new Error('R2_ACCOUNT_ID environment variable is missing');
-}
-if (!process.env.R2_ACCESS_KEY_ID) {
-  throw new Error('R2_ACCESS_KEY_ID environment variable is missing');
-}
-if (!process.env.R2_SECRET_ACCESS_KEY) {
-  throw new Error('R2_SECRET_ACCESS_KEY environment variable is missing');
-}
-
-// Initialize R2 client (S3-compatible)
-const r2Client = new S3Client({
-  region: 'auto',
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-  },
-});
-
-const R2_BUCKET = process.env.R2_BUCKET || 'metric-exports';
 const MAX_ROWS = 1000000; // 1 million row limit for safety
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB max file size
 
@@ -224,32 +199,28 @@ export const exportMetricData: ReturnType<
       const fileName = `${sanitizedMetricName}_${timestamp}.csv`;
       const key = `exports/${payload.organizationId}/${payload.metricId}/${timestamp}-${randomId}/${fileName}`;
 
-      // Step 6: Upload to R2
-      logger.log('Uploading to R2', { key, bucket: R2_BUCKET });
+      // Step 6: Get storage provider (customer storage or default R2)
+      const storageProvider = await getProviderForOrganization(payload.organizationId);
 
-      try {
-        await r2Client.send(
-          new PutObjectCommand({
-            Bucket: R2_BUCKET,
-            Key: key,
-            Body: csv,
-            ContentType: 'text/csv',
-            ContentDisposition: `attachment; filename="${fileName}"`,
-            Metadata: {
-              'metric-id': payload.metricId,
-              'user-id': payload.userId,
-              'organization-id': payload.organizationId,
-              'row-count': String(queryResult.rowCount),
-              'created-at': new Date().toISOString(),
-              'auto-delete': 'true',
-            },
-          })
-        );
+      // Step 7: Upload to storage
+      logger.log('Uploading to storage', { key });
 
-        logger.log('File uploaded successfully');
-      } catch (error) {
-        logger.error('Upload to R2 failed', {
-          error: error instanceof Error ? error.message : 'Unknown error',
+      const uploadResult = await storageProvider.upload(key, csv, {
+        contentType: 'text/csv',
+        contentDisposition: `attachment; filename="${fileName}"`,
+        metadata: {
+          'metric-id': payload.metricId,
+          'user-id': payload.userId,
+          'organization-id': payload.organizationId,
+          'row-count': String(queryResult.rowCount),
+          'created-at': new Date().toISOString(),
+          'auto-delete': 'true',
+        },
+      });
+
+      if (!uploadResult.success) {
+        logger.error('Upload to storage failed', {
+          error: uploadResult.error,
         });
 
         return {
@@ -259,23 +230,13 @@ export const exportMetricData: ReturnType<
         };
       }
 
-      // Step 7: Generate presigned URL with 60-second expiry
+      logger.log('File uploaded successfully');
+
+      // Step 8: Generate presigned URL with 60-second expiry
       let downloadUrl: string;
 
       try {
-        downloadUrl = await getSignedUrl(
-          r2Client,
-          new GetObjectCommand({
-            Bucket: R2_BUCKET,
-            Key: key,
-            ResponseContentDisposition: `attachment; filename="${fileName}"`,
-          }),
-          {
-            expiresIn: 60, // 60 seconds
-            signableHeaders: new Set(['host']),
-          }
-        );
-
+        downloadUrl = await storageProvider.getSignedUrl(key, 60); // 60 seconds
         logger.log('Presigned URL generated', { expiresIn: 60 });
       } catch (error) {
         logger.error('Failed to generate presigned URL', {
@@ -289,11 +250,11 @@ export const exportMetricData: ReturnType<
         };
       }
 
-      // Step 8: Schedule cleanup after 60 seconds (matches URL expiry)
+      // Step 9: Schedule cleanup after 60 seconds (matches URL expiry)
       try {
         const { cleanupExportFile } = await import('./cleanup-export-file');
         await cleanupExportFile.trigger(
-          { key },
+          { key, organizationId: payload.organizationId },
           { delay: '60s' } // 60 seconds delay
         );
 

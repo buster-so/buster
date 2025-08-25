@@ -4,4 +4,4 @@ export {
   setCachedMetricData,
   batchCheckCacheExists,
   generateCacheKey,
-} from './r2-metric-cache';
+} from './metric-cache';

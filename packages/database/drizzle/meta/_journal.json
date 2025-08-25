@@ -631,6 +631,13 @@
       "when": 1755104970838,
       "tag": "0089_black_starhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1756098017282,
+      "tag": "0090_low_beast",
+      "breakpoints": true
     }
   ]
 }

@@ -15,6 +15,7 @@ export type ExportMetricDataInput = z.infer<typeof ExportMetricDataInputSchema>;
 // Schema for cleanup task
 export const CleanupExportFileInputSchema = z.object({
   key: z.string().min(1, 'Storage key is required'),
+  organizationId: z.string().uuid('Organization ID must be a valid UUID'),
 });
 
 export type CleanupExportFileInput = z.infer<typeof CleanupExportFileInputSchema>;

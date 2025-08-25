@@ -245,7 +245,7 @@ export const analystAgentTask: ReturnType<
   machine: 'small-2x',
   schema: AnalystAgentTaskInputSchema,
   queue: analystQueue,
-  maxDuration: 1200, // 15 minutes for complex analysis
+  maxDuration: 1200, // 20 minutes for complex analysis
   run: async (payload): Promise<AnalystAgentTaskOutput> => {
     const taskStartTime = Date.now();
     const resourceTracker = new ResourceTracker();
