@@ -13,7 +13,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
     "build:commonjs": "tsc --module commonjs --moduleResolution node",
@@ -29,7 +28,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@buster/env-utils": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@google-cloud/bigquery": "^8.1.0",

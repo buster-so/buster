@@ -1,37 +1,44 @@
 import type { GitHubOperationError } from '@buster/server-shared/github';
 import { GitHubErrorCode } from '@buster/server-shared/github';
+import { getSecret } from '@buster/secrets';
 import { App } from 'octokit';
 
 /**
- * Get GitHub App credentials from environment variables
+ * Get GitHub App credentials from environment variables or Infisical
  */
-export function getGitHubAppCredentials(): {
+export async function getGitHubAppCredentials(): Promise<{
   appId: number;
   privateKey: string;
   webhookSecret: string;
-} {
-  const appId = process.env.GITHUB_APP_ID;
-  const privateKeyBase64 = process.env.GITHUB_APP_PRIVATE_KEY_BASE64;
-  const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+}> {
+  let appId: string;
+  let privateKeyBase64: string;
+  let webhookSecret: string;
 
-  if (!appId) {
+  try {
+    appId = await getSecret('GITHUB_APP_ID');
+  } catch (error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GITHUB_APP_ID environment variable is not set'
+      'GITHUB_APP_ID not found in environment or Infisical'
     );
   }
 
-  if (!privateKeyBase64) {
+  try {
+    privateKeyBase64 = await getSecret('GITHUB_APP_PRIVATE_KEY_BASE64');
+  } catch (error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GITHUB_APP_PRIVATE_KEY_BASE64 environment variable is not set'
+      'GITHUB_APP_PRIVATE_KEY_BASE64 not found in environment or Infisical'
     );
   }
 
-  if (!webhookSecret) {
+  try {
+    webhookSecret = await getSecret('GITHUB_WEBHOOK_SECRET');
+  } catch (error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GITHUB_WEBHOOK_SECRET environment variable is not set'
+      'GITHUB_WEBHOOK_SECRET not found in environment or Infisical'
     );
   }
 
@@ -69,8 +76,8 @@ export function getGitHubAppCredentials(): {
 /**
  * Create a configured GitHub App instance
  */
-export function createGitHubApp(): App {
-  const { appId, privateKey } = getGitHubAppCredentials();
+export async function createGitHubApp(): Promise<App> {
+  const { appId, privateKey } = await getGitHubAppCredentials();
 
   try {
     return new App({

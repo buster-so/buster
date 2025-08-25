@@ -14,7 +14,6 @@
     }
   },
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
     "typecheck": "tsc --noEmit",
@@ -45,11 +44,10 @@
     "@buster/access-controls": "workspace:*",
     "@buster/data-source": "workspace:*",
     "@buster/database": "workspace:*",
-    "@buster/env-utils": "workspace:*",
     "@buster/sandbox": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/stored-values": "workspace:*",
-    "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster/web-tools": "workspace:*",

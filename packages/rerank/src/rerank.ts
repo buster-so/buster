@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance } from 'axios';
+import { getSecretSync } from '@buster/secrets';
 import type { RerankConfig, RerankResponse, RerankResult } from './types';
 import { RerankResponseSchema } from './types';
 
@@ -9,9 +10,17 @@ export class Reranker {
   private client: AxiosInstance;
 
   constructor(config?: Partial<RerankConfig>) {
-    const apiKey = config?.apiKey || process.env.RERANK_API_KEY;
-    const baseUrl = config?.baseUrl || process.env.RERANK_BASE_URL;
-    const model = config?.model || process.env.RERANK_MODEL;
+    const getEnvValue = (key: string): string | undefined => {
+      try {
+        return getSecretSync(key);
+      } catch {
+        return undefined;
+      }
+    };
+
+    const apiKey = config?.apiKey || getEnvValue('RERANK_API_KEY');
+    const baseUrl = config?.baseUrl || getEnvValue('RERANK_BASE_URL');
+    const model = config?.model || getEnvValue('RERANK_MODEL');
 
     if (!apiKey || apiKey === '') {
       throw new Error('RERANK_API_KEY is required');

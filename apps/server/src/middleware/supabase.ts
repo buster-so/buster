@@ -1,28 +1,33 @@
 import { createClient } from '@supabase/supabase-js';
+import { getSecret } from '@buster/secrets';
 
-export const createSupabaseClient = () => {
-  const supabaseUrl = process.env.SUPABASE_URL;
-
-  if (!supabaseUrl) {
-    throw new Error('SUPABASE_URL is not set');
-  }
-
-  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseServiceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
-  }
+export const createSupabaseClient = async () => {
+  const supabaseUrl = await getSecret('SUPABASE_URL');
+  const supabaseServiceRoleKey = await getSecret('SUPABASE_SERVICE_ROLE_KEY');
 
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
   return supabase;
 };
 
-let globalSupabase: ReturnType<typeof createSupabaseClient> | null = null;
+let globalSupabase: Awaited<ReturnType<typeof createSupabaseClient>> | null = null;
+let initPromise: Promise<void> | null = null;
 
-export const getSupabaseClient = () => {
+const initSupabase = async () => {
+  if (!initPromise) {
+    initPromise = (async () => {
+      globalSupabase = await createSupabaseClient();
+    })();
+  }
+  return initPromise;
+};
+
+export const getSupabaseClient = async () => {
   if (!globalSupabase) {
-    globalSupabase = createSupabaseClient();
+    await initSupabase();
+  }
+  if (!globalSupabase) {
+    throw new Error('Failed to initialize Supabase client');
   }
   return globalSupabase;
 };

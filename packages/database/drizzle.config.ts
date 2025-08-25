@@ -1,6 +1,14 @@
 import { defineConfig } from 'drizzle-kit';
 
-const connectionString = process.env.DATABASE_URL;
+import { getSecretSync } from '@buster/secrets';
+
+const connectionString = (() => {
+  try {
+    return getSecretSync('DATABASE_URL');
+  } catch {
+    return undefined;
+  }
+})();
 
 if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is not defined');

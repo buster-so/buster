@@ -1,16 +1,233 @@
 import { randomUUID } from 'node:crypto';
-import { dataSources, db, eq, messagesToFiles, metricFiles } from '@buster/database';
-import {
-  cleanupTestChats,
-  cleanupTestEnvironment,
-  cleanupTestMessages,
-  createTestChat,
-  createTestDataSource,
-  createTestMessage,
-  setupTestEnvironment,
-} from '@buster/test-utils';
+import { dataSources, db, eq, messagesToFiles, metricFiles, chats, messages, organizations, users } from '@buster/database';
+import { v4 as uuidv4 } from 'uuid';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { trackFileAssociations } from './file-tracking-helper';
+
+// Helper functions for test data creation
+interface CreateTestMessageOptions {
+  requestMessage?: string;
+  title?: string;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
+  responseMessages?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
+  reasoning?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
+  rawLlmMessages?: any;
+  finalReasoningMessage?: string;
+  isCompleted?: boolean;
+  feedback?: string;
+}
+
+async function createTestOrganization(params?: {
+  name?: string;
+}): Promise<string> {
+  try {
+    const organizationId = uuidv4();
+    const name = params?.name || `Test Organization ${uuidv4()}`;
+
+    await db.insert(organizations).values({
+      id: organizationId,
+      name,
+    });
+
+    return organizationId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test organization: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestUser(params?: {
+  email?: string;
+  name?: string;
+}): Promise<string> {
+  try {
+    const userId = uuidv4();
+    const email = params?.email || `test-${uuidv4()}@example.com`;
+    const name = params?.name || 'Test User';
+
+    await db.insert(users).values({
+      id: userId,
+      email,
+      name,
+    });
+
+    return userId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestChat(
+  organizationId?: string,
+  createdBy?: string
+): Promise<{
+  chatId: string;
+  organizationId: string;
+  userId: string;
+}> {
+  try {
+    const chatId = uuidv4();
+
+    // Create organization and user if not provided
+    const orgId = organizationId || (await createTestOrganization());
+    const userId = createdBy || (await createTestUser());
+
+    await db.insert(chats).values({
+      id: chatId,
+      title: 'Test Chat',
+      organizationId: orgId,
+      createdBy: userId,
+      updatedBy: userId,
+      publiclyAccessible: false,
+    });
+
+    return {
+      chatId,
+      organizationId: orgId,
+      userId,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to create test chat: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestMessage(
+  chatId: string,
+  createdBy: string,
+  options: CreateTestMessageOptions = {}
+): Promise<string> {
+  try {
+    const messageId = uuidv4();
+
+    // Use provided options or sensible defaults
+    const messageData = {
+      id: messageId,
+      chatId,
+      createdBy,
+      title: options.title ?? 'Test Message',
+      requestMessage: options.requestMessage ?? 'This is a test message request',
+      responseMessages: options.responseMessages ?? [{ content: 'This is a test response' }],
+      reasoning: options.reasoning ?? { steps: ['Test reasoning step 1', 'Test reasoning step 2'] },
+      rawLlmMessages: options.rawLlmMessages ?? [],
+      finalReasoningMessage: options.finalReasoningMessage ?? 'Test final reasoning',
+      isCompleted: options.isCompleted ?? true,
+      ...(options.feedback && { feedback: options.feedback }),
+    };
+
+    await db.insert(messages).values(messageData);
+
+    return messageId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test message: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestDataSource(params?: {
+  organizationId?: string;
+  createdBy?: string;
+  name?: string;
+  type?: string;
+}): Promise<{
+  dataSourceId: string;
+  organizationId: string;
+  userId: string;
+  dataSourceType: string;
+}> {
+  try {
+    const dataSourceId = uuidv4();
+
+    // Create organization and user if not provided
+    const organizationId = params?.organizationId || (await createTestOrganization());
+    const userId = params?.createdBy || (await createTestUser());
+    const secretId = uuidv4();
+    const dataSourceType = params?.type || 'postgresql';
+    const name = params?.name || `Test Data Source ${uuidv4()}`;
+
+    await db.insert(dataSources).values({
+      id: dataSourceId,
+      name,
+      type: dataSourceType,
+      secretId,
+      organizationId,
+      createdBy: userId,
+      updatedBy: userId,
+      onboardingStatus: 'completed',
+    });
+
+    return {
+      dataSourceId,
+      organizationId,
+      userId,
+      dataSourceType,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to create test data source: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function cleanupTestChats(chatIds: string[]): Promise<void> {
+  for (const chatId of chatIds) {
+    try {
+      await db.delete(chats).where(eq(chats.id, chatId));
+    } catch (error) {
+      console.warn(`Failed to cleanup test chat ${chatId}:`, error);
+    }
+  }
+}
+
+async function cleanupTestMessages(messageIds: string[]): Promise<void> {
+  for (const messageId of messageIds) {
+    try {
+      await db.delete(messages).where(eq(messages.id, messageId));
+    } catch (error) {
+      console.warn(`Failed to cleanup test message ${messageId}:`, error);
+    }
+  }
+}
+
+interface TestEnvironment {
+  cleanup: () => Promise<void>;
+  reset: () => Promise<void>;
+}
+
+async function setupTestEnvironment(): Promise<TestEnvironment> {
+  // Store original environment variables
+  const originalEnv = { ...process.env };
+
+  // Set test-specific environment variables
+  process.env.NODE_ENV = 'test';
+  // Use DATABASE_URL from .env file loaded by vitest config
+
+  const cleanup = async () => {
+    // Restore original environment
+    process.env = originalEnv;
+  };
+
+  const reset = async () => {
+    // Reset to test state without full cleanup
+    process.env.NODE_ENV = 'test';
+  };
+
+  return {
+    cleanup,
+    reset,
+  };
+}
+
+async function cleanupTestEnvironment(): Promise<void> {
+  // No cleanup needed - vitest handles environment variables
+}
 
 describe('file-tracking-helper integration', () => {
   let testChatId: string;

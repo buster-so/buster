@@ -1,5 +1,6 @@
 import { Daytona } from '@daytonaio/sdk';
 import { z } from 'zod';
+import { getSecret } from '@buster/secrets';
 
 // Define schema for sandbox options
 const createSandboxOptionsSchema = z.object({
@@ -8,20 +9,15 @@ const createSandboxOptionsSchema = z.object({
 
 export type CreateSandboxOptions = z.infer<typeof createSandboxOptionsSchema>;
 
-// Define schema for environment validation
-const envSchema = z.object({
-  DAYTONA_API_KEY: z.string().min(1, 'DAYTONA_API_KEY environment variable is required'),
-});
-
 export async function createSandbox(options: CreateSandboxOptions = {}) {
   // Validate options
   const validatedOptions = createSandboxOptionsSchema.parse(options);
 
-  // Validate environment
-  const env = envSchema.parse(process.env);
+  // Get API key from secrets
+  const apiKey = await getSecret('DAYTONA_API_KEY');
 
   // Initialize the Daytona client
-  const daytona = new Daytona({ apiKey: env.DAYTONA_API_KEY, target: 'us' });
+  const daytona = new Daytona({ apiKey, target: 'us' });
 
   // Create the Sandbox instance
   const sandbox = await daytona.create({

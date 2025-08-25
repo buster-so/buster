@@ -1,26 +1,19 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { getSecretSync } from '@buster/secrets';
+import { getSecret } from '@buster/secrets';
 
 // Global pool instance
 let globalPool: postgres.Sql | null = null;
 let globalDb: PostgresJsDatabase | null = null;
 
-// Helper to safely get secret
-function getEnvValue(key: string, defaultValue?: string): string | undefined {
-  try {
-    return getSecretSync(key);
-  } catch {
-    return defaultValue;
-  }
-}
-
 // Environment validation
-function validateEnvironment(): string {
-  const isTest = getEnvValue('NODE_ENV') === 'test';
-  const isProduction = getEnvValue('NODE_ENV') === 'production';
-  const dbUrl = getEnvValue('DATABASE_URL');
+async function validateEnvironment(): Promise<string> {
+  const isTest = process.env.NODE_ENV === 'test';
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  // Try to get DATABASE_URL from secrets
+  const dbUrl = await getSecret('DATABASE_URL').catch(() => null);
 
   // Use default local database URL if none provided
   if (!dbUrl) {
@@ -30,15 +23,14 @@ function validateEnvironment(): string {
   }
 
   // Prevent accidental production database usage in tests
-  const allowProdInTests = getEnvValue('ALLOW_PROD_DB_IN_TESTS');
-  if (isTest && dbUrl.includes('prod') && !allowProdInTests) {
+  if (isTest && dbUrl.includes('prod') && !process.env.ALLOW_PROD_DB_IN_TESTS) {
     throw new Error(
       'Production database detected in test environment. Set ALLOW_PROD_DB_IN_TESTS=true to override.'
     );
   }
 
   // Warn about non-pooled connections in production
-  const poolSize = getEnvValue('DATABASE_POOL_SIZE');
+  const poolSize = await getSecret('DATABASE_POOL_SIZE').catch(() => null);
   if (isProduction && !poolSize) {
     console.warn('DATABASE_POOL_SIZE not set - using default pool size of 100');
   }
@@ -46,13 +38,13 @@ function validateEnvironment(): string {
   return dbUrl;
 }
 
-// Initialize the database pool
-export function initializePool<T extends Record<string, postgres.PostgresType>>(
+// Initialize the database pool with async secrets
+export async function initializePoolAsync<T extends Record<string, postgres.PostgresType>>(
   config: postgres.Options<T> | undefined = {}
-): PostgresJsDatabase {
-  const connectionString = validateEnvironment();
+): Promise<PostgresJsDatabase> {
+  const connectionString = await validateEnvironment();
 
-  const poolSizeStr = getEnvValue('DATABASE_POOL_SIZE');
+  const poolSizeStr = await getSecret('DATABASE_POOL_SIZE').catch(() => null);
   const poolSize = poolSizeStr ? Number.parseInt(poolSizeStr) : 100;
 
   if (globalPool && globalDb) {
@@ -75,17 +67,17 @@ export function initializePool<T extends Record<string, postgres.PostgresType>>(
 }
 
 // Get the database instance (initializes if not already done)
-export function getDb(): PostgresJsDatabase {
+export async function getDbAsync(): Promise<PostgresJsDatabase> {
   if (!globalDb) {
-    return initializePool();
+    return initializePoolAsync();
   }
   return globalDb;
 }
 
 // Get the raw postgres client
-export function getClient(): postgres.Sql {
+export async function getClientAsync(): Promise<postgres.Sql> {
   if (!globalPool) {
-    initializePool();
+    await initializePoolAsync();
   }
   if (!globalPool) {
     throw new Error('Failed to initialize database pool');
@@ -94,7 +86,7 @@ export function getClient(): postgres.Sql {
 }
 
 // Close the pool (useful for graceful shutdown)
-export async function closePool(): Promise<void> {
+export async function closePoolAsync(): Promise<void> {
   if (globalPool) {
     await globalPool.end();
     globalPool = null;
@@ -103,9 +95,9 @@ export async function closePool(): Promise<void> {
 }
 
 // Ping the database to check if connection is possible
-export async function dbPing(): Promise<boolean> {
+export async function dbPingAsync(): Promise<boolean> {
   try {
-    const client = getClient();
+    const client = await getClientAsync();
     await client`SELECT 1`;
     return true;
   } catch (error) {
@@ -113,6 +105,3 @@ export async function dbPing(): Promise<boolean> {
     return false;
   }
 }
-
-// Export the default database instance
-export const db = getDb();

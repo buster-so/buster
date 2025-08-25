@@ -1,0 +1,78 @@
+import { createVertexAnthropic } from '@ai-sdk/google-vertex/anthropic';
+import type { LanguageModelV2 } from '@ai-sdk/provider';
+import { wrapLanguageModel } from 'ai';
+import { BraintrustMiddleware } from 'braintrust';
+import { getSecret } from '@buster/secrets';
+
+export const vertexModelAsync = async (modelId: string): Promise<LanguageModelV2> => {
+  // Fetch credentials from secrets
+  const [clientEmail, privateKey, project] = await Promise.all([
+    getSecret('VERTEX_CLIENT_EMAIL'),
+    getSecret('VERTEX_PRIVATE_KEY'),
+    getSecret('VERTEX_PROJECT'),
+  ]);
+
+  if (!clientEmail || !privateKey || !project) {
+    throw new Error(
+      'Missing required environment variables: VERTEX_CLIENT_EMAIL, VERTEX_PRIVATE_KEY, or VERTEX_PROJECT'
+    );
+  }
+
+  // Handle escaped newlines in private key
+  const processedPrivateKey = privateKey.replace(/\\n/g, '\n');
+
+  const vertex = createVertexAnthropic({
+    baseURL: `https://aiplatform.googleapis.com/v1/projects/${project}/locations/global/publishers/anthropic/models`,
+    location: 'global',
+    project,
+    googleAuthOptions: {
+      credentials: {
+        client_email: clientEmail,
+        private_key: processedPrivateKey,
+      },
+    },
+    headers: {
+      'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+    },
+    fetch: ((url, options) => {
+      if (options?.body) {
+        try {
+          // Parse existing body if it's a string
+          const existingBody =
+            typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+
+          // Append disable_parallel_tool_use if tool_choice is present
+          const modifiedBody = {
+            ...existingBody,
+          };
+
+          if (modifiedBody.tool_choice) {
+            modifiedBody.tool_choice = {
+              ...modifiedBody.tool_choice,
+              disable_parallel_tool_use: true,
+            };
+          }
+
+          // Return modified options
+          return fetch(url, {
+            ...options,
+            body: JSON.stringify(modifiedBody),
+          });
+        } catch (error) {
+          console.error('Failed to parse request body:', error);
+          // If body parsing fails, fall back to original request
+          return fetch(url, options);
+        }
+      }
+
+      // For requests without body, pass through unchanged
+      return fetch(url, options);
+    }) as typeof fetch,
+  });
+
+  // Wrap the model with Braintrust middleware
+  return wrapLanguageModel({
+    model: vertex(modelId),
+    middleware: BraintrustMiddleware({ debug: true }),
+  });
+};

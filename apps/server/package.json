@@ -7,7 +7,6 @@
     }
   },
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || (tsx scripts/validate-env.ts && pnpm run typecheck)",
     "build": "tsup",
     "build:dry-run": "tsup",
     "dev": "bun --watch src/index.ts",
@@ -26,12 +25,11 @@
     "@buster/access-controls": "workspace:*",
     "@buster/ai": "workspace:*",
     "@buster/database": "workspace:*",
-    "@buster/env-utils": "workspace:*",
     "@buster/github": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/server-utils": "workspace:*",
     "@buster/slack": "workspace:*",
-    "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@electric-sql/client": "^1.0.7",

@@ -1,4 +1,5 @@
 import { InstallationCallbackSchema, verifyGitHubWebhookSignature } from '@buster/github';
+import { getSecret } from '@buster/secrets';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -23,13 +24,12 @@ export function githubWebhookValidator(): MiddlewareHandler {
         });
       }
 
-      // Get webhook secret from environment
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
-      if (!webhookSecret) {
+      // Get webhook secret from secrets
+      const webhookSecret = await getSecret('GITHUB_WEBHOOK_SECRET').catch(() => {
         throw new HTTPException(500, {
           message: 'GITHUB_WEBHOOK_SECRET not configured',
         });
-      }
+      });
 
       // Verify the signature
       const isValid = verifyGitHubWebhookSignature(rawBody, signature);

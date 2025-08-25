@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { getSecretSync } from '@buster/secrets';
 import type {
   ISlackOAuthStateStorage,
   ISlackTokenStorage,
@@ -8,8 +9,17 @@ import type { SlackOAuthConfig } from '../types';
 import { SlackAuthService } from './auth';
 
 // Only run if environment is configured
-const runIntegrationTests =
-  process.env.SLACK_BOT_TOKEN !== undefined && process.env.SLACK_CHANNEL_ID !== undefined;
+const hasSlackConfig = (): boolean => {
+  try {
+    getSecretSync('SLACK_BOT_TOKEN');
+    getSecretSync('SLACK_CHANNEL_ID');
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const runIntegrationTests = hasSlackConfig();
 
 const describeIntegration = runIntegrationTests ? describe : describe.skip;
 

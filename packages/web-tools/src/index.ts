@@ -1,6 +1,7 @@
 // Main exports for the web-tools package
 export { researchCompany } from './deep-research/company-research';
 export { FirecrawlService } from './services/firecrawl';
+export { AsyncFirecrawlService, createFirecrawlService } from './services/firecrawl-async';
 export { pollJobStatus } from './utils/polling';
 
 // Types

@@ -11,7 +11,6 @@
     }
   },
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
     "typecheck": "tsc --noEmit",
@@ -26,7 +25,7 @@
     "format:fix": "biome format --write ."
   },
   "dependencies": {
-    "@buster/env-utils": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "axios": "catalog:",

@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@ariakit/react": "^0.4.18",
-    "@buster/env-utils": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@dnd-kit/core": "^6.3.1",

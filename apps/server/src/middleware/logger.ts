@@ -1,8 +1,17 @@
 import { pinoLogger } from 'hono-pino';
 import pino from 'pino';
+import { getSecretSync } from '@buster/secrets';
 
-const isDev = process.env.NODE_ENV !== 'production';
-const logLevel = process.env.LOG_LEVEL || 'info';
+const getEnvValue = (key: string, defaultValue?: string): string | undefined => {
+  try {
+    return getSecretSync(key);
+  } catch {
+    return defaultValue;
+  }
+};
+
+const isDev = getEnvValue('NODE_ENV', 'development') !== 'production';
+const logLevel = getEnvValue('LOG_LEVEL', 'info') || 'info';
 let isPinoPrettyAvailable = true;
 
 // Create base pino instance
@@ -33,7 +42,7 @@ const createBaseLogger = () => {
 const baseLogger = createBaseLogger();
 
 // Simple console capture - only override if LOG_LEVEL is set
-if (process.env.LOG_LEVEL) {
+if (getEnvValue('LOG_LEVEL')) {
   console.info = (first, ...args) => {
     if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
       // Handle pattern: console.info('message', { data })

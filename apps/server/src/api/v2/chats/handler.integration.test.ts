@@ -1,23 +1,117 @@
-import { asc, chats, db, eq, messages, usersToOrganizations } from '@buster/database';
+import { asc, chats, db, eq, messages, organizations, users, usersToOrganizations } from '@buster/database';
 import {
   ChatCreateRequestSchema,
   ChatError,
   type ChatWithMessages,
   ChatWithMessagesSchema,
 } from '@buster/server-shared/chats';
-import {
-  cleanupTestChats,
-  cleanupTestMessages,
-  createTestChat,
-  createTestOrganization,
-  createTestUser,
-} from '@buster/test-utils';
+import { v4 as uuidv4 } from 'uuid';
 import { zValidator } from '@hono/zod-validator';
 import type { User } from '@supabase/supabase-js';
 import { tasks } from '@trigger.dev/sdk/v3';
 import { Hono } from 'hono';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createChatHandler } from './handler';
+
+// Helper functions for test data creation
+async function createTestOrganization(params?: {
+  name?: string;
+}): Promise<string> {
+  try {
+    const organizationId = uuidv4();
+    const name = params?.name || `Test Organization ${uuidv4()}`;
+
+    await db.insert(organizations).values({
+      id: organizationId,
+      name,
+    });
+
+    return organizationId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test organization: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestUser(params?: {
+  email?: string;
+  name?: string;
+}): Promise<string> {
+  try {
+    const userId = uuidv4();
+    const email = params?.email || `test-${uuidv4()}@example.com`;
+    const name = params?.name || 'Test User';
+
+    await db.insert(users).values({
+      id: userId,
+      email,
+      name,
+    });
+
+    return userId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestChat(
+  organizationId?: string,
+  createdBy?: string
+): Promise<{
+  chatId: string;
+  organizationId: string;
+  userId: string;
+}> {
+  try {
+    const chatId = uuidv4();
+
+    // Create organization and user if not provided
+    const orgId = organizationId || (await createTestOrganization());
+    const userId = createdBy || (await createTestUser());
+
+    await db.insert(chats).values({
+      id: chatId,
+      title: 'Test Chat',
+      organizationId: orgId,
+      createdBy: userId,
+      updatedBy: userId,
+      publiclyAccessible: false,
+    });
+
+    return {
+      chatId,
+      organizationId: orgId,
+      userId,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to create test chat: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function cleanupTestChats(chatIds: string[]): Promise<void> {
+  for (const chatId of chatIds) {
+    try {
+      await db.delete(chats).where(eq(chats.id, chatId));
+    } catch (error) {
+      console.warn(`Failed to cleanup test chat ${chatId}:`, error);
+    }
+  }
+}
+
+async function cleanupTestMessages(messageIds: string[]): Promise<void> {
+  for (const messageId of messageIds) {
+    try {
+      await db.delete(messages).where(eq(messages.id, messageId));
+    } catch (error) {
+      console.warn(`Failed to cleanup test message ${messageId}:`, error);
+    }
+  }
+}
 
 /**
  * Integration tests for chat creation endpoint

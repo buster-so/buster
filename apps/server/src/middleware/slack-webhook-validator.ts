@@ -4,6 +4,7 @@ import {
   parseSlackWebhookPayload,
   verifySlackRequest,
 } from '@buster/slack';
+import { getSecret } from '@buster/secrets';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -25,13 +26,12 @@ export function slackWebhookValidator(): MiddlewareHandler {
         headers[key] = value;
       });
 
-      // Get signing secret from environment
-      const signingSecret = process.env.SLACK_SIGNING_SECRET;
-      if (!signingSecret) {
+      // Get signing secret from secrets
+      const signingSecret = await getSecret('SLACK_SIGNING_SECRET').catch(() => {
         throw new HTTPException(500, {
           message: 'SLACK_SIGNING_SECRET not configured',
         });
-      }
+      });
 
       // Verify the request signature
       verifySlackRequest(rawBody, headers, signingSecret);

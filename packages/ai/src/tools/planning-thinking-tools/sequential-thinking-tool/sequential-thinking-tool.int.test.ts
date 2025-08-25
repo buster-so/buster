@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { db, messages } from '@buster/database';
-import { createTestChat, createTestMessage } from '@buster/test-utils';
+import { db, messages, chats, organizations, users } from '@buster/database';
+import { v4 as uuidv4 } from 'uuid';
 import type { ToolCallOptions } from 'ai';
 import { and, eq, isNull } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
@@ -12,6 +12,133 @@ import type {
 import { createSequentialThinkingDelta } from './sequential-thinking-tool-delta';
 import { createSequentialThinkingFinish } from './sequential-thinking-tool-finish';
 import { createSequentialThinkingStart } from './sequential-thinking-tool-start';
+
+// Helper functions for test data creation
+interface CreateTestMessageOptions {
+  requestMessage?: string;
+  title?: string;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
+  responseMessages?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
+  reasoning?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
+  rawLlmMessages?: any;
+  finalReasoningMessage?: string;
+  isCompleted?: boolean;
+  feedback?: string;
+}
+
+async function createTestOrganization(params?: {
+  name?: string;
+}): Promise<string> {
+  try {
+    const organizationId = uuidv4();
+    const name = params?.name || `Test Organization ${uuidv4()}`;
+
+    await db.insert(organizations).values({
+      id: organizationId,
+      name,
+    });
+
+    return organizationId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test organization: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestUser(params?: {
+  email?: string;
+  name?: string;
+}): Promise<string> {
+  try {
+    const userId = uuidv4();
+    const email = params?.email || `test-${uuidv4()}@example.com`;
+    const name = params?.name || 'Test User';
+
+    await db.insert(users).values({
+      id: userId,
+      email,
+      name,
+    });
+
+    return userId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestChat(
+  organizationId?: string,
+  createdBy?: string
+): Promise<{
+  chatId: string;
+  organizationId: string;
+  userId: string;
+}> {
+  try {
+    const chatId = uuidv4();
+
+    // Create organization and user if not provided
+    const orgId = organizationId || (await createTestOrganization());
+    const userId = createdBy || (await createTestUser());
+
+    await db.insert(chats).values({
+      id: chatId,
+      title: 'Test Chat',
+      organizationId: orgId,
+      createdBy: userId,
+      updatedBy: userId,
+      publiclyAccessible: false,
+    });
+
+    return {
+      chatId,
+      organizationId: orgId,
+      userId,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to create test chat: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function createTestMessage(
+  chatId: string,
+  createdBy: string,
+  options: CreateTestMessageOptions = {}
+): Promise<string> {
+  try {
+    const messageId = uuidv4();
+
+    // Use provided options or sensible defaults
+    const messageData = {
+      id: messageId,
+      chatId,
+      createdBy,
+      title: options.title ?? 'Test Message',
+      requestMessage: options.requestMessage ?? 'This is a test message request',
+      responseMessages: options.responseMessages ?? [{ content: 'This is a test response' }],
+      reasoning: options.reasoning ?? { steps: ['Test reasoning step 1', 'Test reasoning step 2'] },
+      rawLlmMessages: options.rawLlmMessages ?? [],
+      finalReasoningMessage: options.finalReasoningMessage ?? 'Test final reasoning',
+      isCompleted: options.isCompleted ?? true,
+      ...(options.feedback && { feedback: options.feedback }),
+    };
+
+    await db.insert(messages).values(messageData);
+
+    return messageId;
+  } catch (error) {
+    throw new Error(
+      `Failed to create test message: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
 
 describe('Sequential Thinking Tool Integration Tests', () => {
   let testChatId: string;
