@@ -2,7 +2,7 @@ import { and, eq, inArray, isNull } from 'drizzle-orm';
 import type { InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { dashboardFiles, messages, messagesToFiles, metricFiles } from '../../schema';
+import { dashboardFiles, messages, messagesToFiles, metricFiles, reportFiles } from '../../schema';
 
 // Type inference from schema
 type Message = InferSelectModel<typeof messages>;
@@ -102,7 +102,18 @@ async function getAssetDetails(
   }
 
   if (assetType === 'report_file') {
-    throw new Error('Report files are not supported yet');
+    const [report] = await db
+      .select({
+        id: reportFiles.id,
+        name: reportFiles.name,
+        content: reportFiles.content,
+        createdBy: reportFiles.createdBy,
+      })
+      .from(reportFiles)
+      .where(and(eq(reportFiles.id, assetId), isNull(reportFiles.deletedAt)))
+      .limit(1);
+
+    return report || null;
   }
 
   const _exhaustiveCheck: never = assetType;
@@ -124,7 +135,12 @@ export async function generateAssetMessages(input: GenerateAssetMessagesInput): 
   }
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const assetTypeStr = validated.assetType === 'metric_file' ? 'metric' : 'dashboard';
+  const assetTypeStr =
+    validated.assetType === 'metric_file'
+      ? 'metric'
+      : validated.assetType === 'dashboard_file'
+        ? 'dashboard'
+        : 'report';
 
   // Prepare asset data and fetch additional context files for dashboards
   interface AssetFileData {
@@ -391,7 +407,47 @@ export async function getAssetDetailsById(
   }
 
   if (validated.assetType === 'report_file') {
-    throw new Error('Report files are not supported yet');
+    const [report] = await db
+      .select({
+        id: reportFiles.id,
+        name: reportFiles.name,
+        content: reportFiles.content,
+        versionHistory: reportFiles.versionHistory,
+        createdBy: reportFiles.createdBy,
+      })
+      .from(reportFiles)
+      .where(and(eq(reportFiles.id, validated.assetId), isNull(reportFiles.deletedAt)))
+      .limit(1);
+
+    if (!report) return null;
+
+    // Extract version number from version history
+    // versionHistory is a Record<string, {content, updated_at, version_number}>
+    // Get the highest version number from the keys
+    const versionNumber = (() => {
+      if (!report.versionHistory || typeof report.versionHistory !== 'object') {
+        return 1;
+      }
+
+      const versionKeys = Object.keys(report.versionHistory);
+      if (versionKeys.length === 0) {
+        return 1;
+      }
+
+      // Parse version keys and find the highest
+      const versions = versionKeys
+        .map((key) => Number.parseInt(key, 10))
+        .filter((v) => !Number.isNaN(v));
+      return versions.length > 0 ? Math.max(...versions) : 1;
+    })();
+
+    return {
+      id: report.id,
+      name: report.name,
+      content: report.content,
+      versionNumber,
+      createdBy: report.createdBy,
+    };
   }
 
   // Exhaustive check

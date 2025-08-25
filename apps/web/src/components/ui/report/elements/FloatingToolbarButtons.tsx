@@ -8,10 +8,10 @@ import { useEditorReadOnly } from 'platejs/react';
 
 import { AIToolbarButton } from './AIToolbarButton';
 import { CommentToolbarButton } from './CommandToolbarButton';
-import { InlineEquationToolbarButton } from './EquationToolbarButton';
+// import { InlineEquationToolbarButton } from './EquationToolbarButton';
 import { LinkToolbarButton } from './LinkToolbarButton';
 import { MarkToolbarButton } from './MarktoolbarButton';
-import { MoreToolbarButton } from './MoreToolbarButton';
+// import { MoreToolbarButton } from './MoreToolbarButton';
 import { SuggestionToolbarButton } from './SuggestionToolbarButton';
 import { ToolbarGroup } from '@/components/ui/toolbar/Toolbar';
 import { TurnIntoToolbarButton } from './TurnIntoToolbarButton';
@@ -53,7 +53,7 @@ export function FloatingToolbarButtons() {
               <NodeTypeIcons.code />
             </MarkToolbarButton>
 
-            <InlineEquationToolbarButton />
+            {/* <InlineEquationToolbarButton /> */}
 
             <LinkToolbarButton />
           </ToolbarGroup>
@@ -64,7 +64,7 @@ export function FloatingToolbarButtons() {
         {/* <CommentToolbarButton />
         <SuggestionToolbarButton /> */}
 
-        {!readOnly && <MoreToolbarButton />}
+        {/* {!readOnly && <MoreToolbarButton />} */}
       </ToolbarGroup>
     </>
   );

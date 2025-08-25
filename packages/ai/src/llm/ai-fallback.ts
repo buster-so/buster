@@ -131,6 +131,9 @@ export class FallbackModel implements LanguageModelV2 {
     if (!model) {
       throw new Error(`No model available at index ${this._currentModelIndex}`);
     }
+    console.info(
+      `[Fallback] Using model: ${model.modelId} (index: ${this._currentModelIndex}/${this.settings.models.length - 1})`
+    );
     return model;
   }
 
@@ -141,13 +144,19 @@ export class FallbackModel implements LanguageModelV2 {
     const now = Date.now();
     if (now - this.lastModelReset >= this.modelResetInterval) {
       // Reset to primary model
+      console.info(
+        `[Fallback] Resetting to primary model after ${this.modelResetInterval}ms timeout`
+      );
       this.currentModelIndex = 0;
       this.lastModelReset = now;
     }
   }
 
   private switchToNextModel() {
+    const previousModel = this.settings.models[this.currentModelIndex]?.modelId || 'unknown';
     this.currentModelIndex = (this.currentModelIndex + 1) % this.settings.models.length;
+    const nextModel = this.settings.models[this.currentModelIndex]?.modelId || 'unknown';
+    console.warn(`Switching from model ${previousModel} to ${nextModel} due to error`);
   }
 
   private async retry<T>(fn: () => PromiseLike<T>): Promise<T> {
@@ -161,7 +170,13 @@ export class FallbackModel implements LanguageModelV2 {
       // Retry current model up to maxRetriesPerModel times
       while (modelRetryCount < maxRetriesPerModel) {
         try {
-          return await fn();
+          const result = await fn();
+          if (modelRetryCount > 0 || this.currentModelIndex !== initialModel) {
+            console.info(
+              `[Fallback] Request succeeded on model ${this.modelId} after ${modelRetryCount} retries`
+            );
+          }
+          return result;
         } catch (error) {
           lastError = error as RetryableError;
           const shouldRetry = this.settings.shouldRetryThisError || defaultShouldRetryThisError;
@@ -188,6 +203,9 @@ export class FallbackModel implements LanguageModelV2 {
       }
 
       // All retries for this model exhausted, switch to next model
+      console.warn(
+        `Model ${this.modelId} exhausted ${maxRetriesPerModel} retries, switching to next model`
+      );
       this.switchToNextModel();
 
       if (this.currentModelIndex === initialModel) {
@@ -225,6 +243,7 @@ export class FallbackModel implements LanguageModelV2 {
     this.checkAndResetModel();
     const self = this;
     const shouldRetry = this.settings.shouldRetryThisError || defaultShouldRetryThisError;
+    console.info(`[Fallback] Starting stream request...`);
     return this.retry(async () => {
       const result = await self.getCurrentModel().doStream(options);
 
@@ -235,6 +254,7 @@ export class FallbackModel implements LanguageModelV2 {
           try {
             const reader = result.stream.getReader();
 
+            let streamedChunks = 0;
             while (true) {
               const result = await reader.read();
 
@@ -246,8 +266,14 @@ export class FallbackModel implements LanguageModelV2 {
                 }
               }
 
-              if (done) break;
+              if (done) {
+                console.info(
+                  `[Fallback] Stream completed successfully. Streamed ${streamedChunks} chunks from ${self.modelId}`
+                );
+                break;
+              }
               controller.enqueue(value);
+              streamedChunks++;
 
               if (value?.type !== 'stream-start') {
                 hasStreamedAny = true;
@@ -278,10 +304,12 @@ export class FallbackModel implements LanguageModelV2 {
             }
             if (!hasStreamedAny || self.retryAfterOutput) {
               // If nothing was streamed yet, switch models and retry
+              console.warn(`Stream error on ${self.modelId}, attempting fallback...`);
               self.switchToNextModel();
 
               // Prevent infinite recursion - if we've tried all models, fail
               if (self.currentModelIndex === 0) {
+                console.error('All models exhausted, failing request');
                 controller.error(error);
                 return;
               }

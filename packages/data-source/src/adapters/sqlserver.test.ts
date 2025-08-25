@@ -51,7 +51,7 @@ describe('SQLServerAdapter', () => {
         type: DataSourceType.SQLServer,
         server: 'localhost',
         port: 1433,
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -76,7 +76,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -94,7 +94,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         encrypt: false,
@@ -131,7 +131,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -148,7 +148,7 @@ describe('SQLServerAdapter', () => {
     const credentials: SQLServerCredentials = {
       type: DataSourceType.SQLServer,
       server: 'localhost',
-      database: 'testdb',
+      default_database: 'testdb',
       username: 'testuser',
       password: 'testpass',
     };
@@ -367,7 +367,7 @@ describe('SQLServerAdapter', () => {
     const credentials: SQLServerCredentials = {
       type: DataSourceType.SQLServer,
       server: 'localhost',
-      database: 'testdb',
+      default_database: 'testdb',
       username: 'testuser',
       password: 'testpass',
     };
@@ -414,7 +414,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -435,7 +435,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -453,7 +453,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -468,7 +468,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -487,7 +487,7 @@ describe('SQLServerAdapter', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };

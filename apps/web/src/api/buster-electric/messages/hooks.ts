@@ -55,7 +55,7 @@ export const useTrackAndUpdateMessageChanges = (
   return useShapeStream(
     shape,
     DEFAULT_UPDATE_OPERATIONS,
-    useMemoizedFn((message) => {
+    (message) => {
       if (message && message.value && chatId) {
         const iChatMessage = updateMessageShapeToIChatMessage(message.value);
         const chat = getChatMemoized(chatId);
@@ -103,7 +103,7 @@ export const useTrackAndUpdateMessageChanges = (
         callback?.(iChatMessage);
         onUpdateChatMessage(iChatMessage);
       }
-    }),
+    },
     subscribe
   );
 };

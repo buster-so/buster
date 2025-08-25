@@ -66,7 +66,7 @@ describe('Adapter Factory', () => {
         type: DataSourceType.MySQL,
         host: 'localhost',
         port: 3306,
-        database: 'test',
+        default_database: 'test',
         username: 'user',
         password: 'pass',
       };
@@ -80,7 +80,7 @@ describe('Adapter Factory', () => {
         type: DataSourceType.SQLServer,
         server: 'localhost',
         port: 1433,
-        database: 'test',
+        default_database: 'test',
         username: 'user',
         password: 'pass',
       };

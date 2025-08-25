@@ -24,8 +24,8 @@ export const ReportPageHeader = React.forwardRef<
   return (
     <div className={cn('flex flex-col space-y-1.5', className)}>
       <EditableTitle
-        disabled={isStreaming}
-        className="h-9"
+        readOnly={isStreaming}
+        className="text-foreground! h-9"
         level={1}
         ref={ref}
         onChange={onChangeName}>

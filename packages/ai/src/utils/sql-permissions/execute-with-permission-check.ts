@@ -13,7 +13,8 @@ export interface ExecuteWithPermissionResult<T = unknown> {
 export async function executeWithPermissionCheck<T>(
   sql: string,
   userId: string,
-  executeFn: () => Promise<T>
+  executeFn: () => Promise<T>,
+  dataSourceSyntax?: string
 ): Promise<ExecuteWithPermissionResult<T>> {
   if (!userId) {
     return {
@@ -23,12 +24,15 @@ export async function executeWithPermissionCheck<T>(
   }
 
   // Validate permissions
-  const permissionResult = await validateSqlPermissions(sql, userId);
+  const permissionResult = await validateSqlPermissions(sql, userId, dataSourceSyntax);
 
   if (!permissionResult.isAuthorized) {
     return {
       success: false,
-      error: createPermissionErrorMessage(permissionResult.unauthorizedTables),
+      error: createPermissionErrorMessage(
+        permissionResult.unauthorizedTables,
+        permissionResult.unauthorizedColumns
+      ),
     };
   }
 

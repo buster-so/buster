@@ -77,10 +77,16 @@ export async function createElectricHandledResponse<
   options?: ElectricResponseHandlerOptions<TInput, TOutput>
 ): Promise<Response> {
   const transformedData = await handleElectricResponse(response, options);
+
+  const headers = new Headers(response.headers);
+  headers.delete('content-encoding');
+  headers.delete('content-length');
+
+  // Return the proxied response
   return new Response(JSON.stringify(transformedData), {
-    headers: response.headers,
     status: response.status,
     statusText: response.statusText,
+    headers,
   });
 }
 

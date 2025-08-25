@@ -28,12 +28,12 @@ export const useTrackAndUpdateChatChanges = (
   return useShapeStream(
     shape,
     updateOperations,
-    useMemoizedFn((chat) => {
+    (chat) => {
       if (chat && chat.value) {
         callback?.(chat.value);
         onUpdateChat(chat.value);
       }
-    }),
+    },
     subscribe
   );
 };

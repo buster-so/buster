@@ -10,6 +10,7 @@ import { useDebounce, useMemoizedFn } from '@/hooks';
 import { useShareMetric } from '@/api/buster_rest/metrics';
 import { useShareDashboard } from '@/api/buster_rest/dashboards';
 import { useShareCollection } from '@/api/buster_rest/collections';
+import { useShareReport } from '@/api/buster_rest/reports';
 import { useGetUserToOrganization } from '../../../api/buster_rest/users';
 import type { SelectItem } from '../../ui/select';
 import { AvatarUserButton } from '../../ui/avatar/AvatarUserButton';
@@ -28,6 +29,7 @@ export const ShareMenuInvite: React.FC<ShareMenuInviteProps> = React.memo(
     const { mutateAsync: onShareDashboard, isPending: isInvitingDashboard } = useShareDashboard();
     const { mutateAsync: onShareCollection, isPending: isInvitingCollection } =
       useShareCollection();
+    const { mutateAsync: onShareReport, isPending: isInvitingReport } = useShareReport();
 
     const [inputValue, setInputValue] = React.useState<string>('');
 
@@ -43,7 +45,8 @@ export const ShareMenuInvite: React.FC<ShareMenuInviteProps> = React.memo(
     });
 
     const disableSubmit = !inputHasText(inputValue) || !isValidEmail(inputValue);
-    const isInviting = isInvitingMetric || isInvitingDashboard || isInvitingCollection;
+    const isInviting =
+      isInvitingMetric || isInvitingDashboard || isInvitingCollection || isInvitingReport;
 
     const options: SelectItem<string>[] = useMemo(() => {
       return (
@@ -102,6 +105,8 @@ export const ShareMenuInvite: React.FC<ShareMenuInviteProps> = React.memo(
         await onShareDashboard(payload);
       } else if (assetType === 'collection') {
         await onShareCollection(payload);
+      } else if (assetType === 'report') {
+        await onShareReport(payload);
       }
 
       setInputValue('');

@@ -1,16 +1,16 @@
 import { cn } from '@/lib/utils';
 import { PlateContainer } from 'platejs/react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import React from 'react';
 
 interface EditorContainerProps {
   className?: string;
   variant?: 'default' | 'comment';
-  readonly?: boolean;
-  disabled?: boolean;
+  readOnly?: boolean;
 }
 
 const editorContainerVariants = cva(
-  'relative w-full cursor-text bg-transparent caret-primary select-text selection:bg-brand/15 focus-visible:outline-none [&_.slate-selection-area]:z-50 [&_.slate-selection-area]:border [&_.slate-selection-area]:border-brand/25 [&_.slate-selection-area]:bg-brand/15',
+  'relative w-full cursor-text bg-transparent select-text selection:bg-brand/15 focus-visible:outline-none [&_.slate-selection-area]:z-50 [&_.slate-selection-area]:border [&_.slate-selection-area]:border-brand/25 [&_.slate-selection-area]:bg-brand/15',
 
   {
     variants: {
@@ -27,34 +27,35 @@ const editorContainerVariants = cva(
           'has-data-readonly:w-fit has-data-readonly:cursor-default has-data-readonly:border-transparent has-data-readonly:focus-within:[box-shadow:none]'
         )
       },
-      readonly: {
-        true: 'cursor-text'
+      readOnly: {
+        true: 'cursor-default user-select-none '
       }
     },
     defaultVariants: {
       variant: 'default',
-      readonly: false
+      readOnly: false
     }
   }
 );
 
-export function EditorContainer({
-  className,
-  variant,
-  disabled,
-  readonly,
-  ...props
-}: React.ComponentProps<'div'> &
-  VariantProps<typeof editorContainerVariants> &
-  EditorContainerProps) {
+export const EditorContainer = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> &
+    VariantProps<typeof editorContainerVariants> &
+    EditorContainerProps
+>(({ className, variant, readOnly, children, ...htmlProps }, ref) => {
   return (
-    <PlateContainer
+    <div
+      ref={ref}
       className={cn(
-        'ignore-click-outside/toolbar overflow-visible! overflow-y-auto',
-        editorContainerVariants({ variant, readonly }),
+        'ignore-click-outside/toolbar',
+        editorContainerVariants({ variant, readOnly }),
         className
       )}
-      {...props}
-    />
+      {...htmlProps}>
+      <PlateContainer>{children}</PlateContainer>
+    </div>
   );
-}
+});
+
+EditorContainer.displayName = 'EditorContainer';

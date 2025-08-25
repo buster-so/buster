@@ -1,4 +1,12 @@
-import { chats, db as dbImport, eq, getDb, messages, organizations, users } from '@buster/database';
+import {
+  chats,
+  db as dbImport,
+  dbInitialized,
+  eq,
+  messages,
+  organizations,
+  users,
+} from '@buster/database';
 import { runs, tasks } from '@trigger.dev/sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -222,7 +230,7 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
     expect(result.output?.result?.workflowCompleted).toBe(true);
 
     // Verify database was updated
-    const db = getDb();
+    const db = await dbInitialized;
     const updatedMessage = await db
       .select({ postProcessingMessage: messages.postProcessingMessage })
       .from(messages)
@@ -249,7 +257,7 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
     });
 
     // Manually add post-processing result to first message
-    const db = getDb();
+    const db = await dbInitialized;
     await db
       .update(messages)
       .set({
@@ -300,7 +308,7 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
     expect(result.output?.messageId).toBe(messageId);
 
     // Cleanup - reset postProcessingMessage to null
-    const db = getDb();
+    const db = await dbInitialized;
     await db
       .update(messages)
       .set({ postProcessingMessage: null })
@@ -331,7 +339,7 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
     expect(duration).toBeLessThan(60000);
 
     // Cleanup - reset postProcessingMessage to null
-    const db = getDb();
+    const db = await dbInitialized;
     await db
       .update(messages)
       .set({ postProcessingMessage: null })

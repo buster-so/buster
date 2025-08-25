@@ -38,7 +38,28 @@ async function initializeGPT5() {
     models,
     modelResetInterval: 60000,
     retryAfterOutput: true,
-    onError: (err) => console.error(`FALLBACK.  Here is the error: ${err}`),
+    onError: (err, modelId) => {
+      // Handle various error formats
+      let errorMessage = 'Unknown error';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (err && typeof err === 'object') {
+        const errObj = err as Record<string, unknown>;
+        if ('message' in errObj) {
+          errorMessage = String(errObj.message);
+        }
+        if ('type' in errObj) {
+          errorMessage = `${errObj.type}: ${errObj.message || 'No message'}`;
+        }
+      } else {
+        errorMessage = String(err);
+      }
+
+      const errorDetails =
+        err instanceof Error && err.stack ? err.stack : JSON.stringify(err, null, 2);
+      console.error(`FALLBACK from model ${modelId}. Error: ${errorMessage}`);
+      console.error('Error details:', errorDetails);
+    },
   });
 
   return _gpt5Instance;

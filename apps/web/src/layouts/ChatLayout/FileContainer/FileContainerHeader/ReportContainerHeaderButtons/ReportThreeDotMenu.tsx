@@ -1,5 +1,9 @@
 import React, { useMemo } from 'react';
 import { useStartChatFromReport } from './useStartChatFromAsset';
+import { useStartChatFromAsset } from '@/api/buster_rest/chats';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { BusterRoutes } from '@/routes/busterRoutes';
+import { timeout } from '@/lib/timeout';
 import {
   Dropdown,
   DropdownContent,
@@ -7,7 +11,7 @@ import {
   type DropdownItems
 } from '@/components/ui/dropdown';
 import { Dots, ShareRight, WandSparkle, History, Star } from '@/components/ui/icons';
-import { Refresh3, FileText, DuplicatePlus } from '@/components/ui/icons/NucleoIconOutlined';
+import { Refresh3, FileText } from '@/components/ui/icons/NucleoIconOutlined';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { Button } from '@/components/ui/buttons';
 import {
@@ -43,9 +47,9 @@ export const ReportThreeDotMenu = React.memo(
     const saveToLibrary = useSaveToLibrary({ reportId });
     const favoriteItem = useFavoriteReportSelectMenu({ reportId });
     const versionHistory = useVersionHistorySelectMenu({ reportId });
-    const verificationItem = useReportVerificationSelectMenu();
-    const refreshReportItem = useRefreshReportSelectMenu();
-    const duplicateReportItem = useDuplicateReportSelectMenu();
+    // const verificationItem = useReportVerificationSelectMenu(); // Hidden - not supported yet
+    const refreshReportItem = useRefreshReportSelectMenu({ reportId });
+    // const duplicateReportItem = useDuplicateReportSelectMenu();
     const { dropdownItem: downloadPdfItem, exportPdfContainer } = useDownloadPdfSelectMenu({
       reportId
     });
@@ -59,10 +63,10 @@ export const ReportThreeDotMenu = React.memo(
         favoriteItem,
         { type: 'divider' },
         versionHistory,
-        verificationItem,
+        // verificationItem, // Hidden - not supported yet
         { type: 'divider' },
         refreshReportItem,
-        duplicateReportItem,
+        // duplicateReportItem,
         downloadPdfItem
       ];
     }, [
@@ -72,9 +76,9 @@ export const ReportThreeDotMenu = React.memo(
       shareMenu,
       favoriteItem,
       versionHistory,
-      verificationItem,
+      // verificationItem,
       refreshReportItem,
-      duplicateReportItem,
+      // duplicateReportItem,
       downloadPdfItem,
       saveToLibrary
     ]);
@@ -116,8 +120,8 @@ const useShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
 
   return useMemo(
     () => ({
-      label: 'Share metric',
-      value: 'share-metric',
+      label: 'Share report',
+      value: 'share-report',
       icon: <ShareRight />,
       disabled: !isEffectiveOwner,
       items:
@@ -277,12 +281,36 @@ const useReportVerificationSelectMenu = (): DropdownItem => {
   );
 };
 
-// Refresh report (stubbed)
-const useRefreshReportSelectMenu = (): DropdownItem => {
-  const onClick = useMemoizedFn(async () => {
-    alert('TODO: Refresh report');
+// Refresh report with latest data
+const useRefreshReportSelectMenu = ({ reportId }: { reportId: string }): DropdownItem => {
+  const { mutateAsync: startChatFromAsset, isPending } = useStartChatFromAsset();
+  const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
+  const onSetFileView = useChatLayoutContextSelector((x) => x.onSetFileView);
 
-    return;
+  const onClick = useMemoizedFn(async () => {
+    try {
+      const result = await startChatFromAsset({
+        asset_id: reportId,
+        asset_type: 'report',
+        prompt: 'Please refresh this report with the most up-to-date data.'
+      });
+
+      // Navigate to the new chat with the report
+      await onChangePage({
+        route: BusterRoutes.APP_CHAT_ID_REPORT_ID,
+        reportId: reportId,
+        chatId: result.id
+      });
+
+      // Wait for the chat to load and set the file view
+      await timeout(250);
+      onSetFileView({
+        fileId: reportId,
+        fileView: 'chart'
+      });
+    } catch (error) {
+      console.error('Failed to refresh report:', error);
+    }
   });
 
   return useMemo(
@@ -290,29 +318,30 @@ const useRefreshReportSelectMenu = (): DropdownItem => {
       label: 'Refresh report',
       value: 'refresh-report',
       icon: <Refresh3 />,
-      onClick
+      onClick,
+      loading: isPending
     }),
-    [onClick]
+    [onClick, isPending]
   );
 };
 
-// Duplicate report (stubbed)
-const useDuplicateReportSelectMenu = (): DropdownItem => {
-  const onClick = useMemoizedFn(async () => {
-    alert('TODO: Duplicate report');
-    return;
-  });
+// // Duplicate report (stubbed)
+// const useDuplicateReportSelectMenu = (): DropdownItem => {
+//   const onClick = useMemoizedFn(async () => {
+//     alert('TODO: Duplicate report');
+//     return;
+//   });
 
-  return useMemo(
-    () => ({
-      label: 'Duplicate',
-      value: 'duplicate-report',
-      icon: <DuplicatePlus />,
-      onClick
-    }),
-    [onClick]
-  );
-};
+//   return useMemo(
+//     () => ({
+//       label: 'Duplicate',
+//       value: 'duplicate-report',
+//       icon: <DuplicatePlus />,
+//       onClick
+//     }),
+//     [onClick]
+//   );
+// };
 
 // Download as PDF
 const useDownloadPdfSelectMenu = ({

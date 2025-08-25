@@ -4,8 +4,8 @@ import {
   datasetPermissions,
   datasets,
   datasetsToPermissionGroups,
+  dbInitialized,
   eq,
-  getDb,
   inArray,
   isNull,
   permissionGroups,
@@ -60,7 +60,7 @@ const HasAllDatasetsAccessSchema = z.object({
 
 // Path 1: Direct User -> Dataset
 async function fetchDirectUserDatasetIds(userId: string): Promise<string[]> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const results = await db
     .select({ datasetId: datasetPermissions.datasetId })
@@ -78,7 +78,7 @@ async function fetchDirectUserDatasetIds(userId: string): Promise<string[]> {
 
 // Path 3: User -> Team -> Dataset (Direct team assignment)
 async function fetchTeamDirectDatasetIds(userId: string): Promise<string[]> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const results = await db
     .selectDistinct({ datasetId: datasetPermissions.datasetId })
@@ -99,7 +99,7 @@ async function fetchTeamDirectDatasetIds(userId: string): Promise<string[]> {
 
 // Path 2: User -> Group -> Dataset
 async function fetchUserGroupDatasetIds(userId: string): Promise<string[]> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const results = await db
     .selectDistinct({ datasetId: datasetsToPermissionGroups.datasetId })
@@ -127,7 +127,7 @@ async function fetchUserGroupDatasetIds(userId: string): Promise<string[]> {
 
 // Path 4: User -> Team -> Group -> Dataset
 async function fetchTeamGroupDatasetIds(userId: string): Promise<string[]> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const results = await db
     .selectDistinct({ datasetId: datasetsToPermissionGroups.datasetId })
@@ -162,7 +162,7 @@ async function fetchTeamGroupDatasetIds(userId: string): Promise<string[]> {
 
 // Path 5: User -> Organization -> Default Permission Group -> Dataset
 async function fetchOrgDefaultDatasetIds(userId: string): Promise<string[]> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   // Get all the user's organizations
   const userOrgs = await db
@@ -229,7 +229,7 @@ export async function getPermissionedDatasets(
   // Validate inputs
   const input = GetPermissionedDatasetsSchema.parse({ userId, page, pageSize });
 
-  const db = getDb();
+  const db = await dbInitialized;
 
   // Fetch all user's organizations and roles
   const userOrgs = await db
@@ -334,7 +334,7 @@ export async function hasDatasetAccess(userId: string, datasetId: string): Promi
   // Validate inputs
   const input = HasDatasetAccessSchema.parse({ userId, datasetId });
 
-  const db = getDb();
+  const db = await dbInitialized;
 
   // --- Check if Dataset exists and get Organization ID and deleted status ---
   const datasetInfo = await db
@@ -408,7 +408,7 @@ export async function hasAllDatasetsAccess(userId: string, datasetIds: string[])
     return false; // No datasets means no access granted
   }
 
-  const db = getDb();
+  const db = await dbInitialized;
 
   // --- Step 1: Verify all datasets exist, are not deleted, and get their org IDs ---
   const datasetInfos = await db
@@ -498,7 +498,7 @@ export async function hasAllDatasetsAccess(userId: string, datasetIds: string[])
 // --- Helper Functions for Individual Permission Checks ---
 
 async function checkDirectUserPermission(userId: string, datasetId: string): Promise<boolean> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const result = await db
     .select({ count: count() })
@@ -518,7 +518,7 @@ async function checkDirectUserPermission(userId: string, datasetId: string): Pro
 }
 
 async function checkTeamDirectPermission(userId: string, datasetId: string): Promise<boolean> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const result = await db
     .select({ count: count() })
@@ -540,7 +540,7 @@ async function checkTeamDirectPermission(userId: string, datasetId: string): Pro
 }
 
 async function checkUserGroupPermission(userId: string, datasetId: string): Promise<boolean> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const result = await db
     .select({ count: count() })
@@ -574,7 +574,7 @@ async function checkUserGroupPermission(userId: string, datasetId: string): Prom
 }
 
 async function checkTeamGroupPermission(userId: string, datasetId: string): Promise<boolean> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   const result = await db
     .select({ count: count() })
@@ -615,7 +615,7 @@ async function checkTeamGroupPermission(userId: string, datasetId: string): Prom
 }
 
 async function checkOrgDefaultPermission(userId: string, datasetId: string): Promise<boolean> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   // Get all the user's organizations
   const userOrgs = await db

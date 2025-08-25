@@ -27,7 +27,7 @@ export class SQLServerAdapter extends BaseAdapter {
       const config: sql.config = {
         server: sqlServerCredentials.server,
         port: sqlServerCredentials.port,
-        database: sqlServerCredentials.database,
+        database: sqlServerCredentials.default_database,
         user: sqlServerCredentials.username,
         password: sqlServerCredentials.password,
         options: {

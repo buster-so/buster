@@ -194,7 +194,7 @@ No conversation history available for analysis.`,
     const tracedFlagChatGeneration = wrapTraced(
       async () => {
         const { object } = await generateObject({
-          model: Sonnet4,
+          model: await Sonnet4,
           schema: flagChatStepLLMOutputSchema,
           messages,
           temperature: 0,

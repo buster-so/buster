@@ -4,6 +4,7 @@ use database::{
     enums::{AssetPermissionRole, AssetType},
     helpers::collections::fetch_collection_with_permission,
     metric_files::fetch_metric_file_with_permissions,
+    report_files::fetch_report_file_with_permission,
     chats::fetch_chat_with_permission,
     models::CollectionToAsset,
     pool::get_pg_pool,
@@ -116,12 +117,14 @@ pub async fn add_assets_to_collection_handler(
     let mut dashboard_ids = Vec::new();
     let mut metric_ids = Vec::new();
     let mut chat_ids = Vec::new();
+    let mut report_ids = Vec::new();
 
     for asset in &assets {
         match asset.asset_type {
             AssetType::DashboardFile => dashboard_ids.push(asset.id),
             AssetType::MetricFile => metric_ids.push(asset.id),
             AssetType::Chat => chat_ids.push(asset.id),
+            AssetType::ReportFile => report_ids.push(asset.id),
             _ => {
                 error!(
                     asset_id = %asset.id,
@@ -561,6 +564,161 @@ pub async fn add_assets_to_collection_handler(
                         error!(collection_id = %collection_id, chat_id = %chat_id, "Error adding chat to collection: {}", e);
                         result.failed_count += 1;
                         result.failed_assets.push(( *chat_id, AssetType::Chat, format!("Database error: {}", e)));
+                    }
+                }
+            }
+        }
+    }
+
+    // Process reports
+    if !report_ids.is_empty() {
+        for report_id in &report_ids {
+            // Check if report exists
+            let report = fetch_report_file_with_permission(&report_id, &user.id).await?;
+
+            let report = if let Some(report) = report {
+                report
+            } else {
+                error!(
+                    report_id = %report_id,
+                    user_id = %user.id,
+                    "Report not found"
+                );
+                result.failed_count += 1;
+                result.failed_assets.push((
+                    *report_id,
+                    AssetType::ReportFile,
+                    "Report not found".to_string(),
+                ));
+                continue;
+            };
+
+            // Check if user has access to the report
+            let has_report_permission = check_permission_access(
+                report.permission,
+                &[
+                    AssetPermissionRole::CanView,
+                    AssetPermissionRole::CanEdit,
+                    AssetPermissionRole::FullAccess,
+                    AssetPermissionRole::Owner,
+                ],
+                report.report_file.organization_id,
+                &user.organizations,
+                report.report_file.workspace_sharing,
+            );
+
+            if !has_report_permission {
+                error!(
+                    report_id = %report_id,
+                    user_id = %user.id,
+                    "User does not have permission to access this report"
+                );
+                result.failed_count += 1;
+                result.failed_assets.push((
+                    *report_id,
+                    AssetType::ReportFile,
+                    "Insufficient permissions".to_string(),
+                ));
+                continue;
+            }
+
+            // Check if the report is already in the collection
+            let existing = match collections_to_assets::table
+                .filter(collections_to_assets::collection_id.eq(collection_id))
+                .filter(collections_to_assets::asset_id.eq(report_id))
+                .filter(collections_to_assets::asset_type.eq(AssetType::ReportFile))
+                .first::<CollectionToAsset>(&mut conn)
+                .await
+            {
+                Ok(record) => Some(record),
+                Err(diesel::NotFound) => None,
+                Err(e) => {
+                    error!("Error checking if report is already in collection: {}", e);
+                    result.failed_count += 1;
+                    result.failed_assets.push((
+                        *report_id,
+                        AssetType::ReportFile,
+                        format!("Database error: {}", e),
+                    ));
+                    continue;
+                }
+            };
+
+            if let Some(existing_record) = existing {
+                if existing_record.deleted_at.is_some() {
+                    // If it was previously deleted, update it
+                    match diesel::update(collections_to_assets::table)
+                        .filter(collections_to_assets::collection_id.eq(collection_id))
+                        .filter(collections_to_assets::asset_id.eq(report_id))
+                        .filter(collections_to_assets::asset_type.eq(AssetType::ReportFile))
+                        .set((
+                            collections_to_assets::deleted_at
+                                .eq::<Option<chrono::DateTime<chrono::Utc>>>(None),
+                            collections_to_assets::updated_at.eq(chrono::Utc::now()),
+                            collections_to_assets::updated_by.eq(user.id),
+                        ))
+                        .execute(&mut conn)
+                        .await
+                    {
+                        Ok(_) => {
+                            result.added_count += 1;
+                        }
+                        Err(e) => {
+                            error!(
+                                collection_id = %collection_id,
+                                report_id = %report_id,
+                                "Error updating report in collection: {}", e
+                            );
+                            result.failed_count += 1;
+                            result.failed_assets.push((
+                                *report_id,
+                                AssetType::ReportFile,
+                                format!("Database error: {}", e),
+                            ));
+                        }
+                    }
+                } else {
+                    // Already in the collection
+                    info!(
+                        collection_id = %collection_id,
+                        report_id = %report_id,
+                        "Report already in collection"
+                    );
+                    result.added_count += 1;
+                }
+            } else {
+                // Add to collection
+                let new_record = CollectionToAsset {
+                    collection_id: *collection_id,
+                    asset_id: *report_id,
+                    asset_type: AssetType::ReportFile,
+                    created_at: chrono::Utc::now(),
+                    created_by: user.id,
+                    updated_at: chrono::Utc::now(),
+                    updated_by: user.id,
+                    deleted_at: None,
+                };
+
+                match diesel::insert_into(collections_to_assets::table)
+                    .values(&new_record)
+                    .execute(&mut conn)
+                    .await
+                {
+                    Ok(_) => {
+                        result.added_count += 1;
+                    }
+                    Err(e) => {
+                        error!(
+                            collection_id = %collection_id,
+                            report_id = %report_id,
+                            "Error adding report to collection: {}", e
+                        );
+                        result.failed_count += 1;
+                        result.failed_assets.push((
+                            *report_id,
+                            AssetType::ReportFile,
+                            format!("Database error: {}", e),
+                        ));
                     }
                 }
             }

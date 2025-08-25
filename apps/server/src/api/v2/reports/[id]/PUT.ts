@@ -2,7 +2,6 @@ import type { User } from '@buster/database';
 import { getUserOrganizationId, updateReport } from '@buster/database';
 import type { UpdateReportRequest, UpdateReportResponse } from '@buster/server-shared/reports';
 import { UpdateReportRequestSchema } from '@buster/server-shared/reports';
-import { platejsToMarkdown } from '@buster/server-utils/report';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -30,9 +29,7 @@ async function updateReportHandler(
     throw new HTTPException(403, { message: 'User does not have permission to edit asset' });
   }
 
-  const { name, content: contentPlateJs, update_version = false } = request;
-
-  const transformedContent = contentPlateJs ? await platejsToMarkdown(contentPlateJs) : undefined;
+  const { name, content, update_version = false } = request;
 
   // Update the report in the database
   await updateReport(
@@ -40,7 +37,7 @@ async function updateReportHandler(
       reportId,
       userId: user.id,
       name,
-      content: transformedContent,
+      content,
     },
     update_version
   );

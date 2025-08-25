@@ -97,14 +97,18 @@ export function extractFilesFromToolCalls(messages: ModelMessage[]): ExtractedFi
           // Extract report content from input and store with toolCallId as key
           const contentObj = content as { toolCallId?: string; input?: unknown };
           const toolCallId = contentObj.toolCallId;
-          const input = contentObj.input as { files?: Array<{ yml_content?: string }> };
+          const input = contentObj.input as {
+            files?: Array<{ yml_content?: string; content?: string }>;
+          };
           if (toolCallId && input && input.files && Array.isArray(input.files)) {
             for (const file of input.files) {
-              if (file.yml_content) {
-                createReportContents.set(toolCallId, file.yml_content);
+              // Check for both yml_content and content fields
+              const reportContent = file.yml_content || file.content;
+              if (reportContent) {
+                createReportContents.set(toolCallId, reportContent);
                 console.info('[done-tool-file-selection] Stored report content for toolCallId', {
                   toolCallId,
-                  contentLength: file.yml_content.length,
+                  contentLength: reportContent.length,
                 });
               }
             }
@@ -196,11 +200,19 @@ export function extractFilesFromToolCalls(messages: ModelMessage[]): ExtractedFi
     }
   }
 
+  // Count reports with metrics
+  const reportsWithMetrics = files.filter((f) => {
+    if (f.fileType !== 'report') return false;
+    // Check if report has content and contains metrics
+    return f.content?.match(/<metric\s+metricId\s*=\s*["'][a-f0-9-]+["']\s*\/>/i);
+  });
+
   console.info('[done-tool-file-selection] Extracted files before deduplication', {
     totalFiles: files.length,
     metrics: files.filter((f) => f.fileType === 'metric').length,
     dashboards: files.filter((f) => f.fileType === 'dashboard').length,
     reports: files.filter((f) => f.fileType === 'report').length,
+    reportsWithMetrics: reportsWithMetrics.length,
     lastReportContent: lastReportInfo ? `${lastReportInfo.content.substring(0, 100)}...` : 'none',
   });
 
@@ -210,11 +222,21 @@ export function extractFilesFromToolCalls(messages: ModelMessage[]): ExtractedFi
   // Filter out metrics that belong to dashboards
   let filteredFiles = filterOutDashboardMetrics(deduplicatedFiles);
 
-  // Filter out metrics and dashboards that are absorbed by the last report
+  // Filter out metrics and dashboards that are referenced in reports
   filteredFiles = filterOutReportContainedFiles(filteredFiles, lastReportInfo);
 
-  // Filter out reports themselves (they shouldn't be selected in done tool)
-  filteredFiles = filteredFiles.filter((file) => file.fileType !== 'report');
+  // Filter out reports that don't have metrics (they won't be in responseMessages anyway)
+  // Keep reports that have metrics since they'll be in the responseMessages
+  filteredFiles = filteredFiles.filter((file) => {
+    if (file.fileType !== 'report') {
+      return true; // Keep all non-report files that passed previous filters
+    }
+
+    // For reports, only keep them if they contain metrics
+    // Reports with metrics will be in responseMessages already, so we filter them out here
+    // to avoid duplication
+    return false;
+  });
 
   console.info('[done-tool-file-selection] Final selected files', {
     totalSelected: filteredFiles.length,
@@ -546,8 +568,8 @@ function filterOutDashboardMetrics(files: ExtractedFile[]): ExtractedFile[] {
 }
 
 /**
- * Filter out metrics and dashboards that are absorbed by reports
- * Metrics/dashboards mentioned in report content are hidden
+ * Filter out metrics and dashboards that are referenced in reports
+ * Any metric that appears in a report should not be selected
  */
 function filterOutReportContainedFiles(
   files: ExtractedFile[],
@@ -566,8 +588,8 @@ function filterOutReportContainedFiles(
   const dashboardsInReports = new Set<string>();
 
   // Extract metric IDs from report content using regex pattern
-  // Looking for patterns like: metricId="UUID" or metric_id="UUID"
-  const metricIdPattern = /metricId[="']+([a-f0-9-]+)["']/gi;
+  // Match any alphanumeric ID with hyphens (UUIDs, simple IDs like "metric-1", etc.)
+  const metricIdPattern = /metricId[="']+([a-zA-Z0-9-]+)["']/gi;
   const matches = reportContent.matchAll(metricIdPattern);
 
   for (const match of matches) {
@@ -577,7 +599,7 @@ function filterOutReportContainedFiles(
   }
 
   // Also check for dashboard IDs in reports
-  const dashboardIdPattern = /dashboardId[="']+([a-f0-9-]+)["']/gi;
+  const dashboardIdPattern = /dashboardId[="']+([a-zA-Z0-9-]+)["']/gi;
   const dashboardMatches = reportContent.matchAll(dashboardIdPattern);
 
   for (const match of dashboardMatches) {
@@ -605,7 +627,7 @@ function filterOutReportContainedFiles(
   const filtered = files.filter((file) => {
     // Check if this metric is referenced in a report
     if (file.fileType === 'metric' && metricsInReports.has(file.id)) {
-      console.info('[done-tool-file-selection] Excluding metric absorbed by report', {
+      console.info('[done-tool-file-selection] Excluding metric referenced in report', {
         metricId: file.id,
         metricName: file.fileName,
       });
@@ -614,7 +636,7 @@ function filterOutReportContainedFiles(
 
     // Check if this dashboard is referenced in a report
     if (file.fileType === 'dashboard' && dashboardsInReports.has(file.id)) {
-      console.info('[done-tool-file-selection] Excluding dashboard absorbed by report', {
+      console.info('[done-tool-file-selection] Excluding dashboard referenced in report', {
         dashboardId: file.id,
         dashboardName: file.fileName,
       });

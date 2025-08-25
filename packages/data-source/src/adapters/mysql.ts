@@ -20,7 +20,7 @@ export class MySQLAdapter extends BaseAdapter {
       const config: mysql.ConnectionOptions = {
         host: mysqlCredentials.host,
         port: mysqlCredentials.port || 3306,
-        database: mysqlCredentials.database,
+        database: mysqlCredentials.default_database,
         user: mysqlCredentials.username,
         password: mysqlCredentials.password,
       };

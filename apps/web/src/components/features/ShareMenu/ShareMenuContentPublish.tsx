@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
 import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
 import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
+import { useUpdateReportShare } from '@/api/buster_rest/reports';
 import { Button } from '@/components/ui/buttons';
 import { DatePicker } from '@/components/ui/date';
 import { Eye, EyeSlash, Link } from '@/components/ui/icons';
@@ -34,10 +35,12 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
       useUpdateDashboardShare();
     const { mutateAsync: onShareCollection, isPending: isPublishingCollection } =
       useUpdateCollectionShare();
+    const { mutateAsync: onShareReport, isPending: isPublishingReport } = useUpdateReportShare();
     const [isPasswordProtected, setIsPasswordProtected] = useState<boolean>(!!password);
     const [_password, _setPassword] = React.useState<string>(password || '');
 
-    const isPublishing = isPublishingMetric || isPublishingDashboard || isPublishingCollection;
+    const isPublishing =
+      isPublishingMetric || isPublishingDashboard || isPublishingCollection || isPublishingReport;
 
     const linkExpiry = useMemo(() => {
       return publicExpirationDate ? new Date(publicExpirationDate) : null;
@@ -51,6 +54,8 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
         url = createBusterRoute({ route: BusterRoutes.APP_DASHBOARD_ID, dashboardId: assetId });
       } else if (assetType === 'collection') {
         url = createBusterRoute({ route: BusterRoutes.APP_COLLECTIONS });
+      } else if (assetType === 'report') {
+        url = createBusterRoute({ route: BusterRoutes.APP_REPORTS_ID, reportId: assetId });
       }
       return window.location.origin + url;
     }, [assetId, assetType]);
@@ -71,6 +76,8 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
         await onShareDashboard(payload);
       } else if (assetType === 'collection') {
         await onShareCollection(payload);
+      } else if (assetType === 'report') {
+        await onShareReport(payload);
       }
     });
 
@@ -93,6 +100,8 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
         await onShareDashboard(payload);
       } else if (assetType === 'collection') {
         await onShareCollection(payload);
+      } else if (assetType === 'report') {
+        await onShareReport(payload);
       }
       _setPassword(password || '');
       if (password) openInfoMessage('Password updated');
@@ -114,6 +123,8 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
         await onShareDashboard(payload);
       } else if (assetType === 'collection') {
         await onShareCollection(payload);
+      } else if (assetType === 'report') {
+        await onShareReport(payload);
       }
     });
 

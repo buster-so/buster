@@ -11,6 +11,7 @@ import type {
 
 vi.mock('@buster/database', () => ({
   updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
+  updateMessage: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 describe('Respond Without Asset Creation Tool Streaming Tests', () => {

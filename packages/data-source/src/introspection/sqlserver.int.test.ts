@@ -19,7 +19,7 @@ function createSQLServerCredentials(): SQLServerCredentials {
     type: DataSourceType.SQLServer,
     server: testConfig.sqlserver.server,
     port: testConfig.sqlserver.port,
-    database: testConfig.sqlserver.database,
+    default_database: testConfig.sqlserver.database,
     username: testConfig.sqlserver.username,
     password: testConfig.sqlserver.password,
     encrypt: testConfig.sqlserver.encrypt,

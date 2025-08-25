@@ -39,3 +39,23 @@ export type ShareMetricResponse = z.infer<typeof ShareMetricResponseSchema>;
 export type ShareDeleteResponse = z.infer<typeof ShareDeleteResponseSchema>;
 export type ShareUpdateResponse = z.infer<typeof ShareUpdateResponseSchema>;
 export type MetricDataResponse = z.infer<typeof MetricDataResponseSchema>;
+
+/**
+ * Path parameters for metric data endpoint
+ */
+export const MetricDataParamsSchema = z.object({
+  id: z.string().uuid('Metric ID must be a valid UUID'),
+});
+
+export type MetricDataParams = z.infer<typeof MetricDataParamsSchema>;
+
+/**
+ * Query parameters for metric data endpoint
+ */
+export const MetricDataQuerySchema = z.object({
+  limit: z.coerce.number().min(1).max(5000).default(5000).optional(),
+  version_number: z.coerce.number().optional(),
+  report_file_id: z.string().uuid().optional(),
+});
+
+export type MetricDataQuery = z.infer<typeof MetricDataQuerySchema>;

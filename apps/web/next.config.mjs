@@ -9,6 +9,7 @@ const __dirname = dirname(__filename);
 const apiUrl = new URL(env.NEXT_PUBLIC_API_URL).origin;
 const api2Url = new URL(env.NEXT_PUBLIC_API2_URL).origin;
 const profilePictureURL = 'https://googleusercontent.com';
+const publicUrlOrigin = new URL(env.NEXT_PUBLIC_URL).origin;
 
 // Derive Supabase origins (HTTP and WS) from env so CSP allows them in all modes
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -44,7 +45,8 @@ const createCspHeader = (isEmbed = false) => {
         ? `frame-ancestors 'self' *`
         : "frame-ancestors 'none'",
     // Frame sources - allow embeds from accepted domains
-    "frame-src 'self' https://vercel.live https://*.twitter.com https://twitter.com https://*.x.com https://x.com https://*.youtube.com https://youtube.com https://*.youtube-nocookie.com https://youtube-nocookie.com https://*.youtu.be https://youtu.be https://*.vimeo.com https://vimeo.com",
+    // Escape publicUrlOrigin to ensure it is a valid CSP source value
+    `frame-src 'self' https://vercel.live https://*.twitter.com https://twitter.com https://*.x.com https://x.com https://*.youtube.com https://youtube.com https://*.youtube-nocookie.com https://youtube-nocookie.com https://*.youtu.be https://youtu.be https://*.vimeo.com https://vimeo.com ${publicUrlOrigin}`,
     // Connect sources for API calls
     (() => {
       const connectSources = [

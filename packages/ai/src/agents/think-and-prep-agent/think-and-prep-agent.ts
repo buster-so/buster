@@ -1,5 +1,5 @@
 import type { PermissionedDataset } from '@buster/access-controls';
-import { type ModelMessage, NoSuchToolError, hasToolCall, stepCountIs, streamText } from 'ai';
+import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
 import { Sonnet4 } from '../../llm';
@@ -18,11 +18,13 @@ import {
 } from '../../tools/communication-tools/submit-thoughts-tool/submit-thoughts-tool';
 import { EXECUTE_SQL_TOOL_NAME } from '../../tools/database-tools/execute-sql/execute-sql';
 import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
-import { healToolWithLlm } from '../../utils';
+import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
 import {
   type AnalysisMode,
   getThinkAndPrepAgentSystemPrompt,
 } from './get-think-and-prep-agent-system-prompt';
+
+export const THINK_AND_PREP_AGENT_NAME = 'thinkAndPrepAgent';
 
 const DEFAULT_CACHE_OPTIONS = {
   anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
@@ -96,10 +98,6 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
   } as ModelMessage;
 
   async function stream({ messages }: ThinkAndPrepStreamOptions) {
-    const maxRetries = 2;
-    let attempt = 0;
-    const currentMessages = [...messages];
-
     const sequentialThinking = createSequentialThinkingTool({ messageId });
     const executeSqlTool = createExecuteSqlTool({
       messageId,
@@ -117,77 +115,66 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
       workflowStartTime,
     });
 
-    while (attempt <= maxRetries) {
-      try {
-        return wrapTraced(
-          () =>
-            streamText({
-              model: Sonnet4,
-              tools: {
-                [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
-                [EXECUTE_SQL_TOOL_NAME]: executeSqlTool,
-                [RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME]: respondWithoutAssetCreation,
-                [SUBMIT_THOUGHTS_TOOL_NAME]: submitThoughts,
-                [MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME]: messageUserClarifyingQuestion,
-              },
-              messages: [systemMessage, datasetsSystemMessage, ...currentMessages],
-              stopWhen: STOP_CONDITIONS,
-              toolChoice: 'required',
-              maxOutputTokens: 10000,
-              temperature: 0,
-              experimental_repairToolCall: healToolWithLlm,
-              onStepFinish: async (event) => {
-                console.info('Think and Prep Agent step finished', {
-                  toolCalls: event.toolCalls?.length || 0,
-                  hasToolResults: !!event.toolResults,
-                });
-              },
-            }),
-          {
-            name: 'Think and Prep Agent',
-          }
-        )();
-      } catch (error) {
-        attempt++;
+    const availableTools = [
+      SEQUENTIAL_THINKING_TOOL_NAME,
+      EXECUTE_SQL_TOOL_NAME,
+      RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
+      SUBMIT_THOUGHTS_TOOL_NAME,
+      MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
+    ];
 
-        // Only retry for NoSuchToolError
-        if (!NoSuchToolError.isInstance(error) || attempt > maxRetries) {
-          console.error('Error in think and prep agent:', error);
-          throw error;
-        }
+    const agentContext: AgentContext = {
+      agentName: THINK_AND_PREP_AGENT_NAME,
+      availableTools,
+      nextPhaseTools: [
+        'createMetrics',
+        'modifyMetrics',
+        'createDashboards',
+        'modifyDashboards',
+        'createReports',
+        'modifyReports',
+        'doneTool',
+      ],
+    };
 
-        // Add healing message and retry
-        const toolName = 'toolName' in error ? String(error.toolName) : 'unknown';
-        const toolCallId = 'toolCallId' in error ? String(error.toolCallId) : 'unknown';
-
-        const healingMessage: ModelMessage = {
-          role: 'tool',
-          content: [
-            {
-              type: 'tool-result',
-              toolCallId,
-              toolName,
-              output: {
-                type: 'text',
-                value: `Tool "${toolName}" is not available. Available tools: sequentialThinking, executeSql, respondWithoutAssetCreation, submitThoughts, messageUserClarifyingQuestion.
-                
-                The next phase of the workflow will be the analyst that has access to the following tools:
-                createMetrics, modifyMetrics, createDashboards, modifyDashboards, doneTool
-                
-                You'll be able to use those when they are available to you.`,
-              },
-            },
-          ],
-        };
-        currentMessages.push(healingMessage);
-
-        console.info(
-          `Retrying think and prep agent after NoSuchToolError (attempt ${attempt}/${maxRetries})`
-        );
+    return wrapTraced(
+      async () =>
+        streamText({
+          model: await Sonnet4,
+          tools: {
+            [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
+            [EXECUTE_SQL_TOOL_NAME]: executeSqlTool,
+            [RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME]: respondWithoutAssetCreation,
+            [SUBMIT_THOUGHTS_TOOL_NAME]: submitThoughts,
+            [MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME]: messageUserClarifyingQuestion,
+          },
+          messages: [systemMessage, datasetsSystemMessage, ...messages],
+          stopWhen: STOP_CONDITIONS,
+          toolChoice: 'required',
+          maxOutputTokens: 10000,
+          temperature: 0,
+          experimental_repairToolCall: async (repairContext) => {
+            return repairToolCall({
+              toolCall: repairContext.toolCall,
+              tools: repairContext.tools,
+              error: repairContext.error,
+              messages: repairContext.messages,
+              ...(repairContext.system && { system: repairContext.system }),
+              ...(repairContext.inputSchema && { inputSchema: repairContext.inputSchema }),
+              agentContext,
+            });
+          },
+          onStepFinish: async (event) => {
+            console.info('Think and Prep Agent step finished', {
+              toolCalls: event.toolCalls?.length || 0,
+              hasToolResults: !!event.toolResults,
+            });
+          },
+        }),
+      {
+        name: 'Think and Prep Agent',
       }
-    }
-
-    throw new Error('Max retry attempts exceeded');
+    )();
   }
 
   return {

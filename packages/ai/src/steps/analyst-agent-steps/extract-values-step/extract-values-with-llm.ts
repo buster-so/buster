@@ -90,7 +90,7 @@ export async function extractValuesWithLLM(
     const tracedValuesExtraction = wrapTraced(
       async () => {
         const { object } = await generateObject({
-          model: Haiku35,
+          model: await Haiku35,
           schema: llmOutputSchema,
           messages,
           temperature: 0,

@@ -105,7 +105,6 @@ export async function getAllRawLlmMessagesForChat(chatId: string) {
 export async function updateMessageFields(
   messageId: string,
   fields: {
-    //TODO: Dallin let's make a type for this. It should not just be a jsonb object.
     responseMessages?: unknown;
     reasoning?: unknown;
     rawLlmMessages?: unknown;

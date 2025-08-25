@@ -6,7 +6,7 @@ use database::{
     pool::get_pg_pool,
     schema::{
         asset_permissions, collections_to_assets, dashboard_files, metric_files, users,
-        chats,
+        chats, report_files,
     },
 };
 use diesel::{ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl, Queryable};
@@ -272,11 +272,39 @@ pub async fn get_collection_handler(
         }
     });
 
+    let report_assets_handle = tokio::spawn({
+        let pool = pool.clone();
+        let req_id = req.id;
+        async move {
+            let mut conn = pool.get().await.map_err(anyhow::Error::from)?;
+            collections_to_assets::table
+                .inner_join(report_files::table.on(report_files::id.eq(collections_to_assets::asset_id)))
+                .left_join(users::table.on(users::id.eq(report_files::created_by)))
+                .filter(collections_to_assets::collection_id.eq(req_id))
+                .filter(collections_to_assets::asset_type.eq(AssetType::ReportFile))
+                .filter(collections_to_assets::deleted_at.is_null())
+                .filter(report_files::deleted_at.is_null())
+                .select((
+                    report_files::id,
+                    report_files::name,
+                    users::name.nullable(),
+                    users::email.nullable(),
+                    report_files::created_at,
+                    report_files::updated_at,
+                    collections_to_assets::asset_type,
+                ))
+                .load::<AssetQueryResult>(&mut conn)
+                .await
+                .map_err(anyhow::Error::from)
+        }
+    });
+
     // Await all tasks and handle results
-    let (metric_assets_result, dashboard_assets_result, chat_assets_result) = tokio::join!(
+    let (metric_assets_result, dashboard_assets_result, chat_assets_result, report_assets_result) = tokio::join!(
         metric_assets_handle,
         dashboard_assets_handle,
-        chat_assets_handle
+        chat_assets_handle,
+        report_assets_handle
     );
 
     // Process metric assets
@@ -318,10 +346,23 @@ pub async fn get_collection_handler(
         }
     };
 
+    // Process report assets
+    let report_assets = match report_assets_result {
+        Ok(Ok(assets)) => assets,
+        Ok(Err(e)) => {
+            tracing::error!("Failed to fetch report assets: {}", e);
+            vec![]
+        }
+        Err(e) => {
+            tracing::error!("Report asset task failed: {}", e);
+            vec![]
+        }
+    };
+
     // println!("dashboard_assets: {:?}", dashboard_assets); // Keep or remove debug print?
 
     // Combine all assets
-    let all_assets = [metric_assets, dashboard_assets, chat_assets].concat(); // Add chat_assets
+    let all_assets = [metric_assets, dashboard_assets, chat_assets, report_assets].concat();
     let formatted_assets = format_assets(all_assets);
 
     // Get workspace sharing enabled by email if set

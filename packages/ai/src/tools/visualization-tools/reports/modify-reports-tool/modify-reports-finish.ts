@@ -36,7 +36,9 @@ export function createModifyReportsFinish(
         for (let i = 0; i < edits.length; i++) {
           const edit = edits[i];
           if (edit) {
-            const operation = edit.code_to_replace === '' ? 'append' : 'replace';
+            // Use explicit operation if provided, otherwise infer from code_to_replace
+            const operation =
+              edit.operation || (edit.code_to_replace === '' ? 'append' : 'replace');
 
             if (state.edits[i]) {
               // Update existing edit with final values

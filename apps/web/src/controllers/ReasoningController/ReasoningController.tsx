@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { ReasoningMessageSelector } from './ReasoningMessages';
 import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
-import { ReasoningScrollToBottom } from './ReasoningScrollToBottom';
+import { ScrollToBottomButton } from '@/components/ui/buttons/ScrollToBottomButton';
 import type { BusterChatMessage, IBusterChat } from '@/api/asset_interfaces/chat';
 
 interface ReasoningControllerProps {
@@ -79,7 +79,7 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
         </div>
       </ScrollArea>
 
-      <ReasoningScrollToBottom
+      <ScrollToBottomButton
         isAutoScrollEnabled={isAutoScrollEnabled}
         scrollToBottom={scrollToBottom}
       />

@@ -1,9 +1,6 @@
 import { updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
-import {
-  createSequentialThinkingRawLlmMessageEntry,
-  createSequentialThinkingReasoningMessage,
-} from './helpers/sequential-thinking-tool-transform-helper';
+import { createSequentialThinkingReasoningMessage } from './helpers/sequential-thinking-tool-transform-helper';
 import type {
   SequentialThinkingContext,
   SequentialThinkingState,
@@ -29,22 +26,14 @@ export function createSequentialThinkingStart(
       options.toolCallId
     );
 
-    // Create initial raw LLM message entry
-    const rawLlmMessage = createSequentialThinkingRawLlmMessageEntry(
-      sequentialThinkingState,
-      options.toolCallId
-    );
-
     try {
       if (context.messageId) {
         const reasoningMessages = reasoningEntry ? [reasoningEntry] : [];
-        const rawLlmMessages = rawLlmMessage ? [rawLlmMessage] : [];
 
-        if (reasoningMessages.length > 0 || rawLlmMessages.length > 0) {
+        if (reasoningMessages.length > 0) {
           await updateMessageEntries({
             messageId: context.messageId,
             reasoningMessages,
-            rawLlmMessages,
           });
 
           console.info('[sequential-thinking] Started sequential thinking:', {

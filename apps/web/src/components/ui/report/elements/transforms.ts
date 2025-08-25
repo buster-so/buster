@@ -41,21 +41,21 @@ const insertBlockMap: Record<string, (editor: PlateEditor, type: string) => void
   [KEYS.audio]: (editor) => insertAudioPlaceholder(editor, { select: true }),
   [KEYS.callout]: (editor) => insertCallout(editor, { select: true }),
   [KEYS.codeBlock]: (editor) => insertCodeBlock(editor, { select: true }),
-  [KEYS.equation]: (editor) => insertEquation(editor, { select: true }),
+  // [KEYS.equation]: (editor) => insertEquation(editor, { select: true }),
   [KEYS.file]: (editor) => insertFilePlaceholder(editor, { select: true }),
-  [KEYS.img]: (editor) => insertImagePlaceholder(editor, { select: true }),
-  [KEYS.mediaEmbed]: (editor) =>
-    editor.tf.insertNodes(editor.api.create.block({ type: KEYS.mediaEmbed }), { select: true }),
-  [KEYS.table]: (editor) => editor.getTransforms(TablePlugin).insert.table({}, { select: true }),
+  // [KEYS.img]: (editor) => insertImagePlaceholder(editor, { select: true }),
+  // [KEYS.mediaEmbed]: (editor) =>
+  //   editor.tf.insertNodes(editor.api.create.block({ type: KEYS.mediaEmbed }), { select: true }),
+  //  [KEYS.table]: (editor) => editor.getTransforms(TablePlugin).insert.table({}, { select: true }),
   [KEYS.toc]: (editor) => insertToc(editor, { select: true }),
   [KEYS.video]: (editor) => insertVideoPlaceholder(editor, { select: true }),
   [CUSTOM_KEYS.metric]: (editor) => insertMetric(editor, { select: true })
 };
 
 const insertInlineMap: Record<string, (editor: PlateEditor, type: string) => void> = {
-  [KEYS.date]: (editor) => insertDate(editor, { select: true }),
-  [KEYS.inlineEquation]: (editor) => insertInlineEquation(editor, '', { select: true }),
-  [KEYS.link]: (editor) => triggerFloatingLink(editor, { focused: true })
+  [KEYS.date]: (editor) => insertDate(editor, { select: true })
+  //[KEYS.inlineEquation]: (editor) => insertInlineEquation(editor, '', { select: true }),
+  //  [KEYS.link]: (editor) => triggerFloatingLink(editor, { focused: true })
 };
 
 export const insertBlock = (editor: PlateEditor, type: string) => {

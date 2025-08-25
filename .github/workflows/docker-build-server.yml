@@ -8,6 +8,7 @@ on:
       - 'packages/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docker-build-server.yml'
+      - '.github/workflows/deploy.yml'
 
 # Only one build per branch at a time, queue others
 concurrency:
@@ -42,43 +43,38 @@ jobs:
           node-version: 22
           cache: 'pnpm'
       
-      - name: Fix pnpm store permissions
-        run: |
-          STORE_PATH=$(pnpm store path --silent)
-          if [ -d "$STORE_PATH" ]; then
-            sudo chown -R $(whoami):$(whoami) "$STORE_PATH" || true
-            chmod -R u+rw "$STORE_PATH" || true
-          fi
-      
       - name: Install bun
         run: npm install -g bun@1.2.15
       
       - name: Mount Turbo cache sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
-          key: ${{ github.repository }}-turbo-cache
+          key: ${{ github.repository }}-turbo-cache-${{ github.ref_name }}
           path: ./.turbo
       
       - name: Mount Docker buildkit sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
-          key: ${{ github.repository }}-buildkit-cache
+          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}
           path: /tmp/.buildkit-cache
       
       - name: Install dependencies
         run: |
           echo "📦 Installing dependencies with pnpm..."
-          pnpm install --frozen-lockfile --prefer-offline
+          pnpm install --frozen-lockfile
       
       - name: Build with Turbo
         run: |
-          echo "🔨 Building server with Turbo (using sticky disk cache)..."
-          pnpm turbo run build --filter=@buster-app/server
+          echo "🔨 Building server with Turbo..."
+          # Build with optimized settings for Docker
+          pnpm turbo run build --filter=@buster-app/server...
           echo "✅ Build complete!"
         env:
           NODE_ENV: production
           DOCKER_BUILD: true
           CI: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
       
       - name: Build server bundle
         run: |
@@ -99,7 +95,7 @@ jobs:
           
           # Install production dependencies only
           cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod --ignore-scripts --no-optional
+          pnpm install --frozen-lockfile --prod --no-optional
           
           # Copy back to workspace
           cd -
@@ -108,7 +104,7 @@ jobs:
           cp -r apps/server/dist docker-context/
           cp apps/server/package.json docker-context/
       
-      - name: Set up Docker Builder with Blacksmith cache
+      - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
       
       - name: Log in to GitHub Container Registry
@@ -121,7 +117,7 @@ jobs:
       - name: Extract metadata and determine tags
         id: meta
         run: |
-          SHA_SHORT=$(git rev-parse --short HEAD)
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
           echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
           
           if [[ "${{ github.ref_name }}" == "main" ]]; then
@@ -150,6 +146,9 @@ jobs:
           build-args: |
             COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
             BUILD_DATE=${{ steps.meta.outputs.timestamp }}
+          platforms: linux/amd64
+          cache-from: type=local,src=/tmp/.buildkit-cache
+          cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
       
       - name: Output image details
         run: |

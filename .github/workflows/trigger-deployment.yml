@@ -27,23 +27,9 @@ jobs:
         with:
           node-version: 22
           cache: 'pnpm'
-      
-      - name: Fix pnpm store permissions
-        run: |
-          STORE_PATH=$(pnpm store path --silent)
-          if [ -d "$STORE_PATH" ]; then
-            sudo chown -R $(whoami):$(whoami) "$STORE_PATH" || true
-            chmod -R u+rw "$STORE_PATH" || true
-          fi
-      
-      - name: Mount Turbo cache sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-turbo-cache
-          path: ./.turbo
           
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile
         
       - name: 🚀 Deploy to ${{ github.ref_name == 'main' && 'Production' || 'Staging' }}
         env:

@@ -8,7 +8,9 @@ export const GetMetricRequestSchema = z.object({
   version_number: z.number().optional(), //api will default to latest if not provided
 });
 
-export const GetMetricDataRequestSchema = GetMetricRequestSchema;
+export const GetMetricDataRequestSchema = GetMetricRequestSchema.extend({
+  limit: z.number().min(1).max(5000).default(5000).optional(),
+});
 
 export const GetMetricListRequestSchema = z.object({
   /** The token representing the current page number for pagination */

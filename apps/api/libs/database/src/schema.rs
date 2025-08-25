@@ -465,6 +465,30 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
+    use super::sql_types::WorkspaceSharingEnum;
+
+    report_files (id) {
+        id -> Uuid,
+        name -> Varchar,
+        content -> Text,
+        organization_id -> Uuid,
+        created_by -> Uuid,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
+        deleted_at -> Nullable<Timestamptz>,
+        publicly_accessible -> Bool,
+        publicly_enabled_by -> Nullable<Uuid>,
+        public_expiry_date -> Nullable<Timestamptz>,
+        version_history -> Jsonb,
+        public_password -> Nullable<Text>,
+        workspace_sharing -> WorkspaceSharingEnum,
+        workspace_sharing_enabled_by -> Nullable<Uuid>,
+        workspace_sharing_enabled_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
     use super::sql_types::UserOrganizationRoleEnum;
 
     organizations (id) {
@@ -757,6 +781,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     metric_files_to_dashboard_files,
     metric_files_to_datasets,
     organizations,
+    report_files,
     permission_groups,
     permission_groups_to_identities,
     permission_groups_to_users,

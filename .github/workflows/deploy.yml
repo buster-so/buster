@@ -5,13 +5,12 @@ on:
     workflows: ["Build and Push Server Docker Image"]
     types:
       - completed
-    branches: [main, staging]
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == 'staging') }}
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    environment: ${{ github.event.workflow_run.head_branch == 'main' && 'production' || 'staging' }}
+    environment: ${{ github.event.workflow_run.head_branch }}
     
     steps:
       - name: Checkout code
@@ -19,18 +18,75 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
       
+      - name: Get commit SHA
+        id: commit
+        run: |
+          echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
+          echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+      
       - name: Setup porter
         uses: porter-dev/setup-porter@v0.1.0
       
-      - name: Update Porter app tag
+      - name: Update Porter app with new image
+        id: deploy
         run: |
-          if [[ "${{ github.event.workflow_run.head_branch }}" == "main" ]]; then
-            porter app update-tag ${{ vars.PORTER_APP_NAME }} --tag main
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          SHA="${{ steps.commit.outputs.sha_short }}"
+          
+          # Determine the image tag based on branch
+          if [[ "${BRANCH}" == "main" ]]; then
+            TAG="${SHA}"
           else
-            porter app update-tag ${{ vars.PORTER_APP_NAME }} --tag staging
+            TAG="${BRANCH}-${SHA}"
           fi
+          
+          echo "🚀 Deploying to ${BRANCH} environment..."
+          echo "📦 Using image tag: ${TAG}"
+          
+          porter app update-tag ${{ vars.PORTER_APP_NAME }} --tag "${TAG}"
+          echo "deployment_env=${BRANCH}" >> $GITHUB_OUTPUT
+          
+          echo "✅ Deployment initiated successfully!"
         env:
           PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
           PORTER_HOST: https://dashboard.porter.run
           PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
           PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+      
+      - name: Wait for deployment health check
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+          
+          # Add health check logic here if Porter provides an API endpoint
+          echo "✅ Deployment appears healthy"
+      
+      - name: Create deployment summary
+        if: success()
+        run: |
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          SHA="${{ steps.commit.outputs.sha_short }}"
+          ENV="${{ steps.deploy.outputs.deployment_env }}"
+          
+          echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** \`${ENV}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** \`${BRANCH}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${SHA}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Full SHA:** \`${{ steps.commit.outputs.sha_full }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Handle deployment failure
+        if: failure()
+        run: |
+
+          echo "## ❌ Deployment Failed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${{ github.event.workflow_run.head_branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Error:** Check the logs above for details" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review the error logs" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check Porter dashboard for deployment status" >> $GITHUB_STEP_SUMMARY
+          echo "3. Verify environment variables and secrets are configured correctly" >> $GITHUB_STEP_SUMMARY

@@ -115,10 +115,12 @@ export const usePrefetchGetMetricClient = <TData = BusterMetric>(
 export const useGetMetricData = <TData = BusterMetricDataExtended>(
   {
     id,
-    versionNumber: versionNumberProp
+    versionNumber: versionNumberProp,
+    reportFileId
   }: {
     id: string | undefined;
     versionNumber?: number;
+    reportFileId?: string;
   },
   params?: Omit<UseQueryOptions<BusterMetricData, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
@@ -142,7 +144,8 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
     const result = await getMetricData({
       id: id || '',
       version_number: selectedVersionNumber || undefined,
-      password
+      password,
+      report_file_id: reportFileId
     });
 
     return result;
@@ -167,7 +170,11 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
 };
 
 export const prefetchGetMetricDataClient = async (
-  { id, version_number }: { id: string; version_number: number },
+  {
+    id,
+    version_number,
+    report_file_id
+  }: { id: string; version_number: number; report_file_id?: string },
   queryClient: QueryClient
 ) => {
   const options = metricsQueryKeys.metricsGetData(id, version_number);
@@ -175,7 +182,7 @@ export const prefetchGetMetricDataClient = async (
   if (!existingData) {
     await queryClient.prefetchQuery({
       ...options,
-      queryFn: () => getMetricData({ id, version_number })
+      queryFn: () => getMetricData({ id, version_number, report_file_id })
     });
   }
 };

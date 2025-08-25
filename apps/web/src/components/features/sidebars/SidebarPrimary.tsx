@@ -85,18 +85,18 @@ const yourStuff = (
         active: isActiveCheck('dashboard', BusterRoutes.APP_DASHBOARDS)
       },
       {
-        label: 'Collections',
-        icon: <ASSET_ICONS.collections />,
-        route: createBusterRoute({ route: BusterRoutes.APP_COLLECTIONS }),
-        id: BusterRoutes.APP_COLLECTIONS,
-        active: isActiveCheck('collection', BusterRoutes.APP_COLLECTIONS)
-      },
-      {
         label: 'Reports',
         icon: <ASSET_ICONS.reports />,
         route: createBusterRoute({ route: BusterRoutes.APP_REPORTS }),
         id: BusterRoutes.APP_REPORTS,
         active: isActiveCheck('report', BusterRoutes.APP_REPORTS)
+      },
+      {
+        label: 'Collections',
+        icon: <ASSET_ICONS.collections />,
+        route: createBusterRoute({ route: BusterRoutes.APP_COLLECTIONS }),
+        id: BusterRoutes.APP_COLLECTIONS,
+        active: isActiveCheck('collection', BusterRoutes.APP_COLLECTIONS)
       }
     ].filter(Boolean) as ISidebarItem[]
   };

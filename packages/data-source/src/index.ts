@@ -78,3 +78,24 @@ export {
   batchWithRateLimit,
   getAllRateLimiterStats,
 } from './utils/rate-limiter';
+
+// Metric query utilities
+export { executeMetricQuery } from './utils/execute-metric-query';
+export type {
+  ExecuteMetricQueryOptions,
+  ExecuteMetricQueryResult,
+} from './utils/execute-metric-query';
+export { createMetadataFromResults } from './utils/create-metadata-from-results';
+
+// SQL validation utilities
+export { checkQueryIsReadOnly } from './utils/sql-validation';
+export type { QueryTypeCheckResult } from './utils/sql-validation';
+
+// R2 cache utilities for metric data
+export {
+  checkCacheExists,
+  getCachedMetricData,
+  setCachedMetricData,
+  batchCheckCacheExists,
+  generateCacheKey,
+} from './cache';

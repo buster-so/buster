@@ -31,10 +31,19 @@ export class RedshiftAdapter extends BaseAdapter {
     const redshiftCredentials = credentials as RedshiftCredentials;
 
     try {
+      // Handle both 'database' and 'default_database' for backward compatibility
+      const database = redshiftCredentials.default_database;
+
+      if (!database) {
+        throw new Error(
+          'Database name is required. Please provide either "database" or "default_database" in credentials.'
+        );
+      }
+
       const config: ClientConfig = {
         host: redshiftCredentials.host,
         port: redshiftCredentials.port || 5439, // Default Redshift port
-        database: redshiftCredentials.database,
+        database: database,
         user: redshiftCredentials.username,
         password: redshiftCredentials.password,
         ssl: redshiftCredentials.ssl ?? true, // SSL is typically required for Redshift
@@ -43,9 +52,10 @@ export class RedshiftAdapter extends BaseAdapter {
       // Handle connection timeout - default to 60 seconds for serverless
       config.connectionTimeoutMillis = redshiftCredentials.connection_timeout || 60000;
 
-      // Set default schema if provided
-      if (redshiftCredentials.schema) {
-        config.options = `-c search_path=${redshiftCredentials.schema}`;
+      // Set default schema if provided (handle both 'schema' and 'default_schema')
+      const schema = redshiftCredentials.default_schema;
+      if (schema) {
+        config.options = `-c search_path=${schema}`;
       }
 
       this.client = new Client(config);

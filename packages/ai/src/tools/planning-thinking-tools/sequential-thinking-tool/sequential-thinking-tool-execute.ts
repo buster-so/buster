@@ -47,8 +47,13 @@ async function processSequentialThinking(
       entries.reasoningMessages = [reasoningEntry];
     }
 
+    // Always send both raw LLM messages together to maintain proper ordering
+    // If rawLlmMessage is null (shouldn't happen since we checked toolCallId), send just the result
     if (rawLlmMessage) {
       entries.rawLlmMessages = [rawLlmMessage, rawToolResultEntry];
+    } else {
+      // This shouldn't happen, but as a fallback, at least send the result
+      entries.rawLlmMessages = [rawToolResultEntry];
     }
 
     try {

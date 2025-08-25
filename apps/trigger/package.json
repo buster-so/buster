@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.864.0",
+    "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "^3.864.0",
     "@buster/access-controls": "workspace:*",
     "@buster/ai": "workspace:*",
@@ -31,7 +31,7 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster/web-tools": "workspace:*",
-    "@trigger.dev/sdk": "catalog:",
+    "@trigger.dev/sdk": "4.0.1",
     "ai": "catalog:",
     "braintrust": "catalog:",
     "drizzle-orm": "catalog:",

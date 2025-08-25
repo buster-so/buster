@@ -11,7 +11,6 @@ import reportsRoutes from './reports';
 import securityRoutes from './security';
 import slackRoutes from './slack';
 import supportRoutes from './support';
-import tempRoutes from './temp';
 import titleRoutes from './title';
 import userRoutes from './users';
 
@@ -28,7 +27,6 @@ const app = new Hono()
   .route('/organizations', organizationRoutes)
   .route('/dictionaries', dictionariesRoutes)
   .route('/title', titleRoutes)
-  .route('/temp', tempRoutes)
   .route('/reports', reportsRoutes);
 
 export default app;

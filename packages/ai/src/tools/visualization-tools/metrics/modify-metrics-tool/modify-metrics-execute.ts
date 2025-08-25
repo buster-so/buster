@@ -1,4 +1,5 @@
-import type { DataSource } from '@buster/data-source';
+import type { Credentials } from '@buster/data-source';
+import { createMetadataFromResults, executeMetricQuery } from '@buster/data-source';
 import { db, metricFiles, updateMessageEntries } from '@buster/database';
 import {
   type ChartConfigProps,
@@ -10,7 +11,7 @@ import { wrapTraced } from 'braintrust';
 import { eq, inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { getDataSource } from '../../../../utils/get-data-source';
+import { getDataSourceCredentials } from '../../../../utils/get-data-source';
 import {
   createPermissionErrorMessage,
   validateSqlPermissions,
@@ -18,7 +19,6 @@ import {
 import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-result-entry';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import { validateAndAdjustBarLineAxes } from '../helpers/bar-line-axis-validator';
-import { createMetadataFromResults } from '../helpers/metadata-from-results';
 import { ensureTimeFrameQuoted } from '../helpers/time-frame-helper';
 import {
   createModifyMetricsRawLlmMessageEntry,
@@ -95,28 +95,8 @@ interface ValidationResult {
   error?: string;
   message?: string;
   results?: Record<string, unknown>[];
-  metadata?: QueryMetadata;
+  metadata?: DataMetadata;
 }
-
-interface QueryMetadata {
-  rowCount: number;
-  totalRowCount: number;
-  executionTime: number;
-  limited: boolean;
-  maxRows: number;
-}
-
-interface ResultMetadata {
-  totalRowCount?: number | undefined;
-  limited?: boolean | undefined;
-  maxRows?: number | undefined;
-}
-
-const resultMetadataSchema = z.object({
-  totalRowCount: z.number().optional(),
-  limited: z.boolean().optional(),
-  maxRows: z.number().optional(),
-});
 
 async function validateSql(
   sqlQuery: string,
@@ -147,11 +127,10 @@ async function validateSql(
       };
     }
 
-    // Get a new DataSource instance
-    let dataSource: DataSource | null = null;
-
+    // Get data source credentials
+    let credentials: Credentials;
     try {
-      dataSource = await getDataSource(dataSourceId);
+      credentials = await getDataSourceCredentials(dataSourceId);
     } catch (_error) {
       return {
         success: false,
@@ -159,128 +138,44 @@ async function validateSql(
       };
     }
 
-    // Retry configuration for SQL validation
-    const MAX_RETRIES = 3;
-    const TIMEOUT_MS = 120000; // 120 seconds (2 minutes) per attempt for Snowflake queue handling
-    const RETRY_DELAYS = [1000, 3000, 6000]; // 1s, 3s, 6s
+    // Execute query using the new utility
+    try {
+      const result = await executeMetricQuery(dataSourceId, sqlQuery, credentials, {
+        maxRows: 1000, // Validation limit
+        timeout: 120000, // 2 minutes
+        retryDelays: [1000, 3000, 6000], // 1s, 3s, 6s
+      });
 
-    // Attempt execution with retries
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        // Execute the SQL query using the DataSource with row limit and timeout for validation
-        // Use maxRows to limit results without modifying the SQL query (preserves Snowflake caching)
-        const result = await dataSource.execute({
-          sql: sqlQuery,
-          options: {
-            maxRows: 1000, // Additional safety limit at adapter level
-            timeout: TIMEOUT_MS,
-          },
-        });
+      // Truncate results to 25 records for display in validation
+      const displayResults = result.data.slice(0, 25);
 
-        if (result.success) {
-          const allResults = result.rows || [];
-          // Truncate results to 25 records for display in validation
-          const results = allResults.slice(0, 25);
-
-          // Validate metadata with Zod schema for runtime safety
-          const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
-          const parsedMetadata: ResultMetadata | undefined = validatedMetadata.success
-            ? validatedMetadata.data
-            : undefined;
-
-          const metadata: QueryMetadata = {
-            rowCount: results.length,
-            totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
-            executionTime: result.executionTime || 100,
-            limited: parsedMetadata?.limited ?? false,
-            maxRows: parsedMetadata?.maxRows ?? 5000,
-          };
-
-          let message: string;
-          if (allResults.length === 0) {
-            message = 'Query executed successfully but returned no records';
-          } else if (result.metadata?.limited) {
-            message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
-          } else {
-            message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
-          }
-
-          return {
-            success: true,
-            message,
-            results,
-            metadata,
-          };
-        }
-
-        // Check if error is timeout-related
-        const errorMessage = result.error?.message || 'Query execution failed';
-        const isTimeout =
-          errorMessage.toLowerCase().includes('timeout') ||
-          errorMessage.toLowerCase().includes('timed out');
-
-        if (isTimeout && attempt < MAX_RETRIES) {
-          // Wait before retry
-          const delay = RETRY_DELAYS[attempt] || 6000;
-          console.warn(
-            `[modify-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
-            {
-              sqlPreview: `${sqlQuery.substring(0, 100)}...`,
-              attempt: attempt + 1,
-              nextDelay: delay,
-            }
-          );
-          await new Promise((resolve) => setTimeout(resolve, delay));
-          continue; // Retry
-        }
-
-        // Not a timeout or no more retries
-        return {
-          success: false,
-          error: errorMessage,
-        };
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'SQL validation failed';
-        const isTimeout =
-          errorMessage.toLowerCase().includes('timeout') ||
-          errorMessage.toLowerCase().includes('timed out');
-
-        if (isTimeout && attempt < MAX_RETRIES) {
-          // Wait before retry
-          const delay = RETRY_DELAYS[attempt] || 6000;
-          console.warn(
-            `[modify-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
-            {
-              sqlPreview: `${sqlQuery.substring(0, 100)}...`,
-              attempt: attempt + 1,
-              nextDelay: delay,
-              error: errorMessage,
-            }
-          );
-          await new Promise((resolve) => setTimeout(resolve, delay));
-          continue; // Retry
-        }
-
-        // Not a timeout or no more retries
-        return {
-          success: false,
-          error: errorMessage,
-        };
+      let message: string;
+      if (result.data.length === 0) {
+        message = 'Query executed successfully but returned no records';
+      } else if (result.hasMoreRecords) {
+        message = `Query validated successfully. Results were limited to 1000 rows for memory protection (query may return more rows when executed)${displayResults.length < result.data.length ? ` - showing first 25 of ${result.data.length} fetched` : ''}`;
+      } else {
+        message = `Query validated successfully and returned ${result.data.length} records${result.data.length > 25 ? ' (showing sample of first 25)' : ''}`;
       }
-    }
 
-    // Should not reach here, but just in case
-    return {
-      success: false,
-      error: 'Max retries exceeded for SQL validation',
-    };
+      return {
+        success: true,
+        message,
+        results: displayResults,
+        metadata: result.dataMetadata,
+      };
+    } catch (error) {
+      console.error('[modify-metrics] SQL validation failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'SQL validation failed',
+      };
+    }
   } catch (error) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'SQL validation failed',
     };
-  } finally {
-    // Data source cleanup handled by getDataSource
   }
 }
 

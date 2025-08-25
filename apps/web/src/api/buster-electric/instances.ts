@@ -117,8 +117,6 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
     memoParams,
     accessToken,
     subscribe,
-    operations.join(','), // primitive dep
-    onUpdate,
-    shouldUnsubscribe
+    operations.join(',') // primitive dep
   ]);
 };

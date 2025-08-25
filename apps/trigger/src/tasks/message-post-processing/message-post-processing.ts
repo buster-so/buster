@@ -1,7 +1,13 @@
 import postProcessingWorkflow, {
   type PostProcessingWorkflowOutput,
 } from '@buster/ai/workflows/message-post-processing-workflow/message-post-processing-workflow';
-import { eq, getBraintrustMetadata, getDb, messages, slackIntegrations } from '@buster/database';
+import {
+  dbInitialized,
+  eq,
+  getBraintrustMetadata,
+  messages,
+  slackIntegrations,
+} from '@buster/database';
 import type {
   AssumptionClassification,
   AssumptionLabel,
@@ -204,7 +210,7 @@ export const messagePostProcessingTask: ReturnType<
       const dbData = extractDbFields(validatedOutput, messageContext.userName);
 
       try {
-        const db = getDb();
+        const db = await dbInitialized;
         await db
           .update(messages)
           .set({
@@ -275,7 +281,7 @@ export const messagePostProcessingTask: ReturnType<
             });
 
             // Need to get integration details to get the token vault key
-            const db = getDb();
+            const db = await dbInitialized;
             const [integration] = await db
               .select({ tokenVaultKey: slackIntegrations.tokenVaultKey })
               .from(slackIntegrations)

@@ -51,6 +51,8 @@ export const assetTypeToRoute = (assetType: ShareAssetType, assetId: string) => 
       return createBusterRoute({ route: BusterRoutes.APP_COLLECTIONS_ID, collectionId: assetId });
     case 'chat':
       return createBusterRoute({ route: BusterRoutes.APP_CHAT_ID, chatId: assetId });
+    case 'report':
+      return createBusterRoute({ route: BusterRoutes.APP_REPORTS_ID, reportId: assetId });
     default:
       console.warn('Asset type to route not found', assetType, assetId);
       return '';

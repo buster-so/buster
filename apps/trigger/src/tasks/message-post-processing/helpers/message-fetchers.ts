@@ -2,9 +2,9 @@ import { getPermissionedDatasets } from '@buster/access-controls';
 import {
   and,
   chats,
+  dbInitialized,
   eq,
   getChatConversationHistory,
-  getDb,
   isNotNull,
   isNull,
   lte,
@@ -23,7 +23,7 @@ import {
  * Fetch current message with user and chat info
  */
 export async function fetchMessageWithContext(messageId: string): Promise<MessageContext> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   try {
     const result = await db
@@ -88,7 +88,7 @@ export async function fetchPreviousPostProcessingMessages(
   chatId: string,
   beforeTimestamp: Date
 ): Promise<PostProcessingResult[]> {
-  const db = getDb();
+  const db = await dbInitialized;
 
   try {
     const result = await db

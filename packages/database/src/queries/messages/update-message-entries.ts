@@ -1,9 +1,16 @@
 import type { ModelMessage } from 'ai';
-import { type SQL, and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { messages } from '../../schema';
 import { ReasoningMessageSchema, ResponseMessageSchema } from '../../schemas/message-schemas';
+import { fetchMessageEntries } from './helpers/fetch-message-entries';
+import {
+  mergeRawLlmMessages,
+  mergeReasoningMessages,
+  mergeResponseMessages,
+} from './helpers/merge-entries';
+import { messageEntriesCache } from './message-entries-cache';
 
 const UpdateMessageEntriesSchema = z.object({
   messageId: z.string().uuid(),
@@ -15,14 +22,13 @@ const UpdateMessageEntriesSchema = z.object({
 export type UpdateMessageEntriesParams = z.infer<typeof UpdateMessageEntriesSchema>;
 
 /**
- * Updates message entries using optimized JSONB merge operations.
- * Performs batch upserts for multiple entries in a single database operation.
+ * Updates message entries with cache-first approach for streaming.
+ * Cache is the source of truth during streaming, DB is updated for persistence.
  *
- * Upsert logic:
- * - responseMessages: upsert by 'id' field
- * - reasoningMessages: upsert by 'id' field
- * - rawLlmMessages: upsert by combination of 'role' and 'toolCallId' in content array
- *   (handles both string content and array content with tool calls)
+ * Merge logic:
+ * - responseMessages: upsert by 'id' field, maintaining order
+ * - reasoningMessages: upsert by 'id' field, maintaining order
+ * - rawLlmMessages: upsert by combination of 'role' and 'toolCallId', maintaining order
  */
 export async function updateMessageEntries({
   messageId,
@@ -31,157 +37,55 @@ export async function updateMessageEntries({
   reasoningMessages,
 }: UpdateMessageEntriesParams): Promise<{ success: boolean }> {
   try {
-    const updates: Record<string, SQL | string> = { updatedAt: new Date().toISOString() };
+    // Fetch existing entries from cache or database
+    const existingEntries = await fetchMessageEntries(messageId);
 
-    // Optimized merge for response messages
-    if (responseMessages?.length) {
-      const newData = JSON.stringify(responseMessages);
-      updates.responseMessages = sql`
-        CASE 
-          WHEN ${messages.responseMessages} IS NULL THEN ${newData}::jsonb
-          ELSE (
-            WITH new_map AS (
-              SELECT jsonb_object_agg(value->>'id', value) AS map
-              FROM jsonb_array_elements(${newData}::jsonb) AS value
-              WHERE value->>'id' IS NOT NULL
-            ),
-            merged AS (
-              SELECT jsonb_agg(
-                CASE 
-                  WHEN new_map.map ? (existing.value->>'id') 
-                  THEN new_map.map->(existing.value->>'id')
-                  ELSE existing.value
-                END
-                ORDER BY existing.ordinality
-              ) AS result
-              FROM jsonb_array_elements(${messages.responseMessages}) WITH ORDINALITY AS existing(value, ordinality)
-              CROSS JOIN new_map
-              UNION ALL
-              SELECT jsonb_agg(new_item.value ORDER BY new_item.ordinality)
-              FROM jsonb_array_elements(${newData}::jsonb) WITH ORDINALITY AS new_item(value, ordinality)
-              CROSS JOIN new_map
-              WHERE NOT EXISTS (
-                SELECT 1 FROM jsonb_array_elements(${messages.responseMessages}) AS existing
-                WHERE existing.value->>'id' = new_item.value->>'id'
-              )
-            )
-            SELECT COALESCE(jsonb_agg(value), '[]'::jsonb)
-            FROM (
-              SELECT jsonb_array_elements(result) AS value
-              FROM merged
-              WHERE result IS NOT NULL
-            ) t
-          )
-        END`;
+    if (!existingEntries) {
+      throw new Error(`Message not found: ${messageId}`);
     }
 
-    // Optimized merge for reasoning messages
-    if (reasoningMessages?.length) {
-      const newData = JSON.stringify(reasoningMessages);
-      updates.reasoning = sql`
-        CASE 
-          WHEN ${messages.reasoning} IS NULL THEN ${newData}::jsonb
-          ELSE (
-            WITH new_map AS (
-              SELECT jsonb_object_agg(value->>'id', value) AS map
-              FROM jsonb_array_elements(${newData}::jsonb) AS value
-              WHERE value->>'id' IS NOT NULL
-            ),
-            merged AS (
-              SELECT jsonb_agg(
-                CASE 
-                  WHEN new_map.map ? (existing.value->>'id') 
-                  THEN new_map.map->(existing.value->>'id')
-                  ELSE existing.value
-                END
-                ORDER BY existing.ordinality
-              ) AS result
-              FROM jsonb_array_elements(${messages.reasoning}) WITH ORDINALITY AS existing(value, ordinality)
-              CROSS JOIN new_map
-              UNION ALL
-              SELECT jsonb_agg(new_item.value ORDER BY new_item.ordinality)
-              FROM jsonb_array_elements(${newData}::jsonb) WITH ORDINALITY AS new_item(value, ordinality)
-              CROSS JOIN new_map
-              WHERE NOT EXISTS (
-                SELECT 1 FROM jsonb_array_elements(${messages.reasoning}) AS existing
-                WHERE existing.value->>'id' = new_item.value->>'id'
-              )
-            )
-            SELECT COALESCE(jsonb_agg(value), '[]'::jsonb)
-            FROM (
-              SELECT jsonb_array_elements(result) AS value
-              FROM merged
-              WHERE result IS NOT NULL
-            ) t
-          )
-        END`;
+    // Merge with new entries
+    const mergedEntries = {
+      responseMessages: responseMessages
+        ? mergeResponseMessages(existingEntries.responseMessages, responseMessages)
+        : existingEntries.responseMessages,
+      reasoning: reasoningMessages
+        ? mergeReasoningMessages(existingEntries.reasoning, reasoningMessages)
+        : existingEntries.reasoning,
+      rawLlmMessages: rawLlmMessages
+        ? mergeRawLlmMessages(existingEntries.rawLlmMessages, rawLlmMessages)
+        : existingEntries.rawLlmMessages,
+    };
+
+    // Update cache immediately (cache is source of truth during streaming)
+    messageEntriesCache.set(messageId, mergedEntries);
+
+    // Update database asynchronously for persistence (fire-and-forget)
+    // If this fails, cache still has the latest state for next update
+    const updateData: Record<string, unknown> = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (responseMessages) {
+      updateData.responseMessages = mergedEntries.responseMessages;
     }
 
-    // Optimized merge for raw LLM messages - handles both string and array content
-    if (rawLlmMessages?.length) {
-      const newData = JSON.stringify(rawLlmMessages);
-      updates.rawLlmMessages = sql`
-        CASE 
-          WHEN ${messages.rawLlmMessages} IS NULL THEN ${newData}::jsonb
-          ELSE (
-            WITH new_messages AS (
-              SELECT 
-                value,
-                value->>'role' AS role,
-                COALESCE(
-                  CASE 
-                    WHEN jsonb_typeof(value->'content') = 'array' THEN
-                      (SELECT string_agg(c->>'toolCallId', ',' ORDER BY c->>'toolCallId')
-                       FROM jsonb_array_elements(value->'content') c
-                       WHERE c->>'toolCallId' IS NOT NULL)
-                    ELSE NULL
-                  END,
-                  ''
-                ) AS tool_calls
-              FROM jsonb_array_elements(${newData}::jsonb) AS value
-            ),
-            existing_messages AS (
-              SELECT 
-                value,
-                ordinality,
-                value->>'role' AS role,
-                COALESCE(
-                  CASE 
-                    WHEN jsonb_typeof(value->'content') = 'array' THEN
-                      (SELECT string_agg(c->>'toolCallId', ',' ORDER BY c->>'toolCallId')
-                       FROM jsonb_array_elements(value->'content') c
-                       WHERE c->>'toolCallId' IS NOT NULL)
-                    ELSE NULL
-                  END,
-                  ''
-                ) AS tool_calls
-              FROM jsonb_array_elements(${messages.rawLlmMessages}) WITH ORDINALITY AS t(value, ordinality)
-            )
-            SELECT COALESCE(
-              jsonb_agg(value ORDER BY ord),
-              '[]'::jsonb
-            )
-            FROM (
-              -- Keep existing messages that aren't being updated
-              SELECT e.value, e.ordinality AS ord
-              FROM existing_messages e
-              WHERE NOT EXISTS (
-                SELECT 1 FROM new_messages n
-                WHERE n.role = e.role AND n.tool_calls = e.tool_calls
-              )
-              UNION ALL
-              -- Add all new messages
-              SELECT n.value, 1000000 + row_number() OVER () AS ord
-              FROM new_messages n
-            ) combined
-          )
-        END`;
+    if (reasoningMessages) {
+      updateData.reasoning = mergedEntries.reasoning;
     }
 
-    await db
-      .update(messages)
-      .set(updates)
-      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+    if (rawLlmMessages) {
+      updateData.rawLlmMessages = mergedEntries.rawLlmMessages;
+    }
+
+    // Non-blocking DB update - don't await
+    db.update(messages)
+      .set(updateData)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+      .catch((error) => {
+        // Log but don't fail - cache has the truth
+        console.error('Background DB update failed (cache still valid):', error);
+      });
 
     return { success: true };
   } catch (error) {

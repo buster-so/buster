@@ -158,7 +158,8 @@ CollectionList.displayName = 'CollectionList';
 
 const CollectionIconRecord: Record<string, React.ReactNode> = {
   dashboard: <ASSET_ICONS.dashboards />,
-  metric: <ASSET_ICONS.metrics />
+  metric: <ASSET_ICONS.metrics />,
+  report: <ASSET_ICONS.reports />
 };
 
 const createAssetLink = (asset: BusterCollectionItemAsset, collectionId: string) => {
@@ -173,6 +174,13 @@ const createAssetLink = (asset: BusterCollectionItemAsset, collectionId: string)
     return createBusterRoute({
       route: BusterRoutes.APP_DASHBOARD_ID,
       dashboardId: asset.id
+    });
+  }
+
+  if (asset.asset_type === 'report') {
+    return createBusterRoute({
+      route: BusterRoutes.APP_REPORTS_ID,
+      reportId: asset.id
     });
   }
 

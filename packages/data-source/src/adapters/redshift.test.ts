@@ -33,7 +33,7 @@ describe('RedshiftAdapter', () => {
         type: DataSourceType.Redshift,
         host: 'cluster.region.redshift.amazonaws.com',
         port: 5439,
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -56,7 +56,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -74,7 +74,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -92,7 +92,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         ssl: false,
@@ -116,7 +116,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         ssl: sslOptions,
@@ -135,7 +135,7 @@ describe('RedshiftAdapter', () => {
       const credentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -149,7 +149,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -166,7 +166,7 @@ describe('RedshiftAdapter', () => {
     const credentials: RedshiftCredentials = {
       type: DataSourceType.Redshift,
       host: 'cluster.redshift.amazonaws.com',
-      database: 'testdb',
+      default_database: 'testdb',
       username: 'testuser',
       password: 'testpass',
     };
@@ -350,7 +350,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -369,7 +369,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -387,7 +387,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -402,7 +402,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -421,7 +421,7 @@ describe('RedshiftAdapter', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'cluster.redshift.amazonaws.com',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };

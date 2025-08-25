@@ -142,7 +142,7 @@ Generate a concise update message for the data team.`;
   ];
 
   const { object } = await generateObject({
-    model: Sonnet4,
+    model: await Sonnet4,
     schema: generateUpdateMessageOutputSchema,
     messages: systemAndUserMessages,
     temperature: 0,

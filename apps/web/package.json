@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbo",
-    "dev:fast": "make start-fast",
+    "dev:fast": "make fast",
     "build": "next build",
     "start": "next start",
     "lint": "next lint && npx prettier --write . '!src/components/ui/icons/**' --log-level error",

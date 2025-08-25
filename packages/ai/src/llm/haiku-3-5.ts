@@ -32,6 +32,7 @@ async function initializeHaiku35() {
   try {
     await getSecret(AI_KEYS.VERTEX_CLIENT_EMAIL);
     await getSecret(AI_KEYS.VERTEX_PRIVATE_KEY);
+    await getSecret(AI_KEYS.VERTEX_PROJECT);
     try {
       models.push(await vertexModel('claude-3-5-haiku@20241022'));
       console.info('Haiku35: Vertex AI model added to fallback chain');
@@ -40,6 +41,7 @@ async function initializeHaiku35() {
     }
   } catch {
     // Vertex credentials not available, skip Vertex model
+    console.info('Haiku35: Vertex credentials not available, skipping Vertex model');
   }
 
   // Ensure we have at least one model
@@ -55,7 +57,28 @@ async function initializeHaiku35() {
     models,
     modelResetInterval: 60000,
     retryAfterOutput: true,
-    onError: (err) => console.error(`FALLBACK.  Here is the error: ${err}`),
+    onError: (err, modelId) => {
+      // Handle various error formats
+      let errorMessage = 'Unknown error';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (err && typeof err === 'object') {
+        const errObj = err as Record<string, unknown>;
+        if ('message' in errObj) {
+          errorMessage = String(errObj.message);
+        }
+        if ('type' in errObj) {
+          errorMessage = `${errObj.type}: ${errObj.message || 'No message'}`;
+        }
+      } else {
+        errorMessage = String(err);
+      }
+
+      const errorDetails =
+        err instanceof Error && err.stack ? err.stack : JSON.stringify(err, null, 2);
+      console.error(`FALLBACK from model ${modelId}. Error: ${errorMessage}`);
+      console.error('Error details:', errorDetails);
+    },
   });
 
   return _haiku35Instance;

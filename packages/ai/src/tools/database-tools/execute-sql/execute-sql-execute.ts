@@ -94,7 +94,10 @@ async function executeSingleStatement(
   if (!permissionResult.isAuthorized) {
     return {
       success: false,
-      error: createPermissionErrorMessage(permissionResult.unauthorizedTables),
+      error: createPermissionErrorMessage(
+        permissionResult.unauthorizedTables,
+        permissionResult.unauthorizedColumns
+      ),
     };
   }
 

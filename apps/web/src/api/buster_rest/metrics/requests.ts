@@ -39,10 +39,13 @@ export const getMetric_server = async ({ id, password }: Parameters<typeof getMe
 export const getMetricData = async ({
   id,
   version_number,
-  password
-}: GetMetricDataRequest): Promise<MetricDataResponse> => {
-  return mainApi
-    .get<MetricDataResponse>(`/metric_files/${id}/data`, { params: { password, version_number } })
+  password,
+  report_file_id
+}: GetMetricDataRequest & { report_file_id?: string }): Promise<MetricDataResponse> => {
+  return mainApiV2
+    .get<MetricDataResponse>(`/metric_files/${id}/data`, {
+      params: { password, version_number, report_file_id }
+    })
     .then((res) => res.data);
 };
 

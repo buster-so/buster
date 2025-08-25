@@ -1,45 +1,81 @@
-Edit an existing report with find/replace operations or appends during the same creation flow before using `done`.
+Modify an existing report by applying one or more edits in order. Each edit is either a targeted replace or an append. Supports streaming (optimistic) updates and a final, consistent apply with versioning.
 
-  ## Usage Restrictions
-  - Do NOT use this tool for any follow-up after a report has been completed with `done`. After `done`, it is impossible to edit the completed report.
-  - For ANY follow-up request (including small text changes, filter tweaks, or time-range adjustments), you MUST create a new derived report with `createReports` instead of editing the original.
-  - Use this tool only for minor, immediate iterations before `done` within the same creation flow.
-  
-## How Edits Work
+## When to Use
+- Use during the same report creation/iteration flow before calling `done`.
+- Do not use after `done`. For any follow-up changes (even small tweaks), create a new derived report with `createReports`.
 
-This tool applies a series of edit operations to a report sequentially:
+## Inputs
+- id: UUID of the existing report to edit (required)
+- name: Report name (for tracking)
+- edits: Array of edits applied sequentially. Each edit contains:
+  - operation: "append" | "replace". If omitted, it is inferred as:
+    - append when code_to_replace is an empty string
+    - replace otherwise
+  - code_to_replace: String to find in the current content (required for replace; must be empty for append)
+  - code: New markdown content to insert (required)
 
-1. **Replace Mode** (when code_to_replace is provided):
-   - Finds the exact text specified in code_to_replace
-   - Replaces it with the text in code
-   - The operation will fail if the text to replace is not found
+## How It Works
+- Edits are applied in order; later edits see the results of earlier ones.
+- Streaming behavior (during tool argument streaming):
+  - append: new content is appended atomically as it streams
+  - replace: waits until code_to_replace is fully known, then performs an atomic replace
+  - If a streaming write fails or is incomplete, the final execute step re-applies all edits deterministically.
+- Execute step (authoritative):
+  - Loads the current report
+  - Applies each edit in memory
+  - Stops on the first failing edit and returns partial results if applicable
+  - Persists changes and updates version history; version increments only when appropriate
+  - Emits a response message only when the resulting report contains metrics
 
-2. **Append Mode** (when code_to_replace is empty):
-   - Appends the text in code to the end of the report
-   - Useful for adding new sections or content
+## Output
+- success: boolean
+- message: human-readable result
+- file: { id, name, content, version_number, updated_at }
+- error: string (present on failures or partial failures)
+
+## Failure/Edge Cases
+- Missing or invalid report id → failure
+- Report not found (soft-deleted or nonexistent) → failure
+- Replace text not found → that edit fails with a helpful preview, subsequent edits are not applied
+- Partial application is possible; the latest content and aggregated errors are returned
 
 ## Best Practices
+- Prefer append for adding new sections; it is safer and streams efficiently
+- For replace, provide a precise and unique code_to_replace to avoid unintended matches
+- Break large changes into multiple focused edits
+- Always verify the UUID you are editing
 
-- Edits are applied in order, so later edits see the results of earlier ones
-- Use specific, unique text for code_to_replace to avoid unintended replacements
-- For large changes, consider using multiple smaller, targeted edits
-- Always verify the report ID before attempting edits
+##IMPORTANT
+- Please always use the arguments in this order: operation, code_to_replace, code.
 
-## Example Usage
+## Examples
 
+Append to the end of the report:
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "Q4 2024 Sales Report",
+  "id": "1b2c3d4e-1111-2222-3333-444455556666",
+  "name": "Q3 Marketing Report",
   "edits": [
     {
-      "code_to_replace": "## Preliminary Results",
-      "code": "## Final Results"
-    },
-    {
+      "operation": "append",
       "code_to_replace": "",
-      "code": "\\n\\n## Addendum\\nAdditional analysis completed on..."
+      "code": "\n## Appendix\nAdditional notes..."
     }
   ]
 }
-````
+```
+
+Replace existing text:
+```json
+{
+  "id": "1b2c3d4e-1111-2222-3333-444455556666",
+  "name": "Q3 Marketing Report",
+  "edits": [
+    {
+      "operation": "replace",
+      "code_to_replace": "Old Summary Section",
+      "code": "## Summary\nUpdated narrative and KPIs."
+    }
+  ]
+}
+```

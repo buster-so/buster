@@ -60,6 +60,23 @@
   }
 }
 
+@keyframes highlightFade {
+  0% {
+    /* Use highlight background, fallback to brand, then yellow */
+    background-color: var(--color-highlight-background, var(--color-purple-100, yellow));
+    /* Use box-shadow instead of border - doesn't take up space */
+    box-shadow: 0 1.5px 0 0 var(--color-highlight-border, var(--color-purple-300, yellow));
+  }
+  100% {
+    background-color: var(--color-highlight-to-background, transparent);
+    box-shadow: 0 0 0 0 var(--color-highlight-to-border, transparent);
+  }
+}
+
+.animate-highlight-fade {
+  animation: highlightFade var(--tw-duration, 2s) ease-out forwards;
+}
+
 .fade-in {
   animation-name: fade-in;
   animation-duration: var(--tw-duration, 0.7s);

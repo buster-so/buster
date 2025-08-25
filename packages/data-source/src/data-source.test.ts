@@ -103,7 +103,7 @@ describe('DataSource Unit Tests', () => {
           credentials: {
             type: DataSourceType.MySQL,
             host: 'localhost',
-            database: 'test',
+            default_database: 'test',
             username: 'user',
             password: 'pass',
           },
@@ -714,7 +714,7 @@ describe('DataSource Unit Tests', () => {
           credentials: {
             type: DataSourceType.MySQL,
             host: 'localhost',
-            database: 'test',
+            default_database: 'test',
             username: 'user',
             password: 'pass',
           },

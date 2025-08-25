@@ -14,6 +14,8 @@ const assetCheckPages: BusterRoutes[] = [
   BusterRoutes.APP_DASHBOARD_ID,
   BusterRoutes.APP_DASHBOARD_ID_FILE,
   BusterRoutes.APP_COLLECTIONS_ID,
+  BusterRoutes.APP_REPORTS_ID,
+  BusterRoutes.APP_REPORTS_ID_FILE,
   BusterRoutes.APP_CHAT,
   BusterRoutes.APP_CHAT_ID,
   BusterRoutes.APP_CHAT_ID_METRIC_ID,
@@ -24,7 +26,9 @@ const assetCheckPages: BusterRoutes[] = [
   BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID,
   BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_CHART,
   BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_RESULTS,
-  BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_SQL
+  BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_SQL,
+  BusterRoutes.APP_CHAT_ID_REPORT_ID,
+  BusterRoutes.APP_CHAT_ID_REPORT_ID_FILE
 ];
 
 const assetRedirectRecord: Partial<Record<BusterRoutes, BusterRoutes>> = {
@@ -32,6 +36,8 @@ const assetRedirectRecord: Partial<Record<BusterRoutes, BusterRoutes>> = {
   [BusterRoutes.APP_METRIC_ID_RESULTS]: BusterRoutes.EMBED_METRIC_ID,
   [BusterRoutes.APP_DASHBOARD_ID]: BusterRoutes.EMBED_DASHBOARD_ID,
   [BusterRoutes.APP_DASHBOARD_ID_FILE]: BusterRoutes.EMBED_DASHBOARD_ID,
+  [BusterRoutes.APP_REPORTS_ID]: BusterRoutes.EMBED_REPORTS_ID,
+  [BusterRoutes.APP_REPORTS_ID_FILE]: BusterRoutes.EMBED_REPORTS_ID,
   [BusterRoutes.APP_CHAT]: BusterRoutes.EMBED_DASHBOARD_ID,
   [BusterRoutes.APP_CHAT_ID]: BusterRoutes.EMBED_DASHBOARD_ID,
   [BusterRoutes.APP_CHAT_ID_METRIC_ID]: BusterRoutes.EMBED_METRIC_ID,
@@ -42,20 +48,25 @@ const assetRedirectRecord: Partial<Record<BusterRoutes, BusterRoutes>> = {
   [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID]: BusterRoutes.EMBED_METRIC_ID,
   [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_CHART]: BusterRoutes.EMBED_METRIC_ID,
   [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_RESULTS]: BusterRoutes.EMBED_METRIC_ID,
-  [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_SQL]: BusterRoutes.EMBED_METRIC_ID
+  [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_METRIC_ID_SQL]: BusterRoutes.EMBED_METRIC_ID,
+  [BusterRoutes.APP_CHAT_ID_REPORT_ID]: BusterRoutes.EMBED_REPORTS_ID,
+  [BusterRoutes.APP_CHAT_ID_REPORT_ID_FILE]: BusterRoutes.EMBED_REPORTS_ID
 };
 
 const embedAssetToRegularAssetRecord: Record<BusterEmbedRoutes, BusterRoutes> = {
   [BusterRoutes.EMBED_METRIC_ID]: BusterRoutes.APP_METRIC_ID_CHART,
   [BusterRoutes.EMBED_DASHBOARD_ID]: BusterRoutes.APP_DASHBOARD_ID,
-  [BusterRoutes.EMBED_COLLECTION_ID]: BusterRoutes.APP_COLLECTIONS_ID
+  [BusterRoutes.EMBED_COLLECTION_ID]: BusterRoutes.APP_COLLECTIONS_ID,
+  [BusterRoutes.EMBED_REPORTS_ID]: BusterRoutes.APP_REPORTS_ID
 };
 
 const publicPages: BusterRoutes[] = [
   BusterRoutes.APP_METRIC_ID_CHART,
   BusterRoutes.APP_DASHBOARD_ID,
+  BusterRoutes.APP_REPORTS_ID,
   BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART,
   BusterRoutes.APP_CHAT_ID_DASHBOARD_ID,
+  BusterRoutes.APP_CHAT_ID_REPORT_ID,
   ...Object.values(BusterEmbedRoutes),
   ...Object.values(BusterAuthRoutes)
 ];

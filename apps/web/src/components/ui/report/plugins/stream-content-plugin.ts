@@ -1,13 +1,6 @@
 import type { PlateEditor } from 'platejs/react';
-import type { Element, Text, Value } from 'platejs';
+import type { Element, TElement, Text, Value } from 'platejs';
 import { createPlatePlugin } from 'platejs/react';
-import type { ReportElementWithId } from '@buster/server-shared/reports';
-
-type StreamContentNode = ReportElementWithId & {
-  children: (ReportElementWithId['children'] & {
-    streamContent?: boolean;
-  })[];
-};
 
 export const StreamContentPlugin = createPlatePlugin({
   key: 'streamContent',
@@ -52,7 +45,7 @@ export const StreamContentPlugin = createPlatePlugin({
     /**
      * Stream complete array of chunks with efficient length-based updates
      */
-    streamFull: (chunks: ReportElementWithId[]) => {
+    streamFull: (chunks: Value) => {
       const editor = ctx.editor as PlateEditor;
 
       if (!chunks || chunks.length === 0) {
@@ -60,12 +53,11 @@ export const StreamContentPlugin = createPlatePlugin({
       }
 
       // Prevent undo/redo and defer normalization for performance
-      editor.tf.withScrolling(() => {
-        editor.tf.withoutSaving(() => {
-          editor.tf.withoutNormalizing(() => {
-            const operations = buildUpdateOperations(editor, chunks);
-            executeOperations(operations);
-          });
+
+      editor.tf.withoutSaving(() => {
+        editor.tf.withoutNormalizing(() => {
+          const operations = buildUpdateOperations(editor, chunks);
+          executeOperations(operations);
         });
       });
     }
@@ -75,10 +67,7 @@ export const StreamContentPlugin = createPlatePlugin({
 /**
  * Build operations needed to update the editor with new chunks
  */
-const buildUpdateOperations = (
-  editor: PlateEditor,
-  chunks: ReportElementWithId[]
-): Array<() => void> => {
+const buildUpdateOperations = (editor: PlateEditor, chunks: Value): Array<() => void> => {
   const currentNodes = editor.children;
   const currentLength = currentNodes.length;
   const incomingLength = chunks.length;
@@ -93,8 +82,8 @@ const buildUpdateOperations = (
       const operation = buildNodeUpdateOperation(
         editor,
         i,
-        currentNodes[i] as ReportElementWithId,
-        chunk
+        currentNodes[i] as TElement,
+        chunk as TElement
       );
       if (operation) {
         operations.push(operation);
@@ -119,8 +108,8 @@ const buildUpdateOperations = (
 const buildNodeUpdateOperation = (
   editor: PlateEditor,
   index: number,
-  existingNode: ReportElementWithId,
-  chunk: ReportElementWithId
+  existingNode: TElement,
+  chunk: TElement
 ): (() => void) | null => {
   // Quick ID check first (fast)
   if (existingNode.id !== chunk.id) {
@@ -141,7 +130,7 @@ const buildNodeUpdateOperation = (
 /**
  * Replace a node at the specified index
  */
-const replaceNode = (editor: PlateEditor, index: number, chunk: ReportElementWithId) => {
+const replaceNode = (editor: PlateEditor, index: number, chunk: TElement) => {
   editor.tf.removeNodes({ at: [index] });
   const nodeToInsert = {
     ...chunk,
@@ -154,7 +143,7 @@ const replaceNode = (editor: PlateEditor, index: number, chunk: ReportElementWit
 /**
  * Append a new node to the end of the editor
  */
-const appendNewNode = (editor: PlateEditor, chunk: ReportElementWithId) => {
+const appendNewNode = (editor: PlateEditor, chunk: TElement) => {
   addStreamContentMark(chunk);
   const nodeToInsert = {
     ...chunk,
@@ -169,7 +158,7 @@ const appendNewNode = (editor: PlateEditor, chunk: ReportElementWithId) => {
   editor.tf.addMarks({ streamContent: true });
 };
 
-const addStreamContentMark = (chunk: ReportElementWithId) => {
+const addStreamContentMark = (chunk: TElement) => {
   (chunk.children as Value).forEach((child) => {
     child.streamContent = true;
   });
@@ -213,7 +202,7 @@ const extractTextFromNode = (node: Element | Text): string => {
 /**
  * Extract text content from children array (optimized for performance)
  */
-const extractTextFromChildren = (children: ReportElementWithId['children']): string => {
+const extractTextFromChildren = (children: TElement['children']): string => {
   // Use string concatenation instead of map/join for better performance
   let result = '';
   for (const node of children) {

@@ -73,7 +73,7 @@ export const NodeTypeLabels = {
   columnsThree: {
     label: '3 columns',
     keyboard: undefined,
-    keywords: []
+    keywords: ['three', '3', 'columns']
   },
 
   // Text formatting

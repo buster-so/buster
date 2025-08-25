@@ -25,11 +25,15 @@ export const MetricContent = React.memo(
     const reportId = useChatLayoutContextSelector((x) => x.reportId) || '';
     const reportVersionNumber = useChatLayoutContextSelector((x) => x.reportVersionNumber);
     const ref = useRef<HTMLDivElement>(null);
+    const hasBeenInViewport = useRef(false);
 
     const [inViewport] = useInViewport(ref, {
       threshold: 0.33
     });
-    const renderChart = inViewport || isExportMode;
+    if (inViewport && !hasBeenInViewport.current) {
+      hasBeenInViewport.current = true;
+    }
+    const renderChart = inViewport || isExportMode || hasBeenInViewport.current;
 
     const {
       data: metric,
@@ -48,7 +52,8 @@ export const MetricContent = React.memo(
       error: metricDataError
     } = useGetMetricData({
       id: metricId,
-      versionNumber: metricVersionNumber
+      versionNumber: metricVersionNumber,
+      reportFileId: reportId || undefined
     });
 
     const link = useMemo(() => {

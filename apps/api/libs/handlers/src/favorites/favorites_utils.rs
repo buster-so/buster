@@ -10,7 +10,7 @@ use database::{
     enums::AssetType,
     pool::get_pg_pool,
     models::UserFavorite,
-    schema::{collections, collections_to_assets, dashboard_files, chats, messages_deprecated, threads_deprecated, user_favorites, metric_files},
+    schema::{collections, collections_to_assets, dashboard_files, chats, messages_deprecated, threads_deprecated, user_favorites, metric_files, report_files},
 };
 
 use middleware::AuthenticatedUser;
@@ -108,10 +108,21 @@ pub async fn list_user_favorites(user: &AuthenticatedUser) -> Result<Vec<Favorit
         tokio::spawn(async move { get_favorite_chats(chat_ids).await })
     };
 
-    let (dashboard_fav_res, collection_fav_res, threads_fav_res, metrics_fav_res, chats_fav_res) =
-        match tokio::try_join!(dashboard_favorites, collection_favorites, threads_favorites, metrics_favorites, chats_favorites) {
-            Ok((dashboard_fav_res, collection_fav_res, threads_fav_res, metrics_fav_res, chats_fav_res)) => {
-                (dashboard_fav_res, collection_fav_res, threads_fav_res, metrics_fav_res, chats_fav_res)
+    let reports_favorites = {
+        let report_ids = Arc::new(
+            user_favorites
+                .iter()
+                .filter(|(_, f)| f == &AssetType::ReportFile)
+                .map(|f| f.0)
+                .collect::<Vec<Uuid>>(),
+        );
+        tokio::spawn(async move { get_favorite_reports(report_ids).await })
+    };
+
+    let (dashboard_fav_res, collection_fav_res, threads_fav_res, metrics_fav_res, chats_fav_res, reports_fav_res) =
+        match tokio::try_join!(dashboard_favorites, collection_favorites, threads_favorites, metrics_favorites, chats_favorites, reports_favorites) {
+            Ok((dashboard_fav_res, collection_fav_res, threads_fav_res, metrics_fav_res, chats_fav_res, reports_fav_res)) => {
+                (dashboard_fav_res, collection_fav_res, threads_fav_res, metrics_fav_res, chats_fav_res, reports_fav_res)
             }
             Err(e) => {
                 tracing::error!("Error getting favorite assets: {}", e);
@@ -156,6 +167,14 @@ pub async fn list_user_favorites(user: &AuthenticatedUser) -> Result<Vec<Favorit
         Err(e) => {
             tracing::error!("Error getting favorite chats: {}", e);
             return Err(anyhow!("Error getting favorite chats: {}", e));
+        }
+    };
+
+    let favorite_reports = match reports_fav_res {
+        Ok(reports) => reports,
+        Err(e) => {
+            tracing::error!("Error getting favorite reports: {}", e);
+            return Err(anyhow!("Error getting favorite reports: {}", e));
         }
     };
 
@@ -208,6 +227,15 @@ pub async fn list_user_favorites(user: &AuthenticatedUser) -> Result<Vec<Favorit
                         id: chat.id,
                         name: chat.name.clone(),
                         type_: AssetType::Chat,
+                    });
+                }
+            }
+            AssetType::ReportFile => {
+                if let Some(report) = favorite_reports.iter().find(|r| r.id == favorite.0) {
+                    favorites.push(FavoriteObject {
+                        id: report.id,
+                        name: report.name.clone(),
+                        type_: AssetType::ReportFile,
                     });
                 }
             }
@@ -329,15 +357,20 @@ async fn get_assets_from_collections(
         tokio::spawn(async move { get_chats_from_collections(&collection_ids).await })
     };
 
+    let reports_handle = {
+        let collection_ids = Arc::clone(&collection_ids);
+        tokio::spawn(async move { get_reports_from_collections(&collection_ids).await })
+    };
+
     let collection_name_handle = {
         let collection_ids = Arc::clone(&collection_ids);
         tokio::spawn(async move { get_collection_names(&collection_ids).await })
     };
 
-    let (dashboards_res, metrics_res, chats_res, collection_name_res) =
-        match tokio::join!(dashboards_handle, metrics_handle, chats_handle, collection_name_handle) {
-            (Ok(dashboards), Ok(metrics), Ok(chats), Ok(collection_name)) => {
-                (dashboards, metrics, chats, collection_name)
+    let (dashboards_res, metrics_res, chats_res, reports_res, collection_name_res) =
+        match tokio::join!(dashboards_handle, metrics_handle, chats_handle, reports_handle, collection_name_handle) {
+            (Ok(dashboards), Ok(metrics), Ok(chats), Ok(reports), Ok(collection_name)) => {
+                (dashboards, metrics, chats, reports, collection_name)
             }
             _ => {
                 return Err(anyhow!(
@@ -359,6 +392,11 @@ async fn get_assets_from_collections(
     let chats = match chats_res {
         Ok(chats) => chats,
         Err(e) => return Err(anyhow!("Error getting chats from collection: {:?}", e)),
+    };
+
+    let reports = match reports_res {
+        Ok(reports) => reports,
+        Err(e) => return Err(anyhow!("Error getting reports from collection: {:?}", e)),
     };
 
     let collection_names = match collection_name_res {
@@ -400,6 +438,18 @@ async fn get_assets_from_collections(
                 .iter()
                 .filter_map(|(chat_collection_id, favorite_object)| {
                     if *chat_collection_id == collection_id {
+                        Some(favorite_object.clone())
+                    } else {
+                        None
+                    }
+                }),
+        );
+
+        assets.extend(
+            reports
+                .iter()
+                .filter_map(|(report_collection_id, favorite_object)| {
+                    if *report_collection_id == collection_id {
                         Some(favorite_object.clone())
                     } else {
                         None
@@ -568,6 +618,50 @@ async fn get_chats_from_collections(
     Ok(chat_objects)
 }
 
+async fn get_reports_from_collections(
+    collection_ids: &[Uuid],
+) -> Result<Vec<(Uuid, FavoriteObject)>> {
+    let mut conn = match get_pg_pool().get().await {
+        Ok(conn) => conn,
+        Err(e) => return Err(anyhow!("Error getting connection from pool: {:?}", e)),
+    };
+
+    let report_records: Vec<(Uuid, Uuid, String)> = match report_files::table
+        .inner_join(
+            collections_to_assets::table.on(report_files::id.eq(collections_to_assets::asset_id)),
+        )
+        .select((
+            collections_to_assets::collection_id,
+            report_files::id,
+            report_files::name,
+        ))
+        .filter(collections_to_assets::collection_id.eq_any(collection_ids))
+        .filter(collections_to_assets::asset_type.eq(AssetType::ReportFile))
+        .filter(report_files::deleted_at.is_null())
+        .filter(collections_to_assets::deleted_at.is_null())
+        .load::<(Uuid, Uuid, String)>(&mut conn)
+        .await
+    {
+        Ok(report_records) => report_records,
+        Err(e) => return Err(anyhow!("Error loading report records: {:?}", e)),
+    };
+
+    let report_objects: Vec<(Uuid, FavoriteObject)> = report_records
+        .iter()
+        .map(|(collection_id, id, name)| {
+            (
+                *collection_id,
+                FavoriteObject {
+                    id: *id,
+                    name: name.clone(),
+                    type_: AssetType::ReportFile,
+                },
+            )
+        })
+        .collect();
+    Ok(report_objects)
+}
+
 async fn get_favorite_metrics(metric_ids: Arc<Vec<Uuid>>) -> Result<Vec<FavoriteObject>> {
     let mut conn = match get_pg_pool().get().await {
         Ok(conn) => conn,
@@ -595,6 +689,35 @@ async fn get_favorite_metrics(metric_ids: Arc<Vec<Uuid>>) -> Result<Vec<Favorite
         })
         .collect();
     Ok(favorite_metrics)
+}
+
+async fn get_favorite_reports(report_ids: Arc<Vec<Uuid>>) -> Result<Vec<FavoriteObject>> {
+    let mut conn = match get_pg_pool().get().await {
+        Ok(conn) => conn,
+        Err(e) => return Err(anyhow!("Error getting connection from pool: {:?}", e)),
+    };
+
+    let report_records: Vec<(Uuid, String)> = match report_files::table
+        .select((report_files::id, report_files::name))
+        .filter(report_files::id.eq_any(report_ids.as_ref()))
+        .filter(report_files::deleted_at.is_null())
+        .load::<(Uuid, String)>(&mut conn)
+        .await
+    {
+        Ok(report_records) => report_records,
+        Err(diesel::NotFound) => return Err(anyhow!("Reports not found")),
+        Err(e) => return Err(anyhow!("Error loading report records: {:?}", e)),
+    };
+
+    let favorite_reports = report_records
+        .iter()
+        .map(|(id, name)| FavoriteObject {
+            id: *id,
+            name: name.clone(),
+            type_: AssetType::ReportFile,
+        })
+        .collect();
+    Ok(favorite_reports)
 }
 
 pub async fn update_favorites(user: &AuthenticatedUser, favorites: &[Uuid]) -> Result<()> {

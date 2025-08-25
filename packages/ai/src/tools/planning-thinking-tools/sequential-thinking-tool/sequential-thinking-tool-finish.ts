@@ -1,10 +1,7 @@
 import { updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
 import { normalizeEscapedText } from '../../../utils/streaming/escape-normalizer';
-import {
-  createSequentialThinkingRawLlmMessageEntry,
-  createSequentialThinkingReasoningMessage,
-} from './helpers/sequential-thinking-tool-transform-helper';
+import { createSequentialThinkingReasoningMessage } from './helpers/sequential-thinking-tool-transform-helper';
 import type {
   SequentialThinkingContext,
   SequentialThinkingInput,
@@ -31,22 +28,14 @@ export function createSequentialThinkingFinish(
       'completed' // Mark as completed when finish is called
     );
 
-    // Create final raw LLM message entry
-    const rawLlmMessage = createSequentialThinkingRawLlmMessageEntry(
-      sequentialThinkingState,
-      options.toolCallId
-    );
-
     try {
       if (context.messageId) {
         const reasoningMessages = reasoningEntry ? [reasoningEntry] : [];
-        const rawLlmMessages = rawLlmMessage ? [rawLlmMessage] : [];
 
-        if (reasoningMessages.length > 0 || rawLlmMessages.length > 0) {
+        if (reasoningMessages.length > 0) {
           await updateMessageEntries({
             messageId: context.messageId,
             reasoningMessages,
-            rawLlmMessages,
           });
 
           console.info('[sequential-thinking] Completed sequential thinking:', {

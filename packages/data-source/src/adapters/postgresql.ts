@@ -48,9 +48,13 @@ export class PostgreSQLAdapter extends BaseAdapter {
         password: pgCredentials.password,
       };
 
-      // Handle SSL configuration
-      if (pgCredentials.ssl !== undefined) {
-        config.ssl = pgCredentials.ssl;
+      // Handle SSL configuration - default to true for security
+      // But allow self-signed certificates to avoid connection errors
+      if (pgCredentials.ssl !== false) {
+        config.ssl =
+          pgCredentials.ssl === true || pgCredentials.ssl === undefined
+            ? { rejectUnauthorized: false } // Allow self-signed certificates
+            : pgCredentials.ssl; // Use custom SSL config if provided
       }
 
       // Handle connection timeout

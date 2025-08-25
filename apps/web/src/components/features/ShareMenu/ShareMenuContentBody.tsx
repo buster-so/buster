@@ -8,6 +8,7 @@ import type {
 import { useUnshareCollection, useUpdateCollectionShare } from '@/api/buster_rest/collections';
 import { useUnshareDashboard, useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
 import { useUnshareMetric, useUpdateMetricShare } from '@/api/buster_rest/metrics';
+import { useUnshareReport, useUpdateReportShare } from '@/api/buster_rest/reports';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { ShareMenuContentEmbed } from './ShareMenuContentEmbed';
@@ -72,9 +73,11 @@ const ShareMenuContentShare: React.FC<ShareMenuContentBodyProps> = React.memo(
     const { mutateAsync: onUpdateMetricShare } = useUpdateMetricShare();
     const { mutateAsync: onUpdateDashboardShare } = useUpdateDashboardShare();
     const { mutateAsync: onUpdateCollectionShare } = useUpdateCollectionShare();
+    const { mutateAsync: onUpdateReportShare } = useUpdateReportShare();
     const { mutateAsync: onUnshareMetric } = useUnshareMetric();
     const { mutateAsync: onUnshareDashboard } = useUnshareDashboard();
     const { mutateAsync: onUnshareCollection } = useUnshareCollection();
+    const { mutateAsync: onUnshareReport } = useUnshareReport();
 
     const hasIndividualPermissions = !!individual_permissions?.length;
     const workspaceMemberCount = shareAssetConfig.workspace_member_count || 0;
@@ -87,6 +90,8 @@ const ShareMenuContentShare: React.FC<ShareMenuContentBodyProps> = React.memo(
           await onUpdateDashboardShare(payload);
         } else if (assetType === 'collection') {
           await onUpdateCollectionShare(payload);
+        } else if (assetType === 'report') {
+          await onUpdateReportShare(payload);
         }
       }
     );
@@ -116,6 +121,8 @@ const ShareMenuContentShare: React.FC<ShareMenuContentBodyProps> = React.memo(
           await onUnshareDashboard(payload);
         } else if (assetType === 'collection') {
           await onUnshareCollection(payload);
+        } else if (assetType === 'report') {
+          await onUnshareReport(payload);
         }
       }
     });

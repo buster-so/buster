@@ -70,12 +70,18 @@ describe('runGetRepositoryTreeStep', () => {
   });
 
   it('should handle missing sandbox gracefully', async () => {
+    // Create a minimal sandbox object that passes validation but doesn't have full functionality
+    const minimalSandbox = {
+      id: 'mock-sandbox-minimal',
+      fs: {},
+    } as unknown as Sandbox;
+
     const input = {
       message: 'Test message',
       organizationId: 'org-123',
       contextInitialized: true,
       context: {
-        sandbox: null as any,
+        sandbox: minimalSandbox,
         dataSourceId: validDataSourceId,
         todoList: '',
         clarificationQuestions: [],

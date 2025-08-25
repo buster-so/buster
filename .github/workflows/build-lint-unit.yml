@@ -1,0 +1,124 @@
+name: Build, Lint, and Unit Tests
+
+on:
+  pull_request:
+
+# Cancel in-progress runs when a new commit is pushed to the same PR
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+jobs:
+  # Build job - runs in parallel
+  build:
+    name: Build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages (excluding web)
+        run: pnpm build --filter='!@buster-app/web'
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+
+  # Lint job - runs in parallel
+  lint:
+    name: Lint
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint all packages (excluding web)
+        run: pnpm lint --filter='!@buster-app/web'
+        env:
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+
+  # Test job - runs after build completes
+  test:
+    name: Test
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build required packages
+        run: pnpm build --filter='!@buster-app/web'
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+
+      - name: Run all unit tests (excluding web)
+        run: pnpm test:unit --filter='!@buster-app/web'
+        env:
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: |
+            **/coverage/**
+            !**/coverage/tmp/**
+          retention-days: 7

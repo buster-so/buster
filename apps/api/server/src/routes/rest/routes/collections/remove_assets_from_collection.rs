@@ -67,6 +67,7 @@ pub async fn remove_assets_from_collection(
         match asset.type_.to_lowercase().as_str() {
             "dashboard" => Some(AssetToRemove::Dashboard(asset.id)),
             "metric" => Some(AssetToRemove::Metric(asset.id)),
+            "report" => Some(AssetToRemove::Report(asset.id)),
             _ => None,
         }
     }).collect();
@@ -77,6 +78,7 @@ pub async fn remove_assets_from_collection(
                 let type_str = match asset_type {
                     AssetType::DashboardFile => "dashboard",
                     AssetType::MetricFile => "metric",
+                    AssetType::ReportFile => "report",
                     _ => "unknown",
                 };
                 

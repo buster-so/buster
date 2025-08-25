@@ -181,7 +181,7 @@ No conversation history available for analysis.`,
     const tracedAssumptionsGeneration = wrapTraced(
       async () => {
         const { object } = await generateObject({
-          model: Sonnet4,
+          model: await Sonnet4,
           schema: identifyAssumptionsLLMOutputSchema,
           messages,
           temperature: 0,

@@ -105,6 +105,27 @@ pub struct MetricFile {
     pub workspace_sharing_enabled_at: Option<DateTime<Utc>>,
 }
 
+#[derive(Queryable, Insertable, Identifiable, Debug, Clone, Serialize)]
+#[diesel(table_name = report_files)]
+pub struct ReportFile {
+    pub id: Uuid,
+    pub name: String,
+    pub content: String,
+    pub organization_id: Uuid,
+    pub created_by: Uuid,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub deleted_at: Option<DateTime<Utc>>,
+    pub publicly_accessible: bool,
+    pub publicly_enabled_by: Option<Uuid>,
+    pub public_expiry_date: Option<DateTime<Utc>>,
+    pub version_history: VersionHistory,
+    pub public_password: Option<String>,
+    pub workspace_sharing: WorkspaceSharing,
+    pub workspace_sharing_enabled_by: Option<Uuid>,
+    pub workspace_sharing_enabled_at: Option<DateTime<Utc>>,
+}
+
 #[derive(Queryable, Insertable, Identifiable, Associations, Debug, Clone, Serialize)]
 #[diesel(belongs_to(Organization))]
 #[diesel(belongs_to(User, foreign_key = created_by))]

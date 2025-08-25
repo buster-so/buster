@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import type {
   GetReportsListResponse,
-  GetReportIndividualResponse,
+  GetReportResponse,
   GetReportsListRequest
 } from '@buster/server-shared/reports';
 
@@ -14,7 +14,7 @@ const reportsGetList = (filters?: GetReportsListRequest) =>
   });
 
 const reportsGetReport = (reportId: string, versionNumber?: number | null) =>
-  queryOptions<GetReportIndividualResponse>({
+  queryOptions<GetReportResponse>({
     queryKey: ['reports', 'get', reportId, versionNumber || 'INITIAL'] as const,
     staleTime: 60 * 1000 // 60 seconds
   });

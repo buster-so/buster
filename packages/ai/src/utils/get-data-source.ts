@@ -6,7 +6,7 @@ import { sql } from 'drizzle-orm';
 /**
  * Get data source credentials from vault
  */
-async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
+export async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
   try {
     // Query the vault to get the credentials
     const secretResult = await db.execute(

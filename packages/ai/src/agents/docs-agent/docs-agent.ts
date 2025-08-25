@@ -18,8 +18,10 @@ import {
   createWebSearchTool,
   executeSqlDocsAgent,
 } from '../../tools';
-import { healToolWithLlm } from '../../utils/tool-call-repair';
+import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
 import { getDocsAgentSystemPrompt } from './get-docs-agent-system-prompt';
+
+export const DOCS_AGENT_NAME = 'docsAgent';
 
 const DEFAULT_CACHE_OPTIONS = {
   anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
@@ -122,10 +124,27 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
   });
 
   async function stream({ messages }: DocsStreamOptions) {
+    // Collect available tools dynamically based on what's enabled
+    const availableTools: string[] = ['sequentialThinking'];
+    if (grepSearch) availableTools.push('grepSearch');
+    if (readFiles) availableTools.push('readFiles');
+    if (editFiles) availableTools.push('editFiles');
+    if (createFiles) availableTools.push('createFiles');
+    if (deleteFiles) availableTools.push('deleteFiles');
+    if (listFiles) availableTools.push('listFiles');
+    availableTools.push('executeSql');
+    if (bashExecute) availableTools.push('bashExecute');
+    availableTools.push('updateClarificationsFile', 'checkOffTodoList', 'idleTool', 'webSearch');
+
+    const agentContext: AgentContext = {
+      agentName: DOCS_AGENT_NAME,
+      availableTools,
+    };
+
     return wrapTraced(
-      () =>
+      async () =>
         streamText({
-          model: Sonnet4,
+          model: await Sonnet4,
           tools: {
             sequentialThinking: createSequentialThinkingTool({
               messageId: docsAgentOptions.messageId,
@@ -149,7 +168,17 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
           maxOutputTokens: 10000,
           temperature: 0,
           experimental_context: docsAgentOptions,
-          experimental_repairToolCall: healToolWithLlm,
+          experimental_repairToolCall: async (repairContext) => {
+            return repairToolCall({
+              toolCall: repairContext.toolCall,
+              tools: repairContext.tools,
+              error: repairContext.error,
+              messages: repairContext.messages,
+              ...(repairContext.system && { system: repairContext.system }),
+              ...(repairContext.inputSchema && { inputSchema: repairContext.inputSchema }),
+              agentContext,
+            });
+          },
         }),
       {
         name: 'Docs Agent',

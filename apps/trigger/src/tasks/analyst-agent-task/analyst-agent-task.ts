@@ -7,7 +7,6 @@ import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './type
 import {
   getBraintrustMetadata,
   getChatConversationHistory,
-  getChatDashboardFiles,
   getMessageContext,
   getOrganizationDataSource,
 } from '@buster/database';
@@ -18,6 +17,7 @@ import { type PermissionedDataset, getPermissionedDatasets } from '@buster/acces
 // AI package imports
 import { type AnalystWorkflowInput, runAnalystWorkflow } from '@buster/ai';
 
+import type { ModelMessage } from 'ai';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 
 /**
@@ -278,13 +278,9 @@ export const analystAgentTask: ReturnType<
         messageId: payload.message_id,
       });
 
-      // Start loading data source and dashboard files as soon as we have the required IDs
+      // Start loading data source as soon as we have the required IDs
       const dataSourcePromise = messageContextPromise.then((context) =>
         getOrganizationDataSource({ organizationId: context.organizationId })
-      );
-
-      const dashboardFilesPromise = messageContextPromise.then((context) =>
-        getChatDashboardFiles({ chatId: context.chatId })
       );
 
       // Fetch user's datasets as soon as we have the userId
@@ -312,21 +308,14 @@ export const analystAgentTask: ReturnType<
       const braintrustMetadataPromise = getBraintrustMetadata({ messageId: payload.message_id });
 
       // Wait for all operations to complete
-      const [
-        messageContext,
-        conversationHistory,
-        dataSource,
-        dashboardFiles,
-        datasets,
-        braintrustMetadata,
-      ] = await Promise.all([
-        messageContextPromise,
-        conversationHistoryPromise,
-        dataSourcePromise,
-        dashboardFilesPromise,
-        datasetsPromise,
-        braintrustMetadataPromise,
-      ]);
+      const [messageContext, conversationHistory, dataSource, datasets, braintrustMetadata] =
+        await Promise.all([
+          messageContextPromise,
+          conversationHistoryPromise,
+          dataSourcePromise,
+          datasetsPromise,
+          braintrustMetadataPromise,
+        ]);
 
       const dataLoadEnd = Date.now();
       const dataLoadTime = dataLoadEnd - dataLoadStart;
@@ -338,14 +327,6 @@ export const analystAgentTask: ReturnType<
         organizationId: messageContext.organizationId,
         dataSourceId: dataSource.dataSourceId,
         dataSourceSyntax: dataSource.dataSourceSyntax,
-        dashboardFilesCount: dashboardFiles.length,
-        dashboardFiles: dashboardFiles.map((d) => ({
-          id: d.id,
-          name: d.name,
-          versionNumber: d.versionNumber,
-          metricIdsCount: d.metricIds.length,
-          metricIds: d.metricIds,
-        })),
         datasetsCount: datasets.length,
         datasets: datasets.map((d) => ({
           id: d.id,
@@ -358,20 +339,21 @@ export const analystAgentTask: ReturnType<
       // Log performance after data loading
       logPerformanceMetrics('post-data-load', payload.message_id, taskStartTime, resourceTracker);
 
-      // Task 4: Prepare workflow input with conversation history and dashboard files
-      // Convert conversation history to messages format expected by the workflow
-      const messages =
+      // Task 4: Prepare workflow input with conversation history
+      // The conversation history from getChatConversationHistory is already in ModelMessage[] format
+      const modelMessages: ModelMessage[] =
         conversationHistory.length > 0
           ? conversationHistory
           : [
               {
-                role: 'user' as const,
+                role: 'user',
+                // v5 supports string content directly for user messages
                 content: messageContext.requestMessage,
               },
             ];
 
       const workflowInput: AnalystWorkflowInput = {
-        messages,
+        messages: modelMessages,
         messageId: payload.message_id,
         chatId: messageContext.chatId,
         userId: messageContext.userId,
@@ -384,8 +366,6 @@ export const analystAgentTask: ReturnType<
       logger.log('Workflow input prepared', {
         messageId: payload.message_id,
         messagesCount: workflowInput.messages.length,
-        hasDashboardFiles: dashboardFiles.length > 0,
-        dashboardFilesCount: dashboardFiles.length,
         totalPrepTimeMs: Date.now() - dataLoadStart,
       });
 

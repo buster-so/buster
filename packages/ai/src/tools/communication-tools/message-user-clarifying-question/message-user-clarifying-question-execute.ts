@@ -1,6 +1,7 @@
 import { updateMessageEntries } from '@buster/database';
 import { wrapTraced } from 'braintrust';
 import { createRawToolResultEntry } from '../../shared/create-raw-llm-tool-result-entry';
+import { messageUserClarifyingQuestionRawLlmMessageEntry } from './helpers/message-user-clarifying-question-transform-helper';
 import type {
   MessageUserClarifyingQuestionContext,
   MessageUserClarifyingQuestionInput,
@@ -11,6 +12,7 @@ import { MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME } from './message-user-clari
 
 // Process message user clarifying question tool execution
 async function processMessageUserClarifyingQuestion(
+  state: MessageUserClarifyingQuestionState,
   toolCallId: string,
   messageId: string
 ): Promise<MessageUserClarifyingQuestionOutput> {
@@ -18,6 +20,8 @@ async function processMessageUserClarifyingQuestion(
     success: true,
   };
 
+  // Create both the tool call and result messages to maintain proper ordering
+  const rawLlmMessage = messageUserClarifyingQuestionRawLlmMessageEntry(toolCallId, state);
   const rawToolResultEntry = createRawToolResultEntry(
     toolCallId,
     MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
@@ -25,9 +29,10 @@ async function processMessageUserClarifyingQuestion(
   );
 
   try {
+    // Send both messages together: tool call followed by result
     await updateMessageEntries({
       messageId,
-      rawLlmMessages: [rawToolResultEntry],
+      rawLlmMessages: [rawLlmMessage, rawToolResultEntry],
     });
   } catch (error) {
     console.error('[message-user-clarifying-question] Error updating message entries:', error);
@@ -50,7 +55,7 @@ export function createMessageUserClarifyingQuestionExecute(
         throw new Error('Tool call ID is required');
       }
 
-      return processMessageUserClarifyingQuestion(state.toolCallId, context.messageId);
+      return processMessageUserClarifyingQuestion(state, state.toolCallId, context.messageId);
     },
     { name: 'Message User Clarifying Question' }
   );

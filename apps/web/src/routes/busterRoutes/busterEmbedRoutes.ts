@@ -1,7 +1,8 @@
 export enum BusterEmbedRoutes {
   EMBED_METRIC_ID = '/embed/metrics/:metricId',
   EMBED_DASHBOARD_ID = '/embed/dashboards/:dashboardId',
-  EMBED_COLLECTION_ID = '/embed/collections/:collectionId'
+  EMBED_COLLECTION_ID = '/embed/collections/:collectionId',
+  EMBED_REPORTS_ID = '/embed/reports/:reportId'
 }
 
 export type BusterEmbedRoutesWithArgs = {
@@ -16,5 +17,9 @@ export type BusterEmbedRoutesWithArgs = {
   [BusterEmbedRoutes.EMBED_COLLECTION_ID]: {
     route: BusterEmbedRoutes.EMBED_COLLECTION_ID;
     collectionId: string;
+  };
+  [BusterEmbedRoutes.EMBED_REPORTS_ID]: {
+    route: BusterEmbedRoutes.EMBED_REPORTS_ID;
+    reportId: string;
   };
 };

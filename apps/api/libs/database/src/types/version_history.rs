@@ -35,6 +35,8 @@ pub enum VersionContent {
     MetricYml(Box<MetricYml>),
     #[serde(alias = "dashboard_yml")]
     DashboardYml(DashboardYml),
+    // For report files that store content as a plain string
+    ReportContent(String),
 }
 
 impl From<MetricYml> for VersionContent {

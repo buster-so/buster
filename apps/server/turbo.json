@@ -17,8 +17,7 @@
         "@buster/data-source#dev",
         "@buster-app/trigger#dev",
         "@buster-app/electric-server#dev",
-        "@buster-app/api-legacy#dev",
-        "@buster/server-utils#dev"
+        "@buster-app/api-legacy#dev"
       ]
     },
     "dev:fast": {
@@ -32,8 +31,7 @@
         "@buster/data-source#dev",
         "@buster-app/trigger#dev:fast",
         "@buster-app/electric-server#dev:fast",
-        "@buster-app/api-legacy#dev:fast",
-        "@buster/server-utils#dev:fast"
+        "@buster-app/api-legacy#dev:fast"
       ]
     }
   }

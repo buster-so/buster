@@ -55,6 +55,7 @@
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.2",
+    "lru-cache": "^11.1.0",
     "postgres": "^3.4.7",
     "zod": "catalog:"
   }

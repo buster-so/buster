@@ -156,28 +156,28 @@ export const menuGroups: MenuGroup[] = [
       }
     }))
   },
-  {
-    group: MenuGroupLabels.media,
-    items: [
-      {
-        icon: <NodeTypeIcons.image />,
-        keywords: NodeTypeLabels.image?.keywords,
-        label: NodeTypeLabels.image.label,
-        value: KEYS.img
-      },
-      {
-        icon: <NodeTypeIcons.embed />,
-        keywords: NodeTypeLabels.embed?.keywords,
-        label: NodeTypeLabels.embed.label,
-        value: KEYS.mediaEmbed
-      }
-    ].map((item) => ({
-      ...item,
-      onSelect: (editor, value) => {
-        insertBlock(editor, value);
-      }
-    }))
-  },
+  // {
+  //   group: MenuGroupLabels.media,
+  //   items: [
+  //     {
+  //       icon: <NodeTypeIcons.image />,
+  //       keywords: NodeTypeLabels.image?.keywords,
+  //       label: NodeTypeLabels.image.label,
+  //       value: KEYS.img
+  //     },
+  //     {
+  //       icon: <NodeTypeIcons.embed />,
+  //       keywords: NodeTypeLabels.embed?.keywords,
+  //       label: NodeTypeLabels.embed.label,
+  //       value: KEYS.mediaEmbed
+  //     }
+  //   ].map((item) => ({
+  //     ...item,
+  //     onSelect: (editor, value) => {
+  //       insertBlock(editor, value);
+  //     }
+  //   }))
+  // },
   {
     group: MenuGroupLabels.advancedBlocks,
     items: [
@@ -192,14 +192,14 @@ export const menuGroups: MenuGroup[] = [
         keywords: NodeTypeLabels.columnsThree.keywords,
         label: NodeTypeLabels.columnsThree.label,
         value: 'action_three_columns'
-      },
-      {
-        focusEditor: false,
-        icon: <NodeTypeIcons.equation />,
-        keywords: NodeTypeLabels.equation.keywords,
-        label: NodeTypeLabels.equation.label,
-        value: KEYS.equation
       }
+      // {
+      //   focusEditor: false,
+      //   icon: <NodeTypeIcons.equation />,
+      //   keywords: NodeTypeLabels.equation.keywords,
+      //   label: NodeTypeLabels.equation.label,
+      //   value: KEYS.equation
+      // }
     ].map((item) => ({
       ...item,
       onSelect: (editor, value) => {
@@ -210,26 +210,26 @@ export const menuGroups: MenuGroup[] = [
   {
     group: MenuGroupLabels.inline,
     items: [
-      {
-        icon: <NodeTypeIcons.link />,
-        keywords: NodeTypeLabels.link?.keywords,
-        label: NodeTypeLabels.link.label,
-        value: KEYS.link
-      },
+      // {
+      //   icon: <NodeTypeIcons.link />,
+      //   keywords: NodeTypeLabels.link?.keywords,
+      //   label: NodeTypeLabels.link.label,
+      //   value: KEYS.link
+      // },
       {
         focusEditor: true,
         icon: <NodeTypeIcons.calendar />,
         keywords: NodeTypeLabels.date.keywords,
         label: NodeTypeLabels.date.label,
         value: KEYS.date
-      },
-      {
-        focusEditor: false,
-        icon: <NodeTypeIcons.equation />,
-        keywords: NodeTypeLabels.inlineEquation.keywords,
-        label: NodeTypeLabels.inlineEquation.label,
-        value: KEYS.inlineEquation
       }
+      // {
+      //   focusEditor: false,
+      //   icon: <NodeTypeIcons.equation />,
+      //   keywords: NodeTypeLabels.inlineEquation.keywords,
+      //   label: NodeTypeLabels.inlineEquation.label,
+      //   value: KEYS.inlineEquation
+      // }
     ].map((item) => ({
       ...item,
       onSelect: (editor, value) => {

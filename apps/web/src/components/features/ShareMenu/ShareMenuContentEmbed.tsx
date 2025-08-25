@@ -3,6 +3,7 @@ import { ShareAssetType } from '@buster/server-shared/share';
 import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
 import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
 import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
+import { useUpdateReportShare } from '@/api/buster_rest/reports';
 import { Button } from '@/components/ui/buttons';
 import { Link } from '@/components/ui/icons';
 import { Input } from '@/components/ui/inputs';
@@ -31,6 +32,13 @@ export const ShareMenuContentEmbed: React.FC<ShareMenuContentBodyProps> = React.
         url = createBusterRoute({
           route: BusterRoutes.EMBED_DASHBOARD_ID,
           dashboardId: assetId
+        });
+      }
+
+      if (assetType === 'report') {
+        url = createBusterRoute({
+          route: BusterRoutes.EMBED_REPORTS_ID,
+          reportId: assetId
         });
       }
 
@@ -71,6 +79,7 @@ export const ShareMenuContentEmbedFooter = ({
   const { mutateAsync: onShareDashboard } = useUpdateDashboardShare();
   const { mutateAsync: onShareMetric } = useUpdateMetricShare();
   const { mutateAsync: onShareCollection } = useUpdateCollectionShare();
+  const { mutateAsync: onShareReport } = useUpdateReportShare();
   const { openSuccessMessage } = useBusterNotifications();
 
   const onPublish = useMemoizedFn(async () => {
@@ -86,8 +95,10 @@ export const ShareMenuContentEmbedFooter = ({
       await onShareDashboard(payload);
     } else if (assetType === 'collection') {
       await onShareCollection(payload);
+    } else if (assetType === 'report') {
+      await onShareReport(payload);
     }
-    openSuccessMessage('Succuessfully published');
+    openSuccessMessage('Successfully published');
   });
 
   return (

@@ -1,4 +1,3 @@
-import type { ReportElementsWithIds } from '@buster/database';
 import { z } from 'zod';
 import { AssetCollectionsSchema } from '../collections/shared-asset-collections';
 import { ShareConfigSchema } from '../share';
@@ -10,8 +9,12 @@ export const ReportListItemSchema = z.object({
   created_by_id: z.string(),
   created_by_name: z.string().nullable(),
   created_by_avatar: z.string().nullable(),
+  created_at: z.string(),
   updated_at: z.string(),
   publicly_accessible: z.boolean(),
+  workspace_sharing: z.string(),
+  is_shared: z.boolean(),
+  permission: z.string().nullable(),
 });
 
 export const ReportIndividualResponseSchema = z.object({
@@ -25,7 +28,7 @@ export const ReportIndividualResponseSchema = z.object({
   version_number: z.number(),
   versions: VersionsSchema,
   collections: AssetCollectionsSchema,
-  content: z.any() as z.ZodType<ReportElementsWithIds>, //we use any here because we don't want to import the schema here :(
+  content: z.string(),
   ...ShareConfigSchema.shape,
 });
 

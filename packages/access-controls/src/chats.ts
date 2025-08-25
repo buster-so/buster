@@ -4,8 +4,8 @@ import {
   assetTypeEnum,
   chats,
   collectionsToAssets,
+  dbInitialized,
   eq,
-  getDb,
   identityTypeEnum,
   isNull,
   usersToOrganizations,
@@ -28,7 +28,7 @@ export const canUserAccessChat = async ({
   // Validate inputs
   const input = CanUserAccessChatSchema.parse({ userId, chatId });
 
-  const db = getDb();
+  const db = await dbInitialized;
 
   // Run all permission checks concurrently for optimal performance
   const [directPermission, collectionPermission, chatInfo, userOrgs] = await Promise.all([
@@ -77,7 +77,7 @@ export const canUserAccessChat = async ({
 
 // Helper function to check direct chat permission
 async function checkDirectChatPermission(
-  db: ReturnType<typeof getDb>,
+  db: Awaited<typeof dbInitialized>,
   userId: string,
   chatId: string
 ): Promise<boolean> {
@@ -100,7 +100,7 @@ async function checkDirectChatPermission(
 
 // Helper function to check collection-based chat permission
 async function checkCollectionChatPermission(
-  db: ReturnType<typeof getDb>,
+  db: Awaited<typeof dbInitialized>,
   userId: string,
   chatId: string
 ): Promise<boolean> {
@@ -131,7 +131,7 @@ async function checkCollectionChatPermission(
 
 // Helper function to get chat info (creator and organization)
 async function getChatInfo(
-  db: ReturnType<typeof getDb>,
+  db: Awaited<typeof dbInitialized>,
   chatId: string
 ): Promise<{ createdBy: string; organizationId: string } | null> {
   const result = await db
@@ -148,7 +148,7 @@ async function getChatInfo(
 
 // Helper function to get user's organizations and roles
 async function getUserOrganizations(
-  db: ReturnType<typeof getDb>,
+  db: Awaited<typeof dbInitialized>,
   userId: string
 ): Promise<Array<{ organizationId: string; role: string }>> {
   const result = await db

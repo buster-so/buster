@@ -6,10 +6,11 @@ import { messages } from '../../schema';
 
 /**
  * Convert messages from old CoreMessage format (v4) to ModelMessage format (v5)
- * Main changes: tool calls 'args' → 'input', tool results 'result' → 'output'
- *
- * Since we're dealing with unknown data from the database, we cast to ModelMessage[]
- * and let the runtime handle any actual format differences.
+ * Key changes:
+ * - Tool calls: 'args' → 'input'
+ * - Tool results: 'result' → structured 'output' object
+ * - Image/File parts: 'mimeType' → 'mediaType'
+ * - User/Assistant string content remains as string (v5 supports both)
  */
 export function convertCoreToModel(messages: unknown): ModelMessage[] {
   if (!Array.isArray(messages)) {
@@ -23,49 +24,224 @@ export function convertCoreToModel(messages: unknown): ModelMessage[] {
     }
 
     const msg = message as Record<string, unknown>;
+    const { role, content } = msg;
 
-    // For assistant messages, update tool call args → input
-    if (msg.role === 'assistant' && Array.isArray(msg.content)) {
-      return {
-        ...msg,
-        content: msg.content.map((part: unknown) => {
-          if (
-            part &&
-            typeof part === 'object' &&
-            'type' in part &&
-            part.type === 'tool-call' &&
-            'args' in part
-          ) {
-            const { args, ...rest } = part as Record<string, unknown>;
-            return { ...rest, input: args };
+    switch (role) {
+      case 'system':
+        // System messages remain string-based in both v4 and v5
+        return {
+          ...msg,
+          content: typeof content === 'string' ? content : '',
+        } as ModelMessage;
+
+      case 'user':
+        // User messages: handle both string and array content
+        if (typeof content === 'string') {
+          // v5 supports string content directly for user messages
+          return msg as ModelMessage;
+        }
+        if (Array.isArray(content)) {
+          // Convert any image/file parts
+          return {
+            ...msg,
+            content: content.map(convertContentPart),
+          } as ModelMessage;
+        }
+        return { ...msg, content: '' } as ModelMessage;
+
+      case 'assistant':
+        // Assistant messages: handle both string and array content
+        if (typeof content === 'string') {
+          // v5 supports string content directly for assistant messages
+          return msg as ModelMessage;
+        }
+        if (Array.isArray(content)) {
+          // Convert tool calls and other parts
+          return {
+            ...msg,
+            content: content.map(convertContentPart),
+          } as ModelMessage;
+        }
+        return { ...msg, content: '' } as ModelMessage;
+
+      case 'tool':
+        // Tool messages: convert result to structured output
+        if (Array.isArray(content)) {
+          // Convert and flatten nested results
+          const convertedContent = [];
+          for (const part of content) {
+            const converted = convertToolResultPart(part);
+            if (converted !== null) {
+              if (Array.isArray(converted)) {
+                // Flatten nested arrays (from wrapper tool results)
+                convertedContent.push(...converted);
+              } else {
+                convertedContent.push(converted);
+              }
+            }
           }
-          return part;
-        }),
-      } as ModelMessage;
-    }
 
-    // For tool messages, update result → output
-    if (msg.role === 'tool' && Array.isArray(msg.content)) {
-      return {
-        ...msg,
-        content: msg.content.map((part: unknown) => {
-          if (
-            part &&
-            typeof part === 'object' &&
-            'type' in part &&
-            part.type === 'tool-result' &&
-            'result' in part
-          ) {
-            const { result, ...rest } = part as Record<string, unknown>;
-            return { ...rest, output: result };
-          }
-          return part;
-        }),
-      } as ModelMessage;
-    }
+          return {
+            ...msg,
+            content: convertedContent,
+          } as ModelMessage;
+        }
+        return { role: 'tool', content: [] } as ModelMessage;
 
-    return message as ModelMessage;
+      default:
+        return msg as ModelMessage;
+    }
   });
+}
+
+/**
+ * Convert content parts from v4 to v5 format
+ */
+function convertContentPart(part: unknown): unknown {
+  if (!part || typeof part !== 'object') {
+    return part;
+  }
+
+  const p = part as Record<string, unknown>;
+
+  switch (p.type) {
+    case 'text':
+      // Text parts remain the same
+      return part;
+
+    case 'image':
+      // Convert mimeType → mediaType
+      if ('mimeType' in p) {
+        const { mimeType, ...rest } = p;
+        return {
+          ...rest,
+          mediaType: mimeType,
+        };
+      }
+      return part;
+
+    case 'file':
+      // Convert mimeType → mediaType
+      if ('mimeType' in p) {
+        const { mimeType, ...rest } = p;
+        return {
+          ...rest,
+          mediaType: mimeType,
+        };
+      }
+      return part;
+
+    case 'tool-call':
+      // Tool calls: args → input (AI SDK v5 change)
+      if ('args' in p) {
+        const { args, ...rest } = p;
+        return { ...rest, input: args };
+      }
+      return part;
+
+    default:
+      return part;
+  }
+}
+
+/**
+ * Convert tool result parts from v4 to v5 format
+ */
+function convertToolResultPart(part: unknown): unknown | unknown[] | null {
+  if (!part || typeof part !== 'object') {
+    return part;
+  }
+
+  const p = part as Record<string, unknown>;
+
+  if (p.type !== 'tool-result') {
+    return part;
+  }
+
+  // Check if this is a wrapper with empty toolCallId/toolName and nested results
+  if (
+    'toolCallId' in p &&
+    (p.toolCallId === '' || !p.toolCallId) &&
+    'toolName' in p &&
+    (p.toolName === '' || !p.toolName) &&
+    'result' in p &&
+    Array.isArray(p.result)
+  ) {
+    // This is a wrapper - extract and convert the nested tool results
+    const nestedResults = [];
+    for (const nestedItem of p.result) {
+      if (
+        nestedItem &&
+        typeof nestedItem === 'object' &&
+        'type' in nestedItem &&
+        nestedItem.type === 'tool-result'
+      ) {
+        const converted = convertToolResultPart(nestedItem);
+        if (converted !== null) {
+          if (Array.isArray(converted)) {
+            nestedResults.push(...converted);
+          } else {
+            nestedResults.push(converted);
+          }
+        }
+      }
+    }
+    // Return the array of nested results to be flattened
+    return nestedResults.length > 0 ? nestedResults : null;
+  }
+
+  // Only convert if we have 'result' field but not 'output' (v4 format)
+  if ('result' in p && !('output' in p)) {
+    const { result, experimental_content, isError, ...rest } = p;
+
+    // Validate toolCallId exists and matches Anthropic's pattern
+    const toolCallId = rest.toolCallId;
+    if (!toolCallId || typeof toolCallId !== 'string' || toolCallId.trim() === '') {
+      console.warn('[chatConversationHistory] Skipping tool-result with invalid toolCallId:', {
+        toolCallId,
+        toolName: rest.toolName,
+      });
+      // Skip this tool result entirely if toolCallId is invalid
+      return null;
+    }
+
+    // Check if toolCallId matches the required pattern
+    const validPattern = /^[a-zA-Z0-9_-]+$/;
+    if (!validPattern.test(toolCallId)) {
+      console.warn('[chatConversationHistory] Tool-result has invalid toolCallId format:', {
+        toolCallId,
+        toolName: rest.toolName,
+      });
+      // Skip this tool result if the ID doesn't match the pattern
+      return null;
+    }
+
+    // Convert to v5's structured output format
+    let output: { type: string; value: unknown };
+    if (isError) {
+      // Error results
+      if (typeof result === 'string') {
+        output = { type: 'error-text', value: result };
+      } else {
+        output = { type: 'error-json', value: result };
+      }
+    } else {
+      // Success results
+      if (typeof result === 'string') {
+        output = { type: 'text', value: result };
+      } else {
+        output = { type: 'json', value: result };
+      }
+    }
+
+    return {
+      ...rest,
+      output,
+    };
+  }
+
+  // Already in v5 format or doesn't need conversion
+  return part;
 }
 
 // Helper function to get chatId from messageId

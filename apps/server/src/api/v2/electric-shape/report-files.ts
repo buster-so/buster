@@ -1,27 +1,46 @@
 import { hasAssetPermission } from '@buster/access-controls';
-import { type ReportElementsWithIds, getReportMetadata, type reportFiles } from '@buster/database';
-import type { ReportIndividualResponse } from '@buster/server-shared/reports';
-import { markdownToPlatejs } from '@buster/server-utils/report';
-import type { ChangeMessage } from '@electric-sql/client';
+import { getReportMetadata } from '@buster/database';
 import type { Context } from 'hono';
-import type { ZodError } from 'zod';
+import { z } from 'zod';
 import { errorResponse } from '../../../utils/response';
-import { createProxiedResponse, extractParamFromWhere } from './_helpers';
-import {
-  type TransformCallback,
-  createElectricHandledResponse,
-} from './_helpers/transform-request';
+import { extractParamFromWhere } from './_helpers';
 
-type StreamableReportProperties = Pick<typeof reportFiles.$inferSelect, 'name' | 'id' | 'content'>;
-type ReportFile = Partial<ReportIndividualResponse>;
 type ReportMetadata = Awaited<ReturnType<typeof getReportMetadata>>;
+
+const AcceptedColumnsEnum = z.enum(['content', 'name', 'id', 'publicly_accessible']);
+const columnsSchema = z.object({
+  columns: z
+    .string()
+    .min(1, 'Columns are required')
+    .refine(
+      (columns) => {
+        const columnsArray = columns.split(',');
+        return columnsArray.every((column) => {
+          return AcceptedColumnsEnum.safeParse(column)?.success;
+        });
+      },
+      {
+        message:
+          'Invalid column provided. Accepted columns are: content, name, id, publicly_accessible',
+      }
+    ),
+});
 
 export const reportFilesProxyRouter = async (
   url: URL,
   _userId: string,
   c: Context
-): Promise<Response> => {
+): Promise<URL> => {
   const reportId = extractParamFromWhere(url, 'id');
+  const columns = url.searchParams.get('columns');
+
+  // Validate columns using Zod
+  const validationResult = columnsSchema.safeParse({ columns });
+
+  if (!validationResult.success) {
+    const errorMessage = validationResult.error.errors[0]?.message || 'Invalid columns parameter';
+    throw errorResponse(errorMessage, 403);
+  }
 
   if (!reportId) {
     throw errorResponse('Report ID (id) is required', 403);
@@ -54,24 +73,5 @@ export const reportFilesProxyRouter = async (
     throw errorResponse('You do not have access to this report', 403);
   }
 
-  // Fetch the response and transform it
-  const response = await createProxiedResponse(url);
-
-  return createElectricHandledResponse<StreamableReportProperties, ReportFile>(response, {
-    transformCallback,
-  });
-};
-
-const transformCallback: TransformCallback<StreamableReportProperties, ReportFile> = async ({
-  value: { content, ...values },
-}) => {
-  const returnValue: ReportFile = values;
-
-  if (content) {
-    const { elements, error } = await markdownToPlatejs(content);
-    if (error) console.error('Error transforming report content:', error);
-    else returnValue.content = elements as ReportElementsWithIds; //why do I need as here? makes no gorey damn sense
-  }
-
-  return returnValue;
+  return url;
 };

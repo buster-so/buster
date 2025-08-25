@@ -1,62 +1,33 @@
 import type { LanguageModelV2ToolCall } from '@ai-sdk/provider';
-import { generateObject } from 'ai';
-import { type InvalidToolInputError, NoSuchToolError, type ToolSet } from 'ai';
-import { Sonnet4 } from '../../llm';
+import type { InvalidToolInputError, ModelMessage, NoSuchToolError, ToolSet } from 'ai';
+import { repairToolCall } from './repair-tool-call';
+import type { AgentContext } from './types';
 
-interface ToolCallWithArgs extends LanguageModelV2ToolCall {
-  args?: unknown;
-}
-
+// Legacy function that now delegates to the new modular repair system
 export async function healToolWithLlm({
   toolCall,
   tools,
   error,
+  messages = [],
+  system,
+  inputSchema,
+  agentContext,
 }: {
   toolCall: LanguageModelV2ToolCall;
   tools: ToolSet;
   error: NoSuchToolError | InvalidToolInputError;
+  messages?: ModelMessage[];
+  system?: string | ModelMessage | ModelMessage[];
+  inputSchema?: (toolCall: LanguageModelV2ToolCall) => unknown;
+  agentContext?: AgentContext;
 }) {
-  try {
-    if (error instanceof NoSuchToolError) {
-      return null;
-    }
-
-    const tool = tools[toolCall.toolName as keyof typeof tools];
-
-    if (!tool) {
-      throw new Error(`Tool ${toolCall.toolName} not found`);
-    }
-
-    if (!tool.inputSchema) {
-      throw new Error(`Tool ${toolCall.toolName} has no input schema`);
-    }
-
-    // Type assertion to access args property
-    const toolCallWithArgs = toolCall as ToolCallWithArgs;
-
-    const { object: repairedArgs } = await generateObject({
-      model: Sonnet4,
-      schema: tool.inputSchema,
-      prompt: [
-        `The model tried to call the tool "${toolCall.toolName}"`,
-        `with the following arguments:`,
-        JSON.stringify(toolCallWithArgs.args),
-        `The tool accepts the following schema:`,
-        JSON.stringify(tool.inputSchema),
-        'Please fix the arguments.',
-      ].join('\n'),
-    });
-
-    return { ...toolCall, args: repairedArgs } as LanguageModelV2ToolCall;
-  } catch (error) {
-    console.error('Failed to heal tool call with LLM:', error);
-    console.error('Tool call that failed:', toolCall);
-
-    // Re-throw with more context
-    throw new Error(
-      `Failed to heal tool call "${toolCall.toolName}": ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-  }
+  return repairToolCall({
+    toolCall,
+    tools,
+    error,
+    messages,
+    ...(system !== undefined && { system }),
+    ...(inputSchema !== undefined && { inputSchema }),
+    ...(agentContext !== undefined && { agentContext }),
+  });
 }

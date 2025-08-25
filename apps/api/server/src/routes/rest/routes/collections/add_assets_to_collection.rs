@@ -66,6 +66,7 @@ pub async fn add_assets_to_collection(
         let asset_type = match asset.type_.to_lowercase().as_str() {
             "dashboard" => Some(AssetType::DashboardFile),
             "metric" => Some(AssetType::MetricFile),
+            "report" => Some(AssetType::ReportFile),
             _ => None,
         };
         
@@ -81,6 +82,7 @@ pub async fn add_assets_to_collection(
                 let type_str = match asset_type {
                     AssetType::DashboardFile => "dashboard",
                     AssetType::MetricFile => "metric",
+                    AssetType::ReportFile => "report",
                     _ => "unknown",
                 };
                 

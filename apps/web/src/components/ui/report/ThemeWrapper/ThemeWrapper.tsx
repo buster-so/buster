@@ -46,18 +46,11 @@ const EDITOR_THEME = { ...CSS_VARIABLES_THEME, ...THEME_RESET_STYLE };
 
 export function ThemeWrapper({ children, className, defaultTheme, id }: ThemeWrapperProps) {
   return (
-    <>
-      <div
-        id={id}
-        style={EDITOR_THEME}
-        className={cn(
-          'themes-wrapper h-full w-full overflow-visible bg-transparent antialiased',
-          className
-        )}>
-        {children}
-      </div>
-
-      {/* <ThemesStyle /> */}
-    </>
+    <div
+      id={id}
+      style={EDITOR_THEME}
+      className={cn('themes-wrapper w-full bg-transparent antialiased', className)}>
+      {children}
+    </div>
   );
 }

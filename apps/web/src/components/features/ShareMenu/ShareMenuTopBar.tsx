@@ -29,12 +29,12 @@ export const ShareMenuTopBar: React.FC<{
         {
           value: ShareMenuTopBarOptions.Publish,
           label: 'Publish',
-          show: assetType !== 'collection' && canEditPermissions
+          show: assetType !== 'collection' && assetType !== 'report' && canEditPermissions
         },
         {
           value: ShareMenuTopBarOptions.Embed,
           label: 'Embed',
-          show: assetType !== 'collection' && canEditPermissions
+          show: assetType !== 'collection' && assetType !== 'report' && canEditPermissions
         }
       ]
         .filter((o) => o.show)

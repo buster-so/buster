@@ -24,7 +24,6 @@ export const useTrackAndUpdateReportChanges = ({
     DEFAULT_UPDATE_OPERATIONS,
     (report) => {
       if (report.value) {
-        console.log('report', report.value);
         const queryKey = reportsQueryKeys.reportsGetReport(reportId).queryKey;
         queryClient.setQueryData(queryKey, (v) => {
           if (!v) return v;

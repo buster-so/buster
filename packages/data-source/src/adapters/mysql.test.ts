@@ -34,7 +34,7 @@ describe('MySQLAdapter', () => {
         type: DataSourceType.MySQL,
         host: 'localhost',
         port: 3306,
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -54,7 +54,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -72,7 +72,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         ssl: { rejectUnauthorized: true },
@@ -91,7 +91,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
         connection_timeout: 5000,
@@ -110,7 +110,7 @@ describe('MySQLAdapter', () => {
       const credentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -124,7 +124,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -270,7 +270,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -289,7 +289,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -307,7 +307,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -322,7 +322,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };
@@ -341,7 +341,7 @@ describe('MySQLAdapter', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
-        database: 'testdb',
+        default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
       };

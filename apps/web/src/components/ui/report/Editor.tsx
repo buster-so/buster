@@ -12,7 +12,7 @@ const editorVariants = cva(
   cn(
     'group/editor',
     'relative w-full cursor-text overflow-x-visible break-words whitespace-pre-wrap select-text',
-    'rounded-md ring-offset-background focus-visible:outline-none',
+    'ring-offset-background focus-visible:outline-none',
     'placeholder:text-muted-foreground/80 **:data-slate-placeholder:!top-1/2 **:data-slate-placeholder:-translate-y-1/2 **:data-slate-placeholder:text-muted-foreground/80 **:data-slate-placeholder:opacity-100!',
     '[&_strong]:font-bold'
   ),
@@ -21,17 +21,16 @@ const editorVariants = cva(
       variant: 'default'
     },
     variants: {
-      disabled: {
-        true: 'cursor-not-allowed opacity-50'
+      readOnly: {
+        true: ''
       },
       focused: {
         true: 'ring-2 ring-ring ring-offset-2'
       },
       variant: {
-        ai: 'w-full px-0 text-base md:text-sm',
         comment: cn('rounded-none border-none bg-transparent text-sm'),
-        default: 'size-full px-16 pt-4 pb-72 text-base sm:px-[max(64px,calc(50%-350px))]',
-        fullWidth: 'size-full px-16 pt-4 pb-72 text-base sm:px-24',
+        default: 'px-16 pt-4 pb-72 text-base sm:px-[max(64px,calc(50%-350px))]',
+        fullWidth: 'px-16 pt-4 pb-72 text-base sm:px-24',
         none: ''
       }
     }
@@ -41,20 +40,20 @@ const editorVariants = cva(
 export type EditorProps = PlateContentProps & VariantProps<typeof editorVariants>;
 
 export const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
-  ({ className, disabled, focused, variant, ...props }, ref) => {
+  ({ className, disabled, focused, variant, readOnly, ...props }, ref) => {
     return (
       <PlateContent
         ref={ref}
         className={cn(
           editorVariants({
-            disabled,
+            readOnly,
             focused,
             variant
           }),
           className
         )}
-        disabled={disabled}
-        disableDefaultStyles
+        readOnly={readOnly}
+        disableDefaultStyles={true}
         {...props}
       />
     );
