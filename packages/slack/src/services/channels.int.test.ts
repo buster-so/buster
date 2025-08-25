@@ -1,9 +1,9 @@
+import { SLACK_KEYS, getSecret } from '@buster/secrets';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { SlackChannelService } from './channels';
 
 // Only run if environment is configured
-const runIntegrationTests =
-  process.env.SLACK_BOT_TOKEN !== undefined && process.env.SLACK_CHANNEL_ID !== undefined;
+let runIntegrationTests: boolean;
 
 const describeIntegration = runIntegrationTests ? describe : describe.skip;
 
@@ -12,9 +12,17 @@ describeIntegration('SlackChannelService Integration', () => {
   let botToken: string;
   let channelId: string;
 
-  beforeAll(() => {
-    botToken = process.env.SLACK_BOT_TOKEN!;
-    channelId = process.env.SLACK_CHANNEL_ID!;
+  beforeAll(async () => {
+    try {
+      await getSecret(SLACK_KEYS.SLACK_BOT_TOKEN);
+      await getSecret(SLACK_KEYS.SLACK_CHANNEL_ID);
+      runIntegrationTests = true;
+    } catch {
+      runIntegrationTests = false;
+    }
+
+    botToken = await getSecret(SLACK_KEYS.SLACK_BOT_TOKEN);
+    channelId = await getSecret(SLACK_KEYS.SLACK_CHANNEL_ID);
     channelService = new SlackChannelService();
   });
 
@@ -98,7 +106,12 @@ describeIntegration('SlackChannelService Integration', () => {
     it('should join a public channel successfully', async () => {
       // This test is a bit tricky - we need a channel we're not in
       // For safety, we'll skip the actual join unless a test channel is provided
-      const testChannelId = process.env.SLACK_TEST_JOIN_CHANNEL_ID;
+      let testChannelId: string | undefined;
+      try {
+        testChannelId = await getSecret(SLACK_KEYS.SLACK_TEST_JOIN_CHANNEL_ID);
+      } catch {
+        testChannelId = undefined;
+      }
 
       if (!testChannelId) {
         console.log('Skipping join test - set SLACK_TEST_JOIN_CHANNEL_ID to test');
@@ -120,12 +133,24 @@ describeIntegration('SlackChannelService Integration', () => {
 
     it('should leave a channel successfully', async () => {
       // Skip destructive test unless explicitly enabled
-      if (process.env.SLACK_SKIP_LEAVE_TESTS === 'true') {
+      let skipLeaveTests: string | undefined;
+      try {
+        skipLeaveTests = await getSecret(SLACK_KEYS.SLACK_SKIP_LEAVE_TESTS);
+      } catch {
+        skipLeaveTests = undefined;
+      }
+
+      if (skipLeaveTests === 'true') {
         console.log('Skipping leave test - destructive action');
         return;
       }
 
-      const testChannelId = process.env.SLACK_TEST_LEAVE_CHANNEL_ID;
+      let testChannelId: string | undefined;
+      try {
+        testChannelId = await getSecret(SLACK_KEYS.SLACK_TEST_LEAVE_CHANNEL_ID);
+      } catch {
+        testChannelId = undefined;
+      }
       if (!testChannelId) {
         console.log('Skipping leave test - set SLACK_TEST_LEAVE_CHANNEL_ID to test');
         return;

@@ -38,7 +38,7 @@ export type UpdateSecretInput = z.infer<typeof UpdateSecretInputSchema>;
  */
 export async function createSecret(input: CreateSecretInput): Promise<string> {
   const validatedInput = CreateSecretInputSchema.parse(input);
-  const client = getClient();
+  const client = await getClient();
 
   try {
     const result = await client`
@@ -66,7 +66,7 @@ export async function createSecret(input: CreateSecretInput): Promise<string> {
  */
 export async function updateSecret(input: UpdateSecretInput): Promise<string> {
   const validatedInput = UpdateSecretInputSchema.parse(input);
-  const client = getClient();
+  const client = await getClient();
 
   try {
     // Note: vault.update_secret returns void, not an ID
@@ -93,7 +93,7 @@ export async function updateSecret(input: UpdateSecretInput): Promise<string> {
  */
 export async function deleteSecret(id: string): Promise<void> {
   const validatedId = z.string().uuid().parse(id);
-  const client = getClient();
+  const client = await getClient();
 
   try {
     await client`
@@ -112,7 +112,7 @@ export async function deleteSecret(id: string): Promise<void> {
  */
 export async function getSecret(id: string): Promise<VaultSecret | null> {
   const validatedId = z.string().uuid().parse(id);
-  const client = getClient();
+  const client = await getClient();
 
   try {
     const result = await client`
@@ -147,7 +147,7 @@ export async function getSecret(id: string): Promise<VaultSecret | null> {
  */
 export async function getSecretByName(name: string): Promise<VaultSecret | null> {
   const validatedName = z.string().parse(name);
-  const client = getClient();
+  const client = await getClient();
 
   try {
     const result = await client`
@@ -182,7 +182,7 @@ export async function getSecretByName(name: string): Promise<VaultSecret | null>
  */
 export async function listSecrets(limit = 100): Promise<VaultSecret[]> {
   const validatedLimit = z.number().positive().max(1000).parse(limit);
-  const client = getClient();
+  const client = await getClient();
 
   try {
     const result = await client`

@@ -4,6 +4,30 @@ import { fileURLToPath } from 'node:url';
 import { InfisicalSDK } from '@infisical/sdk';
 import { config } from 'dotenv';
 
+// Export all key constants
+export { AI_KEYS } from './keys/ai';
+export { DATABASE_KEYS } from './keys/database';
+export { DATA_SOURCE_KEYS } from './keys/data-source';
+export { GITHUB_KEYS } from './keys/github';
+export { SANDBOX_KEYS } from './keys/sandbox';
+export { SERVER_KEYS } from './keys/server';
+export { SHARED_KEYS } from './keys/shared';
+export { SLACK_KEYS } from './keys/slack';
+export { TRIGGER_KEYS } from './keys/trigger';
+export { WEB_TOOLS_KEYS } from './keys/web-tools';
+
+// Export types
+export type { AIKeys } from './keys/ai';
+export type { DatabaseKeys } from './keys/database';
+export type { DataSourceKeys } from './keys/data-source';
+export type { GitHubKeys } from './keys/github';
+export type { SandboxKeys } from './keys/sandbox';
+export type { ServerKeys } from './keys/server';
+export type { SharedKeys } from './keys/shared';
+export type { SlackKeys } from './keys/slack';
+export type { TriggerKeys } from './keys/trigger';
+export type { WebToolsKeys } from './keys/web-tools';
+
 // Get the directory of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -155,18 +179,6 @@ class SecretManager {
     );
   }
 
-  getSecretSync(key: string): string {
-    // Only check process.env for sync version
-    const envValue = process.env[key];
-    if (envValue) {
-      return envValue;
-    }
-
-    throw new Error(
-      `Secret "${key}" not found in environment variables. For Infisical secrets, use getSecret() instead of getSecretSync().`
-    );
-  }
-
   // Preload is now a no-op since we fetch in real-time
   async preloadSecrets(): Promise<void> {
     await this.initInfisical();
@@ -185,10 +197,6 @@ export async function getSecret(key: string): Promise<string> {
   return defaultManager.getSecret(key);
 }
 
-export function getSecretSync(key: string): string {
-  return defaultManager.getSecretSync(key);
-}
-
 export async function preloadSecrets(): Promise<void> {
   return defaultManager.preloadSecrets();
 }
@@ -196,7 +204,6 @@ export async function preloadSecrets(): Promise<void> {
 // Export for testing purposes
 export function createSecretManager(options?: SecretManagerOptions): {
   getSecret: (key: string) => Promise<string>;
-  getSecretSync: (key: string) => string;
   preloadSecrets: () => Promise<void>;
   getAvailableKeys: () => string[];
 } {
@@ -211,7 +218,6 @@ export function createSecretManager(options?: SecretManagerOptions): {
 
   return {
     getSecret: (key: string) => manager.getSecret(key),
-    getSecretSync: (key: string) => manager.getSecretSync(key),
     preloadSecrets: () => manager.preloadSecrets(),
     getAvailableKeys: () => manager.getAvailableKeys(),
   };

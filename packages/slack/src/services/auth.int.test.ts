@@ -1,4 +1,4 @@
-import { getSecretSync } from '@buster/secrets';
+import { SLACK_KEYS, getSecret } from '@buster/secrets';
 import { beforeAll, describe, expect, it } from 'vitest';
 import type {
   ISlackOAuthStateStorage,
@@ -9,19 +9,15 @@ import type { SlackOAuthConfig } from '../types';
 import { SlackAuthService } from './auth';
 
 // Only run if environment is configured
-const hasSlackConfig = (): boolean => {
+const hasSlackConfig = async (): Promise<boolean> => {
   try {
-    getSecretSync('SLACK_BOT_TOKEN');
-    getSecretSync('SLACK_CHANNEL_ID');
+    await getSecret(SLACK_KEYS.SLACK_BOT_TOKEN);
+    await getSecret(SLACK_KEYS.SLACK_CHANNEL_ID);
     return true;
   } catch {
     return false;
   }
 };
-
-const runIntegrationTests = hasSlackConfig();
-
-const describeIntegration = runIntegrationTests ? describe : describe.skip;
 
 // Simple in-memory storage implementations for testing
 class InMemoryTokenStorage implements ISlackTokenStorage {
@@ -60,22 +56,40 @@ class InMemoryStateStorage implements ISlackOAuthStateStorage {
   }
 }
 
-describeIntegration('SlackAuthService Integration', () => {
+describe('SlackAuthService Integration', () => {
+  let hasConfig = false;
   let authService: SlackAuthService;
   let tokenStorage: ISlackTokenStorage;
   let stateStorage: ISlackOAuthStateStorage;
   let botToken: string;
 
   // Mock OAuth config for testing
-  const mockConfig: SlackOAuthConfig = {
-    clientId: process.env.SLACK_CLIENT_ID || 'test-client-id',
-    clientSecret: process.env.SLACK_CLIENT_SECRET || 'test-client-secret',
-    redirectUri: process.env.SLACK_REDIRECT_URI || 'https://example.com/slack/callback',
-    scopes: ['channels:read', 'chat:write', 'channels:manage'],
-  };
+  let mockConfig: SlackOAuthConfig;
 
-  beforeAll(() => {
-    botToken = process.env.SLACK_BOT_TOKEN!;
+  beforeAll(async () => {
+    hasConfig = await hasSlackConfig();
+
+    if (!hasConfig) {
+      return; // Skip setup if no config available
+    }
+
+    try {
+      mockConfig = {
+        clientId: await getSecret(SLACK_KEYS.SLACK_CLIENT_ID),
+        clientSecret: await getSecret(SLACK_KEYS.SLACK_CLIENT_SECRET),
+        redirectUri: await getSecret(SLACK_KEYS.SLACK_REDIRECT_URI),
+        scopes: ['channels:read', 'chat:write', 'channels:manage'],
+      };
+    } catch {
+      mockConfig = {
+        clientId: 'test-client-id',
+        clientSecret: 'test-client-secret',
+        redirectUri: 'https://example.com/slack/callback',
+        scopes: ['channels:read', 'chat:write', 'channels:manage'],
+      };
+    }
+
+    botToken = await getSecret(SLACK_KEYS.SLACK_BOT_TOKEN);
     tokenStorage = new InMemoryTokenStorage();
     stateStorage = new InMemoryStateStorage();
     authService = new SlackAuthService(mockConfig, tokenStorage, stateStorage);
@@ -83,6 +97,7 @@ describeIntegration('SlackAuthService Integration', () => {
 
   describe('OAuth URL Generation', () => {
     it('should generate valid OAuth URL with state', async () => {
+      if (!hasConfig) return;
       const { authUrl, state } = await authService.generateAuthUrl({
         userId: 'test-user-123',
         source: 'integration-test',
@@ -103,6 +118,7 @@ describeIntegration('SlackAuthService Integration', () => {
     });
 
     it('should store state for CSRF protection', async () => {
+      if (!hasConfig) return;
       const { state } = await authService.generateAuthUrl({
         testData: 'integration-test',
       });
@@ -115,6 +131,7 @@ describeIntegration('SlackAuthService Integration', () => {
     });
 
     it('should generate unique states', async () => {
+      if (!hasConfig) return;
       const states = new Set<string>();
 
       for (let i = 0; i < 10; i++) {
@@ -129,6 +146,7 @@ describeIntegration('SlackAuthService Integration', () => {
 
   describe('Token Validation', () => {
     it('should validate a real bot token', async () => {
+      if (!hasConfig) return;
       // Store the bot token
       await tokenStorage.storeToken('test-bot', botToken);
 
@@ -138,6 +156,7 @@ describeIntegration('SlackAuthService Integration', () => {
     });
 
     it('should fail validation for invalid token', async () => {
+      if (!hasConfig) return;
       // Store an invalid token
       await tokenStorage.storeToken('invalid-bot', 'xoxb-invalid-token');
 
@@ -147,6 +166,7 @@ describeIntegration('SlackAuthService Integration', () => {
     });
 
     it('should return false for non-existent token', async () => {
+      if (!hasConfig) return;
       const isValid = await authService.testToken('non-existent-key');
       expect(isValid).toBe(false);
     });

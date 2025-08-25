@@ -2,6 +2,7 @@
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DATABASE_KEYS, getSecret } from '@buster/secrets';
 import { closePool } from '../src/connection';
 import { executeSqlFile } from './executeSqlFile';
 
@@ -32,23 +33,32 @@ async function setupDatabase(): Promise<void> {
   }
 }
 
-// Check if DATABASE_URL is defined
-if (!process.env.DATABASE_URL) {
-  console.error('❌ ERROR: DATABASE_URL environment variable is not defined');
-  console.error('Please ensure you have a .env file with DATABASE_URL configured');
-  process.exit(1);
+// Check if required environment variables are defined
+async function checkRequiredEnvVars(): Promise<void> {
+  try {
+    await getSecret(DATABASE_KEYS.DATABASE_URL);
+  } catch {
+    console.error('❌ ERROR: DATABASE_URL environment variable is not defined');
+    console.error('Please ensure you have a .env file with DATABASE_URL configured');
+    process.exit(1);
+  }
+
+  try {
+    await getSecret(DATABASE_KEYS.SUPABASE_URL);
+  } catch {
+    console.error('❌ ERROR: SUPABASE_URL environment variable is not defined');
+    console.error('Please ensure you have a .env file with SUPABASE_URL configured');
+    process.exit(1);
+  }
+
+  try {
+    await getSecret(DATABASE_KEYS.SUPABASE_SERVICE_ROLE_KEY);
+  } catch {
+    console.error('❌ ERROR: SUPABASE_SERVICE_ROLE_KEY environment variable is not defined');
+    console.error('Please ensure you have a .env file with SUPABASE_SERVICE_ROLE_KEY configured');
+    process.exit(1);
+  }
 }
 
-if (!process.env.SUPABASE_URL) {
-  console.error('❌ ERROR: SUPABASE_URL environment variable is not defined');
-  console.error('Please ensure you have a .env file with SUPABASE_URL configured');
-  process.exit(1);
-}
-
-if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('❌ ERROR: SUPABASE_SERVICE_ROLE_KEY environment variable is not defined');
-  console.error('Please ensure you have a .env file with SUPABASE_SERVICE_ROLE_KEY configured');
-  process.exit(1);
-}
-
+await checkRequiredEnvVars();
 await setupDatabase();

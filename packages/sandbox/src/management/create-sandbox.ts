@@ -1,4 +1,4 @@
-import { getSecret } from '@buster/secrets';
+import { SANDBOX_KEYS, getSecret } from '@buster/secrets';
 import { Daytona } from '@daytonaio/sdk';
 import { z } from 'zod';
 
@@ -14,7 +14,7 @@ export async function createSandbox(options: CreateSandboxOptions = {}) {
   const validatedOptions = createSandboxOptionsSchema.parse(options);
 
   // Get API key from secrets
-  const apiKey = await getSecret('DAYTONA_API_KEY');
+  const apiKey = await getSecret(SANDBOX_KEYS.DAYTONA_API_KEY);
 
   // Initialize the Daytona client
   const daytona = new Daytona({ apiKey, target: 'us' });

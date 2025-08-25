@@ -1,4 +1,4 @@
-import { getSecret } from '@buster/secrets';
+import { GITHUB_KEYS, getSecret } from '@buster/secrets';
 import type { GitHubOperationError } from '@buster/server-shared/github';
 import { GitHubErrorCode } from '@buster/server-shared/github';
 import { App } from 'octokit';
@@ -16,7 +16,7 @@ export async function getGitHubAppCredentials(): Promise<{
   let webhookSecret: string;
 
   try {
-    appId = await getSecret('GITHUB_APP_ID');
+    appId = await getSecret(GITHUB_KEYS.GITHUB_APP_ID);
   } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
@@ -25,7 +25,7 @@ export async function getGitHubAppCredentials(): Promise<{
   }
 
   try {
-    privateKeyBase64 = await getSecret('GITHUB_APP_PRIVATE_KEY_BASE64');
+    privateKeyBase64 = await getSecret(GITHUB_KEYS.GITHUB_APP_PRIVATE_KEY_BASE64);
   } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
@@ -34,7 +34,7 @@ export async function getGitHubAppCredentials(): Promise<{
   }
 
   try {
-    webhookSecret = await getSecret('GITHUB_WEBHOOK_SECRET');
+    webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
   } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,

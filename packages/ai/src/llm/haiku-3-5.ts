@@ -1,5 +1,5 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider';
-import { AI_KEYS, getSecretSync } from '@buster/secrets';
+import { AI_KEYS, getSecret } from '@buster/secrets';
 import { createFallback } from './ai-fallback';
 import { anthropicModel } from './providers/anthropic';
 import { vertexModel } from './providers/vertex';
@@ -7,7 +7,7 @@ import { vertexModel } from './providers/vertex';
 // Lazy initialization to allow mocking in tests
 let _haiku35Instance: ReturnType<typeof createFallback> | null = null;
 
-function initializeHaiku35() {
+async function initializeHaiku35() {
   if (_haiku35Instance) {
     return _haiku35Instance;
   }
@@ -17,9 +17,9 @@ function initializeHaiku35() {
 
   // Only include Anthropic if API key is available
   try {
-    getSecretSync(AI_KEYS.ANTHROPIC_API_KEY);
+    await getSecret(AI_KEYS.ANTHROPIC_API_KEY);
     try {
-      models.push(anthropicModel('claude-3-5-haiku-20241022'));
+      models.push(await anthropicModel('claude-3-5-haiku-20241022'));
       console.info('Haiku35: Anthropic model added to fallback chain');
     } catch (error) {
       console.warn('Haiku35: Failed to initialize Anthropic model:', error);
@@ -30,10 +30,10 @@ function initializeHaiku35() {
 
   // Only include Vertex if credentials are available
   try {
-    getSecretSync(AI_KEYS.VERTEX_CLIENT_EMAIL);
-    getSecretSync(AI_KEYS.VERTEX_PRIVATE_KEY);
+    await getSecret(AI_KEYS.VERTEX_CLIENT_EMAIL);
+    await getSecret(AI_KEYS.VERTEX_PRIVATE_KEY);
     try {
-      models.push(vertexModel('claude-3-5-haiku@20241022'));
+      models.push(await vertexModel('claude-3-5-haiku@20241022'));
       console.info('Haiku35: Vertex AI model added to fallback chain');
     } catch (error) {
       console.warn('Haiku35: Failed to initialize Vertex AI model:', error);
@@ -61,23 +61,10 @@ function initializeHaiku35() {
   return _haiku35Instance;
 }
 
-// Export a proxy that initializes on first use
-export const Haiku35 = new Proxy({} as ReturnType<typeof createFallback>, {
-  get(_target, prop) {
-    const instance = initializeHaiku35();
-    // Direct property access without receiver to avoid proxy conflicts
-    return instance[prop as keyof typeof instance];
-  },
-  has(_target, prop) {
-    const instance = initializeHaiku35();
-    return prop in instance;
-  },
-  ownKeys(_target) {
-    const instance = initializeHaiku35();
-    return Reflect.ownKeys(instance);
-  },
-  getOwnPropertyDescriptor(_target, prop) {
-    const instance = initializeHaiku35();
-    return Reflect.getOwnPropertyDescriptor(instance, prop);
-  },
-});
+// Export initialization function for async usage
+export async function getHaiku35(): Promise<ReturnType<typeof createFallback>> {
+  return await initializeHaiku35();
+}
+
+// Export a promise-based instance for backwards compatibility
+export const Haiku35 = initializeHaiku35();

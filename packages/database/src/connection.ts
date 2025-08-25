@@ -1,4 +1,4 @@
-import { getSecretSync } from '@buster/secrets';
+import { DATABASE_KEYS, SHARED_KEYS, getSecret } from '@buster/secrets';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -8,19 +8,19 @@ let globalPool: postgres.Sql | null = null;
 let globalDb: PostgresJsDatabase | null = null;
 
 // Helper to safely get secret
-function getEnvValue(key: string, defaultValue?: string): string | undefined {
+async function getEnvValue(key: string, defaultValue?: string): Promise<string | undefined> {
   try {
-    return getSecretSync(key);
+    return await getSecret(key);
   } catch {
     return defaultValue;
   }
 }
 
 // Environment validation
-function validateEnvironment(): string {
-  const isTest = getEnvValue('NODE_ENV') === 'test';
-  const isProduction = getEnvValue('NODE_ENV') === 'production';
-  const dbUrl = getEnvValue('DATABASE_URL');
+async function validateEnvironment(): Promise<string> {
+  const isTest = (await getEnvValue(SHARED_KEYS.NODE_ENV)) === 'test';
+  const isProduction = (await getEnvValue(SHARED_KEYS.NODE_ENV)) === 'production';
+  const dbUrl = await getEnvValue(DATABASE_KEYS.DATABASE_URL);
 
   // Use default local database URL if none provided
   if (!dbUrl) {
@@ -30,7 +30,7 @@ function validateEnvironment(): string {
   }
 
   // Prevent accidental production database usage in tests
-  const allowProdInTests = getEnvValue('ALLOW_PROD_DB_IN_TESTS');
+  const allowProdInTests = await getEnvValue('ALLOW_PROD_DB_IN_TESTS'); // Not in constants - rarely used
   if (isTest && dbUrl.includes('prod') && !allowProdInTests) {
     throw new Error(
       'Production database detected in test environment. Set ALLOW_PROD_DB_IN_TESTS=true to override.'
@@ -38,7 +38,7 @@ function validateEnvironment(): string {
   }
 
   // Warn about non-pooled connections in production
-  const poolSize = getEnvValue('DATABASE_POOL_SIZE');
+  const poolSize = await getEnvValue('DATABASE_POOL_SIZE'); // Not in constants - optional config
   if (isProduction && !poolSize) {
     console.warn('DATABASE_POOL_SIZE not set - using default pool size of 100');
   }
@@ -47,12 +47,12 @@ function validateEnvironment(): string {
 }
 
 // Initialize the database pool
-export function initializePool<T extends Record<string, postgres.PostgresType>>(
+export async function initializePool<T extends Record<string, postgres.PostgresType>>(
   config: postgres.Options<T> | undefined = {}
-): PostgresJsDatabase {
-  const connectionString = validateEnvironment();
+): Promise<PostgresJsDatabase> {
+  const connectionString = await validateEnvironment();
 
-  const poolSizeStr = getEnvValue('DATABASE_POOL_SIZE');
+  const poolSizeStr = await getEnvValue('DATABASE_POOL_SIZE'); // Not in constants - optional config
   const poolSize = poolSizeStr ? Number.parseInt(poolSizeStr) : 100;
 
   if (globalPool && globalDb) {
@@ -75,17 +75,17 @@ export function initializePool<T extends Record<string, postgres.PostgresType>>(
 }
 
 // Get the database instance (initializes if not already done)
-export function getDb(): PostgresJsDatabase {
+export async function getDb(): Promise<PostgresJsDatabase> {
   if (!globalDb) {
-    return initializePool();
+    return await initializePool();
   }
   return globalDb;
 }
 
 // Get the raw postgres client
-export function getClient(): postgres.Sql {
+export async function getClient(): Promise<postgres.Sql> {
   if (!globalPool) {
-    initializePool();
+    await initializePool();
   }
   if (!globalPool) {
     throw new Error('Failed to initialize database pool');
@@ -105,7 +105,7 @@ export async function closePool(): Promise<void> {
 // Ping the database to check if connection is possible
 export async function dbPing(): Promise<boolean> {
   try {
-    const client = getClient();
+    const client = await getClient();
     await client`SELECT 1`;
     return true;
   } catch (error) {
@@ -114,5 +114,44 @@ export async function dbPing(): Promise<boolean> {
   }
 }
 
-// Export the default database instance
-export const db = getDb();
+// Synchronous getter that assumes database is already initialized
+export function getSyncDb(): PostgresJsDatabase {
+  if (!globalDb) {
+    throw new Error('Database not initialized. Call initializePool() first.');
+  }
+  return globalDb;
+}
+
+// Export the database initialization promise
+export const dbInitialized = getDb();
+
+// Export a synchronous database instance (will throw if not initialized)
+// This maintains backwards compatibility for existing code
+export const db = new Proxy({} as PostgresJsDatabase, {
+  get(_target, prop) {
+    if (!globalDb) {
+      throw new Error(
+        'Database not initialized. Import and await dbInitialized first, or use getSyncDb() after initialization.'
+      );
+    }
+    return Reflect.get(globalDb, prop);
+  },
+  has(_target, prop) {
+    if (!globalDb) {
+      throw new Error('Database not initialized. Import and await dbInitialized first.');
+    }
+    return prop in globalDb;
+  },
+  ownKeys(_target) {
+    if (!globalDb) {
+      throw new Error('Database not initialized.');
+    }
+    return Reflect.ownKeys(globalDb);
+  },
+  getOwnPropertyDescriptor(_target, prop) {
+    if (!globalDb) {
+      throw new Error('Database not initialized.');
+    }
+    return Reflect.getOwnPropertyDescriptor(globalDb, prop);
+  },
+});

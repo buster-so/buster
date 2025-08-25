@@ -1,13 +1,21 @@
+import { SANDBOX_KEYS, getSecret } from '@buster/secrets';
 import type { Sandbox } from '@daytonaio/sdk';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createSandbox } from '../management/create-sandbox';
 import { runTypescript } from './run-typescript';
 
 describe('runTypescript integration test', () => {
-  const hasApiKey = !!process.env.DAYTONA_API_KEY;
+  let hasApiKey: boolean;
   let sandbox: Sandbox;
 
   beforeAll(async () => {
+    try {
+      await getSecret(SANDBOX_KEYS.DAYTONA_API_KEY);
+      hasApiKey = true;
+    } catch {
+      hasApiKey = false;
+    }
+
     if (!hasApiKey) return;
 
     // Create a sandbox for the tests

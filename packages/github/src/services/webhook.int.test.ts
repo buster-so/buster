@@ -1,16 +1,17 @@
 import { createHmac } from 'node:crypto';
+import { GITHUB_KEYS, getSecret } from '@buster/secrets';
 import { describe, expect, it } from 'vitest';
 import { skipIfNoGitHubCredentials } from '../../../../apps/server/src/api/v2/github/test-helpers/github-test-setup';
 import { verifyGitHubWebhookSignature } from './webhook';
 
 describe('GitHub Webhook Service Integration Tests', () => {
   describe('Webhook Signature Verification', () => {
-    it('should verify valid webhook signature', () => {
+    it('should verify valid webhook signature', async () => {
       if (skipIfNoGitHubCredentials()) {
         return;
       }
 
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET!;
+      const webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
 
       // Sample webhook payload
       const payload = {
@@ -34,12 +35,12 @@ describe('GitHub Webhook Service Integration Tests', () => {
       expect(isValid).toBe(true);
     });
 
-    it('should reject invalid webhook signature', () => {
+    it('should reject invalid webhook signature', async () => {
       if (skipIfNoGitHubCredentials()) {
         return;
       }
 
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET!;
+      const webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
 
       const payload = {
         action: 'created',
@@ -54,16 +55,16 @@ describe('GitHub Webhook Service Integration Tests', () => {
       const wrongSignature = `sha256=${createHmac('sha256', 'wrong-secret').update(payloadString).digest('hex')}`;
 
       // Should fail verification
-      const isValid = verifyWebhookSignature(payloadString, wrongSignature, webhookSecret);
+      const isValid = verifyGitHubWebhookSignature(payloadString, wrongSignature);
       expect(isValid).toBe(false);
     });
 
-    it('should reject signature with wrong format', () => {
+    it('should reject signature with wrong format', async () => {
       if (skipIfNoGitHubCredentials()) {
         return;
       }
 
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET!;
+      const webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
 
       const payload = { test: 'data' };
       const payloadString = JSON.stringify(payload);
@@ -82,12 +83,12 @@ describe('GitHub Webhook Service Integration Tests', () => {
       }
     });
 
-    it('should handle different payload types', () => {
+    it('should handle different payload types', async () => {
       if (skipIfNoGitHubCredentials()) {
         return;
       }
 
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET!;
+      const webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
 
       // Test different GitHub webhook event types
       const payloads = [
@@ -119,12 +120,12 @@ describe('GitHub Webhook Service Integration Tests', () => {
       }
     });
 
-    it('should be consistent with repeated verifications', () => {
+    it('should be consistent with repeated verifications', async () => {
       if (skipIfNoGitHubCredentials()) {
         return;
       }
 
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET!;
+      const webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
 
       const payload = { test: 'consistency' };
       const payloadString = JSON.stringify(payload);
@@ -137,12 +138,12 @@ describe('GitHub Webhook Service Integration Tests', () => {
       }
     });
 
-    it('should handle large payloads', () => {
+    it('should handle large payloads', async () => {
       if (skipIfNoGitHubCredentials()) {
         return;
       }
 
-      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET!;
+      const webhookSecret = await getSecret(GITHUB_KEYS.GITHUB_WEBHOOK_SECRET);
 
       // Create a large payload similar to real GitHub webhooks
       const largePayload = {

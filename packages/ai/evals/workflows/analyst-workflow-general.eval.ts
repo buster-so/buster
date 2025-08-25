@@ -1,14 +1,16 @@
-import { AI_KEYS, getSecretSync } from '@buster/secrets';
+import { AI_KEYS, getSecret } from '@buster/secrets';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { Eval, initDataset, initLogger } from 'braintrust';
 import analystWorkflow, {
   type AnalystRuntimeContext,
 } from '../../src/workflows/analyst-agent-workflow/analyst-workflow';
 
-initLogger({
-  apiKey: getSecretSync(AI_KEYS.BRAINTRUST_KEY),
-  projectName: 'ANALYST-WORKFLOW',
-});
+(async () => {
+  initLogger({
+    apiKey: await getSecret(AI_KEYS.BRAINTRUST_KEY),
+    projectName: 'ANALYST-WORKFLOW',
+  });
+})();
 
 const runAnalystWorkflow = async (input: string) => {
   const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();

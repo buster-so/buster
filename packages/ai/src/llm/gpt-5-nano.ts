@@ -1,12 +1,12 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider';
-import { AI_KEYS, getSecretSync } from '@buster/secrets';
+import { AI_KEYS, getSecret } from '@buster/secrets';
 import { createFallback } from './ai-fallback';
 import { openaiModel } from './providers/openai';
 
 // Lazy initialization to allow mocking in tests
 let _gpt5Instance: ReturnType<typeof createFallback> | null = null;
 
-function initializeGPT5() {
+async function initializeGPT5() {
   if (_gpt5Instance) {
     return _gpt5Instance;
   }
@@ -16,9 +16,9 @@ function initializeGPT5() {
 
   // Only include OpenAI if API key is available
   try {
-    getSecretSync(AI_KEYS.OPENAI_API_KEY);
+    await getSecret(AI_KEYS.OPENAI_API_KEY);
     try {
-      models.push(openaiModel('gpt-5-nano-2025-08-07'));
+      models.push(await openaiModel('gpt-5-nano-2025-08-07'));
       console.info('GPT5: OpenAI model added to fallback chain');
     } catch (error) {
       console.warn('GPT5: Failed to initialize OpenAI model:', error);
@@ -44,23 +44,10 @@ function initializeGPT5() {
   return _gpt5Instance;
 }
 
-// Export a proxy that initializes on first use
-export const GPT5Nano = new Proxy({} as ReturnType<typeof createFallback>, {
-  get(_target, prop) {
-    const instance = initializeGPT5();
-    // Direct property access without receiver to avoid proxy conflicts
-    return instance[prop as keyof typeof instance];
-  },
-  has(_target, prop) {
-    const instance = initializeGPT5();
-    return prop in instance;
-  },
-  ownKeys(_target) {
-    const instance = initializeGPT5();
-    return Reflect.ownKeys(instance);
-  },
-  getOwnPropertyDescriptor(_target, prop) {
-    const instance = initializeGPT5();
-    return Reflect.getOwnPropertyDescriptor(instance, prop);
-  },
-});
+// Export initialization function for async usage
+export async function getGPT5Nano(): Promise<ReturnType<typeof createFallback>> {
+  return await initializeGPT5();
+}
+
+// Export a promise-based instance for backwards compatibility
+export const GPT5Nano = initializeGPT5();
