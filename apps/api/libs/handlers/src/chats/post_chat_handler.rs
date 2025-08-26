@@ -3,8 +3,8 @@ use dashmap::DashMap;
 use database::enums::WorkspaceSharing;
 use middleware::AuthenticatedUser;
 use std::collections::HashSet;
-use std::env;
 use std::{collections::HashMap, time::{Instant, Duration}};
+use secrets::get_secret_sync_or_default;
 use std::sync::Arc;
 
 use agents::{
@@ -2723,7 +2723,7 @@ pub async fn generate_conversation_title(
     // Set up LiteLLM client
     let llm_client = LiteLLMClient::new(None, None);
 
-    let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
+    let model = if get_secret_sync_or_default("ENVIRONMENT", "development") == "local" {
         "gpt-4.1-nano".to_string()
     } else {
         "gemini-2.0-flash-001".to_string()

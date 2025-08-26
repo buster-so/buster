@@ -104,7 +104,7 @@ pub async fn create_share_by_email(
             // User doesn't exist, create a new user in Supabase Auth
             // This will automatically create the user in the database through triggers
             let user_id = Uuid::new_v4();
-            let supabase_client = SupabaseClient::new()
+            let supabase_client = SupabaseClient::new().await
                 .context("Failed to initialize Supabase client")?;
 
             // Create user in Supabase Auth

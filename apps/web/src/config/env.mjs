@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
-// Load environment variables from root .env file
-import { loadRootEnv } from '@buster/env-utils';
-loadRootEnv();
+// Environment variables are loaded automatically from .env file by Next.js
+// For server-side secrets, use @buster/secrets package
 
 const isServer = typeof window === 'undefined';
 

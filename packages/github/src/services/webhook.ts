@@ -9,17 +9,17 @@ import { getGitHubAppCredentials } from '../client/app';
  * @param signature The signature from the X-Hub-Signature-256 header
  * @returns true if the signature is valid, false otherwise
  */
-export function verifyGitHubWebhookSignature(
+export async function verifyGitHubWebhookSignature(
   payload: string,
   signature: string | undefined
-): boolean {
+): Promise<boolean> {
   if (!signature) {
     console.error('Missing GitHub webhook signature header');
     return false;
   }
 
   try {
-    const { webhookSecret } = getGitHubAppCredentials();
+    const { webhookSecret } = await getGitHubAppCredentials();
 
     // GitHub sends the signature in the format "sha256=<signature>"
     if (!signature.startsWith('sha256=')) {
@@ -76,10 +76,10 @@ export function extractGitHubWebhookSignature(
  * @param headers The request headers
  * @throws Error if the signature is invalid
  */
-export function verifyGitHubWebhook(
+export async function verifyGitHubWebhook(
   payload: string,
   headers: Record<string, string | string[] | undefined>
-): void {
+): Promise<void> {
   const signature = extractGitHubWebhookSignature(headers);
 
   if (!signature) {
@@ -89,7 +89,7 @@ export function verifyGitHubWebhook(
     );
   }
 
-  const isValid = verifyGitHubWebhookSignature(payload, signature);
+  const isValid = await verifyGitHubWebhookSignature(payload, signature);
 
   if (!isValid) {
     throw createGitHubError(

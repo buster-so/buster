@@ -1,4 +1,5 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider';
+import { AI_KEYS, getSecret } from '@buster/secrets';
 import { createFallback } from './ai-fallback';
 import { anthropicModel } from './providers/anthropic';
 import { vertexModel } from './providers/vertex';
@@ -6,7 +7,7 @@ import { vertexModel } from './providers/vertex';
 // Lazy initialization to allow mocking in tests
 let _haiku35Instance: ReturnType<typeof createFallback> | null = null;
 
-function initializeHaiku35() {
+async function initializeHaiku35() {
   if (_haiku35Instance) {
     return _haiku35Instance;
   }
@@ -15,35 +16,32 @@ function initializeHaiku35() {
   const models: LanguageModelV2[] = [];
 
   // Only include Anthropic if API key is available
-  if (process.env.ANTHROPIC_API_KEY) {
+  try {
+    await getSecret(AI_KEYS.ANTHROPIC_API_KEY);
     try {
-      models.push(anthropicModel('claude-3-5-haiku-20241022'));
+      models.push(await anthropicModel('claude-3-5-haiku-20241022'));
       console.info('Haiku35: Anthropic model added to fallback chain');
     } catch (error) {
       console.warn('Haiku35: Failed to initialize Anthropic model:', error);
     }
+  } catch {
+    // API key not available, skip Anthropic model
   }
 
-  // Only include Vertex if all required credentials are available
-  if (
-    process.env.VERTEX_CLIENT_EMAIL &&
-    process.env.VERTEX_PRIVATE_KEY &&
-    process.env.VERTEX_PROJECT
-  ) {
+  // Only include Vertex if credentials are available
+  try {
+    await getSecret(AI_KEYS.VERTEX_CLIENT_EMAIL);
+    await getSecret(AI_KEYS.VERTEX_PRIVATE_KEY);
+    await getSecret(AI_KEYS.VERTEX_PROJECT);
     try {
-      models.push(vertexModel('claude-3-5-haiku@20241022'));
-      console.info('Haiku35: Vertex AI model added to fallback chain (fallback)');
+      models.push(await vertexModel('claude-3-5-haiku@20241022'));
+      console.info('Haiku35: Vertex AI model added to fallback chain');
     } catch (error) {
       console.warn('Haiku35: Failed to initialize Vertex AI model:', error);
     }
-  } else {
-    const missing = [];
-    if (!process.env.VERTEX_CLIENT_EMAIL) missing.push('VERTEX_CLIENT_EMAIL');
-    if (!process.env.VERTEX_PRIVATE_KEY) missing.push('VERTEX_PRIVATE_KEY');
-    if (!process.env.VERTEX_PROJECT) missing.push('VERTEX_PROJECT');
-    console.info(
-      `Haiku35: Missing Vertex credentials (${missing.join(', ')}), skipping Vertex model`
-    );
+  } catch {
+    // Vertex credentials not available, skip Vertex model
+    console.info('Haiku35: Vertex credentials not available, skipping Vertex model');
   }
 
   // Ensure we have at least one model
@@ -86,23 +84,14 @@ function initializeHaiku35() {
   return _haiku35Instance;
 }
 
-// Export a proxy that initializes on first use
-export const Haiku35 = new Proxy({} as ReturnType<typeof createFallback>, {
-  get(_target, prop) {
-    const instance = initializeHaiku35();
-    // Direct property access without receiver to avoid proxy conflicts
-    return instance[prop as keyof typeof instance];
-  },
-  has(_target, prop) {
-    const instance = initializeHaiku35();
-    return prop in instance;
-  },
-  ownKeys(_target) {
-    const instance = initializeHaiku35();
-    return Reflect.ownKeys(instance);
-  },
-  getOwnPropertyDescriptor(_target, prop) {
-    const instance = initializeHaiku35();
-    return Reflect.getOwnPropertyDescriptor(instance, prop);
-  },
-});
+// Export initialization function for async usage
+export async function getHaiku35(): Promise<ReturnType<typeof createFallback>> {
+  return await initializeHaiku35();
+}
+
+// Export a promise-based instance for backwards compatibility
+// In test environment, export a resolved promise with a mock value to prevent initialization
+export const Haiku35 =
+  process.env.NODE_ENV === 'test' || process.env.VITEST
+    ? Promise.resolve('mock-haiku-35')
+    : initializeHaiku35();

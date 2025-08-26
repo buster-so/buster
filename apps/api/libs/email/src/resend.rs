@@ -1,15 +1,18 @@
 use anyhow::Result;
-use std::{collections::HashSet, env};
+use secrets::get_secret_sync;
+use std::collections::HashSet;
 use uuid::Uuid;
 use html_escape::encode_text as escape_html;
 
 use resend_rs::{types::CreateEmailBaseOptions, Resend};
 
 lazy_static::lazy_static! {
-    // TODO: Consider injecting these via a config struct instead of static env vars
-    static ref RESEND_API_KEY: String = env::var("RESEND_API_KEY").expect("RESEND_API_KEY must be set");
+    // These are loaded from secrets module
+    static ref RESEND_API_KEY: String = get_secret_sync("RESEND_API_KEY")
+        .expect("RESEND_API_KEY must be set in environment or loaded via init_secrets");
     static ref RESEND_CLIENT: Resend = Resend::new(&RESEND_API_KEY);
-    static ref BUSTER_URL: String = env::var("BUSTER_URL").expect("BUSTER_URL must be set");
+    static ref BUSTER_URL: String = get_secret_sync("BUSTER_URL")
+        .expect("BUSTER_URL must be set in environment or loaded via init_secrets");
 }
 
 #[derive(Debug, Clone)] // Added derives for potential broader use

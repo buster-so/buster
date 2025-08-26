@@ -28,6 +28,7 @@ futures = { workspace = true }
 sqlparser = { workspace = true }
 num-traits = { workspace = true }
 reqwest = { workspace = true }
+secrets = { path = "../secrets" }
 
 [dev-dependencies]
 tokio-test = { workspace = true }

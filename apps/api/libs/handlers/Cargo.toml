@@ -34,6 +34,7 @@ email = { path = "../email" }
 sql_analyzer = { path = "../sql_analyzer" }
 dataset_security = { path = "../dataset_security" }
 semantic_layer = { path = "../semantic_layer" }
+secrets = { path = "../secrets" }
 
 # Add any handler-specific dependencies here 
 dashmap = "5.5.3"

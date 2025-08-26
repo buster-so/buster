@@ -1,3 +1,4 @@
+import { DATABASE_KEYS, SHARED_KEYS, getSecretSync } from '@buster/secrets';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -6,11 +7,20 @@ import postgres from 'postgres';
 let globalPool: postgres.Sql | null = null;
 let globalDb: PostgresJsDatabase | null = null;
 
-// Environment validation
+// Helper to safely get secret synchronously
+function getEnvValue(key: string, defaultValue?: string): string | undefined {
+  try {
+    return getSecretSync(key);
+  } catch {
+    return defaultValue;
+  }
+}
+
+// Environment validation (now synchronous)
 function validateEnvironment(): string {
-  const isTest = process.env.NODE_ENV === 'test';
-  const isProduction = process.env.NODE_ENV === 'production';
-  const dbUrl = process.env.DATABASE_URL;
+  const isTest = getEnvValue(SHARED_KEYS.NODE_ENV) === 'test';
+  const isProduction = getEnvValue(SHARED_KEYS.NODE_ENV) === 'production';
+  const dbUrl = getEnvValue(DATABASE_KEYS.DATABASE_URL);
 
   // Use default local database URL if none provided
   if (!dbUrl) {
@@ -20,33 +30,33 @@ function validateEnvironment(): string {
   }
 
   // Prevent accidental production database usage in tests
-  if (isTest && dbUrl.includes('prod') && !process.env.ALLOW_PROD_DB_IN_TESTS) {
+  const allowProdInTests = getEnvValue('ALLOW_PROD_DB_IN_TESTS'); // Not in constants - rarely used
+  if (isTest && dbUrl.includes('prod') && !allowProdInTests) {
     throw new Error(
       'Production database detected in test environment. Set ALLOW_PROD_DB_IN_TESTS=true to override.'
     );
   }
 
   // Warn about non-pooled connections in production
-  if (isProduction && !process.env.DATABASE_POOL_SIZE) {
+  const poolSize = getEnvValue('DATABASE_POOL_SIZE'); // Not in constants - optional config
+  if (isProduction && !poolSize) {
     console.warn('DATABASE_POOL_SIZE not set - using default pool size of 100');
   }
 
   return dbUrl;
 }
 
-// Initialize the database pool
+// Initialize the database pool (now synchronous)
 export function initializePool<T extends Record<string, postgres.PostgresType>>(
   config: postgres.Options<T> | undefined = {}
 ): PostgresJsDatabase {
-  const connectionString = validateEnvironment();
-
-  const poolSize = process.env.DATABASE_POOL_SIZE
-    ? Number.parseInt(process.env.DATABASE_POOL_SIZE)
-    : 100;
-
   if (globalPool && globalDb) {
     return globalDb;
   }
+
+  const connectionString = validateEnvironment();
+  const poolSizeStr = getEnvValue('DATABASE_POOL_SIZE'); // Not in constants - optional config
+  const poolSize = poolSizeStr ? Number.parseInt(poolSizeStr) : 100;
 
   // Create postgres client with pool configuration
   globalPool = postgres(connectionString, {
@@ -63,7 +73,7 @@ export function initializePool<T extends Record<string, postgres.PostgresType>>(
   return globalDb;
 }
 
-// Get the database instance (initializes if not already done)
+// Get the database instance (initializes if not already done) - now synchronous
 export function getDb(): PostgresJsDatabase {
   if (!globalDb) {
     return initializePool();
@@ -71,7 +81,7 @@ export function getDb(): PostgresJsDatabase {
   return globalDb;
 }
 
-// Get the raw postgres client
+// Get the raw postgres client (now synchronous)
 export function getClient(): postgres.Sql {
   if (!globalPool) {
     initializePool();
@@ -103,5 +113,13 @@ export async function dbPing(): Promise<boolean> {
   }
 }
 
-// Export the default database instance
-export const db = getDb();
+// Synchronous getter that assumes database is already initialized
+export function getSyncDb(): PostgresJsDatabase {
+  if (!globalDb) {
+    throw new Error('Database not initialized. Call initializePool() first.');
+  }
+  return globalDb;
+}
+
+// Export the database instance - initializes synchronously on first use
+export const db: PostgresJsDatabase = getDb();

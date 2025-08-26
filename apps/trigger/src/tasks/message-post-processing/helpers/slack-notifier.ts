@@ -1,7 +1,7 @@
 import {
   and,
+  db,
   eq,
-  getDb,
   getSecretByName,
   isNull,
   messages,
@@ -9,6 +9,7 @@ import {
   slackIntegrations,
   slackMessageTracking,
 } from '@buster/database';
+import { SERVER_KEYS, SLACK_KEYS, getSecret } from '@buster/secrets';
 import { SlackMessageSource, convertMarkdownToSlack } from '@buster/slack';
 import { logger } from '@trigger.dev/sdk/v3';
 
@@ -76,8 +77,6 @@ export async function getExistingSlackMessageForChat(chatId: string): Promise<{
   integrationId?: string;
 } | null> {
   try {
-    const db = getDb();
-
     // Find messages from the same chat that have been sent to Slack
     const existingSlackMessages = await db
       .select({
@@ -150,7 +149,6 @@ export async function sendSlackNotification(
 ): Promise<SlackNotificationResult> {
   try {
     // Step 1: Check if organization has active Slack integration
-    const db = getDb();
     const [integration] = await db
       .select()
       .from(slackIntegrations)
@@ -202,7 +200,7 @@ export async function sendSlackNotification(
     }
 
     // Step 4: Format the Slack message
-    const slackMessage = formatSlackMessage(params);
+    const slackMessage = await formatSlackMessage(params);
 
     // Step 5: Send the message via Slack API
     const result = await sendSlackMessage(
@@ -211,8 +209,8 @@ export async function sendSlackNotification(
       slackMessage
     );
 
-    const busterChannelToken = process.env.BUSTER_ALERT_CHANNEL_TOKEN;
-    const busterChannelId = process.env.BUSTER_ALERT_CHANNEL_ID;
+    const busterChannelToken = await getSecret(SLACK_KEYS.BUSTER_ALERT_CHANNEL_TOKEN);
+    const busterChannelId = await getSecret(SLACK_KEYS.BUSTER_ALERT_CHANNEL_ID);
 
     //Step 6: Send Alert To Buster Channel
     if (busterChannelToken && busterChannelId) {
@@ -419,9 +417,10 @@ function formatSlackReplyMessage(params: SlackReplyNotificationParams): SlackMes
 /**
  * Format the Slack message based on the notification type
  */
-function formatSlackMessage(params: SlackNotificationParams): SlackMessage {
+async function formatSlackMessage(params: SlackNotificationParams): Promise<SlackMessage> {
   const userName = params.userName || 'Unknown User';
-  const chatUrl = `${process.env.BUSTER_URL}/app/chats/${params.chatId}`;
+  const busterUrl = await getSecret(SERVER_KEYS.BUSTER_URL);
+  const chatUrl = `${busterUrl}/app/chats/${params.chatId}`;
 
   // Case 1: Formatted message from workflow (highest priority)
   if (params.formattedMessage) {
@@ -608,8 +607,6 @@ export async function trackSlackNotification(params: {
   summaryMessage?: string;
   slackBlocks?: SlackBlock[];
 }): Promise<void> {
-  const db = getDb();
-
   try {
     await db.transaction(async (tx) => {
       // Insert into slack_message_tracking

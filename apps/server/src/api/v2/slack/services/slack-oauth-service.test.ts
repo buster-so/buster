@@ -25,6 +25,23 @@ vi.mock('@buster/database', () => ({
   deleteSecret: vi.fn(),
 }));
 
+// Mock secrets manager before importing
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn().mockImplementation(async (key: string) => {
+    const secrets: Record<string, string> = {
+      SLACK_CLIENT_ID: 'test-client-id',
+      SLACK_CLIENT_SECRET: 'test-client-secret',
+      SERVER_URL: 'https://test.com',
+    };
+    return secrets[key] || '';
+  }),
+  SERVER_KEYS: {
+    SLACK_CLIENT_ID: 'SLACK_CLIENT_ID',
+    SLACK_CLIENT_SECRET: 'SLACK_CLIENT_SECRET',
+    SERVER_URL: 'SERVER_URL',
+  },
+}));
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as slackHelpers from './slack-helpers';
 
@@ -37,12 +54,7 @@ vi.mock('@buster/slack', () => ({
   })),
 }));
 
-// Mock environment variables before importing
-vi.stubEnv('SLACK_CLIENT_ID', 'test-client-id');
-vi.stubEnv('SLACK_CLIENT_SECRET', 'test-client-secret');
-vi.stubEnv('SERVER_URL', 'https://test.com');
-
-// Import after mocking env vars
+// Import after mocking
 import { SlackOAuthService } from './slack-oauth-service';
 
 describe('SlackOAuthService', () => {

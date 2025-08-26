@@ -166,7 +166,7 @@ Generate a cohesive summary with title for the data team.`;
   ];
 
   const { object } = await generateObject({
-    model: Sonnet4,
+    model: await Sonnet4,
     schema: generateSummaryOutputSchema,
     messages: systemAndUserMessages,
     temperature: 0,

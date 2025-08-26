@@ -1,6 +1,7 @@
 use anyhow::Result;
 use serde_json::Value;
-use std::{collections::HashMap, env};
+use std::collections::HashMap;
+use secrets::get_secret_sync_or_default;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -46,7 +47,7 @@ pub fn get_configuration(agent_data: &ModeAgentData, data_source_syntax: Option<
 
     // 2. Define the model for this mode
 
-    let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
+    let model = if get_secret_sync_or_default("ENVIRONMENT", "development") == "local" {
         "o4-mini".to_string()
     } else {
         "o4-mini".to_string()

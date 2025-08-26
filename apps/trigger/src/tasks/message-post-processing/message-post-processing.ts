@@ -1,7 +1,8 @@
 import postProcessingWorkflow, {
   type PostProcessingWorkflowOutput,
 } from '@buster/ai/workflows/message-post-processing-workflow/message-post-processing-workflow';
-import { eq, getBraintrustMetadata, getDb, messages, slackIntegrations } from '@buster/database';
+import { db, eq, getBraintrustMetadata, messages, slackIntegrations } from '@buster/database';
+import { BRAINTRUST_KEYS, SERVER_KEYS, getSecret } from '@buster/secrets';
 import type {
   AssumptionClassification,
   AssumptionLabel,
@@ -10,7 +11,6 @@ import type {
 } from '@buster/server-shared/message';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { currentSpan, initLogger, wrapTraced } from 'braintrust';
-import { z } from 'zod/v4';
 import {
   buildWorkflowInput,
   fetchMessageWithContext,
@@ -100,14 +100,17 @@ export const messagePostProcessingTask: ReturnType<
   run: async (payload: TaskInput): Promise<TaskOutput> => {
     const startTime = Date.now();
 
-    if (!process.env.BRAINTRUST_KEY) {
-      throw new Error('BRAINTRUST_KEY is not set');
+    const braintrustApiKey = await getSecret(BRAINTRUST_KEYS.BRAINTRUST_API_KEY);
+    const environment = await getSecret(SERVER_KEYS.ENVIRONMENT);
+
+    if (!braintrustApiKey) {
+      throw new Error('BRAINTRUST_API_KEY is not set');
     }
 
     // Initialize Braintrust logger
     const braintrustLogger = initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
-      projectName: process.env.ENVIRONMENT || 'development',
+      apiKey: braintrustApiKey,
+      projectName: environment || 'development',
     });
 
     try {
@@ -141,7 +144,7 @@ export const messagePostProcessingTask: ReturnType<
         hasRawLlmMessages: !!messageContext.rawLlmMessages,
       });
 
-      // Step 3: Build workflow input
+      // Step 3: Build workflow inpu
       const workflowInput = buildWorkflowInput(
         messageContext,
         previousPostProcessingResults,
@@ -204,7 +207,6 @@ export const messagePostProcessingTask: ReturnType<
       const dbData = extractDbFields(validatedOutput, messageContext.userName);
 
       try {
-        const db = getDb();
         await db
           .update(messages)
           .set({
@@ -275,7 +277,6 @@ export const messagePostProcessingTask: ReturnType<
             });
 
             // Need to get integration details to get the token vault key
-            const db = getDb();
             const [integration] = await db
               .select({ tokenVaultKey: slackIntegrations.tokenVaultKey })
               .from(slackIntegrations)

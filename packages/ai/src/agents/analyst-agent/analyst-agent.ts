@@ -103,9 +103,9 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     };
 
     return wrapTraced(
-      () =>
+      async () =>
         streamText({
-          model: Sonnet4,
+          model: await Sonnet4,
           tools: {
             [CREATE_METRICS_TOOL_NAME]: createMetrics,
             [MODIFY_METRICS_TOOL_NAME]: modifyMetrics,

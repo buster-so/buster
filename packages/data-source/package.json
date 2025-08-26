@@ -13,7 +13,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
     "build:commonjs": "tsc --module commonjs --moduleResolution node",
@@ -32,7 +31,7 @@
     "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "^3.864.0",
     "@buster/database": "workspace:*",
-    "@buster/env-utils": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",

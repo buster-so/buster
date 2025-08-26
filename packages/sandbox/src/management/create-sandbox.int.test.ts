@@ -1,8 +1,18 @@
+import { SANDBOX_KEYS, getSecret } from '@buster/secrets';
 import { describe, expect, it } from 'vitest';
 import { createSandbox } from './create-sandbox';
 
 describe('createSandbox integration tests', () => {
-  const hasApiKey = !!process.env.DAYTONA_API_KEY;
+  let hasApiKey: boolean;
+
+  beforeAll(async () => {
+    try {
+      await getSecret(SANDBOX_KEYS.DAYTONA_API_KEY);
+      hasApiKey = true;
+    } catch {
+      hasApiKey = false;
+    }
+  });
 
   it.skipIf(!hasApiKey)('should create a sandbox with default language', async () => {
     const sandbox = await createSandbox();

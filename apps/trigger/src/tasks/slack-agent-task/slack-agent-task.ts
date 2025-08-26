@@ -3,9 +3,11 @@ import {
   checkForDuplicateMessages,
   db,
   eq,
+  getSecret,
   messages,
   updateMessage,
 } from '@buster/database';
+import { SERVER_KEYS } from '@buster/secrets';
 import {
   SlackMessagingService,
   addReaction,
@@ -376,8 +378,9 @@ export const slackAgentTask: ReturnType<
       }
 
       // Step 6: Initial fast polling to check if task starts quickly
+
       const messagingService = new SlackMessagingService();
-      const busterUrl = process.env.BUSTER_URL || 'https://platform.buster.so';
+      const busterUrl = await getSecret(SERVER_KEYS.BUSTER_URL);
       let progressMessageTs: string | undefined;
       let queuedMessageTs: string | undefined;
       let hasStartedRunning = false;

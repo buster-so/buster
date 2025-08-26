@@ -13,7 +13,6 @@
     { "path": "../../packages/database" },
     { "path": "../../packages/server-shared" },
     { "path": "../../packages/slack" },
-    { "path": "../../packages/test-utils" },
     { "path": "../../packages/vitest-config" }
   ]
 }

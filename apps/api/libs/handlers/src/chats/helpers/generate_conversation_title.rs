@@ -3,6 +3,7 @@ use agents::LiteLlmMessage;
 use litellm::{ChatCompletionRequest, LiteLLMClient, Metadata, LiteLlmMessage as LiteLLMAgentMessage};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use secrets::get_secret_sync_or_default;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -69,7 +70,7 @@ pub async fn generate_conversation_title(
     // Set up LiteLLM client
     let llm_client = LiteLLMClient::new(None, None);
 
-    let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
+    let model = if get_secret_sync_or_default("ENVIRONMENT", "development") == "local" {
         "gpt-4.1-nano".to_string()
     } else {
         "gemini-2.0-flash-001".to_string()

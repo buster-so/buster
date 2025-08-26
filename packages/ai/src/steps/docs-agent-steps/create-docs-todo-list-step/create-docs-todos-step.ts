@@ -60,7 +60,7 @@ async function generateDocsTodosWithLLM(
     const tracedTodosGeneration = wrapTraced(
       async () => {
         const { object } = await generateObject({
-          model: Sonnet4,
+          model: await Sonnet4,
           schema: llmOutputSchema,
           messages: messagesWithContext,
           temperature: 0,

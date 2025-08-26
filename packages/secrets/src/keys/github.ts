@@ -1,0 +1,14 @@
+/**
+ * Secret keys used by the @buster/github package
+ */
+
+export const GITHUB_KEYS = {
+  GITHUB_APP_ID: 'GITHUB_APP_ID',
+  GITHUB_APP_NAME: 'GITHUB_APP_NAME',
+  GITHUB_APP_PRIVATE_KEY_BASE64: 'GITHUB_APP_PRIVATE_KEY_BASE64',
+  GITHUB_APP_PRIVATE_KEY_BASE: 'GITHUB_APP_PRIVATE_KEY_BASE',
+  GITHUB_WEBHOOK_SECRET: 'GITHUB_WEBHOOK_SECRET',
+  GITHUB_TOKEN: 'GITHUB_TOKEN',
+} as const;
+
+export type GitHubKeys = (typeof GITHUB_KEYS)[keyof typeof GITHUB_KEYS];

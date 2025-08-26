@@ -40,7 +40,7 @@ export async function researchCompany(
     throw new CompanyResearchError(`Invalid URL format: ${url}`, 'INVALID_URL');
   }
 
-  const firecrawl = new FirecrawlService();
+  const firecrawl = await FirecrawlService.create();
 
   try {
     // Create a focused research query for the company

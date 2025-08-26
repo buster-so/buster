@@ -23,6 +23,11 @@ vi.mock('./helpers', () => ({
 }));
 
 vi.mock('@buster/database', () => ({
+  db: {
+    update: vi.fn(),
+    set: vi.fn(),
+    where: vi.fn(),
+  },
   getDb: vi.fn(),
   eq: vi.fn((a, b) => ({ type: 'eq', a, b })),
   messages: { id: 'messages.id', postProcessingMessage: 'messages.postProcessingMessage' },
@@ -72,29 +77,46 @@ vi.mock('braintrust', () => ({
   wrapTraced: vi.fn((fn) => fn),
 }));
 
+// Mock secrets module
+vi.mock('@buster/secrets', () => ({
+  BRAINTRUST_KEYS: {
+    BRAINTRUST_API_KEY: 'BRAINTRUST_API_KEY',
+  },
+  SERVER_KEYS: {
+    ENVIRONMENT: 'ENVIRONMENT',
+    BUSTER_URL: 'BUSTER_URL',
+  },
+  SLACK_KEYS: {
+    BUSTER_ALERT_CHANNEL_TOKEN: 'BUSTER_ALERT_CHANNEL_TOKEN',
+    BUSTER_ALERT_CHANNEL_ID: 'BUSTER_ALERT_CHANNEL_ID',
+  },
+  getSecret: vi.fn((key) => {
+    const secrets: Record<string, string> = {
+      BRAINTRUST_API_KEY: 'test-braintrust-api-key',
+      ENVIRONMENT: 'test',
+      BUSTER_URL: 'https://platform.buster.so',
+      BUSTER_ALERT_CHANNEL_TOKEN: 'xoxb-test-token',
+      BUSTER_ALERT_CHANNEL_ID: 'C123456',
+    };
+    return Promise.resolve(secrets[key]);
+  }),
+}));
+
 describe('messagePostProcessingTask', () => {
   let mockDb: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock BRAINTRUST_KEY for unit tests
-    vi.stubEnv('BRAINTRUST_KEY', 'test-braintrust-key');
-    mockDb = {
-      update: vi.fn().mockReturnThis(),
-      set: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-    };
 
-    // Default mock chain behavior
+    // Get the mocked db object from the module mock
+    mockDb = vi.mocked(database.db);
+
+    // Set up the mock chain to return itself for most methods
+    mockDb.update.mockReturnValue(mockDb);
+    mockDb.set.mockReturnValue(mockDb);
     mockDb.where.mockReturnValue(mockDb);
-    mockDb.limit.mockResolvedValue([{ tokenVaultKey: 'vault-key-123' }]);
-    mockDb.orderBy.mockResolvedValue([]);
 
-    vi.mocked(database.getDb).mockReturnValue(mockDb);
+    // No need to mock getDb since implementation imports and uses the exported `db` instance directly
   });
 
   it('should process message successfully for initial message', async () => {

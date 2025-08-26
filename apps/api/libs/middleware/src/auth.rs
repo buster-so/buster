@@ -9,17 +9,37 @@ use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl};
 use diesel_async::RunQueryDsl;
 use futures::try_join;
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
-use lazy_static::lazy_static;
+use secrets::{get_secret_sync, get_secret_sync_or_default};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, env};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::types::{AuthenticatedUser, OrganizationMembership, TeamMembership};
+use std::sync::OnceLock;
 
-lazy_static! {
-    static ref JWT_SECRET: String = env::var("JWT_SECRET").expect("JWT_SECRET is not set");
-    static ref WEBHOOK_TOKEN: String =
-        env::var("BUSTER_WH_TOKEN").expect("BUSTER_WH_TOKEN is not set");
+static JWT_SECRET: OnceLock<String> = OnceLock::new();
+static WEBHOOK_TOKEN: OnceLock<String> = OnceLock::new();
+
+fn get_jwt_secret() -> &'static str {
+    JWT_SECRET.get_or_init(|| {
+        // Try to get from secrets cache (populated by init_secrets)
+        get_secret_sync("JWT_SECRET")
+            .unwrap_or_else(|e| {
+                tracing::error!("Failed to get JWT_SECRET from secrets cache: {}", e);
+                panic!("JWT_SECRET must be loaded via init_secrets() at startup");
+            })
+    })
+}
+
+fn get_webhook_token() -> &'static str {
+    WEBHOOK_TOKEN.get_or_init(|| {
+        // Try to get from secrets cache (populated by init_secrets)
+        get_secret_sync("BUSTER_WH_TOKEN")
+            .unwrap_or_else(|e| {
+                tracing::warn!("Failed to get BUSTER_WH_TOKEN from secrets cache: {}. Using empty string.", e);
+                String::new()
+            })
+    })
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -62,7 +82,7 @@ pub async fn auth(mut req: Request, next: Next) -> Result<Response, StatusCode> 
     });
 
     if let Some(token) = bearer_token {
-        if token == *WEBHOOK_TOKEN {
+        if token == get_webhook_token() {
             return Ok(next.run(req).await);
         }
     }
@@ -94,7 +114,7 @@ pub async fn auth(mut req: Request, next: Next) -> Result<Response, StatusCode> 
     };
 
     // --- Payment Required Check START ---
-    if env::var("ENVIRONMENT").unwrap_or_default() == "production" {
+    if get_secret_sync_or_default("ENVIRONMENT", "development") == "production" {
         if let Some(org_membership) = user.organizations.get(0) {
             let org_id = org_membership.id;
             let pg_pool = get_pg_pool();
@@ -153,7 +173,7 @@ async fn authorize_current_user(token: &str) -> Result<Option<AuthenticatedUser>
 
     let token_data = match decode::<JwtClaims>(
         token,
-        &DecodingKey::from_secret(JWT_SECRET.as_ref()),
+        &DecodingKey::from_secret(get_jwt_secret().as_ref()),
         &validation,
     ) {
         Ok(jwt_claims) => jwt_claims.claims,

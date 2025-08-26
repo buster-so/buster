@@ -1,7 +1,18 @@
 import { InvalidToolInputError } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
-import type { RepairContext } from '../types';
-import { canHandleInvalidInput, repairInvalidInput } from './structured-output-strategy';
+
+// Mock the LLM module first to prevent initialization
+vi.mock('../../../llm', () => ({
+  Sonnet4: Promise.resolve('mock-model'),
+  Haiku35: Promise.resolve('mock-haiku-model'),
+  getSonnet4: vi.fn().mockResolvedValue('mock-model'),
+  getHaiku35: vi.fn().mockResolvedValue('mock-haiku-model'),
+}));
+
+// Mock braintrust before imports
+vi.mock('braintrust', () => ({
+  wrapTraced: (fn: any) => fn,
+}));
 
 // Mock the dependencies
 vi.mock('ai', async () => {
@@ -12,13 +23,8 @@ vi.mock('ai', async () => {
   };
 });
 
-vi.mock('braintrust', () => ({
-  wrapTraced: (fn: any) => fn,
-}));
-
-vi.mock('../../../llm', () => ({
-  Sonnet4: 'mock-model',
-}));
+import type { RepairContext } from '../types';
+import { canHandleInvalidInput, repairInvalidInput } from './structured-output-strategy';
 
 describe('structured-output-strategy', () => {
   describe('canHandleInvalidInput', () => {

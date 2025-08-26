@@ -1,0 +1,36 @@
+/**
+ * Secret keys used by the @buster-app/server application
+ */
+
+export const SERVER_KEYS = {
+  // Database
+  DATABASE_URL: 'DATABASE_URL',
+
+  // Supabase
+  SUPABASE_URL: 'SUPABASE_URL',
+  SUPABASE_SERVICE_ROLE_KEY: 'SUPABASE_SERVICE_ROLE_KEY',
+
+  // Electric SQL
+  ELECTRIC_PROXY_URL: 'ELECTRIC_PROXY_URL',
+  ELECTRIC_SOURCE_ID: 'ELECTRIC_SOURCE_ID',
+  ELECTRIC_SECRET: 'ELECTRIC_SECRET',
+
+  // Trigger.dev
+  TRIGGER_SECRET_KEY: 'TRIGGER_SECRET_KEY',
+
+  // Slack Integration
+  SLACK_CLIENT_ID: 'SLACK_CLIENT_ID',
+  SLACK_CLIENT_SECRET: 'SLACK_CLIENT_SECRET',
+  SLACK_SIGNING_SECRET: 'SLACK_SIGNING_SECRET',
+  SLACK_APP_SUPPORT_URL: 'SLACK_APP_SUPPORT_URL',
+
+  // Server Configuration
+  SERVER_PORT: 'SERVER_PORT',
+  SERVER_URL: 'SERVER_URL',
+  BUSTER_URL: 'BUSTER_URL',
+
+  // Environment
+  ENVIRONMENT: 'ENVIRONMENT',
+} as const;
+
+export type ServerKeys = (typeof SERVER_KEYS)[keyof typeof SERVER_KEYS];

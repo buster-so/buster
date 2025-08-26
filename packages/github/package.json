@@ -15,7 +15,6 @@
     }
   },
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
     "typecheck": "tsc --noEmit",
@@ -30,9 +29,9 @@
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@buster/env-utils": "workspace:*",
     "@buster/database": "workspace:*",
     "@buster/server-shared": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "octokit": "^5.0.3",
     "zod": "^3.23.8"
   },

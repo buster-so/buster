@@ -8,13 +8,25 @@ import { slackHandler } from './handler';
 
 const app = new Hono()
   // Public endpoints (no auth required for OAuth flow)
-  .post('/auth/init', requireAuth, (c) => slackHandler.initiateOAuth(c))
-  .get('/auth/callback', (c) => slackHandler.handleOAuthCallback(c))
+  .post('/auth/init', requireAuth, async (c) => {
+    return await slackHandler.initiateOAuth(c);
+  })
+  .get('/auth/callback', async (c) => {
+    return await slackHandler.handleOAuthCallback(c);
+  })
   // Protected endpoints
-  .get('/integration', requireAuth, (c) => slackHandler.getIntegration(c))
-  .put('/integration', requireAuth, (c) => slackHandler.updateIntegration(c))
-  .get('/channels', requireAuth, (c) => slackHandler.getChannels(c))
-  .delete('/integration', requireAuth, (c) => slackHandler.removeIntegration(c))
+  .get('/integration', requireAuth, async (c) => {
+    return await slackHandler.getIntegration(c);
+  })
+  .put('/integration', requireAuth, async (c) => {
+    return await slackHandler.updateIntegration(c);
+  })
+  .get('/channels', requireAuth, async (c) => {
+    return await slackHandler.getChannels(c);
+  })
+  .delete('/integration', requireAuth, async (c) => {
+    return await slackHandler.removeIntegration(c);
+  })
   // Events endpoint (no auth required for Slack webhooks)
   .post('/events', slackWebhookValidator(), handleSlackEventsEndpoint)
   // Error handling

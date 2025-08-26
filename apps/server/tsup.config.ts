@@ -18,7 +18,6 @@ export default defineConfig({
     '@buster/database',
     '@buster/server-shared',
     '@buster/slack',
-    '@buster/test-utils',
     '@buster/typescript-config',
     '@buster/vitest-config',
   ],

@@ -1,8 +1,8 @@
 import {
   type User,
   and,
+  db,
   eq,
-  getDb,
   isNull,
   organizations,
   users,
@@ -58,7 +58,6 @@ export async function checkUserInOrganization(
   organizationId: string
 ): Promise<UserOrganizationInfo | null> {
   const input = CheckUserInOrganizationSchema.parse({ userId, organizationId });
-  const db = getDb();
 
   const result = await db
     .select({
@@ -91,7 +90,6 @@ export async function checkUserInOrganization(
  */
 export async function getUserOrganizations(userId: string): Promise<UserOrganizationInfo[]> {
   const input = GetUserOrganizationsSchema.parse({ userId });
-  const db = getDb();
 
   const results = await db
     .select({
@@ -119,7 +117,6 @@ export async function checkEmailDomainForOrganization(
   organizationId: string
 ): Promise<boolean> {
   const input = CheckEmailDomainSchema.parse({ email, organizationId });
-  const db = getDb();
 
   // Get organization domains
   const orgResult = await db
@@ -161,8 +158,6 @@ export async function checkEmailDomainForOrganization(
 export async function getOrganizationWithDefaults(
   organizationId: string
 ): Promise<OrganizationWithDefaults | null> {
-  const db = getDb();
-
   const result = await db
     .select()
     .from(organizations)
@@ -191,7 +186,6 @@ export async function createUserInOrganization(
   createdById: string
 ): Promise<{ user: User; membership: UserOrganizationInfo }> {
   const input = CreateUserInOrganizationSchema.parse({ email, name, organizationId, createdById });
-  const db = getDb();
 
   // Get organization defaults
   const org = await getOrganizationWithDefaults(input.organizationId);

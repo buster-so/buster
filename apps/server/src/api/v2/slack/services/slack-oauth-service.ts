@@ -1,3 +1,4 @@
+import { SERVER_KEYS, getSecret } from '@buster/secrets';
 import { SlackAuthService } from '@buster/slack';
 import { z } from 'zod';
 import { SLACK_OAUTH_SCOPES } from '../constants';
@@ -37,13 +38,33 @@ const OAuthMetadataSchema = z.object({
 export type OAuthMetadata = z.infer<typeof OAuthMetadataSchema>;
 
 export class SlackOAuthService {
-  private slackAuth: SlackAuthService;
-  private env: z.infer<typeof SlackEnvSchema>;
+  private slackAuth: SlackAuthService | null = null;
+  private env: z.infer<typeof SlackEnvSchema> | null = null;
+  private initPromise: Promise<void> | null = null;
 
-  constructor() {
+  private async initialize(): Promise<void> {
+    if (this.slackAuth) return; // Already initialized
+    if (this.initPromise) return this.initPromise; // Initialization in progress
+
+    this.initPromise = this.doInitialize();
+    await this.initPromise;
+  }
+
+  private async doInitialize(): Promise<void> {
     try {
+      // Get secrets from secrets manager
+      const [clientId, clientSecret, serverUrl] = await Promise.all([
+        getSecret(SERVER_KEYS.SLACK_CLIENT_ID),
+        getSecret(SERVER_KEYS.SLACK_CLIENT_SECRET),
+        getSecret(SERVER_KEYS.SERVER_URL),
+      ]);
+
       // Validate environment variables
-      this.env = SlackEnvSchema.parse(process.env);
+      this.env = SlackEnvSchema.parse({
+        SLACK_CLIENT_ID: clientId,
+        SLACK_CLIENT_SECRET: clientSecret,
+        SERVER_URL: serverUrl,
+      });
 
       // Initialize Slack auth service with storage implementations
       this.slackAuth = new SlackAuthService(
@@ -62,11 +83,6 @@ export class SlackOAuthService {
         stack: error instanceof Error ? error.stack : undefined,
         errorType: error instanceof Error ? error.constructor.name : typeof error,
         timestamp: new Date().toISOString(),
-        environment: {
-          hasClientId: !!process.env.SLACK_CLIENT_ID,
-          hasClientSecret: !!process.env.SLACK_CLIENT_SECRET,
-          hasServerUrl: !!process.env.SERVER_URL,
-        },
       });
       throw new Error(
         `Failed to initialize Slack OAuth service: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -91,6 +107,9 @@ export class SlackOAuthService {
     metadata?: OAuthMetadata;
   }): Promise<{ authUrl: string; state: string }> {
     try {
+      // Ensure service is initialized
+      await this.initialize();
+
       // Check for existing integration - allow re-installation if scopes don't match
       const existing = await slackHelpers.getActiveIntegration(params.organizationId);
       if (existing) {
@@ -108,6 +127,9 @@ export class SlackOAuthService {
       };
 
       // Generate OAuth URL and state
+      if (!this.slackAuth) {
+        throw new Error('Slack auth service not initialized');
+      }
       const { authUrl, state } = await this.slackAuth.generateAuthUrl(metadata);
 
       // Create pending integration
@@ -146,6 +168,9 @@ export class SlackOAuthService {
     error?: string;
   }> {
     try {
+      // Ensure service is initialized
+      await this.initialize();
+
       // Validate state and get pending integration
       const integration = await slackHelpers.getPendingIntegrationByState(params.state);
       if (!integration) {
@@ -158,6 +183,9 @@ export class SlackOAuthService {
 
       // Exchange code for token - use integration.id as tokenKey
       const tokenKey = `slack-token-${integration.id}`;
+      if (!this.slackAuth) {
+        throw new Error('Slack auth service not initialized');
+      }
       const tokenResponse = await this.slackAuth.handleCallback(
         params.code,
         params.state,

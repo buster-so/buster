@@ -138,9 +138,9 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
     };
 
     return wrapTraced(
-      () =>
+      async () =>
         streamText({
-          model: Sonnet4,
+          model: await Sonnet4,
           tools: {
             [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
             [EXECUTE_SQL_TOOL_NAME]: executeSqlTool,

@@ -1,6 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
+// Mock @buster/secrets
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn().mockImplementation(async (key: string) => {
+    // Return process.env values to allow tests to control them
+    return process.env[key];
+  }),
+  SHARED_KEYS: {
+    NODE_ENV: 'NODE_ENV',
+    ENVIRONMENT: 'ENVIRONMENT',
+    DATABASE_URL: 'DATABASE_URL',
+    SUPABASE_URL: 'SUPABASE_URL',
+    SUPABASE_SERVICE_ROLE_KEY: 'SUPABASE_SERVICE_ROLE_KEY',
+    SUPABASE_ANON_KEY: 'SUPABASE_ANON_KEY',
+    LOG_LEVEL: 'LOG_LEVEL',
+    CI: 'CI',
+  },
+}));
+
 describe('logger middleware', () => {
   let originalEnv: NodeJS.ProcessEnv;
   let originalConsole: {

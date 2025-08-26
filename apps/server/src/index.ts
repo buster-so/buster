@@ -1,10 +1,6 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-// Load environment variables from root .env file
-import { loadRootEnv } from '@buster/env-utils';
-loadRootEnv();
-
 // Import custom middleware
 import { corsMiddleware } from './middleware/cors';
 import { loggerMiddleware } from './middleware/logger';
@@ -48,7 +44,7 @@ app.onError((err, c) => {
   return c.json(
     {
       error: 'Internal Server Error 😕',
-      message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
+      message: 'Something went wrong',
     },
     500
   );
@@ -59,8 +55,8 @@ app.notFound((c) => {
   return c.json({ error: 'Not Found', message: 'The requested resource was not found' }, 404);
 });
 
-// Get port from environment variable or defaults to 3002 for local development
-const port = Number.parseInt(process.env.SERVER_PORT || '3002', 10);
+// Get port from environment or default to 3002
+const port = process.env.SERVER_PORT ? Number.parseInt(process.env.SERVER_PORT, 10) : 3002;
 
 // Export for Bun
 export default {

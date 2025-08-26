@@ -1,7 +1,9 @@
-export const getElectricShapeUrl = (requestUrl: string) => {
+import { ELECTRIC_KEYS, getSecret } from '@buster/secrets';
+
+export const getElectricShapeUrl = async (requestUrl: string) => {
   const url = new URL(requestUrl);
 
-  const baseUrl = process.env.ELECTRIC_PROXY_URL;
+  const baseUrl = await getSecret(ELECTRIC_KEYS.ELECTRIC_PROXY_URL);
 
   if (!baseUrl) {
     throw new Error('ELECTRIC_PROXY_URL is not set');
@@ -12,8 +14,10 @@ export const getElectricShapeUrl = (requestUrl: string) => {
   baseUrlObj.pathname = '/v1/shape';
   const originUrl = new URL(baseUrlObj.toString());
 
-  if (process.env.ELECTRIC_SOURCE_ID) {
-    originUrl.searchParams.set('source_id', process.env.ELECTRIC_SOURCE_ID);
+  const sourceId = await getSecret(ELECTRIC_KEYS.ELECTRIC_SOURCE_ID);
+
+  if (sourceId) {
+    originUrl.searchParams.set('source_id', sourceId);
   }
 
   // Copy over the relevant query params that the Electric client adds

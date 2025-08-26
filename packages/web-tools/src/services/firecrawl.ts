@@ -1,3 +1,4 @@
+import { WEB_TOOLS_KEYS, getSecret } from '@buster/secrets';
 import FirecrawlApp from '@mendable/firecrawl-js';
 import { CompanyResearchError } from '../deep-research/types';
 
@@ -73,20 +74,37 @@ export interface WebSearchResponse {
 export class FirecrawlService {
   private app: FirecrawlApp;
 
-  constructor(config?: FirecrawlConfig) {
-    const apiKey = config?.apiKey || process.env.FIRECRAWL_API_KEY;
+  constructor(apiKey: string, config?: Omit<FirecrawlConfig, 'apiKey'>) {
+    this.app = new FirecrawlApp({
+      apiKey,
+      ...(config?.apiUrl && { apiUrl: config.apiUrl }),
+    });
+  }
 
-    if (!apiKey) {
+  /**
+   * Create a FirecrawlService instance with async secret loading
+   */
+  static async create(config?: FirecrawlConfig): Promise<FirecrawlService> {
+    const apiKey =
+      config?.apiKey ||
+      (async () => {
+        try {
+          return await getSecret(WEB_TOOLS_KEYS.FIRECRAWL_API_KEY);
+        } catch {
+          return undefined;
+        }
+      })();
+
+    const resolvedApiKey = typeof apiKey === 'string' ? apiKey : await apiKey;
+
+    if (!resolvedApiKey) {
       throw new CompanyResearchError(
         'Firecrawl API key is required. Set FIRECRAWL_API_KEY environment variable or pass it in config.',
         'API_ERROR'
       );
     }
 
-    this.app = new FirecrawlApp({
-      apiKey,
-      ...(config?.apiUrl && { apiUrl: config.apiUrl }),
-    });
+    return new FirecrawlService(resolvedApiKey, config);
   }
 
   /**

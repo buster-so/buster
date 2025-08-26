@@ -57,7 +57,7 @@ async function generateAnalysisTypeWithLLM(messages: ModelMessage[]): Promise<{
     const tracedAnalysisType = wrapTraced(
       async () => {
         const { object } = await generateObject({
-          model: GPT5Mini,
+          model: await GPT5Mini,
           schema: llmOutputSchema,
           messages: llmMessages,
           temperature: 1,

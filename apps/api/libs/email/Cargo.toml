@@ -19,7 +19,10 @@ resend-rs = { workspace = true }
 lazy_static = { workspace = true }
 html-escape = { workspace = true }
 # Add other workspace dependencies as needed (e.g., related to email sending like reqwest or specific email crates)
-# reqwest = { workspace = true, features = ["json"] } 
+# reqwest = { workspace = true, features = ["json"] }
+
+# Add secrets dependency
+secrets = { path = "../secrets" } 
 
 # Development dependencies
 [dev-dependencies]

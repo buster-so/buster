@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-const app = new Hono().get('/:id', (c) => {
+const app = new Hono().get('/:id', async (c) => {
   const userId = c.req.param('id');
 
   // Stub data for individual user

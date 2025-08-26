@@ -87,7 +87,7 @@ async function generateTodosWithLLM(
         await onStreamStart();
 
         const { object, textStream } = streamObject({
-          model: Sonnet4,
+          model: await Sonnet4,
           schema: llmOutputSchema,
           messages: todosMessages,
           temperature: 0,

@@ -1,3 +1,4 @@
+import { SLACK_KEYS, getSecret } from '@buster/secrets';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   MessageTemplates,
@@ -8,8 +9,7 @@ import {
 import { SlackMessagingService } from './messaging';
 
 // Only run if environment is configured
-const runIntegrationTests =
-  process.env.SLACK_BOT_TOKEN !== undefined && process.env.SLACK_CHANNEL_ID !== undefined;
+let runIntegrationTests: boolean;
 
 const describeIntegration = runIntegrationTests ? describe : describe.skip;
 
@@ -19,9 +19,17 @@ describeIntegration('SlackMessagingService Integration', () => {
   let channelId: string;
   let testMessageTs: string | undefined;
 
-  beforeAll(() => {
-    botToken = process.env.SLACK_BOT_TOKEN!;
-    channelId = process.env.SLACK_CHANNEL_ID!;
+  beforeAll(async () => {
+    try {
+      await getSecret(SLACK_KEYS.SLACK_BOT_TOKEN);
+      await getSecret(SLACK_KEYS.SLACK_CHANNEL_ID);
+      runIntegrationTests = true;
+    } catch {
+      runIntegrationTests = false;
+    }
+
+    botToken = await getSecret(SLACK_KEYS.SLACK_BOT_TOKEN);
+    channelId = await getSecret(SLACK_KEYS.SLACK_CHANNEL_ID);
     messagingService = new SlackMessagingService();
   });
 
@@ -204,7 +212,14 @@ describeIntegration('SlackMessagingService Integration', () => {
 
     it('should delete a message', async () => {
       // Skip if configured to avoid destructive tests
-      if (process.env.SLACK_SKIP_DELETE_TESTS === 'true') {
+      let skipDeleteTests: string | undefined;
+      try {
+        skipDeleteTests = await getSecret(SLACK_KEYS.SLACK_SKIP_DELETE_TESTS);
+      } catch {
+        skipDeleteTests = undefined;
+      }
+
+      if (skipDeleteTests === 'true') {
         return;
       }
 

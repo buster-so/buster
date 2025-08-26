@@ -1,3 +1,4 @@
+import { WEB_TOOLS_KEYS, getSecret } from '@buster/secrets';
 import { FirecrawlService, type WebSearchOptions, type WebSearchResult } from '@buster/web-tools';
 import { wrapTraced } from 'braintrust';
 import type { WebSearchToolInput, WebSearchToolOutput } from './web-search-tool';
@@ -6,7 +7,8 @@ export function createWebSearchToolExecute() {
   return wrapTraced(
     async (input: WebSearchToolInput): Promise<WebSearchToolOutput> => {
       try {
-        const firecrawlService = new FirecrawlService();
+        const apiKey = await getSecret(WEB_TOOLS_KEYS.FIRECRAWL_API_KEY);
+        const firecrawlService = new FirecrawlService(apiKey);
 
         const searchOptions: WebSearchOptions = {
           limit: input.limit || 5,

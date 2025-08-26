@@ -50,6 +50,7 @@ middleware = { path = "../libs/middleware" }
 sharing = { path = "../libs/sharing" }
 search = { path = "../libs/search" }
 stored_values = { path = "../libs/stored_values" }
+secrets = { path = "../libs/secrets" }
 
 # Workspace Libraries
 dataset_security = { path = "../libs/dataset_security" }

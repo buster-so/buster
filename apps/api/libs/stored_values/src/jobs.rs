@@ -167,7 +167,7 @@ pub async fn sync_distinct_values_chunk(
 
     // Instantiate the LiteLLM Client
     let litellm_client = LiteLLMClient::new(
-        std::env::var("OPENAI_API_KEY").ok(),
+        secrets::get_secret("OPENAI_API_KEY").await.ok(),
         Some("https://api.openai.com/v1/".to_string()),
     );
 

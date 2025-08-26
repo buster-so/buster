@@ -3,89 +3,116 @@
  * Optimized for serverless environments (Lambda, Trigger.dev)
  */
 
-// Check if we're in a test environment
-const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
+import { SHARED_KEYS, getSecret } from '@buster/secrets';
 
-export const TIMEOUT_CONFIG = {
-  // Connection timeouts
-  connection: {
-    acquisition: isTestEnvironment ? 5000 : 15000, // 5s for tests, 15s for production
-    health: isTestEnvironment ? 1000 : 3000, // 1s for tests, 3s for production
-    total: isTestEnvironment ? 10000 : 30000, // 10s for tests, 30s for production
-  },
+// Helper to safely get optional secrets
+async function getOptionalSecret(key: string): Promise<string | undefined> {
+  try {
+    return await getSecret(key);
+  } catch {
+    return undefined;
+  }
+}
 
-  // Query execution timeouts
-  query: {
-    validation: isTestEnvironment ? 5000 : 120000, // 5s for tests, 2 minutes for production
-    standard: isTestEnvironment ? 5000 : 120000, // 5s for tests, 2 minutes for production
-    extended: isTestEnvironment ? 10000 : 180000, // 10s for tests, 3 minutes for production
-    default: isTestEnvironment ? 5000 : 120000, // 5s for tests, 2 minutes for production
-  },
+// Function to determine if we're in a test environment
+async function isTestEnvironment(): Promise<boolean> {
+  const nodeEnv = await getOptionalSecret(SHARED_KEYS.NODE_ENV);
+  const vitest = await getOptionalSecret('VITEST');
+  return nodeEnv === 'test' || vitest === 'true';
+}
 
-  // Retry configuration
-  retry: {
-    maxAttempts: isTestEnvironment ? 2 : 3, // Fewer retries in tests
-    delays: isTestEnvironment ? [500, 1000] : [1000, 3000, 6000], // Shorter delays in tests
-    timeout: {
-      multiplier: 1.5, // Multiply timeout by this on each retry
-      max: isTestEnvironment ? 15000 : 180000, // 15s for tests, 3 minutes for production
+// Initialize timeout configuration
+async function initializeTimeoutConfig() {
+  const isTest = await isTestEnvironment();
+
+  return {
+    // Connection timeouts
+    connection: {
+      acquisition: isTest ? 5000 : 15000, // 5s for tests, 15s for production
+      health: isTest ? 1000 : 3000, // 1s for tests, 3s for production
+      total: isTest ? 10000 : 30000, // 10s for tests, 30s for production
     },
-  },
 
-  // Serverless-specific
-  serverless: {
-    maxTotalTime: isTestEnvironment ? 20000 : 150000, // 20s for tests, 2.5 minutes for production
-    connectionReuse: isTestEnvironment ? 60000 : 300000, // 1 minute for tests, 5 minutes for production
-  },
-} as const;
+    // Query execution timeouts
+    query: {
+      validation: isTest ? 5000 : 120000, // 5s for tests, 2 minutes for production
+      standard: isTest ? 5000 : 120000, // 5s for tests, 2 minutes for production
+      extended: isTest ? 10000 : 180000, // 10s for tests, 3 minutes for production
+      default: isTest ? 5000 : 120000, // 5s for tests, 2 minutes for production
+    },
+
+    // Retry configuration
+    retry: {
+      maxAttempts: isTest ? 2 : 3, // Fewer retries in tests
+      delays: isTest ? [500, 1000] : [1000, 3000, 6000], // Shorter delays in tests
+      timeout: {
+        multiplier: 1.5, // Multiply timeout by this on each retry
+        max: isTest ? 15000 : 180000, // 15s for tests, 3 minutes for production
+      },
+    },
+
+    // Serverless-specific
+    serverless: {
+      maxTotalTime: isTest ? 20000 : 150000, // 20s for tests, 2.5 minutes for production
+      connectionReuse: isTest ? 60000 : 300000, // 1 minute for tests, 5 minutes for production
+    },
+  } as const;
+}
+
+// Export the timeout configuration as a promise
+export const TIMEOUT_CONFIG = initializeTimeoutConfig();
 
 /**
  * Get timeout for a specific operation type
  */
-export function getOperationTimeout(
+export async function getOperationTimeout(
   operationType: 'validation' | 'standard' | 'extended' | 'connection',
   isServerless = false
-): number {
+): Promise<number> {
+  const config = await TIMEOUT_CONFIG;
+
   if (isServerless && operationType !== 'connection') {
     // In serverless, cap all query timeouts to ensure completion
     return Math.min(
-      TIMEOUT_CONFIG.query[operationType] || TIMEOUT_CONFIG.query.default,
-      TIMEOUT_CONFIG.serverless.maxTotalTime
+      config.query[operationType] || config.query.default,
+      config.serverless.maxTotalTime
     );
   }
 
   switch (operationType) {
     case 'connection':
-      return TIMEOUT_CONFIG.connection.acquisition;
+      return config.connection.acquisition;
     case 'validation':
-      return TIMEOUT_CONFIG.query.validation;
+      return config.query.validation;
     case 'standard':
-      return TIMEOUT_CONFIG.query.standard;
+      return config.query.standard;
     case 'extended':
-      return TIMEOUT_CONFIG.query.extended;
+      return config.query.extended;
     default:
-      return TIMEOUT_CONFIG.query.default;
+      return config.query.default;
   }
 }
 
 /**
  * Calculate timeout for retry attempt
  */
-export function getRetryTimeout(attemptNumber: number, baseTimeout: number): number {
-  const multiplier = TIMEOUT_CONFIG.retry.timeout.multiplier ** attemptNumber;
+export async function getRetryTimeout(attemptNumber: number, baseTimeout: number): Promise<number> {
+  const config = await TIMEOUT_CONFIG;
+  const multiplier = config.retry.timeout.multiplier ** attemptNumber;
   const timeout = Math.round(baseTimeout * multiplier);
-  return Math.min(timeout, TIMEOUT_CONFIG.retry.timeout.max);
+  return Math.min(timeout, config.retry.timeout.max);
 }
 
 /**
  * Get delay before retry attempt
  */
-export function getRetryDelay(attemptNumber: number): number {
-  const delay = TIMEOUT_CONFIG.retry.delays[attemptNumber];
+export async function getRetryDelay(attemptNumber: number): Promise<number> {
+  const config = await TIMEOUT_CONFIG;
+  const delay = config.retry.delays[attemptNumber];
   if (delay !== undefined) {
     return delay;
   }
   // Return the last delay in the array as fallback
-  const lastDelay = TIMEOUT_CONFIG.retry.delays[TIMEOUT_CONFIG.retry.delays.length - 1];
+  const lastDelay = config.retry.delays[config.retry.delays.length - 1];
   return lastDelay !== undefined ? lastDelay : 6000; // Fallback to 6s if something goes wrong
 }

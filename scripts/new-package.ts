@@ -387,7 +387,6 @@ async function createPackageFiles(config: PackageConfig) {
     dependencies: {
       "@buster/typescript-config": "workspace:*",
       "@buster/vitest-config": "workspace:*",
-      "@buster/env-utils": "workspace:*"
     },
   };
 
@@ -466,29 +465,15 @@ export const howdy = () => {
 
   await writeFile(join(directory, "src", "lib", "index.ts"), libIndex);
 
-  // Create a proper validate-env.ts script
+  // Create a placeholder script since env validation is now handled by @buster/secrets at runtime
   const validateEnv = `#!/usr/bin/env node
 
-// This script uses the shared env-utils to validate environment variables
-import { loadRootEnv, validateEnv } from '@buster/env-utils';
+// Environment variables are now managed by @buster/secrets package
+// which fetches secrets from Infisical or falls back to .env file
+// No prebuild validation needed as secrets are fetched at runtime
 
-// Load environment variables from root .env file
-loadRootEnv();
-
-// Define required environment variables for this package
-const requiredEnv = {
-  // NODE_ENV is optional - will default to 'development' if not set
-  // Add your required environment variables here:
-  // DATABASE_URL: process.env.DATABASE_URL,
-  // API_KEY: process.env.API_KEY,
-};
-
-// Validate environment variables
-const { hasErrors } = validateEnv(requiredEnv);
-
-if (hasErrors) {
-  process.exit(1);
-}
+console.log('✅ Using @buster/secrets for runtime secret management');
+process.exit(0);
 `;
 
   await writeFile(join(directory, "scripts", "validate-env.ts"), validateEnv);

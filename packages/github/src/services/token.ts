@@ -234,7 +234,7 @@ async function generateNewInstallationToken(
   integrationId: string
 ): Promise<InstallationTokenResponse> {
   try {
-    const app = createGitHubApp();
+    const app = await createGitHubApp();
 
     // Create installation access token
     const { data } = await app.octokit.rest.apps.createInstallationAccessToken({

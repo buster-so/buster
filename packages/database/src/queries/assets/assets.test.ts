@@ -13,6 +13,19 @@ vi.mock('../../connection', () => ({
   },
 }));
 
+// Type for mock database chain
+type MockDbChain = {
+  select: ReturnType<typeof vi.fn>;
+  from: ReturnType<typeof vi.fn>;
+  where: ReturnType<typeof vi.fn>;
+  limit: ReturnType<typeof vi.fn>;
+};
+
+type MockInsertChain = {
+  values: ReturnType<typeof vi.fn>;
+  returning: ReturnType<typeof vi.fn>;
+};
+
 // Mock crypto.randomUUID
 vi.stubGlobal('crypto', {
   randomUUID: vi.fn(() => 'test-uuid-123'),
@@ -51,7 +64,7 @@ describe('Asset Queries', () => {
         limit: vi.fn().mockResolvedValue([mockReport]),
       };
 
-      vi.mocked(db).select.mockReturnValue(mockDbChain as any);
+      vi.mocked(db).select.mockReturnValue(mockDbChain as unknown as ReturnType<typeof db.select>);
 
       const result = await getAssetDetailsById({
         assetId: '123e4567-e89b-12d3-a456-426614174000',
@@ -91,7 +104,7 @@ describe('Asset Queries', () => {
         limit: vi.fn().mockResolvedValue([mockReport]),
       };
 
-      vi.mocked(db).select.mockReturnValue(mockDbChain as any);
+      vi.mocked(db).select.mockReturnValue(mockDbChain as unknown as ReturnType<typeof db.select>);
 
       const result = await getAssetDetailsById({
         assetId: '223e4567-e89b-12d3-a456-426614174000',
@@ -109,7 +122,7 @@ describe('Asset Queries', () => {
         limit: vi.fn().mockResolvedValue([]),
       };
 
-      vi.mocked(db).select.mockReturnValue(mockDbChain as any);
+      vi.mocked(db).select.mockReturnValue(mockDbChain as unknown as ReturnType<typeof db.select>);
 
       const result = await getAssetDetailsById({
         assetId: '323e4567-e89b-12d3-a456-426614174000',
@@ -135,7 +148,7 @@ describe('Asset Queries', () => {
         limit: vi.fn().mockResolvedValue([mockMetric]),
       };
 
-      vi.mocked(db).select.mockReturnValue(mockDbChain as any);
+      vi.mocked(db).select.mockReturnValue(mockDbChain as unknown as ReturnType<typeof db.select>);
 
       const result = await getAssetDetailsById({
         assetId: '423e4567-e89b-12d3-a456-426614174000',
@@ -178,7 +191,7 @@ describe('Asset Queries', () => {
         limit: vi.fn().mockResolvedValue([mockDashboard]),
       };
 
-      vi.mocked(db).select.mockReturnValue(mockDbChain as any);
+      vi.mocked(db).select.mockReturnValue(mockDbChain as unknown as ReturnType<typeof db.select>);
 
       const result = await getAssetDetailsById({
         assetId: '523e4567-e89b-12d3-a456-426614174000',
@@ -236,8 +249,8 @@ describe('Asset Queries', () => {
         ]),
       };
 
-      vi.mocked(db).select.mockReturnValue(selectMock as any);
-      vi.mocked(db).insert.mockReturnValue(insertMock as any);
+      vi.mocked(db).select.mockReturnValue(selectMock as unknown as ReturnType<typeof db.select>);
+      vi.mocked(db).insert.mockReturnValue(insertMock as unknown as ReturnType<typeof db.insert>);
 
       const result = await generateAssetMessages({
         assetId: '623e4567-e89b-12d3-a456-426614174000',
@@ -275,7 +288,7 @@ describe('Asset Queries', () => {
         limit: vi.fn().mockResolvedValue([]),
       };
 
-      vi.mocked(db).select.mockReturnValue(selectMock as any);
+      vi.mocked(db).select.mockReturnValue(selectMock as unknown as ReturnType<typeof db.select>);
 
       await expect(
         generateAssetMessages({
@@ -323,8 +336,8 @@ describe('Asset Queries', () => {
         ]),
       };
 
-      vi.mocked(db).select.mockReturnValue(selectMock as any);
-      vi.mocked(db).insert.mockReturnValue(insertMock as any);
+      vi.mocked(db).select.mockReturnValue(selectMock as unknown as ReturnType<typeof db.select>);
+      vi.mocked(db).insert.mockReturnValue(insertMock as unknown as ReturnType<typeof db.insert>);
 
       await generateAssetMessages({
         assetId: 'c23e4567-e89b-12d3-a456-426614174000',

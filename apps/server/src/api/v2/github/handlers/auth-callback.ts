@@ -1,4 +1,5 @@
-import { getUserOrganizationId } from '@buster/database';
+import { getSecret, getUserOrganizationId } from '@buster/database';
+import { SERVER_KEYS } from '@buster/secrets';
 import { handleInstallationCallback } from '../services/handle-installation-callback';
 import { retrieveInstallationState } from '../services/installation-state';
 
@@ -23,7 +24,8 @@ export async function authCallbackHandler(
   request: CompleteInstallationRequest
 ): Promise<AuthCallbackResult> {
   // Get base URL from environment
-  const baseUrl = process.env.BUSTER_URL || '';
+
+  const baseUrl = await getSecret(SERVER_KEYS.BUSTER_URL);
 
   // Handle user cancellation
   if (request.error === 'access_denied') {

@@ -15,7 +15,6 @@
     }
   },
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
     "typecheck": "tsc --noEmit",
@@ -29,7 +28,7 @@
     "test:integration": "vitest run src/**/*.int.test.ts"
   },
   "dependencies": {
-    "@buster/env-utils": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@slack/web-api": "^6.13.0",
     "zod": "catalog:"
   },

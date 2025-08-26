@@ -1,6 +1,5 @@
-use std::env;
-
 use reqwest::{Client, Error};
+use secrets::SupabaseConfig;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -48,13 +47,12 @@ pub struct SupabaseClient {
 
 impl SupabaseClient {
     // Initialize the client with env variables
-    pub fn new() -> Result<Self, env::VarError> {
-        let url = env::var("SUPABASE_URL")?;
-        let service_role_key = env::var("SUPABASE_SERVICE_ROLE_KEY")?;
+    pub async fn new() -> Result<Self, anyhow::Error> {
+        let config = SupabaseConfig::from_secrets().await?;
 
         Ok(Self {
-            url,
-            service_role_key,
+            url: config.url,
+            service_role_key: config.service_role_key,
             client: Client::new(),
         })
     }

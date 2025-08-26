@@ -13,7 +13,6 @@
     { "path": "../database" },
     { "path": "../server-shared" },
     { "path": "../stored-values" },
-    { "path": "../test-utils" },
     { "path": "../vitest-config" }
   ]
 }

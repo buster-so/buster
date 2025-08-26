@@ -2,7 +2,6 @@
 //!
 //! This module provides middleware for error tracking and logging with Sentry
 
-use std::env;
 use std::fmt::Display;
 use anyhow::Error;
 use axum::extract::Request;
@@ -16,6 +15,7 @@ use axum::{
     Json,
 };
 use serde_json::json;
+use secrets::get_secret_sync_or_default;
 
 /// Creates a Sentry layer for the Axum application
 ///
@@ -46,7 +46,7 @@ pub fn sentry_layer() -> ServiceBuilder<tower::layer::util::Stack<
 /// # Returns
 /// A Sentry client guard that keeps the client alive
 pub fn init_sentry(dsn: &str) -> Option<sentry::ClientInitGuard> {
-    let environment = env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
+    let environment = get_secret_sync_or_default("ENVIRONMENT", "development");
     let is_development = environment == "development";
 
     if is_development {
@@ -70,7 +70,7 @@ pub fn init_sentry(dsn: &str) -> Option<sentry::ClientInitGuard> {
 /// # Returns
 /// true if Sentry should be enabled, false otherwise
 pub fn is_sentry_enabled() -> bool {
-    let environment = env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
+    let environment = get_secret_sync_or_default("ENVIRONMENT", "development");
     environment != "development"
 }
 

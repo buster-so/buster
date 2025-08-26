@@ -7,7 +7,7 @@
     "dev": "echo 'y' | npx trigger.dev@latest dev",
     "dev:fast": "echo 'y' | npx trigger.dev@latest dev",
     "deploy": "echo 'y' | npx trigger.dev@latest deploy",
-    "build": "echo 'No build step required' && tsc --noEmit",
+    "build": "echo 'No build step required but we run it to make sure env is loaded' && tsc --noEmit",
     "build:dry-run": "echo 'No build step required but we run it to make sure env is loaded' && tsc --noEmit",
     "lint": "biome check --write",
     "test": "vitest run",
@@ -25,9 +25,9 @@
     "@buster/ai": "workspace:*",
     "@buster/data-source": "workspace:^",
     "@buster/database": "workspace:*",
+    "@buster/secrets": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/slack": "workspace:*",
-    "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster/web-tools": "workspace:*",
@@ -35,10 +35,12 @@
     "ai": "catalog:",
     "braintrust": "catalog:",
     "drizzle-orm": "catalog:",
+    "uuid": "^11.1.0",
     "vitest": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "4.0.1"
+    "@trigger.dev/build": "4.0.1",
+    "@types/uuid": "^10.0.0"
   }
 }

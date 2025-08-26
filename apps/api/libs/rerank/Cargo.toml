@@ -8,6 +8,7 @@ reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 dotenv = { workspace = true }
+secrets = { path = "../secrets" }
 
 [dev-dependencies]
 dotenv = { workspace = true }

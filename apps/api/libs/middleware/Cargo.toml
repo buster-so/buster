@@ -34,6 +34,7 @@ tracing-subscriber = { workspace = true }
 
 # Internal workspace dependencies
 database = { path = "../database" }
+secrets = { path = "../secrets" }
 
 [dev-dependencies]
 tokio-test = { workspace = true }

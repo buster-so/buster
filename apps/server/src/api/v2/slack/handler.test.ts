@@ -4,6 +4,52 @@ import { HTTPException } from 'hono/http-exception';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SlackHandler } from './handler';
 
+// Mock @buster/secrets
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn().mockImplementation(async (key: string) => {
+    const secrets: Record<string, string> = {
+      BUSTER_URL: 'https://test.com',
+      SLACK_CLIENT_ID: 'test-client-id',
+      SLACK_CLIENT_SECRET: 'test-client-secret',
+      SERVER_URL: 'https://test.com',
+    };
+    return secrets[key] || '';
+  }),
+  SERVER_KEYS: {
+    DATABASE_URL: 'DATABASE_URL',
+    SUPABASE_URL: 'SUPABASE_URL',
+    SUPABASE_SERVICE_ROLE_KEY: 'SUPABASE_SERVICE_ROLE_KEY',
+    ELECTRIC_PROXY_URL: 'ELECTRIC_PROXY_URL',
+    ELECTRIC_SOURCE_ID: 'ELECTRIC_SOURCE_ID',
+    ELECTRIC_SECRET: 'ELECTRIC_SECRET',
+    TRIGGER_SECRET_KEY: 'TRIGGER_SECRET_KEY',
+    SLACK_CLIENT_ID: 'SLACK_CLIENT_ID',
+    SLACK_CLIENT_SECRET: 'SLACK_CLIENT_SECRET',
+    SLACK_SIGNING_SECRET: 'SLACK_SIGNING_SECRET',
+    SLACK_APP_SUPPORT_URL: 'SLACK_APP_SUPPORT_URL',
+    SERVER_PORT: 'SERVER_PORT',
+    SERVER_URL: 'SERVER_URL',
+    BUSTER_URL: 'BUSTER_URL',
+    ENVIRONMENT: 'ENVIRONMENT',
+  },
+  SLACK_KEYS: {
+    SLACK_CLIENT_ID: 'SLACK_CLIENT_ID',
+    SLACK_CLIENT_SECRET: 'SLACK_CLIENT_SECRET',
+    SLACK_SIGNING_SECRET: 'SLACK_SIGNING_SECRET',
+    SLACK_REDIRECT_URI: 'SLACK_REDIRECT_URI',
+    SLACK_BOT_TOKEN: 'SLACK_BOT_TOKEN',
+    SLACK_CHANNEL_ID: 'SLACK_CHANNEL_ID',
+    SLACK_TEST_JOIN_CHANNEL_ID: 'SLACK_TEST_JOIN_CHANNEL_ID',
+    SLACK_TEST_LEAVE_CHANNEL_ID: 'SLACK_TEST_LEAVE_CHANNEL_ID',
+    SLACK_TEST_ACCESS_TOKEN: 'SLACK_TEST_ACCESS_TOKEN',
+    SLACK_SKIP_DELETE_TESTS: 'SLACK_SKIP_DELETE_TESTS',
+    SLACK_SKIP_LEAVE_TESTS: 'SLACK_SKIP_LEAVE_TESTS',
+    SLACK_APP_SUPPORT_URL: 'SLACK_APP_SUPPORT_URL',
+    BUSTER_ALERT_CHANNEL_TOKEN: 'BUSTER_ALERT_CHANNEL_TOKEN',
+    BUSTER_ALERT_CHANNEL_ID: 'BUSTER_ALERT_CHANNEL_ID',
+  },
+}));
+
 // Mock dependencies
 const mockSlackOAuthService = {
   isEnabled: vi.fn(),
@@ -136,7 +182,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/app/settings/integrations?status=cancelled'
+        'https://test.com/app/settings/integrations?status=cancelled'
       );
     });
 
@@ -146,7 +192,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/app/settings/integrations?status=error&error=invalid_parameters'
+        'https://test.com/app/settings/integrations?status=error&error=invalid_parameters'
       );
     });
 
@@ -171,7 +217,7 @@ describe('SlackHandler', () => {
         state: 'test-state',
       });
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/dashboard?status=success&workspace=Test%20Workspace'
+        'https://test.com/dashboard?status=success&workspace=Test%20Workspace'
       );
     });
 
@@ -191,7 +237,7 @@ describe('SlackHandler', () => {
       await handler.handleOAuthCallback(mockContext);
 
       expect(mockContext.redirect).toHaveBeenCalledWith(
-        '/app/settings/integrations?status=error&error=invalid_state'
+        'https://test.com/app/settings/integrations?status=error&error=invalid_state'
       );
     });
   });

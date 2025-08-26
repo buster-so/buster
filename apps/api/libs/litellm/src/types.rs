@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
-use std::env;
+use secrets::get_secret_sync;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatCompletionRequest {
@@ -1068,7 +1068,7 @@ mod tests {
 }
 
 fn should_skip_metadata(metadata: &Option<Metadata>) -> bool {
-    let env_var_condition_met = match env::var("LLM_BASE_URL") {
+    let env_var_condition_met = match get_secret_sync("LLM_BASE_URL") {
         Ok(val) => val == "https://api.openai.com/v1",
         Err(_) => false, // If env var is not set or any error, condition is not met
     };

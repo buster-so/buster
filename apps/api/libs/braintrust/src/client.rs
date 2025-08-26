@@ -3,7 +3,7 @@ use reqwest::Client;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, Sender};
 use tracing::{debug, error};
-use std::env;
+use secrets::get_secret_sync;
 use uuid::Uuid;
 
 use crate::types::{Span, EventPayload, Prompt};
@@ -36,7 +36,7 @@ impl BraintrustClient {
         // Get API key from parameter or environment variable
         let api_key = match api_key {
             Some(key) => key.to_string(),
-            None => env::var(BRAINTRUST_API_KEY_ENV).map_err(|_| {
+            None => get_secret_sync(BRAINTRUST_API_KEY_ENV).map_err(|_| {
                 anyhow!("Braintrust API key not provided and {} environment variable not set", BRAINTRUST_API_KEY_ENV)
             })?,
         };

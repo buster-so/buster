@@ -1,4 +1,5 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider';
+import { AI_KEYS, getSecret } from '@buster/secrets';
 import { createFallback } from './ai-fallback';
 import { anthropicModel } from './providers/anthropic';
 import { vertexModel } from './providers/vertex';
@@ -6,7 +7,7 @@ import { vertexModel } from './providers/vertex';
 // Lazy initialization to allow mocking in tests
 let _opus41Instance: ReturnType<typeof createFallback> | null = null;
 
-function initializeOpus41() {
+async function initializeOpus41() {
   if (_opus41Instance) {
     return _opus41Instance;
   }
@@ -15,13 +16,16 @@ function initializeOpus41() {
   const models: LanguageModelV2[] = [];
 
   // Only include Anthropic if API key is available
-  if (process.env.ANTHROPIC_API_KEY) {
+  try {
+    await getSecret(AI_KEYS.ANTHROPIC_API_KEY);
     try {
-      models.push(anthropicModel('claude-opus-4-1-20250805'));
+      models.push(await anthropicModel('claude-opus-4-1-20250805'));
       console.info('Opus41: Anthropic model added to fallback chain');
     } catch (error) {
       console.warn('Opus41: Failed to initialize Anthropic model:', error);
     }
+  } catch {
+    // API key not available, skip Anthropic model
   }
 
   // Ensure we have at least one model
@@ -43,23 +47,10 @@ function initializeOpus41() {
   return _opus41Instance;
 }
 
-// Export a proxy that initializes on first use
-export const Opus41 = new Proxy({} as ReturnType<typeof createFallback>, {
-  get(_target, prop) {
-    const instance = initializeOpus41();
-    // Direct property access without receiver to avoid proxy conflicts
-    return instance[prop as keyof typeof instance];
-  },
-  has(_target, prop) {
-    const instance = initializeOpus41();
-    return prop in instance;
-  },
-  ownKeys(_target) {
-    const instance = initializeOpus41();
-    return Reflect.ownKeys(instance);
-  },
-  getOwnPropertyDescriptor(_target, prop) {
-    const instance = initializeOpus41();
-    return Reflect.getOwnPropertyDescriptor(instance, prop);
-  },
-});
+// Export initialization function for async usage
+export async function getOpus41(): Promise<ReturnType<typeof createFallback>> {
+  return await initializeOpus41();
+}
+
+// Export a promise-based instance for backwards compatibility
+export const Opus41 = initializeOpus41();

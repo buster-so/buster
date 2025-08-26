@@ -1,7 +1,7 @@
 use dotenv::dotenv;
 use reqwest::Client;
+use secrets::{get_secret_sync, get_secret_sync_or_default};
 use serde::{Deserialize, Serialize};
-use std::env;
 use std::error::Error;
 
 pub struct Reranker {
@@ -15,9 +15,9 @@ impl Reranker {
     pub fn new() -> Result<Self, Box<dyn Error>> {
         dotenv().ok();
         
-        let api_key = env::var("RERANK_API_KEY")?;
-        let model = env::var("RERANK_MODEL")?;
-        let base_url = env::var("RERANK_BASE_URL")?;
+        let api_key = get_secret_sync("RERANK_API_KEY")?;
+        let model = get_secret_sync("RERANK_MODEL")?;
+        let base_url = get_secret_sync("RERANK_BASE_URL")?;
         
         let client = Client::new();
         Ok(Self {

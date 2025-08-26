@@ -1,6 +1,7 @@
 use anyhow::Result;
 use serde_json::Value;
-use std::{collections::HashMap, env};
+use std::collections::HashMap;
+use secrets::get_secret_sync_or_default;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -28,7 +29,7 @@ pub fn get_configuration(
 
     // 2. Define the model for this mode (From original MODEL const)
     let model =
-        if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
+        if get_secret_sync_or_default("ENVIRONMENT", "development") == "local" {
             "gpt-4.1-mini".to_string()
         } else {
             "gemini-2.0-flash-001".to_string()

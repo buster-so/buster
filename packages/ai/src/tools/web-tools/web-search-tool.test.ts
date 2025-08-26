@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createWebSearchTool } from './web-search-tool';
 
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn().mockResolvedValue('mock-api-key'),
+  WEB_TOOLS_KEYS: {
+    FIRECRAWL_API_KEY: 'FIRECRAWL_API_KEY',
+  },
+}));
+
 vi.mock('@buster/web-tools', () => {
   const mockFirecrawlService = {
     webSearch: vi.fn(),
@@ -11,6 +18,11 @@ vi.mock('@buster/web-tools', () => {
     mockFirecrawlService,
   };
 });
+
+// Mock braintrust
+vi.mock('braintrust', () => ({
+  wrapTraced: vi.fn((fn) => fn),
+}));
 
 describe('webSearch tool', () => {
   let mockFirecrawlService: any;

@@ -1,4 +1,5 @@
 import { getS3IntegrationByOrganizationId, getSecretByName } from '@buster/database';
+import { DATA_SOURCE_KEYS, getSecret } from '@buster/secrets';
 import type { CreateS3IntegrationRequest } from '@buster/server-shared';
 import { createGCSProvider } from './providers/gcs-provider';
 import { createR2Provider } from './providers/r2-provider';
@@ -25,13 +26,13 @@ export function createStorageProvider(config: StorageConfig): StorageProvider {
 /**
  * Get the default R2 storage provider
  */
-export function getDefaultProvider(): StorageProvider {
-  const accountId = process.env.R2_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const bucket = process.env.R2_BUCKET || 'metric-exports';
+export async function getDefaultProvider(): Promise<StorageProvider> {
+  const accountId = await getSecret(DATA_SOURCE_KEYS.R2_ACCOUNT_ID);
+  const accessKeyId = await getSecret(DATA_SOURCE_KEYS.R2_ACCESS_KEY_ID);
+  const secretAccessKey = await getSecret(DATA_SOURCE_KEYS.R2_SECRET_ACCESS_KEY);
+  const bucket = await getSecret(DATA_SOURCE_KEYS.R2_BUCKET);
 
-  if (!accountId || !accessKeyId || !secretAccessKey) {
+  if (!accountId || !accessKeyId || !secretAccessKey || !bucket) {
     throw new Error('Default R2 storage credentials not configured');
   }
 

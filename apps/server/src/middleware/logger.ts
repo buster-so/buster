@@ -1,12 +1,38 @@
+import { getSecret } from '@buster/secrets';
+import type { Context, Next } from 'hono';
+import type { MiddlewareHandler } from 'hono';
 import { pinoLogger } from 'hono-pino';
+import type { PinoLogger } from 'hono-pino';
 import pino from 'pino';
 
-const isDev = process.env.NODE_ENV !== 'production';
-const logLevel = process.env.LOG_LEVEL || 'info';
+const getEnvValue = async (key: string, defaultValue?: string): Promise<string | undefined> => {
+  try {
+    return await getSecret(key);
+  } catch {
+    return defaultValue;
+  }
+};
+
+// Initialize async values
+let isDev: boolean;
+let logLevel: string;
+let isInitialized = false;
+
+const initializeLogger = async (): Promise<void> => {
+  if (isInitialized) return;
+
+  const nodeEnv = await getEnvValue('NODE_ENV', 'development');
+  isDev = nodeEnv !== 'production';
+  logLevel = (await getEnvValue('LOG_LEVEL', 'info')) || 'info';
+
+  isInitialized = true;
+};
 let isPinoPrettyAvailable = true;
 
 // Create base pino instance
-const createBaseLogger = () => {
+const createBaseLogger = async (): Promise<pino.Logger> => {
+  await initializeLogger();
+
   if (isDev && isPinoPrettyAvailable) {
     try {
       // Only use pino-pretty transport in development
@@ -30,55 +56,77 @@ const createBaseLogger = () => {
   });
 };
 
-const baseLogger = createBaseLogger();
+const baseLoggerPromise = createBaseLogger();
 
-// Simple console capture - only override if LOG_LEVEL is set
-if (process.env.LOG_LEVEL) {
-  console.info = (first, ...args) => {
-    if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
-      // Handle pattern: console.info('message', { data })
-      baseLogger.info(args[0], first);
-    } else if (typeof first === 'string') {
-      // Handle pattern: console.info('message')
-      baseLogger.info(first);
-    } else {
-      // Handle pattern: console.info({ data })
-      baseLogger.info({ data: first }, ...args);
-    }
-  };
-  console.warn = (first, ...args) => {
-    if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
-      // Handle pattern: console.warn('message', { data })
-      baseLogger.warn(args[0], first);
-    } else if (typeof first === 'string') {
-      // Handle pattern: console.warn('message')
-      baseLogger.warn(first);
-    } else {
-      // Handle pattern: console.warn({ data })
-      baseLogger.warn({ data: first }, ...args);
-    }
-  };
-  console.error = (first, ...args) => {
-    if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
-      // Handle pattern: console.error('message', { data })
-      baseLogger.error(args[0], first);
-    } else if (typeof first === 'string') {
-      // Handle pattern: console.error('message')
-      baseLogger.error(first);
-    } else {
-      // Handle pattern: console.error({ data })
-      baseLogger.error({ data: first }, ...args);
-    }
-  };
+// Async initialization of console overrides
+const initializeConsoleOverrides = async (): Promise<void> => {
+  await initializeLogger();
+  const hasLogLevel = await getEnvValue('LOG_LEVEL');
 
-  // Suppress debug logs when LOG_LEVEL is info or higher
-  if (logLevel !== 'debug' && logLevel !== 'trace') {
-    console.debug = () => {};
+  if (hasLogLevel) {
+    const baseLogger = await baseLoggerPromise;
+    console.info = (first, ...args) => {
+      if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
+        // Handle pattern: console.info('message', { data })
+        baseLogger.info(args[0], first);
+      } else if (typeof first === 'string') {
+        // Handle pattern: console.info('message')
+        baseLogger.info(first);
+      } else {
+        // Handle pattern: console.info({ data })
+        baseLogger.info({ data: first }, ...args);
+      }
+    };
+    console.warn = (first, ...args) => {
+      if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
+        // Handle pattern: console.warn('message', { data })
+        baseLogger.warn(args[0], first);
+      } else if (typeof first === 'string') {
+        // Handle pattern: console.warn('message')
+        baseLogger.warn(first);
+      } else {
+        // Handle pattern: console.warn({ data })
+        baseLogger.warn({ data: first }, ...args);
+      }
+    };
+    console.error = (first, ...args) => {
+      if (typeof first === 'string' && args.length > 0 && typeof args[0] === 'object') {
+        // Handle pattern: console.error('message', { data })
+        baseLogger.error(args[0], first);
+      } else if (typeof first === 'string') {
+        // Handle pattern: console.error('message')
+        baseLogger.error(first);
+      } else {
+        // Handle pattern: console.error({ data })
+        baseLogger.error({ data: first }, ...args);
+      }
+    };
+
+    // Suppress debug logs when LOG_LEVEL is info or higher
+    if (logLevel !== 'debug' && logLevel !== 'trace') {
+      console.debug = () => {};
+    }
   }
-}
+};
 
-// Create logger middleware
-export const loggerMiddleware = pinoLogger({
-  pino: baseLogger,
-  http: false, // Disable automatic HTTP request logging
-});
+// Initialize console overrides
+initializeConsoleOverrides();
+
+// Create async logger middleware
+export const createLoggerMiddleware = async () => {
+  const baseLogger = await baseLoggerPromise;
+  return pinoLogger({
+    pino: baseLogger,
+    http: false, // Disable automatic HTTP request logging
+  });
+};
+
+// Cache the middleware promise to avoid recreating it on every request
+type LoggerEnv = { Variables: { logger: PinoLogger } };
+const cachedMiddleware: MiddlewareHandler<LoggerEnv> | null = null;
+
+// Export middleware that handles async initialization
+export const loggerMiddleware: MiddlewareHandler<LoggerEnv> = async (c, next) => {
+  const middleware = cachedMiddleware ?? (await createLoggerMiddleware());
+  return middleware(c, next);
+};

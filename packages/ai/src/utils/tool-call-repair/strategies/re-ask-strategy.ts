@@ -57,7 +57,7 @@ export async function repairWrongToolName(
 
       try {
         const result = streamText({
-          model: Sonnet4,
+          model: await Sonnet4,
           messages: healingMessages,
           tools: context.tools,
           maxOutputTokens: 1000,

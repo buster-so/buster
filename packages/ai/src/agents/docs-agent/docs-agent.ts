@@ -142,9 +142,9 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     };
 
     return wrapTraced(
-      () =>
+      async () =>
         streamText({
-          model: Sonnet4,
+          model: await Sonnet4,
           tools: {
             sequentialThinking: createSequentialThinkingTool({
               messageId: docsAgentOptions.messageId,

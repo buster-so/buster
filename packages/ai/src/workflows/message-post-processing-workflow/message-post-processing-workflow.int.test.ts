@@ -1,3 +1,4 @@
+import { AI_KEYS, getSecret } from '@buster/secrets';
 import type { ModelMessage } from 'ai';
 import { initLogger } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -6,11 +7,20 @@ import runMessagePostProcessingWorkflow, {
 } from './message-post-processing-workflow';
 
 describe('Post-Processing Workflow Integration Tests', () => {
-  beforeAll(() => {
-    initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
-      projectName: process.env.ENVIRONMENT,
-    });
+  beforeAll(async () => {
+    try {
+      const apiKey = await getSecret(AI_KEYS.BRAINTRUST_KEY);
+      const projectName = await getSecret(AI_KEYS.ENVIRONMENT);
+
+      if (apiKey && projectName) {
+        initLogger({
+          apiKey,
+          projectName,
+        });
+      }
+    } catch {
+      // Skip logger initialization if secrets aren't available
+    }
   });
 
   afterAll(async () => {

@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DATABASE_KEYS, getSecret } from '@buster/secrets';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -10,12 +11,12 @@ import postgres from 'postgres';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not defined');
-}
-
 async function markMigrationsAsApplied() {
+  const connectionString = await getSecret(DATABASE_KEYS.DATABASE_URL);
+  if (!connectionString) {
+    throw new Error('DATABASE_URL environment variable is not defined');
+  }
+
   const client = postgres(connectionString);
   const db = drizzle(client);
 
@@ -75,4 +76,4 @@ async function markMigrationsAsApplied() {
 }
 
 // Run the script
-markMigrationsAsApplied();
+await markMigrationsAsApplied();

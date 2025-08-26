@@ -1,11 +1,12 @@
 import { InvalidToolInputError, NoSuchToolError } from 'ai';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ANALYST_AGENT_NAME } from '../../agents';
-import { repairToolCall } from './repair-tool-call';
-import type { RepairContext } from './types';
 
-vi.mock('braintrust', () => ({
-  wrapTraced: (fn: any) => fn,
+// Mock the LLM modules to prevent initialization
+vi.mock('../../llm', () => ({
+  Sonnet4: Promise.resolve('mock-model'),
+  Haiku35: Promise.resolve('mock-haiku-model'),
+  getSonnet4: vi.fn().mockResolvedValue('mock-model'),
+  getHaiku35: vi.fn().mockResolvedValue('mock-haiku-model'),
 }));
 
 // Mock the strategy functions
@@ -18,6 +19,11 @@ vi.mock('./strategies/re-ask-strategy', () => ({
   canHandleNoSuchTool: vi.fn(),
   repairWrongToolName: vi.fn(),
 }));
+
+// Import after all mocks are set up
+import { ANALYST_AGENT_NAME } from '../../agents';
+import { repairToolCall } from './repair-tool-call';
+import type { RepairContext } from './types';
 
 describe('repairToolCall', () => {
   beforeEach(() => {
