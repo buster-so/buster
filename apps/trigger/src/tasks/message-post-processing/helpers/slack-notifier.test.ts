@@ -65,7 +65,6 @@ global.fetch = vi.fn();
 describe('slack-notifier', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.BUSTER_URL = 'https://platform.buster.so';
   });
 
   describe('formatSlackMessage with markdown conversion', () => {

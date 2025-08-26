@@ -88,8 +88,6 @@ describe('githubWebhookValidator', () => {
   it('should reject request without signature header', async () => {
     const { app, body } = createMockContext(); // No signature
 
-    process.env.GITHUB_WEBHOOK_SECRET = 'test-secret';
-
     const res = await app.request('/', {
       method: 'POST',
       body,
@@ -102,8 +100,6 @@ describe('githubWebhookValidator', () => {
 
   it('should reject request with invalid signature', async () => {
     const { app, headers, body } = createMockContext('sha256=invalid-signature');
-
-    process.env.GITHUB_WEBHOOK_SECRET = 'test-secret';
 
     // Mock signature verification to return false
     vi.mocked(verifyGitHubWebhookSignature).mockReturnValue(false);
@@ -139,7 +135,6 @@ describe('githubWebhookValidator', () => {
   it('should reject request with invalid JSON payload', async () => {
     const { app, headers } = createMockContext('sha256=test-signature');
 
-    process.env.GITHUB_WEBHOOK_SECRET = 'test-secret';
     vi.mocked(verifyGitHubWebhookSignature).mockReturnValue(true);
 
     const res = await app.request('/', {
@@ -161,7 +156,6 @@ describe('githubWebhookValidator', () => {
 
     const { app, headers, body } = createMockContext('sha256=test-signature', invalidPayload);
 
-    process.env.GITHUB_WEBHOOK_SECRET = 'test-secret';
     vi.mocked(verifyGitHubWebhookSignature).mockReturnValue(true);
 
     // Mock schema to throw an error for invalid payload

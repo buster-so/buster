@@ -9,6 +9,14 @@ interface MockFirecrawlApp {
   search: ReturnType<typeof vi.fn>;
 }
 
+// Mock the @buster/secrets module
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn().mockResolvedValue('test-api-key'),
+  WEB_TOOLS_KEYS: {
+    FIRECRAWL_API_KEY: 'FIRECRAWL_API_KEY',
+  },
+}));
+
 // Mock the FirecrawlApp
 vi.mock('@mendable/firecrawl-js', () => {
   return {
@@ -28,23 +36,21 @@ describe('FirecrawlService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Set API key for tests
-    process.env.FIRECRAWL_API_KEY = 'test-api-key';
   });
 
-  it('should create service with API key from environment', () => {
-    service = new FirecrawlService();
+  it('should create service with API key from secrets', async () => {
+    service = await FirecrawlService.create();
     expect(service).toBeInstanceOf(FirecrawlService);
   });
 
-  it('should create service with API key from config', () => {
-    service = new FirecrawlService({ apiKey: 'custom-api-key' });
+  it('should create service with API key from config', async () => {
+    service = await FirecrawlService.create({ apiKey: 'custom-api-key' });
     expect(service).toBeInstanceOf(FirecrawlService);
   });
 
   describe('startDeepResearch', () => {
-    beforeEach(() => {
-      service = new FirecrawlService();
+    beforeEach(async () => {
+      service = await FirecrawlService.create();
     });
 
     it('should start deep research with default options', async () => {
@@ -92,8 +98,8 @@ describe('FirecrawlService', () => {
   });
 
   describe('getJobStatus', () => {
-    beforeEach(() => {
-      service = new FirecrawlService();
+    beforeEach(async () => {
+      service = await FirecrawlService.create();
     });
 
     it('should get job status', async () => {
@@ -116,8 +122,8 @@ describe('FirecrawlService', () => {
   });
 
   describe('scrapeUrl', () => {
-    beforeEach(() => {
-      service = new FirecrawlService();
+    beforeEach(async () => {
+      service = await FirecrawlService.create();
     });
 
     it('should scrape URL with default options', async () => {
@@ -160,8 +166,8 @@ describe('FirecrawlService', () => {
   });
 
   describe('validateUrl', () => {
-    beforeEach(() => {
-      service = new FirecrawlService();
+    beforeEach(async () => {
+      service = await FirecrawlService.create();
     });
 
     it('should return true for valid accessible URL', async () => {
@@ -184,8 +190,8 @@ describe('FirecrawlService', () => {
   });
 
   describe('webSearch', () => {
-    beforeEach(() => {
-      service = new FirecrawlService();
+    beforeEach(async () => {
+      service = await FirecrawlService.create();
     });
 
     it('should perform web search with default options', async () => {
