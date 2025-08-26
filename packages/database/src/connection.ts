@@ -125,6 +125,13 @@ export function getSyncDb(): PostgresJsDatabase {
 // Export the database initialization promise
 export const dbInitialized = getDb();
 
+// Auto-initialize database on module import for Trigger.dev tasks
+// This ensures the database is ready when the task runs
+getDb().catch((error) => {
+  console.error('Failed to initialize database connection on module load:', error);
+  // Don't throw - let individual queries handle the error
+});
+
 // Export a synchronous database instance (will throw if not initialized)
 // This maintains backwards compatibility for existing code
 export const db = new Proxy({} as PostgresJsDatabase, {

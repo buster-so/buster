@@ -248,7 +248,7 @@ async function handleInstallationUnsuspended(installationId: string): Promise<Gi
  */
 async function generateAndStoreToken(installationId: string): Promise<string> {
   try {
-    const app = createGitHubApp();
+    const app = await createGitHubApp();
 
     // Generate installation access token
     const { data } = await app.octokit.rest.apps.createInstallationAccessToken({

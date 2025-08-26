@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { type AssetPermissionCheck, checkPermission } from '@buster/access-controls';
 import { createAdapter, getProviderForOrganization } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
-import { getDataSourceCredentials, getMetricForExport } from '@buster/database';
+import { dbInitialized, getDataSourceCredentials, getMetricForExport } from '@buster/database';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import { convertToCSV, estimateCSVSize } from './csv-helpers';
 import {
@@ -47,6 +47,9 @@ export const exportMetricData: ReturnType<
   },
   run: async (payload): Promise<ExportMetricDataOutput> => {
     const startTime = Date.now();
+
+    // Ensure database is initialized before any queries
+    await dbInitialized;
 
     try {
       logger.log('Starting metric export', {

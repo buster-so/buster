@@ -2,8 +2,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { esbuildPlugin } from '@trigger.dev/build/extensions';
 import { defineConfig } from '@trigger.dev/sdk';
+import * as dotenv from 'dotenv';
 
-// Environment variables are loaded automatically by @buster/secrets
+dotenv.config({ path: '../../.env' });
 
 export default defineConfig({
   project: 'proj_lyyhkqmzhwiskfnavddk',

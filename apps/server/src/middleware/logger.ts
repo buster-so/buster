@@ -1,6 +1,8 @@
 import { getSecret } from '@buster/secrets';
 import type { Context, Next } from 'hono';
+import type { MiddlewareHandler } from 'hono';
 import { pinoLogger } from 'hono-pino';
+import type { PinoLogger } from 'hono-pino';
 import pino from 'pino';
 
 const getEnvValue = async (key: string, defaultValue?: string): Promise<string | undefined> => {
@@ -120,12 +122,11 @@ export const createLoggerMiddleware = async () => {
 };
 
 // Cache the middleware promise to avoid recreating it on every request
-let cachedMiddleware: ReturnType<typeof pinoLogger> | null = null;
+type LoggerEnv = { Variables: { logger: PinoLogger } };
+const cachedMiddleware: MiddlewareHandler<LoggerEnv> | null = null;
 
 // Export middleware that handles async initialization
-export const loggerMiddleware = async (c: Context, next: Next) => {
-  if (!cachedMiddleware) {
-    cachedMiddleware = await createLoggerMiddleware();
-  }
-  return cachedMiddleware(c, next);
+export const loggerMiddleware: MiddlewareHandler<LoggerEnv> = async (c, next) => {
+  const middleware = cachedMiddleware ?? (await createLoggerMiddleware());
+  return middleware(c, next);
 };

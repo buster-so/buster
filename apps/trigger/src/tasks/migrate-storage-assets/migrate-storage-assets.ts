@@ -46,7 +46,7 @@ export const migrateStorageAssets: ReturnType<
       });
 
       // Get default R2 provider to read from
-      const defaultProvider = getDefaultProvider();
+      const defaultProvider = await getDefaultProvider();
 
       // Get customer's storage provider to write to
       const customerProvider = await getProviderForOrganization(payload.organizationId);
