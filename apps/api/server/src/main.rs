@@ -28,9 +28,13 @@ pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 #[tokio::main]
 #[allow(unused)]
 async fn main() -> Result<(), anyhow::Error> {
+    println!("Starting API server initialization...");
+    
     dotenv().ok();
+    println!("Environment variables loaded from .env file");
 
     // Initialize Infisical and load all secrets
+    println!("Attempting to connect to Infisical...");
     match init_secrets().await {
         Ok(_) => {
             // Don't log here yet - tracing subscriber isn't initialized
@@ -51,31 +55,40 @@ async fn main() -> Result<(), anyhow::Error> {
 
     let environment = get_secret_or_default("ENVIRONMENT", "development").await;
     let is_development = environment == "development";
+    println!("Environment: {}", environment);
 
     ring::default_provider()
         .install_default()
         .expect("Failed to install default crypto provider");
+    println!("Crypto provider initialized");
 
     // Initialize Sentry using our middleware helper
     let _guard = init_sentry(
         "https://a417fbed1de30d2714a8afbe38d5bc1b@o4505360096428032.ingest.us.sentry.io/4507360721043456"
     );
+    println!("Sentry initialized");
 
     // Set up the tracing subscriber with conditional Sentry integration
     let log_level = get_secret_or_default("LOG_LEVEL", "warn").await.to_uppercase();
+    println!("Log level set to: {}", log_level);
 
     let env_filter =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(log_level));
 
     // Re-initialize the tracing subscriber with Sentry integration using our middleware helper
     init_tracing_subscriber(env_filter);
+    println!("Tracing subscriber initialized");
 
     info!("Successfully initialized with secrets from Infisical");
 
+    info!("Initializing database connection pools...");
     if let Err(e) = init_pools().await {
         tracing::error!("Failed to initialize database pools: {}", e);
+        eprintln!("CRITICAL: Database connection failed - {}", e);
+        eprintln!("Check DATABASE_URL and database availability");
         return Ok(());
     }
+    info!("Database pools initialized successfully");
 
     // --- Start Stored Values Sync Job Scheduler ---
     let scheduler = JobScheduler::new().await?; // Using `?` assuming main returns Result
@@ -97,13 +110,19 @@ async fn main() -> Result<(), anyhow::Error> {
     info!("Stored values sync job scheduler started.");
     // --- End Stored Values Sync Job Scheduler ---
 
+    info!("Building API routes...");
     let protected_router = Router::new().nest("/api/v1", routes::protected_router());
-    let public_router = Router::new().route("/health", axum::routing::get(|| async { "OK" }));
+    let public_router = Router::new().route("/health", axum::routing::get(|| async { 
+        info!("Health check endpoint hit");
+        "OK" 
+    }));
+    info!("Routes configured");
 
     let (shutdown_tx, _) = broadcast::channel::<()>(1);
     let shutdown_tx = Arc::new(shutdown_tx);
 
     // Base router configuration
+    info!("Configuring middleware layers...");
     let app = Router::new()
         .merge(protected_router)
         .merge(public_router)
@@ -111,6 +130,7 @@ async fn main() -> Result<(), anyhow::Error> {
         .layer(cors())
         .layer(CompressionLayer::new())
         .layer(Extension(shutdown_tx.clone()));
+    info!("Middleware configured");
 
     // Add Sentry layers if not in development using our middleware helper
     let app = if !is_development {
@@ -124,23 +144,34 @@ async fn main() -> Result<(), anyhow::Error> {
         .parse()
         .expect("Invalid SERVER_PORT value");
 
-    info!("Starting server on port {}", port_number);
+    info!("Attempting to bind to port {}...", port_number);
     let listener = match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port_number)).await {
-        Ok(listener) => listener,
+        Ok(listener) => {
+            info!("Successfully bound to port {}", port_number);
+            listener
+        },
         Err(e) => {
             tracing::error!("Failed to bind to port {}: {}", port_number, e);
+            eprintln!("CRITICAL: Cannot bind to port {} - {}", port_number, e);
+            eprintln!("Check if another process is using this port: lsof -i :{}", port_number);
             return Ok(());
         }
     };
 
-    info!("Server is running on http://0.0.0.0:{}", port_number);
+    info!("🚀 Server is running on http://0.0.0.0:{}", port_number);
+    info!("Health check available at: http://0.0.0.0:{}/health", port_number);
     
     let server = axum::serve(listener, app);
 
+    info!("Server ready to accept connections");
+    
     tokio::select! {
         res = server => {
             if let Err(e) = res {
                 error!("Axum server error: {}", e);
+                eprintln!("CRITICAL: Server crashed with error: {}", e);
+            } else {
+                info!("Server shut down normally");
             }
          },
         _ = tokio::signal::ctrl_c() => {
@@ -149,5 +180,6 @@ async fn main() -> Result<(), anyhow::Error> {
         }
     }
 
+    info!("Server shutdown complete");
     Ok(())
 }
