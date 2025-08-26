@@ -57,7 +57,7 @@ export async function rateLimitDelay(ms = 1000): Promise<void> {
   } else {
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
-// since the CLI runs synchronously and can't await async operations
+  // since the CLI runs synchronously and can't await async operations
 }
 
 /**

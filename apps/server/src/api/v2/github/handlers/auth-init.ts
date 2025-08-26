@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { getSecret, type User, getUserOrganizationId } from '@buster/database';
+import { type User, getSecret, getUserOrganizationId } from '@buster/database';
 import { GITHUB_KEYS } from '@buster/secrets';
 import { HTTPException } from 'hono/http-exception';
 import { storeInstallationState } from '../services/installation-state';

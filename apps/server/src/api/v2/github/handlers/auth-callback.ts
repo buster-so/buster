@@ -1,7 +1,7 @@
 import { getSecret, getUserOrganizationId } from '@buster/database';
+import { SERVER_KEYS } from '@buster/secrets';
 import { handleInstallationCallback } from '../services/handle-installation-callback';
 import { retrieveInstallationState } from '../services/installation-state';
-import { SERVER_KEYS } from '@buster/secrets';
 
 interface CompleteInstallationRequest {
   state?: string | undefined;

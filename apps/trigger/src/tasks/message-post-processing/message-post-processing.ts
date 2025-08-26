@@ -8,7 +8,7 @@ import {
   messages,
   slackIntegrations,
 } from '@buster/database';
-import { BRAINTRUST_KEYS, getSecret, SERVER_KEYS } from '@buster/secrets';
+import { BRAINTRUST_KEYS, SERVER_KEYS, getSecret } from '@buster/secrets';
 import type {
   AssumptionClassification,
   AssumptionLabel,

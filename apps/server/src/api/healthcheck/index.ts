@@ -99,7 +99,9 @@ async function performHealthCheck(): Promise<HealthCheckResult> {
       throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
     }
   } catch (error) {
-    throw new Error(`Failed to retrieve required secrets: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to retrieve required secrets: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 
   const [dbCheck] = await Promise.all([checkDatabase()]);

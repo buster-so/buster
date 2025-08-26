@@ -9,7 +9,7 @@ import {
   slackIntegrations,
   slackMessageTracking,
 } from '@buster/database';
-import { getSecret, SERVER_KEYS, SLACK_KEYS } from '@buster/secrets';
+import { SERVER_KEYS, SLACK_KEYS, getSecret } from '@buster/secrets';
 import { SlackMessageSource, convertMarkdownToSlack } from '@buster/slack';
 import { logger } from '@trigger.dev/sdk/v3';
 
