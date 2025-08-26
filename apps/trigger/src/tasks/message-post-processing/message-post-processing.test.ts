@@ -84,29 +84,16 @@ describe('messagePostProcessingTask', () => {
     vi.clearAllMocks();
     // Mock BRAINTRUST_KEY for unit tests
     vi.stubEnv('BRAINTRUST_KEY', 'test-braintrust-key');
-    
+
     // Get the mocked db object from the module mock
     mockDb = vi.mocked(database.db);
-    
+
     // Set up the mock chain to return itself for most methods
     mockDb.update.mockReturnValue(mockDb);
     mockDb.set.mockReturnValue(mockDb);
     mockDb.where.mockReturnValue(mockDb);
-    
-    // Also keep the old getDb mock for backward compatibility if still used
-    const mockGetDb = {
-      update: vi.fn().mockReturnThis(),
-      set: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-    };
-    mockGetDb.where.mockReturnValue(mockGetDb);
-    mockGetDb.limit.mockResolvedValue([{ tokenVaultKey: 'vault-key-123' }]);
-    mockGetDb.orderBy.mockResolvedValue([]);
-    vi.mocked(database.getDb).mockReturnValue(mockGetDb);
+
+    // No need to mock getDb since implementation imports and uses the exported `db` instance directly
   });
 
   it('should process message successfully for initial message', async () => {

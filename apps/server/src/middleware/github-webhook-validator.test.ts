@@ -67,7 +67,6 @@ describe('githubWebhookValidator', () => {
   it('should validate a valid webhook request', async () => {
     const { app, headers, body } = createMockContext('sha256=test-signature');
 
-
     // Mock signature verification to return true
     vi.mocked(verifyGitHubWebhookSignature).mockReturnValue(true);
 

@@ -49,10 +49,10 @@ describe('message-fetchers', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Get the mocked db object from the module mock
     mockDb = vi.mocked(database.db);
-    
+
     // Set up the mock chain to return itself for most methods
     mockDb.select.mockReturnValue(mockDb);
     mockDb.from.mockReturnValue(mockDb);
@@ -60,7 +60,7 @@ describe('message-fetchers', () => {
     mockDb.leftJoin.mockReturnValue(mockDb);
     mockDb.where.mockReturnValue(mockDb);
     mockDb.orderBy.mockReturnValue(mockDb);
-    
+
     // Also mock getChatConversationHistory
     vi.mocked(database.getChatConversationHistory).mockResolvedValue([]);
   });
@@ -79,7 +79,7 @@ describe('message-fetchers', () => {
       };
 
       mockDb.limit.mockResolvedValue([messageData]);
-      
+
       // Mock getChatConversationHistory to return the expected messages
       vi.mocked(database.getChatConversationHistory).mockResolvedValue(
         messageData.rawLlmMessages as any
@@ -123,7 +123,7 @@ describe('message-fetchers', () => {
       };
 
       mockDb.limit.mockResolvedValue([messageData]);
-      
+
       // Mock getChatConversationHistory to return the expected messages
       vi.mocked(database.getChatConversationHistory).mockResolvedValue(
         messageData.rawLlmMessages as any

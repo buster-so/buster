@@ -11,7 +11,6 @@ import type {
 } from '@buster/server-shared/message';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { currentSpan, initLogger, wrapTraced } from 'braintrust';
-import { z } from 'zod/v4';
 import {
   buildWorkflowInput,
   fetchMessageWithContext,
@@ -145,7 +144,7 @@ export const messagePostProcessingTask: ReturnType<
         hasRawLlmMessages: !!messageContext.rawLlmMessages,
       });
 
-      // Step 3: Build workflow input
+      // Step 3: Build workflow inpu
       const workflowInput = buildWorkflowInput(
         messageContext,
         previousPostProcessingResults,

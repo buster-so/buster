@@ -18,7 +18,12 @@ vi.mock('@buster/database', () => ({
         where: vi.fn(() => ({
           limit: vi.fn(() =>
             Promise.resolve([
-              { id: 'integration-1', defaultChannel: { id: 'C123' }, tokenVaultKey: 'vault-key-1', status: 'active' },
+              {
+                id: 'integration-1',
+                defaultChannel: { id: 'C123' },
+                tokenVaultKey: 'vault-key-1',
+                status: 'active',
+              },
             ])
           ),
         })),

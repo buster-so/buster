@@ -28,9 +28,10 @@ describe('verify-webhook-signature', () => {
     // Default mock for getSecret
     vi.mocked(getSecret).mockImplementation(async (key: string) => {
       if (key === 'GITHUB_APP_ID') return '123456';
-      if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64') return Buffer.from(
-        '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
-      ).toString('base64');
+      if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64')
+        return Buffer.from(
+          '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
+        ).toString('base64');
       if (key === 'GITHUB_WEBHOOK_SECRET') return 'test-webhook-secret';
       throw new Error(`Unexpected key: ${key}`);
     });
@@ -200,7 +201,9 @@ describe('verify-webhook-signature', () => {
       };
 
       // Act & Assert
-      await expect(verifyGitHubWebhook(payload, headers)).rejects.toThrow('Invalid webhook signature');
+      await expect(verifyGitHubWebhook(payload, headers)).rejects.toThrow(
+        'Invalid webhook signature'
+      );
     });
 
     it('should include error code in thrown error', async () => {

@@ -36,7 +36,7 @@ describe('github-app', () => {
       // Arrange
       const privateKey = '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----';
       const privateKeyBase64 = Buffer.from(privateKey).toString('base64');
-      
+
       vi.mocked(getSecret).mockImplementation(async (key: string) => {
         if (key === 'GITHUB_APP_ID') return '123456';
         if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64') return privateKeyBase64;
@@ -119,7 +119,8 @@ describe('github-app', () => {
       // Arrange
       vi.mocked(getSecret).mockImplementation(async (key: string) => {
         if (key === 'GITHUB_APP_ID') return '123456';
-        if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64') return Buffer.from('not-a-private-key').toString('base64');
+        if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64')
+          return Buffer.from('not-a-private-key').toString('base64');
         if (key === 'GITHUB_WEBHOOK_SECRET') return 'test';
         throw new Error(`Unexpected key: ${key}`);
       });
@@ -136,7 +137,7 @@ describe('github-app', () => {
       // Arrange
       const privateKey = '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----';
       const privateKeyBase64 = Buffer.from(privateKey).toString('base64');
-      
+
       vi.mocked(getSecret).mockImplementation(async (key: string) => {
         if (key === 'GITHUB_APP_ID') return '123456';
         if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64') return privateKeyBase64;
@@ -162,7 +163,7 @@ describe('github-app', () => {
       // Arrange
       const privateKey = '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----';
       const privateKeyBase64 = Buffer.from(privateKey).toString('base64');
-      
+
       vi.mocked(getSecret).mockImplementation(async (key: string) => {
         if (key === 'GITHUB_APP_ID') return '123456';
         if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64') return privateKeyBase64;
@@ -175,7 +176,9 @@ describe('github-app', () => {
       });
 
       // Act & Assert
-      await expect(createGitHubApp()).rejects.toThrow('Failed to create GitHub App: Failed to create app');
+      await expect(createGitHubApp()).rejects.toThrow(
+        'Failed to create GitHub App: Failed to create app'
+      );
     });
   });
 });
