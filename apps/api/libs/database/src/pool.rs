@@ -7,6 +7,7 @@ use diesel_async::{pooled_connection::AsyncDieselConnectionManager, AsyncPgConne
 use futures::future::BoxFuture;
 use futures::FutureExt;
 use once_cell::sync::OnceCell;
+use secrets::{get_secret, get_secret_or_default, DatabaseConfig, RedisConfig};
 use sqlx::postgres::{PgPool as SqlxPool, PgPoolOptions};
 use std::env;
 use std::sync::Arc;
@@ -74,12 +75,16 @@ pub fn get_redis_pool() -> &'static RedisPool {
 }
 
 pub async fn establish_diesel_connection() -> Result<PgPool> {
-    let db_url = env::var("DATABASE_URL")
-        .unwrap_or("postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string());
-    let max_pool_size: usize = env::var("DATABASE_POOL_SIZE")
-        .unwrap_or("30".to_string())
-        .parse()
-        .expect("DATABASE_POOL_SIZE must be a valid usize");
+    let db_config = match DatabaseConfig::from_secrets().await {
+        Ok(config) => config,
+        Err(_) => DatabaseConfig {
+            url: "postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string(),
+            pool_size: 30,
+        }
+    };
+    
+    let db_url = db_config.url;
+    let max_pool_size = db_config.pool_size as usize;
 
     let ssl_mode = extract_ssl_mode(&db_url);
     
@@ -125,10 +130,9 @@ pub async fn establish_diesel_connection() -> Result<PgPool> {
 }
 
 pub async fn establish_sqlx_connection() -> Result<SqlxPool> {
-    let db_url = env::var("POOLER_URL")
-        .unwrap_or("postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string());
-    let max_pool_size: u32 = env::var("SQLX_POOL_SIZE")
-        .unwrap_or("30".to_string())
+    let db_url = get_secret("POOLER_URL").await
+        .unwrap_or_else(|_| "postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string());
+    let max_pool_size: u32 = get_secret_or_default("SQLX_POOL_SIZE", "30").await
         .parse()
         .expect("SQLX_POOL_SIZE must be a valid u32");
 
@@ -264,7 +268,13 @@ impl rustls::client::danger::ServerCertVerifier for NoVerifier {
 }
 
 pub async fn create_redis_pool() -> Result<RedisPool> {
-    let redis_url = env::var("REDIS_URL").unwrap_or("redis://localhost:6379".to_string());
+    let redis_config = match RedisConfig::from_secrets().await {
+        Ok(config) => config,
+        Err(_) => RedisConfig {
+            url: "redis://localhost:6379".to_string(),
+        }
+    };
+    let redis_url = redis_config.url;
 
     let manager = match RedisConnectionManager::new(redis_url) {
         Ok(manager) => manager,
@@ -293,7 +303,7 @@ pub async fn init_test_pools() -> Result<()> {
     // Only initialize if pools haven't been set yet
     if DIESEL_POOL.get().is_none() && SQLX_POOL.get().is_none() && REDIS_POOL.get().is_none() {
         // Use test-specific database URLs 
-        std::env::set_var("DATABASE_URL", std::env::var("TEST_DATABASE_URL")
+        std::env::set_var("DATABASE_URL", get_secret("TEST_DATABASE_URL").await
             .unwrap_or_else(|_| "postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string()));
             
         // Initialize the pools normally

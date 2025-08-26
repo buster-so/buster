@@ -4,7 +4,7 @@ use dataset_security::get_permissioned_datasets;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
-use std::env;
+use secrets::get_secret_sync_or_default;
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use uuid::Uuid;
@@ -170,7 +170,7 @@ impl BusterMultiAgent {
         // Create the mode provider
         let mode_provider = Arc::new(BusterModeProvider { agent_data });
 
-        let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
+        let model = if get_secret_sync_or_default("ENVIRONMENT", "development") == "local" {
             "o4-mini".to_string()
         } else {
             "o4-mini".to_string()

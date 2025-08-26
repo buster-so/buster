@@ -1,5 +1,7 @@
+import { ELECTRIC_KEYS, getSecret } from '@buster/secrets';
+
 export const createProxiedResponse = async (url: URL): Promise<Response> => {
-  const secretKey = process.env.ELECTRIC_SECRET;
+  const secretKey = await getSecret(ELECTRIC_KEYS.ELECTRIC_SECRET);
 
   if (!secretKey) {
     throw new Error('ELECTRIC_SECRET is not set');

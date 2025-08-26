@@ -17,6 +17,9 @@ reqwest = { workspace = true, features = ["json", "rustls-tls"] }
 # Non-workspace dependencies (if any, prefer workspace)
 dotenvy = "0.15"
 
+# Add secrets dependency  
+secrets = { path = "../secrets" }
+
 [dev-dependencies]
 tokio-test = { workspace = true }
 mockito = { workspace = true } 

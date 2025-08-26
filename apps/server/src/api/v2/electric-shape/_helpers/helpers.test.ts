@@ -30,32 +30,22 @@ describe('getElectricShapeUrl', () => {
     }
   });
 
-  it('should return default URL with /v1/shape path when no ELECTRIC_PROXY_URL is set', () => {
+  it('should return default URL with /v1/shape path when no ELECTRIC_PROXY_URL is set', async () => {
     const requestUrl = 'http://example.com/test?table=users';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('http://localhost:3000/v1/shape?table=users');
   });
 
-  it('should use ELECTRIC_PROXY_URL environment variable when set', () => {
+  it('should use ELECTRIC_PROXY_URL environment variable when set', async () => {
     process.env.ELECTRIC_PROXY_URL = 'https://electric.example.com';
     const requestUrl = 'http://example.com/test?table=users&live=true';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('https://electric.example.com/v1/shape?table=users&live=true');
   });
 
-  it('should copy allowed query parameters', () => {
-    const requestUrl = 'http://example.com/test?live=true&table=users&handle=abc123&offset=100';
-    const result = getElectricShapeUrl(requestUrl);
-
-    expect(result.searchParams.get('live')).toBe('true');
-    expect(result.searchParams.get('table')).toBe('users');
-    expect(result.searchParams.get('handle')).toBe('abc123');
-    expect(result.searchParams.get('offset')).toBe('100');
-  });
-
-  it('should copy all allowed query parameters', () => {
+  it('should copy allowed query parameters', async () => {
     const allowedParams = [
       'live=true',
       'table=users',
@@ -70,7 +60,7 @@ describe('getElectricShapeUrl', () => {
     ];
 
     const requestUrl = `http://example.com/test?${allowedParams.join('&')}`;
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('live')).toBe('true');
     expect(result.searchParams.get('table')).toBe('users');
@@ -84,9 +74,38 @@ describe('getElectricShapeUrl', () => {
     expect(result.searchParams.get('secret')).toBe('secret123');
   });
 
-  it('should not copy disallowed query parameters', () => {
+  it('should copy all allowed query parameters', async () => {
+    const allowedParams = [
+      'live=true',
+      'table=users',
+      'handle=abc123',
+      'offset=100',
+      'cursor=xyz789',
+      'where=id>10',
+      'params={"key":"value"}',
+      'columns=id,name',
+      'replica=primary',
+      'secret=secret123',
+    ];
+
+    const requestUrl = `http://example.com/test?${allowedParams.join('&')}`;
+    const result = await getElectricShapeUrl(requestUrl);
+
+    expect(result.searchParams.get('live')).toBe('true');
+    expect(result.searchParams.get('table')).toBe('users');
+    expect(result.searchParams.get('handle')).toBe('abc123');
+    expect(result.searchParams.get('offset')).toBe('100');
+    expect(result.searchParams.get('cursor')).toBe('xyz789');
+    expect(result.searchParams.get('where')).toBe('id>10');
+    expect(result.searchParams.get('params')).toBe('{"key":"value"}');
+    expect(result.searchParams.get('columns')).toBe('id,name');
+    expect(result.searchParams.get('replica')).toBe('primary');
+    expect(result.searchParams.get('secret')).toBe('secret123');
+  });
+
+  it('should not copy disallowed query parameters', async () => {
     const requestUrl = 'http://example.com/test?table=users&forbidden=value&another=param&limit=50';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('table')).toBe('users');
     expect(result.searchParams.get('forbidden')).toBeNull();
@@ -94,10 +113,10 @@ describe('getElectricShapeUrl', () => {
     expect(result.searchParams.get('limit')).toBeNull();
   });
 
-  it('should handle mixed allowed and disallowed parameters', () => {
+  it('should handle mixed allowed and disallowed parameters', async () => {
     const requestUrl =
       'http://example.com/test?live=true&forbidden=value&table=users&limit=50&handle=abc';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('live')).toBe('true');
     expect(result.searchParams.get('table')).toBe('users');
@@ -106,61 +125,61 @@ describe('getElectricShapeUrl', () => {
     expect(result.searchParams.get('limit')).toBeNull();
   });
 
-  it('should handle URL with no query parameters', () => {
+  it('should handle URL with no query parameters', async () => {
     const requestUrl = 'http://example.com/test';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('http://localhost:3000/v1/shape');
     expect(result.searchParams.toString()).toBe('');
   });
 
-  it('should handle empty query parameter values', () => {
+  it('should handle empty query parameter values', async () => {
     const requestUrl = 'http://example.com/test?table=&live=true&handle=';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('table')).toBe('');
     expect(result.searchParams.get('live')).toBe('true');
     expect(result.searchParams.get('handle')).toBe('');
   });
 
-  it('should handle URL-encoded query parameters', () => {
+  it('should handle URL-encoded query parameters', async () => {
     const requestUrl = 'http://example.com/test?where=id%3E10&params=%7B%22key%22%3A%22value%22%7D';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('where')).toBe('id>10');
     expect(result.searchParams.get('params')).toBe('{"key":"value"}');
   });
 
-  it('should handle complex where clause with special characters', () => {
+  it('should handle complex where clause with special characters', async () => {
     const whereClause = "name='John Doe' AND age>18";
     const encodedWhere = encodeURIComponent(whereClause);
     const requestUrl = `http://example.com/test?table=users&where=${encodedWhere}`;
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('table')).toBe('users');
     expect(result.searchParams.get('where')).toBe(whereClause);
   });
 
-  it('should preserve multiple values for the same parameter', () => {
+  it('should preserve multiple values for the same parameter', async () => {
     // Note: URL constructor handles multiple params by taking the last value
     const requestUrl = 'http://example.com/test?table=users&table=posts';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.searchParams.get('table')).toBe('posts');
   });
 
-  it('should handle ELECTRIC_PROXY_URL with trailing slash', () => {
+  it('should handle ELECTRIC_PROXY_URL with trailing slash', async () => {
     process.env.ELECTRIC_PROXY_URL = 'https://electric.example.com/';
     const requestUrl = 'http://example.com/test?table=users';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('https://electric.example.com/v1/shape?table=users');
   });
 
-  it('should handle ELECTRIC_PROXY_URL with path', () => {
+  it('should handle ELECTRIC_PROXY_URL with path', async () => {
     process.env.ELECTRIC_PROXY_URL = 'https://api.example.com/electric';
     const requestUrl = 'http://example.com/test?table=users';
-    const result = getElectricShapeUrl(requestUrl);
+    const result = await getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('https://api.example.com/v1/shape?table=users');
   });

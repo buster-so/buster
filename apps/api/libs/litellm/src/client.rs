@@ -1,16 +1,16 @@
 use anyhow::Result;
 use futures_util::StreamExt;
 use reqwest::{header, Client};
-use std::env;
 use tokio::sync::mpsc;
 use once_cell::sync::Lazy;
 use tracing;
+use secrets::{get_secret_sync, get_secret_sync_or_default};
 
 use super::types::*;
 
 // Debug flag controlled by environment variable
 static DEBUG_ENABLED: Lazy<bool> = Lazy::new(|| {
-    env::var("LITELLM_DEBUG")
+    get_secret_sync("LITELLM_DEBUG")
         .map(|val| val.to_lowercase() == "true" || val == "1")
         .unwrap_or(false)
 });
@@ -33,11 +33,11 @@ impl LiteLLMClient {
         // Check for API key - when using LiteLLM with a config file, the API key is typically
         // already in the config file, so we just need a dummy value here for the client
         let api_key = api_key
-            .or_else(|| env::var("LLM_API_KEY").ok())
+            .or_else(|| get_secret_sync("LLM_API_KEY").ok())
             .unwrap_or_else(|| {
                 // If we have a LiteLLM config path, we can use a placeholder API key
                 // since auth will be handled by the LiteLLM server using the config
-                if env::var("LITELLM_CONFIG_PATH").is_ok() {
+                if get_secret_sync("LITELLM_CONFIG_PATH").is_ok() {
                     Self::debug_log("Using LiteLLM config from environment");
                     "dummy-key-not-used".to_string()
                 } else {
@@ -46,7 +46,7 @@ impl LiteLLMClient {
             });
 
         let base_url = base_url
-            .or_else(|| env::var("LLM_BASE_URL").ok())
+            .or_else(|| get_secret_sync("LLM_BASE_URL").ok())
             .unwrap_or_else(|| "http://localhost:8000".to_string());
 
         let mut headers = header::HeaderMap::new();
@@ -356,8 +356,8 @@ mod tests {
         dotenv().ok();
 
         // Get API key and base URL from environment
-        let api_key = env::var("LLM_API_KEY").expect("LLM_API_KEY must be set");
-        let base_url = env::var("LLM_BASE_URL").expect("LLM_API_BASE must be set");
+        let api_key = get_secret_sync("LLM_API_KEY").expect("LLM_API_KEY must be set");
+        let base_url = get_secret_sync("LLM_BASE_URL").expect("LLM_API_BASE must be set");
 
         (api_key, base_url)
     }

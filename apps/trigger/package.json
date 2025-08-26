@@ -40,7 +40,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "catalog:",
+    "@trigger.dev/build": "4.0.1",
     "@types/uuid": "^10.0.0"
   }
 }

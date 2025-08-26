@@ -10,7 +10,7 @@ const app = new Hono().post(
       name: z.string().min(1),
     })
   ),
-  (c) => {
+  async (c) => {
     return c.json({ message: 'User created' });
   }
 );

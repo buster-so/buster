@@ -31,6 +31,8 @@ dotenv = { workspace = true }
 reqwest = { workspace = true }
 lazy_static = { workspace = true }
 
+# Add secrets dependency
+secrets = { path = "../secrets" }
 
 [dev-dependencies]
 tokio-test = { workspace = true } 

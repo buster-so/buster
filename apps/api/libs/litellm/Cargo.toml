@@ -14,6 +14,7 @@ reqwest = { workspace = true }
 dotenv = { workspace = true }
 once_cell = "1.19.0"
 tracing = "0.1"
+secrets = { path = "../secrets" }
 
 [dev-dependencies]
 mockito = { workspace = true }

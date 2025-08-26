@@ -1,5 +1,5 @@
 import { getUserOrganizationId } from '@buster/database';
-import { getSecret, SERVER_KEYS } from '@buster/secrets';
+import { SERVER_KEYS, getSecret } from '@buster/secrets';
 import {
   type GetChannelsResponse,
   type GetIntegrationResponse,

@@ -15,6 +15,7 @@ export { SHARED_KEYS } from './keys/shared';
 export { SLACK_KEYS } from './keys/slack';
 export { TRIGGER_KEYS } from './keys/trigger';
 export { WEB_TOOLS_KEYS } from './keys/web-tools';
+export { ELECTRIC_KEYS } from './keys/electric';
 
 // Export types
 export type { AIKeys } from './keys/ai';

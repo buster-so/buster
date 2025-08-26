@@ -7,7 +7,8 @@ use litellm::{
 use once_cell::sync::Lazy;
 use serde_json::Value;
 use std::time::{Duration, Instant};
-use std::{collections::HashMap, env, sync::Arc};
+use secrets::{get_secret_sync, get_secret_sync_or_default};
+use std::{collections::HashMap, sync::Arc};
 use tokio::sync::{broadcast, mpsc, RwLock};
 use tokio_retry::{strategy::ExponentialBackoff, Retry};
 use tracing::{debug, error, info, instrument, warn};
@@ -218,8 +219,8 @@ impl Agent {
         name: String,
         mode_provider: Arc<dyn ModeProvider + Send + Sync>,
     ) -> Self {
-        let llm_api_key = env::var("LLM_API_KEY").ok(); // Use ok() instead of expect
-        let llm_base_url = env::var("LLM_BASE_URL").ok(); // Use ok() instead of expect
+        let llm_api_key = get_secret_sync("LLM_API_KEY").ok(); // Use ok() instead of expect
+        let llm_base_url = get_secret_sync("LLM_BASE_URL").ok(); // Use ok() instead of expect
 
         let llm_client = LiteLLMClient::new(llm_api_key, llm_base_url);
 
@@ -594,7 +595,7 @@ impl Agent {
             *current = Some(thread_ref.clone());
         }
 
-        let max_recursion = std::env::var("MAX_RECURSION")
+        let max_recursion = get_secret_sync("MAX_RECURSION")
             .ok()
             .and_then(|v| v.parse::<u32>().ok())
             .unwrap_or(15);
@@ -1429,8 +1430,8 @@ mod tests {
             Uuid::new_v4(),
             Uuid::new_v4(),
             "test_agent_no_tools".to_string(),
-            env::var("LLM_API_KEY").ok(),
-            env::var("LLM_BASE_URL").ok(),
+            get_secret_sync("LLM_API_KEY").ok(),
+            get_secret_sync("LLM_BASE_URL").ok(),
             mock_provider,
         ));
 
@@ -1461,8 +1462,8 @@ mod tests {
             Uuid::new_v4(),
             Uuid::new_v4(),
             "test_agent_with_tools".to_string(),
-            env::var("LLM_API_KEY").ok(),
-            env::var("LLM_BASE_URL").ok(),
+            get_secret_sync("LLM_API_KEY").ok(),
+            get_secret_sync("LLM_BASE_URL").ok(),
             mock_provider,
         ));
 
@@ -1505,8 +1506,8 @@ mod tests {
             Uuid::new_v4(),
             Uuid::new_v4(),
             "test_agent_multi_step".to_string(),
-            env::var("LLM_API_KEY").ok(),
-            env::var("LLM_BASE_URL").ok(),
+            get_secret_sync("LLM_API_KEY").ok(),
+            get_secret_sync("LLM_BASE_URL").ok(),
             mock_provider,
         ));
 
@@ -1548,8 +1549,8 @@ mod tests {
             Uuid::new_v4(),
             Uuid::new_v4(),
             "test_agent_disabled".to_string(),
-            env::var("LLM_API_KEY").ok(),
-            env::var("LLM_BASE_URL").ok(),
+            get_secret_sync("LLM_API_KEY").ok(),
+            get_secret_sync("LLM_BASE_URL").ok(),
             mock_provider,
         ));
 
@@ -1631,8 +1632,8 @@ mod tests {
             Uuid::new_v4(),
             Uuid::new_v4(),
             "test_agent_state".to_string(),
-            env::var("LLM_API_KEY").ok(),
-            env::var("LLM_BASE_URL").ok(),
+            get_secret_sync("LLM_API_KEY").ok(),
+            get_secret_sync("LLM_BASE_URL").ok(),
             mock_provider,
         ));
 

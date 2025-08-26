@@ -7,8 +7,8 @@ use diesel_async::RunQueryDsl;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use middleware::AuthenticatedUser;
 use serde::{Deserialize, Serialize};
-use std::env;
 use uuid::Uuid;
+use secrets::get_secret_sync;
 
 use crate::routes::rest::ApiResponse;
 use database::models::ApiKey;
@@ -44,7 +44,7 @@ pub async fn post_api_key(
 }
 
 async fn post_api_key_handler(user: AuthenticatedUser) -> Result<String> {
-    let jwt_secret = env::var("JWT_SECRET").map_err(|_| anyhow::anyhow!("JWT_SECRET not set"))?;
+    let jwt_secret = get_secret_sync("JWT_SECRET").map_err(|_| anyhow::anyhow!("JWT_SECRET not set"))?;
 
     // Create JWT claims
     let claims = ApiKeyClaims {

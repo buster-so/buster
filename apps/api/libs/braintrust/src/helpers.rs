@@ -39,7 +39,7 @@ pub async fn get_prompt_system_message(client: &BraintrustClient, prompt_id: &st
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env;
+    use secrets::get_secret_sync;
     use dotenv::dotenv;
     
     #[tokio::test]
@@ -48,7 +48,7 @@ mod tests {
         dotenv().ok();
         
         // Skip test if no API key is available
-        if env::var("BRAINTRUST_API_KEY").is_err() {
+        if get_secret_sync("BRAINTRUST_API_KEY").is_err() {
             println!("Skipping test_get_prompt_system_message: No API key available");
             return Ok(());
         }

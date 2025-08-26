@@ -1,6 +1,5 @@
-use std::env;
-
 use anyhow::Result;
+use secrets::get_secret_sync_or_default;
 use litellm::{AgentMessage, ChatCompletionRequest, LiteLLMClient, Metadata, ResponseFormat};
 use serde_json::Value;
 use tracing::{error, warn};
@@ -63,7 +62,7 @@ Example Output for the above plan: `["Create line chart visualization 'Daily Tra
         plan
     );
 
-    let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
+    let model = if get_secret_sync_or_default("ENVIRONMENT", "development") == "local" {
         "gpt-4.1-nano".to_string()
     } else {
         "gemini-2.0-flash-001".to_string()

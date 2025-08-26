@@ -1,4 +1,4 @@
-import { getSecret, SERVER_KEYS } from '@buster/secrets';
+import { SERVER_KEYS, getSecret } from '@buster/secrets';
 import { SlackAuthService } from '@buster/slack';
 import { z } from 'zod';
 import { SLACK_OAUTH_SCOPES } from '../constants';
@@ -41,10 +41,6 @@ export class SlackOAuthService {
   private slackAuth: SlackAuthService | null = null;
   private env: z.infer<typeof SlackEnvSchema> | null = null;
   private initPromise: Promise<void> | null = null;
-
-  constructor() {
-    // Initialization will happen on first use
-  }
 
   private async initialize(): Promise<void> {
     if (this.slackAuth) return; // Already initialized
@@ -131,7 +127,10 @@ export class SlackOAuthService {
       };
 
       // Generate OAuth URL and state
-      const { authUrl, state } = await this.slackAuth!.generateAuthUrl(metadata);
+      if (!this.slackAuth) {
+        throw new Error('Slack auth service not initialized');
+      }
+      const { authUrl, state } = await this.slackAuth.generateAuthUrl(metadata);
 
       // Create pending integration
       await slackHelpers.createPendingIntegration({
@@ -184,7 +183,10 @@ export class SlackOAuthService {
 
       // Exchange code for token - use integration.id as tokenKey
       const tokenKey = `slack-token-${integration.id}`;
-      const tokenResponse = await this.slackAuth!.handleCallback(
+      if (!this.slackAuth) {
+        throw new Error('Slack auth service not initialized');
+      }
+      const tokenResponse = await this.slackAuth.handleCallback(
         params.code,
         params.state,
         tokenKey

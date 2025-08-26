@@ -267,7 +267,7 @@ fn determine_types(data_type: &DataType) -> (SimpleType, ColumnType) {
 mod tests {
     use super::*;
     use sqlx::postgres::PgPoolOptions;
-    use std::env;
+    use secrets::get_secret_sync;
 
     // Test that postgres_query properly applies the limit at the database level
     #[tokio::test]
@@ -275,7 +275,7 @@ mod tests {
         use crate::data_source_query_routes::postgres_query::postgres_query;
         
         // Skip test if no test database is available
-        let database_url = match env::var("TEST_DATABASE_URL") {
+        let database_url = match get_secret_sync("TEST_DATABASE_URL") {
             Ok(url) => url,
             Err(_) => return, // Skip test if env var not available
         };
@@ -328,7 +328,7 @@ mod tests {
         use sqlx::mysql::MySqlPoolOptions;
         
         // Skip test if no test database is available
-        let database_url = match env::var("TEST_MYSQL_URL") {
+        let database_url = match get_secret_sync("TEST_MYSQL_URL") {
             Ok(url) => url,
             Err(_) => return, // Skip test if env var not available
         };

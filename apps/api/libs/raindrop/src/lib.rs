@@ -5,7 +5,7 @@ pub mod types;
 
 use anyhow::Context;
 use reqwest::{Client, header};
-use std::env;
+use secrets::get_secret_sync;
 use tracing::{debug, error, instrument};
 
 use errors::RaindropError;
@@ -26,7 +26,7 @@ impl RaindropClient {
     /// Reads the write key from the `RAINDROP_WRITE_KEY` environment variable.
     /// Uses the default Raindrop API base URL.
     pub fn new() -> Result<Self, RaindropError> {
-        let write_key = env::var("RAINDROP_WRITE_KEY")
+        let write_key = get_secret_sync("RAINDROP_WRITE_KEY")
             .map_err(|_| RaindropError::MissingApiKey)?;
         let base_url = DEFAULT_BASE_URL.to_string();
         Self::build_client(write_key, base_url)

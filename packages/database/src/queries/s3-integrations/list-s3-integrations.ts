@@ -49,7 +49,7 @@ export async function listS3Integrations(
 
   const integrations = await query;
 
-  return integrations.map((integration: any) => ({
+  return integrations.map((integration) => ({
     id: integration.id,
     provider: integration.provider,
     organizationId: integration.organizationId,

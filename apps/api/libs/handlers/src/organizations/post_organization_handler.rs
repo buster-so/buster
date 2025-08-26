@@ -1,6 +1,5 @@
-use std::env;
-
 use anyhow::{Context, Result};
+use secrets::get_secret_sync_or_default;
 use chrono::Utc;
 use database::{
     enums::{SharingSetting, UserOrganizationRole, UserOrganizationStatus},
@@ -82,11 +81,11 @@ pub async fn post_organization_handler(name: String, user: AuthenticatedUser) ->
         user.id
     );
 
-    if env::var("TELEMETRY_ENABLED").unwrap_or_default() == "true" {
+    if get_secret_sync_or_default("TELEMETRY_ENABLED", "") == "true" {
         let user_domain = user.email.split('@').last().unwrap_or_default().to_string();
         let user_company_name = new_organization.name.clone();
         tokio::spawn(async move {
-            let posthog_telemetry_key = env::var("POSTHOG_TELEMETRY_KEY").unwrap_or_default();
+            let posthog_telemetry_key = get_secret_sync_or_default("POSTHOG_TELEMETRY_KEY", "");
             let client_options = match ClientOptionsBuilder::default()
                 .api_key(posthog_telemetry_key)
                 .api_endpoint("https://us.i.posthog.com/capture".to_string())

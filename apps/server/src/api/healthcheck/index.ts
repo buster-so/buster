@@ -1,4 +1,5 @@
 import { dbPing } from '@buster/database';
+import { SERVER_KEYS, getSecret } from '@buster/secrets';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 interface HealthCheckResult {
@@ -73,20 +74,32 @@ function checkMemory(): { status: 'pass' | 'fail' | 'warn'; message?: string } {
 }
 
 async function performHealthCheck(): Promise<HealthCheckResult> {
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL is not set');
-  }
+  // Check required secrets are accessible
+  try {
+    const [databaseUrl, electricProxyUrl, supabaseUrl, supabaseServiceRoleKey] = await Promise.all([
+      getSecret(SERVER_KEYS.DATABASE_URL),
+      getSecret(SERVER_KEYS.ELECTRIC_PROXY_URL),
+      getSecret(SERVER_KEYS.SUPABASE_URL),
+      getSecret(SERVER_KEYS.SUPABASE_SERVICE_ROLE_KEY),
+    ]);
 
-  if (!process.env.ELECTRIC_PROXY_URL) {
-    throw new Error('ELECTRIC_PROXY_URL is not set');
-  }
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL is not set');
+    }
 
-  if (!process.env.SUPABASE_URL) {
-    throw new Error('SUPABASE_URL is not set');
-  }
+    if (!electricProxyUrl) {
+      throw new Error('ELECTRIC_PROXY_URL is not set');
+    }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
+    if (!supabaseUrl) {
+      throw new Error('SUPABASE_URL is not set');
+    }
+
+    if (!supabaseServiceRoleKey) {
+      throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
+    }
+  } catch (error) {
+    throw new Error(`Failed to retrieve required secrets: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 
   const [dbCheck] = await Promise.all([checkDatabase()]);

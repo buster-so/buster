@@ -1,7 +1,6 @@
 mod routes;
 pub mod utils;
 
-use std::env;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -15,6 +14,7 @@ use middleware::{
     error::{init_sentry, init_tracing_subscriber, sentry_layer},
 };
 use rustls::crypto::ring;
+use secrets::{init_secrets, get_secret_or_default};
 use stored_values::jobs::trigger_stale_sync_jobs;
 use tokio::sync::broadcast;
 use tokio_cron_scheduler::{Job, JobScheduler};
@@ -30,7 +30,26 @@ pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 async fn main() -> Result<(), anyhow::Error> {
     dotenv().ok();
 
-    let environment = env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
+    // Initialize Infisical and load all secrets
+    match init_secrets().await {
+        Ok(_) => {
+            // Don't log here yet - tracing subscriber isn't initialized
+            println!("Successfully loaded secrets from Infisical");
+        }
+        Err(e) => {
+            eprintln!("Failed to initialize Infisical secrets: {}", e);
+            eprintln!("Make sure INFISICAL_CLIENT_ID, INFISICAL_CLIENT_SECRET, and INFISICAL_PROJECT_ID are set in .env");
+            return Err(anyhow::anyhow!("Failed to initialize secrets"));
+        }
+    }
+    
+    // Verify critical secrets are available after init
+    if secrets::get_secret_sync("JWT_SECRET").is_err() {
+        eprintln!("JWT_SECRET is not available after init_secrets(). Check your Infisical configuration.");
+        return Err(anyhow::anyhow!("JWT_SECRET not available"));
+    }
+
+    let environment = get_secret_or_default("ENVIRONMENT", "development").await;
     let is_development = environment == "development";
 
     ring::default_provider()
@@ -43,15 +62,15 @@ async fn main() -> Result<(), anyhow::Error> {
     );
 
     // Set up the tracing subscriber with conditional Sentry integration
-    let log_level = env::var("LOG_LEVEL")
-        .unwrap_or_else(|_| "warn".to_string())
-        .to_uppercase();
+    let log_level = get_secret_or_default("LOG_LEVEL", "warn").await.to_uppercase();
 
     let env_filter =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(log_level));
 
-    // Initialize the tracing subscriber with Sentry integration using our middleware helper
+    // Re-initialize the tracing subscriber with Sentry integration using our middleware helper
     init_tracing_subscriber(env_filter);
+
+    info!("Successfully initialized with secrets from Infisical");
 
     if let Err(e) = init_pools().await {
         tracing::error!("Failed to initialize database pools: {}", e);
@@ -63,7 +82,7 @@ async fn main() -> Result<(), anyhow::Error> {
     info!("Starting stored values sync job scheduler...");
 
     // Schedule to run every hour
-    let job = Job::new_async("*/5 * * * * *", move |uuid, mut l| {
+    let job = Job::new_async("0 0 * * * *", move |uuid, mut l| {
         Box::pin(async move {
             info!(job_uuid = %uuid, "Running hourly stored values sync job check.");
             if let Err(e) = trigger_stale_sync_jobs().await {
@@ -100,11 +119,12 @@ async fn main() -> Result<(), anyhow::Error> {
         app
     };
 
-    let port_number: u16 = env::var("PORT")
+    let port_number: u16 = std::env::var("SERVER_PORT")
         .unwrap_or_else(|_| "3001".to_string())
         .parse()
-        .unwrap();
+        .expect("Invalid SERVER_PORT value");
 
+    info!("Starting server on port {}", port_number);
     let listener = match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port_number)).await {
         Ok(listener) => listener,
         Err(e) => {

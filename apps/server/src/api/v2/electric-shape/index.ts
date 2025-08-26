@@ -15,7 +15,7 @@ const app = new Hono()
   .use('*', requireAuth)
   // GET route for Electric SQL proxy
   .get('/', zValidator('query', electricShapeSchema), async (c) => {
-    const url = getElectricShapeUrl(c.req.url);
+    const url = await getElectricShapeUrl(c.req.url);
     const table = url.searchParams.get('table');
     const userId = getUserIdFromContext(c);
 

@@ -1,7 +1,9 @@
-export const getElectricShapeUrl = (requestUrl: string) => {
+import { ELECTRIC_KEYS, getSecret } from '@buster/secrets';
+
+export const getElectricShapeUrl = async (requestUrl: string) => {
   const url = new URL(requestUrl);
 
-  const baseUrl = process.env.ELECTRIC_PROXY_URL;
+  const baseUrl = await getSecret(ELECTRIC_KEYS.ELECTRIC_PROXY_URL);
 
   if (!baseUrl) {
     throw new Error('ELECTRIC_PROXY_URL is not set');

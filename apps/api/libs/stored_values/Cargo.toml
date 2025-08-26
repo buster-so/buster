@@ -23,6 +23,7 @@ query_engine = { path = "../query_engine" }
 
 # ---> Add litellm dependency <---
 litellm = { path = "../litellm" }
+secrets = { path = "../secrets" }
 
 [dev-dependencies]
 tokio-test = { workspace = true }

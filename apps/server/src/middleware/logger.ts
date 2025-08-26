@@ -1,4 +1,5 @@
 import { getSecret } from '@buster/secrets';
+import type { Context, Next } from 'hono';
 import { pinoLogger } from 'hono-pino';
 import pino from 'pino';
 
@@ -118,5 +119,13 @@ export const createLoggerMiddleware = async () => {
   });
 };
 
-// Export a promise for backwards compatibility
-export const loggerMiddleware = createLoggerMiddleware();
+// Cache the middleware promise to avoid recreating it on every request
+let cachedMiddleware: ReturnType<typeof pinoLogger> | null = null;
+
+// Export middleware that handles async initialization
+export const loggerMiddleware = async (c: Context, next: Next) => {
+  if (!cachedMiddleware) {
+    cachedMiddleware = await createLoggerMiddleware();
+  }
+  return cachedMiddleware(c, next);
+};

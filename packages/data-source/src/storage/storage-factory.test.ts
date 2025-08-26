@@ -1,4 +1,3 @@
-import { getS3IntegrationByOrganizationId, getSecretByName } from '@buster/database';
 import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createGCSProvider } from './providers/gcs-provider';
 import { createR2Provider } from './providers/r2-provider';
@@ -11,7 +10,14 @@ import {
 } from './storage-factory';
 import type { StorageConfig } from './types';
 
-vi.mock('@buster/database');
+// Mock database functions before importing them
+vi.mock('@buster/database', () => ({
+  getS3IntegrationByOrganizationId: vi.fn(),
+  getSecretByName: vi.fn(),
+}));
+
+// Import after mocking
+import { getS3IntegrationByOrganizationId, getSecretByName } from '@buster/database';
 vi.mock('./providers/s3-provider');
 vi.mock('./providers/r2-provider');
 vi.mock('./providers/gcs-provider');
