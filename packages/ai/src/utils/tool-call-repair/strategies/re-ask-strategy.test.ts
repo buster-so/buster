@@ -1,6 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
+// Mock the LLM module first to prevent initialization
+vi.mock('../../../llm', () => ({
+  Sonnet4: Promise.resolve('mock-model'),
+  Haiku35: Promise.resolve('mock-haiku-model'),
+  getSonnet4: vi.fn().mockResolvedValue('mock-model'),
+  getHaiku35: vi.fn().mockResolvedValue('mock-haiku-model'),
+}));
+
+// Mock braintrust before imports
+vi.mock('braintrust', () => ({
+  wrapTraced: (fn: any) => fn,
+}));
+
 // Mock the dependencies - must be before imports
 vi.mock('ai', () => {
   class MockNoSuchToolError extends Error {
@@ -32,14 +45,6 @@ import { NoSuchToolError, generateText, streamText } from 'ai';
 import { ANALYST_AGENT_NAME, THINK_AND_PREP_AGENT_NAME } from '../../../agents';
 import type { RepairContext } from '../types';
 import { canHandleNoSuchTool, repairWrongToolName } from './re-ask-strategy';
-
-vi.mock('braintrust', () => ({
-  wrapTraced: (fn: any) => fn,
-}));
-
-vi.mock('../../../llm', () => ({
-  Sonnet4: 'mock-model',
-}));
 
 describe('re-ask-strategy', () => {
   beforeEach(() => {

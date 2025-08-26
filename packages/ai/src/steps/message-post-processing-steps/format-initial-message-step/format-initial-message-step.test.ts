@@ -6,19 +6,20 @@ import {
   runFormatInitialMessageStep,
 } from './format-initial-message-step';
 
-// Mock the generateObject function to avoid actual LLM calls in unit tests
-vi.mock('ai', () => ({
-  generateObject: vi.fn(),
-}));
-
-// Mock the Sonnet4 model
+// Mock the LLM module first to prevent initialization
 vi.mock('../../../llm/sonnet-4', () => ({
-  Sonnet4: 'mocked-sonnet-4-model',
+  Sonnet4: Promise.resolve('mocked-sonnet-4-model'),
+  getSonnet4: vi.fn().mockResolvedValue('mocked-sonnet-4-model'),
 }));
 
 // Mock braintrust to avoid external dependencies in unit tests
 vi.mock('braintrust', () => ({
   wrapTraced: vi.fn((fn) => fn),
+}));
+
+// Mock the generateObject function to avoid actual LLM calls in unit tests
+vi.mock('ai', () => ({
+  generateObject: vi.fn(),
 }));
 
 describe('format-initial-message-step', () => {
