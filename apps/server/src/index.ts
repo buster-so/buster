@@ -1,3 +1,25 @@
+// Preload secrets before any other imports that might use them
+import { preloadSecrets } from '@buster/secrets';
+
+await (async () => {
+  try {
+    console.info('🔑 Preloading secrets from Infisical...');
+    await preloadSecrets();
+    console.info('✅ Secrets preloaded successfully');
+
+    // Verify critical secrets
+    const criticalSecrets = ['DATABASE_URL'];
+    for (const secret of criticalSecrets) {
+      if (!process.env[secret]) {
+        console.warn(`⚠️  Warning: ${secret} is not set after preload`);
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️  Could not preload secrets from Infisical:', error);
+    console.info('📝 Using environment variables from .env file');
+  }
+})();
+
 import { Hono } from 'hono';
 import { z } from 'zod';
 

@@ -81,14 +81,21 @@ async fn main() -> Result<(), anyhow::Error> {
 
     info!("Successfully initialized with secrets from Infisical");
 
+    println!("About to initialize database connection pools...");
     info!("Initializing database connection pools...");
-    if let Err(e) = init_pools().await {
-        tracing::error!("Failed to initialize database pools: {}", e);
-        eprintln!("CRITICAL: Database connection failed - {}", e);
-        eprintln!("Check DATABASE_URL and database availability");
-        return Ok(());
+    match init_pools().await {
+        Ok(_) => {
+            println!("Database pools initialized successfully");
+            info!("Database pools initialized successfully");
+        }
+        Err(e) => {
+            println!("Database initialization failed: {}", e);
+            eprintln!("CRITICAL: Database connection failed - {}", e);
+            eprintln!("Check DATABASE_URL and database availability");
+            tracing::error!("Failed to initialize database pools: {}", e);
+            return Ok(());
+        }
     }
-    info!("Database pools initialized successfully");
 
     // --- Start Stored Values Sync Job Scheduler ---
     let scheduler = JobScheduler::new().await?; // Using `?` assuming main returns Result

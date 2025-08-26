@@ -210,9 +210,25 @@ class SecretManager {
     );
   }
 
-  // Preload is now a no-op since we fetch in real-time
-  async preloadSecrets(): Promise<void> {
+  // Preload critical secrets into process.env
+  async preloadSecrets(keysToPreload?: string[]): Promise<void> {
     await this.initInfisical();
+
+    // If no keys specified, only preload the most critical ones
+    // that are needed for app initialization (like DATABASE_URL)
+    const criticalKeys = keysToPreload || ['DATABASE_URL'];
+
+    // Try to fetch and set each critical secret
+    for (const key of criticalKeys) {
+      try {
+        const value = await this.getSecret(key);
+        if (value && !process.env[key]) {
+          process.env[key] = value;
+        }
+      } catch (_error) {
+        // Secret not found, continue with others
+      }
+    }
   }
 
   // Get all available secret keys (for debugging)
@@ -232,15 +248,15 @@ export function getSecretSync(key: string): string {
   return defaultManager.getSecretSync(key);
 }
 
-export async function preloadSecrets(): Promise<void> {
-  return defaultManager.preloadSecrets();
+export async function preloadSecrets(keysToPreload?: string[]): Promise<void> {
+  return defaultManager.preloadSecrets(keysToPreload);
 }
 
 // Export for testing purposes
 export function createSecretManager(options?: SecretManagerOptions): {
   getSecret: (key: string) => Promise<string>;
   getSecretSync: (key: string) => string;
-  preloadSecrets: () => Promise<void>;
+  preloadSecrets: (keysToPreload?: string[]) => Promise<void>;
   getAvailableKeys: () => string[];
 } {
   // Create a new instance with a factory method
@@ -255,7 +271,7 @@ export function createSecretManager(options?: SecretManagerOptions): {
   return {
     getSecret: (key: string) => manager.getSecret(key),
     getSecretSync: (key: string) => manager.getSecretSync(key),
-    preloadSecrets: () => manager.preloadSecrets(),
+    preloadSecrets: (keysToPreload?: string[]) => manager.preloadSecrets(keysToPreload),
     getAvailableKeys: () => manager.getAvailableKeys(),
   };
 }

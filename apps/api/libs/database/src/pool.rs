@@ -22,6 +22,9 @@ static SQLX_POOL: OnceCell<SqlxPool> = OnceCell::new();
 static REDIS_POOL: OnceCell<RedisPool> = OnceCell::new();
 
 pub async fn init_pools() -> Result<()> {
+    println!("init_pools() called - starting database initialization");
+    eprintln!("DEBUG: Attempting to establish database connections...");
+    
     let diesel_pool = match establish_diesel_connection().await {
         Ok(pool) => {
             // Warm up Diesel pool by acquiring min_idle connections
@@ -75,15 +78,23 @@ pub fn get_redis_pool() -> &'static RedisPool {
 }
 
 pub async fn establish_diesel_connection() -> Result<PgPool> {
+    println!("establish_diesel_connection() called");
     let db_config = match DatabaseConfig::from_secrets().await {
-        Ok(config) => config,
-        Err(_) => DatabaseConfig {
-            url: "postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string(),
-            pool_size: 30,
+        Ok(config) => {
+            println!("Got database config from secrets");
+            config
+        },
+        Err(e) => {
+            println!("Failed to get database config from secrets: {}, using fallback", e);
+            DatabaseConfig {
+                url: "postgresql://postgres:postgres@127.0.0.1:54322/postgres".to_string(),
+                pool_size: 30,
+            }
         }
     };
     
-    let db_url = db_config.url;
+    let db_url = db_config.url.clone();
+    println!("Using database URL: {}", db_url.split('@').last().unwrap_or("unknown"));
     let max_pool_size = db_config.pool_size as usize;
 
     let ssl_mode = extract_ssl_mode(&db_url);

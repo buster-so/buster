@@ -1,6 +1,5 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { db } from '@buster/database';
 import { esbuildPlugin } from '@trigger.dev/build/extensions';
 import { defineConfig } from '@trigger.dev/sdk';
 import * as dotenv from 'dotenv';
@@ -11,6 +10,26 @@ export default defineConfig({
   project: 'proj_lyyhkqmzhwiskfnavddk',
   runtime: 'node',
   logLevel: 'log',
+  // Initialize secrets before tasks are loaded
+  init: async () => {
+    const { preloadSecrets } = await import('@buster/secrets');
+    try {
+      console.info('🔑 Preloading secrets from Infisical...');
+      await preloadSecrets();
+      console.info('✅ Secrets preloaded successfully');
+
+      // Verify critical secrets
+      const criticalSecrets = ['DATABASE_URL'];
+      for (const secret of criticalSecrets) {
+        if (!process.env[secret]) {
+          console.warn(`⚠️  Warning: ${secret} is not set after preload`);
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️  Could not preload secrets from Infisical:', error);
+      console.info('📝 Using environment variables from .env file');
+    }
+  },
   // The max compute seconds a task is allowed to run. If the task run exceeds this duration, it will be stopped.
   // You can override this on an individual task.
   // See https://trigger.dev/docs/runs/max-duration
