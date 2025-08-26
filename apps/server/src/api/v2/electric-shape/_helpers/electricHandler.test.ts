@@ -1,27 +1,30 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createProxiedResponse } from './electricHandler';
 
+// Mock @buster/secrets
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn(),
+  ELECTRIC_KEYS: {
+    ELECTRIC_PROXY_URL: 'ELECTRIC_PROXY_URL',
+    ELECTRIC_SECRET: 'ELECTRIC_SECRET',
+    ELECTRIC_SOURCE_ID: 'ELECTRIC_SOURCE_ID',
+  },
+}));
+
+import { getSecret } from '@buster/secrets';
+
 describe('createProxiedResponse', () => {
   const mockFetch = vi.fn<typeof fetch>();
-  let originalEnv: string | undefined;
 
   beforeEach(() => {
     vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
-    // Store original environment variable
-    originalEnv = process.env.ELECTRIC_SECRET;
-    // Set default secret for tests
-    process.env.ELECTRIC_SECRET = 'test-secret';
+    // Default mock for getSecret - can be overridden in individual tests
+    vi.mocked(getSecret).mockResolvedValue('test-secret');
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    // Restore original environment variable
-    if (originalEnv !== undefined) {
-      process.env.ELECTRIC_SECRET = originalEnv;
-    } else {
-      process.env.ELECTRIC_SECRET = undefined;
-    }
   });
 
   it('should proxy a successful response and remove content-encoding and content-length headers', async () => {
@@ -213,8 +216,8 @@ describe('createProxiedResponse', () => {
   });
 
   it('should throw error when ELECTRIC_SECRET environment variable is not set', async () => {
-    // Remove the environment variable
-    process.env.ELECTRIC_SECRET = '';
+    // Mock getSecret to return empty string for ELECTRIC_SECRET
+    vi.mocked(getSecret).mockResolvedValue('');
 
     const testUrl = new URL('https://example.com/test');
 
@@ -226,7 +229,7 @@ describe('createProxiedResponse', () => {
 
   it('should add secret key to URL params when ELECTRIC_SECRET is set', async () => {
     const secretKey = 'test-secret-key-123';
-    process.env.ELECTRIC_SECRET = secretKey;
+    vi.mocked(getSecret).mockResolvedValue(secretKey);
 
     const testUrl = new URL('https://example.com/test');
     const mockResponseBody = 'test response';

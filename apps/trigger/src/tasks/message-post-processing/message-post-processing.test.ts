@@ -23,6 +23,11 @@ vi.mock('./helpers', () => ({
 }));
 
 vi.mock('@buster/database', () => ({
+  db: {
+    update: vi.fn(),
+    set: vi.fn(),
+    where: vi.fn(),
+  },
   getDb: vi.fn(),
   eq: vi.fn((a, b) => ({ type: 'eq', a, b })),
   messages: { id: 'messages.id', postProcessingMessage: 'messages.postProcessingMessage' },
@@ -79,7 +84,17 @@ describe('messagePostProcessingTask', () => {
     vi.clearAllMocks();
     // Mock BRAINTRUST_KEY for unit tests
     vi.stubEnv('BRAINTRUST_KEY', 'test-braintrust-key');
-    mockDb = {
+    
+    // Get the mocked db object from the module mock
+    mockDb = vi.mocked(database.db);
+    
+    // Set up the mock chain to return itself for most methods
+    mockDb.update.mockReturnValue(mockDb);
+    mockDb.set.mockReturnValue(mockDb);
+    mockDb.where.mockReturnValue(mockDb);
+    
+    // Also keep the old getDb mock for backward compatibility if still used
+    const mockGetDb = {
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
@@ -88,13 +103,10 @@ describe('messagePostProcessingTask', () => {
       limit: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
     };
-
-    // Default mock chain behavior
-    mockDb.where.mockReturnValue(mockDb);
-    mockDb.limit.mockResolvedValue([{ tokenVaultKey: 'vault-key-123' }]);
-    mockDb.orderBy.mockResolvedValue([]);
-
-    vi.mocked(database.getDb).mockReturnValue(mockDb);
+    mockGetDb.where.mockReturnValue(mockGetDb);
+    mockGetDb.limit.mockResolvedValue([{ tokenVaultKey: 'vault-key-123' }]);
+    mockGetDb.orderBy.mockResolvedValue([]);
+    vi.mocked(database.getDb).mockReturnValue(mockGetDb);
   });
 
   it('should process message successfully for initial message', async () => {

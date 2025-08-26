@@ -7,93 +7,106 @@ import {
   verifyGitHubWebhookSignature,
 } from './verify-webhook-signature';
 
-describe('verify-webhook-signature', () => {
-  const originalEnv = process.env;
+// Mock @buster/secrets
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn(),
+  GITHUB_KEYS: {
+    GITHUB_APP_ID: 'GITHUB_APP_ID',
+    GITHUB_APP_NAME: 'GITHUB_APP_NAME',
+    GITHUB_APP_PRIVATE_KEY_BASE64: 'GITHUB_APP_PRIVATE_KEY_BASE64',
+    GITHUB_APP_PRIVATE_KEY_BASE: 'GITHUB_APP_PRIVATE_KEY_BASE',
+    GITHUB_WEBHOOK_SECRET: 'GITHUB_WEBHOOK_SECRET',
+    GITHUB_TOKEN: 'GITHUB_TOKEN',
+  },
+}));
 
+import { getSecret } from '@buster/secrets';
+
+describe('verify-webhook-signature', () => {
   beforeEach(() => {
-    // Set up test environment
-    process.env = {
-      ...originalEnv,
-      GITHUB_APP_ID: '123456',
-      GITHUB_APP_PRIVATE_KEY_BASE64: Buffer.from(
-        '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
-      ).toString('base64'),
-      GITHUB_WEBHOOK_SECRET: 'test-webhook-secret',
-    };
     vi.clearAllMocks();
+    // Default mock for getSecret
+    vi.mocked(getSecret).mockImplementation(async (key: string) => {
+      if (key === 'GITHUB_APP_ID') return '123456';
+      if (key === 'GITHUB_APP_PRIVATE_KEY_BASE64') return Buffer.from(
+        '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
+      ).toString('base64');
+      if (key === 'GITHUB_WEBHOOK_SECRET') return 'test-webhook-secret';
+      throw new Error(`Unexpected key: ${key}`);
+    });
   });
 
   afterEach(() => {
-    process.env = originalEnv;
+    vi.restoreAllMocks();
   });
 
   describe('verifyGitHubWebhookSignature', () => {
-    it('should return true for valid signature', () => {
+    it('should return true for valid signature', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const signature = `sha256=${createHmac('sha256', 'test-webhook-secret').update(payload).digest('hex')}`;
 
       // Act
-      const result = verifyGitHubWebhookSignature(payload, signature);
+      const result = await verifyGitHubWebhookSignature(payload, signature);
 
       // Assert
       expect(result).toBe(true);
     });
 
-    it('should return false for invalid signature', () => {
+    it('should return false for invalid signature', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const signature = 'sha256=invalid-signature';
 
       // Act
-      const result = verifyGitHubWebhookSignature(payload, signature);
+      const result = await verifyGitHubWebhookSignature(payload, signature);
 
       // Assert
       expect(result).toBe(false);
     });
 
-    it('should return false when signature is missing', () => {
+    it('should return false when signature is missing', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
 
       // Act
-      const result = verifyGitHubWebhookSignature(payload, undefined);
+      const result = await verifyGitHubWebhookSignature(payload, undefined);
 
       // Assert
       expect(result).toBe(false);
     });
 
-    it('should return false when signature format is invalid', () => {
+    it('should return false when signature format is invalid', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const signature = 'invalid-format-signature';
 
       // Act
-      const result = verifyGitHubWebhookSignature(payload, signature);
+      const result = await verifyGitHubWebhookSignature(payload, signature);
 
       // Assert
       expect(result).toBe(false);
     });
 
-    it('should return false when signature has wrong algorithm', () => {
+    it('should return false when signature has wrong algorithm', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const signature = `sha1=${createHmac('sha1', 'test-webhook-secret').update(payload).digest('hex')}`;
 
       // Act
-      const result = verifyGitHubWebhookSignature(payload, signature);
+      const result = await verifyGitHubWebhookSignature(payload, signature);
 
       // Assert
       expect(result).toBe(false);
     });
 
-    it('should handle different payload types', () => {
+    it('should handle different payload types', async () => {
       // Arrange
       const payload = 'plain-text-payload';
       const signature = `sha256=${createHmac('sha256', 'test-webhook-secret').update(payload).digest('hex')}`;
 
       // Act
-      const result = verifyGitHubWebhookSignature(payload, signature);
+      const result = await verifyGitHubWebhookSignature(payload, signature);
 
       // Assert
       expect(result).toBe(true);
@@ -156,7 +169,7 @@ describe('verify-webhook-signature', () => {
   });
 
   describe('verifyGitHubWebhook', () => {
-    it('should not throw for valid webhook', () => {
+    it('should not throw for valid webhook', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const signature = `sha256=${createHmac('sha256', 'test-webhook-secret').update(payload).digest('hex')}`;
@@ -165,21 +178,21 @@ describe('verify-webhook-signature', () => {
       };
 
       // Act & Assert
-      expect(() => verifyGitHubWebhook(payload, headers)).not.toThrow();
+      await expect(verifyGitHubWebhook(payload, headers)).resolves.not.toThrow();
     });
 
-    it('should throw when signature is missing', () => {
+    it('should throw when signature is missing', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const headers = {};
 
       // Act & Assert
-      expect(() => verifyGitHubWebhook(payload, headers)).toThrow(
+      await expect(verifyGitHubWebhook(payload, headers)).rejects.toThrow(
         'Missing X-Hub-Signature-256 header'
       );
     });
 
-    it('should throw when signature is invalid', () => {
+    it('should throw when signature is invalid', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const headers = {
@@ -187,10 +200,10 @@ describe('verify-webhook-signature', () => {
       };
 
       // Act & Assert
-      expect(() => verifyGitHubWebhook(payload, headers)).toThrow('Invalid webhook signature');
+      await expect(verifyGitHubWebhook(payload, headers)).rejects.toThrow('Invalid webhook signature');
     });
 
-    it('should include error code in thrown error', () => {
+    it('should include error code in thrown error', async () => {
       // Arrange
       const payload = JSON.stringify({ test: 'data' });
       const headers = {
@@ -200,7 +213,7 @@ describe('verify-webhook-signature', () => {
       // Act
       let error: any;
       try {
-        verifyGitHubWebhook(payload, headers);
+        await verifyGitHubWebhook(payload, headers);
       } catch (e) {
         error = e;
       }

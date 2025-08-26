@@ -1,6 +1,6 @@
 import {
   and,
-  dbInitialized,
+  db,
   eq,
   getSecretByName,
   isNull,
@@ -77,8 +77,6 @@ export async function getExistingSlackMessageForChat(chatId: string): Promise<{
   integrationId?: string;
 } | null> {
   try {
-    const db = await dbInitialized;
-
     // Find messages from the same chat that have been sent to Slack
     const existingSlackMessages = await db
       .select({
@@ -151,7 +149,6 @@ export async function sendSlackNotification(
 ): Promise<SlackNotificationResult> {
   try {
     // Step 1: Check if organization has active Slack integration
-    const db = await dbInitialized;
     const [integration] = await db
       .select()
       .from(slackIntegrations)
@@ -610,8 +607,6 @@ export async function trackSlackNotification(params: {
   summaryMessage?: string;
   slackBlocks?: SlackBlock[];
 }): Promise<void> {
-  const db = await dbInitialized;
-
   try {
     await db.transaction(async (tx) => {
       // Insert into slack_message_tracking

@@ -42,8 +42,7 @@ vi.mock('@buster/database', () => {
   const mockDbInstance = createChainableMock();
 
   return {
-    getDb: vi.fn(() => Promise.resolve(mockDbInstance)),
-    dbInitialized: Promise.resolve(mockDbInstance),
+    db: mockDbInstance,
     and: vi.fn((...args) => ({ type: 'and', args })),
     eq: vi.fn((a, b) => ({ type: 'eq', a, b })),
     isNull: vi.fn((field) => ({ type: 'isNull', field })),
@@ -88,9 +87,9 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return empty array when user has no organization', async () => {
-      // Get the dbInitialized mock
+      // Get the db mock
       const dbModule = await import('@buster/database');
-      const mockDb = await dbModule.dbInitialized;
+      const mockDb = dbModule.db;
 
       // Mock for user organization query (returns empty)
       mockDb.select.mockReturnValueOnce(mockDb);
@@ -105,9 +104,9 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return datasets for admin users', async () => {
-      // Get the dbInitialized mock
+      // Get the db mock
       const dbModule = await import('@buster/database');
-      const mockDb = await dbModule.dbInitialized;
+      const mockDb = dbModule.db;
 
       // Mock for user organization query - returns admin user
       mockDb.select.mockReturnValueOnce(mockDb);
@@ -155,9 +154,9 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return false when dataset is deleted', async () => {
-      // Get the dbInitialized mock
+      // Get the db mock
       const dbModule = await import('@buster/database');
-      const mockDb = await dbModule.dbInitialized;
+      const mockDb = dbModule.db;
 
       // Clear previous mock calls
       vi.clearAllMocks();
@@ -198,9 +197,9 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
     });
 
     it('should return false when not all datasets exist', async () => {
-      // Get the dbInitialized mock
+      // Get the db mock
       const dbModule = await import('@buster/database');
-      const mockDb = await dbModule.dbInitialized;
+      const mockDb = dbModule.db;
 
       // Clear previous mock calls
       vi.clearAllMocks();
@@ -226,9 +225,9 @@ describe('Access Controls Unit Tests - Organization Default Permission Group', (
 
   describe('Edge Cases', () => {
     it('should handle database connection errors gracefully', async () => {
-      // Get the dbInitialized mock
+      // Get the db mock
       const dbModule = await import('@buster/database');
-      const mockDb = await dbModule.dbInitialized;
+      const mockDb = dbModule.db;
 
       // Clear previous mock calls
       vi.clearAllMocks();

@@ -16,8 +16,20 @@ vi.mock('@buster/database', () => ({
   getSecretByName: vi.fn(),
 }));
 
+// Mock secrets package
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn(),
+  DATA_SOURCE_KEYS: {
+    R2_ACCOUNT_ID: 'R2_ACCOUNT_ID',
+    R2_ACCESS_KEY_ID: 'R2_ACCESS_KEY_ID',
+    R2_SECRET_ACCESS_KEY: 'R2_SECRET_ACCESS_KEY',
+    R2_BUCKET: 'R2_BUCKET',
+  },
+}));
+
 // Import after mocking
 import { getS3IntegrationByOrganizationId, getSecretByName } from '@buster/database';
+import { getSecret } from '@buster/secrets';
 vi.mock('./providers/s3-provider');
 vi.mock('./providers/r2-provider');
 vi.mock('./providers/gcs-provider');
@@ -115,23 +127,18 @@ describe('Storage Factory', () => {
   });
 
   describe('getDefaultProvider', () => {
-    const originalEnv = process.env;
+    it('should create default R2 provider with environment variables', async () => {
+      (getSecret as Mock).mockImplementation(async (key: string) => {
+        const secrets: Record<string, string> = {
+          R2_ACCOUNT_ID: 'test-account',
+          R2_ACCESS_KEY_ID: 'test-key',
+          R2_SECRET_ACCESS_KEY: 'test-secret',
+          R2_BUCKET: 'custom-bucket',
+        };
+        return secrets[key];
+      });
 
-    beforeEach(() => {
-      process.env = { ...originalEnv };
-    });
-
-    afterEach(() => {
-      process.env = originalEnv;
-    });
-
-    it('should create default R2 provider with environment variables', () => {
-      process.env.R2_ACCOUNT_ID = 'test-account';
-      process.env.R2_ACCESS_KEY_ID = 'test-key';
-      process.env.R2_SECRET_ACCESS_KEY = 'test-secret';
-      process.env.R2_BUCKET = 'custom-bucket';
-
-      const provider = getDefaultProvider();
+      const provider = await getDefaultProvider();
 
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
@@ -143,55 +150,59 @@ describe('Storage Factory', () => {
       expect(provider).toBeDefined();
     });
 
-    it('should use default bucket name if not specified', () => {
-      process.env.R2_ACCOUNT_ID = 'test-account';
-      process.env.R2_ACCESS_KEY_ID = 'test-key';
-      process.env.R2_SECRET_ACCESS_KEY = 'test-secret';
-      delete process.env.R2_BUCKET;
-
-      const provider = getDefaultProvider();
-
-      expect(createR2Provider).toHaveBeenCalledWith({
-        provider: 'r2',
-        accountId: 'test-account',
-        bucket: 'metric-exports',
-        accessKeyId: 'test-key',
-        secretAccessKey: 'test-secret',
+    it('should use default bucket name if not specified', async () => {
+      (getSecret as Mock).mockImplementation(async (key: string) => {
+        const secrets: Record<string, string | undefined> = {
+          R2_ACCOUNT_ID: 'test-account',
+          R2_ACCESS_KEY_ID: 'test-key',
+          R2_SECRET_ACCESS_KEY: 'test-secret',
+          R2_BUCKET: undefined,
+        };
+        return secrets[key];
       });
-      expect(provider).toBeDefined();
+
+      await expect(getDefaultProvider()).rejects.toThrow(
+        'Default R2 storage credentials not configured'
+      );
     });
 
-    it('should throw error if R2 credentials are missing', () => {
-      delete process.env.R2_ACCOUNT_ID;
-      delete process.env.R2_ACCESS_KEY_ID;
-      delete process.env.R2_SECRET_ACCESS_KEY;
+    it('should throw error if R2 credentials are missing', async () => {
+      (getSecret as Mock).mockResolvedValue(undefined);
 
-      expect(() => getDefaultProvider()).toThrow('Default R2 storage credentials not configured');
+      await expect(getDefaultProvider()).rejects.toThrow(
+        'Default R2 storage credentials not configured'
+      );
     });
 
-    it('should throw error if partial R2 credentials are missing', () => {
-      process.env.R2_ACCOUNT_ID = 'test-account';
-      delete process.env.R2_ACCESS_KEY_ID;
-      process.env.R2_SECRET_ACCESS_KEY = 'test-secret';
+    it('should throw error if partial R2 credentials are missing', async () => {
+      (getSecret as Mock).mockImplementation(async (key: string) => {
+        const secrets: Record<string, string | undefined> = {
+          R2_ACCOUNT_ID: 'test-account',
+          R2_ACCESS_KEY_ID: undefined,
+          R2_SECRET_ACCESS_KEY: 'test-secret',
+          R2_BUCKET: 'metric-exports',
+        };
+        return secrets[key];
+      });
 
-      expect(() => getDefaultProvider()).toThrow('Default R2 storage credentials not configured');
+      await expect(getDefaultProvider()).rejects.toThrow(
+        'Default R2 storage credentials not configured'
+      );
     });
   });
 
   describe('getProviderForOrganization', () => {
-    const originalEnv = process.env;
-
     beforeEach(() => {
-      process.env = {
-        ...originalEnv,
-        R2_ACCOUNT_ID: 'default-account',
-        R2_ACCESS_KEY_ID: 'default-key',
-        R2_SECRET_ACCESS_KEY: 'default-secret',
-      };
-    });
-
-    afterEach(() => {
-      process.env = originalEnv;
+      // Mock getSecret for default provider
+      (getSecret as Mock).mockImplementation(async (key: string) => {
+        const secrets: Record<string, string> = {
+          R2_ACCOUNT_ID: 'default-account',
+          R2_ACCESS_KEY_ID: 'default-key',
+          R2_SECRET_ACCESS_KEY: 'default-secret',
+          R2_BUCKET: 'metric-exports',
+        };
+        return secrets[key];
+      });
     });
 
     it('should return S3 provider for organization with S3 integration', async () => {

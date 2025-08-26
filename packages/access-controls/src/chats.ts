@@ -4,7 +4,7 @@ import {
   assetTypeEnum,
   chats,
   collectionsToAssets,
-  dbInitialized,
+  db as database,
   eq,
   identityTypeEnum,
   isNull,
@@ -28,21 +28,19 @@ export const canUserAccessChat = async ({
   // Validate inputs
   const input = CanUserAccessChatSchema.parse({ userId, chatId });
 
-  const db = await dbInitialized;
-
   // Run all permission checks concurrently for optimal performance
   const [directPermission, collectionPermission, chatInfo, userOrgs] = await Promise.all([
     // Check 1: Direct user permission on chat
-    checkDirectChatPermission(db, input.userId, input.chatId),
+    checkDirectChatPermission(database, input.userId, input.chatId),
 
     // Check 2: User permission through collections
-    checkCollectionChatPermission(db, input.userId, input.chatId),
+    checkCollectionChatPermission(database, input.userId, input.chatId),
 
     // Check 3: Get chat info (creator & organization)
-    getChatInfo(db, input.chatId),
+    getChatInfo(database, input.chatId),
 
     // Check 4: Get user's organizations and roles
-    getUserOrganizations(db, input.userId),
+    getUserOrganizations(database, input.userId),
   ]);
 
   // If chat doesn't exist or is deleted, deny access
@@ -77,7 +75,7 @@ export const canUserAccessChat = async ({
 
 // Helper function to check direct chat permission
 async function checkDirectChatPermission(
-  db: Awaited<typeof dbInitialized>,
+  db: typeof database,
   userId: string,
   chatId: string
 ): Promise<boolean> {
@@ -100,7 +98,7 @@ async function checkDirectChatPermission(
 
 // Helper function to check collection-based chat permission
 async function checkCollectionChatPermission(
-  db: Awaited<typeof dbInitialized>,
+  db: typeof database,
   userId: string,
   chatId: string
 ): Promise<boolean> {
@@ -131,7 +129,7 @@ async function checkCollectionChatPermission(
 
 // Helper function to get chat info (creator and organization)
 async function getChatInfo(
-  db: Awaited<typeof dbInitialized>,
+  db: typeof database,
   chatId: string
 ): Promise<{ createdBy: string; organizationId: string } | null> {
   const result = await db
@@ -148,7 +146,7 @@ async function getChatInfo(
 
 // Helper function to get user's organizations and roles
 async function getUserOrganizations(
-  db: Awaited<typeof dbInitialized>,
+  db: typeof database,
   userId: string
 ): Promise<Array<{ organizationId: string; role: string }>> {
   const result = await db

@@ -1,33 +1,31 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { extractParamFromWhere, getElectricShapeUrl } from '.';
 
+// Mock @buster/secrets
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn(),
+  ELECTRIC_KEYS: {
+    ELECTRIC_PROXY_URL: 'ELECTRIC_PROXY_URL',
+    ELECTRIC_SECRET: 'ELECTRIC_SECRET',
+    ELECTRIC_SOURCE_ID: 'ELECTRIC_SOURCE_ID',
+  },
+}));
+
+import { getSecret } from '@buster/secrets';
+
 describe('getElectricShapeUrl', () => {
-  let originalElectricUrl: string | undefined;
-  let originalSourceId: string | undefined;
-
   beforeEach(() => {
-    // Save original environment variables
-    originalElectricUrl = process.env.ELECTRIC_PROXY_URL;
-    originalSourceId = process.env.ELECTRIC_SOURCE_ID;
-
-    // Set default test values
-    process.env.ELECTRIC_PROXY_URL = 'http://localhost:3000';
-    process.env.ELECTRIC_SOURCE_ID = '';
+    vi.clearAllMocks();
+    // Default mock for getSecret
+    vi.mocked(getSecret).mockImplementation(async (key: string) => {
+      if (key === 'ELECTRIC_PROXY_URL') return 'http://localhost:3000';
+      if (key === 'ELECTRIC_SOURCE_ID') return '';
+      throw new Error(`Secret not found: ${key}`);
+    });
   });
 
   afterEach(() => {
-    // Restore original environment variables
-    if (originalElectricUrl !== undefined) {
-      process.env.ELECTRIC_PROXY_URL = originalElectricUrl;
-    } else {
-      delete process.env.ELECTRIC_PROXY_URL;
-    }
-
-    if (originalSourceId !== undefined) {
-      process.env.ELECTRIC_SOURCE_ID = originalSourceId;
-    } else {
-      delete process.env.ELECTRIC_SOURCE_ID;
-    }
+    vi.restoreAllMocks();
   });
 
   it('should return default URL with /v1/shape path when no ELECTRIC_PROXY_URL is set', async () => {
@@ -38,7 +36,11 @@ describe('getElectricShapeUrl', () => {
   });
 
   it('should use ELECTRIC_PROXY_URL environment variable when set', async () => {
-    process.env.ELECTRIC_PROXY_URL = 'https://electric.example.com';
+    vi.mocked(getSecret).mockImplementation(async (key: string) => {
+      if (key === 'ELECTRIC_PROXY_URL') return 'https://electric.example.com';
+      if (key === 'ELECTRIC_SOURCE_ID') return '';
+      throw new Error(`Secret not found: ${key}`);
+    });
     const requestUrl = 'http://example.com/test?table=users&live=true';
     const result = await getElectricShapeUrl(requestUrl);
 
@@ -169,7 +171,11 @@ describe('getElectricShapeUrl', () => {
   });
 
   it('should handle ELECTRIC_PROXY_URL with trailing slash', async () => {
-    process.env.ELECTRIC_PROXY_URL = 'https://electric.example.com/';
+    vi.mocked(getSecret).mockImplementation(async (key: string) => {
+      if (key === 'ELECTRIC_PROXY_URL') return 'https://electric.example.com/';
+      if (key === 'ELECTRIC_SOURCE_ID') return '';
+      throw new Error(`Secret not found: ${key}`);
+    });
     const requestUrl = 'http://example.com/test?table=users';
     const result = await getElectricShapeUrl(requestUrl);
 
@@ -177,7 +183,11 @@ describe('getElectricShapeUrl', () => {
   });
 
   it('should handle ELECTRIC_PROXY_URL with path', async () => {
-    process.env.ELECTRIC_PROXY_URL = 'https://api.example.com/electric';
+    vi.mocked(getSecret).mockImplementation(async (key: string) => {
+      if (key === 'ELECTRIC_PROXY_URL') return 'https://api.example.com/electric';
+      if (key === 'ELECTRIC_SOURCE_ID') return '';
+      throw new Error(`Secret not found: ${key}`);
+    });
     const requestUrl = 'http://example.com/test?table=users';
     const result = await getElectricShapeUrl(requestUrl);
 

@@ -1,12 +1,12 @@
 import { InvalidToolInputError, NoSuchToolError } from 'ai';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ANALYST_AGENT_NAME } from '../../agents';
-import { repairToolCall } from './repair-tool-call';
-import type { RepairContext } from './types';
 
-vi.mock('braintrust', () => ({
-  wrapTraced: (fn: any) => fn,
-}));
+// Set up environment variables before any imports to prevent initialization errors
+process.env.ANTHROPIC_API_KEY = 'test-anthropic-key';
+process.env.OPENAI_API_KEY = 'test-openai-key';
+process.env.VERTEX_CLIENT_EMAIL = 'test-vertex-email';
+process.env.VERTEX_PRIVATE_KEY = 'test-vertex-key';
+process.env.VERTEX_PROJECT = 'test-vertex-project';
 
 // Mock the strategy functions
 vi.mock('./strategies/structured-output-strategy', () => ({
@@ -18,6 +18,11 @@ vi.mock('./strategies/re-ask-strategy', () => ({
   canHandleNoSuchTool: vi.fn(),
   repairWrongToolName: vi.fn(),
 }));
+
+// Import after all mocks are set up
+import { ANALYST_AGENT_NAME } from '../../agents';
+import { repairToolCall } from './repair-tool-call';
+import type { RepairContext } from './types';
 
 describe('repairToolCall', () => {
   beforeEach(() => {

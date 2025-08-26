@@ -14,8 +14,7 @@ vi.mock('@buster/database', () => {
   };
 
   return {
-    getDb: vi.fn(() => Promise.resolve(mockDb)),
-    dbInitialized: Promise.resolve(mockDb),
+    db: mockDb,
     and: vi.fn((...args) => ({ _and: args })),
     eq: vi.fn((a, b) => ({ _eq: [a, b] })),
     isNull: vi.fn((a) => ({ _isNull: a })),
@@ -58,7 +57,7 @@ describe('canUserAccessChat', () => {
     vi.clearAllMocks();
     // Get the mock database object
     const dbModule = await import('@buster/database');
-    mockDb = await dbModule.dbInitialized;
+    mockDb = dbModule.db;
 
     // Reset all mocks before each test
     mockDb.select.mockClear();

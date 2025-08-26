@@ -24,7 +24,7 @@ vi.mock('@buster/database', () => {
 
   return {
     getDb: vi.fn(() => Promise.resolve(mockDb)),
-    dbInitialized: Promise.resolve(mockDb),
+    db: mockDb,
     and: vi.fn((...args) => ({ _and: args })),
     eq: vi.fn((a, b) => ({ _eq: [a, b] })),
     isNull: vi.fn((a) => ({ _isNull: a })),
@@ -61,7 +61,7 @@ describe('user-organizations', () => {
     vi.clearAllMocks();
     // Get the mock database object
     const dbModule = await import('@buster/database');
-    mockDb = await dbModule.dbInitialized;
+    mockDb = dbModule.db;
 
     // Reset mock methods to return 'this' for chaining
     mockDb.select.mockReturnThis();
@@ -85,8 +85,6 @@ describe('user-organizations', () => {
         },
       ]);
 
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
-
       const result = await checkUserInOrganization(TEST_USER_ID, TEST_ORG_ID);
 
       expect(result).toEqual({
@@ -102,8 +100,6 @@ describe('user-organizations', () => {
 
     it('should return null when user does not exist in org', async () => {
       mockDb.limit.mockResolvedValue([]);
-
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkUserInOrganization(TEST_USER_ID, TEST_ORG_ID);
 
@@ -136,8 +132,6 @@ describe('user-organizations', () => {
 
       mockDb.where.mockResolvedValue(mockOrgs);
 
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
-
       const result = await getUserOrganizations(TEST_USER_ID);
 
       expect(result).toEqual(mockOrgs);
@@ -146,8 +140,6 @@ describe('user-organizations', () => {
 
     it('should return empty array when user has no organizations', async () => {
       mockDb.where.mockResolvedValue([]);
-
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await getUserOrganizations(TEST_USER_ID);
 
@@ -159,8 +151,6 @@ describe('user-organizations', () => {
     it('should return true when email domain matches org domain', async () => {
       mockDb.limit.mockResolvedValue([{ domains: ['example.com', 'test.com'] }]);
 
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
-
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
       expect(result).toBe(true);
@@ -168,8 +158,6 @@ describe('user-organizations', () => {
 
     it('should return true when email domain matches with @ prefix', async () => {
       mockDb.limit.mockResolvedValue([{ domains: ['@example.com', 'test.com'] }]);
-
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -179,8 +167,6 @@ describe('user-organizations', () => {
     it('should return false when email domain does not match', async () => {
       mockDb.limit.mockResolvedValue([{ domains: ['other.com'] }]);
 
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
-
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
       expect(result).toBe(false);
@@ -188,8 +174,6 @@ describe('user-organizations', () => {
 
     it('should return false when org has no domains', async () => {
       mockDb.limit.mockResolvedValue([{ domains: null }]);
-
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -199,8 +183,6 @@ describe('user-organizations', () => {
     it('should return false when org does not exist', async () => {
       mockDb.limit.mockResolvedValue([]);
 
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
-
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
       expect(result).toBe(false);
@@ -208,8 +190,6 @@ describe('user-organizations', () => {
 
     it('should be case insensitive for domain matching', async () => {
       mockDb.limit.mockResolvedValue([{ domains: ['EXAMPLE.COM'] }]);
-
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await checkEmailDomainForOrganization('user@example.com', TEST_ORG_ID);
 
@@ -230,8 +210,6 @@ describe('user-organizations', () => {
 
       mockDb.limit.mockResolvedValue([mockOrg]);
 
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
-
       const result = await getOrganizationWithDefaults(TEST_ORG_ID);
 
       expect(result).toEqual(mockOrg);
@@ -239,8 +217,6 @@ describe('user-organizations', () => {
 
     it('should return null when organization does not exist', async () => {
       mockDb.limit.mockResolvedValue([]);
-
-      vi.mocked(db.getDb).mockResolvedValue(mockDb as any);
 
       const result = await getOrganizationWithDefaults(TEST_ORG_ID);
 

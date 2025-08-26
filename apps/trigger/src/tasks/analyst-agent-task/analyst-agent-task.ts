@@ -5,7 +5,6 @@ import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './type
 
 // Task 2 & 4: Database helpers (IMPLEMENTED)
 import {
-  dbInitialized,
   getBraintrustMetadata,
   getChatConversationHistory,
   getMessageContext,
@@ -239,9 +238,6 @@ export const analystAgentTask: ReturnType<
   run: async (payload): Promise<AnalystAgentTaskOutput> => {
     const taskStartTime = Date.now();
     const resourceTracker = new ResourceTracker();
-
-    // Ensure database is initialized before any queries
-    await dbInitialized;
 
     // Log initial performance metrics
     logPerformanceMetrics('task-start', payload.message_id, taskStartTime, resourceTracker);

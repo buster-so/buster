@@ -63,7 +63,7 @@ export async function searchValuesByEmbedding(
     const validOptions = SearchOptionsSchema.parse(options);
 
     const schemaName = formatSchemaName(validDataSourceId);
-    const client = await getClient();
+    const client = getClient();
 
     // Build similarity expression with optional threshold
     const similarityExpr = validOptions.similarityThreshold
@@ -158,7 +158,7 @@ export async function searchValuesByEmbeddingWithFilters(
     const validOptions = SearchOptionsSchema.parse(options);
 
     const pgSchemaName = formatSchemaName(validDataSourceId);
-    const client = await getClient();
+    const client = getClient();
 
     // Build filter conditions and parameters
     const filters: string[] = [];
@@ -445,7 +445,7 @@ export async function healthCheck(dataSourceId: string): Promise<boolean> {
   try {
     const validDataSourceId = UuidSchema.parse(dataSourceId);
     const schemaName = formatSchemaName(validDataSourceId);
-    const client = await getClient();
+    const client = getClient();
 
     // Check if the table exists and is accessible
     const result = await client.unsafe(

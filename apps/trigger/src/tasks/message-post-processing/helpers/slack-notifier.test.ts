@@ -12,20 +12,20 @@ vi.mock('@buster/slack', () => ({
 
 // Mock the database
 vi.mock('@buster/database', () => ({
-  getDb: vi.fn(() => ({
+  db: {
     select: vi.fn(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           limit: vi.fn(() =>
             Promise.resolve([
-              { id: 'integration-1', defaultChannel: { id: 'C123' }, tokenVaultKey: 'vault-key-1' },
+              { id: 'integration-1', defaultChannel: { id: 'C123' }, tokenVaultKey: 'vault-key-1', status: 'active' },
             ])
           ),
         })),
       })),
     })),
     transaction: vi.fn(),
-  })),
+  },
   getSecretByName: vi.fn(() => Promise.resolve({ secret: 'xoxb-test-token' })),
   eq: vi.fn(),
   and: vi.fn(),
@@ -34,6 +34,24 @@ vi.mock('@buster/database', () => ({
   messagesToSlackMessages: {},
   slackIntegrations: {},
   slackMessageTracking: {},
+}));
+
+// Mock the @buster/secrets module
+vi.mock('@buster/secrets', () => ({
+  SERVER_KEYS: {
+    BUSTER_URL: 'BUSTER_URL',
+  },
+  SLACK_KEYS: {
+    BUSTER_ALERT_CHANNEL_TOKEN: 'BUSTER_ALERT_CHANNEL_TOKEN',
+    BUSTER_ALERT_CHANNEL_ID: 'BUSTER_ALERT_CHANNEL_ID',
+  },
+  getSecret: vi.fn((key) => {
+    if (key === 'BUSTER_URL') {
+      return Promise.resolve('https://platform.buster.so');
+    }
+    // Return null for alert channel keys to skip that step in tests
+    return Promise.resolve(null);
+  }),
 }));
 
 // Mock fetch

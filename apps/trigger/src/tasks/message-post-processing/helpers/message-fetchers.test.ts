@@ -10,7 +10,15 @@ import {
 
 // Mock the database module
 vi.mock('@buster/database', () => ({
-  getDb: vi.fn(),
+  db: {
+    select: vi.fn(),
+    from: vi.fn(),
+    innerJoin: vi.fn(),
+    leftJoin: vi.fn(),
+    where: vi.fn(),
+    orderBy: vi.fn(),
+    limit: vi.fn(),
+  },
   and: vi.fn((...args) => ({ type: 'and', args })),
   eq: vi.fn((a, b) => ({ type: 'eq', a, b })),
   lt: vi.fn((a, b) => ({ type: 'lt', a, b })),
@@ -27,7 +35,8 @@ vi.mock('@buster/database', () => ({
     rawLlmMessages: 'messages.rawLlmMessages',
   },
   chats: { id: 'chats.id', organizationId: 'chats.organizationId' },
-  users: { id: 'users.id', name: 'users.name' },
+  users: { id: 'users.id', name: 'users.name', email: 'users.email' },
+  getChatConversationHistory: vi.fn(),
 }));
 
 // Mock access controls
@@ -40,24 +49,20 @@ describe('message-fetchers', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDb = {
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      leftJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn(),
-      limit: vi.fn(),
-    };
-
+    
+    // Get the mocked db object from the module mock
+    mockDb = vi.mocked(database.db);
+    
     // Set up the mock chain to return itself for most methods
     mockDb.select.mockReturnValue(mockDb);
     mockDb.from.mockReturnValue(mockDb);
     mockDb.innerJoin.mockReturnValue(mockDb);
     mockDb.leftJoin.mockReturnValue(mockDb);
     mockDb.where.mockReturnValue(mockDb);
-
-    vi.mocked(database.getDb).mockReturnValue(mockDb);
+    mockDb.orderBy.mockReturnValue(mockDb);
+    
+    // Also mock getChatConversationHistory
+    vi.mocked(database.getChatConversationHistory).mockResolvedValue([]);
   });
 
   describe('fetchMessageWithContext', () => {
@@ -69,10 +74,16 @@ describe('message-fetchers', () => {
         createdAt: '2024-01-01T00:00:00Z',
         rawLlmMessages: [{ role: 'user', content: 'Test message' }],
         userName: 'John Doe',
+        userEmail: 'john@example.com',
         organizationId: '423e4567-e89b-12d3-a456-426614174000',
       };
 
       mockDb.limit.mockResolvedValue([messageData]);
+      
+      // Mock getChatConversationHistory to return the expected messages
+      vi.mocked(database.getChatConversationHistory).mockResolvedValue(
+        messageData.rawLlmMessages as any
+      );
 
       const result = await fetchMessageWithContext(messageData.id);
 
@@ -107,10 +118,16 @@ describe('message-fetchers', () => {
         createdAt: '2024-01-01T00:00:00Z',
         rawLlmMessages: [{ role: 'user', content: 'Test' }],
         userName: null,
+        userEmail: null,
         organizationId: '423e4567-e89b-12d3-a456-426614174000',
       };
 
       mockDb.limit.mockResolvedValue([messageData]);
+      
+      // Mock getChatConversationHistory to return the expected messages
+      vi.mocked(database.getChatConversationHistory).mockResolvedValue(
+        messageData.rawLlmMessages as any
+      );
 
       const result = await fetchMessageWithContext(messageData.id);
       expect(result.userName).toBe('Unknown');

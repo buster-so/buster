@@ -3,6 +3,19 @@ import { HTTPException } from 'hono/http-exception';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { githubWebhookValidator } from './github-webhook-validator';
 
+// Mock @buster/secrets
+vi.mock('@buster/secrets', () => ({
+  getSecret: vi.fn(),
+  GITHUB_KEYS: {
+    GITHUB_APP_ID: 'GITHUB_APP_ID',
+    GITHUB_APP_NAME: 'GITHUB_APP_NAME',
+    GITHUB_APP_PRIVATE_KEY_BASE64: 'GITHUB_APP_PRIVATE_KEY_BASE64',
+    GITHUB_APP_PRIVATE_KEY_BASE: 'GITHUB_APP_PRIVATE_KEY_BASE',
+    GITHUB_WEBHOOK_SECRET: 'GITHUB_WEBHOOK_SECRET',
+    GITHUB_TOKEN: 'GITHUB_TOKEN',
+  },
+}));
+
 // Mock the verify webhook signature from github package
 vi.mock('@buster/github', () => ({
   verifyGitHubWebhookSignature: vi.fn(),
@@ -12,10 +25,13 @@ vi.mock('@buster/github', () => ({
 }));
 
 import { InstallationCallbackSchema, verifyGitHubWebhookSignature } from '@buster/github';
+import { getSecret } from '@buster/secrets';
 
 describe('githubWebhookValidator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock for getSecret - can be overridden in individual tests
+    vi.mocked(getSecret).mockResolvedValue('test-webhook-secret');
   });
   const mockPayload = {
     action: 'created' as const,
@@ -51,8 +67,6 @@ describe('githubWebhookValidator', () => {
   it('should validate a valid webhook request', async () => {
     const { app, headers, body } = createMockContext('sha256=test-signature');
 
-    // Mock environment variable
-    process.env.GITHUB_WEBHOOK_SECRET = 'test-secret';
 
     // Mock signature verification to return true
     vi.mocked(verifyGitHubWebhookSignature).mockReturnValue(true);
@@ -109,8 +123,8 @@ describe('githubWebhookValidator', () => {
   it('should reject request when webhook secret is not configured', async () => {
     const { app, headers, body } = createMockContext('sha256=test-signature');
 
-    // Remove environment variable
-    delete process.env.GITHUB_WEBHOOK_SECRET;
+    // Mock getSecret to reject for webhook secret
+    vi.mocked(getSecret).mockRejectedValue(new Error('Secret not found'));
 
     const res = await app.request('/', {
       method: 'POST',
