@@ -117,4 +117,8 @@ export async function getSonnet4(): Promise<ReturnType<typeof createFallback>> {
 }
 
 // Export a promise-based instance for backwards compatibility
-export const Sonnet4 = initializeSonnet4();
+// In test environment, export a resolved promise with a mock value to prevent initialization
+export const Sonnet4 =
+  process.env.NODE_ENV === 'test' || process.env.VITEST
+    ? Promise.resolve('mock-sonnet-4')
+    : initializeSonnet4();

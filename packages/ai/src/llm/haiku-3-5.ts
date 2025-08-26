@@ -90,4 +90,8 @@ export async function getHaiku35(): Promise<ReturnType<typeof createFallback>> {
 }
 
 // Export a promise-based instance for backwards compatibility
-export const Haiku35 = initializeHaiku35();
+// In test environment, export a resolved promise with a mock value to prevent initialization
+export const Haiku35 =
+  process.env.NODE_ENV === 'test' || process.env.VITEST
+    ? Promise.resolve('mock-haiku-35')
+    : initializeHaiku35();

@@ -21,7 +21,7 @@
     "dev:fast": "tsc --watch",
     "lint": "biome check --write",
     "test": "vitest run",
-    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:unit": "NODE_ENV=test vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
     "test:integration": "vitest run src/**/*.int.test.ts src/**/*.integration.test.ts",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
