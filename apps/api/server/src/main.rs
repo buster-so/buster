@@ -133,6 +133,8 @@ async fn main() -> Result<(), anyhow::Error> {
         }
     };
 
+    info!("Server is running on http://0.0.0.0:{}", port_number);
+    
     let server = axum::serve(listener, app);
 
     tokio::select! {
