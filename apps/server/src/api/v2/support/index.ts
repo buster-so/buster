@@ -1,3 +1,4 @@
+import { SLACK_KEYS, getSecret } from '@buster/secrets';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -25,7 +26,7 @@ This is a POST endpoint that sends a support request to the Buster team.
 
 */
   .post('/', zValidator('json', SUPPORT_REQUEST_SCHEMA), async (c) => {
-    const slackHookURL = process.env.SLACK_APP_SUPPORT_URL || '';
+    const slackHookURL = await getSecret(SLACK_KEYS.SLACK_APP_SUPPORT_URL);
     const request = c.req.valid('json');
     const {
       type,

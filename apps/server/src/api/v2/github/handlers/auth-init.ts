@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
-import { type User, getUserOrganizationId } from '@buster/database';
+import { getSecret, type User, getUserOrganizationId } from '@buster/database';
+import { GITHUB_KEYS } from '@buster/secrets';
 import { HTTPException } from 'hono/http-exception';
 import { storeInstallationState } from '../services/installation-state';
 
@@ -26,8 +27,9 @@ export async function authInitHandler(user: User): Promise<{ redirectUrl: string
     createdAt: new Date().toISOString(),
   });
 
+  const appId = await getSecret(GITHUB_KEYS.GITHUB_APP_ID);
+
   // Get GitHub App ID from environment
-  const appId = process.env.GITHUB_APP_ID;
   if (!appId) {
     throw new HTTPException(500, {
       message: 'GitHub App not configured',
@@ -35,7 +37,7 @@ export async function authInitHandler(user: User): Promise<{ redirectUrl: string
   }
 
   // Build the GitHub installation URL
-  const appName = process.env.GITHUB_APP_NAME;
+  const appName = await getSecret(GITHUB_KEYS.GITHUB_APP_NAME);
   if (!appName) {
     throw new HTTPException(500, {
       message: 'GitHub App name not configured',

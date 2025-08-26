@@ -1,10 +1,8 @@
 import { defineConfig } from 'drizzle-kit';
 
-import { DATABASE_KEYS } from '@buster/secrets';
+import { DATABASE_KEYS, getSecretSync } from '@buster/secrets';
 
-// For drizzle-kit CLI usage, we need to use process.env directly
-// since the CLI runs synchronously and can't await async operations
-const connectionString = process.env[DATABASE_KEYS.DATABASE_URL];
+const connectionString = getSecretSync(DATABASE_KEYS.DATABASE_URL);
 
 if (!connectionString) {
   throw new Error(`${DATABASE_KEYS.DATABASE_URL} environment variable is not defined`);

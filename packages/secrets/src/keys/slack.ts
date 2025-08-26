@@ -24,6 +24,10 @@ export const SLACK_KEYS = {
 
   // App Configuration
   SLACK_APP_SUPPORT_URL: 'SLACK_APP_SUPPORT_URL',
+
+  // Buster Alert Channel
+  BUSTER_ALERT_CHANNEL_TOKEN: 'BUSTER_ALERT_CHANNEL_TOKEN',
+  BUSTER_ALERT_CHANNEL_ID: 'BUSTER_ALERT_CHANNEL_ID',
 } as const;
 
 export type SlackKeys = (typeof SLACK_KEYS)[keyof typeof SLACK_KEYS];

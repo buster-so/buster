@@ -17,6 +17,7 @@ import { type PermissionedDataset, getPermissionedDatasets } from '@buster/acces
 // AI package imports
 import { type AnalystWorkflowInput, runAnalystWorkflow } from '@buster/ai';
 
+import { BRAINTRUST_KEYS, SERVER_KEYS, getSecret } from '@buster/secrets';
 import type { ModelMessage } from 'ai';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 
@@ -222,18 +223,6 @@ function logPerformanceMetrics(
   });
 }
 
-/**
- * Simplified Analyst Agent Task
- *
- * TASK 1 STATUS: ✅ COMPLETED - Schema validation implemented
- * TASK 2 STATUS: ✅ COMPLETED - Database helpers implemented in @buster/database
- * TASK 3 STATUS: ✅ COMPLETED - Runtime context setup function implemented
- * TASK 4 STATUS: ✅ COMPLETED - Chat history loading using getChatConversationHistory
- * TASK 5 STATUS: ✅ COMPLETED - Workflow integration enabled and functional
- *
- * All tasks 1-5 are fully implemented and integrated. Workflow integration is complete and functional.
- */
-//@ts-ignore
 export const analystAgentTask: ReturnType<
   typeof schemaTask<
     'analyst-agent-task',
@@ -253,14 +242,17 @@ export const analystAgentTask: ReturnType<
     // Log initial performance metrics
     logPerformanceMetrics('task-start', payload.message_id, taskStartTime, resourceTracker);
 
-    if (!process.env.BRAINTRUST_KEY) {
-      throw new Error('BRAINTRUST_KEY is not set');
+    const braintrustApiKey = await getSecret(BRAINTRUST_KEYS.BRAINTRUST_API_KEY);
+    const environment = await getSecret(SERVER_KEYS.ENVIRONMENT);
+
+    if (!braintrustApiKey) {
+      throw new Error('BRAINTRUST_API_KEY is not set');
     }
 
     // Initialize Braintrust logger
     const braintrustLogger = initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
-      projectName: process.env.ENVIRONMENT || 'development',
+      apiKey: braintrustApiKey,
+      projectName: environment || 'development',
     });
 
     try {

@@ -28,6 +28,9 @@ export const SERVER_KEYS = {
   SERVER_PORT: 'SERVER_PORT',
   SERVER_URL: 'SERVER_URL',
   BUSTER_URL: 'BUSTER_URL',
+
+  // Environment
+  ENVIRONMENT: 'ENVIRONMENT',
 } as const;
 
 export type ServerKeys = (typeof SERVER_KEYS)[keyof typeof SERVER_KEYS];

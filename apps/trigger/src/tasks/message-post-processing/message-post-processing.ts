@@ -8,6 +8,7 @@ import {
   messages,
   slackIntegrations,
 } from '@buster/database';
+import { BRAINTRUST_KEYS, getSecret, SERVER_KEYS } from '@buster/secrets';
 import type {
   AssumptionClassification,
   AssumptionLabel,
@@ -106,14 +107,17 @@ export const messagePostProcessingTask: ReturnType<
   run: async (payload: TaskInput): Promise<TaskOutput> => {
     const startTime = Date.now();
 
-    if (!process.env.BRAINTRUST_KEY) {
-      throw new Error('BRAINTRUST_KEY is not set');
+    const braintrustApiKey = await getSecret(BRAINTRUST_KEYS.BRAINTRUST_API_KEY);
+    const environment = await getSecret(SERVER_KEYS.ENVIRONMENT);
+
+    if (!braintrustApiKey) {
+      throw new Error('BRAINTRUST_API_KEY is not set');
     }
 
     // Initialize Braintrust logger
     const braintrustLogger = initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
-      projectName: process.env.ENVIRONMENT || 'development',
+      apiKey: braintrustApiKey,
+      projectName: environment || 'development',
     });
 
     try {

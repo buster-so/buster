@@ -16,6 +16,7 @@ export { SLACK_KEYS } from './keys/slack';
 export { TRIGGER_KEYS } from './keys/trigger';
 export { WEB_TOOLS_KEYS } from './keys/web-tools';
 export { ELECTRIC_KEYS } from './keys/electric';
+export { BRAINTRUST_KEYS } from './keys/braintrust';
 
 // Export types
 export type { AIKeys } from './keys/ai';
@@ -28,6 +29,8 @@ export type { SharedKeys } from './keys/shared';
 export type { SlackKeys } from './keys/slack';
 export type { TriggerKeys } from './keys/trigger';
 export type { WebToolsKeys } from './keys/web-tools';
+export type { ElectricKeys } from './keys/electric';
+export type { BraintrustKeys } from './keys/braintrust';
 
 // Get the directory of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -79,7 +82,22 @@ class SecretManager {
 
   protected constructor(options: SecretManagerOptions = {}) {
     this.options = {
-      environment: options.environment || process.env.INFISICAL_ENVIRONMENT || 'development',
+      environment:
+        options.environment /* `process.env` is a Node.js global object that provides
+      access to the environment variables of the current
+      process. Environment variables are key-value pairs that
+      can be set outside of the application and are accessible
+      within the application. In the provided code,
+      `process.env` is used to access environment variables like
+      `INIFISICAL_ENVIRONMENT`, `INIFISICAL_PROJECT_ID`,
+      `INIFISICAL_CLIENT_ID`, `INIFISICAL_CLIENT_SECRET`, and
+      `INIFISICAL_SITE_URL` to configure the `SecretManager`
+      instance. These environment variables are used to store
+      sensitive information or configuration settings that can
+      vary between different environments without hardcoding
+      them in the code. */ ||
+        process.env.INFISICAL_ENVIRONMENT ||
+        'development',
       projectId: options.projectId || process.env.INFISICAL_PROJECT_ID,
       clientId: options.clientId || process.env.INFISICAL_CLIENT_ID,
       clientSecret: options.clientSecret || process.env.INFISICAL_CLIENT_SECRET,
@@ -180,6 +198,18 @@ class SecretManager {
     );
   }
 
+  // Synchronous variant: checks only environment variables
+  getSecretSync(key: string): string {
+    const envValue = process.env[key];
+    if (envValue) {
+      return envValue;
+    }
+
+    throw new Error(
+      `Secret "${key}" not found in environment variables. Use async getSecret to fetch from Infisical or set it in your .env.`
+    );
+  }
+
   // Preload is now a no-op since we fetch in real-time
   async preloadSecrets(): Promise<void> {
     await this.initInfisical();
@@ -198,6 +228,10 @@ export async function getSecret(key: string): Promise<string> {
   return defaultManager.getSecret(key);
 }
 
+export function getSecretSync(key: string): string {
+  return defaultManager.getSecretSync(key);
+}
+
 export async function preloadSecrets(): Promise<void> {
   return defaultManager.preloadSecrets();
 }
@@ -205,6 +239,7 @@ export async function preloadSecrets(): Promise<void> {
 // Export for testing purposes
 export function createSecretManager(options?: SecretManagerOptions): {
   getSecret: (key: string) => Promise<string>;
+  getSecretSync: (key: string) => string;
   preloadSecrets: () => Promise<void>;
   getAvailableKeys: () => string[];
 } {
@@ -219,6 +254,7 @@ export function createSecretManager(options?: SecretManagerOptions): {
 
   return {
     getSecret: (key: string) => manager.getSecret(key),
+    getSecretSync: (key: string) => manager.getSecretSync(key),
     preloadSecrets: () => manager.preloadSecrets(),
     getAvailableKeys: () => manager.getAvailableKeys(),
   };
