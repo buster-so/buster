@@ -77,13 +77,36 @@ vi.mock('braintrust', () => ({
   wrapTraced: vi.fn((fn) => fn),
 }));
 
+// Mock secrets module
+vi.mock('@buster/secrets', () => ({
+  BRAINTRUST_KEYS: {
+    BRAINTRUST_API_KEY: 'BRAINTRUST_API_KEY',
+  },
+  SERVER_KEYS: {
+    ENVIRONMENT: 'ENVIRONMENT',
+    BUSTER_URL: 'BUSTER_URL',
+  },
+  SLACK_KEYS: {
+    BUSTER_ALERT_CHANNEL_TOKEN: 'BUSTER_ALERT_CHANNEL_TOKEN',
+    BUSTER_ALERT_CHANNEL_ID: 'BUSTER_ALERT_CHANNEL_ID',
+  },
+  getSecret: vi.fn((key) => {
+    const secrets: Record<string, string> = {
+      BRAINTRUST_API_KEY: 'test-braintrust-api-key',
+      ENVIRONMENT: 'test',
+      BUSTER_URL: 'https://platform.buster.so',
+      BUSTER_ALERT_CHANNEL_TOKEN: 'xoxb-test-token',
+      BUSTER_ALERT_CHANNEL_ID: 'C123456',
+    };
+    return Promise.resolve(secrets[key]);
+  }),
+}));
+
 describe('messagePostProcessingTask', () => {
   let mockDb: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock BRAINTRUST_KEY for unit tests
-    vi.stubEnv('BRAINTRUST_KEY', 'test-braintrust-key');
 
     // Get the mocked db object from the module mock
     mockDb = vi.mocked(database.db);
