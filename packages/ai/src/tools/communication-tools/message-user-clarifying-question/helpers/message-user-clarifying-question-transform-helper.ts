@@ -12,23 +12,31 @@ export const MESSAGE_USER_CLARIFYING_QUESTION_KEYS = {
 } as const;
 
 // Helper to create response entry for clarifying question
-export function messageUserClarifyingQuestionResponseMessage(
-  toolCallId: string,
-  messageUserClarifyingQuestionState: MessageUserClarifyingQuestionState
-): ChatMessageResponseMessage {
+export function createMessageUserClarifyingQuestionResponseMessage(
+  state: MessageUserClarifyingQuestionState,
+  toolCallId: string
+): ChatMessageResponseMessage | undefined {
+  if (!state.clarifyingQuestion) {
+    return undefined;
+  }
+
   return {
     id: toolCallId,
     type: 'text',
-    message: messageUserClarifyingQuestionState.clarifyingQuestion || '',
+    message: state.clarifyingQuestion,
     is_final_message: true,
   };
 }
 
 // Helper to create raw LLM message entry
-export function messageUserClarifyingQuestionRawLlmMessageEntry(
-  toolCallId: string,
-  messageUserClarifyingQuestionState: MessageUserClarifyingQuestionState
-): ModelMessage {
+export function createMessageUserClarifyingQuestionRawLlmMessageEntry(
+  state: MessageUserClarifyingQuestionState,
+  toolCallId: string
+): ModelMessage | undefined {
+  if (!state.args) {
+    return undefined;
+  }
+
   return {
     role: 'assistant',
     content: [
@@ -36,7 +44,7 @@ export function messageUserClarifyingQuestionRawLlmMessageEntry(
         type: 'tool-call',
         toolCallId,
         toolName: MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
-        input: messageUserClarifyingQuestionState.args,
+        input: state.args,
       },
     ],
   };

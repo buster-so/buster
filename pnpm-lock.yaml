@@ -1084,24 +1084,6 @@ importers:
         specifier: ^5.6.3
         version: 5.8.3
 
-  packages/rerank:
-    dependencies:
-      '@buster/env-utils':
-        specifier: workspace:*
-        version: link:../env-utils
-      '@buster/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@buster/vitest-config':
-        specifier: workspace:*
-        version: link:../vitest-config
-      axios:
-        specifier: 'catalog:'
-        version: 1.11.0
-      zod:
-        specifier: 'catalog:'
-        version: 3.25.76
-
   packages/sandbox:
     dependencies:
       '@buster/env-utils':

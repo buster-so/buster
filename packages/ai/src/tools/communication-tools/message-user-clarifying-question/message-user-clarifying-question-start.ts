@@ -1,47 +1,76 @@
 import { updateMessage, updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
+import type { UpdateMessageEntriesParams } from '../../../../../database/src/queries/messages/update-message-entries';
+import { createRawToolResultEntry } from '../../shared/create-raw-llm-tool-result-entry';
 import {
-  messageUserClarifyingQuestionRawLlmMessageEntry,
-  messageUserClarifyingQuestionResponseMessage,
+  createMessageUserClarifyingQuestionRawLlmMessageEntry,
+  createMessageUserClarifyingQuestionResponseMessage,
 } from './helpers/message-user-clarifying-question-transform-helper';
-import type {
-  MessageUserClarifyingQuestionContext,
-  MessageUserClarifyingQuestionState,
+import {
+  MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
+  type MessageUserClarifyingQuestionContext,
+  type MessageUserClarifyingQuestionState,
 } from './message-user-clarifying-question';
 
-// Factory function for onInputStart callback
+// Factory function that creates a type-safe callback for the specific agent context
 export function createMessageUserClarifyingQuestionStart(
   context: MessageUserClarifyingQuestionContext,
   state: MessageUserClarifyingQuestionState
 ) {
-  return async (options: ToolCallOptions) => {
-    const messageId = context.messageId;
-
+  return async function messageUserClarifyingQuestionStart(
+    options: ToolCallOptions
+  ): Promise<void> {
     // Reset state for new tool call to prevent contamination from previous calls
     state.toolCallId = options.toolCallId;
-    state.args = '';
+    state.args = undefined;
     state.clarifyingQuestion = undefined;
 
-    // If we have a messageId, create initial database entries
-    if (messageId) {
-      try {
-        // Create initial response entry (empty, will be updated with streaming)
-        const responseEntry = messageUserClarifyingQuestionResponseMessage(state.toolCallId, state);
+    const responseEntry = createMessageUserClarifyingQuestionResponseMessage(
+      state,
+      options.toolCallId
+    );
+    const rawLlmMessage = createMessageUserClarifyingQuestionRawLlmMessageEntry(
+      state,
+      options.toolCallId
+    );
 
-        // Create raw LLM message entry
-        const rawLlmEntry = messageUserClarifyingQuestionRawLlmMessageEntry(
-          state.toolCallId,
-          state
-        );
+    // Create the tool result immediately with success: true
+    // This ensures it's always present even if the stream terminates early
+    const rawToolResultEntry = createRawToolResultEntry(
+      options.toolCallId,
+      MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
+      {
+        success: true,
+      }
+    );
 
-        // Update database with initial entries (append mode)
-        await updateMessageEntries({
-          messageId,
-          responseMessages: [responseEntry],
-          rawLlmMessages: [rawLlmEntry],
-        });
+    const entries: UpdateMessageEntriesParams = {
+      messageId: context.messageId,
+    };
 
-        // Mark message as completed and add final reasoning message with workflow time
+    if (responseEntry) {
+      entries.responseMessages = [responseEntry];
+    }
+
+    // Include both the tool call and tool result in raw LLM messages
+    // Since it's an upsert, sending both together ensures completeness
+    const rawLlmMessages = [];
+    if (rawLlmMessage) {
+      rawLlmMessages.push(rawLlmMessage);
+    }
+    rawLlmMessages.push(rawToolResultEntry);
+
+    if (rawLlmMessages.length > 0) {
+      entries.rawLlmMessages = rawLlmMessages;
+    }
+
+    try {
+      if (entries.responseMessages || entries.rawLlmMessages) {
+        await updateMessageEntries(entries);
+      }
+
+      // Mark message as completed and add final reasoning message with workflow time
+      if (context.messageId) {
         const currentTime = Date.now();
         const elapsedTimeMs = currentTime - context.workflowStartTime;
         const elapsedSeconds = Math.floor(elapsedTimeMs / 1000);
@@ -54,19 +83,13 @@ export function createMessageUserClarifyingQuestionStart(
           timeString = `${elapsedMinutes} minutes`;
         }
 
-        await updateMessage(messageId, {
+        await updateMessage(context.messageId, {
           isCompleted: true,
           finalReasoningMessage: `Reasoned for ${timeString}`,
         });
-      } catch (error) {
-        console.error(
-          '[message-user-clarifying-question] Failed to create initial database entries',
-          {
-            messageId,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          }
-        );
       }
+    } catch (error) {
+      console.error('[message-user-clarifying-question] Failed to update message entries:', error);
     }
   };
 }

@@ -4,7 +4,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "dev": "echo 'y' | npx trigger.dev@latest dev",
+    "dev": "echo 'y' | npx trigger.dev@latest dev --env-file ../../.env",
     "dev:fast": "echo 'y' | npx trigger.dev@latest dev",
     "deploy": "echo 'y' | npx trigger.dev@latest deploy",
     "build": "echo 'No build step required' && tsc --noEmit",

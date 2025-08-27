@@ -1,45 +1,52 @@
-import { updateMessageEntries } from '@buster/database';
+import { type UpdateMessageEntriesParams, updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
-import type { DoneToolInput } from '../done-tool/done-tool';
-import { messageUserClarifyingQuestionResponseMessage } from './helpers/message-user-clarifying-question-transform-helper';
+import {
+  createMessageUserClarifyingQuestionRawLlmMessageEntry,
+  createMessageUserClarifyingQuestionResponseMessage,
+} from './helpers/message-user-clarifying-question-transform-helper';
 import type {
   MessageUserClarifyingQuestionContext,
   MessageUserClarifyingQuestionInput,
   MessageUserClarifyingQuestionState,
 } from './message-user-clarifying-question';
 
-// Factory function for onInputAvailable callback
 export function createMessageUserClarifyingQuestionFinish(
   context: MessageUserClarifyingQuestionContext,
   state: MessageUserClarifyingQuestionState
 ) {
-  return async (options: { input: MessageUserClarifyingQuestionInput } & ToolCallOptions) => {
-    const messageId = context.messageId;
-
-    // Ensure state has complete input
-    state.args = options.input.clarifying_question;
+  return async function messageUserClarifyingQuestionFinish(
+    options: { input: MessageUserClarifyingQuestionInput } & ToolCallOptions
+  ): Promise<void> {
+    state.toolCallId = options.toolCallId;
     state.clarifyingQuestion = options.input.clarifying_question;
 
-    // If we have a messageId, finalize database entries
-    if (messageId) {
-      try {
-        // Create final response entry with complete question
-        const responseEntry = messageUserClarifyingQuestionResponseMessage(
-          options.toolCallId,
-          state
-        );
+    const responseEntry = createMessageUserClarifyingQuestionResponseMessage(
+      state,
+      options.toolCallId
+    );
+    const rawLlmMessage = createMessageUserClarifyingQuestionRawLlmMessageEntry(
+      state,
+      options.toolCallId
+    );
 
-        // Final update to database
-        await updateMessageEntries({
-          messageId,
-          responseMessages: [responseEntry],
-        });
-      } catch (error) {
-        console.error('[message-user-clarifying-question] Failed to finalize database entries', {
-          messageId,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        });
+    const entries: UpdateMessageEntriesParams = {
+      messageId: context.messageId,
+    };
+
+    if (responseEntry) {
+      entries.responseMessages = [responseEntry];
+    }
+
+    if (rawLlmMessage) {
+      entries.rawLlmMessages = [rawLlmMessage];
+    }
+
+    try {
+      if (entries.responseMessages || entries.rawLlmMessages) {
+        await updateMessageEntries(entries);
       }
+    } catch (error) {
+      console.error('[message-user-clarifying-question] Failed to update message entries:', error);
     }
   };
 }

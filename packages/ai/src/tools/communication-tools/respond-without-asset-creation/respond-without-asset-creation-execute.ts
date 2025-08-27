@@ -44,6 +44,7 @@ async function processRespondWithoutAssetCreation(
   return output;
 }
 
+// Factory function that creates the execute function with proper context typing
 export function createRespondWithoutAssetCreationExecute(
   context: RespondWithoutAssetCreationContext,
   state: RespondWithoutAssetCreationState
@@ -56,7 +57,7 @@ export function createRespondWithoutAssetCreationExecute(
         throw new Error('Tool call ID is required');
       }
 
-      return await processRespondWithoutAssetCreation(state, state.toolCallId, context.messageId);
+      return processRespondWithoutAssetCreation(state, state.toolCallId, context.messageId);
     },
     { name: 'Respond Without Asset Creation' }
   );

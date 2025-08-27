@@ -403,7 +403,7 @@ The following items were processed:
       const deltaHandler = createRespondWithoutAssetCreationDelta(mockContext, state);
       const finishHandler = createRespondWithoutAssetCreationFinish(mockContext, state);
 
-      await startHandler({ toolCallId: 'test-123' });
+      await startHandler({ toolCallId: 'test-123', messages: [] });
       expect(state.toolCallId).toBeTypeOf('string');
 
       await deltaHandler({
@@ -437,7 +437,7 @@ The following items were processed:
 
       const toolCallId = 'streaming-test-123';
 
-      await startHandler({ toolCallId });
+      await startHandler({ toolCallId, messages: [] });
       expect(state.toolCallId).toBe(toolCallId);
 
       const chunks = [

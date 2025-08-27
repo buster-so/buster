@@ -15,6 +15,7 @@ import type {
 } from './respond-without-asset-creation-tool';
 
 // Type-safe key extraction from the schema - will cause compile error if field name changes
+// Using keyof with the inferred type ensures we're using the actual schema keys
 const FINAL_RESPONSE_KEY =
   'final_response' as const satisfies keyof RespondWithoutAssetCreationInput;
 

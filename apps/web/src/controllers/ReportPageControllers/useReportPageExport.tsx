@@ -165,26 +165,50 @@ const buildExportHtml = async (options?: {
       clone.removeAttribute('spellcheck');
     }
 
-    // Ensure the cloned root has no padding and full width
+    // Apply page-friendly styles to elements for proper pagination
+    const reportSections = clonedRoot.querySelectorAll(
+      '.report-section, .report-block, article, section, [data-export-metric]'
+    );
+    reportSections.forEach((section) => {
+      const el = section as HTMLElement;
+      // Add page-break-inside avoid to keep sections together
+      const currentStyle = el.getAttribute('style') || '';
+      el.setAttribute('style', `${currentStyle}; page-break-inside: avoid;`);
+    });
+
+    // Ensure the cloned root has proper styles for pagination
     const existingStyle = clonedRoot.getAttribute('style') || '';
     clonedRoot.setAttribute(
       'style',
-      `${existingStyle}; width: 100%; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: visible;`.trim()
+      `${existingStyle}; width: 100%; padding: 0; height: auto !important; overflow: visible;`.trim()
     );
 
-    // Wrap content with a fixed width, centered container for consistency
+    // Remove fixed height from report-page-controller and its children
+    const reportController = clonedRoot.querySelector('#report-page-controller');
+    if (reportController) {
+      const rcEl = reportController as HTMLElement;
+      const rcStyle = rcEl.getAttribute('style') || '';
+      rcEl.setAttribute(
+        'style',
+        rcStyle.replace(/height:\s*[^;]+;?/gi, 'height: auto !important;')
+      );
+
+      // Also fix direct children
+      const directChild = rcEl.children[0] as HTMLElement;
+      if (directChild) {
+        const childStyle = directChild.getAttribute('style') || '';
+        directChild.setAttribute(
+          'style',
+          childStyle.replace(/height:\s*[^;]+;?/gi, 'height: auto !important;')
+        );
+      }
+    }
+
+    // Wrap content with proper print layout container
     const wrapper = document.createElement('div');
     wrapper.setAttribute(
       'style',
-      [
-        'width: 816px',
-        'max-width: 816px',
-        'min-width: 816px',
-        'margin: 24px auto',
-        'background: #ffffff',
-        'padding: 40px',
-        'box-sizing: border-box'
-      ].join('; ')
+      ['width: 100%', 'background: #ffffff', 'padding: 0', 'box-sizing: border-box'].join('; ')
     );
     wrapper.appendChild(clonedRoot);
     contentHtml = wrapper.outerHTML;
@@ -192,7 +216,7 @@ const buildExportHtml = async (options?: {
     throw new Error('No live root found');
   }
 
-  // Build a minimal HTML document without external CSS
+  // Build HTML document with proper print pagination CSS
   const html = `<!DOCTYPE html>
       <html lang="en">
         <head>
@@ -201,9 +225,87 @@ const buildExportHtml = async (options?: {
           <meta name="color-scheme" content="light dark" />
           <title>${documentTitle}</title>
           <style>
-            body { margin: 0; background: #f5f5f5; }
+            body { 
+              margin: 0; 
+              background: #ffffff;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+            
+            /* Override height constraints for pagination */
+            #report-page-controller,
+            #report-page-controller > div {
+              height: auto !important;
+              overflow: visible !important;
+            }
+            
+            /* Print-specific styles for proper pagination */
             @media print {
-              body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              @page {
+                size: letter;
+                margin: 0.75in;
+              }
+              
+              body { 
+                background: #fff; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+              }
+              
+              /* Page break controls */
+              h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid;
+                page-break-inside: avoid;
+              }
+              
+              p, li, blockquote {
+                page-break-inside: avoid;
+                orphans: 3;
+                widows: 3;
+              }
+              
+              img, svg, canvas {
+                page-break-inside: avoid;
+                max-width: 100% !important;
+              }
+              
+              table {
+                page-break-inside: avoid;
+              }
+              
+              /* Keep sections together when possible */
+              section, article, .report-section, .report-block {
+                page-break-inside: avoid;
+              }
+              
+              /* Add page breaks between major sections if needed */
+              .page-break {
+                page-break-before: always;
+              }
+              
+              /* Ensure content flows naturally across pages */
+              * {
+                float: none !important;
+                position: static !important;
+              }
+            }
+            
+            /* Screen styles for preview */
+            @media screen {
+              body {
+                background: #f5f5f5;
+                padding: 20px;
+              }
+              
+              #report-page-controller {
+                background: white;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                margin: 0 auto;
+                max-width: 8.5in;
+                min-height: 11in;
+                padding: 0.75in;
+              }
             }
           </style>
         </head>

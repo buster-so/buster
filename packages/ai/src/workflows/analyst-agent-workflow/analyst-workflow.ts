@@ -76,25 +76,49 @@ export async function runAnalystWorkflow(
     },
   });
 
-  messages.push(...thinkAndPrepAgentStepResults.messages);
-
-  const analystAgentStepResults = await runAnalystAgentStep({
-    options: {
-      messageId: input.messageId,
-      chatId: input.chatId,
-      organizationId: input.organizationId,
-      dataSourceId: input.dataSourceId,
-      dataSourceSyntax: input.dataSourceSyntax,
-      userId: input.userId,
-      datasets: input.datasets,
-      workflowStartTime,
-    },
-    streamOptions: {
-      messages,
-    },
+  console.info('[runAnalystWorkflow] DEBUG: Think-and-prep results', {
+    workflowId,
+    messageId: input.messageId,
+    earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
+    messageCount: thinkAndPrepAgentStepResults.messages.length,
   });
 
-  messages.push(...analystAgentStepResults.messages);
+  messages.push(...thinkAndPrepAgentStepResults.messages);
+
+  // Check if think-and-prep agent terminated early (clarifying question or direct response)
+  let analystAgentStepResults = { messages: [] as ModelMessage[] };
+
+  if (!thinkAndPrepAgentStepResults.earlyTermination) {
+    console.info('[runAnalystWorkflow] Running analyst agent step (early termination = false)', {
+      workflowId,
+      messageId: input.messageId,
+      earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
+    });
+
+    analystAgentStepResults = await runAnalystAgentStep({
+      options: {
+        messageId: input.messageId,
+        chatId: input.chatId,
+        organizationId: input.organizationId,
+        dataSourceId: input.dataSourceId,
+        dataSourceSyntax: input.dataSourceSyntax,
+        userId: input.userId,
+        datasets: input.datasets,
+        workflowStartTime,
+      },
+      streamOptions: {
+        messages,
+      },
+    });
+
+    messages.push(...analystAgentStepResults.messages);
+  } else {
+    console.info('[runAnalystWorkflow] DEBUG: SKIPPING analyst agent due to early termination', {
+      workflowId,
+      messageId: input.messageId,
+      earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
+    });
+  }
 
   // Extract all tool calls from messages
   const allToolCalls = extractToolCallsFromMessages(messages);

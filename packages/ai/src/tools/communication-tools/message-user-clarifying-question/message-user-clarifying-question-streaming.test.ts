@@ -11,6 +11,7 @@ import { createMessageUserClarifyingQuestionStart } from './message-user-clarify
 // Mock the database update function
 vi.mock('@buster/database', () => ({
   updateMessageEntries: vi.fn().mockResolvedValue(undefined),
+  updateMessage: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock braintrust

@@ -41,15 +41,12 @@ export function createRespondWithoutAssetCreationFinish(
       entries.rawLlmMessages = [rawLlmMessage];
     }
 
-    // Only update database if we have a valid messageId
-    if (context.messageId) {
-      try {
-        if (entries.responseMessages || entries.rawLlmMessages) {
-          await updateMessageEntries(entries);
-        }
-      } catch (error) {
-        console.error('[respond-without-asset-creation] Failed to update final entries:', error);
+    try {
+      if (entries.responseMessages || entries.rawLlmMessages) {
+        await updateMessageEntries(entries);
       }
+    } catch (error) {
+      console.error('[respond-without-asset-creation] Failed to update message entries:', error);
     }
   };
 }

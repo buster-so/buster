@@ -36,6 +36,11 @@ export const ShareMenuContent: React.FC<{
         route: BusterRoutes.APP_COLLECTIONS_ID,
         collectionId: assetId
       });
+    } else if (assetType === 'report' && assetId) {
+      url = createBusterRoute({
+        route: BusterRoutes.APP_REPORTS_ID,
+        reportId: assetId
+      });
     }
     const urlWithDomain = window.location.origin + url;
     navigator.clipboard.writeText(urlWithDomain);

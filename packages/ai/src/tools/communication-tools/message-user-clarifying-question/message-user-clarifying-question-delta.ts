@@ -1,21 +1,24 @@
-import { updateMessageEntries } from '@buster/database';
+import { type UpdateMessageEntriesParams, updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
 import {
   OptimisticJsonParser,
   getOptimisticValue,
 } from '../../../utils/streaming/optimistic-json-parser';
-import { messageUserClarifyingQuestionResponseMessage } from './helpers/message-user-clarifying-question-transform-helper';
+import {
+  createMessageUserClarifyingQuestionRawLlmMessageEntry,
+  createMessageUserClarifyingQuestionResponseMessage,
+} from './helpers/message-user-clarifying-question-transform-helper';
 import type {
   MessageUserClarifyingQuestionContext,
   MessageUserClarifyingQuestionInput,
   MessageUserClarifyingQuestionState,
 } from './message-user-clarifying-question';
 
-// Type-safe key extraction from the input schema - ensures compile-time safety if field name changes
+// Type-safe key extraction from the schema - will cause compile error if field name changes
+// Using keyof with the inferred type ensures we're using the actual schema keys
 const CLARIFYING_QUESTION_KEY =
   'clarifying_question' as const satisfies keyof MessageUserClarifyingQuestionInput;
 
-// Factory function for onInputDelta callback
 export function createMessageUserClarifyingQuestionDelta(
   context: MessageUserClarifyingQuestionContext,
   state: MessageUserClarifyingQuestionState
@@ -23,39 +26,53 @@ export function createMessageUserClarifyingQuestionDelta(
   return async function messageUserClarifyingQuestionDelta(
     options: { inputTextDelta: string } & ToolCallOptions
   ): Promise<void> {
-    // Accumulate the delta into args to maintain a running buffer
+    // Accumulate the delta to the args
     state.args = (state.args || '') + options.inputTextDelta;
 
-    // Parse optimistically to extract the clarifying question even from incomplete JSON
+    // Use optimistic parsing to extract values even from incomplete JSON
     const parseResult = OptimisticJsonParser.parse(state.args);
 
+    // Extract clarifying_question from the optimistically parsed values - type-safe key
     const clarifyingQuestion = getOptimisticValue<string>(
       parseResult.extractedValues,
       CLARIFYING_QUESTION_KEY
     );
 
     if (clarifyingQuestion !== undefined && clarifyingQuestion !== '') {
-      // Update in-memory state
+      // Update the state with the extracted clarifying_question
       state.clarifyingQuestion = clarifyingQuestion;
 
-      // Persist streaming progress if we have required identifiers
-      const messageId = context.messageId;
-      const toolCallId = options.toolCallId ?? state.toolCallId;
+      // Create the response entries with the current state
+      const responseEntry = createMessageUserClarifyingQuestionResponseMessage(
+        state,
+        options.toolCallId
+      );
+      const rawLlmMessage = createMessageUserClarifyingQuestionRawLlmMessageEntry(
+        state,
+        options.toolCallId || ''
+      );
 
-      if (messageId && toolCallId) {
-        try {
-          const responseEntry = messageUserClarifyingQuestionResponseMessage(toolCallId, state);
+      const entries: UpdateMessageEntriesParams = {
+        messageId: context.messageId,
+      };
 
-          await updateMessageEntries({
-            messageId,
-            responseMessages: [responseEntry],
-          });
-        } catch (error) {
-          console.error(
-            '[message-user-clarifying-question] Failed to update streaming progress:',
-            error
-          );
+      if (responseEntry) {
+        entries.responseMessages = [responseEntry];
+      }
+
+      if (rawLlmMessage) {
+        entries.rawLlmMessages = [rawLlmMessage];
+      }
+
+      try {
+        if (entries.responseMessages || entries.rawLlmMessages) {
+          await updateMessageEntries(entries);
         }
+      } catch (error) {
+        console.error(
+          '[message-user-clarifying-question] Failed to update streaming entries:',
+          error
+        );
       }
     }
   };
