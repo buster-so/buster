@@ -1,179 +1,107 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createCheckOffTodoListTool } from './check-off-todo-list-tool';
+import { createUpdateTodoListTool } from './update-todo-list-tool';
 import type {
-  CheckOffTodoListToolInput,
-  CheckOffTodoListToolOutput,
-} from './check-off-todo-list-tool';
+  UpdateTodoListToolInput,
+  UpdateTodoListToolOutput,
+} from './update-todo-list-tool';
 
-describe('checkOffTodoList', () => {
-  let checkOffTodoListTool: ReturnType<typeof createCheckOffTodoListTool>;
-  let todoList: string;
-  let updateTodoListCalled: boolean;
+describe('updateTodoListTool', () => {
+  let updateTodoListTool: ReturnType<typeof createUpdateTodoListTool>;
+  let currentTodoList: string;
 
   // Helper to call execute with a concrete signature
-  const run = async (input: CheckOffTodoListToolInput): Promise<CheckOffTodoListToolOutput> => {
-    const exec = checkOffTodoListTool.execute as (
-      i: CheckOffTodoListToolInput
-    ) => Promise<CheckOffTodoListToolOutput>;
+  const run = async (input: UpdateTodoListToolInput): Promise<UpdateTodoListToolOutput> => {
+    const exec = updateTodoListTool.execute as (
+      i: UpdateTodoListToolInput
+    ) => Promise<UpdateTodoListToolOutput>;
     return exec(input);
   };
 
   beforeEach(() => {
-    todoList = '';
-    updateTodoListCalled = false;
-    checkOffTodoListTool = createCheckOffTodoListTool({
-      get todoList() {
-        return todoList;
-      },
-      updateTodoList: (newList: string) => {
-        todoList = newList;
-        updateTodoListCalled = true;
-      },
+    currentTodoList = '## Todo List\n- [ ] Initial task';
+    updateTodoListTool = createUpdateTodoListTool({
+      todoList: currentTodoList,
     });
   });
 
-  it('should check off a single todo item successfully', async () => {
-    todoList = `## Todo List
+  it('should update the todo list successfully', async () => {
+    const newTodoList = `## Todo List
+- [x] Initial task
 - [ ] Write unit tests
-- [ ] Implement feature
-- [ ] Review code`;
+- [ ] Implement feature`;
 
     const result = await run({
-      todoItems: ['Write unit tests'],
+      todoList: newTodoList,
     });
 
     expect(result.success).toBe(true);
-    expect(result.updatedTodoList).toContain('- [x] Write unit tests');
-    expect(result.updatedTodoList).toContain('- [ ] Implement feature');
-    expect(result.updatedTodoList).toContain('- [ ] Review code');
-    expect(result.message).toBe('Successfully checked off all 1 items');
-    expect(result.checkedOffItems).toEqual(['Write unit tests']);
-    expect(result.failedItems).toEqual([]);
-
-    // Verify context was updated
-    expect(updateTodoListCalled).toBe(true);
-    expect(todoList).toBe(result.updatedTodoList);
+    expect(result.updatedTodoList).toBe(newTodoList);
+    expect(result.message).toBe('Todo list updated successfully');
   });
 
-  it('should check off multiple todo items successfully', async () => {
-    todoList = `## Todo List
-- [ ] Write unit tests
-- [ ] Implement feature
-- [ ] Review code
-- [ ] Deploy to production`;
-
+  it('should handle empty todo list', async () => {
     const result = await run({
-      todoItems: ['Write unit tests', 'Review code'],
+      todoList: '',
     });
 
     expect(result.success).toBe(true);
-    expect(result.updatedTodoList).toContain('- [x] Write unit tests');
-    expect(result.updatedTodoList).toContain('- [ ] Implement feature');
-    expect(result.updatedTodoList).toContain('- [x] Review code');
-    expect(result.updatedTodoList).toContain('- [ ] Deploy to production');
-    expect(result.message).toBe('Successfully checked off all 2 items');
-    expect(result.checkedOffItems).toEqual(['Write unit tests', 'Review code']);
-    expect(result.failedItems).toEqual([]);
-  });
-
-  it('should handle partial success when some items are not found', async () => {
-    todoList = `## Todo List
-- [ ] Write unit tests
-- [ ] Implement feature
-- [ ] Review code`;
-
-    const result = await run({
-      todoItems: ['Write unit tests', 'Non-existent task', 'Review code'],
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.updatedTodoList).toContain('- [x] Write unit tests');
-    expect(result.updatedTodoList).toContain('- [ ] Implement feature');
-    expect(result.updatedTodoList).toContain('- [x] Review code');
-    expect(result.message).toBe('Successfully checked off 2 out of 3 items');
-    expect(result.checkedOffItems).toEqual(['Write unit tests', 'Review code']);
-    expect(result.failedItems).toEqual(['Non-existent task']);
-  });
-
-  it('should return error when todo list is not found in context', async () => {
-    todoList = '';
-
-    const result = await run({
-      todoItems: ['Some task', 'Another task'],
-    });
-
-    expect(result.success).toBe(false);
     expect(result.updatedTodoList).toBe('');
-    expect(result.message).toBe('No todo list found in context');
-    expect(result.checkedOffItems).toEqual([]);
-    expect(result.failedItems).toEqual(['Some task', 'Another task']);
+    expect(result.message).toBe('Todo list cleared');
   });
 
-  it('should return error when no items could be checked off', async () => {
-    todoList = `## Todo List
-- [ ] Write unit tests
-- [ ] Implement feature`;
-
+  it('should handle todo list with only whitespace', async () => {
     const result = await run({
-      todoItems: ['Non-existent task', 'Another missing task'],
-    });
-
-    expect(result.success).toBe(false);
-    expect(result.updatedTodoList).toBe(todoList);
-    expect(result.message).toBe(
-      'No items were checked off - they may not exist or are already checked'
-    );
-    expect(result.checkedOffItems).toEqual([]);
-    expect(result.failedItems).toEqual(['Non-existent task', 'Another missing task']);
-  });
-
-  it('should not check off already checked items', async () => {
-    todoList = `## Todo List
-- [x] Write unit tests
-- [ ] Implement feature
-- [ ] Review code`;
-
-    const result = await run({
-      todoItems: ['Write unit tests', 'Implement feature'],
+      todoList: '   \n   \n   ',
     });
 
     expect(result.success).toBe(true);
-    expect(result.updatedTodoList).toContain('- [x] Write unit tests');
-    expect(result.updatedTodoList).toContain('- [x] Implement feature');
-    expect(result.message).toBe('Successfully checked off 1 out of 2 items');
-    expect(result.checkedOffItems).toEqual(['Implement feature']);
-    expect(result.failedItems).toEqual(['Write unit tests']);
+    expect(result.updatedTodoList).toBe('   \n   \n   ');
+    expect(result.message).toBe('Todo list cleared');
   });
 
-  it('should handle empty array of todo items', async () => {
-    todoList = `## Todo List
-- [ ] Write unit tests`;
+  it('should update with complex markdown formatting', async () => {
+    const complexTodoList = `## Todo List
+
+### High Priority
+- [x] Critical bug fix
+- [ ] Security patch
+
+### Medium Priority
+- [ ] Feature A
+- [ ] Feature B
+
+### Low Priority
+- [ ] Documentation
+- [ ] Cleanup old code`;
 
     const result = await run({
-      todoItems: [],
-    });
-
-    expect(result.success).toBe(false);
-    expect(result.updatedTodoList).toBe(todoList);
-    expect(result.checkedOffItems).toEqual([]);
-    expect(result.failedItems).toEqual([]);
-  });
-
-  it('should handle first occurrence when there are duplicates', async () => {
-    todoList = `## Todo List
-- [ ] Write unit tests
-- [ ] Write unit tests
-- [ ] Implement feature`;
-
-    const result = await run({
-      todoItems: ['Write unit tests'],
+      todoList: complexTodoList,
     });
 
     expect(result.success).toBe(true);
-    // Only the first occurrence should be checked off
-    const lines = result.updatedTodoList.split('\n');
-    expect(lines[1]).toBe('- [x] Write unit tests');
-    expect(lines[2]).toBe('- [ ] Write unit tests');
-    expect(result.checkedOffItems).toEqual(['Write unit tests']);
+    expect(result.updatedTodoList).toBe(complexTodoList);
+    expect(result.message).toBe('Todo list updated successfully');
+  });
+
+  it('should handle todo list with various markdown elements', async () => {
+    const markdownTodoList = `## Todo List
+
+**Important Tasks:**
+- [ ] Task 1 with **bold** text
+- [ ] Task 2 with *italic* text
+- [ ] Task 3 with \`code\` formatting
+
+> Note: These are important tasks
+
+1. Numbered item 1
+2. Numbered item 2`;
+
+    const result = await run({
+      todoList: markdownTodoList,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.updatedTodoList).toBe(markdownTodoList);
+    expect(result.message).toBe('Todo list updated successfully');
   });
 });

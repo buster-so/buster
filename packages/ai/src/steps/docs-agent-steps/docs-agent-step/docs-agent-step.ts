@@ -69,13 +69,16 @@ export async function runDocsAgentStep(params: DocsAgentStepInput): Promise<void
 
     // Create the docs agent with folder structure and context
     const docsAgent = createDocsAgent({
-      folder_structure: validatedParams.repositoryTree,
+      fileTree: validatedParams.repositoryTree,
       userId: validatedParams.organizationId, // Using organizationId as userId for now
       chatId: Date.now().toString(), // Using current timestamp as chatId
       dataSourceId: dataSourceId || '',
+      dataSourceSyntax: '', // Adding required field
       organizationId: validatedParams.organizationId || '',
       messageId: validatedParams.messageId, // Optional field
       sandbox: sandbox, // Pass sandbox for file tools
+      todoList: todoList,
+      clarifications: [],
     });
 
     const userMessage = `${validatedParams.message}`;
