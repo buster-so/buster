@@ -25,10 +25,8 @@ export function createUpdateClarificationsFileToolExecute(
         // Validate all clarifications against the schema
         const validatedClarifications = z.array(ClarifyingQuestionSchema).parse(clarifications);
 
-        // Update the context with the new clarifications array
-        if (context.updateClarifications) {
-          context.updateClarifications(validatedClarifications);
-        }
+        // Update the context directly by replacing the clarifications array
+        context.clarifications = validatedClarifications;
 
         return {
           success: true,

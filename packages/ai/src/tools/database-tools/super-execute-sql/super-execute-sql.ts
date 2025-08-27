@@ -4,7 +4,6 @@ import type { DocsAgentOptions } from '../../../agents/docs-agent/docs-agent';
 import { createSuperExecuteSqlExecute } from './super-execute-sql-execute';
 
 export const SUPER_EXECUTE_SQL_TOOL_NAME = 'superExecuteSql';
-export const EXECUTE_SQL_DOCS_AGENT_NAME = 'executeSqlDocsAgent';
 
 export const SuperExecuteSqlInputSchema = z.object({
   statements: z.array(z.string()).describe(
@@ -100,36 +99,3 @@ export function createSuperExecuteSqlTool(context: SuperExecuteSqlContext) {
     execute,
   });
 }
-
-// Legacy export for backward compatibility - renamed to match previous naming
-export const executeSqlDocsAgent = tool({
-  description: `Use this to run lightweight validation and metadata queries for documentation purposes.
-    This tool is specifically for the docs agent to gather metadata, validate assumptions, and collect context.
-    Please limit your queries to 100 rows for performance.
-    Query results will be limited to 100 rows for performance. 
-    You must use the <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. 
-    Common documentation queries include row counts, sample values, min/max values, distinct counts, 
-    referential integrity checks, and match percentage calculations.`,
-  inputSchema: SuperExecuteSqlInputSchema,
-  outputSchema: SuperExecuteSqlOutputSchema,
-  execute: async (input, { experimental_context: context }) => {
-    const rawContext = context as DocsAgentOptions;
-
-    const superExecuteSqlContext = SuperExecuteSqlContextSchema.parse({
-      dataSourceId: rawContext.dataSourceId,
-    });
-
-    // Create temporary state for this execution
-    const state: SuperExecuteSqlState = {
-      startTime: Date.now(),
-      executionTime: undefined,
-      isComplete: false,
-      executionResults: undefined,
-    };
-
-    const executeFunction = createSuperExecuteSqlExecute(state, superExecuteSqlContext);
-    return await executeFunction(input);
-  },
-});
-
-export default executeSqlDocsAgent;

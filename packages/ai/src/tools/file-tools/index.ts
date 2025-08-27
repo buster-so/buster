@@ -1,4 +1,4 @@
-export { createBashTool, bashExecute } from './bash-tool';
+export { createBashTool } from './bash-tool/bash-tool';
 export { createListFilesTool } from './list-files-tool/list-files-tool';
 export { createReadFilesTool } from './read-files-tool/read-files-tool';
 export { createCreateFilesTool } from './create-files-tool/create-files-tool';

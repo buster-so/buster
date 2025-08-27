@@ -10,7 +10,7 @@ export { createModifyDashboardsTool } from './visualization-tools/dashboards/mod
 export { createCreateReportsTool } from './visualization-tools/reports/create-reports-tool/create-reports-tool';
 export { createModifyReportsTool } from './visualization-tools/reports/modify-reports-tool/modify-reports-tool';
 export { createExecuteSqlTool } from './database-tools/execute-sql/execute-sql';
-export { executeSqlDocsAgent } from './database-tools/super-execute-sql/super-execute-sql';
+export { createSuperExecuteSqlTool } from './database-tools/super-execute-sql/super-execute-sql';
 // File tools - factory functions
 export { createListFilesTool } from './file-tools/list-files-tool/list-files-tool';
 export { createReadFilesTool } from './file-tools/read-files-tool/read-files-tool';
@@ -23,10 +23,9 @@ export { createGrepSearchTool } from './file-tools/grep-search-tool/grep-search-
 export { createWebSearchTool } from './web-tools/web-search-tool';
 
 // Planning/thinking tools - factory functions
-export { createCheckOffTodoListTool } from './planning-thinking-tools/check-off-todo-list-tool/check-off-todo-list-tool';
+export { createUpdateTodoListTool } from './planning-thinking-tools/update-todo-list-tool/update-todo-list-tool';
 export { createUpdateClarificationsFileTool } from './planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
 
 // Legacy exports for backward compatibility (to be deprecated)
-export { bashExecute } from './file-tools/bash-tool';
-export { checkOffTodoList } from './planning-thinking-tools/check-off-todo-list-tool/check-off-todo-list-tool';
+export { updateTodoList } from './planning-thinking-tools/update-todo-list-tool/update-todo-list-tool';
 export { updateClarificationsFile } from './planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';

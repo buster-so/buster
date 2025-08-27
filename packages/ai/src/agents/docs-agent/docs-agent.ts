@@ -5,7 +5,6 @@ import z from 'zod';
 import { Sonnet4 } from '../../llm/sonnet-4';
 import {
   createBashTool,
-  createCheckOffTodoListTool,
   createCreateFilesTool,
   createDeleteFilesTool,
   createEditFilesTool,
@@ -15,11 +14,14 @@ import {
   createReadFilesTool,
   createSequentialThinkingTool,
   createUpdateClarificationsFileTool,
+  createUpdateTodoListTool,
   createWebSearchTool,
-  executeSqlDocsAgent,
 } from '../../tools';
 import { IDLE_TOOL_NAME } from '../../tools/communication-tools/idle-tool/idle-tool';
-import { EXECUTE_SQL_DOCS_AGENT_NAME } from '../../tools/database-tools/super-execute-sql/super-execute-sql';
+import {
+  SUPER_EXECUTE_SQL_TOOL_NAME,
+  createSuperExecuteSqlTool,
+} from '../../tools/database-tools/super-execute-sql/super-execute-sql';
 import { BASH_TOOL_NAME } from '../../tools/file-tools/bash-tool/bash-tool';
 import { CREATE_FILES_TOOL_NAME } from '../../tools/file-tools/create-files-tool/create-files-tool';
 import { DELETE_FILES_TOOL_NAME } from '../../tools/file-tools/delete-files-tool/delete-files-tool';
@@ -27,9 +29,10 @@ import { EDIT_FILES_TOOL_NAME } from '../../tools/file-tools/edit-files-tool/edi
 import { GREP_SEARCH_TOOL_NAME } from '../../tools/file-tools/grep-search-tool/grep-search-tool';
 import { LIST_FILES_TOOL_NAME } from '../../tools/file-tools/list-files-tool/list-files-tool';
 import { READ_FILES_TOOL_NAME } from '../../tools/file-tools/read-files-tool/read-files-tool';
-import { CHECK_OFF_TODO_LIST_TOOL_NAME } from '../../tools/planning-thinking-tools/check-off-todo-list-tool/check-off-todo-list-tool';
 import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
 import { UPDATE_CLARIFICATIONS_FILE_TOOL_NAME } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
+import { ClarifyingQuestionSchema } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool-execute';
+import { UPDATE_TODO_LIST_TOOL_NAME } from '../../tools/planning-thinking-tools/update-todo-list-tool/update-todo-list-tool';
 import { WEB_SEARCH_TOOL_NAME } from '../../tools/web-tools/web-search-tool';
 import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
 import { getDocsAgentFileTreeSystemPrompt } from './get-docs-agent-file-tree-system-prompt';
@@ -61,6 +64,11 @@ export const DocsAgentOptionsSchema = z.object({
     { message: 'Invalid Sandbox instance' }
   ),
   fileTree: z.string().describe('The file tree of the dbt repository'),
+  todoList: z.string().default('').describe('The current todo list in markdown format'),
+  clarifications: z
+    .array(ClarifyingQuestionSchema)
+    .default([])
+    .describe('Current clarification questions'),
 });
 
 const DocsAgentStreamOptionsSchema = z.object({
@@ -96,9 +104,9 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     [LIST_FILES_TOOL_NAME]: createListFilesTool(docsAgentOptions),
     [READ_FILES_TOOL_NAME]: createReadFilesTool(docsAgentOptions),
     [SEQUENTIAL_THINKING_TOOL_NAME]: createSequentialThinkingTool(docsAgentOptions),
-    [CHECK_OFF_TODO_LIST_TOOL_NAME]: createCheckOffTodoListTool(docsAgentOptions),
     [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(),
-    [EXECUTE_SQL_DOCS_AGENT_NAME]: executeSqlDocsAgent,
+    [SUPER_EXECUTE_SQL_TOOL_NAME]: createSuperExecuteSqlTool(docsAgentOptions),
+    [UPDATE_TODO_LIST_TOOL_NAME]: createUpdateTodoListTool(docsAgentOptions),
     [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions),
   };
 

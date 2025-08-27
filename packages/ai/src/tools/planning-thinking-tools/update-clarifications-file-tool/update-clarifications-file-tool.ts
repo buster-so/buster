@@ -21,13 +21,7 @@ const UpdateClarificationsFileToolOutputSchema = z.object({
 });
 
 const UpdateClarificationsFileToolContextSchema = z.object({
-  clarifications: z.array(ClarifyingQuestionSchema).optional().describe('Current clarifications'),
-  updateClarifications: z
-    .function()
-    .args(z.array(ClarifyingQuestionSchema))
-    .returns(z.void())
-    .optional()
-    .describe('Function to update clarifications'),
+  clarifications: z.array(ClarifyingQuestionSchema).describe('Current clarifications'),
 });
 
 export type UpdateClarificationsFileToolInput = z.infer<
@@ -57,5 +51,4 @@ export function createUpdateClarificationsFileTool<
 // Legacy export for backward compatibility
 export const updateClarificationsFile = createUpdateClarificationsFileTool({
   clarifications: [],
-  updateClarifications: () => {},
 });
