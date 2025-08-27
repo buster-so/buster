@@ -27,31 +27,31 @@ export function buildTreeFromPaths(paths: string[]): TreeNode {
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (!part) continue; // Skip empty parts
-      
+
       const isFile = i === parts.length - 1 && path.includes('.');
-      
+
       // Ensure current has children array
       if (!current.children) {
         current.children = [];
       }
-      
-      let child = current.children.find(c => c.name === part);
-      
+
+      let child = current.children.find((c) => c.name === part);
+
       if (!child) {
         const newChild: TreeNode = {
           name: part,
           type: isFile ? 'file' : 'directory',
           path: parts.slice(0, i + 1).join('/'),
         };
-        
+
         if (!isFile) {
           newChild.children = [];
         }
-        
+
         current.children.push(newChild);
         child = newChild;
       }
-      
+
       if (!isFile && child.type === 'directory') {
         current = child;
       }
@@ -85,7 +85,7 @@ export function formatTreeAsString(node: TreeNode, prefix = '', isLast = true): 
     const childrenStr = children
       .map((child, i) => formatTreeAsString(child, prefix + extension, i === children.length - 1))
       .join('\n');
-    return result + '\n' + childrenStr;
+    return `${result}\n${childrenStr}`;
   }
 
   return result;

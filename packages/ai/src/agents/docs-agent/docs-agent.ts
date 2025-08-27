@@ -2,7 +2,7 @@ import type { Sandbox } from '@buster/sandbox';
 import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
-import { Sonnet4 } from '../../llm/sonnet-4';
+import { GPT5 } from '../../llm/gpt-5';
 import {
   createBashTool,
   createCreateFilesTool,
@@ -45,6 +45,7 @@ const DEFAULT_CACHE_OPTIONS = {
   openai: {
     parallelToolCalls: false,
     reasoningEffort: 'minimal',
+    reasoningSummary: 'detailed',
   },
 };
 
@@ -103,7 +104,6 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     [GREP_SEARCH_TOOL_NAME]: createGrepSearchTool(docsAgentOptions),
     [LIST_FILES_TOOL_NAME]: createListFilesTool(docsAgentOptions),
     [READ_FILES_TOOL_NAME]: createReadFilesTool(docsAgentOptions),
-    [SEQUENTIAL_THINKING_TOOL_NAME]: createSequentialThinkingTool(docsAgentOptions),
     [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(),
     [SUPER_EXECUTE_SQL_TOOL_NAME]: createSuperExecuteSqlTool(docsAgentOptions),
     [UPDATE_TODO_LIST_TOOL_NAME]: createUpdateTodoListTool(docsAgentOptions),
@@ -119,7 +119,7 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     return wrapTraced(
       () =>
         streamText({
-          model: Sonnet4,
+          model: GPT5,
           tools,
           messages: [systemMessage, fileTreeSystemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,

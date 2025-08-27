@@ -1,3 +1,5 @@
+import { getSandboxFileTree } from '@buster/sandbox/filesystem/file-tree/get-file-tree';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { DocsAgentContextSchema } from '../../../agents/docs-agent/docs-agent-context';
 
@@ -23,28 +25,19 @@ export type GetRepositoryTreeStepOutput = z.infer<typeof GetRepositoryTreeStepOu
 /**
  * Gets the repository tree structure for documentation generation
  */
-export async function runGetRepositoryTreeStep(
-  input: GetRepositoryTreeStepInput
-): Promise<GetRepositoryTreeStepOutput> {
-  const validatedInput = GetRepositoryTreeStepInputSchema.parse(input);
+export const runGetRepositoryTreeStep = wrapTraced(
+  async (input: GetRepositoryTreeStepInput): Promise<GetRepositoryTreeStepOutput> => {
+    const validatedInput = GetRepositoryTreeStepInputSchema.parse(input);
 
-  // TODO: Implement actual repository tree generation
-  // For now, return a basic tree structure
-  const repositoryTree = `
-Repository Structure:
-├── src/
-│   ├── components/
-│   ├── utils/
-│   └── index.ts
-├── tests/
-├── package.json
-└── README.md
-`;
+    // Get the actual file tree from the sandbox
+    const repositoryTree = await getSandboxFileTree(validatedInput.context.sandbox);
 
-  return {
-    message: validatedInput.message,
-    organizationId: validatedInput.organizationId,
-    context: validatedInput.context,
-    repositoryTree: repositoryTree.trim(),
-  };
-}
+    return {
+      message: validatedInput.message,
+      organizationId: validatedInput.organizationId,
+      context: validatedInput.context,
+      repositoryTree: repositoryTree.trim(),
+    };
+  },
+  { name: 'Get Repository Tree Step' }
+);

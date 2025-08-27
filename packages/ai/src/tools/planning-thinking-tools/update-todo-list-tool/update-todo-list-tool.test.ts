@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createUpdateTodoListTool } from './update-todo-list-tool';
-import type {
-  UpdateTodoListToolInput,
-  UpdateTodoListToolOutput,
-} from './update-todo-list-tool';
+import type { UpdateTodoListToolInput, UpdateTodoListToolOutput } from './update-todo-list-tool';
 
 describe('updateTodoListTool', () => {
   let updateTodoListTool: ReturnType<typeof createUpdateTodoListTool>;

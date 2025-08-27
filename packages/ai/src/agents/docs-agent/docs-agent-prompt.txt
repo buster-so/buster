@@ -96,7 +96,7 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
 <repository_structure>
 - Prioritize exploration: Using `readFiles` liberally to gain all context that might be relevant.
 - Main file types:
-    - `table_name.yml` files: YAML configuration for dbt models, used as the primary source for documentation. Structured with descriptions, dimensions, measures, metrics, filters, relationships. Editable.
+    - `table_name.yml` files: YAML configuration for dbt models, used as the primary source for documentation. Structured with descriptions, dimensions, measures, metrics, filters, relationships. Editable. When writing long-form text (e.g., descriptions), use YAML's '>' multiline marker to improve readability and formatting in the generated YAML files.
     - `table_name.sql` files: SQL defining model logic. Read-only; use to inform .yml docs (e.g., transformations, joins).
     - `table_name.json` files: JSON metadata (e.g., lineage, stats like row count, null rate, samples, uniqueness, etc). Read-only; use to enrich .yml docs.
     - `concept_name.md` files: Markdown for broader concepts/metrics not tied to one table. Editable; should be nested in folders for better organization.
@@ -113,19 +113,20 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
     ```yaml
     models:
     - name: model_name  # Required: Unique identifier (typically snake_case)
-        description: "Description of the model"  # Required: Clear explanation of the model's purpose, utility, contents, and key details
+        description: >  # Required: Use '>' for long-form text for readability
+            Clear explanation of the model's purpose, utility, contents, and key details
         dimensions:  # Optional: List of non-numeric attributes for grouping, filtering, or segmenting
         - name: dimension_name  # Required: Matches column name in database
-            description: "Description of the dimension, including what it represents, value patterns, and analytical utility"  # Required
+            description: >  # Required: Use '>' for multiline/long-form text. Description of the dimension, including what it represents, value patterns, and analytical utility
             type: string  # Recommended: Data type (e.g., string, timestamp, boolean, date, number/integer)
             searchable: true  # Optional: Whether this dimension can be used in natural language searches
         measures:  # Optional: List of quantifiable numeric attributes that can be aggregated
         - name: measure_name  # Required: Matches column name in database
-            description: "Description of the measure, including what it represents, how it's calculated (if derived), and utility"  # Required
+            description: >  # Required: Use '>' for multiline/long-form text. Description of the measure, including what it represents, how it's calculated (if derived), and utility
             type: decimal  # Required: Raw data type from database (e.g., decimal/number, integer)
         metrics:  # Optional: List of derived calculations and business KPIs
         - name: metric_name  # Required: Descriptive name
-            description: "Description of the metric, its business significance, and interpretation"  # Required
+            description: >  # Required: Use '>' for multiline/long-form text. Description of the metric, its business significance, and interpretation
             expr: "SQL expression for the metric"  # Required: SQL formula (e.g., sum(revenue) / count(order_id))
             args:  # Optional: Parameters for dynamic metrics
             - name: arg_name
@@ -134,7 +135,7 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
                 default: 30  # Optional
         filters:  # Optional: Reusable boolean conditions for queries
         - name: filter_name  # Required
-            description: "Description of the filter and its use"  # Required
+            description: >  # Required: Use '>' for multiline/long-form text. Description of the filter and its use
             expr: "Boolean SQL expression"  # Required (e.g., status = 'complete')
             args:  # Optional
             - name: arg_name
@@ -142,13 +143,14 @@ You have tools at your disposal to solve problems and complete the task(s) on yo
                 description: "Description of the argument"
         relationships:  # Optional: Connections to other models
         - name: related_model_name  # Required: Name of the other model
-            description: "Description of the relationship and its analytical utility"  # Required
+            description: >  # Required: Use '>' for multiline/long-form text. Description of the relationship and its analytical utility
             source_col: local_column  # Required: Join key in this model
             ref_col: related_column  # Required: Join key in the related model
             cardinality: many-to-one  # Optional: Relationship type (kebab-case: one-to-one, one-to-many, many-to-one, many-to-many)
             type: left  # Optional: Join type (kebab-case: left, inner, right, full-outer)
     ```
 - Ensure YAML is properly formatted and valid
+- When writing long-form, multiline, or especially descriptive fields (such as 'description'), always use the YAML '>' indicator to represent the text in a folded, readable style.
 - Use tools like `readFiles` to validate before committing
 - When updating, preserve existing structure and only add or modify based on new information
 </yaml_files>

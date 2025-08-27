@@ -1,3 +1,4 @@
+import { runTypescript } from '@buster/sandbox';
 import { wrapTraced } from 'braintrust';
 import type {
   DeleteFilesToolContext,
@@ -27,85 +28,114 @@ export function createDeleteFilesToolExecute(context: DeleteFilesToolContext) {
           };
         }
 
-        const results = [];
+        // Generate CommonJS code for sandbox execution
+        const sandboxCode = `
+const fs = require('fs');
+const path = require('path');
 
-        // Process each file path
-        for (const filePath of paths) {
+const paths = ${JSON.stringify(paths)};  // Direct stringify, no double encoding
+const results = [];
+
+// Process files
+for (const filePath of paths) {
+  try {
+    const resolvedPath = path.isAbsolute(filePath) 
+      ? filePath 
+      : path.join(process.cwd(), filePath);
+    
+    // Check if path exists and get stats
+    let stats;
+    try {
+      stats = fs.statSync(resolvedPath);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        results.push({
+          success: false,
+          path: filePath,
+          error: 'File not found'
+        });
+        continue;
+      }
+      throw error;
+    }
+    
+    // Check if it's a directory
+    if (stats.isDirectory()) {
+      results.push({
+        success: false,
+        path: filePath,
+        error: 'Cannot delete directories with this tool'
+      });
+      continue;
+    }
+    
+    // Delete the file
+    fs.unlinkSync(resolvedPath);
+    
+    results.push({
+      success: true,
+      path: filePath
+    });
+  } catch (error) {
+    results.push({
+      success: false,
+      path: filePath,
+      error: (error instanceof Error ? error.message : String(error)) || 'Unknown error'
+    });
+  }
+}
+
+console.log(JSON.stringify(results));
+`;
+
+        const result = await runTypescript(sandbox, sandboxCode);
+
+        if (result.exitCode !== 0) {
+          console.error('Sandbox execution failed. Exit code:', result.exitCode);
+          console.error('Stderr:', result.stderr);
+          console.error('Result:', result.result);
+          throw new Error(`Sandbox execution failed: ${result.stderr || 'Unknown error'}`);
+        }
+
+        let fileResults: Array<{
+          success: boolean;
+          path: string;
+          error?: string;
+        }>;
+        try {
+          // Extract only the last line which should be our JSON output
+          const lines = result.result.trim().split('\n');
+          const jsonLine = lines[lines.length - 1] || '';
+          fileResults = JSON.parse(jsonLine);
+        } catch (parseError) {
+          console.error('Failed to parse sandbox output:', result.result);
+          // Try parsing the entire result as a fallback
           try {
-            // First check if it's a directory
-            const testResult = await sandbox.process.codeRun(`
-              const fs = require('fs');
-              
-              try {
-                const stats = fs.statSync('${filePath.replace(/'/g, "\\'")}');
-                process.stdout.write(JSON.stringify({ isDirectory: stats.isDirectory() }));
-              } catch (error) {
-                process.stdout.write(JSON.stringify({ error: error.code || error.message }));
-                process.exit(1);
-              }
-            `);
-
-            if (testResult.exitCode === 0) {
-              let testData: { isDirectory?: boolean; error?: string };
-              try {
-                testData = JSON.parse(testResult.result.trim());
-              } catch (parseError) {
-                results.push({
-                  status: 'error' as const,
-                  path: filePath,
-                  error_message: `Failed to parse directory check result: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`,
-                });
-                continue;
-              }
-
-              if (testData.isDirectory) {
-                results.push({
-                  status: 'error' as const,
-                  path: filePath,
-                  error_message: 'Cannot delete directories with this tool',
-                });
-                continue;
-              }
-            }
-
-            // Use rm command to delete the file
-            const deleteResult = await sandbox.process.codeRun(`
-              const { execSync } = require('child_process');
-              
-              try {
-                execSync('rm "${filePath.replace(/"/g, '\\"')}"', { encoding: 'utf8' });
-                process.stdout.write('SUCCESS');
-              } catch (error) {
-                process.stderr.write('ERROR: ' + error.message);
-                process.exit(1);
-              }
-            `);
-
-            if (deleteResult.exitCode === 0) {
-              results.push({
-                status: 'success' as const,
-                path: filePath,
-              });
-            } else {
-              const errorMessage = deleteResult.result || 'Unknown error';
-              results.push({
-                status: 'error' as const,
-                path: filePath,
-                error_message: errorMessage.includes('No such file')
-                  ? 'File not found'
-                  : errorMessage,
-              });
-            }
-          } catch (error) {
-            results.push({
-              status: 'error' as const,
-              path: filePath,
-              error_message: error instanceof Error ? error.message : 'Unknown error',
-            });
+            fileResults = JSON.parse(result.result.trim());
+          } catch (_fallbackError) {
+            throw new Error(
+              `Failed to parse sandbox output: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`
+            );
           }
         }
 
-        return { results };
+        const output: DeleteFilesToolOutput = {
+          results: fileResults.map((fileResult) => {
+            if (fileResult.success) {
+              return {
+                status: 'success' as const,
+                path: fileResult.path,
+              };
+            }
+            return {
+              status: 'error' as const,
+              path: fileResult.path,
+              error_message: fileResult.error || 'Unknown error',
+            };
+          }),
+        };
+
+        return output;
       } catch (error) {
         const errorMessage = `Execution error: ${error instanceof Error ? error.message : 'Unknown error'}`;
         return {

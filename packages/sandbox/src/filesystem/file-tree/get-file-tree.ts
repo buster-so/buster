@@ -6,7 +6,7 @@ export async function getSandboxFileTree(sandbox: Sandbox): Promise<string> {
   // -L 20: go 20 levels deep
   // -F: append indicators (/ for dirs, * for executables, etc)
   // -I: ignore patterns for node_modules and .git to keep output manageable
-  const treeCommand = 'tree -a -L 20 -F -I "node_modules|.git" /home/daytona/';
+  const treeCommand = 'tree -a -L 20 -F -I "node_modules|.git"';
 
   const result = await sandbox.process.executeCommand(treeCommand, '/home/daytona/');
 

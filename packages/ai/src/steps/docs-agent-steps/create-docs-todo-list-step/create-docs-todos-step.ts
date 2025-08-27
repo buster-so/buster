@@ -2,8 +2,17 @@ import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { Sonnet4 } from '../../../llm/sonnet-4';
+import { GPT5 } from '../../../llm/gpt-5';
 import { getCreateDocsTodosSystemMessage } from './get-create-docs-todos-system-message';
+
+const DEFAULT_CACHE_OPTIONS = {
+  anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
+  openai: {
+    parallelToolCalls: false,
+    reasoningEffort: 'minimal',
+    reasoningSummary: 'detailed',
+  },
+};
 
 // Zod schemas first - following Zod-first approach
 export const createDocsTodosParamsSchema = z.object({
@@ -60,10 +69,11 @@ async function generateDocsTodosWithLLM(
     const tracedTodosGeneration = wrapTraced(
       async () => {
         const { object } = await generateObject({
-          model: Sonnet4,
+          model: GPT5,
           schema: llmOutputSchema,
           messages: messagesWithContext,
           temperature: 0,
+          providerOptions: DEFAULT_CACHE_OPTIONS,
         });
 
         return object;

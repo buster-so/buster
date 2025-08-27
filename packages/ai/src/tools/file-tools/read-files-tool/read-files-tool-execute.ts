@@ -29,13 +29,11 @@ export function createReadFilesToolExecute(context: ReadFilesToolContext) {
         }
 
         // Generate CommonJS code for sandbox execution
-        const filesJson = JSON.stringify(files);
         const sandboxCode = `
 const fs = require('fs');
 const path = require('path');
 
-const filesJson = ${JSON.stringify(filesJson)};
-const files = JSON.parse(filesJson);
+const files = ${JSON.stringify(files)};  // Direct stringify, no double encoding
 const results = [];
 const MAX_LINES = 1000;
 
@@ -88,12 +86,20 @@ console.log(JSON.stringify(results));
           error?: string;
         }>;
         try {
-          fileResults = JSON.parse(result.result.trim());
+          // Extract only the last line which should be our JSON output
+          const lines = result.result.trim().split('\n');
+          const jsonLine = lines[lines.length - 1] || '';
+          fileResults = JSON.parse(jsonLine);
         } catch (parseError) {
           console.error('Failed to parse sandbox output:', result.result);
-          throw new Error(
-            `Failed to parse sandbox output: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`
-          );
+          // Try parsing the entire result as a fallback
+          try {
+            fileResults = JSON.parse(result.result.trim());
+          } catch (_fallbackError) {
+            throw new Error(
+              `Failed to parse sandbox output: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`
+            );
+          }
         }
 
         const output: ReadFilesToolOutput = {

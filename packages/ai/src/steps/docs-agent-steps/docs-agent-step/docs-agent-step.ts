@@ -1,5 +1,6 @@
 import type { Sandbox } from '@buster/sandbox';
 import type { ModelMessage } from 'ai';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { createDocsAgent } from '../../../agents/docs-agent/docs-agent';
 import { DocsAgentContextSchema } from '../../../agents/docs-agent/docs-agent-context';
@@ -45,79 +46,90 @@ export type DocsAgentStepOutput = z.infer<typeof DocsAgentStepOutputSchema>;
 /**
  * Main documentation agent that processes todos and creates documentation
  */
-export async function runDocsAgentStep(params: DocsAgentStepInput): Promise<void> {
-  // Validate input
-  const validatedParams = DocsAgentStepInputSchema.parse(params);
+export const runDocsAgentStep = wrapTraced(
+  async (params: DocsAgentStepInput): Promise<void> => {
+    // Validate input
+    const validatedParams = DocsAgentStepInputSchema.parse(params);
 
-  // Extract values from context
-  const sandbox = validatedParams.context.sandbox as Sandbox;
-  const todoList = validatedParams.todoList;
-  const dataSourceId = validatedParams.context.dataSourceId;
+    // Extract values from context
+    const sandbox = validatedParams.context.sandbox as Sandbox;
+    const todoList = validatedParams.todoList;
+    const dataSourceId = validatedParams.context.dataSourceId;
 
-  try {
-    // Get current working directory from sandbox
-    let cwdMessage = '';
-    if (sandbox) {
-      try {
-        const pwdResult = await sandbox.process.executeCommand('pwd');
-        const currentDir = pwdResult.result.trim();
-        cwdMessage = `cwd: ${currentDir}`;
-      } catch (error) {
-        console.warn('[DocsAgent] Failed to get current working directory:', error);
+    try {
+      // Get current working directory from sandbox
+      let cwdMessage = '';
+      if (sandbox) {
+        try {
+          const pwdResult = await sandbox.process.executeCommand('pwd');
+          const currentDir = pwdResult.result.trim();
+          cwdMessage = `cwd: ${currentDir}`;
+        } catch (error) {
+          console.warn('[DocsAgent] Failed to get current working directory:', error);
+        }
       }
-    }
 
-    // Create the docs agent with folder structure and context
-    const docsAgent = createDocsAgent({
-      fileTree: validatedParams.repositoryTree,
-      userId: validatedParams.organizationId, // Using organizationId as userId for now
-      chatId: Date.now().toString(), // Using current timestamp as chatId
-      dataSourceId: dataSourceId || '',
-      dataSourceSyntax: '', // Adding required field
-      organizationId: validatedParams.organizationId || '',
-      messageId: validatedParams.messageId, // Optional field
-      sandbox: sandbox, // Pass sandbox for file tools
-      todoList: todoList,
-      clarifications: [],
-    });
-
-    const userMessage = `${validatedParams.message}`;
-    const todoMessage = `<todo-list>\n${todoList}\n</todo-list>`;
-
-    const messages: ModelMessage[] = [
-      {
-        role: 'user',
-        content: userMessage,
-      },
-      {
-        role: 'user',
-        content: todoMessage,
-      },
-    ];
-
-    // Add cwd message if available (after todo list)
-    if (cwdMessage) {
-      messages.push({
-        role: 'user',
-        content: cwdMessage,
+      // Create the docs agent with folder structure and context
+      const docsAgent = createDocsAgent({
+        fileTree: validatedParams.repositoryTree,
+        userId: validatedParams.organizationId, // Using organizationId as userId for now
+        chatId: Date.now().toString(), // Using current timestamp as chatId
+        dataSourceId: dataSourceId || '',
+        dataSourceSyntax: '', // Adding required field
+        organizationId: validatedParams.organizationId || '',
+        messageId: validatedParams.messageId, // Optional field
+        sandbox: sandbox, // Pass sandbox for file tools
+        todoList: todoList,
+        clarifications: [],
       });
+
+      const userMessage = `${validatedParams.message}`;
+      const todoMessage = `<todo-list>\n${todoList}\n</todo-list>`;
+
+      const messages: ModelMessage[] = [
+        {
+          role: 'user',
+          content: userMessage,
+        },
+        {
+          role: 'user',
+          content: todoMessage,
+        },
+      ];
+
+      // Add cwd message if available (after todo list)
+      if (cwdMessage) {
+        messages.push({
+          role: 'user',
+          content: cwdMessage,
+        });
+      }
+
+      // Execute the docs agent
+      const result = await docsAgent.stream({ messages });
+
+      // Consume the text stream to ensure the agent continues processing
+      if (result.textStream) {
+        for await (const _ of result.textStream) {
+          // We don't need to do anything with the text chunks,
+          // just consume them to keep the stream flowing
+        }
+      }
+
+      // Wait for the response and extract tool calls
+      const response = await result.response;
+
+      if (!response || !Array.isArray(response.messages)) {
+        throw new Error('Docs agent returned an invalid response shape (missing messages array)');
+      }
+
+      return;
+    } catch (error) {
+      console.error('[DocsAgent] Error executing docs agent:', error);
+      throw new Error(
+        `Docs agent execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
-
-    // Execute the docs agent
-    const result = await docsAgent.stream({ messages });
-
-    // Wait for the response and extract tool calls
-    const response = await result.response;
-
-    if (!response || !Array.isArray(response.messages)) {
-      throw new Error('Docs agent returned an invalid response shape (missing messages array)');
-    }
-
-    return;
-  } catch (error) {
-    console.error('[DocsAgent] Error executing docs agent:', error);
-    throw new Error(
-      `Docs agent execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
-  }
-}
+  },
+  { name: 'Docs Agent Step' }
+);
