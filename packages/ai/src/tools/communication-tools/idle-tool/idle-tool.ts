@@ -2,7 +2,8 @@ import { tool } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 
-// Input/Output schemas
+export const IDLE_TOOL_NAME = 'idleTool';
+
 const IdleInputSchema = z.object({
   final_response: z
     .string()
@@ -16,7 +17,6 @@ const IdleOutputSchema = z.object({
   success: z.boolean().describe('Whether the operation was successful'),
 });
 
-// Optional context for consistency with other tools
 const IdleContextSchema = z.object({
   messageId: z.string().optional().describe('The message ID for tracking tool execution.'),
 });

@@ -18,40 +18,45 @@ import {
   createWebSearchTool,
   executeSqlDocsAgent,
 } from '../../tools';
+import { IDLE_TOOL_NAME } from '../../tools/communication-tools/idle-tool/idle-tool';
 import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
+import { getDocsAgentFileTreeSystemPrompt } from './get-docs-agent-file-tree-system-prompt';
 import { getDocsAgentSystemPrompt } from './get-docs-agent-system-prompt';
 
 export const DOCS_AGENT_NAME = 'docsAgent';
 
 const DEFAULT_CACHE_OPTIONS = {
   anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
+  openai: {
+    parallelToolCalls: false,
+    reasoningEffort: 'minimal',
+  },
 };
 
-const STOP_CONDITIONS = [stepCountIs(50), hasToolCall('idleTool')];
+const STOP_CONDITIONS = [stepCountIs(50), hasToolCall(IDLE_TOOL_NAME)];
 
-const DocsAgentOptionsSchema = z.object({
-  folder_structure: z.string().describe('The file structure of the dbt repository'),
+export const DocsAgentOptionsSchema = z.object({
   userId: z.string(),
   chatId: z.string(),
   dataSourceId: z.string(),
+  dataSourceSyntax: z.string(),
   organizationId: z.string(),
   messageId: z.string(),
-  sandbox: z
-    .custom<Sandbox>(
-      (val) => {
-        return val && typeof val === 'object' && 'id' in val && 'fs' in val;
-      },
-      { message: 'Invalid Sandbox instance' }
-    )
-    .optional(),
+  sandbox: z.custom<Sandbox>(
+    (val) => {
+      return val && typeof val === 'object' && 'id' in val && 'fs' in val;
+    },
+    { message: 'Invalid Sandbox instance' }
+  ),
+  fileTree: z.string().describe('The file tree of the dbt repository'),
 });
 
-const DocsStreamOptionsSchema = z.object({
+const DocsAgentStreamOptionsSchema = z.object({
   messages: z.array(z.custom<ModelMessage>()).describe('The messages to send to the docs agent'),
 });
 
 export type DocsAgentOptions = z.infer<typeof DocsAgentOptionsSchema>;
-export type DocsStreamOptions = z.infer<typeof DocsStreamOptionsSchema>;
+export type DocsAgentStreamOptions = z.infer<typeof DocsAgentStreamOptionsSchema>;
 
 // Extended type for passing to tools (includes sandbox)
 export type DocsAgentContextWithSandbox = DocsAgentOptions & { sandbox: Sandbox };
@@ -59,115 +64,36 @@ export type DocsAgentContextWithSandbox = DocsAgentOptions & { sandbox: Sandbox 
 export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
   const systemMessage = {
     role: 'system',
-    content: getDocsAgentSystemPrompt(docsAgentOptions.folder_structure),
+    content: getDocsAgentSystemPrompt(),
     providerOptions: DEFAULT_CACHE_OPTIONS,
   } as ModelMessage;
 
-  const idleTool = createIdleTool();
+  const fileTreeSystemMessage = {
+    role: 'system',
+    content: getDocsAgentFileTreeSystemPrompt(docsAgentOptions.fileTree),
+    providerOptions: DEFAULT_CACHE_OPTIONS,
+  } as ModelMessage;
 
-  // Create tool context with messageId and sandbox if available
-  // Create file tools with context (only if sandbox is available)
-  const listFiles = docsAgentOptions.sandbox
-    ? createListFilesTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
-  const readFiles = docsAgentOptions.sandbox
-    ? createReadFilesTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
-  const createFiles = docsAgentOptions.sandbox
-    ? createCreateFilesTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
-  const editFiles = docsAgentOptions.sandbox
-    ? createEditFilesTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
-  const deleteFiles = docsAgentOptions.sandbox
-    ? createDeleteFilesTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
-  const bashExecute = docsAgentOptions.sandbox
-    ? createBashTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
-  const grepSearch = docsAgentOptions.sandbox
-    ? createGrepSearchTool({
-        messageId: docsAgentOptions.messageId || 'default',
-        sandbox: docsAgentOptions.sandbox,
-      })
-    : undefined;
+  const tools = {
+    [IDLE_TOOL_NAME]: createIdleTool(),
+  };
 
-  const webSearch = createWebSearchTool();
+  const agentContext: AgentContext = {
+    agentName: DOCS_AGENT_NAME,
+    availableTools: Object.keys(tools),
+  };
 
-  // Create planning tools with simple context
-  const checkOffTodoList = createCheckOffTodoListTool({
-    todoList: '',
-    updateTodoList: () => {},
-  });
-
-  const updateClarificationsFile = createUpdateClarificationsFileTool({
-    clarifications: [],
-    updateClarifications: () => {},
-  });
-
-  async function stream({ messages }: DocsStreamOptions) {
-    // Collect available tools dynamically based on what's enabled
-    const availableTools: string[] = ['sequentialThinking'];
-    if (grepSearch) availableTools.push('grepSearch');
-    if (readFiles) availableTools.push('readFiles');
-    if (editFiles) availableTools.push('editFiles');
-    if (createFiles) availableTools.push('createFiles');
-    if (deleteFiles) availableTools.push('deleteFiles');
-    if (listFiles) availableTools.push('listFiles');
-    availableTools.push('executeSql');
-    if (bashExecute) availableTools.push('bashExecute');
-    availableTools.push('updateClarificationsFile', 'checkOffTodoList', 'idleTool', 'webSearch');
-
-    const agentContext: AgentContext = {
-      agentName: DOCS_AGENT_NAME,
-      availableTools,
-    };
-
+  async function stream({ messages }: DocsAgentStreamOptions) {
     return wrapTraced(
       () =>
         streamText({
           model: Sonnet4,
-          tools: {
-            sequentialThinking: createSequentialThinkingTool({
-              messageId: docsAgentOptions.messageId,
-            }),
-            ...(grepSearch && { grepSearch }),
-            ...(readFiles && { readFiles }),
-            ...(editFiles && { editFiles }),
-            ...(createFiles && { createFiles }),
-            ...(deleteFiles && { deleteFiles }),
-            ...(listFiles && { listFiles }),
-            executeSql: executeSqlDocsAgent,
-            ...(bashExecute && { bashExecute }),
-            updateClarificationsFile,
-            checkOffTodoList,
-            idleTool,
-            webSearch,
-          },
-          messages: [systemMessage, ...messages],
+          tools: {},
+          messages: [systemMessage, fileTreeSystemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',
           maxOutputTokens: 10000,
           temperature: 0,
-          experimental_context: docsAgentOptions,
           experimental_repairToolCall: async (repairContext) => {
             return repairToolCall({
               toolCall: repairContext.toolCall,
@@ -178,6 +104,17 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
               ...(repairContext.inputSchema && { inputSchema: repairContext.inputSchema }),
               agentContext,
             });
+          },
+          onStepFinish: async (event) => {
+            // Wait for all tool operations to complete before moving to next step
+            // This ensures done tool's async operations complete before stream terminates
+            console.info('Docs Agent Finished', {
+              toolCalls: event.toolCalls?.length || 0,
+              hasToolResults: !!event.toolResults,
+            });
+          },
+          onFinish: () => {
+            console.info('Analyst Agent finished');
           },
         }),
       {

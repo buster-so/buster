@@ -1,0 +1,4 @@
+Your current working directory is: `~/` or `home/daytona/`
+
+Here is the file tree of your workspace:
+{{file_tree}}

@@ -78,43 +78,27 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     providerOptions: DEFAULT_CACHE_OPTIONS,
   } as ModelMessage;
 
+  const tools = {
+    [CREATE_METRICS_TOOL_NAME]: createCreateMetricsTool(analystAgentOptions),
+    [MODIFY_METRICS_TOOL_NAME]: createModifyMetricsTool(analystAgentOptions),
+    [CREATE_DASHBOARDS_TOOL_NAME]: createCreateDashboardsTool(analystAgentOptions),
+    [MODIFY_DASHBOARDS_TOOL_NAME]: createModifyDashboardsTool(analystAgentOptions),
+    [CREATE_REPORTS_TOOL_NAME]: createCreateReportsTool(analystAgentOptions),
+    [MODIFY_REPORTS_TOOL_NAME]: createModifyReportsTool(analystAgentOptions),
+    [DONE_TOOL_NAME]: createDoneTool(analystAgentOptions),
+  };
+
+  const agentContext: AgentContext = {
+    agentName: ANALYST_AGENT_NAME,
+    availableTools: Object.keys(tools),
+  };
+
   async function stream({ messages }: AnalystStreamOptions) {
-    const createMetrics = createCreateMetricsTool(analystAgentOptions);
-    const modifyMetrics = createModifyMetricsTool(analystAgentOptions);
-    const createDashboards = createCreateDashboardsTool(analystAgentOptions);
-    const modifyDashboards = createModifyDashboardsTool(analystAgentOptions);
-    const createReports = createCreateReportsTool(analystAgentOptions);
-    const modifyReports = createModifyReportsTool(analystAgentOptions);
-    const doneTool = createDoneTool(analystAgentOptions);
-
-    const availableTools = [
-      CREATE_METRICS_TOOL_NAME,
-      MODIFY_METRICS_TOOL_NAME,
-      CREATE_DASHBOARDS_TOOL_NAME,
-      MODIFY_DASHBOARDS_TOOL_NAME,
-      CREATE_REPORTS_TOOL_NAME,
-      MODIFY_REPORTS_TOOL_NAME,
-      DONE_TOOL_NAME,
-    ];
-
-    const agentContext: AgentContext = {
-      agentName: ANALYST_AGENT_NAME,
-      availableTools,
-    };
-
     return wrapTraced(
       () =>
         streamText({
           model: Sonnet4,
-          tools: {
-            [CREATE_METRICS_TOOL_NAME]: createMetrics,
-            [MODIFY_METRICS_TOOL_NAME]: modifyMetrics,
-            [CREATE_DASHBOARDS_TOOL_NAME]: createDashboards,
-            [MODIFY_DASHBOARDS_TOOL_NAME]: modifyDashboards,
-            [CREATE_REPORTS_TOOL_NAME]: createReports,
-            [MODIFY_REPORTS_TOOL_NAME]: modifyReports,
-            [DONE_TOOL_NAME]: doneTool,
-          },
+          tools,
           messages: [systemMessage, datasetsSystemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',

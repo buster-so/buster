@@ -7,7 +7,7 @@ describe('Docs Agent Instructions', () => {
     const content = docsAgentPrompt;
 
     // Expected template variables
-    const expectedVariables = ['folder_structure', 'date'];
+    const expectedVariables = ['date'];
 
     // Find all template variables in the file
     const templateVariablePattern = /\{\{([^}]+)\}\}/g;
@@ -37,23 +37,13 @@ describe('Docs Agent Instructions', () => {
   });
 
   it('should load and process the prompt template correctly', () => {
-    const folderStructure = `
-- src/
-  - models/
-    - users.yml
-    - orders.yml
-`;
-    const result = getDocsAgentSystemPrompt(folderStructure);
+    const result = getDocsAgentSystemPrompt();
 
     expect(result).toBeDefined();
     expect(typeof result).toBe('string');
     expect(result.length).toBeGreaterThan(0);
 
-    // Should contain the folder structure we provided
-    expect(result).toContain(folderStructure);
-
     // Should not contain any unreplaced template variables
-    expect(result).not.toMatch(/\{\{folder_structure\}\}/);
     expect(result).not.toMatch(/\{\{date\}\}/);
 
     // Should contain a valid ISO date string
@@ -62,7 +52,7 @@ describe('Docs Agent Instructions', () => {
   });
 
   it('should contain expected sections from the prompt template', () => {
-    const result = getDocsAgentSystemPrompt('Test folder structure');
+    const result = getDocsAgentSystemPrompt();
 
     // Check for key sections that should be in the prompt
     expect(result).toContain('<intro>');
@@ -74,13 +64,15 @@ describe('Docs Agent Instructions', () => {
     expect(result).toContain('You are Buster');
   });
 
-  it('should throw an error for empty folder structure', () => {
+  it('should work without parameters', () => {
+    // The function should work without any parameters
     expect(() => {
-      getDocsAgentSystemPrompt('');
-    }).toThrow('Folder structure is required');
+      getDocsAgentSystemPrompt();
+    }).not.toThrow();
 
-    expect(() => {
-      getDocsAgentSystemPrompt('   '); // whitespace only
-    }).toThrow('Folder structure is required');
+    const result = getDocsAgentSystemPrompt();
+    expect(result).toBeDefined();
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
   });
 });

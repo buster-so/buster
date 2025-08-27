@@ -1,26 +1,24 @@
-import docsAgentPrompt from './docs-agent-prompt.txt';
+import docsAgentFileTreePrompt from './docs-agent-file-tree-prompt.txt';
 
 /**
  * Template parameters for the docs agent prompt
  */
 export interface DocsAgentTemplateParams {
-  date: string;
+  fileTree: string;
 }
 
 /**
  * Loads the docs agent prompt template and replaces variables
  */
 function loadAndProcessPrompt(params: DocsAgentTemplateParams): string {
-  return docsAgentPrompt.replace(/\{\{date\}\}/g, params.date);
+  return docsAgentFileTreePrompt.replace(/\{\{file_tree\}\}/g, params.fileTree);
 }
 
 /**
  * Export the template function for use in agent files
  */
-export const getDocsAgentSystemPrompt = (): string => {
-  const currentDate = new Date().toISOString();
-
+export const getDocsAgentFileTreeSystemPrompt = (fileTree: string): string => {
   return loadAndProcessPrompt({
-    date: currentDate,
+    fileTree,
   });
 };
