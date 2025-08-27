@@ -95,13 +95,11 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     [GREP_SEARCH_TOOL_NAME]: createGrepSearchTool(docsAgentOptions),
     [LIST_FILES_TOOL_NAME]: createListFilesTool(docsAgentOptions),
     [READ_FILES_TOOL_NAME]: createReadFilesTool(docsAgentOptions),
+    [SEQUENTIAL_THINKING_TOOL_NAME]: createSequentialThinkingTool(docsAgentOptions),
     [CHECK_OFF_TODO_LIST_TOOL_NAME]: createCheckOffTodoListTool(docsAgentOptions),
-    [SEQUENTIAL_THINKING_TOOL_NAME]: createSequentialThinkingTool({
-      messageId: docsAgentOptions.messageId,
-    }),
-    [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions),
     [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(),
     [EXECUTE_SQL_DOCS_AGENT_NAME]: executeSqlDocsAgent,
+    [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions),
   };
 
   const agentContext: AgentContext = {

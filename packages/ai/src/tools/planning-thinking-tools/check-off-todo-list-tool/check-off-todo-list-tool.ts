@@ -30,9 +30,7 @@ export type CheckOffTodoListToolInput = z.infer<typeof CheckOffTodoListToolInput
 export type CheckOffTodoListToolOutput = z.infer<typeof CheckOffTodoListToolOutputSchema>;
 export type CheckOffTodoListToolContext = z.infer<typeof CheckOffTodoListToolContextSchema>;
 
-export function createCheckOffTodoListTool<
-  TAgentContext extends CheckOffTodoListToolContext = CheckOffTodoListToolContext,
->(context: TAgentContext) {
+export function createCheckOffTodoListTool(context: CheckOffTodoListToolContext) {
   const execute = createCheckOffTodoListToolExecute(context);
 
   return tool({
