@@ -1,25 +1,43 @@
-import { randomUUID } from 'node:crypto';
+import type { Sandbox } from '@buster/sandbox';
 import type { ModelMessage } from 'ai';
 import { z } from 'zod';
-import { DocsAgentContextSchema } from '../../agents/docs-agent/docs-agent-context';
-import {
-  runCreateDocsTodosStep,
-  runDocsAgentStep,
-  runGetRepositoryTreeStep,
-  runInitializeContextStep,
-} from '../../steps';
+import { runCreateDocsTodosStep, runDocsAgentStep, runGetRepositoryTreeStep } from '../../steps';
 
-// Input schema for the workflow
-export const docsAgentWorkflowInputSchema = z.object({
-  message: z.string().describe('The user message'),
-  organizationId: z.string().describe('The organization ID'),
-  context: DocsAgentContextSchema.describe('The docs agent context'),
+// Input schema for the workflow - matching analyst-workflow structure
+export const DocsAgentWorkflowInputSchema = z.object({
+  messages: z.array(z.custom<ModelMessage>()),
+  messageId: z.string().uuid(),
+  chatId: z.string().uuid(),
+  userId: z.string().uuid(),
+  organizationId: z.string().uuid(),
+  dataSourceId: z.string().uuid(),
+  sandbox: z.custom<Sandbox>(
+    (val) => {
+      return val && typeof val === 'object' && 'id' in val && 'fs' in val;
+    },
+    {
+      message: 'Invalid Sandbox instance',
+    }
+  ),
 });
 
 // Output schema for the workflow
-export const docsAgentWorkflowOutputSchema = z.object({
-  todos: z.array(z.string()).optional().describe('Array of todos'),
-  todoList: z.string().optional().describe('The TODO list'),
+export const DocsAgentWorkflowOutputSchema = z.object({
+  workflowId: z.string(),
+  chatId: z.string().uuid(),
+  messageId: z.string().uuid(),
+  userId: z.string().uuid(),
+  organizationId: z.string().uuid(),
+  dataSourceId: z.string().uuid(),
+
+  startTime: z.number(),
+  endTime: z.number(),
+  totalExecutionTimeMs: z.number(),
+
+  messages: z.array(z.custom<ModelMessage>()),
+
+  todos: z.string().optional().describe('The TODO list'),
+  repositoryTree: z.string().optional().describe('The repository tree structure'),
   documentationCreated: z.boolean().optional().describe('Whether documentation was created'),
   clarificationNeeded: z.boolean().optional().describe('Whether clarification is needed'),
   clarificationQuestion: z
@@ -31,75 +49,105 @@ export const docsAgentWorkflowOutputSchema = z.object({
     .optional()
     .describe('Clarification question details'),
   finished: z.boolean().optional().describe('Whether the agent finished'),
-  metadata: z
-    .object({
-      filesCreated: z.number().optional(),
-      toolsUsed: z.array(z.string()).optional(),
-    })
-    .optional()
-    .describe('Metadata about the execution'),
+
+  summary: z.object({
+    filesCreated: z.number().optional(),
+    filesModified: z.number().optional(),
+    toolsUsed: z.array(z.string()).optional(),
+  }),
 });
 
-export type DocsAgentWorkflowInput = z.infer<typeof docsAgentWorkflowInputSchema>;
-export type DocsAgentWorkflowOutput = z.infer<typeof docsAgentWorkflowOutputSchema>;
+export type DocsAgentWorkflowInput = z.infer<typeof DocsAgentWorkflowInputSchema>;
+export type DocsAgentWorkflowOutput = z.infer<typeof DocsAgentWorkflowOutputSchema>;
 
 /**
  * Runs the documentation agent workflow
  * This workflow processes documentation requests through multiple steps:
- * 1. Initialize context
- * 2. Get repository tree structure
- * 3. Create TODO list for documentation tasks
- * 4. Execute the docs agent to create documentation
+ * 1. Get repository tree structure
+ * 2. Create TODO list for documentation tasks
+ * 3. Execute the docs agent to create documentation
  */
-export async function runDocsAgentWorkflow(input: DocsAgentWorkflowInput): Promise<void> {
+export async function runDocsAgentWorkflow(
+  input: DocsAgentWorkflowInput
+): Promise<DocsAgentWorkflowOutput> {
+  const workflowStartTime = Date.now();
+  const workflowId = `workflow_${input.chatId}_${input.messageId}`;
+
   // Validate input
-  const validatedInput = docsAgentWorkflowInputSchema.parse(input);
+  const validatedInput = DocsAgentWorkflowInputSchema.parse(input);
 
-  // Step 1: Initialize context
-  const contextResult = await runInitializeContextStep({
-    message: validatedInput.message,
-    organizationId: validatedInput.organizationId,
-    context: validatedInput.context,
-  });
+  const { messages, sandbox, dataSourceId } = validatedInput;
 
-  // Step 2: Get repository tree structure
+  // Step 1: Get repository tree structure
+  // This step loads the file tree from the sandbox
   const treeResult = await runGetRepositoryTreeStep({
-    message: contextResult.message,
-    organizationId: contextResult.organizationId,
-    contextInitialized: contextResult.contextInitialized,
-    context: contextResult.context,
+    message: messages[messages.length - 1]?.content?.toString() || '',
+    organizationId: validatedInput.organizationId,
+    contextInitialized: true,
+    context: {
+      sandbox: sandbox,
+      todoList: '',
+      clarificationQuestions: [],
+      dataSourceId: dataSourceId,
+    },
   });
 
-  // Step 3: Create todos based on the message and repository structure
-  // Convert the single message to a messages array for the todos step
-  const messages: ModelMessage[] = [
-    {
-      role: 'user',
-      content: treeResult.message,
-    },
-  ];
-
+  // Step 2: Create todos based on the messages and repository structure
   const todosResult = await runCreateDocsTodosStep({
     messages,
     repositoryTree: treeResult.repositoryTree,
   });
 
-  // TODO: This is a temporary solution to get a messageId
-  const messageId = randomUUID();
+  // Add the todos message to the messages array
+  messages.push(todosResult.todosMessage);
 
-  // Step 4: Execute the docs agent with all the prepared data
+  // Step 3: Execute the docs agent with all the prepared data
   const _agentResult = await runDocsAgentStep({
     todos: todosResult.todos,
-    todoList: todosResult.todos, // Using todos as todoList
-    message: treeResult.message,
-    messageId: messageId,
-    organizationId: treeResult.organizationId,
-    context: treeResult.context,
+    todoList: todosResult.todos,
+    message: messages[messages.length - 1]?.content?.toString() || '',
+    messageId: validatedInput.messageId,
+    organizationId: validatedInput.organizationId,
+    context: {
+      sandbox: sandbox,
+      todoList: todosResult.todos,
+      clarificationQuestions: [],
+      dataSourceId: dataSourceId,
+    },
     repositoryTree: treeResult.repositoryTree,
   });
 
-  // Return the final results from the agent
-  return;
+  const workflowEndTime = Date.now();
+
+  // Construct the comprehensive output
+  const output: DocsAgentWorkflowOutput = {
+    workflowId,
+    chatId: input.chatId,
+    messageId: input.messageId,
+    userId: input.userId,
+    organizationId: input.organizationId,
+    dataSourceId: input.dataSourceId,
+
+    startTime: workflowStartTime,
+    endTime: workflowEndTime,
+    totalExecutionTimeMs: workflowEndTime - workflowStartTime,
+
+    messages,
+
+    todos: todosResult.todos,
+    repositoryTree: treeResult.repositoryTree,
+    documentationCreated: true, // TODO: Extract from agent result
+    clarificationNeeded: false, // TODO: Extract from agent result
+    finished: true, // TODO: Extract from agent result
+
+    summary: {
+      filesCreated: 0, // TODO: Extract from agent result
+      filesModified: 0, // TODO: Extract from agent result
+      toolsUsed: [], // TODO: Extract from agent result
+    },
+  };
+
+  return output;
 }
 
 // Default export for backward compatibility if needed

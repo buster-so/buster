@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Sandbox } from '@daytonaio/sdk';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createSandbox } from '../../management/create-sandbox';
 import { getSandboxFileTree } from './get-file-tree';
 
@@ -18,7 +18,7 @@ describe('getSandboxFileTree', () => {
       'echo "deeply nested" > /home/daytona/test-dir/nested-dir/deep-file.js',
       'echo "hidden file" > /home/daytona/.hidden-file',
       'mkdir -p /home/daytona/.hidden-dir',
-      'echo "hidden nested" > /home/daytona/.hidden-dir/hidden-nested.txt'
+      'echo "hidden nested" > /home/daytona/.hidden-dir/hidden-nested.txt',
     ];
 
     for (const command of testFiles) {
@@ -41,12 +41,12 @@ describe('getSandboxFileTree', () => {
     expect(fileTree).toContain('nested-file.md');
     expect(fileTree).toContain('nested-dir/');
     expect(fileTree).toContain('deep-file.js');
-    
+
     // Verify hidden files and directories are included
     expect(fileTree).toContain('.hidden-file');
     expect(fileTree).toContain('.hidden-dir/');
     expect(fileTree).toContain('hidden-nested.txt');
-    
+
     // Verify it's actually a tree structure with indentation
     expect(fileTree).toMatch(/├──|└──|│/); // Tree characters
   });
@@ -55,7 +55,10 @@ describe('getSandboxFileTree', () => {
     // Create a deeply nested structure
     const deepPath = '/home/daytona/deep1/deep2/deep3/deep4/deep5/deep6/deep7/deep8/deep9/deep10';
     await sandbox.process.executeCommand(`mkdir -p ${deepPath}`, '/home/daytona/');
-    await sandbox.process.executeCommand(`echo "very deep" > ${deepPath}/deep-file.txt`, '/home/daytona/');
+    await sandbox.process.executeCommand(
+      `echo "very deep" > ${deepPath}/deep-file.txt`,
+      '/home/daytona/'
+    );
 
     const fileTree = await getSandboxFileTree(sandbox);
 
