@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import type { Sandbox } from '@daytonaio/sdk';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { createSandbox } from '../management/create-sandbox';
+import { createSandbox } from '../../management/create-sandbox';
 import {
   type FileInput,
   type UploadProgress,

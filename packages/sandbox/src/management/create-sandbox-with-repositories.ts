@@ -12,24 +12,24 @@ export type CreateSandboxWithRepositoriesOptions = z.infer<
   typeof CreateSandboxWithRepositoriesSchema
 >;
 
-export async function createSandbox(options: CreateSandboxWithRepositoriesOptions) {
-  // Validate options
-  const validatedOptions = CreateSandboxWithRepositoriesSchema.parse(options);
-
+export async function createSandboxWithRepositories(options: CreateSandboxWithRepositoriesOptions) {
   // Initialize the Daytona client
   const daytona = new Daytona({ apiKey: process.env.DAYTONA_API_KEY, target: 'us' });
 
   // Create the Sandbox instance
   const sandbox = await daytona.create({
-    language: validatedOptions.language || 'typescript',
+    language: options.language || 'typescript',
+    envVars: {
+      GITHUB_TOKEN: options.githubToken,
+    },
   });
 
   // Clone repositories concurrently if provided
-  if (validatedOptions.repositories && validatedOptions.repositories.length > 0) {
-    console.info(`Cloning ${validatedOptions.repositories.length} repositories concurrently...`);
+  if (options.repositories && options.repositories.length > 0) {
+    console.info(`Cloning ${options.repositories.length} repositories concurrently...`);
 
     // Create clone commands for each repository
-    const cloneCommands = validatedOptions.repositories.map((repoUrl, index) => {
+    const cloneCommands = options.repositories.map((repoUrl, index) => {
       // Extract repository name from URL for folder naming
       const repoName = repoUrl.split('/').pop()?.replace('.git', '') || `repo-${index}`;
 
@@ -37,11 +37,11 @@ export async function createSandbox(options: CreateSandboxWithRepositoriesOption
       let cloneCommand = '';
 
       // If GitHub token is provided and it's a GitHub URL, use token authentication
-      if (validatedOptions.githubToken && repoUrl.includes('github.com')) {
+      if (options.githubToken && repoUrl.includes('github.com')) {
         // Insert token into the URL for authentication
         const authenticatedUrl = repoUrl.replace(
           'https://github.com/',
-          `https://${validatedOptions.githubToken}@github.com/`
+          `https://${options.githubToken}@github.com/`
         );
         cloneCommand = `git clone ${authenticatedUrl} /home/daytona/${repoName}`;
       } else {
@@ -55,6 +55,16 @@ export async function createSandbox(options: CreateSandboxWithRepositoriesOption
     const clonePromises = cloneCommands.map(async (command, index) => {
       try {
         const result = await sandbox.process.executeCommand(command, '/home/daytona/');
+
+        // Check if the command failed based on exit code
+        if (result.exitCode !== 0) {
+          const error = new Error(
+            `Git clone failed with exit code ${result.exitCode}: ${result.result}`
+          );
+          console.error(`Failed to clone repository ${index + 1}:`, error.message);
+          return { success: false, index, error };
+        }
+
         console.info(`Repository ${index + 1} cloned successfully`);
         return { success: true, index, result };
       } catch (error) {
@@ -73,7 +83,7 @@ export async function createSandbox(options: CreateSandboxWithRepositoriesOption
     }
 
     console.info(
-      `Successfully cloned ${results.filter((r) => r.success).length} out of ${validatedOptions.repositories.length} repositories`
+      `Successfully cloned ${results.filter((r) => r.success).length} out of ${options.repositories.length} repositories`
     );
   }
 

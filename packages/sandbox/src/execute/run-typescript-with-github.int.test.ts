@@ -19,7 +19,7 @@ describe('runTypescript with GitHub token integration tests', () => {
   afterAll(async () => {
     if (!hasApiKey) return;
     // Clean up the sandbox
-    await sandbox.kill();
+    await sandbox.delete();
   });
 
   it.skipIf(!hasApiKey)('should pass GitHub token as environment variable', async () => {

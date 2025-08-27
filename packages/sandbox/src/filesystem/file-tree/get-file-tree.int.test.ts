@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Sandbox } from '@daytonaio/sdk';
 import { createSandbox } from '../../management/create-sandbox';
-import { getSandboxFileTree } from './get-sandbox-file-tree';
+import { getSandboxFileTree } from './get-file-tree';
 
 describe('getSandboxFileTree', () => {
   let sandbox: Sandbox;

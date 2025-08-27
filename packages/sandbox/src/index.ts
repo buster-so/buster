@@ -12,7 +12,7 @@ export {
   normalizePath,
   joinPaths,
   validatePath,
-} from './filesystem/add-files';
+} from './filesystem/add-files/add-files';
 
 // Export Zod schemas
 export {
@@ -22,7 +22,7 @@ export {
   UploadProgressSchema,
   UploadResultSchema,
   FileUploadItemSchema,
-} from './filesystem/add-files';
+} from './filesystem/add-files/add-files';
 
 // Export inferred types
 export type {
@@ -32,4 +32,4 @@ export type {
   UploadProgress,
   UploadResult,
   FileUploadItem,
-} from './filesystem/add-files';
+} from './filesystem/add-files/add-files';
