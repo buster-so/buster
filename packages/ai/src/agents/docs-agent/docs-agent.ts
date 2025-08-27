@@ -5,7 +5,6 @@ import z from 'zod';
 import { GPT5 } from '../../llm/gpt-5';
 import {
   createBashTool,
-  createCreateFilesTool,
   createDeleteFilesTool,
   createEditFilesTool,
   createGrepSearchTool,
@@ -16,6 +15,7 @@ import {
   createUpdateClarificationsFileTool,
   createUpdateTodoListTool,
   createWebSearchTool,
+  createWriteFilesTool,
 } from '../../tools';
 import { IDLE_TOOL_NAME } from '../../tools/communication-tools/idle-tool/idle-tool';
 import {
@@ -23,12 +23,12 @@ import {
   createSuperExecuteSqlTool,
 } from '../../tools/database-tools/super-execute-sql/super-execute-sql';
 import { BASH_TOOL_NAME } from '../../tools/file-tools/bash-tool/bash-tool';
-import { CREATE_FILES_TOOL_NAME } from '../../tools/file-tools/create-files-tool/create-files-tool';
 import { DELETE_FILES_TOOL_NAME } from '../../tools/file-tools/delete-files-tool/delete-files-tool';
 import { EDIT_FILES_TOOL_NAME } from '../../tools/file-tools/edit-files-tool/edit-files-tool';
 import { GREP_SEARCH_TOOL_NAME } from '../../tools/file-tools/grep-search-tool/grep-search-tool';
 import { LIST_FILES_TOOL_NAME } from '../../tools/file-tools/list-files-tool/list-files-tool';
 import { READ_FILES_TOOL_NAME } from '../../tools/file-tools/read-files-tool/read-files-tool';
+import { WRITE_FILES_TOOL_NAME } from '../../tools/file-tools/write-files-tool/write-files-tool';
 import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
 import { UPDATE_CLARIFICATIONS_FILE_TOOL_NAME } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
 import { ClarifyingQuestionSchema } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool-execute';
@@ -44,8 +44,7 @@ const DEFAULT_CACHE_OPTIONS = {
   anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
   openai: {
     parallelToolCalls: false,
-    reasoningEffort: 'minimal',
-    reasoningSummary: 'detailed',
+    reasoningEffort: 'medium',
   },
 };
 
@@ -98,7 +97,7 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
   const tools = {
     [IDLE_TOOL_NAME]: createIdleTool(),
     [BASH_TOOL_NAME]: createBashTool(docsAgentOptions),
-    [CREATE_FILES_TOOL_NAME]: createCreateFilesTool(docsAgentOptions),
+    [WRITE_FILES_TOOL_NAME]: createWriteFilesTool(docsAgentOptions),
     [DELETE_FILES_TOOL_NAME]: createDeleteFilesTool(docsAgentOptions),
     [EDIT_FILES_TOOL_NAME]: createEditFilesTool(docsAgentOptions),
     [GREP_SEARCH_TOOL_NAME]: createGrepSearchTool(docsAgentOptions),
@@ -124,7 +123,7 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
           messages: [systemMessage, fileTreeSystemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',
-          maxOutputTokens: 10000,
+          maxOutputTokens: 25000,
           temperature: 0,
           experimental_repairToolCall: async (repairContext) => {
             return repairToolCall({

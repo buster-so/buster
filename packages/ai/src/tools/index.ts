@@ -14,7 +14,7 @@ export { createSuperExecuteSqlTool } from './database-tools/super-execute-sql/su
 // File tools - factory functions
 export { createListFilesTool } from './file-tools/list-files-tool/list-files-tool';
 export { createReadFilesTool } from './file-tools/read-files-tool/read-files-tool';
-export { createCreateFilesTool } from './file-tools/create-files-tool/create-files-tool';
+export { createWriteFilesTool } from './file-tools/write-files-tool/write-files-tool';
 export { createEditFilesTool } from './file-tools/edit-files-tool/edit-files-tool';
 export { createDeleteFilesTool } from './file-tools/delete-files-tool/delete-files-tool';
 export { createBashTool } from './file-tools/bash-tool';

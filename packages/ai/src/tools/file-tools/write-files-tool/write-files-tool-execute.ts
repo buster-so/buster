@@ -1,14 +1,14 @@
 import { runTypescript } from '@buster/sandbox';
 import { wrapTraced } from 'braintrust';
 import type {
-  CreateFilesToolContext,
-  CreateFilesToolInput,
-  CreateFilesToolOutput,
-} from './create-files-tool';
+  WriteFilesToolContext,
+  WriteFilesToolInput,
+  WriteFilesToolOutput,
+} from './write-files-tool';
 
-export function createCreateFilesToolExecute(context: CreateFilesToolContext) {
+export function createWriteFilesToolExecute(context: WriteFilesToolContext) {
   return wrapTraced(
-    async (input: CreateFilesToolInput): Promise<CreateFilesToolOutput> => {
+    async (input: WriteFilesToolInput): Promise<WriteFilesToolOutput> => {
       const { files } = input;
 
       if (!files || files.length === 0) {
@@ -23,7 +23,7 @@ export function createCreateFilesToolExecute(context: CreateFilesToolContext) {
             results: files.map((file) => ({
               status: 'error' as const,
               filePath: file.path,
-              errorMessage: 'File creation requires sandbox environment',
+              errorMessage: 'File writing requires sandbox environment',
             })),
           };
         }
@@ -44,6 +44,18 @@ for (const file of files) {
       ? file.path 
       : path.join(process.cwd(), file.path);
     const dirPath = path.dirname(resolvedPath);
+
+    // Check if file exists and handle overwrite logic
+    const fileExists = fs.existsSync(resolvedPath);
+    const overwrite = file.overwrite || false;
+    if (fileExists && !overwrite) {
+      results.push({
+        success: false,
+        filePath: file.path,
+        error: 'File already exists and overwrite is set to false'
+      });
+      continue;
+    }
 
     // Only create directory if we haven't already created it
     if (!createdDirs.has(dirPath)) {
@@ -123,7 +135,33 @@ console.log(JSON.stringify(results));
           }
         }
 
-        const output: CreateFilesToolOutput = {
+        // Create checkpoint commit for successfully written files
+        const successfulFiles = fileResults.filter((r) => r.success);
+        if (successfulFiles.length > 0) {
+          try {
+            // Create checkpoint commit message
+            const commitMessage =
+              successfulFiles.length === 1
+                ? `docs: write ${successfulFiles[0]?.filePath || 'file'}`
+                : `docs: write ${successfulFiles.length} files`;
+
+            // Commit all changes and push to remote
+            await sandbox.process.executeCommand(
+              `git commit -a -m "${commitMessage}" --no-verify && git push`,
+              process.cwd()
+            );
+
+            console.info(`Created checkpoint commit for ${successfulFiles.length} file(s) and pushed to remote`);
+          } catch (gitError) {
+            // Log but don't fail - files were written successfully
+            console.warn(
+              'Git operations failed:',
+              gitError instanceof Error ? gitError.message : 'Unknown error'
+            );
+          }
+        }
+
+        const output: WriteFilesToolOutput = {
           results: fileResults.map((fileResult) => {
             if (fileResult.success) {
               return {
@@ -141,7 +179,7 @@ console.log(JSON.stringify(results));
 
         return output;
       } catch (error) {
-        const errorOutput: CreateFilesToolOutput = {
+        const errorOutput: WriteFilesToolOutput = {
           results: files.map((file) => ({
             status: 'error' as const,
             filePath: file.path,
@@ -152,6 +190,6 @@ console.log(JSON.stringify(results));
         return errorOutput;
       }
     },
-    { name: 'create-files' }
+    { name: 'write-files' }
   );
 }

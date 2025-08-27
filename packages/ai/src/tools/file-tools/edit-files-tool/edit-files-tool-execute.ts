@@ -37,13 +37,26 @@ export function createEditFilesToolExecute(context: EditFilesToolContext) {
           };
         }
 
-        // Generate CommonJS code for sandbox execution
+        // Generate TypeScript code for sandbox execution
         const sandboxCode = `
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-const edits = ${JSON.stringify(edits)};  // Direct stringify, no double encoding
-const results = [];
+interface Edit {
+  filePath: string;
+  findString: string;
+  replaceString: string;
+}
+
+interface EditResult {
+  success: boolean;
+  filePath: string;
+  error?: string;
+  message?: string;
+}
+
+const edits: Edit[] = ${JSON.stringify(edits)};  // Direct stringify, no double encoding
+const results: EditResult[] = [];
 
 // Process edits
 for (const edit of edits) {
@@ -53,11 +66,11 @@ for (const edit of edits) {
       : path.join(process.cwd(), edit.filePath);
       
     // Read the file
-    let content;
+    let content: string;
     try {
       content = fs.readFileSync(resolvedPath, 'utf-8');
     } catch (error) {
-      if (error.code === 'ENOENT') {
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
         results.push({
           success: false,
           filePath: edit.filePath,
@@ -144,6 +157,32 @@ console.log(JSON.stringify(results));
 
         const successful = fileResults.filter((r) => r.success).length;
         const failed = fileResults.length - successful;
+
+        // Create checkpoint commit for successfully edited files
+        const successfulFiles = fileResults.filter((r) => r.success);
+        if (successfulFiles.length > 0) {
+          try {
+            // Create checkpoint commit message
+            const commitMessage =
+              successfulFiles.length === 1
+                ? `docs: edit ${successfulFiles[0]?.filePath || 'file'}`
+                : `docs: edit ${successfulFiles.length} files`;
+
+            // Commit all changes and push to remote
+            await sandbox.process.executeCommand(
+              `git commit -a -m "${commitMessage}" --no-verify && git push`,
+              process.cwd()
+            );
+
+            console.info(`Created checkpoint commit for ${successfulFiles.length} edited file(s) and pushed to remote`);
+          } catch (gitError) {
+            // Log but don't fail - files were edited successfully
+            console.warn(
+              'Git operations failed:',
+              gitError instanceof Error ? gitError.message : 'Unknown error'
+            );
+          }
+        }
 
         const output = {
           results: fileResults.map((fileResult) => {

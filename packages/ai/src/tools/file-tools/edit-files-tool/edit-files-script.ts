@@ -26,11 +26,13 @@ async function editFiles(edits: FileEdit[]): Promise<FileEditResult[]> {
 
       try {
         await fs.access(resolvedPath);
-      } catch {
+      } catch (_accessError) {
+        const errorMsg = 'File not found';
+        console.error(`Error accessing file ${filePath}: ${errorMsg}`);
         results.push({
           success: false,
           filePath,
-          error: 'File not found',
+          error: errorMsg,
         });
         continue;
       }
@@ -41,19 +43,23 @@ async function editFiles(edits: FileEdit[]): Promise<FileEditResult[]> {
       const occurrences = (content.match(new RegExp(escapedFindString, 'g')) || []).length;
 
       if (occurrences === 0) {
+        const errorMsg = `Find string not found in file: "${findString}"`;
+        console.error(`Error in ${filePath}: ${errorMsg}`);
         results.push({
           success: false,
           filePath,
-          error: `Find string not found in file: "${findString}"`,
+          error: errorMsg,
         });
         continue;
       }
 
       if (occurrences > 1) {
+        const errorMsg = `Find string appears ${occurrences} times in file. Please use a more specific string that appears exactly once: "${findString}"`;
+        console.error(`Error in ${filePath}: ${errorMsg}`);
         results.push({
           success: false,
           filePath,
-          error: `Find string appears ${occurrences} times in file. Please use a more specific string that appears exactly once: "${findString}"`,
+          error: errorMsg,
         });
         continue;
       }
@@ -67,10 +73,12 @@ async function editFiles(edits: FileEdit[]): Promise<FileEditResult[]> {
         message: `Successfully replaced "${findString}" with "${replaceString}" in ${filePath}`,
       });
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error(`Error processing ${filePath}: ${errorMsg}`);
       results.push({
         success: false,
         filePath,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: errorMsg,
       });
     }
   }
@@ -84,12 +92,14 @@ async function main() {
   const args = process.argv.slice(2);
 
   if (args.length === 0) {
+    const errorMsg = 'No arguments provided to script';
+    console.error(errorMsg);
     console.log(
       JSON.stringify([
         {
           success: false,
           filePath: '',
-          error: 'No arguments provided to script',
+          error: errorMsg,
         },
       ])
     );
@@ -127,12 +137,14 @@ async function main() {
     }
   } catch (error) {
     // Return error information instead of empty array
+    const errorMsg = `Failed to parse arguments: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    console.error(errorMsg);
     console.log(
       JSON.stringify([
         {
           success: false,
           filePath: '',
-          error: `Failed to parse arguments: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          error: errorMsg,
         },
       ])
     );
@@ -141,19 +153,29 @@ async function main() {
 
   const results = await editFiles(edits);
 
+  // Check if any edits failed
+  const hasFailures = results.some((r) => !r.success);
+
   // Output as JSON to stdout
   console.log(JSON.stringify(results));
+
+  // Exit with error code if any edits failed
+  if (hasFailures) {
+    process.exit(1);
+  }
 }
 
 // Run the script
 main().catch((error) => {
   // Return error information for unexpected errors
+  const errorMsg = `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+  console.error(errorMsg);
   console.log(
     JSON.stringify([
       {
         success: false,
         filePath: '',
-        error: `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: errorMsg,
       },
     ])
   );

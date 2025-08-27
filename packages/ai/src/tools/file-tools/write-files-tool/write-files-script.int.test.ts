@@ -10,7 +10,7 @@ const execAsync = promisify(exec);
 // Helper to execute script with clean stderr
 async function runScript(args: string) {
   const { stdout, stderr } = await execAsync(
-    `npx tsx ${path.join(__dirname, 'create-files-script.ts')} ${args}`,
+    `npx tsx ${path.join(__dirname, 'write-files-script.ts')} ${args}`,
     { env: { ...process.env, npm_config_loglevel: 'error' } }
   );
 
@@ -23,13 +23,13 @@ async function runScript(args: string) {
   return { stdout, stderr: cleanStderr };
 }
 
-describe('create-files-script integration tests', () => {
+describe('write-files-script integration tests', () => {
   let tempDir: string;
-  const scriptPath = path.join(__dirname, 'create-files-script.ts');
+  const scriptPath = path.join(__dirname, 'write-files-script.ts');
 
   beforeEach(async () => {
     // Create a temporary directory for test files
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'create-files-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'write-files-test-'));
   });
 
   afterEach(async () => {

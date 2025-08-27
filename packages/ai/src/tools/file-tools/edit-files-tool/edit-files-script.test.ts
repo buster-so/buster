@@ -25,7 +25,10 @@ describe('edit-files-script', () => {
     }
   });
 
-  async function runScript(args: string[]): Promise<{ stdout: string; stderr: string }> {
+  async function runScript(
+    args: string[],
+    expectFailure = false
+  ): Promise<{ stdout: string; stderr: string }> {
     // Properly escape arguments for shell
     const escapedArgs = args.map((arg) => {
       // If it contains special characters, wrap in single quotes
@@ -34,8 +37,20 @@ describe('edit-files-script', () => {
       }
       return arg;
     });
-    const { stdout, stderr } = await exec(`npx tsx ${scriptPath} ${escapedArgs.join(' ')}`);
-    return { stdout, stderr };
+
+    try {
+      const { stdout, stderr } = await exec(`npx tsx ${scriptPath} ${escapedArgs.join(' ')}`);
+      return { stdout, stderr };
+    } catch (error: unknown) {
+      if (expectFailure && error && typeof error === 'object' && 'stdout' in error) {
+        // When we expect failure, return the stdout/stderr from the error
+        return {
+          stdout: (error as { stdout: string }).stdout,
+          stderr: (error as { stderr?: string }).stderr || '',
+        };
+      }
+      throw error;
+    }
   }
 
   describe('functional tests', () => {
@@ -79,7 +94,7 @@ describe('edit-files-script', () => {
           replaceString: 'replaced',
         },
       ];
-      const { stdout } = await runScript([JSON.stringify(edits)]);
+      const { stdout } = await runScript([JSON.stringify(edits)], true);
       const results = JSON.parse(stdout);
 
       expect(results).toEqual([
@@ -157,7 +172,7 @@ describe('edit-files-script', () => {
 
       // Run the script
       const edits = [{ filePath: testFile, findString: 'Goodbye', replaceString: 'Hi' }];
-      const { stdout } = await runScript([JSON.stringify(edits)]);
+      const { stdout } = await runScript([JSON.stringify(edits)], true);
       const results = JSON.parse(stdout);
 
       expect(results).toEqual([
@@ -179,7 +194,7 @@ describe('edit-files-script', () => {
 
       // Run the script
       const edits = [{ filePath: testFile, findString: 'test', replaceString: 'replaced' }];
-      const { stdout } = await runScript([JSON.stringify(edits)]);
+      const { stdout } = await runScript([JSON.stringify(edits)], true);
       const results = JSON.parse(stdout);
 
       expect(results).toHaveLength(1);
@@ -315,7 +330,7 @@ describe('edit-files-script', () => {
         { filePath: file1, findString: 'Hello', replaceString: 'Hi' },
         { filePath: file2, findString: 'test', replaceString: 'replaced' },
       ];
-      const { stdout } = await runScript([JSON.stringify(edits)]);
+      const { stdout } = await runScript([JSON.stringify(edits)], true);
       const results = JSON.parse(stdout);
 
       expect(results).toHaveLength(2);

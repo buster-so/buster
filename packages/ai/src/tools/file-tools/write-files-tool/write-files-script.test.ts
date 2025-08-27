@@ -7,13 +7,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 const exec = promisify(child_process.exec);
 
-describe('create-files-script', () => {
-  const scriptPath = path.join(__dirname, 'create-files-script.ts');
+describe('write-files-script', () => {
+  const scriptPath = path.join(__dirname, 'write-files-script.ts');
   let tempDir: string;
 
   beforeEach(async () => {
     // Create a temporary directory for test files
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'create-files-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'write-files-test-'));
   });
 
   afterEach(async () => {

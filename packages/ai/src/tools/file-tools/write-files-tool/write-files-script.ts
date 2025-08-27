@@ -1,28 +1,41 @@
+import * as fsSync from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
-interface FileCreateParams {
+interface FileWriteParams {
   path: string;
   content: string;
+  overwrite?: boolean;
 }
 
-interface FileCreateResult {
+interface FileWriteResult {
   success: boolean;
   filePath: string;
   error?: string;
 }
 
-async function createFiles(fileParams: FileCreateParams[]): Promise<FileCreateResult[]> {
-  const results: FileCreateResult[] = [];
+async function writeFiles(fileParams: FileWriteParams[]): Promise<FileWriteResult[]> {
+  const results: FileWriteResult[] = [];
   const createdDirs = new Set<string>();
 
   // Process files sequentially to avoid race conditions
-  for (const { path: filePath, content } of fileParams) {
+  for (const { path: filePath, content, overwrite = false } of fileParams) {
     try {
       const resolvedPath = path.isAbsolute(filePath)
         ? filePath
         : path.join(process.cwd(), filePath);
       const dirPath = path.dirname(resolvedPath);
+
+      // Check if file exists and handle overwrite logic
+      const fileExists = fsSync.existsSync(resolvedPath);
+      if (fileExists && !overwrite) {
+        results.push({
+          success: false,
+          filePath,
+          error: 'File already exists and overwrite is set to false',
+        });
+        continue;
+      }
 
       // Only create directory if we haven't already created it
       if (!createdDirs.has(dirPath)) {
@@ -75,7 +88,7 @@ async function main() {
     process.exit(1);
   }
 
-  let fileParams: FileCreateParams[];
+  let fileParams: FileWriteParams[];
   try {
     // The script expects file parameters as a JSON string in the first argument (possibly base64 encoded)
     let fileParamsJson = args[0];
@@ -110,6 +123,9 @@ async function main() {
       if (typeof param.content !== 'string') {
         throw new Error('Each file parameter must have a content string');
       }
+      if (param.overwrite !== undefined && typeof param.overwrite !== 'boolean') {
+        throw new Error('overwrite parameter must be a boolean if provided');
+      }
     }
   } catch (error) {
     // Return error information instead of empty array
@@ -125,7 +141,7 @@ async function main() {
     process.exit(1);
   }
 
-  const results = await createFiles(fileParams);
+  const results = await writeFiles(fileParams);
 
   // Output as JSON to stdout
   console.log(JSON.stringify(results));
