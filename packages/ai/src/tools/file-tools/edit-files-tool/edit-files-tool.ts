@@ -3,6 +3,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createEditFilesToolExecute } from './edit-files-tool-execute';
 
+export const EDIT_FILES_TOOL_NAME = 'editFiles';
+
 const EditFileParamsSchema = z.object({
   filePath: z.string().describe('Relative or absolute path to the file'),
   findString: z.string().describe('Text to find (must appear exactly once)'),

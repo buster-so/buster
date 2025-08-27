@@ -3,6 +3,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createListFilesToolExecute } from './list-files-tool-execute';
 
+export const LIST_FILES_TOOL_NAME = 'listFiles';
+
 const ListFilesOptionsSchema = z.object({
   depth: z
     .number()

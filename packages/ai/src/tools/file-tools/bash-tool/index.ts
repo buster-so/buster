@@ -7,6 +7,3 @@ export type {
   BashToolOutput,
   BashToolContext,
 } from './bash-tool';
-
-// Legacy exports for backward compatibility
-export { bashExecute, executeBash, createBashTool as createBashExecute } from './bash-execute-tool';

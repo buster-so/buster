@@ -16,7 +16,7 @@ const executeBashCommands = wrapTraced(
         // Execute all commands concurrently using executeCommand
         const resultPromises = commands.map(async (cmd) => {
           try {
-            const result = await sandbox.process.executeCommand(cmd.command);
+            const result = await sandbox.process.executeCommand(cmd.command, '/home/daytona');
 
             // The sandbox returns the full output in result.result
             // For bash commands, we want to capture everything and trim whitespace

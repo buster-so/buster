@@ -2,6 +2,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createCheckOffTodoListToolExecute } from './check-off-todo-list-tool-execute';
 
+export const CHECK_OFF_TODO_LIST_TOOL_NAME = 'checkOffTodoList';
+
 export const CheckOffTodoListToolInputSchema = z.object({
   todoItems: z.array(z.string()).describe('An array of todo item texts to check off in the list'),
 });

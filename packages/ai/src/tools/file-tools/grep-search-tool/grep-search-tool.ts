@@ -3,6 +3,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createGrepSearchToolExecute } from './grep-search-tool-execute';
 
+export const GREP_SEARCH_TOOL_NAME = 'grepSearch';
+
 const GrepResultSchema = z.object({
   success: z.boolean().describe('Whether the command executed successfully'),
   command: z.string().describe('The command that was executed'),

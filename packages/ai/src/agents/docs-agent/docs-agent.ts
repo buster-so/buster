@@ -19,6 +19,18 @@ import {
   executeSqlDocsAgent,
 } from '../../tools';
 import { IDLE_TOOL_NAME } from '../../tools/communication-tools/idle-tool/idle-tool';
+import { EXECUTE_SQL_DOCS_AGENT_NAME } from '../../tools/database-tools/super-execute-sql/super-execute-sql';
+import { BASH_TOOL_NAME } from '../../tools/file-tools/bash-tool/bash-tool';
+import { CREATE_FILES_TOOL_NAME } from '../../tools/file-tools/create-files-tool/create-files-tool';
+import { DELETE_FILES_TOOL_NAME } from '../../tools/file-tools/delete-files-tool/delete-files-tool';
+import { EDIT_FILES_TOOL_NAME } from '../../tools/file-tools/edit-files-tool/edit-files-tool';
+import { GREP_SEARCH_TOOL_NAME } from '../../tools/file-tools/grep-search-tool/grep-search-tool';
+import { LIST_FILES_TOOL_NAME } from '../../tools/file-tools/list-files-tool/list-files-tool';
+import { READ_FILES_TOOL_NAME } from '../../tools/file-tools/read-files-tool/read-files-tool';
+import { CHECK_OFF_TODO_LIST_TOOL_NAME } from '../../tools/planning-thinking-tools/check-off-todo-list-tool/check-off-todo-list-tool';
+import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
+import { UPDATE_CLARIFICATIONS_FILE_TOOL_NAME } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
+import { WEB_SEARCH_TOOL_NAME } from '../../tools/web-tools/web-search-tool';
 import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
 import { getDocsAgentFileTreeSystemPrompt } from './get-docs-agent-file-tree-system-prompt';
 import { getDocsAgentSystemPrompt } from './get-docs-agent-system-prompt';
@@ -76,6 +88,20 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
 
   const tools = {
     [IDLE_TOOL_NAME]: createIdleTool(),
+    [BASH_TOOL_NAME]: createBashTool(docsAgentOptions),
+    [CREATE_FILES_TOOL_NAME]: createCreateFilesTool(docsAgentOptions),
+    [DELETE_FILES_TOOL_NAME]: createDeleteFilesTool(docsAgentOptions),
+    [EDIT_FILES_TOOL_NAME]: createEditFilesTool(docsAgentOptions),
+    [GREP_SEARCH_TOOL_NAME]: createGrepSearchTool(docsAgentOptions),
+    [LIST_FILES_TOOL_NAME]: createListFilesTool(docsAgentOptions),
+    [READ_FILES_TOOL_NAME]: createReadFilesTool(docsAgentOptions),
+    [CHECK_OFF_TODO_LIST_TOOL_NAME]: createCheckOffTodoListTool(docsAgentOptions),
+    [SEQUENTIAL_THINKING_TOOL_NAME]: createSequentialThinkingTool({
+      messageId: docsAgentOptions.messageId,
+    }),
+    [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions),
+    [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(),
+    [EXECUTE_SQL_DOCS_AGENT_NAME]: executeSqlDocsAgent,
   };
 
   const agentContext: AgentContext = {
@@ -88,7 +114,7 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
       () =>
         streamText({
           model: Sonnet4,
-          tools: {},
+          tools,
           messages: [systemMessage, fileTreeSystemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',

@@ -3,6 +3,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createDeleteFilesToolExecute } from './delete-files-tool-execute';
 
+export const DELETE_FILES_TOOL_NAME = 'deleteFiles';
+
 export const DeleteFilesToolInputSchema = z.object({
   paths: z
     .array(z.string())

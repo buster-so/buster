@@ -5,6 +5,8 @@ import {
   createUpdateClarificationsFileToolExecute,
 } from './update-clarifications-file-tool-execute';
 
+export const UPDATE_CLARIFICATIONS_FILE_TOOL_NAME = 'updateClarificationsFile';
+
 export const UpdateClarificationsFileToolInputSchema = z.object({
   clarifications: z
     .array(ClarifyingQuestionSchema)

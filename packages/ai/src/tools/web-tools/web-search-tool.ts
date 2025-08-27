@@ -2,6 +2,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createWebSearchToolExecute } from './web-search-tool-execute';
 
+export const WEB_SEARCH_TOOL_NAME = 'webSearch';
+
 export const WebSearchToolInputSchema = z.object({
   query: z.string().min(1, 'Search query is required').describe('The search query to execute'),
   limit: z

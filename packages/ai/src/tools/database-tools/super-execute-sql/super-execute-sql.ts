@@ -3,6 +3,9 @@ import { z } from 'zod';
 import type { DocsAgentOptions } from '../../../agents/docs-agent/docs-agent';
 import { createSuperExecuteSqlExecute } from './super-execute-sql-execute';
 
+export const SUPER_EXECUTE_SQL_TOOL_NAME = 'superExecuteSql';
+export const EXECUTE_SQL_DOCS_AGENT_NAME = 'executeSqlDocsAgent';
+
 export const SuperExecuteSqlInputSchema = z.object({
   statements: z.array(z.string()).describe(
     `Array of lightweight, optimized SQL statements to execute for documentation purposes. 

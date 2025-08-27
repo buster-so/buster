@@ -3,6 +3,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createReadFilesToolExecute } from './read-files-tool-execute';
 
+export const READ_FILES_TOOL_NAME = 'readFiles';
+
 export const ReadFilesToolInputSchema = z.object({
   files: z
     .array(z.string())

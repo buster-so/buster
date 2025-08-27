@@ -3,6 +3,8 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { createBashToolExecute } from './bash-tool-execute';
 
+export const BASH_TOOL_NAME = 'bashTool';
+
 const BashCommandSchema = z.object({
   command: z.string().describe('The bash command to execute'),
   description: z.string().optional().describe('Description of what this command does'),
@@ -46,9 +48,7 @@ export type BashToolOutput = z.infer<typeof BashToolOutputSchema>;
 export type BashToolContext = z.infer<typeof BashToolContextSchema>;
 
 // Factory function to create the bash tool
-export function createBashTool<TAgentContext extends BashToolContext = BashToolContext>(
-  context: TAgentContext
-) {
+export function createBashTool(context: BashToolContext) {
   const execute = createBashToolExecute(context);
 
   return tool({
