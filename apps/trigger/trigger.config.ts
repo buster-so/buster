@@ -22,7 +22,7 @@ export default defineConfig({
     },
   },
   build: {
-    external: ['lz4', 'xxhash'],
+    external: ['lz4', 'xxhash', 'duckdb'],
     extensions: [
       esbuildPlugin({
         name: 'buster-path-resolver',

@@ -10,19 +10,19 @@ import type {
   TableSampler,
 } from './types';
 
+import { getTableSample as getBigQueryTableSample } from './dialects/bigquery/sampling';
+import { getStructuralMetadata as getBigQueryStructuralMetadata } from './dialects/bigquery/structural';
+import { getTableSample as getMySQLTableSample } from './dialects/mysql/sampling';
+import { getStructuralMetadata as getMySQLStructuralMetadata } from './dialects/mysql/structural';
+import { getTableSample as getPostgreSQLTableSample } from './dialects/postgresql/sampling';
+import { getStructuralMetadata as getPostgreSQLStructuralMetadata } from './dialects/postgresql/structural';
+import { getTableSample as getRedshiftTableSample } from './dialects/redshift/sampling';
+import { getStructuralMetadata as getRedshiftStructuralMetadata } from './dialects/redshift/structural';
+import { getTableSample as getSnowflakeTableSample } from './dialects/snowflake/sampling';
 // Import dialect-specific implementations (to be created)
 import { getStructuralMetadata as getSnowflakeStructuralMetadata } from './dialects/snowflake/structural';
-import { getTableSample as getSnowflakeTableSample } from './dialects/snowflake/sampling';
-import { getStructuralMetadata as getPostgreSQLStructuralMetadata } from './dialects/postgresql/structural';
-import { getTableSample as getPostgreSQLTableSample } from './dialects/postgresql/sampling';
-import { getStructuralMetadata as getMySQLStructuralMetadata } from './dialects/mysql/structural';
-import { getTableSample as getMySQLTableSample } from './dialects/mysql/sampling';
-import { getStructuralMetadata as getBigQueryStructuralMetadata } from './dialects/bigquery/structural';
-import { getTableSample as getBigQueryTableSample } from './dialects/bigquery/sampling';
-import { getStructuralMetadata as getRedshiftStructuralMetadata } from './dialects/redshift/structural';
-import { getTableSample as getRedshiftTableSample } from './dialects/redshift/sampling';
-import { getStructuralMetadata as getSQLServerStructuralMetadata } from './dialects/sqlserver/structural';
 import { getTableSample as getSQLServerTableSample } from './dialects/sqlserver/sampling';
+import { getStructuralMetadata as getSQLServerStructuralMetadata } from './dialects/sqlserver/structural';
 
 /**
  * Factory function to create a structural metadata fetcher based on dialect

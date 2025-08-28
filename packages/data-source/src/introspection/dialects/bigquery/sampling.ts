@@ -11,7 +11,12 @@ export async function getTableSample(
   sampleSize: number
 ): Promise<TableSample> {
   const startTime = new Date();
-  const qualifiedTable = getQualifiedTableName(table.database, table.schema, table.name, 'bigquery');
+  const qualifiedTable = getQualifiedTableName(
+    table.database,
+    table.schema,
+    table.name,
+    'bigquery'
+  );
 
   try {
     // For small tables, just fetch all rows
@@ -31,7 +36,7 @@ export async function getTableSample(
 
     // BigQuery supports TABLESAMPLE SYSTEM
     const percentage = calculateSamplePercentage(sampleSize * 1.2, table.rowCount);
-    
+
     const sampleQuery = `
       SELECT * 
       FROM ${qualifiedTable}
@@ -69,6 +74,7 @@ export async function getTableSample(
         samplingMethod: 'RANDOM_LIMIT',
       };
     } catch (fallbackError) {
+      console.error(fallbackError);
       throw new Error(
         `Failed to sample table ${qualifiedTable}: ${
           error instanceof Error ? error.message : 'Unknown error'

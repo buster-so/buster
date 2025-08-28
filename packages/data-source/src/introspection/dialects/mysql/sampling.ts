@@ -55,7 +55,7 @@ export async function getTableSample(
     // This uses a WHERE clause with RAND() to pre-filter rows before sorting
     // The multiplier ensures we get enough rows even with the random filter
     const sampleRate = Math.min(1, (sampleSize * 3) / table.rowCount);
-    
+
     const optimizedQuery = `
       SELECT * FROM (
         SELECT * 

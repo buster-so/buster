@@ -11,7 +11,12 @@ export async function getTableSample(
   sampleSize: number
 ): Promise<TableSample> {
   const startTime = new Date();
-  const qualifiedTable = getQualifiedTableName(table.database, table.schema, table.name, 'sqlserver');
+  const qualifiedTable = getQualifiedTableName(
+    table.database,
+    table.schema,
+    table.name,
+    'sqlserver'
+  );
 
   try {
     // For small tables, just fetch all rows
@@ -32,7 +37,7 @@ export async function getTableSample(
     // SQL Server supports TABLESAMPLE with percentage or rows
     // Using percentage for consistency
     const percentage = calculateSamplePercentage(sampleSize * 1.2, table.rowCount);
-    
+
     const sampleQuery = `
       SELECT TOP ${sampleSize} *
       FROM ${qualifiedTable}

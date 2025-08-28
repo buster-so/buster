@@ -47,10 +47,10 @@ describe('docs-agent-workflow integration', () => {
     // Create sandbox with repository
     const sandbox = await createSandboxWithRepositories({
       language: 'typescript',
-      repositories: [process.env.TEST_SAMPLE_REPO!],
+      repository: process.env.TEST_SAMPLE_REPO!,
       githubToken: process.env.TEST_GITHUB_PAT!,
       branchName: branchName,
-    });
+    } as Parameters<typeof createSandboxWithRepositories>[0] & { repository: string });
 
     // Get file tree from sandbox
     const fileTree = await getSandboxFileTree(sandbox);

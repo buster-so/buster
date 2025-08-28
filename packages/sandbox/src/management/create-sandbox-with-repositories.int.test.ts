@@ -17,11 +17,12 @@ describe('create-sandbox-with-repositories integration', () => {
     }
   });
 
-  it('should create sandbox and clone repository concurrently', async () => {
+  it('should create sandbox and clone repository', async () => {
     const sandbox = await createSandboxWithRepositories({
       language: 'typescript',
-      repositories: [process.env.TEST_SAMPLE_REPO!],
+      repository: process.env.TEST_SAMPLE_REPO!,
       githubToken: process.env.TEST_GITHUB_PAT!,
+      branchName: `test-${Date.now()}`,
     });
 
     // Clean up - stop the sandbox

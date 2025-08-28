@@ -37,22 +37,22 @@ export async function getStructuralMetadata(
     const conditions: string[] = [];
 
     if (filters?.databases && filters.databases.length > 0) {
-      const list = filters.databases.map(d => `'${d}'`).join(',');
+      const list = filters.databases.map((d) => `'${d}'`).join(',');
       conditions.push(`table_catalog IN (${list})`);
     }
 
     if (filters?.schemas && filters.schemas.length > 0) {
-      const list = filters.schemas.map(s => `'${s}'`).join(',');
+      const list = filters.schemas.map((s) => `'${s}'`).join(',');
       conditions.push(`table_schema IN (${list})`);
     }
 
     if (filters?.tables && filters.tables.length > 0) {
-      const list = filters.tables.map(t => `'${t}'`).join(',');
+      const list = filters.tables.map((t) => `'${t}'`).join(',');
       conditions.push(`table_name IN (${list})`);
     }
 
     if (conditions.length > 0) {
-      query += ' AND ' + conditions.join(' AND ');
+      query += ` AND ${conditions.join(' AND ')}`;
     }
 
     query += ' ORDER BY table_catalog, table_schema, table_name';

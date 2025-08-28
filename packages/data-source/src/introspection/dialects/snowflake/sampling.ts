@@ -12,7 +12,12 @@ export async function getTableSample(
   sampleSize: number
 ): Promise<TableSample> {
   const startTime = new Date();
-  const qualifiedTable = getQualifiedTableName(table.database, table.schema, table.name, 'snowflake');
+  const qualifiedTable = getQualifiedTableName(
+    table.database,
+    table.schema,
+    table.name,
+    'snowflake'
+  );
 
   try {
     // For small tables, just fetch all rows

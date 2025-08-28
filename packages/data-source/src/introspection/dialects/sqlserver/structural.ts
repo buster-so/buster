@@ -47,17 +47,17 @@ export async function getStructuralMetadata(
     const conditions: string[] = [];
 
     if (filters?.databases && filters.databases.length > 0) {
-      const list = filters.databases.map(d => `'${d}'`).join(',');
+      const list = filters.databases.map((d) => `'${d}'`).join(',');
       conditions.push(`DB_NAME() IN (${list})`);
     }
 
     if (filters?.schemas && filters.schemas.length > 0) {
-      const list = filters.schemas.map(s => `'${s}'`).join(',');
+      const list = filters.schemas.map((s) => `'${s}'`).join(',');
       conditions.push(`s.name IN (${list})`);
     }
 
     if (filters?.tables && filters.tables.length > 0) {
-      const list = filters.tables.map(t => `'${t}'`).join(',');
+      const list = filters.tables.map((t) => `'${t}'`).join(',');
       conditions.push(`t.name IN (${list})`);
     }
 
@@ -90,12 +90,12 @@ export async function getStructuralMetadata(
     `;
 
     if (filters?.schemas && filters.schemas.length > 0) {
-      const list = filters.schemas.map(s => `'${s}'`).join(',');
+      const list = filters.schemas.map((s) => `'${s}'`).join(',');
       query += ` AND s.name IN (${list})`;
     }
 
     if (filters?.tables && filters.tables.length > 0) {
-      const list = filters.tables.map(t => `'${t}'`).join(',');
+      const list = filters.tables.map((t) => `'${t}'`).join(',');
       query += ` AND v.name IN (${list})`;
     }
 

@@ -1,25 +1,26 @@
-import { logger, schemaTask, task } from '@trigger.dev/sdk/v3';
 import { createAdapter } from '@buster/data-source';
-import { getStructuralMetadata, getDynamicSampleSize } from '@buster/data-source';
+import { DataSourceType, getDynamicSampleSize, getStructuralMetadata } from '@buster/data-source';
+import type { Credentials } from '@buster/data-source';
 import { getDataSourceCredentials } from '@buster/database';
+import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { getTableStatisticsTask } from './get-table-statistics-task';
 import {
-  IntrospectDataTaskInputSchema,
+  type GetTableStatisticsInput,
   type IntrospectDataTaskInput,
+  IntrospectDataTaskInputSchema,
   type IntrospectDataTaskOutput,
-  type SampleTableTaskInput,
 } from './types';
-import { sampleTableTask } from './sampleTableTask';
 
 /**
  * Main introspection task that fetches structural metadata and triggers sampling sub-tasks
- * 
+ *
  * This task:
  * 1. Fetches credentials for the data source
  * 2. Creates a database adapter connection
  * 3. Gets structural metadata (tables and row counts)
  * 4. Triggers sub-tasks to sample each table
  * 5. Returns summary of the introspection
- * 
+ *
  * @example
  * ```typescript
  * const result = await introspectDataTask.trigger({
@@ -31,8 +32,14 @@ import { sampleTableTask } from './sampleTableTask';
  * });
  * ```
  */
-export const introspectDataTask = schemaTask({
-  id: 'introspect-data-main',
+export const introspectDataTask: ReturnType<
+  typeof schemaTask<
+    'introspect-data-source',
+    typeof IntrospectDataTaskInputSchema,
+    IntrospectDataTaskOutput
+  >
+> = schemaTask({
+  id: 'introspect-data-source',
   schema: IntrospectDataTaskInputSchema,
   maxDuration: 300, // 5 minutes
   run: async (payload: IntrospectDataTaskInput): Promise<IntrospectDataTaskOutput> => {
@@ -42,28 +49,30 @@ export const introspectDataTask = schemaTask({
     });
 
     let adapter = null;
-    
+
+    function isCredentials(value: unknown): value is Credentials {
+      if (!value || typeof value !== 'object') return false;
+      const type = (value as { type?: unknown }).type;
+      if (typeof type !== 'string') return false;
+      return (Object.values(DataSourceType) as string[]).includes(type);
+    }
+
     try {
       // Step 1: Fetch credentials from vault
       logger.log('Fetching credentials for data source', { dataSourceId: payload.dataSourceId });
       const credentials = await getDataSourceCredentials({ dataSourceId: payload.dataSourceId });
 
-      // Validate credentials have required type field
-      if (!credentials.type) {
-        throw new Error('Invalid credentials: missing type field');
+      if (!isCredentials(credentials)) {
+        throw new Error('Invalid credentials returned from vault');
       }
 
       // Step 2: Create adapter
       logger.log('Creating database adapter', { type: credentials.type });
-      adapter = await createAdapter(credentials as any);
+      adapter = await createAdapter(credentials);
 
       // Step 3: Get structural metadata
       logger.log('Fetching structural metadata', { filters: payload.filters });
-      const metadata = await getStructuralMetadata(
-        adapter,
-        credentials.type as any,
-        payload.filters
-      );
+      const metadata = await getStructuralMetadata(adapter, credentials.type, payload.filters);
 
       // Update metadata with dataSourceId
       metadata.dataSourceId = payload.dataSourceId;
@@ -74,12 +83,12 @@ export const introspectDataTask = schemaTask({
       });
 
       // Step 4: Trigger sub-tasks for each table
-      const subTaskPromises: Promise<any>[] = [];
-      
+      const subTaskPromises: Promise<unknown>[] = [];
+
       for (const table of metadata.tables) {
         // Calculate dynamic sample size
         const sampleSize = getDynamicSampleSize(table.rowCount);
-        
+
         logger.log('Triggering sample task for table', {
           table: `${table.database}.${table.schema}.${table.name}`,
           rowCount: table.rowCount,
@@ -87,7 +96,7 @@ export const introspectDataTask = schemaTask({
         });
 
         // Prepare sub-task input
-        const subTaskInput: SampleTableTaskInput = {
+        const subTaskInput: GetTableStatisticsInput = {
           dataSourceId: payload.dataSourceId,
           table: {
             name: table.name,
@@ -101,7 +110,7 @@ export const introspectDataTask = schemaTask({
         };
 
         // Trigger sub-task without waiting
-        const promise = sampleTableTask.trigger(subTaskInput);
+        const promise = getTableStatisticsTask.trigger(subTaskInput);
         subTaskPromises.push(promise);
       }
 

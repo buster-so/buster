@@ -37,7 +37,7 @@ export async function getStructuralMetadata(
     let paramIndex = 1;
 
     if (filters?.databases && filters.databases.length > 0) {
-      conditions.push(`current_database() = ANY($${paramIndex}::text[])`);  
+      conditions.push(`current_database() = ANY($${paramIndex}::text[])`);
       params.push(filters.databases);
       paramIndex++;
     }
@@ -73,7 +73,12 @@ export async function getStructuralMetadata(
     `;
 
     if (conditions.length > 0) {
-      query += ' AND ' + conditions.join(' AND ').replace(/tablename/g, 'viewname').replace(/schemaname/g, 'schemaname');
+      query +=
+        ' AND ' +
+        conditions
+          .join(' AND ')
+          .replace(/tablename/g, 'viewname')
+          .replace(/schemaname/g, 'schemaname');
     }
 
     query += ' ORDER BY database_name, schema_name, table_name';

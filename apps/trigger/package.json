@@ -35,6 +35,7 @@
     "ai": "catalog:",
     "braintrust": "catalog:",
     "drizzle-orm": "catalog:",
+    "duckdb": "^1.3.2",
     "vitest": "catalog:",
     "zod": "catalog:"
   },

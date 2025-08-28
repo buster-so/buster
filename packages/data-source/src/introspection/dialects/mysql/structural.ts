@@ -60,7 +60,7 @@ export async function getStructuralMetadata(
     }
 
     if (conditions.length > 0) {
-      query += ' AND ' + conditions.join(' AND ');
+      query += ` AND ${conditions.join(' AND ')}`;
     }
 
     query += ' ORDER BY t.TABLE_SCHEMA, t.TABLE_NAME';

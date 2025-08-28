@@ -73,7 +73,7 @@ export async function getStructuralMetadata(
     // Parse results
     for (const row of result.rows) {
       const tableType = getString(row.table_type) || 'TABLE';
-      
+
       // Map Snowflake table types to our standard types
       let mappedType: TableMetadata['type'] = 'TABLE';
       if (tableType === 'VIEW') mappedType = 'VIEW';
