@@ -5,6 +5,7 @@ import { z } from 'zod';
 export const DocsAgentContextKeys = {
   Sandbox: 'sandbox',
   TodoList: 'todoList',
+  Notepad: 'notepad',
   ClarificationQuestions: 'clarificationQuestions',
   DataSourceId: 'dataSourceId',
 } as const;
@@ -31,6 +32,7 @@ export const DocsAgentContextSchema = z.object({
     }
   ),
   [DocsAgentContextKeys.TodoList]: z.string(),
+  [DocsAgentContextKeys.Notepad]: z.string(),
   [DocsAgentContextKeys.ClarificationQuestions]: z.array(ClarifyingQuestionSchema),
   [DocsAgentContextKeys.DataSourceId]: z.string().uuid(),
 });

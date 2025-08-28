@@ -105,7 +105,9 @@ describe('updateTodoListTool', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.updatedTodoList).toBe('## Todo List\n- [ ] Initial task\n- [ ] New appended task');
+      expect(result.updatedTodoList).toBe(
+        '## Todo List\n- [ ] Initial task\n- [ ] New appended task'
+      );
       expect(result.errors).toBeUndefined();
     });
 
@@ -126,14 +128,16 @@ describe('updateTodoListTool', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.updatedTodoList).toBe('## Todo List\n- [ ] Initial task\n- [ ] Task 2\n- [ ] Task 3');
+      expect(result.updatedTodoList).toBe(
+        '## Todo List\n- [ ] Initial task\n- [ ] Task 2\n- [ ] Task 3'
+      );
       expect(result.errors).toBeUndefined();
     });
 
     it('should append to an empty todo list', async () => {
       context.todoList = '';
       updateTodoListTool = createUpdateTodoListTool(context);
-      
+
       const result = await run({
         edits: [
           {
@@ -152,7 +156,7 @@ describe('updateTodoListTool', () => {
     it('should append with proper formatting when content ends with newline', async () => {
       context.todoList = '## Todo List\n- [ ] Initial task\n';
       updateTodoListTool = createUpdateTodoListTool(context);
-      
+
       const result = await run({
         edits: [
           {
@@ -192,7 +196,9 @@ describe('updateTodoListTool', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.updatedTodoList).toBe('## Updated Todo List\n- [x] Initial task\n\n### New Section\n- [ ] New task');
+      expect(result.updatedTodoList).toBe(
+        '## Updated Todo List\n- [x] Initial task\n\n### New Section\n- [ ] New task'
+      );
       expect(result.errors).toBeUndefined();
     });
 
@@ -226,9 +232,9 @@ describe('updateTodoListTool', () => {
 ### High Priority
 - [x] Critical bug fix
 - [ ] Security patch`;
-      
+
       updateTodoListTool = createUpdateTodoListTool(context);
-      
+
       const result = await run({
         edits: [
           {
@@ -256,9 +262,9 @@ describe('updateTodoListTool', () => {
 
 **Important Tasks:**
 - [ ] Task with **bold** text`;
-      
+
       updateTodoListTool = createUpdateTodoListTool(context);
-      
+
       const result = await run({
         edits: [
           {
@@ -299,7 +305,7 @@ describe('updateTodoListTool', () => {
 
     it('should not update context when operations fail', async () => {
       const originalContent = context.todoList;
-      
+
       const result = await run({
         edits: [
           {

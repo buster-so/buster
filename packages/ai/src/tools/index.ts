@@ -25,7 +25,9 @@ export { createWebSearchTool } from './web-tools/web-search-tool';
 // Planning/thinking tools - factory functions
 export { createUpdateTodoListTool } from './planning-thinking-tools/update-todo-list-tool/update-todo-list-tool';
 export { createUpdateClarificationsFileTool } from './planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
+export { createUpdateNotepadTool } from './planning-thinking-tools/update-notepad-tool/update-notepad-tool';
 
 // Legacy exports for backward compatibility (to be deprecated)
 export { updateTodoList } from './planning-thinking-tools/update-todo-list-tool/update-todo-list-tool';
 export { updateClarificationsFile } from './planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
+export { updateNotepad } from './planning-thinking-tools/update-notepad-tool/update-notepad-tool';

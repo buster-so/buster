@@ -9,6 +9,7 @@ import { DocsAgentContextSchema } from '../../../agents/docs-agent/docs-agent-co
 export const DocsAgentStepInputSchema = z.object({
   todos: z.string().describe('The todos string'),
   todoList: z.string().describe('The TODO list'),
+  notepad: z.string().describe('The notepad for documenting process'),
   message: z.string().describe('The user message'),
   messageId: z.string().describe('The user message'),
   organizationId: z.string().describe('The organization ID'),
@@ -19,6 +20,7 @@ export const DocsAgentStepInputSchema = z.object({
 export const DocsAgentStepOutputSchema = z.object({
   todos: z.array(z.string()).optional().describe('Array of todos'),
   todoList: z.string().optional().describe('The TODO list'),
+  notepad: z.string().optional().describe('The notepad contents'),
   documentationCreated: z.boolean().optional().describe('Whether documentation was created'),
   clarificationNeeded: z.boolean().optional().describe('Whether clarification is needed'),
   clarificationQuestion: z
@@ -54,6 +56,7 @@ export const runDocsAgentStep = wrapTraced(
     // Extract values from context
     const sandbox = validatedParams.context.sandbox as Sandbox;
     const todoList = validatedParams.todoList;
+    const notepad = validatedParams.notepad || '';
     const dataSourceId = validatedParams.context.dataSourceId;
 
     try {
@@ -68,6 +71,7 @@ export const runDocsAgentStep = wrapTraced(
         messageId: validatedParams.messageId, // Optional field
         sandbox: sandbox, // Pass sandbox for file tools
         todoList: todoList,
+        notepad: notepad,
         clarifications: [],
       });
 

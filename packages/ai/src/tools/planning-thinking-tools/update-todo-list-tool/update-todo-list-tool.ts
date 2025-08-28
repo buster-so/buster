@@ -4,33 +4,33 @@ import { createUpdateTodoListToolExecute } from './update-todo-list-tool-execute
 
 /**
  * Tool for managing markdown-formatted todo lists with checkbox items.
- * 
+ *
  * IMPORTANT: All todo items must use the checkbox format:
  * - [ ] for unchecked/pending tasks
  * - [x] for checked/completed tasks
- * 
+ *
  * Example todo list structure:
- * 
+ *
  * # Project Implementation Todo
- * 
+ *
  * ## Phase 1: Setup and Planning
  * - [x] Initialize repository structure
  * - [x] Set up development environment
  * - [ ] Define API specifications
  * - [ ] Create database schema
- * 
+ *
  * ## Phase 2: Core Features
  * - [ ] Implement user authentication
  * - [ ] Build user profile endpoints
  * - [ ] Add authorization middleware
  * - [ ] Create user settings page
- * 
+ *
  * ## Phase 3: Testing
  * - [ ] Write unit tests for auth module
  * - [ ] Add integration tests for API
  * - [ ] Perform security audit
  * - [ ] Run performance benchmarks
- * 
+ *
  * ## Phase 4: Documentation and Deployment
  * - [ ] Update API documentation
  * - [ ] Write deployment guide

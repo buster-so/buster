@@ -37,6 +37,7 @@ export async function runInitializeContextStep(
     context: {
       sandbox: validatedParams.context.sandbox,
       todoList: validatedParams.context.todoList,
+      notepad: validatedParams.context.notepad,
       clarificationQuestions: validatedParams.context.clarificationQuestions,
       dataSourceId: validatedParams.context.dataSourceId,
     },

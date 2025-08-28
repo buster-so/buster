@@ -171,10 +171,12 @@ console.log(JSON.stringify(results));
             // Commit all changes and push to remote
             await sandbox.process.executeCommand(
               `git commit -a -m "${commitMessage}" --no-verify && git push`,
-              process.cwd()
+              '/home/daytona/angel-dbt-sample'
             );
 
-            console.info(`Created checkpoint commit for ${successfulFiles.length} edited file(s) and pushed to remote`);
+            console.info(
+              `Created checkpoint commit for ${successfulFiles.length} edited file(s) and pushed to remote`
+            );
           } catch (gitError) {
             // Log but don't fail - files were edited successfully
             console.warn(

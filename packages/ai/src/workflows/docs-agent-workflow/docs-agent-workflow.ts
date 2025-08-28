@@ -2,7 +2,10 @@ import type { Sandbox } from '@buster/sandbox';
 import type { ModelMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { /* runCreateDocsTodosStep, */ runDocsAgentStep, runGetRepositoryTreeStep } from '../../steps';
+import {
+  /* runCreateDocsTodosStep, */ runDocsAgentStep,
+  runGetRepositoryTreeStep,
+} from '../../steps';
 
 // Input schema for the workflow - matching analyst-workflow structure
 export const DocsAgentWorkflowInputSchema = z.object({
@@ -38,6 +41,7 @@ export const DocsAgentWorkflowOutputSchema = z.object({
   messages: z.array(z.custom<ModelMessage>()),
 
   todos: z.string().optional().describe('The TODO list'),
+  notepad: z.string().optional().describe('The notepad contents'),
   repositoryTree: z.string().optional().describe('The repository tree structure'),
   documentationCreated: z.boolean().optional().describe('Whether documentation was created'),
   clarificationNeeded: z.boolean().optional().describe('Whether clarification is needed'),
@@ -87,6 +91,7 @@ export const runDocsAgentWorkflow = wrapTraced(
       context: {
         sandbox: sandbox,
         todoList: '',
+        notepad: '',
         clarificationQuestions: [],
         dataSourceId: dataSourceId,
       },
@@ -105,12 +110,14 @@ export const runDocsAgentWorkflow = wrapTraced(
     const _agentResult = await runDocsAgentStep({
       todos: '', // todosResult.todos,
       todoList: '', // todosResult.todos,
+      notepad: '', // Initialize empty notepad
       message: messages[messages.length - 1]?.content?.toString() || '',
       messageId: validatedInput.messageId,
       organizationId: validatedInput.organizationId,
       context: {
         sandbox: sandbox,
         todoList: '', // todosResult.todos,
+        notepad: '', // Initialize empty notepad in context
         clarificationQuestions: [],
         dataSourceId: dataSourceId,
       },
@@ -135,6 +142,7 @@ export const runDocsAgentWorkflow = wrapTraced(
       messages,
 
       todos: '', // todosResult.todos,
+      notepad: '', // TODO: Extract from agent result
       repositoryTree: treeResult.repositoryTree,
       documentationCreated: true, // TODO: Extract from agent result
       clarificationNeeded: false, // TODO: Extract from agent result

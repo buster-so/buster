@@ -13,6 +13,7 @@ import {
   createReadFilesTool,
   createSequentialThinkingTool,
   createUpdateClarificationsFileTool,
+  createUpdateNotepadTool,
   createUpdateTodoListTool,
   createWebSearchTool,
   createWriteFilesTool,
@@ -32,6 +33,7 @@ import { WRITE_FILES_TOOL_NAME } from '../../tools/file-tools/write-files-tool/w
 import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
 import { UPDATE_CLARIFICATIONS_FILE_TOOL_NAME } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
 import { ClarifyingQuestionSchema } from '../../tools/planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool-execute';
+import { UPDATE_NOTEPAD_TOOL_NAME } from '../../tools/planning-thinking-tools/update-notepad-tool/update-notepad-tool';
 import { UPDATE_TODO_LIST_TOOL_NAME } from '../../tools/planning-thinking-tools/update-todo-list-tool/update-todo-list-tool';
 import { WEB_SEARCH_TOOL_NAME } from '../../tools/web-tools/web-search-tool';
 import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
@@ -65,6 +67,10 @@ export const DocsAgentOptionsSchema = z.object({
   ),
   fileTree: z.string().describe('The file tree of the dbt repository'),
   todoList: z.string().default('').describe('The current todo list in markdown format'),
+  notepad: z
+    .string()
+    .default('')
+    .describe('The notepad for documenting findings, decisions, and process'),
   clarifications: z
     .array(ClarifyingQuestionSchema)
     .default([])
@@ -101,6 +107,13 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     providerOptions: DEFAULT_CACHE_OPTIONS,
   } as ModelMessage;
 
+  const notepadSystemMessage = {
+    role: 'system',
+    content:
+      'Your notepad is currently empty. Use the updateNotepad tool to document your findings, decisions, assumptions, and challenges as you work through the task.',
+    providerOptions: DEFAULT_CACHE_OPTIONS,
+  } as ModelMessage;
+
   const tools = {
     [IDLE_TOOL_NAME]: createIdleTool(),
     [BASH_TOOL_NAME]: createBashTool(docsAgentOptions),
@@ -110,9 +123,10 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     [GREP_SEARCH_TOOL_NAME]: createGrepSearchTool(docsAgentOptions),
     [LIST_FILES_TOOL_NAME]: createListFilesTool(docsAgentOptions),
     [READ_FILES_TOOL_NAME]: createReadFilesTool(docsAgentOptions),
-    [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(),
+    // [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(), // TODO: improve this with firecrawl v2 then re-enable -- key to using this is to try and find information from docs/support pages that could help understand things.
     [SUPER_EXECUTE_SQL_TOOL_NAME]: createSuperExecuteSqlTool(docsAgentOptions),
     [UPDATE_TODO_LIST_TOOL_NAME]: createUpdateTodoListTool(docsAgentOptions),
+    [UPDATE_NOTEPAD_TOOL_NAME]: createUpdateNotepadTool(docsAgentOptions),
     [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions),
   };
 
@@ -127,7 +141,13 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
         streamText({
           model: GPT5,
           tools,
-          messages: [systemMessage, fileTreeSystemMessage, todoListSystemMessage, ...messages],
+          messages: [
+            systemMessage,
+            fileTreeSystemMessage,
+            todoListSystemMessage,
+            notepadSystemMessage,
+            ...messages,
+          ],
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',
           maxOutputTokens: 25000,

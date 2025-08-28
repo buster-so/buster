@@ -1,15 +1,15 @@
 import { wrapTraced } from 'braintrust';
 import type {
-  UpdateTodoListEdit,
-  UpdateTodoListToolContext,
-  UpdateTodoListToolInput,
-  UpdateTodoListToolOutput,
-} from './update-todo-list-tool';
+  UpdateNotepadEdit,
+  UpdateNotepadToolContext,
+  UpdateNotepadToolInput,
+  UpdateNotepadToolOutput,
+} from './update-notepad-tool';
 
-// Apply a single edit operation to the todo list content
+// Apply a single edit operation to the notepad content
 function applyEditToContent(
   content: string,
-  edit: UpdateTodoListEdit
+  edit: UpdateNotepadEdit
 ): {
   success: boolean;
   content?: string;
@@ -53,12 +53,12 @@ function applyEditToContent(
   }
 }
 
-export function createUpdateTodoListToolExecute(context: UpdateTodoListToolContext) {
+export function createUpdateNotepadToolExecute(context: UpdateNotepadToolContext) {
   return wrapTraced(
-    async (input: UpdateTodoListToolInput): Promise<UpdateTodoListToolOutput> => {
+    async (input: UpdateNotepadToolInput): Promise<UpdateNotepadToolOutput> => {
       const { edits } = input;
 
-      let currentContent = context.todoList;
+      let currentContent = context.notepad;
       const errors: string[] = [];
 
       // Apply each edit sequentially
@@ -74,15 +74,15 @@ export function createUpdateTodoListToolExecute(context: UpdateTodoListToolConte
 
       // Update the context with the final content
       if (errors.length === 0) {
-        Object.assign(context, { todoList: currentContent });
+        Object.assign(context, { notepad: currentContent });
       }
 
       return {
         success: errors.length === 0,
-        updatedTodoList: currentContent,
+        updatedNotepad: currentContent,
         errors: errors.length > 0 ? errors : undefined,
       };
     },
-    { name: 'update-todo-list-execute' }
+    { name: 'update-notepad-execute' }
   );
 }
