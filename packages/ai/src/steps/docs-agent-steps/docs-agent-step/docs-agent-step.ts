@@ -57,18 +57,6 @@ export const runDocsAgentStep = wrapTraced(
     const dataSourceId = validatedParams.context.dataSourceId;
 
     try {
-      // Get current working directory from sandbox
-      let cwdMessage = '';
-      if (sandbox) {
-        try {
-          const pwdResult = await sandbox.process.executeCommand('pwd');
-          const currentDir = pwdResult.result.trim();
-          cwdMessage = `cwd: ${currentDir}`;
-        } catch (error) {
-          console.warn('[DocsAgent] Failed to get current working directory:', error);
-        }
-      }
-
       // Create the docs agent with folder structure and context
       const docsAgent = createDocsAgent({
         fileTree: validatedParams.repositoryTree,
@@ -84,26 +72,13 @@ export const runDocsAgentStep = wrapTraced(
       });
 
       const userMessage = `${validatedParams.message}`;
-      const todoMessage = `<todo-list>\n${todoList}\n</todo-list>`;
 
       const messages: ModelMessage[] = [
         {
           role: 'user',
           content: userMessage,
         },
-        {
-          role: 'user',
-          content: todoMessage,
-        },
       ];
-
-      // Add cwd message if available (after todo list)
-      if (cwdMessage) {
-        messages.push({
-          role: 'user',
-          content: cwdMessage,
-        });
-      }
 
       // Execute the docs agent
       const result = await docsAgent.stream({ messages });

@@ -94,6 +94,13 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     providerOptions: DEFAULT_CACHE_OPTIONS,
   } as ModelMessage;
 
+  const todoListSystemMessage = {
+    role: 'system',
+    content:
+      'Currently your todo list is empty. You should evaluate the user message and create a todo list based on the user message.',
+    providerOptions: DEFAULT_CACHE_OPTIONS,
+  } as ModelMessage;
+
   const tools = {
     [IDLE_TOOL_NAME]: createIdleTool(),
     [BASH_TOOL_NAME]: createBashTool(docsAgentOptions),
@@ -120,7 +127,7 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
         streamText({
           model: GPT5,
           tools,
-          messages: [systemMessage, fileTreeSystemMessage, ...messages],
+          messages: [systemMessage, fileTreeSystemMessage, todoListSystemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',
           maxOutputTokens: 25000,

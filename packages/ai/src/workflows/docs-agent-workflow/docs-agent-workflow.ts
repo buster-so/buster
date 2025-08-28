@@ -2,7 +2,7 @@ import type { Sandbox } from '@buster/sandbox';
 import type { ModelMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { runCreateDocsTodosStep, runDocsAgentStep, runGetRepositoryTreeStep } from '../../steps';
+import { /* runCreateDocsTodosStep, */ runDocsAgentStep, runGetRepositoryTreeStep } from '../../steps';
 
 // Input schema for the workflow - matching analyst-workflow structure
 export const DocsAgentWorkflowInputSchema = z.object({
@@ -93,24 +93,24 @@ export const runDocsAgentWorkflow = wrapTraced(
     });
 
     // Step 2: Create todos based on the messages and repository structure
-    const todosResult = await runCreateDocsTodosStep({
-      messages,
-      repositoryTree: treeResult.repositoryTree,
-    });
+    // const todosResult = await runCreateDocsTodosStep({
+    //   messages,
+    //   repositoryTree: treeResult.repositoryTree,
+    // });
 
     // Add the todos message to the messages array
-    messages.push(todosResult.todosMessage);
+    // messages.push(todosResult.todosMessage);
 
     // Step 3: Execute the docs agent with all the prepared data
     const _agentResult = await runDocsAgentStep({
-      todos: todosResult.todos,
-      todoList: todosResult.todos,
+      todos: '', // todosResult.todos,
+      todoList: '', // todosResult.todos,
       message: messages[messages.length - 1]?.content?.toString() || '',
       messageId: validatedInput.messageId,
       organizationId: validatedInput.organizationId,
       context: {
         sandbox: sandbox,
-        todoList: todosResult.todos,
+        todoList: '', // todosResult.todos,
         clarificationQuestions: [],
         dataSourceId: dataSourceId,
       },
@@ -134,7 +134,7 @@ export const runDocsAgentWorkflow = wrapTraced(
 
       messages,
 
-      todos: todosResult.todos,
+      todos: '', // todosResult.todos,
       repositoryTree: treeResult.repositoryTree,
       documentationCreated: true, // TODO: Extract from agent result
       clarificationNeeded: false, // TODO: Extract from agent result
