@@ -1,112 +1,155 @@
-# Introspect Data Task
+# Introspect Data Tasks
 
-This task provides automated data source introspection capabilities, allowing you to connect to various database systems and analyze their structure.
+This module provides data source introspection using a functional factory pattern with Trigger.dev orchestration.
 
-## Features
+## Overview
 
-- **Connection Testing**: Verifies database connectivity before introspection
-- **Full Schema Analysis**: Discovers databases, schemas, tables, columns, and views
-- **Multi-Database Support**: Works with Snowflake, PostgreSQL, MySQL, BigQuery, SQL Server, Redshift, and Databricks
-- **Error Handling**: Graceful error handling with detailed logging
-- **Resource Management**: Automatic connection cleanup
+The introspection system uses a two-phase approach:
+1. **Main Task (`introspectDataTask`)**: Fetches structural metadata (tables, row counts) and triggers sampling sub-tasks
+2. **Sub-Task (`sampleTableTask`)**: Samples individual tables for future statistical analysis
 
-## Usage
+## Tasks
 
+### introspectDataTask
+
+Main introspection task that fetches high-level metadata and orchestrates table sampling.
+
+**Input Schema:**
 ```typescript
-import { introspectData } from './tasks/introspectData';
-import { DataSourceType } from '@buster/data-source';
+interface IntrospectDataTaskInput {
+  dataSourceId: string;        // UUID of data source (credentials stored in vault)
+  filters?: {
+    databases?: string[];      // Filter to specific databases
+    schemas?: string[];        // Filter to specific schemas
+    tables?: string[];         // Filter to specific tables
+  };
+}
+```
 
-// Example: Snowflake introspection
-const result = await introspectData.trigger({
-  dataSourceName: 'my-snowflake-warehouse',
-  credentials: {
-    type: DataSourceType.Snowflake,
-    account_id: 'ABC12345.us-central1.gcp',
-    warehouse_id: 'COMPUTE_WH',
-    username: 'your-username',
-    password: 'your-password',
-    default_database: 'ANALYTICS_DB',
-    default_schema: 'PUBLIC'
-  },
-  options: {
+**Output Schema:**
+```typescript
+interface IntrospectDataTaskOutput {
+  success: boolean;
+  dataSourceId: string;
+  tablesFound: number;
+  subTasksTriggered: number;
+  error?: string;
+}
+```
+
+**Example Usage:**
+```typescript
+import { introspectDataTask } from './tasks/introspectData';
+
+const result = await introspectDataTask.trigger({
+  dataSourceId: "550e8400-e29b-41d4-a716-446655440000",
+  filters: {
     databases: ['ANALYTICS_DB'],
     schemas: ['PUBLIC', 'STAGING']
   }
 });
-
-// Example: PostgreSQL introspection
-const pgResult = await introspectData.trigger({
-  dataSourceName: 'my-postgres-db',
-  credentials: {
-    type: DataSourceType.PostgreSQL,
-    host: 'localhost',
-    port: 5432,
-    database: 'myapp',
-    username: 'postgres',
-    password: 'password',
-    schema: 'public'
-  }
-});
 ```
 
-## Input Schema
+### sampleTableTask
 
-### IntrospectDataInput
+Sub-task that samples individual tables using dialect-specific sampling methods.
 
-| Field               | Type        | Required | Description                                                |
-| ------------------- | ----------- | -------- | ---------------------------------------------------------- |
-| `dataSourceName`    | string      | Yes      | Unique identifier for the data source                      |
-| `credentials`       | Credentials | Yes      | Database connection credentials (type depends on database) |
-| `options`           | Object      | No       | Optional filters for introspection scope                   |
-| `options.databases` | string[]    | No       | Limit introspection to specific databases                  |
-| `options.schemas`   | string[]    | No       | Limit introspection to specific schemas                    |
-| `options.tables`    | string[]    | No       | Limit introspection to specific tables                     |
+**Input Schema:**
+```typescript
+interface SampleTableTaskInput {
+  dataSourceId: string;
+  table: {
+    name: string;
+    schema: string;
+    database: string;
+    rowCount: number;
+    sizeBytes?: number;
+    type: 'TABLE' | 'VIEW' | 'MATERIALIZED_VIEW' | 'EXTERNAL_TABLE' | 'TEMPORARY_TABLE';
+  };
+  sampleSize: number;
+}
+```
 
-### Supported Credential Types
+**Output Schema:**
+```typescript
+interface SampleTableTaskOutput {
+  success: boolean;
+  tableId: string;
+  sampleSize: number;
+  actualSamples: number;
+  samplingMethod: string;
+  error?: string;
+}
+```
 
-- **Snowflake**: `account_id`, `warehouse_id`, `username`, `password`, `default_database`, etc.
-- **PostgreSQL**: `host`, `port`, `database`, `username`, `password`, `schema`, etc.
-- **MySQL**: `host`, `port`, `database`, `username`, `password`, etc.
-- **BigQuery**: `project_id`, `service_account_key`, `default_dataset`, etc.
-- **SQL Server**: `server`, `port`, `database`, `username`, `password`, etc.
-- **Redshift**: `host`, `port`, `database`, `username`, `password`, etc.
-- **Databricks**: `server_hostname`, `http_path`, `access_token`, etc.
+## Key Features
 
-## Output Schema
+### Dynamic Sample Sizing
+The system automatically determines optimal sample sizes based on table size:
+- ≤100K rows: Sample all rows
+- ≤1M rows: Sample 100K rows
+- ≤10M rows: Sample 250K rows
+- >10M rows: Sample 500K rows (max)
 
-### IntrospectDataOutput
+### Dialect-Specific Sampling
+Each database type uses its most efficient sampling method:
+- **Snowflake**: `SAMPLE(n ROWS)` or `TABLESAMPLE BERNOULLI`
+- **PostgreSQL**: `TABLESAMPLE SYSTEM` or `TABLESAMPLE BERNOULLI`
+- **MySQL**: Optimized `ORDER BY RAND()` with pre-filtering
+- **BigQuery**: `TABLESAMPLE SYSTEM`
+- **Redshift**: `ORDER BY RANDOM()`
+- **SQL Server**: `TABLESAMPLE` or `ORDER BY NEWID()`
 
-| Field            | Type    | Description                                       |
-| ---------------- | ------- | ------------------------------------------------- |
-| `success`        | boolean | Whether the introspection completed successfully  |
-| `dataSourceName` | string  | The name of the data source that was introspected |
-| `error`          | string  | Error message if introspection failed (optional)  |
+### Error Handling
+- Automatic fallback strategies when primary sampling methods fail
+- Connection cleanup in all scenarios
+- Detailed error logging for debugging
 
-## Error Handling
+### Performance
+- **Main Task**: 5-minute max duration
+- **Sub-Tasks**: 2-minute max duration per table
+- Parallel sub-task execution for efficiency
+- No database writes (read-only operations)
 
-The task includes comprehensive error handling:
+## Architecture
 
-- **Connection Errors**: If the database connection fails
-- **Authentication Errors**: If credentials are invalid
-- **Permission Errors**: If the user lacks required permissions
-- **Timeout Errors**: If operations exceed the 5-minute limit
+The system uses a functional factory pattern:
+```
+factory.ts
+  ├─ createStructuralMetadataFetcher(dialect)
+  └─ createTableSampler(dialect)
+      ├─ dialects/snowflake/
+      ├─ dialects/postgresql/
+      ├─ dialects/mysql/
+      ├─ dialects/bigquery/
+      ├─ dialects/redshift/
+      └─ dialects/sqlserver/
+```
 
-All errors are logged with context and returned in the output for debugging.
+## Future Enhancements
 
-## Performance Considerations
+The current implementation includes TODO markers for:
+- Statistical analysis of sampled data
+- Column-level statistics calculation
+- Data quality metrics generation
+- Pattern detection and data profiling
 
-- **Timeout**: Tasks are limited to 5 minutes (300 seconds)
-- **Connection Cleanup**: Database connections are automatically closed
-- **Batched Operations**: Column statistics are processed in batches for efficiency
-- **Caching**: The underlying introspection engine uses caching to optimize repeated queries
+## Supported Databases
+
+All major data warehouses and databases are supported:
+- Snowflake
+- PostgreSQL
+- MySQL
+- BigQuery
+- Redshift
+- SQL Server
 
 ## Logging
 
-The task provides detailed logging at each step:
+Both tasks provide detailed logging:
+- Connection status
+- Metadata fetching progress
+- Sampling methods used
+- Error details with context
 
-- Connection testing
-- Introspection progress
-- Results summary (counts of databases, schemas, tables, etc.)
-- Error details
-
-Check the Trigger.dev dashboard for detailed execution logs. 
+Check the Trigger.dev dashboard for detailed execution logs.

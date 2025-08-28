@@ -28,11 +28,39 @@ export {
   isSupported,
 } from './adapters/factory';
 
-// Introspection interfaces and implementations
+// New functional introspection API
+export {
+  createStructuralMetadataFetcher,
+  createTableSampler,
+  getStructuralMetadata,
+  sampleTable,
+  getDynamicSampleSize,
+  parseDate,
+  parseNumber,
+  parseBoolean,
+  getString,
+  getQualifiedTableName,
+  formatRowCount,
+  calculateSamplePercentage,
+  validateFilters,
+} from './introspection';
+
+// Export new introspection types
+export type {
+  IntrospectionFilters,
+  TableMetadata,
+  StructuralMetadata,
+  TableSample,
+  StructuralMetadataFetcher,
+  TableSampler,
+  IntrospectionDialect,
+} from './introspection';
+
+// Legacy introspection interfaces and implementations
 export type { DataSourceIntrospector } from './introspection/base';
 export { BaseIntrospector } from './introspection/base';
 
-// Individual introspectors
+// Individual introspectors (legacy)
 export { SnowflakeIntrospector } from './introspection/snowflake';
 export { PostgreSQLIntrospector } from './introspection/postgresql';
 export { MySQLIntrospector } from './introspection/mysql';
