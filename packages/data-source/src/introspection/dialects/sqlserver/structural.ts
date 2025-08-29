@@ -61,8 +61,13 @@ export async function getStructuralMetadata(
       conditions.push(`t.name IN (${list})`);
     }
 
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      const list = filters.excludeTables.map((t) => `'${t}'`).join(',');
+      conditions.push(`t.name NOT IN (${list})`);
+    }
+
     if (conditions.length > 0) {
-      query += ' AND ' + conditions.join(' AND ');
+      query += ` AND ${conditions.join(' AND ')}`;
     }
 
     query += ` GROUP BY DB_NAME(), s.name, t.name, t.type_desc, p.rows, ep.value, t.create_date, t.modify_date`;
@@ -97,6 +102,11 @@ export async function getStructuralMetadata(
     if (filters?.tables && filters.tables.length > 0) {
       const list = filters.tables.map((t) => `'${t}'`).join(',');
       query += ` AND v.name IN (${list})`;
+    }
+
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      const list = filters.excludeTables.map((t) => `'${t}'`).join(',');
+      query += ` AND v.name NOT IN (${list})`;
     }
 
     query += ' ORDER BY database_name, schema_name, table_name';

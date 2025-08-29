@@ -8,6 +8,8 @@
  * @returns Optimal sample size for statistical analysis
  */
 export function getDynamicSampleSize(totalRows: number): number {
+  // For empty tables, return minimum sample size of 1 to avoid validation errors
+  if (totalRows === 0) return 1;
   if (totalRows <= 100_000) return totalRows; // Small: take all
   if (totalRows <= 1_000_000) return 100_000; // Medium: 100K sample
   if (totalRows <= 10_000_000) return 250_000; // Large: 250K sample

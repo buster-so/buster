@@ -20,6 +20,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import type { OrganizationColorPalettes } from './schema-types';
+import type { DatasetMetadata } from './types/dataset-metadata';
 
 export const assetPermissionRoleEnum = pgEnum('asset_permission_role_enum', [
   'owner',
@@ -811,6 +812,7 @@ export const datasets = pgTable(
     model: text(),
     ymlFile: text('yml_file'),
     databaseIdentifier: text('database_identifier'),
+    metadata: jsonb().$type<DatasetMetadata>().notNull(),
   },
   (table) => [
     foreignKey({

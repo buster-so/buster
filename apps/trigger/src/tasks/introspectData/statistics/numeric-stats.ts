@@ -11,7 +11,7 @@ export class NumericStatsAnalyzer {
   /**
    * Check if a column is numeric
    */
-  async isNumericColumn(column: string, dataType: string): Promise<boolean> {
+  async isNumericColumn(_column: string, dataType: string): Promise<boolean> {
     const numericTypes = ['INTEGER', 'BIGINT', 'DOUBLE', 'FLOAT', 'DECIMAL', 'NUMERIC', 'REAL'];
     return numericTypes.some((type) => dataType.toUpperCase().includes(type));
   }
@@ -33,15 +33,26 @@ export class NumericStatsAnalyzer {
 
     try {
       const result = await this.db.query<{
-        mean: number;
-        median: number;
-        std_dev: number;
+        mean: number | string;
+        median: number | string;
+        std_dev: number | string;
       }>(sql);
 
+      // Helper to handle potential string values from DuckDB
+      const toNumber = (value: number | string | undefined): number => {
+        if (value === undefined || value === null) return 0;
+        if (typeof value === 'number') return value;
+        if (value === 'Infinity') return Number.POSITIVE_INFINITY;
+        if (value === '-Infinity') return Number.NEGATIVE_INFINITY;
+        if (value === 'NaN') return 0;
+        const parsed = Number.parseFloat(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      };
+
       return {
-        mean: result[0]?.mean ?? 0,
-        median: result[0]?.median ?? 0,
-        stdDev: result[0]?.std_dev ?? 0,
+        mean: toNumber(result[0]?.mean),
+        median: toNumber(result[0]?.median),
+        stdDev: toNumber(result[0]?.std_dev),
       };
     } catch (error) {
       logger.warn(`Failed to compute descriptive stats for column ${column}`, {
@@ -68,19 +79,30 @@ export class NumericStatsAnalyzer {
 
     try {
       const result = await this.db.query<{
-        p25: number;
-        p50: number;
-        p75: number;
-        p95: number;
-        p99: number;
+        p25: number | string;
+        p50: number | string;
+        p75: number | string;
+        p95: number | string;
+        p99: number | string;
       }>(sql);
 
+      // Helper to handle potential string values from DuckDB
+      const toNumber = (value: number | string | undefined): number => {
+        if (value === undefined || value === null) return 0;
+        if (typeof value === 'number') return value;
+        if (value === 'Infinity') return Number.POSITIVE_INFINITY;
+        if (value === '-Infinity') return Number.NEGATIVE_INFINITY;
+        if (value === 'NaN') return 0;
+        const parsed = Number.parseFloat(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      };
+
       return {
-        p25: result[0]?.p25 ?? 0,
-        p50: result[0]?.p50 ?? 0,
-        p75: result[0]?.p75 ?? 0,
-        p95: result[0]?.p95 ?? 0,
-        p99: result[0]?.p99 ?? 0,
+        p25: toNumber(result[0]?.p25),
+        p50: toNumber(result[0]?.p50),
+        p75: toNumber(result[0]?.p75),
+        p95: toNumber(result[0]?.p95),
+        p99: toNumber(result[0]?.p99),
       };
     } catch (error) {
       logger.warn(`Failed to compute percentiles for column ${column}`, {
@@ -101,8 +123,20 @@ export class NumericStatsAnalyzer {
     `;
 
     try {
-      const result = await this.db.query<{ skewness: number }>(sql);
-      return result[0]?.skewness ?? 0;
+      const result = await this.db.query<{ skewness: number | string }>(sql);
+      const skewnessValue = result[0]?.skewness;
+
+      // Handle special values that DuckDB might return as strings
+      if (typeof skewnessValue === 'string') {
+        if (skewnessValue === 'Infinity') return Number.POSITIVE_INFINITY;
+        if (skewnessValue === '-Infinity') return Number.NEGATIVE_INFINITY;
+        if (skewnessValue === 'NaN') return 0;
+        // Try to parse as number if it's a numeric string
+        const parsed = Number.parseFloat(skewnessValue);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
+      return skewnessValue ?? 0;
     } catch (error) {
       logger.warn(`Failed to compute skewness for column ${column}`, {
         error: error instanceof Error ? error.message : String(error),
@@ -125,7 +159,7 @@ export class NumericStatsAnalyzer {
       )
       SELECT 
         SUM(CASE 
-          WHEN ABS(CAST("${column}" AS DOUBLE) - stats.mean) > 3 * stats.stddev THEN 1 
+          WHEN ABS(CAST("${column}" AS DOUBLE) - stats.mean) > 2.5 * stats.stddev THEN 1 
           ELSE 0 
         END) * 1.0 / COUNT(*) as outlier_rate
       FROM ${this.db.getTableName()}, stats
@@ -133,8 +167,19 @@ export class NumericStatsAnalyzer {
     `;
 
     try {
-      const result = await this.db.query<{ outlier_rate: number }>(sql);
-      return result[0]?.outlier_rate ?? 0;
+      const result = await this.db.query<{ outlier_rate: number | string }>(sql);
+      const outlierRateValue = result[0]?.outlier_rate;
+
+      // Handle potential string values from DuckDB
+      if (typeof outlierRateValue === 'string') {
+        if (outlierRateValue === 'Infinity') return 1; // Cap at 100%
+        if (outlierRateValue === '-Infinity') return 0;
+        if (outlierRateValue === 'NaN') return 0;
+        const parsed = Number.parseFloat(outlierRateValue);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
+      return outlierRateValue ?? 0;
     } catch (error) {
       logger.warn(`Failed to compute outlier rate for column ${column}`, {
         error: error instanceof Error ? error.message : String(error),

@@ -29,7 +29,12 @@ export class SampleValuesExtractor {
     try {
       const result = await this.db.query<{ avg_length: number }>(sql);
       return (result[0]?.avg_length ?? 0) > 100;
-    } catch {
+    } catch (error) {
+      logger.warn('Failed to determine if column contains long text', {
+        column,
+        dataType,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return false;
     }
   }
@@ -60,7 +65,12 @@ export class SampleValuesExtractor {
     try {
       const result = await this.db.query<{ json_count: number }>(sql);
       return (result[0]?.json_count ?? 0) > 5;
-    } catch {
+    } catch (error) {
+      logger.warn('Failed to determine if column contains JSON data', {
+        column,
+        dataType,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return false;
     }
   }
@@ -68,7 +78,7 @@ export class SampleValuesExtractor {
   /**
    * Get sample values for a standard column (50 distinct values)
    */
-  async getStandardSampleValues(column: string, limit = 50): Promise<any[]> {
+  async getStandardSampleValues(column: string, limit = 50): Promise<unknown[]> {
     const sql = `
       SELECT DISTINCT "${column}" as sample_value
       FROM ${this.db.getTableName()}
@@ -78,7 +88,7 @@ export class SampleValuesExtractor {
     `;
 
     try {
-      const result = await this.db.query<{ sample_value: any }>(sql);
+      const result = await this.db.query<{ sample_value: unknown }>(sql);
       return result.map((r) => r.sample_value);
     } catch (error) {
       logger.warn(`Failed to get standard sample values for column ${column}`, {
@@ -89,20 +99,24 @@ export class SampleValuesExtractor {
   }
 
   /**
-   * Get sample values for long text columns (10 samples, truncated)
+   * Get sample values for long text columns (5 samples, truncated)
    */
-  async getLongTextSampleValues(column: string, limit = 10, maxLength = 150): Promise<string[]> {
+  async getLongTextSampleValues(column: string, limit = 5, maxLength = 150): Promise<string[]> {
     const sql = `
-      SELECT DISTINCT 
+      WITH sampled AS (
+        SELECT "${column}"
+        FROM ${this.db.getTableName()}
+        WHERE "${column}" IS NOT NULL
+        ORDER BY RANDOM()
+        LIMIT ${limit}
+      )
+      SELECT 
         CASE 
           WHEN LENGTH(CAST("${column}" AS VARCHAR)) > ${maxLength}
           THEN SUBSTR(CAST("${column}" AS VARCHAR), 1, ${maxLength - 3}) || '...'
           ELSE CAST("${column}" AS VARCHAR)
         END as sample_value
-      FROM ${this.db.getTableName()}
-      WHERE "${column}" IS NOT NULL
-      ORDER BY RANDOM()
-      LIMIT ${limit}
+      FROM sampled
     `;
 
     try {
@@ -119,31 +133,17 @@ export class SampleValuesExtractor {
   /**
    * Get sample values for JSON columns (3 samples, simplified)
    */
-  async getJsonSampleValues(column: string, limit = 3): Promise<any[]> {
+  async getJsonSampleValues(column: string, limit = 3): Promise<unknown[]> {
     const sql = `
-      WITH json_samples AS (
-        SELECT DISTINCT "${column}" as value
-        FROM ${this.db.getTableName()}
-        WHERE "${column}" IS NOT NULL
-        ORDER BY RANDOM()
-        LIMIT ${limit}
-      )
-      SELECT 
-        CASE
-          WHEN LENGTH(CAST(value AS VARCHAR)) > 500
-          THEN 
-            CASE
-              WHEN CAST(value AS VARCHAR) LIKE '[%'
-              THEN json_extract(value, '$[0:2]')
-              ELSE value
-            END
-          ELSE value
-        END as sample_value
-      FROM json_samples
+      SELECT "${column}" as sample_value
+      FROM ${this.db.getTableName()}
+      WHERE "${column}" IS NOT NULL
+      ORDER BY "${column}"
+      LIMIT ${limit}
     `;
 
     try {
-      const result = await this.db.query<{ sample_value: any }>(sql);
+      const result = await this.db.query<{ sample_value: unknown }>(sql);
       return result.map((r) => {
         // Try to parse and re-stringify for better formatting
         try {
@@ -166,7 +166,7 @@ export class SampleValuesExtractor {
   /**
    * Get appropriate sample values based on column characteristics
    */
-  async getSampleValues(column: string, dataType: string): Promise<any[]> {
+  async getSampleValues(column: string, dataType: string): Promise<unknown[]> {
     try {
       // Check column type and get appropriate samples
       const [isLongText, isJson] = await Promise.all([
@@ -176,11 +176,11 @@ export class SampleValuesExtractor {
 
       if (isJson) {
         return await this.getJsonSampleValues(column);
-      } else if (isLongText) {
-        return await this.getLongTextSampleValues(column);
-      } else {
-        return await this.getStandardSampleValues(column);
       }
+      if (isLongText) {
+        return await this.getLongTextSampleValues(column);
+      }
+      return await this.getStandardSampleValues(column);
     } catch (error) {
       logger.error(`Failed to get sample values for column ${column}`, {
         error: error instanceof Error ? error.message : String(error),
@@ -194,10 +194,10 @@ export class SampleValuesExtractor {
    */
   async batchGetSampleValues(
     columns: Array<{ name: string; type: string }>
-  ): Promise<Map<string, any[]>> {
+  ): Promise<Map<string, unknown[]>> {
     logger.log('Extracting sample values for columns', { columnCount: columns.length });
 
-    const samples = new Map<string, any[]>();
+    const samples = new Map<string, unknown[]>();
 
     // Get samples in parallel
     const promises = columns.map(async (col) => {

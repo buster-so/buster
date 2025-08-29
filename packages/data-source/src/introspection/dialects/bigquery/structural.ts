@@ -51,6 +51,11 @@ export async function getStructuralMetadata(
       conditions.push(`table_name IN (${list})`);
     }
 
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      const list = filters.excludeTables.map((t) => `'${t}'`).join(',');
+      conditions.push(`table_name NOT IN (${list})`);
+    }
+
     if (conditions.length > 0) {
       query += ` AND ${conditions.join(' AND ')}`;
     }

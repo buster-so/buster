@@ -3,9 +3,9 @@
  */
 
 export interface TopValue {
-  value: any;
+  value: unknown;
+  count: number;
   percentage: number;
-  rank: number;
 }
 
 export interface NumericStatistics {
@@ -26,7 +26,7 @@ export interface NumericStatistics {
 export interface ColumnClassification {
   isLikelyEnum: boolean;
   isLikelyIdentifier: boolean;
-  identifierType?: 'primary_key' | 'foreign_key' | 'natural_key';
+  identifierType?: 'primary_key' | 'foreign_key' | 'natural_key' | 'sequential' | 'uuid_like';
   enumValues?: string[];
 }
 
@@ -63,7 +63,7 @@ export interface ColumnProfile {
   giniCoefficient: number;
 
   // Sample values
-  sampleValues: any[];
+  sampleValues: unknown[];
 
   // Numeric-specific
   numericStats?: NumericStatistics;

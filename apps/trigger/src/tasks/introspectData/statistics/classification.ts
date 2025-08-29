@@ -39,9 +39,15 @@ export class ClassificationAnalyzer {
         ec.uniqueness,
         c.top10_coverage,
         CASE 
+          WHEN ec.distinct_count <= 2 
+           AND ec.total_count >= 3
+          THEN true
+          WHEN ec.distinct_count <= 20 
+           AND ec.uniqueness <= 0.05 
+          THEN true
           WHEN ec.distinct_count < 100 
-           AND ec.uniqueness < 0.01 
-           AND c.top10_coverage > 0.8 
+           AND ec.uniqueness <= 0.1 
+           AND c.top10_coverage >= 0.9 
           THEN true 
           ELSE false 
         END as is_likely_enum
@@ -63,13 +69,14 @@ export class ClassificationAnalyzer {
       const distinctCount = result[0]?.distinct_count;
       if (isEnum && distinctCount !== undefined && distinctCount < 100) {
         const valuesSQL = `
-          SELECT DISTINCT "${column}" as value
+          SELECT "${column}" as value, COUNT(*) as frequency
           FROM ${this.db.getTableName()}
           WHERE "${column}" IS NOT NULL
-          ORDER BY "${column}"
+          GROUP BY "${column}"
+          ORDER BY frequency DESC, "${column}"
         `;
 
-        const values = await this.db.query<{ value: any }>(valuesSQL);
+        const values = await this.db.query<{ value: unknown; frequency: number }>(valuesSQL);
         enumValues = values.map((v) => String(v.value));
       }
 
@@ -90,7 +97,7 @@ export class ClassificationAnalyzer {
    */
   async detectIdentifier(column: string): Promise<{
     isIdentifier: boolean;
-    identifierType?: 'primary_key' | 'foreign_key' | 'natural_key';
+    identifierType?: 'primary_key' | 'foreign_key' | 'natural_key' | 'sequential' | 'uuid_like';
   }> {
     const sql = `
       WITH identifier_check AS (
@@ -105,24 +112,64 @@ export class ClassificationAnalyzer {
         -- Check if numeric values are sequential
         SELECT 
           CASE 
-            WHEN COUNT(*) > 10 
+            WHEN COUNT(*) >= 10 
+             AND TRY_CAST(MAX("${column}") AS BIGINT) IS NOT NULL
+             AND TRY_CAST(MIN("${column}") AS BIGINT) IS NOT NULL
              AND TRY_CAST(MAX("${column}") AS BIGINT) - TRY_CAST(MIN("${column}") AS BIGINT) = COUNT(DISTINCT "${column}") - 1
             THEN true 
             ELSE false 
           END as is_sequential
         FROM ${this.db.getTableName()}
         WHERE "${column}" IS NOT NULL
+      ),
+      uuid_check AS (
+        SELECT 
+          CASE 
+            WHEN COUNT(*) > 0 
+             AND AVG(CASE 
+               WHEN LENGTH(CAST("${column}" AS VARCHAR)) = 36
+                AND CAST("${column}" AS VARCHAR) LIKE '________-____-____-____-____________' 
+               THEN 1.0
+               ELSE 0.0
+             END) > 0.9
+            THEN true
+            ELSE false
+          END as is_uuid_like
+        FROM ${this.db.getTableName()}
+        WHERE "${column}" IS NOT NULL
+        LIMIT 100
+      ),
+      date_check AS (
+        SELECT 
+          CASE 
+            WHEN COUNT(*) > 0 
+             AND COUNT(CASE 
+               WHEN CAST("${column}" AS VARCHAR) SIMILAR TO '[0-9]{4}-[0-9]{2}-[0-9]{2}.*' 
+                 OR CAST("${column}" AS VARCHAR) SIMILAR TO '[0-9]{2}/[0-9]{2}/[0-9]{4}.*'
+               THEN 1 
+             END) > COUNT(*) * 0.8
+            THEN true
+            ELSE false
+          END as is_date_like
+        FROM ${this.db.getTableName()}
+        WHERE "${column}" IS NOT NULL
+        LIMIT 100
       )
       SELECT 
         ic.*,
         sc.is_sequential,
+        uc.is_uuid_like,
+        dc.is_date_like,
         CASE 
-          WHEN ic.uniqueness > 0.95 AND ic.null_rate < 0.01 THEN true
-          WHEN ic.uniqueness = 1.0 THEN true
+          WHEN dc.is_date_like THEN false
+          WHEN ic.distinct_count < 10 THEN false
+          WHEN ic.uniqueness > 0.95 AND ic.null_rate < 0.01 AND ic.distinct_count >= 10 THEN true
+          WHEN ic.uniqueness = 1.0 AND ic.distinct_count >= 10 THEN true
           WHEN sc.is_sequential THEN true
+          WHEN uc.is_uuid_like AND ic.uniqueness > 0.9 THEN true
           ELSE false
         END as is_likely_identifier
-      FROM identifier_check ic, sequential_check sc
+      FROM identifier_check ic, sequential_check sc, uuid_check uc, date_check dc
     `;
 
     try {
@@ -131,18 +178,41 @@ export class ClassificationAnalyzer {
         null_rate: number;
         distinct_count: number;
         is_sequential: boolean;
+        is_uuid_like: boolean;
+        is_date_like: boolean;
         is_likely_identifier: boolean;
       }>(sql);
 
       const isIdentifier = result[0]?.is_likely_identifier ?? false;
-      let identifierType: 'primary_key' | 'foreign_key' | 'natural_key' | undefined;
+      let identifierType:
+        | 'primary_key'
+        | 'foreign_key'
+        | 'natural_key'
+        | 'sequential'
+        | 'uuid_like'
+        | undefined;
 
       if (isIdentifier) {
         const uniqueness = result[0]?.uniqueness ?? 0;
         const nullRate = result[0]?.null_rate ?? 0;
+        const isSequential = result[0]?.is_sequential ?? false;
+        const isUuidLike = result[0]?.is_uuid_like ?? false;
         const columnLower = column.toLowerCase();
 
-        if (uniqueness === 1.0 && nullRate === 0) {
+        if (isUuidLike) {
+          identifierType = 'uuid_like';
+        } else if (isSequential) {
+          identifierType = 'sequential';
+        } else if (uniqueness === 1.0 && nullRate === 0) {
+          identifierType = 'primary_key';
+        } else if (
+          uniqueness > 0.95 &&
+          (columnLower.includes('_id') ||
+            columnLower.includes('id_') ||
+            columnLower === 'id' ||
+            columnLower.endsWith('_key'))
+        ) {
+          // If it looks like an ID column name and has high uniqueness
           identifierType = 'primary_key';
         } else if (
           uniqueness > 0.95 &&

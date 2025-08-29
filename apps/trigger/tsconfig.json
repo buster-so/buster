@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "outDir": "dist",
     "rootDir": ".",
-    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json"
+    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
+    "types": ["vitest/globals"]
   },
   "include": ["src/**/*", "tests/**/*", "env.d.ts"],
   "exclude": ["node_modules", "dist"],

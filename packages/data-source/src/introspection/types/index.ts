@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { DatabaseAdapter } from '../../adapters/base';
 import { DataSourceType } from '../../types/credentials';
 
 // Filters for introspection operations
@@ -6,6 +7,7 @@ export const IntrospectionFiltersSchema = z.object({
   databases: z.array(z.string()).optional(),
   schemas: z.array(z.string()).optional(),
   tables: z.array(z.string()).optional(),
+  excludeTables: z.array(z.string()).optional(),
 });
 
 export type IntrospectionFilters = z.infer<typeof IntrospectionFiltersSchema>;
@@ -38,12 +40,25 @@ export const StructuralMetadataSchema = z.object({
 
 export type StructuralMetadata = z.infer<typeof StructuralMetadataSchema>;
 
+// Column schema information for sampled data
+export const ColumnSchemaSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  nullable: z.boolean().optional(),
+  length: z.number().optional(),
+  precision: z.number().optional(),
+  scale: z.number().optional(),
+});
+
+export type ColumnSchema = z.infer<typeof ColumnSchemaSchema>;
+
 // Table sample data
 export const TableSampleSchema = z.object({
   tableId: z.string(), // Composite of database.schema.table
   rowCount: z.number().int().nonnegative(),
   sampleSize: z.number().int().nonnegative(),
   sampleData: z.array(z.record(z.unknown())), // Raw sample rows
+  columnSchemas: z.array(ColumnSchemaSchema).optional(), // Column schema information
   sampledAt: z.date(),
   samplingMethod: z.string(), // e.g., "TABLESAMPLE", "RANDOM", etc.
 });
@@ -52,12 +67,12 @@ export type TableSample = z.infer<typeof TableSampleSchema>;
 
 // Function signatures for factory pattern
 export type StructuralMetadataFetcher = (
-  adapter: any, // Will use DatabaseAdapter type from adapters
+  adapter: DatabaseAdapter,
   filters?: IntrospectionFilters
 ) => Promise<StructuralMetadata>;
 
 export type TableSampler = (
-  adapter: any, // Will use DatabaseAdapter type from adapters
+  adapter: DatabaseAdapter,
   table: TableMetadata,
   sampleSize: number
 ) => Promise<TableSample>;

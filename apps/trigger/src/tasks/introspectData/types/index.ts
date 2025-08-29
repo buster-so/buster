@@ -17,6 +17,7 @@ export const IntrospectDataTaskInputSchema = z.object({
       databases: z.array(z.string()).optional(),
       schemas: z.array(z.string()).optional(),
       tables: z.array(z.string()).optional(),
+      excludeTables: z.array(z.string()).optional(),
     })
     .optional(),
 });
@@ -65,8 +66,8 @@ export const ColumnProfileSchema = z.object({
   topValues: z.array(
     z.object({
       value: z.unknown(),
+      count: z.number(),
       percentage: z.number(),
-      rank: z.number(),
     })
   ),
   entropy: z.number(),
@@ -92,14 +93,6 @@ export const ColumnProfileSchema = z.object({
       outlierRate: z.number().min(0).max(1),
     })
     .optional(),
-
-  // Classification
-  classification: z.object({
-    isLikelyEnum: z.boolean(),
-    isLikelyIdentifier: z.boolean(),
-    identifierType: z.enum(['primary_key', 'foreign_key', 'natural_key']).optional(),
-    enumValues: z.array(z.string()).optional(),
-  }),
 });
 
 export type ColumnProfile = z.infer<typeof ColumnProfileSchema>;
@@ -108,6 +101,7 @@ export type ColumnProfile = z.infer<typeof ColumnProfileSchema>;
 export const GetTableStatisticsOutputSchema = z.object({
   success: z.boolean(),
   tableId: z.string(),
+  totalRows: z.number(),
   sampleSize: z.number(),
   actualSamples: z.number(),
   samplingMethod: z.string(),

@@ -1,10 +1,11 @@
 import type { DatabaseAdapter } from '../../../adapters/base';
-import type { TableMetadata, TableSample } from '../../types';
+import type { ColumnSchema, TableMetadata, TableSample } from '../../types';
 import { calculateSamplePercentage, getQualifiedTableName } from '../../utils';
 
 /**
- * Sample a Snowflake table using SAMPLE clause
- * Snowflake supports efficient TABLESAMPLE for random sampling
+ * Sample a Snowflake table using efficient sampling methods
+ * - For tables: Uses TABLESAMPLE BERNOULLI for efficient random sampling
+ * - For views: Uses LIMIT to fetch up to 1M rows
  */
 export async function getTableSample(
   adapter: DatabaseAdapter,
@@ -20,85 +21,145 @@ export async function getTableSample(
   );
 
   try {
-    // For small tables, just fetch all rows
-    if (table.rowCount <= sampleSize) {
-      const query = `SELECT * FROM ${qualifiedTable} LIMIT ${sampleSize}`;
-      const result = await adapter.query(query);
+    // For views, use hash-based sampling for better distribution
+    if (table.type === 'VIEW') {
+      const maxViewSample = 500000; // Reduced from 1M for better performance
+      const viewSampleSize = Math.min(sampleSize, maxViewSample);
+      
+      // Try hash-based sampling first for pseudo-random distribution
+      try {
+        // HASH(*) in Snowflake hashes the entire row
+        // MOD 10 gives us ~10% sample which should be enough for 500k from most views
+        const hashQuery = `
+          SELECT * FROM ${qualifiedTable}
+          WHERE MOD(HASH(*), 10) = 0
+          LIMIT ${viewSampleSize}
+        `;
+        
+        const result = await adapter.query(hashQuery, undefined, viewSampleSize);
+        
+        // If we got at least 50% of requested rows, consider it successful
+        if (result.rows.length >= viewSampleSize * 0.5) {
+          const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+            name: field.name,
+            type: field.type,
+            nullable: field.nullable,
+            length: field.length,
+            precision: field.precision,
+            scale: field.scale,
+          }));
+
+          return {
+            tableId: `${table.database}.${table.schema}.${table.name}`,
+            rowCount: table.rowCount,
+            sampleSize: result.rows.length,
+            sampleData: result.rows,
+            columnSchemas,
+            sampledAt: startTime,
+            samplingMethod: 'VIEW_HASH_SAMPLE',
+          };
+        }
+      } catch {
+        // Hash sampling failed or returned too few rows, fall through to simple LIMIT
+      }
+      
+      // Fallback to simple LIMIT if hash sampling fails
+      const query = `SELECT * FROM ${qualifiedTable} LIMIT ${viewSampleSize}`;
+      const result = await adapter.query(query, undefined, viewSampleSize);
+
+      const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+        name: field.name,
+        type: field.type,
+        nullable: field.nullable,
+        length: field.length,
+        precision: field.precision,
+        scale: field.scale,
+      }));
 
       return {
         tableId: `${table.database}.${table.schema}.${table.name}`,
         rowCount: table.rowCount,
         sampleSize: result.rows.length,
         sampleData: result.rows,
+        columnSchemas,
+        sampledAt: startTime,
+        samplingMethod: 'VIEW_LIMIT',
+      };
+    }
+
+    // For small tables, just fetch all rows
+    if (table.rowCount <= sampleSize) {
+      const query = `SELECT * FROM ${qualifiedTable} LIMIT ${sampleSize}`;
+      const result = await adapter.query(query, undefined, sampleSize);
+
+      const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+        name: field.name,
+        type: field.type,
+        nullable: field.nullable,
+        length: field.length,
+        precision: field.precision,
+        scale: field.scale,
+      }));
+
+      return {
+        tableId: `${table.database}.${table.schema}.${table.name}`,
+        rowCount: table.rowCount,
+        sampleSize: result.rows.length,
+        sampleData: result.rows,
+        columnSchemas,
         sampledAt: startTime,
         samplingMethod: 'FULL_TABLE',
       };
     }
 
-    // For larger tables, use Snowflake's SAMPLE clause
-    // SAMPLE can use either row count or percentage
-    // Using row count is more predictable for our use case
-    const sampleQuery = `
-      SELECT * 
-      FROM ${qualifiedTable}
-      SAMPLE (${sampleSize} ROWS)
-      ORDER BY RANDOM()
-    `;
+    // For larger tables, use TABLESAMPLE BERNOULLI for efficient random sampling
+    const percentage = calculateSamplePercentage(sampleSize, table.rowCount);
+    // Add explicit LIMIT to ensure we don't get more rows than requested
+    const sampleQuery = `SELECT * FROM ${qualifiedTable} TABLESAMPLE BERNOULLI (${percentage}) LIMIT ${sampleSize}`;
 
-    const result = await adapter.query(sampleQuery);
+    const result = await adapter.query(sampleQuery, undefined, sampleSize);
 
-    // If SAMPLE didn't return enough rows (can happen with very skewed data),
-    // fall back to TABLESAMPLE with percentage
-    if (result.rows.length < sampleSize * 0.9) {
-      // Less than 90% of requested
-      const percentage = calculateSamplePercentage(sampleSize, table.rowCount);
-      const fallbackQuery = `
-        SELECT * 
-        FROM ${qualifiedTable}
-        TABLESAMPLE BERNOULLI (${percentage})
-        ORDER BY RANDOM()
-        LIMIT ${sampleSize}
-      `;
-
-      const fallbackResult = await adapter.query(fallbackQuery);
-      return {
-        tableId: `${table.database}.${table.schema}.${table.name}`,
-        rowCount: table.rowCount,
-        sampleSize: fallbackResult.rows.length,
-        sampleData: fallbackResult.rows,
-        sampledAt: startTime,
-        samplingMethod: 'TABLESAMPLE_BERNOULLI',
-      };
-    }
+    const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+      name: field.name,
+      type: field.type,
+      nullable: field.nullable,
+      length: field.length,
+      precision: field.precision,
+      scale: field.scale,
+    }));
 
     return {
       tableId: `${table.database}.${table.schema}.${table.name}`,
       rowCount: table.rowCount,
       sampleSize: result.rows.length,
       sampleData: result.rows,
+      columnSchemas,
       sampledAt: startTime,
-      samplingMethod: 'SAMPLE_ROWS',
+      samplingMethod: 'TABLESAMPLE_BERNOULLI',
     };
   } catch (error) {
-    // If sampling fails, try a simple LIMIT with ORDER BY RANDOM()
+    // If TABLESAMPLE fails (shouldn't happen for tables), fall back to simple LIMIT
     try {
-      const fallbackQuery = `
-        SELECT * 
-        FROM ${qualifiedTable}
-        ORDER BY RANDOM()
-        LIMIT ${sampleSize}
-      `;
+      const fallbackQuery = `SELECT * FROM ${qualifiedTable} LIMIT ${sampleSize}`;
 
-      const result = await adapter.query(fallbackQuery);
+      const result = await adapter.query(fallbackQuery, undefined, sampleSize);
       return {
         tableId: `${table.database}.${table.schema}.${table.name}`,
         rowCount: table.rowCount,
         sampleSize: result.rows.length,
         sampleData: result.rows,
+        columnSchemas: result.fields.map((field) => ({
+          name: field.name,
+          type: field.type,
+          nullable: field.nullable,
+          length: field.length,
+          precision: field.precision,
+          scale: field.scale,
+        })),
         sampledAt: startTime,
-        samplingMethod: 'RANDOM_LIMIT',
+        samplingMethod: 'LIMIT_FALLBACK',
       };
-    } catch (fallbackError) {
+    } catch (_fallbackError) {
       throw new Error(
         `Failed to sample table ${qualifiedTable}: ${
           error instanceof Error ? error.message : 'Unknown error'

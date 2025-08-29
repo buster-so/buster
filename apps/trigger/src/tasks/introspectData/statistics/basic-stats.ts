@@ -1,20 +1,22 @@
 import { logger } from '@trigger.dev/sdk';
-import type { DuckDBManager } from './duckdb-manager';
+import { z } from 'zod';
+import { type DuckDBManager, SQLQuery } from './duckdb-manager';
 import type { BasicStats } from './types';
 
 /**
- * Compute basic statistics for columns
+ * Improved basic statistics analyzer with type safety
  */
 export class BasicStatsAnalyzer {
   constructor(private db: DuckDBManager) {}
 
   /**
-   * Compute null rate for a column
+   * Compute null rate for a column with parameterized query
    */
   async computeNullRate(column: string): Promise<number> {
+    const escapedColumn = this.escapeIdentifier(column);
     const sql = `
       SELECT 
-        SUM(CASE WHEN "${column}" IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as null_rate
+        SUM(CASE WHEN "${escapedColumn}" IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as null_rate
       FROM ${this.db.getTableName()}
     `;
 
@@ -26,8 +28,9 @@ export class BasicStatsAnalyzer {
    * Compute distinct count for a column
    */
   async computeDistinctCount(column: string): Promise<number> {
+    const escapedColumn = this.escapeIdentifier(column);
     const sql = `
-      SELECT COUNT(DISTINCT "${column}") as distinct_count 
+      SELECT COUNT(DISTINCT "${escapedColumn}") as distinct_count 
       FROM ${this.db.getTableName()}
     `;
 
@@ -39,9 +42,10 @@ export class BasicStatsAnalyzer {
    * Compute uniqueness ratio for a column
    */
   async computeUniquenessRatio(column: string): Promise<number> {
+    const escapedColumn = this.escapeIdentifier(column);
     const sql = `
       SELECT 
-        COUNT(DISTINCT "${column}") * 1.0 / COUNT(*) as uniqueness_ratio
+        COUNT(DISTINCT "${escapedColumn}") * 1.0 / COUNT(*) as uniqueness_ratio
       FROM ${this.db.getTableName()}
     `;
 
@@ -50,13 +54,17 @@ export class BasicStatsAnalyzer {
   }
 
   /**
-   * Compute empty string rate for a column
-   * Note: This should only be called for text-based columns
+   * Compute empty string rate for text columns
    */
-  async computeEmptyStringRate(column: string): Promise<number> {
+  async computeEmptyStringRate(column: string, isTextColumn: boolean): Promise<number> {
+    if (!isTextColumn) {
+      return 0;
+    }
+
+    const escapedColumn = this.escapeIdentifier(column);
     const sql = `
       SELECT 
-        SUM(CASE WHEN "${column}" = '' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as empty_string_rate
+        SUM(CASE WHEN "${escapedColumn}" = '' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as empty_string_rate
       FROM ${this.db.getTableName()}
     `;
 
@@ -64,7 +72,6 @@ export class BasicStatsAnalyzer {
       const result = await this.db.query<{ empty_string_rate: number }>(sql);
       return result[0]?.empty_string_rate ?? 0;
     } catch (error) {
-      // If type conversion fails, return 0
       logger.warn(`Failed to compute empty string rate for column ${column}`, {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -73,13 +80,14 @@ export class BasicStatsAnalyzer {
   }
 
   /**
-   * Batch compute basic statistics for multiple columns with type awareness
-   * More efficient than individual queries
+   * Batch compute basic statistics with improved performance
    */
   async batchComputeBasicStats(
     columnMetadata: Array<{ name: string; type: string }>
   ): Promise<Map<string, BasicStats>> {
-    logger.log('Computing basic statistics for columns', { columnCount: columnMetadata.length });
+    logger.log('Computing basic statistics for columns', {
+      columnCount: columnMetadata.length,
+    });
 
     const stats = new Map<string, BasicStats>();
 
@@ -88,31 +96,12 @@ export class BasicStatsAnalyzer {
     }
 
     try {
-      // Build a single query to compute all basic stats for all columns
-      const selectClauses = columnMetadata.flatMap((col) => {
-        const escapedCol = `"${col.name}"`;
-        const clauses = [
-          `SUM(CASE WHEN ${escapedCol} IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as "${col.name}_null_rate"`,
-          `COUNT(DISTINCT ${escapedCol}) as "${col.name}_distinct_count"`,
-          `COUNT(DISTINCT ${escapedCol}) * 1.0 / COUNT(*) as "${col.name}_uniqueness_ratio"`,
-        ];
+      // Build optimized batch query
+      const selectClauses = this.buildBatchSelectClauses(columnMetadata);
 
-        // Only check for empty strings on text-based columns
-        const isTextType = ['VARCHAR', 'TEXT', 'STRING', 'CHAR'].some((textType) =>
-          col.type.toUpperCase().includes(textType)
-        );
-
-        if (isTextType) {
-          clauses.push(
-            `SUM(CASE WHEN ${escapedCol} = '' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as "${col.name}_empty_rate"`
-          );
-        } else {
-          // For non-text columns, set empty rate to 0
-          clauses.push(`0 as "${col.name}_empty_rate"`);
-        }
-
-        return clauses;
-      });
+      if (selectClauses.length === 0) {
+        return stats;
+      }
 
       const sql = `
         SELECT 
@@ -120,17 +109,22 @@ export class BasicStatsAnalyzer {
         FROM ${this.db.getTableName()}
       `;
 
-      const result = await this.db.query(sql);
+      const result = await this.db.query<Record<string, number>>(sql);
 
-      if (result.length > 0) {
+      if (result.length > 0 && result[0]) {
         const row = result[0];
 
         for (const col of columnMetadata) {
+          const nullRateKey = `${col.name}_null_rate`;
+          const distinctCountKey = `${col.name}_distinct_count`;
+          const uniquenessRatioKey = `${col.name}_uniqueness_ratio`;
+          const emptyRateKey = `${col.name}_empty_rate`;
+
           stats.set(col.name, {
-            nullRate: row[`${col.name}_null_rate`] ?? 0,
-            distinctCount: row[`${col.name}_distinct_count`] ?? 0,
-            uniquenessRatio: row[`${col.name}_uniqueness_ratio`] ?? 0,
-            emptyStringRate: row[`${col.name}_empty_rate`] ?? 0,
+            nullRate: this.getNumericValue(row[nullRateKey], 0),
+            distinctCount: this.getNumericValue(row[distinctCountKey], 0),
+            uniquenessRatio: this.getNumericValue(row[uniquenessRatioKey], 0),
+            emptyStringRate: this.getNumericValue(row[emptyRateKey], 0),
           });
         }
       }
@@ -139,39 +133,126 @@ export class BasicStatsAnalyzer {
         columnsProcessed: columnMetadata.length,
       });
     } catch (error) {
-      logger.error('Error computing basic statistics', {
+      logger.error('Error computing batch basic statistics', {
         error: error instanceof Error ? error.message : String(error),
       });
 
-      // Fallback to individual queries if batch fails
-      for (const col of columnMetadata) {
-        try {
-          const isTextType = ['VARCHAR', 'TEXT', 'STRING', 'CHAR'].some((textType) =>
-            col.type.toUpperCase().includes(textType)
-          );
-
-          stats.set(col.name, {
-            nullRate: await this.computeNullRate(col.name),
-            distinctCount: await this.computeDistinctCount(col.name),
-            uniquenessRatio: await this.computeUniquenessRatio(col.name),
-            emptyStringRate: isTextType ? await this.computeEmptyStringRate(col.name) : 0,
-          });
-        } catch (colError) {
-          logger.warn(`Failed to compute stats for column ${col.name}`, {
-            error: colError instanceof Error ? colError.message : String(colError),
-          });
-
-          // Set default values for failed column
-          stats.set(col.name, {
-            nullRate: 0,
-            distinctCount: 0,
-            uniquenessRatio: 0,
-            emptyStringRate: 0,
-          });
-        }
-      }
+      // Fallback to individual queries
+      await this.fallbackToIndividualQueries(columnMetadata, stats);
     }
 
     return stats;
+  }
+
+  /**
+   * Build select clauses for batch query
+   */
+  private buildBatchSelectClauses(columnMetadata: Array<{ name: string; type: string }>): string[] {
+    const clauses: string[] = [];
+
+    for (const col of columnMetadata) {
+      const escapedCol = this.escapeIdentifier(col.name);
+      const safeAlias = this.getSafeAlias(col.name);
+
+      // Basic statistics that apply to all columns
+      clauses.push(
+        `SUM(CASE WHEN "${escapedCol}" IS NULL THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as "${safeAlias}_null_rate"`,
+        `COUNT(DISTINCT "${escapedCol}") as "${safeAlias}_distinct_count"`,
+        `COUNT(DISTINCT "${escapedCol}") * 1.0 / COUNT(*) as "${safeAlias}_uniqueness_ratio"`
+      );
+
+      // Empty string rate only for text columns
+      if (this.isTextType(col.type)) {
+        clauses.push(
+          `SUM(CASE WHEN "${escapedCol}" = '' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) as "${safeAlias}_empty_rate"`
+        );
+      } else {
+        clauses.push(`0 as "${safeAlias}_empty_rate"`);
+      }
+    }
+
+    return clauses;
+  }
+
+  /**
+   * Fallback to individual queries if batch fails
+   */
+  private async fallbackToIndividualQueries(
+    columnMetadata: Array<{ name: string; type: string }>,
+    stats: Map<string, BasicStats>
+  ): Promise<void> {
+    logger.warn('Falling back to individual queries for basic statistics');
+
+    for (const col of columnMetadata) {
+      try {
+        const isTextColumn = this.isTextType(col.type);
+
+        const [nullRate, distinctCount, uniquenessRatio, emptyStringRate] = await Promise.all([
+          this.computeNullRate(col.name),
+          this.computeDistinctCount(col.name),
+          this.computeUniquenessRatio(col.name),
+          this.computeEmptyStringRate(col.name, isTextColumn),
+        ]);
+
+        stats.set(col.name, {
+          nullRate,
+          distinctCount,
+          uniquenessRatio,
+          emptyStringRate,
+        });
+      } catch (error) {
+        logger.error(`Failed to compute basic stats for column ${col.name}`, {
+          error: error instanceof Error ? error.message : String(error),
+        });
+
+        // Set default values on error
+        stats.set(col.name, {
+          nullRate: 0,
+          distinctCount: 0,
+          uniquenessRatio: 0,
+          emptyStringRate: 0,
+        });
+      }
+    }
+  }
+
+  /**
+   * Check if a type is text-based
+   */
+  private isTextType(type: string): boolean {
+    const textTypes = ['VARCHAR', 'TEXT', 'STRING', 'CHAR'];
+    const upperType = type.toUpperCase();
+    return textTypes.some((textType) => upperType.includes(textType));
+  }
+
+  /**
+   * Escape identifier to prevent SQL injection
+   */
+  private escapeIdentifier(identifier: string): string {
+    return identifier.replace(/"/g, '""');
+  }
+
+  /**
+   * Get safe alias for column name (handle special characters)
+   */
+  private getSafeAlias(columnName: string): string {
+    // Replace problematic characters with underscores
+    return columnName.replace(/[^a-zA-Z0-9_]/g, '_');
+  }
+
+  /**
+   * Safely get numeric value with fallback
+   */
+  private getNumericValue(value: unknown, fallback: number): number {
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+    return fallback;
   }
 }

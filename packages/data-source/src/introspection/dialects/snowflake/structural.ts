@@ -1,5 +1,6 @@
 import type { DatabaseAdapter } from '../../../adapters/base';
 import { DataSourceType } from '../../../types/credentials';
+import type { QueryParameter } from '../../../types/query';
 import type { IntrospectionFilters, StructuralMetadata, TableMetadata } from '../../types';
 import {
   formatRowCount,
@@ -44,7 +45,7 @@ export async function getStructuralMetadata(
 
     // Apply filters
     const conditions: string[] = [];
-    const params: any[] = [];
+    const params: QueryParameter[] = [];
 
     if (filters?.databases && filters.databases.length > 0) {
       conditions.push(`t.TABLE_CATALOG IN (${filters.databases.map(() => '?').join(',')})`);
@@ -61,8 +62,13 @@ export async function getStructuralMetadata(
       params.push(...filters.tables);
     }
 
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      conditions.push(`t.TABLE_NAME NOT IN (${filters.excludeTables.map(() => '?').join(',')})`);
+      params.push(...filters.excludeTables);
+    }
+
     if (conditions.length > 0) {
-      query += ' AND ' + conditions.join(' AND ');
+      query += ` AND ${conditions.join(' AND ')}`;
     }
 
     query += ' ORDER BY t.TABLE_CATALOG, t.TABLE_SCHEMA, t.TABLE_NAME';
@@ -71,6 +77,7 @@ export async function getStructuralMetadata(
     const result = await adapter.query(query, params);
 
     // Parse results
+
     for (const row of result.rows) {
       const tableType = getString(row.table_type) || 'TABLE';
 
@@ -87,7 +94,7 @@ export async function getStructuralMetadata(
         ? clusteringKeyStr.split(',').map((k) => k.trim())
         : undefined;
 
-      tables.push({
+      const tableMeta: TableMetadata = {
         name: getString(row.table_name) || '',
         schema: getString(row.schema_name) || '',
         database: getString(row.database_name) || '',
@@ -101,7 +108,9 @@ export async function getStructuralMetadata(
         metadata: {
           isTransient: parseBoolean(row.is_transient),
         },
-      });
+      };
+
+      tables.push(tableMeta);
     }
 
     return {

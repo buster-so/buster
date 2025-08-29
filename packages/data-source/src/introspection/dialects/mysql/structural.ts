@@ -1,5 +1,6 @@
 import type { DatabaseAdapter } from '../../../adapters/base';
 import { DataSourceType } from '../../../types/credentials';
+import type { QueryParameter } from '../../../types/query';
 import type { IntrospectionFilters, StructuralMetadata, TableMetadata } from '../../types';
 import { formatRowCount, getString, parseDate, parseNumber, validateFilters } from '../../utils';
 
@@ -38,7 +39,7 @@ export async function getStructuralMetadata(
 
     // Apply filters
     const conditions: string[] = [];
-    const params: any[] = [];
+    const params: QueryParameter[] = [];
 
     // In MySQL, schema and database are the same thing
     if (filters?.databases && filters.databases.length > 0) {
@@ -59,6 +60,12 @@ export async function getStructuralMetadata(
       params.push(...filters.tables);
     }
 
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      const placeholders = filters.excludeTables.map(() => '?').join(',');
+      conditions.push(`t.TABLE_NAME NOT IN (${placeholders})`);
+      params.push(...filters.excludeTables);
+    }
+
     if (conditions.length > 0) {
       query += ` AND ${conditions.join(' AND ')}`;
     }
@@ -69,6 +76,7 @@ export async function getStructuralMetadata(
     const result = await adapter.query(query, params);
 
     // Parse results
+
     for (const row of result.rows) {
       const tableType = getString(row.table_type) || 'BASE TABLE';
 
@@ -78,7 +86,7 @@ export async function getStructuralMetadata(
       else if (tableType === 'SYSTEM VIEW') mappedType = 'VIEW';
       else if (tableType === 'TEMPORARY') mappedType = 'TEMPORARY_TABLE';
 
-      tables.push({
+      const tableMeta: TableMetadata = {
         name: getString(row.table_name) || '',
         schema: getString(row.schema_name) || '',
         database: getString(row.database_name) || '',
@@ -92,7 +100,9 @@ export async function getStructuralMetadata(
           engine: getString(row.engine),
           autoIncrement: parseNumber(row.auto_increment),
         },
-      });
+      };
+
+      tables.push(tableMeta);
     }
 
     return {

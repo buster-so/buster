@@ -98,6 +98,10 @@ export class SnowflakeAdapter extends BaseAdapter {
       password: credentials.password,
       warehouse: credentials.warehouse_id,
       database: credentials.default_database,
+      // Performance optimizations for streaming large result sets
+      clientSessionKeepAlive: true,
+      clientSessionKeepAliveHeartbeatFrequency: 3600, // 1 hour
+      jsTreatIntegerAsBigInt: false, // Avoid BigInt overhead unless needed
     };
 
     // Use custom_host if provided via accessUrl
@@ -222,7 +226,10 @@ export class SnowflakeAdapter extends BaseAdapter {
               return;
             }
 
+            // Pre-allocate array for better performance (still works like regular array)
             const rows: Record<string, unknown>[] = [];
+            rows.length = limit; // Pre-allocate space
+            let actualRowCount = 0;
             let hasMoreRows = false;
 
             // Request one extra row to check if there are more rows
@@ -233,17 +240,31 @@ export class SnowflakeAdapter extends BaseAdapter {
             }
 
             let rowCount = 0;
+            // Cache for lowercase keys to avoid repeated string operations
+            const keyCache = new Map<string, string>();
 
             stream
               .on('data', (row: Record<string, unknown>) => {
                 // Only keep up to limit rows
                 if (rowCount < limit) {
                   // Transform column names to lowercase to match expected behavior
-                  const transformedRow: Record<string, unknown> = {};
-                  for (const [key, value] of Object.entries(row)) {
-                    transformedRow[key.toLowerCase()] = value;
+                  const transformedRow: Record<string, unknown> = Object.create(null); // Faster object creation
+
+                  // Use cached lowercase keys for better performance
+                  // Avoid Object.entries() which creates intermediate arrays
+                  for (const key in row) {
+                    if (Object.prototype.hasOwnProperty.call(row, key)) {
+                      let lowerKey = keyCache.get(key);
+                      if (!lowerKey) {
+                        lowerKey = key.toLowerCase();
+                        keyCache.set(key, lowerKey);
+                      }
+                      transformedRow[lowerKey] = row[key];
+                    }
                   }
-                  rows.push(transformedRow);
+
+                  rows[actualRowCount] = transformedRow;
+                  actualRowCount++;
                 }
                 rowCount++;
               })
@@ -253,6 +274,8 @@ export class SnowflakeAdapter extends BaseAdapter {
               .on('end', () => {
                 // If we got more rows than requested, there are more available
                 hasMoreRows = rowCount > limit;
+                // Trim array to actual size (remove pre-allocated empty slots)
+                rows.length = actualRowCount;
                 resolve({
                   rows,
                   statement: stmt,

@@ -15,6 +15,6 @@ const img = Image.base('node:20-bookworm-slim')
   .entrypoint(['sh', '-lc', 'sleep infinity']);
 
 await daytona.snapshot.create(
-  { name: 'node-ts-tools', image: img },
+  { name: 'buster/docs:0.0.1', image: img },
   { onLogs: (m) => console.info(m) }
 );

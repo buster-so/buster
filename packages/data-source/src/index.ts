@@ -28,6 +28,22 @@ export {
   isSupported,
 } from './adapters/factory';
 
+// Error classification utilities
+export {
+  classifyError,
+  isRetryableError,
+  formatErrorForUser,
+  DataSourceError,
+  QueryTimeoutError,
+  AuthenticationError,
+  NetworkError,
+  ConfigurationError,
+  ConnectionPoolError,
+  ConnectionAcquisitionTimeoutError,
+  ConnectionPoolExhaustedError,
+  QueryExecutionError,
+} from './errors/data-source-errors';
+
 // New functional introspection API
 export {
   createStructuralMetadataFetcher,
@@ -51,6 +67,7 @@ export type {
   TableMetadata,
   StructuralMetadata,
   TableSample,
+  ColumnSchema,
   StructuralMetadataFetcher,
   TableSampler,
   IntrospectionDialect,

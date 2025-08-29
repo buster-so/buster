@@ -56,6 +56,10 @@ describe('SnowflakeAdapter', () => {
         password: 'testpass',
         warehouse: 'COMPUTE_WH',
         database: 'TESTDB',
+        // Performance optimizations
+        clientSessionKeepAlive: true,
+        clientSessionKeepAliveHeartbeatFrequency: 3600,
+        jsTreatIntegerAsBigInt: false,
       });
       expect(mockConnection.connect).toHaveBeenCalled();
     });

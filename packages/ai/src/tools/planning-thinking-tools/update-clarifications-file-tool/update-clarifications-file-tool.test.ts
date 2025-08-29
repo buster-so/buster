@@ -23,14 +23,21 @@ describe('updateClarificationsFile', () => {
   beforeEach(() => {
     clarifications = [];
     updateClarificationsCalled = false;
-    updateClarificationsFileTool = createUpdateClarificationsFileTool({
-      get clarifications() {
+    const context = {
+      clarifications: clarifications,
+    };
+    updateClarificationsFileTool = createUpdateClarificationsFileTool(context);
+    // Track when clarifications are updated
+    Object.defineProperty(context, 'clarifications', {
+      get() {
         return clarifications;
       },
-      updateClarifications: (newClarifications: any[]) => {
-        clarifications = newClarifications;
+      set(newValue) {
+        clarifications = newValue;
         updateClarificationsCalled = true;
       },
+      enumerable: true,
+      configurable: true,
     });
   });
 

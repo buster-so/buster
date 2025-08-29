@@ -1,5 +1,5 @@
 import type { DatabaseAdapter } from '../../../adapters/base';
-import type { TableMetadata, TableSample } from '../../types';
+import type { ColumnSchema, TableMetadata, TableSample } from '../../types';
 import { calculateSamplePercentage, getQualifiedTableName } from '../../utils';
 
 /**
@@ -19,16 +19,89 @@ export async function getTableSample(
   );
 
   try {
-    // For small tables, just fetch all rows
-    if (table.rowCount <= sampleSize) {
-      const query = `SELECT TOP ${sampleSize} * FROM ${qualifiedTable}`;
+    // For views, use NEWID() for pseudo-random sampling
+    if (table.type === 'VIEW') {
+      const maxViewSample = 500000;
+      const viewSampleSize = Math.min(sampleSize, maxViewSample);
+      
+      // Try using CHECKSUM(NEWID()) for pseudo-random distribution
+      try {
+        // ABS(CHECKSUM(NEWID())) % 10 = 0 gives us ~10% sample
+        const randomQuery = `
+          SELECT TOP ${viewSampleSize} * FROM ${qualifiedTable}
+          WHERE ABS(CHECKSUM(NEWID())) % 10 = 0
+        `;
+        
+        const result = await adapter.query(randomQuery);
+        
+        // If we got at least 50% of requested rows, consider it successful
+        if (result.rows.length >= viewSampleSize * 0.5) {
+          const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+            name: field.name,
+            type: field.type,
+            nullable: field.nullable,
+            length: field.length,
+            precision: field.precision,
+            scale: field.scale,
+          }));
+
+          return {
+            tableId: `${table.database}.${table.schema}.${table.name}`,
+            rowCount: table.rowCount,
+            sampleSize: result.rows.length,
+            sampleData: result.rows,
+            columnSchemas,
+            sampledAt: startTime,
+            samplingMethod: 'VIEW_RANDOM_FILTER',
+          };
+        }
+      } catch {
+        // Random filtering failed or returned too few rows, fall through to simple TOP
+      }
+      
+      // Fallback to simple TOP if random sampling fails
+      const query = `SELECT TOP ${viewSampleSize} * FROM ${qualifiedTable}`;
       const result = await adapter.query(query);
+
+      const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+        name: field.name,
+        type: field.type,
+        nullable: field.nullable,
+        length: field.length,
+        precision: field.precision,
+        scale: field.scale,
+      }));
 
       return {
         tableId: `${table.database}.${table.schema}.${table.name}`,
         rowCount: table.rowCount,
         sampleSize: result.rows.length,
         sampleData: result.rows,
+        columnSchemas,
+        sampledAt: startTime,
+        samplingMethod: 'VIEW_LIMIT',
+      };
+    }
+    // For small tables, just fetch all rows
+    if (table.rowCount <= sampleSize) {
+      const query = `SELECT TOP ${sampleSize} * FROM ${qualifiedTable}`;
+      const result = await adapter.query(query);
+
+      const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+        name: field.name,
+        type: field.type,
+        nullable: field.nullable,
+        length: field.length,
+        precision: field.precision,
+        scale: field.scale,
+      }));
+
+      return {
+        tableId: `${table.database}.${table.schema}.${table.name}`,
+        rowCount: table.rowCount,
+        sampleSize: result.rows.length,
+        sampleData: result.rows,
+        columnSchemas,
         sampledAt: startTime,
         samplingMethod: 'FULL_TABLE',
       };
@@ -60,16 +133,34 @@ export async function getTableSample(
         rowCount: table.rowCount,
         sampleSize: fallbackResult.rows.length,
         sampleData: fallbackResult.rows,
+        columnSchemas: fallbackResult.fields.map((field) => ({
+          name: field.name,
+          type: field.type,
+          nullable: field.nullable,
+          length: field.length,
+          precision: field.precision,
+          scale: field.scale,
+        })),
         sampledAt: startTime,
         samplingMethod: 'NEWID_RANDOM',
       };
     }
+
+    const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+      name: field.name,
+      type: field.type,
+      nullable: field.nullable,
+      length: field.length,
+      precision: field.precision,
+      scale: field.scale,
+    }));
 
     return {
       tableId: `${table.database}.${table.schema}.${table.name}`,
       rowCount: table.rowCount,
       sampleSize: result.rows.length,
       sampleData: result.rows,
+      columnSchemas,
       sampledAt: startTime,
       samplingMethod: 'TABLESAMPLE',
     };
@@ -87,10 +178,18 @@ export async function getTableSample(
         rowCount: table.rowCount,
         sampleSize: result.rows.length,
         sampleData: result.rows,
+        columnSchemas: result.fields.map((field) => ({
+          name: field.name,
+          type: field.type,
+          nullable: field.nullable,
+          length: field.length,
+          precision: field.precision,
+          scale: field.scale,
+        })),
         sampledAt: startTime,
         samplingMethod: 'SIMPLE_TOP',
       };
-    } catch (fallbackError) {
+    } catch (_fallbackError) {
       throw new Error(
         `Failed to sample table ${qualifiedTable}: ${
           error instanceof Error ? error.message : 'Unknown error'

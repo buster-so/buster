@@ -11,7 +11,7 @@ export class DistributionAnalyzer {
   /**
    * Get top N most frequent values in a column
    */
-  async computeTopValues(column: string, limit = 20): Promise<TopValue[]> {
+  async computeTopValues(column: string, limit = 10): Promise<TopValue[]> {
     const sql = `
       WITH value_counts AS (
         SELECT 
@@ -23,24 +23,24 @@ export class DistributionAnalyzer {
       )
       SELECT 
         value,
-        percentage,
-        RANK() OVER (ORDER BY cnt DESC) as frequency_rank
+        cnt as count,
+        percentage
       FROM value_counts
-      ORDER BY frequency_rank
+      ORDER BY cnt DESC
       LIMIT ${limit}
     `;
 
     try {
       const result = await this.db.query<{
-        value: any;
+        value: unknown;
+        count: number;
         percentage: number;
-        frequency_rank: number;
       }>(sql);
 
       return result.map((row) => ({
         value: row.value,
+        count: row.count ?? 0,
         percentage: row.percentage ?? 0,
-        rank: row.frequency_rank ?? 0,
       }));
     } catch (error) {
       logger.warn(`Failed to compute top values for column ${column}`, {
@@ -62,7 +62,7 @@ export class DistributionAnalyzer {
         GROUP BY "${column}"
       )
       SELECT 
-        -SUM(p * LOG2(p + 1e-10)) as entropy
+        -SUM(CASE WHEN p > 0 THEN p * LOG2(p) ELSE 0 END) as entropy
       FROM probs
     `;
 
@@ -82,30 +82,34 @@ export class DistributionAnalyzer {
    */
   async computeGiniCoefficient(column: string): Promise<number> {
     const sql = `
-      WITH ranked AS (
+      WITH value_counts AS (
         SELECT 
-          COUNT(*) as freq,
-          ROW_NUMBER() OVER (ORDER BY COUNT(*)) as rank_num,
-          SUM(COUNT(*)) OVER() as total
+          COUNT(*) as freq
         FROM ${this.db.getTableName()}
+        WHERE "${column}" IS NOT NULL
         GROUP BY "${column}"
       ),
-      with_max AS (
+      sorted_freq AS (
         SELECT 
-          *,
-          MAX(rank_num) OVER() as max_rank
-        FROM ranked
+          freq,
+          ROW_NUMBER() OVER (ORDER BY freq ASC) as rank_idx,
+          COUNT(*) OVER () as n
+        FROM value_counts
       ),
-      cumulative AS (
+      gini_calc AS (
         SELECT 
-          rank_num * 1.0 / max_rank as x,
-          SUM(freq) OVER (ORDER BY rank_num) * 1.0 / total as y,
-          LAG(rank_num * 1.0 / max_rank, 1, 0) OVER (ORDER BY rank_num) as prev_x
-        FROM with_max
+          n,
+          SUM(freq * (2 * rank_idx - n - 1)) as numerator,
+          SUM(freq) * n as denominator
+        FROM sorted_freq
+        GROUP BY n
       )
       SELECT 
-        1 - 2 * SUM(y * prev_x) as gini_coefficient
-      FROM cumulative
+        CASE 
+          WHEN n <= 1 OR denominator = 0 THEN 0
+          ELSE numerator * 1.0 / denominator
+        END as gini_coefficient
+      FROM gini_calc
     `;
 
     try {

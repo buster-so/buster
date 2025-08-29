@@ -1,7 +1,11 @@
 import { createAdapter } from '@buster/data-source';
 import { DataSourceType, getDynamicSampleSize, getStructuralMetadata } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
-import { getDataSourceCredentials } from '@buster/database';
+import {
+  getDataSourceCredentials,
+  getDataSourceWithDetails,
+  upsertDataset,
+} from '@buster/database';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { getTableStatisticsTask } from './get-table-statistics-task';
 import {
@@ -10,6 +14,7 @@ import {
   IntrospectDataTaskInputSchema,
   type IntrospectDataTaskOutput,
 } from './types';
+import { calculateSizingInfo, formatBytes } from './utils/machine-sizing';
 
 /**
  * Main introspection task that fetches structural metadata and triggers sampling sub-tasks
@@ -41,7 +46,8 @@ export const introspectDataTask: ReturnType<
 > = schemaTask({
   id: 'introspect-data-source',
   schema: IntrospectDataTaskInputSchema,
-  maxDuration: 300, // 5 minutes
+  machine: 'small-2x',
+  maxDuration: 600, // 10 minutes
   run: async (payload: IntrospectDataTaskInput): Promise<IntrospectDataTaskOutput> => {
     logger.log('Starting data source introspection', {
       dataSourceId: payload.dataSourceId,
@@ -55,6 +61,17 @@ export const introspectDataTask: ReturnType<
       const type = (value as { type?: unknown }).type;
       if (typeof type !== 'string') return false;
       return (Object.values(DataSourceType) as string[]).includes(type);
+    }
+
+    function mapTableType(type: string): 'table' | 'view' | 'materializedView' {
+      switch (type) {
+        case 'VIEW':
+          return 'view';
+        case 'MATERIALIZED_VIEW':
+          return 'materializedView';
+        default:
+          return 'table';
+      }
     }
 
     try {
@@ -82,17 +99,77 @@ export const introspectDataTask: ReturnType<
         dataSourceType: metadata.dataSourceType,
       });
 
-      // Step 4: Trigger sub-tasks for each table
+      // Filter out excluded tables if specified
+      let filteredTables = metadata.tables;
+      if (payload.filters?.excludeTables && payload.filters.excludeTables.length > 0) {
+        const excludeSet = new Set(payload.filters.excludeTables.map((t) => t.toLowerCase()));
+        filteredTables = metadata.tables.filter((table) => {
+          const tableName = table.name.toLowerCase();
+          const fullTableName = `${table.database}.${table.schema}.${table.name}`.toLowerCase();
+          return !excludeSet.has(tableName) && !excludeSet.has(fullTableName);
+        });
+
+        logger.log('Tables filtered', {
+          originalCount: metadata.tables.length,
+          filteredCount: filteredTables.length,
+          excludedCount: metadata.tables.length - filteredTables.length,
+        });
+      }
+
+      // Step 4: Get data source details for dataset creation
+      logger.log('Fetching data source details for dataset creation');
+      const dataSourceDetails = await getDataSourceWithDetails({
+        dataSourceId: payload.dataSourceId,
+      });
+
+      // Step 5: Create dataset records for each table
+      logger.log('Creating dataset records', {
+        tableCount: filteredTables.length,
+      });
+
+      for (const table of filteredTables) {
+        await upsertDataset({
+          name: table.name,
+          databaseName: table.name,
+          databaseIdentifier: table.database,
+          schema: table.schema,
+          type: mapTableType(table.type),
+          definition: `SELECT * FROM ${table.database}.${table.schema}.${table.name}`,
+          dataSourceId: payload.dataSourceId,
+          organizationId: dataSourceDetails.organizationId,
+          createdBy: dataSourceDetails.createdBy,
+          updatedBy: dataSourceDetails.createdBy,
+        });
+
+        logger.log('Dataset record created/updated', {
+          table: `${table.database}.${table.schema}.${table.name}`,
+        });
+      }
+
+      // Step 6: Trigger sub-tasks for each table
       const subTaskPromises: Promise<unknown>[] = [];
 
-      for (const table of metadata.tables) {
+      for (const table of filteredTables) {
         // Calculate dynamic sample size
-        const sampleSize = getDynamicSampleSize(table.rowCount);
+        // For views, use 1M samples for better statistical analysis
+        const isView = table.type === 'VIEW' || table.type === 'MATERIALIZED_VIEW';
+        const sampleSize = isView ? 1_000_000 : getDynamicSampleSize(table.rowCount);
+
+        // Calculate optimal machine size based on table statistics
+        const sizingInfo = calculateSizingInfo(table.rowCount, table.sizeBytes, sampleSize);
 
         logger.log('Triggering sample task for table', {
           table: `${table.database}.${table.schema}.${table.name}`,
           rowCount: table.rowCount,
+          sizeBytes: table.sizeBytes ? formatBytes(table.sizeBytes) : 'Unknown',
           sampleSize,
+          avgRowSize: sizingInfo.avgRowSizeBytes
+            ? formatBytes(sizingInfo.avgRowSizeBytes)
+            : 'Unknown',
+          estimatedSampleSize: formatBytes(sizingInfo.estimatedSampleBytes),
+          estimatedMemoryRequired: formatBytes(sizingInfo.estimatedMemoryRequired),
+          selectedMachine: sizingInfo.machinePreset,
+          machineSpecs: sizingInfo.machineSpecs,
         });
 
         // Prepare sub-task input
@@ -109,8 +186,10 @@ export const introspectDataTask: ReturnType<
           sampleSize,
         };
 
-        // Trigger sub-task without waiting
-        const promise = getTableStatisticsTask.trigger(subTaskInput);
+        // Trigger sub-task with dynamic machine provisioning
+        const promise = getTableStatisticsTask.trigger(subTaskInput, {
+          machine: sizingInfo.machinePreset,
+        });
         subTaskPromises.push(promise);
       }
 
@@ -125,7 +204,7 @@ export const introspectDataTask: ReturnType<
       return {
         success: true,
         dataSourceId: payload.dataSourceId,
-        tablesFound: metadata.tables.length,
+        tablesFound: filteredTables.length,
         subTasksTriggered: subTaskPromises.length,
       };
     } catch (error) {

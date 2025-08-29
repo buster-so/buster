@@ -1,5 +1,6 @@
 import type { DatabaseAdapter } from '../../../adapters/base';
 import { DataSourceType } from '../../../types/credentials';
+import type { QueryParameter } from '../../../types/query';
 import type { IntrospectionFilters, StructuralMetadata, TableMetadata } from '../../types';
 import { formatRowCount, getString, parseDate, parseNumber, validateFilters } from '../../utils';
 
@@ -44,7 +45,7 @@ export async function getStructuralMetadata(
 
     // Apply filters
     const conditions: string[] = [];
-    const params: any[] = [];
+    const params: QueryParameter[] = [];
     let paramIndex = 1;
 
     // PostgreSQL doesn't have multiple databases per connection, so database filter is ignored
@@ -68,6 +69,12 @@ export async function getStructuralMetadata(
       paramIndex++;
     }
 
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      conditions.push(`t.table_name != ALL($${paramIndex}::text[])`);
+      params.push(filters.excludeTables);
+      paramIndex++;
+    }
+
     if (conditions.length > 0) {
       query += ` AND ${conditions.join(' AND ')}`;
     }
@@ -78,6 +85,7 @@ export async function getStructuralMetadata(
     const result = await adapter.query(query, params);
 
     // Parse results
+
     for (const row of result.rows) {
       const tableType = getString(row.table_type) || 'BASE TABLE';
 
@@ -88,7 +96,7 @@ export async function getStructuralMetadata(
       else if (tableType === 'FOREIGN TABLE') mappedType = 'EXTERNAL_TABLE';
       else if (tableType === 'LOCAL TEMPORARY') mappedType = 'TEMPORARY_TABLE';
 
-      tables.push({
+      const tableMeta: TableMetadata = {
         name: getString(row.table_name) || '',
         schema: getString(row.schema_name) || '',
         database: getString(row.database_name) || '',
@@ -102,7 +110,9 @@ export async function getStructuralMetadata(
           lastVacuum: parseDate(row.last_vacuum),
           lastAnalyze: parseDate(row.last_analyze),
         },
-      });
+      };
+
+      tables.push(tableMeta);
     }
 
     return {

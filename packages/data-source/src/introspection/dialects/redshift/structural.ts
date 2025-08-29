@@ -1,5 +1,6 @@
 import type { DatabaseAdapter } from '../../../adapters/base';
 import { DataSourceType } from '../../../types/credentials';
+import type { QueryParameter } from '../../../types/query';
 import type { IntrospectionFilters, StructuralMetadata, TableMetadata } from '../../types';
 import { formatRowCount, getString, parseDate, parseNumber, validateFilters } from '../../utils';
 
@@ -33,7 +34,7 @@ export async function getStructuralMetadata(
 
     // Apply filters
     const conditions: string[] = [];
-    const params: any[] = [];
+    const params: QueryParameter[] = [];
     let paramIndex = 1;
 
     if (filters?.databases && filters.databases.length > 0) {
@@ -54,8 +55,14 @@ export async function getStructuralMetadata(
       paramIndex++;
     }
 
+    if (filters?.excludeTables && filters.excludeTables.length > 0) {
+      conditions.push(`tablename != ALL($${paramIndex}::text[])`);
+      params.push(filters.excludeTables);
+      paramIndex++;
+    }
+
     if (conditions.length > 0) {
-      query += ' AND ' + conditions.join(' AND ');
+      query += ` AND ${conditions.join(' AND ')}`;
     }
 
     // Add views separately
@@ -73,12 +80,10 @@ export async function getStructuralMetadata(
     `;
 
     if (conditions.length > 0) {
-      query +=
-        ' AND ' +
-        conditions
-          .join(' AND ')
-          .replace(/tablename/g, 'viewname')
-          .replace(/schemaname/g, 'schemaname');
+      query += ` AND ${conditions
+        .join(' AND ')
+        .replace(/tablename/g, 'viewname')
+        .replace(/schemaname/g, 'schemaname')}`;
     }
 
     query += ' ORDER BY database_name, schema_name, table_name';
