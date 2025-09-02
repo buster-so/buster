@@ -25,7 +25,7 @@ export async function getTableSample(
     if (table.type === 'VIEW') {
       const maxViewSample = 500000; // Reduced from 1M for better performance
       const viewSampleSize = Math.min(sampleSize, maxViewSample);
-      
+
       // Try hash-based sampling first for pseudo-random distribution
       try {
         // HASH(*) in Snowflake hashes the entire row
@@ -35,9 +35,9 @@ export async function getTableSample(
           WHERE MOD(HASH(*), 10) = 0
           LIMIT ${viewSampleSize}
         `;
-        
+
         const result = await adapter.query(hashQuery, undefined, viewSampleSize);
-        
+
         // If we got at least 50% of requested rows, consider it successful
         if (result.rows.length >= viewSampleSize * 0.5) {
           const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
@@ -62,7 +62,7 @@ export async function getTableSample(
       } catch {
         // Hash sampling failed or returned too few rows, fall through to simple LIMIT
       }
-      
+
       // Fallback to simple LIMIT if hash sampling fails
       const query = `SELECT * FROM ${qualifiedTable} LIMIT ${viewSampleSize}`;
       const result = await adapter.query(query, undefined, viewSampleSize);

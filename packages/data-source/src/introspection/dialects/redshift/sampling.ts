@@ -24,7 +24,7 @@ export async function getTableSample(
     if (table.type === 'VIEW') {
       const maxViewSample = 500000;
       const viewSampleSize = Math.min(sampleSize, maxViewSample);
-      
+
       // Try RANDOM() filtering for pseudo-random distribution
       try {
         // RANDOM() < 0.1 gives us ~10% sample
@@ -33,9 +33,9 @@ export async function getTableSample(
           WHERE RANDOM() < 0.1
           LIMIT ${viewSampleSize}
         `;
-        
+
         const result = await adapter.query(randomQuery);
-        
+
         // If we got at least 50% of requested rows, consider it successful
         if (result.rows.length >= viewSampleSize * 0.5) {
           const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
@@ -60,7 +60,7 @@ export async function getTableSample(
       } catch {
         // Random filtering failed or returned too few rows, fall through to simple LIMIT
       }
-      
+
       // Fallback to simple LIMIT if random sampling fails
       const query = `SELECT * FROM ${qualifiedTable} LIMIT ${viewSampleSize}`;
       const result = await adapter.query(query);

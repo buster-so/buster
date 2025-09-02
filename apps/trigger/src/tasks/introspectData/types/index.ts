@@ -93,6 +93,28 @@ export const ColumnProfileSchema = z.object({
       outlierRate: z.number().min(0).max(1),
     })
     .optional(),
+
+  // Classification
+  classification: z.object({
+    isLikelyEnum: z.boolean(),
+    isLikelyIdentifier: z.boolean(),
+    identifierType: z
+      .enum(['primary_key', 'foreign_key', 'natural_key', 'sequential', 'uuid_like'])
+      .optional(),
+    enumValues: z.array(z.string()).optional(),
+  }),
+
+  // Dynamic metadata based on detected column semantics
+  dynamicMetadata: z
+    .union([
+      z.object({ type: z.literal('datetime') }).passthrough(),
+      z.object({ type: z.literal('numeric') }).passthrough(),
+      z.object({ type: z.literal('identifier') }).passthrough(),
+      z.object({ type: z.literal('url') }).passthrough(),
+      z.object({ type: z.literal('email') }).passthrough(),
+      z.object({ type: z.literal('json') }).passthrough(),
+    ])
+    .optional(),
 });
 
 export type ColumnProfile = z.infer<typeof ColumnProfileSchema>;

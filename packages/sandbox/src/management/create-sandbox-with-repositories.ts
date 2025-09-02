@@ -19,7 +19,13 @@ export async function createSandboxWithRepositories(options: CreateSandboxWithRe
 
   // Create the Sandbox instance
   const sandbox = await daytona.create({
+    image: 'daytonaio/sandbox:0.4.3	',
     language: options.language || 'typescript',
+    resources: {
+      cpu: 5,
+      memory: 10,
+      disk: 20,
+    },
     envVars: {
       GITHUB_TOKEN: options.githubToken,
     },
@@ -60,23 +66,16 @@ export async function createSandboxWithRepositories(options: CreateSandboxWithRe
         repoPath
       );
 
-      const checkRemoteBranchCmd = `git ls-remote --heads origin ${options.branchName}`;
-      const checkRemoteResult = await sandbox.process.executeCommand(
-        checkRemoteBranchCmd,
-        repoPath
-      );
+      // Strategy: Always try to create and push first, handle failures gracefully
+      console.info(`Setting up branch ${options.branchName} for ${repoName}...`);
 
-      const remoteBranchExists =
-        checkRemoteResult.result && checkRemoteResult.result.trim().length > 0;
+      // Step 1: Create branch locally
+      const createBranchCmd = `git checkout -b ${options.branchName}`;
+      const createResult = await sandbox.process.executeCommand(createBranchCmd, repoPath);
 
-      if (remoteBranchExists) {
-        console.info(
-          `Branch ${options.branchName} exists remotely for ${repoName}, fetching and checking out...`
-        );
-
-        const fetchCmd = `git fetch origin ${options.branchName}:${options.branchName}`;
-        await sandbox.process.executeCommand(fetchCmd, repoPath);
-
+      if (createResult.exitCode !== 0) {
+        // Branch already exists locally, just check it out
+        console.info(`Branch ${options.branchName} already exists locally, checking it out...`);
         const checkoutCmd = `git checkout ${options.branchName}`;
         const checkoutResult = await sandbox.process.executeCommand(checkoutCmd, repoPath);
 
@@ -85,28 +84,70 @@ export async function createSandboxWithRepositories(options: CreateSandboxWithRe
             `Failed to checkout branch ${options.branchName}: ${checkoutResult.result}`
           );
         }
+      }
 
-        console.info(`Switched to existing branch ${options.branchName} for ${repoName}`);
+      // Step 2: Try to push the branch (this will fail if it already exists remotely)
+      const pushCmd = `git push -u origin ${options.branchName}`;
+      const pushResult = await sandbox.process.executeCommand(pushCmd, repoPath);
+
+      if (pushResult.exitCode === 0) {
+        // Successfully created and pushed the branch
+        console.info(
+          `Successfully created and pushed branch ${options.branchName} for ${repoName}`
+        );
+      } else if (
+        pushResult.result?.includes('reference already exists') ||
+        pushResult.result?.includes('already exists') ||
+        pushResult.result?.includes('cannot lock ref')
+      ) {
+        // Branch already exists on remote (created by another sandbox)
+        console.info(`Branch ${options.branchName} already exists on remote, syncing with it...`);
+
+        // Fetch the remote branch
+        await sandbox.process.executeCommand('git fetch origin', repoPath);
+
+        // Delete the local branch and recreate it from remote
+        await sandbox.process.executeCommand(`git checkout main || git checkout master`, repoPath);
+        await sandbox.process.executeCommand(`git branch -D ${options.branchName}`, repoPath);
+
+        // Check out the remote branch
+        const checkoutRemoteCmd = `git checkout -b ${options.branchName} origin/${options.branchName}`;
+        const checkoutRemoteResult = await sandbox.process.executeCommand(
+          checkoutRemoteCmd,
+          repoPath
+        );
+
+        if (checkoutRemoteResult.exitCode !== 0) {
+          // If that fails, try alternative approaches
+          console.info(`Trying alternative checkout approach...`);
+
+          // Try fetching the specific branch
+          const fetchBranchCmd = `git fetch origin ${options.branchName}:${options.branchName}`;
+          await sandbox.process.executeCommand(fetchBranchCmd, repoPath);
+
+          // Now checkout
+          const checkoutCmd = `git checkout ${options.branchName}`;
+          const checkoutResult = await sandbox.process.executeCommand(checkoutCmd, repoPath);
+
+          if (checkoutResult.exitCode !== 0) {
+            throw new Error(
+              `Failed to checkout remote branch ${options.branchName}: ${checkoutResult.result}`
+            );
+          }
+        }
+
+        // Set upstream
+        const setUpstreamCmd = `git branch --set-upstream-to=origin/${options.branchName} ${options.branchName}`;
+        await sandbox.process.executeCommand(setUpstreamCmd, repoPath);
+
+        console.info(
+          `Successfully synced with remote branch ${options.branchName} for ${repoName}`
+        );
       } else {
-        console.info(`Creating new branch ${options.branchName} for ${repoName}...`);
-
-        const createBranchCmd = `git checkout -b ${options.branchName}`;
-        const createResult = await sandbox.process.executeCommand(createBranchCmd, repoPath);
-
-        if (createResult.exitCode !== 0) {
-          throw new Error(`Failed to create branch ${options.branchName}: ${createResult.result}`);
-        }
-
-        const pushCmd = `git push -u origin ${options.branchName}`;
-        const pushResult = await sandbox.process.executeCommand(pushCmd, repoPath);
-
-        if (pushResult.exitCode !== 0) {
-          throw new Error(
-            `Failed to push branch ${options.branchName} to origin: ${pushResult.result}`
-          );
-        }
-
-        console.info(`Created and pushed new branch ${options.branchName} for ${repoName}`);
+        // Some other push error
+        throw new Error(
+          `Failed to push branch ${options.branchName} to origin: ${pushResult.result}`
+        );
       }
 
       console.info(`Repository is now on branch: ${options.branchName}`);

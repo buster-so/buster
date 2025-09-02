@@ -7,8 +7,10 @@ import {
 } from '@buster/database';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { BasicStatsAnalyzer } from './statistics/basic-stats';
+import { ClassificationAnalyzer } from './statistics/classification';
 import { DistributionAnalyzer } from './statistics/distribution';
 import { DuckDBManager } from './statistics/duckdb-manager';
+import { DynamicMetadataOrchestrator } from './statistics/dynamic-metadata-orchestrator';
 import { NumericStatsAnalyzer } from './statistics/numeric-stats';
 import { SampleRowsExtractor } from './statistics/sample-rows';
 import { SampleValuesExtractor } from './statistics/sample-values';
@@ -195,8 +197,10 @@ export const getTableStatisticsTask: ReturnType<
       const basicAnalyzer = new BasicStatsAnalyzer(duckdb);
       const distributionAnalyzer = new DistributionAnalyzer(duckdb);
       const numericAnalyzer = new NumericStatsAnalyzer(duckdb);
+      const classificationAnalyzer = new ClassificationAnalyzer(duckdb);
       const sampleValuesExtractor = new SampleValuesExtractor(duckdb);
       const sampleRowsExtractor = new SampleRowsExtractor(duckdb);
+      const dynamicMetadataOrchestrator = new DynamicMetadataOrchestrator(duckdb);
 
       // Prepare column metadata for batch processing
       const columnMetadata = columns.map((col) => ({
@@ -206,29 +210,34 @@ export const getTableStatisticsTask: ReturnType<
 
       logger.log('Running batch statistical analysis', { columnCount: columns.length });
 
-      // Run all analyses in parallel for efficiency using allSettled for resilience
-      const results = await Promise.allSettled([
+      // Run core analyses in parallel for efficiency using allSettled for resilience
+      const coreResults = await Promise.allSettled([
         basicAnalyzer.batchComputeBasicStats(columnMetadata),
         distributionAnalyzer.batchComputeDistributions(columns),
         numericAnalyzer.batchComputeNumericStats(columnMetadata),
+        classificationAnalyzer.batchClassifyColumns(columns),
         sampleValuesExtractor.batchGetSampleValues(columnMetadata),
         sampleRowsExtractor.getDiverseSampleRows(5), // Get 5 diverse sample rows
       ]);
 
-      // Extract results with proper error handling
-      const basicStats = results[0].status === 'fulfilled' ? results[0].value : new Map();
-      const distributions = results[1].status === 'fulfilled' ? results[1].value : new Map();
-      const numericStats = results[2].status === 'fulfilled' ? results[2].value : new Map();
-      const sampleValues = results[3].status === 'fulfilled' ? results[3].value : new Map();
-      const sampleRows = results[4].status === 'fulfilled' ? results[4].value : [];
+      // Extract core results with proper error handling
+      const basicStats = coreResults[0].status === 'fulfilled' ? coreResults[0].value : new Map();
+      const distributions =
+        coreResults[1].status === 'fulfilled' ? coreResults[1].value : new Map();
+      const numericStats = coreResults[2].status === 'fulfilled' ? coreResults[2].value : new Map();
+      const classifications =
+        coreResults[3].status === 'fulfilled' ? coreResults[3].value : new Map();
+      const sampleValues = coreResults[4].status === 'fulfilled' ? coreResults[4].value : new Map();
+      const sampleRows = coreResults[5].status === 'fulfilled' ? coreResults[5].value : [];
 
-      // Log any failures in statistical analysis
-      results.forEach((result, index) => {
+      // Log any failures in core analysis
+      coreResults.forEach((result, index) => {
         if (result.status === 'rejected') {
           const analysisType = [
             'basic stats',
             'distributions',
             'numeric stats',
+            'classifications',
             'sample values',
             'sample rows',
           ][index];
@@ -239,15 +248,33 @@ export const getTableStatisticsTask: ReturnType<
         }
       });
 
+      // Prepare metadata for dynamic analysis
+      const columnMetadataForDynamic = columns.map((col) => ({
+        name: col,
+        sqlDataType: typeMap.get(col) || 'VARCHAR',
+        sampleValues: sampleValues.get(col) || [],
+      }));
+
+      // Run dynamic metadata collection (this analyzes based on detected column types)
+      logger.log('Running dynamic metadata analysis', { columnCount: columns.length });
+      const dynamicMetadata =
+        await dynamicMetadataOrchestrator.collectDynamicMetadata(columnMetadataForDynamic);
+
+      logger.log('Dynamic metadata analysis completed', {
+        analyzedColumns: dynamicMetadata.size,
+      });
+
       // Combine results into ColumnProfile objects
       const columnProfiles: ColumnProfile[] = columns.map((col) => {
         const dataType = typeMap.get(col) || 'VARCHAR';
         const basic = basicStats.get(col);
         const distribution = distributions.get(col);
         const numeric = numericStats.get(col);
+        const classification = classifications.get(col);
         const samples = sampleValues.get(col);
+        const dynamicMeta = dynamicMetadata.get(col);
 
-        return {
+        const profile: ColumnProfile = {
           columnName: col,
           dataType,
 
@@ -273,25 +300,38 @@ export const getTableStatisticsTask: ReturnType<
             return value;
           }),
 
-          // Numeric statistics (if applicable)
-          numericStats: numeric
-            ? {
-                // Convert Infinity values to 0 for JSON serialization
-                mean: !Number.isFinite(numeric.mean) ? 0 : numeric.mean,
-                median: !Number.isFinite(numeric.median) ? 0 : numeric.median,
-                stdDev: !Number.isFinite(numeric.stdDev) ? 0 : numeric.stdDev,
-                skewness: !Number.isFinite(numeric.skewness) ? 0 : numeric.skewness,
-                percentiles: {
-                  p25: !Number.isFinite(numeric.percentiles.p25) ? 0 : numeric.percentiles.p25,
-                  p50: !Number.isFinite(numeric.percentiles.p50) ? 0 : numeric.percentiles.p50,
-                  p75: !Number.isFinite(numeric.percentiles.p75) ? 0 : numeric.percentiles.p75,
-                  p95: !Number.isFinite(numeric.percentiles.p95) ? 0 : numeric.percentiles.p95,
-                  p99: !Number.isFinite(numeric.percentiles.p99) ? 0 : numeric.percentiles.p99,
-                },
-                outlierRate: !Number.isFinite(numeric.outlierRate) ? 0 : numeric.outlierRate,
-              }
-            : undefined,
+          // Classification results
+          classification: classification ?? {
+            isLikelyEnum: false,
+            isLikelyIdentifier: false,
+          },
         };
+
+        // Add optional properties only if they have values
+        if (numeric) {
+          profile.numericStats = {
+            // Convert Infinity values to 0 for JSON serialization
+            mean: !Number.isFinite(numeric.mean) ? 0 : numeric.mean,
+            median: !Number.isFinite(numeric.median) ? 0 : numeric.median,
+            stdDev: !Number.isFinite(numeric.stdDev) ? 0 : numeric.stdDev,
+            skewness: !Number.isFinite(numeric.skewness) ? 0 : numeric.skewness,
+            percentiles: {
+              p25: !Number.isFinite(numeric.percentiles.p25) ? 0 : numeric.percentiles.p25,
+              p50: !Number.isFinite(numeric.percentiles.p50) ? 0 : numeric.percentiles.p50,
+              p75: !Number.isFinite(numeric.percentiles.p75) ? 0 : numeric.percentiles.p75,
+              p95: !Number.isFinite(numeric.percentiles.p95) ? 0 : numeric.percentiles.p95,
+              p99: !Number.isFinite(numeric.percentiles.p99) ? 0 : numeric.percentiles.p99,
+            },
+            outlierRate: !Number.isFinite(numeric.outlierRate) ? 0 : numeric.outlierRate,
+          };
+        }
+
+        if (dynamicMeta) {
+          // Cast to unknown first to work around Zod's passthrough type requirements
+          profile.dynamicMetadata = dynamicMeta as unknown as ColumnProfile['dynamicMetadata'];
+        }
+
+        return profile;
       });
 
       logger.log('Statistical analysis completed', {
