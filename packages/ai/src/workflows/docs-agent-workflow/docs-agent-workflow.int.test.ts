@@ -216,8 +216,8 @@ describe('docs-agent-workflow integration', () => {
             content: `I need you to add documentation to the newly initiated ${yamlFile} docs.  Here is your playbook:
 
         docs location: ${repoPath}/buster/docs/${yamlFile}
-        metadata location: ${repoPath}/metadata/models/mart/${yamlFile}.json
-        notepad location: None currently exists, please create it at buster/notepad
+        metadata location: ${repoPath}/metadata/${yamlFile}.json
+        notepad location: ${repoPath}/buster/notepad
 
         <playbook>
         ## Phase 1: Analyze relevant files, metadata, notepads, sql, etc. to understand the model. 
@@ -304,26 +304,61 @@ describe('docs-agent-workflow integration', () => {
       }
     };
 
-    // Process all YAML files concurrently - no limits!
-    console.info(`Starting all ${targetYamlFiles.length} YAML files concurrently...`);
+    // Process YAML files in batches of 25
+    const batchSize = 25;
+    const batches: string[][] = [];
 
-    // Start all YAML files at once
-    const allPromises = targetYamlFiles.map((yamlFile, index) => {
-      console.info(`[${yamlFile}] Starting processing...`);
-      return processYamlFile(yamlFile, index).catch((error) => {
-        console.error(`[${yamlFile}] Failed:`, error);
-        return { yamlFile, result: null }; // Return null result on failure
-      });
-    });
+    // Split files into batches
+    for (let i = 0; i < targetYamlFiles.length; i += batchSize) {
+      batches.push(targetYamlFiles.slice(i, i + batchSize));
+    }
 
     console.info(
-      `All ${targetYamlFiles.length} YAML files have been started. Waiting for completion...`
+      `Processing ${targetYamlFiles.length} YAML files in ${batches.length} batches of ${batchSize}`
     );
 
-    // Wait for all to complete
-    const allResults = await Promise.all(allPromises);
+    const allResults: Array<{ yamlFile: string; result: any }> = [];
 
-    console.info('All YAML files processed successfully');
+    // Process each batch sequentially
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      if (!batch) {
+        console.warn(`Batch ${batchIndex + 1} is undefined, skipping...`);
+        continue;
+      }
+
+      console.info(
+        `Starting batch ${batchIndex + 1}/${batches.length} with ${batch.length} files...`
+      );
+
+      // Start all files in the current batch concurrently
+      const batchPromises = batch.map((yamlFile, index) => {
+        const globalIndex = batchIndex * batchSize + index;
+        console.info(`[Batch ${batchIndex + 1}] [${yamlFile}] Starting processing...`);
+        return processYamlFile(yamlFile, globalIndex).catch((error) => {
+          console.error(`[Batch ${batchIndex + 1}] [${yamlFile}] Failed:`, error);
+          return { yamlFile, result: null }; // Return null result on failure
+        });
+      });
+
+      console.info(
+        `[Batch ${batchIndex + 1}] All ${batch.length} files started. Waiting for completion...`
+      );
+
+      // Wait for all files in the current batch to complete
+      const batchResults = await Promise.all(batchPromises);
+      allResults.push(...batchResults);
+
+      console.info(`[Batch ${batchIndex + 1}] Completed! Processed ${batchResults.length} files.`);
+
+      // Add a small delay between batches to allow for cleanup
+      if (batchIndex < batches.length - 1) {
+        console.info(`Waiting 5 seconds before starting next batch...`);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
+    }
+
+    console.info(`All ${batches.length} batches completed successfully`);
     console.info(`Successfully created and processed ${allResults.length} separate sandboxes`);
     console.info(`All changes have been merged into shared branch: ${sharedBranchName}`);
 
