@@ -23,6 +23,7 @@ export const DocsAgentWorkflowInputSchema = z.object({
       message: 'Invalid Sandbox instance',
     }
   ),
+  repositoryName: z.string().optional().describe('The repository name for git operations'),
 });
 
 // Output schema for the workflow
@@ -122,6 +123,7 @@ export const runDocsAgentWorkflow = wrapTraced(
         dataSourceId: dataSourceId,
       },
       repositoryTree: treeResult.repositoryTree,
+      repositoryName: validatedInput.repositoryName,
     });
 
     const workflowEndTime = Date.now();

@@ -35,13 +35,13 @@ describe('docs-agent-workflow integration', () => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
   });
 
-  it('should create sandbox, get file tree, and run docs workflow', async () => {
+  it('should create sandbox batches, get file tree, and run docs workflow', async () => {
     if (!hasRequiredEnvVars) {
       console.info('Skipping test due to missing environment variables');
       return;
     }
 
-    // Prepare comma-separated list of YAML files to process concurrently
+    // Prepare comma-separated list of YAML files to process
     const targetYamlListString =
       process.env.TEST_TARGET_YMLS ||
       [
@@ -161,117 +161,179 @@ describe('docs-agent-workflow integration', () => {
       .map((s) => s.trim())
       .filter(Boolean);
 
+    console.info(`Processing ${targetYamlFiles.length} YAML files with individual sandboxes`);
+
+    // Create a shared branch name that all individual branches will merge into
+    const sharedBranchName = `test-docs-agent-shared-${Date.now()}`;
+    console.info(`Shared branch for merging: ${sharedBranchName}`);
+
+    // Extract repository name from URL for git operations
+    const repoUrl = process.env.TEST_SAMPLE_REPO!;
+    const repoName = repoUrl.split('/').pop()?.replace('.git', '') || 'repository';
+    const repoPath = `/home/daytona/${repoName}`;
+
+    // First, create the shared branch on ONE sandbox
+    const setupSharedBranch = async () => {
+      console.info('Creating initial sandbox to setup shared branch...');
+      const setupSandbox = await createSandboxWithRepositories({
+        language: 'typescript',
+        repository: repoUrl,
+        githubToken: process.env.TEST_GITHUB_PAT!,
+        branchName: sharedBranchName,
+      } as Parameters<typeof createSandboxWithRepositories>[0] & { repository: string });
+
+      // Push the shared branch to ensure it exists
+      await setupSandbox.process.executeCommand(`git push -u origin ${sharedBranchName}`, repoPath);
+
+      console.info(`Shared branch ${sharedBranchName} created and pushed`);
+      await setupSandbox.stop();
+    };
+
+    await setupSharedBranch();
+
+    // Function to process a single YAML file with its own sandbox and branch
+    const processYamlFile = async (yamlFile: string, fileIndex: number) => {
+      const individualBranchName = `${sharedBranchName}-${yamlFile.replace('.yml', '').replace(/[^a-zA-Z0-9]/g, '-')}`;
+      console.info(`[${yamlFile}] Creating sandbox with branch: ${individualBranchName}`);
+
+      const sandbox = await createSandboxWithRepositories({
+        language: 'typescript',
+        repository: repoUrl,
+        githubToken: process.env.TEST_GITHUB_PAT!,
+        branchName: individualBranchName,
+      } as Parameters<typeof createSandboxWithRepositories>[0] & { repository: string });
+
+      console.info(`[${yamlFile}] Sandbox created with ID: ${sandbox.id || 'unknown'}`);
+
+      try {
+        // Get file tree for this sandbox
+        const fileTree = await getSandboxFileTree(sandbox);
+        console.info(`[${yamlFile}] File tree retrieved successfully`);
+
+        const messages: ModelMessage[] = [
+          {
+            role: 'user',
+            content: `I need you to add documentation to the newly initiated ${yamlFile} docs.  Here is your playbook:
+
+        docs location: ${repoPath}/buster/docs/${yamlFile}
+        metadata location: ${repoPath}/metadata/models/mart/${yamlFile}.json
+        notepad location: None currently exists, please create it at buster/notepad
+
+        <playbook>
+        ## Phase 1: Analyze relevant files, metadata, notepads, sql, etc. to understand the model. 
+        - [ ] Look at the .json metadata file to understand the model 
+          - [ ] Specifically analyze the underlying data, patterns, and other information that is important to understand the model.
+          - [ ] Look for any nuance or details that are important for understanding the data model.
+        - [ ] Look at the .sql file and lineage to understand the model. You should traverse through the upstream .sql files to understand the mode.
+        - [ ] Look at the .yml file to understand the model and what needs to be documented/done.
+        - [ ] For vague enums, identifiers, or other cols, you should see if there is a pattern or any insights into what they could represent.
+        - [ ] If needed, run sql queries to understand the model.
+
+        ** Make sure to frequently update your notepad and todo list as you go.
+
+        ## Phase 2: Create the documentation for the model.
+        - [ ] Create the model-level documentation.
+        - [ ] Create the column-level documentation, paying attention to enums, identifiers, etc. and marking them with options or as searchable.
+        - [ ] Add any, decisions, challenges, assumptions, etc. to the notepad.
+        - [ ] Add any clarifications/questions to the clarifications section of the .yml file.
+
+        ** Make sure to frequently update your notepad and todo list as you go.
+
+        ## Phase 3: Explore model and its relationships to other models
+        - [ ] Analyze the model and which columns could be candidates for relationships to other models.
+        - [ ] Use grep search to find columns that might be shared with this model.  This could be through lineage or through shared column names.
+        - [ ] Document relationships in the .yml file that are shared with this model. Specifically, we want to document relationships that have .yml documentation files.
+        - [ ] Add any clarifications, decisison, assumptions, etc. to the notepad.
+        - [ ] Add any clarifications/questions to the clarifications section of the .yml file.
+
+        ** Make sure to frequently update your notepad and todo list as you go.
+        </playbook>
+        `,
+          },
+        ];
+
+        const workflowInput = {
+          messages,
+          messageId: randomUUID(),
+          chatId: randomUUID(),
+          userId: randomUUID(),
+          organizationId: randomUUID(),
+          dataSourceId: randomUUID(),
+          sandbox,
+          repositoryName: repoName,
+        };
+
+        const result = await runDocsAgentWorkflow(workflowInput);
+        console.info(`[${yamlFile}] Workflow completed successfully`);
+
+        // After workflow completes, merge the individual branch into the shared branch
+        console.info(`[${yamlFile}] Merging ${individualBranchName} into ${sharedBranchName}...`);
+
+        // Fetch latest, checkout shared branch, merge individual branch, and push
+        const mergeCommands = `
+          git fetch origin && 
+          git checkout ${sharedBranchName} && 
+          git pull origin ${sharedBranchName} && 
+          git merge origin/${individualBranchName} --no-ff -m "Merge ${yamlFile} documentation updates" && 
+          git push origin ${sharedBranchName}
+        `
+          .replace(/\n\s+/g, ' ')
+          .trim();
+
+        try {
+          const mergeResult = await sandbox.process.executeCommand(mergeCommands, repoPath);
+          console.info(`[${yamlFile}] Successfully merged into shared branch`);
+          console.info(`[${yamlFile}] Merge result:`, mergeResult.result);
+
+          // Delete the individual branch from remote
+          const deleteResult = await sandbox.process.executeCommand(
+            `git push origin --delete ${individualBranchName}`,
+            repoPath
+          );
+          console.info(`[${yamlFile}] Deleted individual branch ${individualBranchName}`);
+        } catch (mergeError) {
+          console.error(`[${yamlFile}] Merge failed:`, mergeError);
+          // Continue processing other files even if merge fails
+        }
+
+        return { yamlFile, result };
+      } finally {
+        // Stop the sandbox for this YAML file
+        await sandbox.stop();
+        console.info(`[${yamlFile}] Sandbox stopped successfully`);
+      }
+    };
+
+    // Process all YAML files concurrently - no limits!
+    console.info(`Starting all ${targetYamlFiles.length} YAML files concurrently...`);
+
+    // Start all YAML files at once
+    const allPromises = targetYamlFiles.map((yamlFile, index) => {
+      console.info(`[${yamlFile}] Starting processing...`);
+      return processYamlFile(yamlFile, index).catch((error) => {
+        console.error(`[${yamlFile}] Failed:`, error);
+        return { yamlFile, result: null }; // Return null result on failure
+      });
+    });
+
     console.info(
-      'Running docs workflow sequentially for YAML files on single sandbox:',
-      targetYamlFiles
+      `All ${targetYamlFiles.length} YAML files have been started. Waiting for completion...`
     );
 
-    // Create a single shared branch name for all tasks
-    const sharedBranchName = `test-docs-agent-${Date.now()}`;
+    // Wait for all to complete
+    const allResults = await Promise.all(allPromises);
 
-    // Create a single sandbox for all tasks
-    console.info('Creating single sandbox for all tasks...');
-    const sandbox = await createSandboxWithRepositories({
-      language: 'typescript',
-      repository: process.env.TEST_SAMPLE_REPO!,
-      githubToken: process.env.TEST_GITHUB_PAT!,
-      branchName: sharedBranchName,
-    } as Parameters<typeof createSandboxWithRepositories>[0] & { repository: string });
+    console.info('All YAML files processed successfully');
+    console.info(`Successfully created and processed ${allResults.length} separate sandboxes`);
+    console.info(`All changes have been merged into shared branch: ${sharedBranchName}`);
 
-    // Get file tree once for the shared sandbox
-    const fileTree = await getSandboxFileTree(sandbox);
-    console.info('File tree retrieved successfully for shared sandbox');
+    // Validate results from all YAML files
+    for (const { yamlFile, result } of allResults) {
+      if (!result) {
+        console.warn(`[${yamlFile}] Skipping validation due to processing failure`);
+        continue;
+      }
 
-    const results = [];
-
-    // Process each YAML file sequentially on the same sandbox
-    for (const yamlFile of targetYamlFiles) {
-      console.info(`[${yamlFile}] Starting workflow on shared sandbox...`);
-
-      const messages: ModelMessage[] = [
-        {
-          role: 'user',
-          content: `I need you to add documentation to the newly initiated ${yamlFile} docs.  Here is your playboook:
-
-        ## Phase 1: Explore Repository and Update Overview
-        - [ ] Explore repo files and lineage metadata
-        - [ ] Reference lineage metadata for dependencies and core entity prioritization
-        - [ ] Review for completeness and thoroughness
-
-        ## Phase 2: Identify, Verify, and Document Relationships
-        - [ ] Pull historic queries to identify common joins
-        - [ ] Validate frequent joins and relationships
-        - [ ] Identify relationships by keywords like "id", "pk", "fk"
-        - [ ] Verify each identified relationship
-        - [ ] Identify self-referential relationships
-        - [ ] Verify each self-referential relationship
-        - [ ] Identify junction tables for many-to-many
-        - [ ] Verify each many-to-many relationship
-        - [ ] Document verified relationships bidirectionally in .yml files
-        - [ ] Confirm all plausible relationships identified and tested
-        - [ ] Confirm all verified relationships documented
-
-        ## Phase 3: Classify Columns as Stored Value or ENUM
-        - [ ] Review metadata and .sql files model-by-model
-        - [ ] Identify and document Stored Value columns
-        - [ ] Identify and document ENUM columns
-        - [ ] Update .yml files with classifications model-by-model
-        - [ ] Confirm all models were checked
-        - [ ] Confirm all Stored Value columns identified correctly
-        - [ ] Confirm all ENUM columns identified correctly
-
-        ## Phase 4: Generate Model Definitions
-        - [ ] Write detailed model descriptions starting with core entities, one at a time
-        - [ ] Save updates to each .yml file
-        - [ ] Confirm all models have descriptions
-        - [ ] Review definitions for clarity to new analysts
-
-        ## Phase 5: Generate Column Definitions
-        - [ ] Write column definitions and keys, model-by-model
-        - [ ] Save updates to each .yml file
-        - [ ] Confirm all models were documented
-        - [ ] Confirm all columns have descriptions
-        - [ ] Review definitions for clarity to new analysts
-
-        ## Phase 6: Identify and Log Clarifications
-        - [ ] Assess documentation for gaps after prior phases
-        - [ ] Impersonate new analyst to find missing/confusing elements
-        - [ ] Impersonate user to spot unclear data request areas
-        - [ ] Identify unclear key concepts or field/model distinctions
-        - [ ] Log important clarification items iteratively
-
-        ## Phase 7: Finalize and Create Pull Request
-        - [ ] Review work for completeness and consistency
-        - [ ] Stage changes with git
-        - [ ] Push changes to branch
-        - [ ] Create pull request
-
-        The key here is that for this specific model, we want to try and cover everything we can about it. We need to document this data model better than a human. So we should look at the metadata, lineage, look at possible join columns, etc.
-        `,
-        },
-      ];
-
-      const workflowInput = {
-        messages,
-        messageId: randomUUID(),
-        chatId: randomUUID(),
-        userId: randomUUID(),
-        organizationId: randomUUID(),
-        dataSourceId: randomUUID(),
-        sandbox,
-      };
-
-      const result = await runDocsAgentWorkflow(workflowInput);
-      console.info(`[${yamlFile}] Workflow completed successfully on shared sandbox`);
-
-      results.push({ yamlFile, result });
-    }
-
-    // Stop the shared sandbox after all workflows complete
-    await sandbox.stop();
-    console.info('Shared sandbox stopped successfully');
-
-    for (const { yamlFile, result } of results) {
       // Validate the workflow output
       expect(result).toBeDefined();
       expect(result.workflowId).toBeDefined();
@@ -298,9 +360,15 @@ describe('docs-agent-workflow integration', () => {
       console.info(`[${yamlFile}] Execution time:`, result.totalExecutionTimeMs, 'ms');
       console.info(
         `[${yamlFile}] TODOs created:`,
-        result.todos?.split('\n').filter((line) => line.includes('- [ ]')).length || 0,
+        result.todos?.split('\n').filter((line: string) => line.includes('- [ ]')).length || 0,
         'items'
       );
     }
+
+    const successfulResults = allResults.filter((r) => r.result !== null).length;
+    console.info(
+      `Total files processed: ${successfulResults}/${targetYamlFiles.length} YAML files`
+    );
+    console.info(`Final shared branch with all changes: ${sharedBranchName}`);
   }, 900000); // 15 minute timeout for full workflow
 });

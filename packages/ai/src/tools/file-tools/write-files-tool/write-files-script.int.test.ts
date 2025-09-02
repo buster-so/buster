@@ -114,7 +114,7 @@ describe('write-files-script integration tests', () => {
     const testFile = path.join(tempDir, 'existing.txt');
     await fs.writeFile(testFile, 'Original content');
 
-    const fileParams = [{ path: testFile, content: 'New content' }];
+    const fileParams = [{ path: testFile, content: 'New content', overwrite: true }];
 
     const { stdout, stderr } = await runScript(`'${JSON.stringify(fileParams)}'`);
 
@@ -125,6 +125,24 @@ describe('write-files-script integration tests', () => {
     // Verify file was overwritten
     const content = await fs.readFile(testFile, 'utf-8');
     expect(content).toBe('New content');
+  });
+
+  it('should not overwrite existing files by default', async () => {
+    const testFile = path.join(tempDir, 'protected.txt');
+    await fs.writeFile(testFile, 'Original content');
+
+    const fileParams = [{ path: testFile, content: 'New content' }];
+
+    const { stdout, stderr } = await runScript(`'${JSON.stringify(fileParams)}'`);
+
+    expect(stderr).toBe('');
+    const results = JSON.parse(stdout);
+    expect(results[0].success).toBe(false);
+    expect(results[0].error).toContain('already exists');
+
+    // Verify file was NOT overwritten
+    const content = await fs.readFile(testFile, 'utf-8');
+    expect(content).toBe('Original content');
   });
 
   it('should handle special characters in content', async () => {

@@ -15,6 +15,7 @@ export const DocsAgentStepInputSchema = z.object({
   organizationId: z.string().describe('The organization ID'),
   context: DocsAgentContextSchema.describe('The docs agent context'),
   repositoryTree: z.string().describe('The tree structure of the repository'),
+  repositoryName: z.string().optional().describe('The repository name for git operations'),
 });
 
 export const DocsAgentStepOutputSchema = z.object({
@@ -73,6 +74,7 @@ export const runDocsAgentStep = wrapTraced(
         todoList: todoList,
         notepad: notepad,
         clarifications: [],
+        repositoryName: validatedParams.repositoryName,
       });
 
       const userMessage = `${validatedParams.message}`;

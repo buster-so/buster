@@ -33,6 +33,8 @@ export function createWriteFilesToolExecute(context: WriteFilesToolContext) {
 const fs = require('fs');
 const path = require('path');
 
+// TypeScript type annotation for the files array
+/** @type {{path: string, content: string, overwrite?: boolean}[]} */
 const files = ${JSON.stringify(files)};  // Direct stringify, no double encoding
 const results = [];
 const createdDirs = new Set();
@@ -47,7 +49,7 @@ for (const file of files) {
 
     // Check if file exists and handle overwrite logic
     const fileExists = fs.existsSync(resolvedPath);
-    const overwrite = file.overwrite || false;
+    const overwrite = file.overwrite !== undefined ? file.overwrite : false;
     if (fileExists && !overwrite) {
       results.push({
         success: false,
@@ -145,10 +147,17 @@ console.log(JSON.stringify(results));
                 ? `docs: write ${successfulFiles[0]?.filePath || 'file'}`
                 : `docs: write ${successfulFiles.length} files`;
 
+            // Use repository name if provided, otherwise default to workspace
+            const repoPath = context.repositoryName
+              ? `/home/daytona/${context.repositoryName}`
+              : '/home/daytona/workspace';
+
+            console.info(`Using repository path for git operations: ${repoPath}`);
+
             // Commit all changes and push to remote
             await sandbox.process.executeCommand(
               `git commit -a -m "${commitMessage}" --no-verify && git push`,
-              '/home/daytona/angel-dbt-sample'
+              repoPath
             );
 
             console.info(

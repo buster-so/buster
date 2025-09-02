@@ -75,6 +75,7 @@ export const DocsAgentOptionsSchema = z.object({
     .array(ClarifyingQuestionSchema)
     .default([])
     .describe('Current clarification questions'),
+  repositoryName: z.string().optional().describe('The repository name for git operations'),
 });
 
 const DocsAgentStreamOptionsSchema = z.object({

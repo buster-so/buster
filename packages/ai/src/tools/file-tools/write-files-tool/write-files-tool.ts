@@ -46,6 +46,7 @@ const WriteFilesToolContextSchema = z.object({
       { message: 'Invalid Sandbox instance' }
     )
     .describe('Sandbox instance for file operations'),
+  repositoryName: z.string().optional().describe('The repository name for git operations'),
 });
 
 export type WriteFilesToolInput = z.infer<typeof WriteFilesToolInputSchema>;

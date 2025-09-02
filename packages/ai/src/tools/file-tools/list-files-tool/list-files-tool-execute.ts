@@ -52,7 +52,7 @@ export function createListFilesToolExecute(context: ListFilesToolContext) {
             const command = `tree ${flags.join(' ')} "${targetPath}"`;
             const result = await sandbox.process.executeCommand(command);
 
-            if (result.exitCode === 0) {
+            if (result.exitCode === 0 && !result.result.includes('[error opening dir]')) {
               const pwdResult = await sandbox.process.executeCommand('pwd');
 
               results.push({

@@ -19,13 +19,7 @@ export async function createSandboxWithRepositories(options: CreateSandboxWithRe
 
   // Create the Sandbox instance
   const sandbox = await daytona.create({
-    image: 'daytonaio/sandbox:0.4.3	',
     language: options.language || 'typescript',
-    resources: {
-      cpu: 5,
-      memory: 10,
-      disk: 20,
-    },
     envVars: {
       GITHUB_TOKEN: options.githubToken,
     },
@@ -46,9 +40,9 @@ export async function createSandboxWithRepositories(options: CreateSandboxWithRe
           'https://github.com/',
           `https://${options.githubToken}@github.com/`
         );
-        cloneCommand = `git clone ${authenticatedUrl} ${repoPath}`;
+        cloneCommand = `git clone ${authenticatedUrl}`;
       } else {
-        cloneCommand = `git clone ${repoUrl} ${repoPath}`;
+        cloneCommand = `git clone ${repoUrl}`;
       }
 
       const cloneResult = await sandbox.process.executeCommand(cloneCommand, '/home/daytona/');

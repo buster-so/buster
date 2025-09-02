@@ -168,10 +168,17 @@ console.log(JSON.stringify(results));
                 ? `docs: edit ${successfulFiles[0]?.filePath || 'file'}`
                 : `docs: edit ${successfulFiles.length} files`;
 
+            // Use repository name if provided, otherwise default to workspace
+            const repoPath = context.repositoryName
+              ? `/home/daytona/${context.repositoryName}`
+              : '/home/daytona/workspace';
+
+            console.info(`Using repository path for git operations: ${repoPath}`);
+
             // Commit all changes and push to remote
             await sandbox.process.executeCommand(
               `git commit -a -m "${commitMessage}" --no-verify && git push`,
-              '/home/daytona/angel-dbt-sample'
+              repoPath
             );
 
             console.info(
