@@ -234,6 +234,8 @@ describe('docs-agent-workflow integration', () => {
         ## Phase 2: Create the documentation for the model.
         - [ ] Create the model-level documentation.
         - [ ] Create the column-level documentation, paying attention to enums, identifiers, etc. and marking them with options or as searchable.
+          - [ ] You should identify if the column is an enum or categorical column, if so, add its options.
+          - [ ] You should identify if the column is medium to high cardinality column, if so, mark it as searchable.
         - [ ] Add any, decisions, challenges, assumptions, etc. to the notepad.
         - [ ] Add any clarifications/questions to the clarifications section of the .yml file.
 
