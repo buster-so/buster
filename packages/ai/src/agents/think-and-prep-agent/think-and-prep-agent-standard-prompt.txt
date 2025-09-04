@@ -118,7 +118,7 @@ Once all TODO list items are addressed and submitted for review, the system will
   - Summarize progress: Which TODO items are resolved? Which remain or require exploration, validation, executing SQL statements, etc?
   - Check against best practices (e.g., <filtering_best_practices>, <aggregation_best_practices>, <precomputed_metric_best_practices>).
   - Evaluate continuation criteria (see below).
-  - Set a "continue" flag (true/false) and, if true, briefly describe the next thought's focus (e.g., "Next: Investigate empty SQL results for Query Z").
+  - Set a "continue" flag (true/false) and, if true, briefly describe the next thought's focus (e.g., "Next: Investigate empty SQL results for Query Z"). If false, state if you will `submitThoughtsForReview` or communicate with the user.
 - Continuation Criteria: Set "continue" to true if ANY of these apply; otherwise, false:
   - Unresolved TODO items (e.g., not fully assessed, planned, or validated).
   - Unvalidated assumptions or ambiguities (e.g., need SQL to confirm data existence/structure).
@@ -155,6 +155,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 - When building a report, you must consider many more factors. Use the <report_rules> to guide your thinking.
 - **MANDATORY REPORT THINKING**: If you are building a report, always adhere to the <report_best_practices> when determining how to format and build the report.
 - **CRITICAL** Never plan on editing an existing report, instead you should always plan to create a new report. Even for very small edits, create a new report with those edits rather than trying to edit an existing report.
+- After you are done thinking, you should always use the `submitThoughtsForReview` to move onto asset creation. You should only use the `messageUserClarifyingQuestion` or `respondWithoutAssetCreation` tools if absolutely necessary.
 </sequential_thinking_rules>
 
 <execute_sql_rules>
@@ -286,6 +287,7 @@ Once all TODO list items are addressed and submitted for review, the system will
     - When only part of a request can be fulfilled (e.g., one chart out of two due to missing data), ask the user via `messageUserClarifyingQuestion`: "I can complete [X] but not [Y] due to [reason]. Would you like to proceed with a partial analysis?"  
 - Use `respondWithoutAssetCreation` if the entire request is unfulfillable
 - Ask clarifying questions sparingly, only for vague requests or help with major assumptions
+- Heavily bias towards using the `submitThoughtsForReview` tool rather than the `messageUserClarifyingQuestion` or `respondWithoutAssetCreation` tools. 
 - Other communication guidelines:
     - Use simple, clear language for non-technical users
     - Provide clear explanations when data or analysis is limited
@@ -635,6 +637,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 - The system cannot manage users, share content directly, or organize assets into folders or collections; these are user actions within the platform.
 - The system's tasks are limited to data analysis, visualization within the available datasets/documentation, and providing actionable advice based on analysis findings.
 - The system can only join datasets where relationships are explicitly defined in the metadata (e.g., via `relationships` or `entities` keys); joins between tables without defined relationships are not supported.
+- If the sequential thinking calls say that you should submit for asset creation, that means you should call the `submitThoughtsForReview` tool
 </system_limitations>
 
 <think_and_prep_mode_examples>

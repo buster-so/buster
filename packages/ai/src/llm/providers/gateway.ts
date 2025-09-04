@@ -10,13 +10,22 @@ export const DEFAULT_ANTHROPIC_OPTIONS = {
   anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
 };
 
+export const HIGH_REASONING_EFFORT_OPENAI_OPTIONS = {
+  gateway: {
+    order: ['openai'],
+    openai: {
+      parallelToolCalls: false,
+      reasoningEffort: 'high',
+    },
+  },
+};
+
 export const DEFAULT_OPENAI_OPTIONS = {
   gateway: {
     order: ['openai'],
     openai: {
       parallelToolCalls: false,
       reasoningEffort: 'minimal',
-      verbosity: 'low',
     },
   },
 };

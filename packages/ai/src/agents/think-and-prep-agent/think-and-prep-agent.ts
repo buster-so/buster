@@ -3,7 +3,13 @@ import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
 import { Sonnet4 } from '../../llm';
-import { DEFAULT_ANTHROPIC_OPTIONS } from '../../llm/providers/gateway';
+import { GPT5 } from '../../llm/gpt-5';
+import { GPT5Mini } from '../../llm/gpt-5-mini';
+import {
+  DEFAULT_ANTHROPIC_OPTIONS,
+  DEFAULT_OPENAI_OPTIONS,
+  HIGH_REASONING_EFFORT_OPENAI_OPTIONS,
+} from '../../llm/providers/gateway';
 import { createExecuteSqlTool, createSequentialThinkingTool } from '../../tools';
 import {
   MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
@@ -133,12 +139,13 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
     return wrapTraced(
       () =>
         streamText({
-          model: Sonnet4,
+          model: GPT5Mini,
           headers: {
-            'anthropic-beta':'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
-            'anthropic_beta': 'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+            'anthropic-beta':
+              'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+            anthropic_beta: 'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
           },
-          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+          providerOptions: HIGH_REASONING_EFFORT_OPENAI_OPTIONS,
           tools: {
             [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
             [EXECUTE_SQL_TOOL_NAME]: executeSqlTool,
@@ -150,7 +157,6 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',
           maxOutputTokens: 25000,
-          temperature: 0,
           experimental_repairToolCall: async (repairContext) => {
             return repairToolCall({
               toolCall: repairContext.toolCall,

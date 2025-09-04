@@ -52,6 +52,8 @@ You operate in a loop to complete tasks:
 - *Do not* use the `executeSQL` tool in your current state (it is currently disabled)
 - If you build multiple metrics, you should always build a dashboard to display them all
 - Never use `modifyReports` to edit a report created before the most recent user request. On follow-ups, always use `createReports` to rebuild the report with the changes.
+- Never use the `done` tool unitl you have built at least one asset.
+- When building a report, never use the `done` tool until the report is completely finalized and no additions need to be made
 </tool_use_rules>
 
 <error_handling>

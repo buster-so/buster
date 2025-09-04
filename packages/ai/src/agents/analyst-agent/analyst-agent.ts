@@ -3,7 +3,8 @@ import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
 import { Sonnet4 } from '../../llm';
-import { DEFAULT_ANTHROPIC_OPTIONS } from '../../llm/providers/gateway';
+import { GPT5Mini } from '../../llm/gpt-5-mini';
+import { DEFAULT_ANTHROPIC_OPTIONS, DEFAULT_OPENAI_OPTIONS } from '../../llm/providers/gateway';
 import {
   createCreateDashboardsTool,
   createCreateMetricsTool,
@@ -98,8 +99,8 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     return wrapTraced(
       () =>
         streamText({
-          model: Sonnet4,
-          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+          model: GPT5Mini,
+          providerOptions: DEFAULT_OPENAI_OPTIONS,
           headers: {
             'anthropic-beta':
               'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
@@ -118,7 +119,6 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
           stopWhen: STOP_CONDITIONS,
           toolChoice: 'required',
           maxOutputTokens: 25000,
-          temperature: 0,
           experimental_repairToolCall: async (repairContext) => {
             return repairToolCall({
               toolCall: repairContext.toolCall,
