@@ -33,7 +33,7 @@ catalog:
   "braintrust": "^0.2.4"
   dotenv: "^17.2.1"
   drizzle-orm: "^0.44.4"
-  hono: "^4.9.2"
+  hono: "^4.9.6"
   pg: "^8.16.3"
   platejs: "^49.2.12"
   "remark-gfm": "^4.0.1"
