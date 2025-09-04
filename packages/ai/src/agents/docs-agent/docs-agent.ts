@@ -127,8 +127,8 @@ export function createDocsAgent(docsAgentOptions: DocsAgentOptions) {
     // [WEB_SEARCH_TOOL_NAME]: createWebSearchTool(), // TODO: improve this with firecrawl v2 then re-enable -- key to using this is to try and find information from docs/support pages that could help understand things.
     [SUPER_EXECUTE_SQL_TOOL_NAME]: createSuperExecuteSqlTool(docsAgentOptions),
     [UPDATE_TODO_LIST_TOOL_NAME]: createUpdateTodoListTool(docsAgentOptions),
-    [UPDATE_NOTEPAD_TOOL_NAME]: createUpdateNotepadTool(docsAgentOptions),
-    [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions),
+    // [UPDATE_NOTEPAD_TOOL_NAME]: createUpdateNotepadTool(docsAgentOptions), // TODO: clean up notepad tool
+    // [UPDATE_CLARIFICATIONS_FILE_TOOL_NAME]: createUpdateClarificationsFileTool(docsAgentOptions), // TODO: clean up clarifications tool
   };
 
   const agentContext: AgentContext = {

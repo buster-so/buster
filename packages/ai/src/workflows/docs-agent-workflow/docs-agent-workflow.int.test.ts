@@ -260,7 +260,7 @@ describe('docs-agent-workflow integration', () => {
           chatId: randomUUID(),
           userId: randomUUID(),
           organizationId: randomUUID(),
-          dataSourceId: randomUUID(),
+          dataSourceId: 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a',
           sandbox,
           repositoryName: repoName,
         };
