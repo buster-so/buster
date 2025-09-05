@@ -23,7 +23,7 @@ export function SlashInputElement(props: PlateElementProps<TComboboxInputElement
   return (
     <PlateElement {...props} as="span" data-slate-value={element.value}>
       <InlineCombobox element={element} trigger="/">
-        <InlineComboboxInput />
+        <InlineComboboxInput placeholder="Filter..." />
 
         <InlineComboboxContent>
           <InlineComboboxEmpty>No results</InlineComboboxEmpty>

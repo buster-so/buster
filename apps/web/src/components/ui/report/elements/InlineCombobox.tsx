@@ -180,8 +180,8 @@ const InlineCombobox = ({
 
 const InlineComboboxInput = React.forwardRef<
   HTMLInputElement,
-  React.HTMLAttributes<HTMLInputElement>
->(({ className, ...props }, propRef) => {
+  React.HTMLAttributes<HTMLInputElement> & { placeholder?: string }
+>(({ className, placeholder, ...props }, propRef) => {
   const {
     inputProps,
     inputRef: contextRef,
@@ -192,6 +192,7 @@ const InlineComboboxInput = React.forwardRef<
   // biome-ignore lint/style/noNonNullAssertion: living on the edge
   const store = useComboboxContext()!;
   const value = store.useState('value');
+  const isOpen = store.useState('open');
 
   const ref = useComposedRef(propRef, contextRef);
 
@@ -213,8 +214,13 @@ const InlineComboboxInput = React.forwardRef<
 
         <Combobox
           ref={ref}
-          className={cn('absolute top-0 left-0 size-full bg-transparent outline-none', className)}
+          className={cn(
+            'absolute top-0 left-0 size-full outline-none',
+            isOpen && !value ? 'bg-muted text-muted-foreground' : 'bg-transparent',
+            className
+          )}
           value={value}
+          placeholder={placeholder}
           autoSelect
           {...inputProps}
           {...props}
