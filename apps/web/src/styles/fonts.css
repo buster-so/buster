@@ -33,3 +33,6 @@
   src: url('./fonts/Roobert-Heavy.otf') format('opentype');
   font-weight: 900;
 }
+
+/* Source Code Pro font for code blocks */
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;600;700&display=swap');
