@@ -2,7 +2,7 @@ import { useDraggable, useDropLine } from '@platejs/dnd';
 import { setColumns } from '@platejs/layout';
 import { useDebouncePopoverOpen } from '@platejs/layout/react';
 import { ResizableProvider } from '@platejs/resizable';
-import { BlockSelectionPlugin } from '@platejs/selection/react';
+import { BlockSelectionPlugin, useBlockSelected } from '@platejs/selection/react';
 import { useComposedRef } from '@udecode/cn';
 import type { TColumnElement } from 'platejs';
 import { PathApi } from 'platejs';
@@ -11,6 +11,7 @@ import {
   PlateElement,
   useEditorRef,
   useElement,
+  useElementSelector,
   usePluginOption,
   useReadOnly,
   useRemoveNodeButton,
@@ -37,6 +38,11 @@ export const ColumnElement = withHOC(
     const { width } = props.element;
     const readOnly = useReadOnly();
     const isSelectionAreaVisible = usePluginOption(BlockSelectionPlugin, 'isSelectionAreaVisible');
+
+    const columnGroupId = useElementSelector(([node]) => node.id as string, [], {
+      key: 'column_group',
+    });
+    const isParentSelected = useBlockSelected(columnGroupId);
 
     const { isDragging, previewRef, handleRef } = useDraggable({
       element: props.element,
@@ -68,7 +74,7 @@ export const ColumnElement = withHOC(
           <div
             className={cn(
               'relative h-full border border-transparent p-1.5',
-              !readOnly && 'border-border rounded-md border-dashed',
+              !readOnly && isParentSelected && 'border-border rounded-md border-dashed',
               isDragging && 'opacity-50'
             )}
           >
