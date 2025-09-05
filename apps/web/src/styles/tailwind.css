@@ -74,7 +74,7 @@
 
   /* Font families */
   --font-sans: "Roobert_Pro", sans-serif;
-  --font-mono: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-mono: "Source Code Pro", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Shadows */
   --shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.05);
