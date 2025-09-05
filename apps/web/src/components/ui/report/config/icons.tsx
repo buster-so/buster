@@ -105,7 +105,7 @@ import {
   Upload,
   VolumeUp,
   // Actions
-  WandSparkle,
+  PenSparkle,
   Xmark,
 } from '@/components/ui/icons';
 
@@ -172,7 +172,7 @@ export const NodeTypeIcons = {
   loader: Loader,
 
   // Actions
-  ai: WandSparkle,
+  ai: PenSparkle,
   export: ArrowDownFromLine,
   import: ArrowUpFromLine,
   link: Link2,

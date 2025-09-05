@@ -46,7 +46,7 @@ export const FixedToolbarButtons = React.memo(() => {
 
           {/* <ToolbarGroup>
             <AIToolbarButton tooltip="AI commands">
-              <WandSparkle />
+              <PenSparkle />
             </AIToolbarButton>
           </ToolbarGroup> */}
 

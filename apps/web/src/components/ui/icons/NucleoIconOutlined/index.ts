@@ -153,7 +153,7 @@ export { default as Upload } from './upload';
 export { default as User } from './user';
 export { default as UserGroup } from './user-group'; // User group icon
 export { default as VolumeUp } from './volume-up';
-export { default as WandSparkle } from './wand-sparkle';
+export { default as PenSparkle } from './pen-sparkle';
 export { default as Window } from './window';
 export { default as WindowDownload } from './window-download';
 export { default as WindowEdit } from './window-edit';

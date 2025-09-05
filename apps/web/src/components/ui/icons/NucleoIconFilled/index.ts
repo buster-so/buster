@@ -7,4 +7,4 @@ export { default as CircleXmark } from './circle-xmark';
 export { default as StarFilled, default as Star } from './star';
 export { default as ThumbsDown } from './thumbs-down';
 export { default as TriangleWarning } from './triangle-warning';
-export { default as WandSparkle } from './wand-sparkle';
+export { default as PenSparkle } from './pen-sparkle';

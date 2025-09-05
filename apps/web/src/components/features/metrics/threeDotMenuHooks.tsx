@@ -18,7 +18,7 @@ import {
   SquareChartPen,
   Star,
   Table,
-  WandSparkle,
+  PenSparkle,
 } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -108,7 +108,7 @@ export const useMetricDrilldownItem = ({ metricId }: { metricId: string }): IDro
           buttonText="Submit request"
         />,
       ],
-      icon: <WandSparkle />,
+      icon: <PenSparkle />,
     }),
     [metricId]
   );
