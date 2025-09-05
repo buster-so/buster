@@ -187,7 +187,7 @@ export const NodeTypeLabels = {
     keywords: [],
   },
   indentation: {
-    label: 'Indentation',
+    label: 'Indent',
     keyboard: undefined,
     keywords: ['indent', 'outdent'],
   },

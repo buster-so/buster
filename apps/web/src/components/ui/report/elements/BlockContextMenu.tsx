@@ -13,6 +13,7 @@ import {
   ContextMenuContent,
   ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuSub,
   ContextMenuSubContent,
@@ -128,27 +129,6 @@ function BlockContextMenuComponent({ children }: { children: React.ReactNode }) 
         }}
       >
         <ContextMenuGroup>
-          {/* <ContextMenuItem
-            onClick={() => {
-              setValue('askAI');
-            }}>
-            <MenuItemContent icon={NodeTypeIcons.ai} labelKey="askAI" />
-          </ContextMenuItem> */}
-          <ContextMenuItem
-            onClick={() => {
-              editor.getTransforms(BlockSelectionPlugin).blockSelection.removeNodes();
-              editor.tf.focus();
-            }}
-          >
-            <MenuItemContent icon={NodeTypeIcons.trash} labelKey="delete" />
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={() => {
-              editor.getTransforms(BlockSelectionPlugin).blockSelection.duplicate();
-            }}
-          >
-            <MenuItemContent icon={NodeTypeIcons.copy} labelKey="duplicate" />
-          </ContextMenuItem>
           <ContextMenuSub>
             <ContextMenuSubTrigger>
               <MenuItemContent icon={NodeTypeIcons.turnInto} labelKey="turnInto" />
@@ -172,7 +152,24 @@ function BlockContextMenuComponent({ children }: { children: React.ReactNode }) 
               </ContextMenuItem>
             </ContextMenuSubContent>
           </ContextMenuSub>
+          <ContextMenuItem
+            onClick={() => {
+              editor.getTransforms(BlockSelectionPlugin).blockSelection.duplicate();
+            }}
+          >
+            <MenuItemContent icon={NodeTypeIcons.copy} labelKey="duplicate" />
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              editor.getTransforms(BlockSelectionPlugin).blockSelection.removeNodes();
+              editor.tf.focus();
+            }}
+          >
+            <MenuItemContent icon={NodeTypeIcons.trash} labelKey="delete" />
+          </ContextMenuItem>
         </ContextMenuGroup>
+
+        <ContextMenuSeparator className="my-[5px]" />
 
         <ContextMenuGroup>
           <ContextMenuSub>
