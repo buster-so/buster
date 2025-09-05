@@ -231,6 +231,44 @@ const DragHandle = function DragHandle({
   const editor = useEditorRef();
   const element = useElement();
 
+  const findEditorContainer = React.useCallback(() => {
+    const editorElement = editor.api.toDOMNode(editor);
+    return editorElement?.closest('.editor-container') as HTMLElement | null;
+  }, [editor]);
+
+  const startDragAutoScroll = React.useCallback(() => {
+    const container = findEditorContainer();
+    if (!container) return;
+
+    let isScrolling = false;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isScrolling) return;
+
+      const rect = container.getBoundingClientRect();
+      const threshold = 50;
+      const scrollSpeed = 10;
+
+      if (e.clientY < rect.top + threshold) {
+        isScrolling = true;
+        container.scrollBy({ top: -scrollSpeed, behavior: 'auto' });
+        setTimeout(() => { isScrolling = false; }, 16);
+      } else if (e.clientY > rect.bottom - threshold) {
+        isScrolling = true;
+        container.scrollBy({ top: scrollSpeed, behavior: 'auto' });
+        setTimeout(() => { isScrolling = false; }, 16);
+      }
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [findEditorContainer]);
+
   return (
     <Tooltip title={isDragging ? '' : isColumn ? 'Drag to move column' : 'Drag to move'}>
       <div
@@ -249,6 +287,8 @@ const DragHandle = function DragHandle({
           previewRef.current?.classList.remove('hidden');
           previewRef.current?.classList.add('opacity-0');
           editor.setOption(DndPlugin, 'multiplePreviewRef', previewRef);
+          
+          startDragAutoScroll();
         }}
         onMouseEnter={() => {
           if (isDragging) return;
