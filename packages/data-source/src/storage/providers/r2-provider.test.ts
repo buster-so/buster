@@ -37,6 +37,8 @@ describe('R2 Provider', () => {
           secretAccessKey: 'test-secret-key',
         },
         forcePathStyle: true,
+        maxAttempts: 3,
+        retryMode: 'adaptive',
       });
     });
   });

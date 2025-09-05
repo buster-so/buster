@@ -36,6 +36,7 @@
     "@ai-sdk/openai": "beta",
     "@buster/database": "workspace:*",
     "@buster/env-utils": "workspace:*",
+    "@buster/ai": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",

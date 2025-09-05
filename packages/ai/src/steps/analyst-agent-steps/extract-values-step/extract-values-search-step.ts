@@ -1,5 +1,5 @@
-import type { StoredValueResult } from '@buster/stored-values';
-import { generateEmbedding, searchValuesByEmbedding } from '@buster/stored-values/search';
+import { generateSingleValueEmbedding } from '@buster/ai/embeddings/generate-embeddings';
+import { type SearchResult, searchSimilarValues } from '@buster/search';
 import type { ModelMessage } from 'ai';
 import { z } from 'zod';
 import { extractValuesWithLLM } from './extract-values-with-llm';
@@ -25,13 +25,13 @@ export type ExtractValuesSearchResult = z.infer<typeof extractValuesSearchResult
  * Organizes search results by schema.table structure with columns and their values
  */
 function organizeResultsBySchemaTable(
-  results: StoredValueResult[]
+  results: SearchResult[]
 ): Record<string, Record<string, string[]>> {
   const organized: Record<string, Record<string, string[]>> = {};
 
   for (const result of results) {
-    const schemaTable = `${result.schema_name}.${result.table_name}`;
-    const column = result.column_name;
+    const schemaTable = `${result.schema}.${result.table}`;
+    const column = result.column;
 
     if (!organized[schemaTable]) {
       organized[schemaTable] = {};
@@ -53,7 +53,7 @@ function organizeResultsBySchemaTable(
 /**
  * Formats search results into the specified message format
  */
-function formatSearchResults(results: StoredValueResult[]): string {
+function formatSearchResults(results: SearchResult[]): string {
   const organized = organizeResultsBySchemaTable(results);
 
   if (Object.keys(organized).length === 0) {
@@ -100,7 +100,7 @@ async function searchStoredValues(
     // Generate embeddings for all keywords concurrently with individual error handling
     const embeddingPromises = values.map(async (value) => {
       try {
-        const embedding = await generateEmbedding([value]);
+        const embedding = await generateSingleValueEmbedding(value);
         return { value, embedding };
       } catch (error) {
         console.error(
@@ -128,8 +128,15 @@ async function searchStoredValues(
     // Search for values using each embedding concurrently with individual error handling
     const searchPromises = validEmbeddings.map(async ({ value, embedding }) => {
       try {
-        const results = await searchValuesByEmbedding(dataSourceId, embedding, { limit: 100 });
-        return results;
+        const searchResponse = await searchSimilarValues(
+          {
+            dataSourceId,
+            query: value,
+            limit: 50,
+          },
+          embedding
+        );
+        return searchResponse.results;
       } catch (error) {
         console.error(
           `[StoredValues] Failed to search stored values for "${value}":`,
@@ -221,14 +228,6 @@ export async function runExtractValuesAndSearchStep(
         },
       ],
     });
-
-    // If we have search results, add them as a user message (for backward compatibility)
-    if (extractedValues.length > 0 && storedValuesResult.searchResults) {
-      resultMessages.push({
-        role: 'user',
-        content: storedValuesResult.searchResults,
-      });
-    }
 
     return {
       values: extractedValues,

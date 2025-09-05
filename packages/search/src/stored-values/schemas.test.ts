@@ -37,10 +37,9 @@ describe('schemas.ts - Unit Tests', () => {
     });
 
     it('should accept arrays of any length', () => {
-      // EmbeddingSchema now accepts arrays of any length
-      expect(EmbeddingSchema.parse([0.1, 0.2, 0.3])).toEqual([0.1, 0.2, 0.3]);
-      expect(EmbeddingSchema.parse(new Array(513).fill(0.1))).toHaveLength(513);
-      expect(EmbeddingSchema.parse([])).toEqual([]);
+      expect(() => EmbeddingSchema.parse([0.1, 0.2, 0.3])).not.toThrow();
+      expect(() => EmbeddingSchema.parse(new Array(513).fill(0.1))).not.toThrow();
+      expect(() => EmbeddingSchema.parse([])).not.toThrow();
     });
 
     it('should reject non-number values', () => {

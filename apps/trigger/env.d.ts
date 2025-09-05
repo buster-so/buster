@@ -9,6 +9,7 @@ declare global {
       BUSTER_URL: string;
       BUSTER_ALERT_CHANNEL_TOKEN?: string;
       BUSTER_ALERT_CHANNEL_ID?: string;
+      TURBOPUFFER_API_KEY?: string;
     }
   }
 }

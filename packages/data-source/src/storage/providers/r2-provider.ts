@@ -32,6 +32,8 @@ export function createR2Provider(config: R2Config): StorageProvider {
       secretAccessKey: config.secretAccessKey,
     },
     forcePathStyle: true, // Required for R2
+    maxAttempts: 3, // Retry configuration for transient errors
+    retryMode: 'adaptive', // Use adaptive retry mode
   });
 
   const bucket = config.bucket;
@@ -66,10 +68,23 @@ export function createR2Provider(config: R2Config): StorageProvider {
       }
       return result;
     } catch (error) {
+      const errorMessage = parseErrorMessage(error);
+
+      // Log detailed error information for SSL/TLS issues
+      if (errorMessage.includes('SSL') || errorMessage.includes('handshake')) {
+        console.error('R2 SSL Error Details:', {
+          error: errorMessage,
+          endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
+          bucket,
+          key,
+          nodeVersion: process.version,
+        });
+      }
+
       return {
         success: false,
         key,
-        error: parseErrorMessage(error),
+        error: errorMessage,
       };
     }
   }

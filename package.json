@@ -25,7 +25,6 @@
     "db:stop": "pnpm --filter @buster/database run db:stop",
     "db:studio": "pnpm --filter @buster/database run db:studio",
     "dev": "turbo dev",
-    "dev:fast": "turbo run dev:fast",
     "dev:no-web": "turbo dev --filter \"!@buster-app/web\"",
     "dev:server": "turbo run dev --filter \"@buster-app/server\"",
     "dev:server:reset": "pnpm run dev:db-init && turbo run dev --filter \"@buster-app/server\"",
@@ -68,9 +67,7 @@
   "packageManager": "pnpm@10.15.0",
   "pnpm": {
     "peerDependencyRules": {
-      "ignoreMissing": [
-        "shiki"
-      ],
+      "ignoreMissing": ["shiki"],
       "allowedVersions": {
         "shiki": "3"
       }

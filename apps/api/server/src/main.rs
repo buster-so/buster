@@ -15,9 +15,7 @@ use middleware::{
     error::{init_sentry, init_tracing_subscriber, sentry_layer},
 };
 use rustls::crypto::ring;
-use stored_values::jobs::trigger_stale_sync_jobs;
 use tokio::sync::broadcast;
-use tokio_cron_scheduler::{Job, JobScheduler};
 use tower::ServiceBuilder;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use tracing::{error, info, warn};
@@ -57,26 +55,6 @@ async fn main() -> Result<(), anyhow::Error> {
         tracing::error!("Failed to initialize database pools: {}", e);
         return Ok(());
     }
-
-    // --- Start Stored Values Sync Job Scheduler ---
-    let scheduler = JobScheduler::new().await?; // Using `?` assuming main returns Result
-    info!("Starting stored values sync job scheduler...");
-
-    // Schedule to run every hour
-    let job = Job::new_async("*/5 * * * * *", move |uuid, mut l| {
-        Box::pin(async move {
-            info!(job_uuid = %uuid, "Running hourly stored values sync job check.");
-            if let Err(e) = trigger_stale_sync_jobs().await {
-                error!(job_uuid = %uuid, "Hourly stored values sync job failed: {}", e);
-            }
-            // Optional: You could check l.next_tick_for_job(uuid).await to see the next scheduled time.
-        })
-    })?;
-
-    scheduler.add(job).await?;
-    scheduler.start().await?;
-    info!("Stored values sync job scheduler started.");
-    // --- End Stored Values Sync Job Scheduler ---
 
     let protected_router = Router::new().nest("/api/v1", routes::protected_router());
     let public_router = Router::new().route("/health", axum::routing::get(|| async { "OK" }));

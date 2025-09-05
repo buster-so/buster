@@ -1,4 +1,3 @@
-import { generateSingleValueEmbedding } from '@buster/ai';
 import { getClient } from '@buster/database';
 import {
   type EmbeddingOptions,
@@ -304,45 +303,9 @@ export async function searchValuesAcrossTargets(
   }
 }
 
-/**
- * Generates embeddings for search terms using OpenAI's text-embedding-3-small model.
- *
- * @param searchTerms - Array of search terms to generate embeddings for
- * @param options - Embedding generation options including retry configuration
- * @returns A Promise containing the embedding array (512 dimensions)
- *
- * @throws {StoredValuesError} When validation fails or embedding generation fails
- *
- * @example
- * ```typescript
- * const embedding = await generateEmbedding(
- *   ['user', 'email', 'address'],
- *   { maxRetries: 5 }
- * );
- * ```
- */
-export async function generateEmbedding(
-  searchTerms: string[],
-  options: EmbeddingOptions = { maxRetries: 3 }
-): Promise<number[]> {
-  try {
-    // Validate inputs
-    const validSearchTerms = SearchTermsSchema.parse(searchTerms);
-    EmbeddingOptionsSchema.parse(options); // Validate options but we don't use them since the search package handles retries
-
-    // Use the search package's embedding generation function
-    const searchQuery = validSearchTerms.join(' ');
-    const embedding = await generateSingleValueEmbedding(searchQuery);
-
-    // Validate output
-    return EmbeddingSchema.parse(embedding);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new StoredValuesError(`Failed to generate embedding: ${error.message}`, error);
-    }
-    throw new StoredValuesError('Failed to generate embedding', error);
-  }
-}
+// Note: generateEmbedding function has been removed to avoid circular dependencies.
+// Users should use embedding generation directly from @buster/ai package:
+// import { generateSingleValueEmbedding } from '@buster/ai';
 
 /**
  * Extracts searchable columns from dataset YAML content.
