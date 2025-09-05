@@ -16,15 +16,15 @@ export const CreateChatButton = React.memo(
     useHotkeys('e', onCreateFileClick, { preventDefault: true });
 
     return (
-      <AppTooltip title={'Start chat'} shortcuts={['e']} delayDuration={650}>
+      <AppTooltip title={'Edit with AI'} shortcuts={['e']} delayDuration={650}>
         <Button
           loading={loading}
           onClick={onCreateFileClick}
-          variant="black"
+          variant="default"
           className="ml-1.5"
           prefix={<Stars />}
         >
-          Start chat
+          Edit with AI
         </Button>
       </AppTooltip>
     );
