@@ -30,7 +30,7 @@ export function CalloutElement({
 
   return (
     <PlateElement
-      className={cn('bg-muted flex rounded-sm p-4 pl-3', attributes.className)}
+      className={cn('bg-muted flex rounded-sm p-2 pl-3 my-2.5 relative group text-[15px] leading-[150%] font-normal', attributes.className)}
       style={{
         ...attributes.style,
         backgroundColor: element.backgroundColor
