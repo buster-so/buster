@@ -315,7 +315,7 @@ const useResultsViewSelectMenu = ({ metricId }: { metricId: string }) => {
   return useMemo(
     () =>
       createDropdownItem({
-        label: 'Results view',
+        label: 'View results',
         value: 'results-view',
         link: {
           unsafeRelative: 'path',
@@ -332,7 +332,7 @@ const useSQLEditorSelectMenu = ({ metricId }: { metricId: string }) => {
   return useMemo(
     () =>
       createDropdownItem({
-        label: 'SQL Editor',
+        label: 'View SQL',
         value: 'sql-editor',
         icon: <SquareCode />,
         link: {

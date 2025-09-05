@@ -13,6 +13,7 @@ import {
   Code,
   Download4,
   History,
+  Image,
   Pencil,
   SquareChart,
   SquareChartPen,
@@ -202,10 +203,10 @@ export const useDownloadPNGSelectMenu = ({
 
   return useMemo(
     () => ({
-      label: 'Download as PNG',
+      label: 'Download as PNG (coming soon)',
       value: 'download-png',
       disabled: true,
-      icon: <SquareChart />,
+      icon: <Image />,
       onClick: async () => {
         const node = document.getElementById(METRIC_CHART_CONTAINER_ID(metricId)) as HTMLElement;
         if (node) {
