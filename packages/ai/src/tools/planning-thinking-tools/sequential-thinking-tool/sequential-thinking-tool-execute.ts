@@ -30,11 +30,7 @@ async function processSequentialThinking(
   };
 
   if (state.toolCallId) {
-    const reasoningEntry = createSequentialThinkingReasoningMessage(
-      state,
-      state.toolCallId,
-      'completed'
-    );
+    const reasoningEntry = createSequentialThinkingReasoningMessage(state, state.toolCallId);
     const rawLlmMessage = createSequentialThinkingRawLlmMessageEntry(state, state.toolCallId);
 
     const rawToolResultEntry = createRawToolResultEntry(

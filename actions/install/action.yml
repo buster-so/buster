@@ -1,0 +1,164 @@
+name: 'Install Buster CLI'
+description: 'Install the Buster CLI binary for use in GitHub Actions workflows'
+author: 'Buster'
+branding:
+  icon: 'download'
+  color: 'blue'
+
+inputs:
+  version:
+    description: 'Version of Buster CLI to install (e.g., v0.3.0, latest)'
+    required: false
+    default: 'latest'
+  token:
+    description: 'GitHub token for API requests (defaults to GITHUB_TOKEN)'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: 'The version of Buster CLI that was installed'
+    value: ${{ steps.install.outputs.version }}
+  binary-path:
+    description: 'Path to the installed Buster CLI binary'
+    value: ${{ steps.install.outputs.binary-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Detect Platform
+      id: platform
+      shell: bash
+      run: |
+        # Detect OS and architecture
+        case "${{ runner.os }}" in
+          Linux)
+            OS="linux"
+            EXT="tar.gz"
+            ;;
+          macOS)
+            OS="darwin"
+            EXT="tar.gz"
+            ;;
+          Windows)
+            OS="windows"
+            EXT="zip"
+            ;;
+          *)
+            echo "❌ Unsupported OS: ${{ runner.os }}"
+            exit 1
+            ;;
+        esac
+        
+        # Detect architecture
+        case "$(uname -m)" in
+          x86_64|amd64)
+            ARCH="x86_64"
+            ;;
+          arm64|aarch64)
+            ARCH="arm64"
+            ;;
+          *)
+            # Default to x86_64 for GitHub hosted runners
+            ARCH="x86_64"
+            ;;
+        esac
+        
+        echo "os=$OS" >> $GITHUB_OUTPUT
+        echo "arch=$ARCH" >> $GITHUB_OUTPUT
+        echo "ext=$EXT" >> $GITHUB_OUTPUT
+        echo "platform=${OS}-${ARCH}" >> $GITHUB_OUTPUT
+        echo "📦 Platform: ${OS}-${ARCH}"
+
+    - name: Get Release Version
+      id: get-version
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        VERSION="${{ inputs.version }}"
+        
+        if [[ "$VERSION" == "latest" ]]; then
+          echo "🔍 Fetching latest release..."
+          VERSION=$(gh release view --repo buster-so/buster --json tagName -q '.tagName' | head -1)
+          
+          if [[ -z "$VERSION" ]]; then
+            echo "❌ Failed to fetch latest version"
+            exit 1
+          fi
+          echo "📌 Latest version: $VERSION"
+        else
+          echo "📌 Using specified version: $VERSION"
+        fi
+        
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Download and Install CLI
+      id: install
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        VERSION="${{ steps.get-version.outputs.version }}"
+        PLATFORM="${{ steps.platform.outputs.platform }}"
+        EXT="${{ steps.platform.outputs.ext }}"
+        
+        # Construct artifact name
+        ARTIFACT_NAME="buster-cli-${PLATFORM}.${EXT}"
+        
+        echo "⬇️ Downloading Buster CLI $VERSION for $PLATFORM..."
+        
+        # Create installation directory
+        INSTALL_DIR="${RUNNER_TEMP}/buster-cli"
+        mkdir -p "$INSTALL_DIR"
+        
+        # Download the release artifact
+        gh release download "$VERSION" \
+          --repo buster-so/buster \
+          --pattern "$ARTIFACT_NAME" \
+          --dir "$INSTALL_DIR" \
+          --clobber
+        
+        # Extract based on OS
+        cd "$INSTALL_DIR"
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          echo "📦 Extracting Windows archive..."
+          unzip -o "$ARTIFACT_NAME"
+          BINARY_NAME="buster.exe"
+        else
+          echo "📦 Extracting Unix archive..."
+          tar -xzf "$ARTIFACT_NAME"
+          BINARY_NAME="buster"
+          chmod +x "$BINARY_NAME"
+        fi
+        
+        # Verify binary exists
+        if [[ ! -f "$BINARY_NAME" ]]; then
+          echo "❌ Binary not found after extraction"
+          ls -la
+          exit 1
+        fi
+        
+        # Get absolute path
+        BINARY_PATH="$(pwd)/$BINARY_NAME"
+        
+        # Add to PATH
+        echo "$(dirname $BINARY_PATH)" >> $GITHUB_PATH
+        
+        # Verify installation
+        echo "✅ Installed Buster CLI to: $BINARY_PATH"
+        "$BINARY_PATH" --version || echo "Version command not implemented"
+        
+        # Set outputs
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "binary-path=$BINARY_PATH" >> $GITHUB_OUTPUT
+        
+        echo "✨ Buster CLI $VERSION installed successfully!"
+
+    - name: Verify Installation
+      shell: bash
+      run: |
+        # This runs in a new step to verify PATH was updated
+        echo "🧪 Verifying Buster CLI is in PATH..."
+        which buster || which buster.exe || echo "Note: Binary might not be in PATH until next step"
+        echo "✅ Installation complete!"

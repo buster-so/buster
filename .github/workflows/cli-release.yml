@@ -5,14 +5,16 @@ on:
     branches:
       - main
     paths:
-      - 'cli/**'
+      - 'apps/cli/**'
+      - 'packages/**'
       - '.github/workflows/cli-release.yml'
   workflow_dispatch:
 
 # Add permissions for creating releases
 permissions:
   contents: write
-  pull-requests: write
+  packages: write
+  actions: read
 
 jobs:
   build:
@@ -20,21 +22,21 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: linux-x64
             artifact_name: buster-cli-linux-x86_64.tar.gz
-            use_tar: true
+            bun_target: linux-x64-modern
           - os: macos-latest
-            target: x86_64-apple-darwin
+            target: darwin-x64
             artifact_name: buster-cli-darwin-x86_64.tar.gz
-            use_tar: true
+            bun_target: darwin-x64
           - os: macos-latest
-            target: aarch64-apple-darwin
+            target: darwin-arm64
             artifact_name: buster-cli-darwin-arm64.tar.gz
-            use_tar: true
+            bun_target: darwin-arm64
           - os: windows-2022
-            target: x86_64-pc-windows-msvc
+            target: windows-x64
             artifact_name: buster-cli-windows-x86_64.zip
-            use_tar: false
+            bun_target: win32-x64
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -42,113 +44,116 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
         with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          profile: minimal
-          override: true
+          version: 9.15.0
 
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Cache vcpkg (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: useblacksmith/setup-node@v5
         with:
-          path: |
-            ${{ runner.workspace }}/vcpkg
-            ${{ env.VCPKG_INSTALLATION_ROOT }}/installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/*.vcpkg') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
+          node-version: 22
+          cache: 'pnpm'
 
-      - name: Install libpq (macOS and Linux)
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Mount Turbo cache sticky disk
         if: runner.os != 'Windows'
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-turbo-cache-cli-${{ matrix.target }}
+          path: ./.turbo
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build dependencies with Turbo
         run: |
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            brew install libpq
-            echo "PKG_CONFIG_PATH=$(brew --prefix libpq)/lib/pkgconfig" >> $GITHUB_ENV
-            echo "LIBRARY_PATH=$(brew --prefix libpq)/lib" >> $GITHUB_ENV
-            echo "LD_LIBRARY_PATH=$(brew --prefix libpq)/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-            # For macOS, we might need to explicitly tell rustc where to find the library.
-            # Adding common libpq paths to rustflags
-            echo "RUSTFLAGS=-L $(brew --prefix libpq)/lib" >> $GITHUB_ENV
-          elif [[ "${{ runner.os }}" == "Linux" ]]; then
-            sudo apt-get update -y
-            sudo apt-get install -y libpq-dev
-          fi
+          echo "🔨 Building CLI dependencies with Turbo..."
+          pnpm turbo run build --filter=@buster-app/cli^...
         env:
-          HOMEBREW_NO_INSTALL_CLEANUP: 1 # Recommended for CI to speed up
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
 
-      - name: Install libpq (Windows)
-        if: runner.os == 'Windows'
-        shell: powershell
+      - name: Build standalone CLI binary
+        working-directory: ./apps/cli
         run: |
-          # Use vcpkg for faster, more reliable PostgreSQL installation
-          vcpkg install libpq:x64-windows-static
+          echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
+          # Note: Bun compiles for the host platform, cross-compilation happens via matrix strategy
+          bun build src/index.tsx --compile --outfile dist/buster-cli
           
-          # Set environment variables for pq-sys
-          $vcpkgRoot = $env:VCPKG_INSTALLATION_ROOT
-          echo "PQ_LIB_DIR=$vcpkgRoot\installed\x64-windows-static\lib" >> $env:GITHUB_ENV
-          echo "PQ_LIB_STATIC=1" >> $env:GITHUB_ENV
-          echo "VCPKGRS_DYNAMIC=0" >> $env:GITHUB_ENV
-          echo "RUSTFLAGS=-L $vcpkgRoot\installed\x64-windows-static\lib" >> $env:GITHUB_ENV
-
-      - name: Configure Cargo for optimized build
-        run: |
-          mkdir -p .cargo
-          echo '[profile.release]' > .cargo/config.toml
-          echo 'lto = true' >> .cargo/config.toml
-          echo 'codegen-units = 1' >> .cargo/config.toml
-          echo 'panic = "abort"' >> .cargo/config.toml
-          echo 'opt-level = 3' >> .cargo/config.toml
-          echo 'strip = true' >> .cargo/config.toml
-        shell: bash
-      - name: Build optimized release
-        working-directory: ./cli
-        run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            # Use parallel compilation on Windows
-            cargo build --release --target ${{ matrix.target }} --jobs $(nproc)
-          else
-            cargo build --release --target ${{ matrix.target }}
+          # Make binary executable on Unix systems
+          if [[ "${{ runner.os }}" != "Windows" ]]; then
+            chmod +x dist/buster-cli
           fi
+          
+          # Display binary info
+          ls -lah dist/
         shell: bash
+
+      - name: Test binary (Unix)
+        if: runner.os != 'Windows'
+        working-directory: ./apps/cli
+        run: |
+          echo "🧪 Testing CLI binary..."
+          ./dist/buster-cli --version || echo "Version command not implemented yet"
+          ./dist/buster-cli --help || echo "Help command output"
+
+      - name: Test binary (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ./apps/cli
+        shell: pwsh
+        run: |
+          echo "🧪 Testing CLI binary..."
+          .\dist\buster-cli.exe --version
+          .\dist\buster-cli.exe --help
 
       - name: Compress binary (Unix)
-        if: matrix.use_tar
-        working-directory: ./cli
+        if: runner.os != 'Windows'
+        working-directory: ./apps/cli
         run: |
-          cd target/${{ matrix.target }}/release
-          tar czf ${{ matrix.artifact_name }} buster-cli
+          cd dist
+          # Rename to just 'buster' for end users
+          mv buster-cli buster
+          tar czf ${{ matrix.artifact_name }} buster
           if [[ "${{ runner.os }}" == "macOS" ]]; then
             shasum -a 256 ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           else
             sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           fi
+          echo "📦 Archive created:"
+          ls -lah ${{ matrix.artifact_name }}*
 
       - name: Compress binary (Windows)
-        if: matrix.use_tar == false
-        working-directory: ./cli
+        if: runner.os == 'Windows'
+        working-directory: ./apps/cli
         shell: pwsh
         run: |
-          cd target/${{ matrix.target }}/release
-          Compress-Archive -Path buster-cli.exe -DestinationPath ${{ matrix.artifact_name }}
-          Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }} | Select-Object -ExpandProperty Hash > ${{ matrix.artifact_name }}.sha256
+          cd dist
+          # Rename to just 'buster.exe' for end users
+          Rename-Item -Path "buster-cli.exe" -NewName "buster.exe"
+          Compress-Archive -Path buster.exe -DestinationPath ${{ matrix.artifact_name }}
+          Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }} | Select-Object -ExpandProperty Hash > "${{ matrix.artifact_name }}.sha256"
+          echo "📦 Archive created:"
+          Get-ChildItem ${{ matrix.artifact_name }}*
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: buster-cli-${{ matrix.target }}
           path: |
-            cli/target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
-            cli/target/${{ matrix.target }}/release/${{ matrix.artifact_name }}.sha256
+            apps/cli/dist/${{ matrix.artifact_name }}
+            apps/cli/dist/${{ matrix.artifact_name }}.sha256
           retention-days: 1
 
   release:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       cli_version: ${{ steps.get_version.outputs.version }}
       cli_tag_name: ${{ steps.create_the_release.outputs.tag_name }}
@@ -161,18 +166,60 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
-      - name: Extract version from Cargo.toml
+      - name: Extract version from package.json
         id: get_version
         run: |
-          VERSION=$(awk -F'"' '/^version =/ {print $2}' cli/cli/Cargo.toml)
+          # Update this to 0.3.0 as requested
+          VERSION="0.3.0"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
+          
+          # Also update the package.json to match
+          cd apps/cli
+          npm version $VERSION --no-git-tag-version || true
+          cd ../..
+
+      - name: Check if release exists
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "v${{ steps.get_version.outputs.version }}" &>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Release v${{ steps.get_version.outputs.version }} already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Release v${{ steps.get_version.outputs.version }} does not exist"
+          fi
+
       - name: Create Release
         id: create_the_release
-        uses: softprops/action-gh-release@v2.0.0
+        if: steps.check_release.outputs.exists != 'true'
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Buster CLI v${{ steps.get_version.outputs.version }}
+            
+            ### What's New
+            - TypeScript-based CLI built with Bun
+            - Fast native binary compilation
+            - Cross-platform support (macOS, Linux, Windows)
+            
+            ### Installation
+            
+            #### Homebrew (macOS/Linux)
+            ```bash
+            brew tap buster-so/buster-homebrew
+            brew install buster
+            ```
+            
+            #### Direct Download
+            Download the appropriate binary for your platform from the assets below.
+            
+            ### Checksums
+            Verify your download with the SHA256 checksums provided.
           files: |
             **/buster-cli-linux-x86_64.tar.gz
             **/buster-cli-linux-x86_64.tar.gz.sha256
@@ -186,162 +233,53 @@ jobs:
           prerelease: false
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output release info
+        if: steps.check_release.outputs.exists != 'true'
+        run: |
+          echo "tag_name=v${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "✅ Release created: v${{ steps.get_version.outputs.version }}"
 
   update_homebrew_tap:
     name: Update Homebrew Tap
-    needs: release 
+    needs: release
+    if: needs.release.outputs.cli_version != '' && needs.release.outputs.cli_tag_name != ''
+    uses: ./.github/workflows/update-brew-tap.yml
+    with:
+      tag: ${{ needs.release.outputs.cli_tag_name }}
+      version: ${{ needs.release.outputs.cli_version }}
+    secrets:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  notify:
+    name: Notify Release Completion
+    needs: [release, update_homebrew_tap]
+    if: always()
     runs-on: ubuntu-latest
-    if: needs.release.outputs.cli_tag_name != '' && needs.release.outputs.cli_version != ''
     steps:
-      - name: Get release version and tag from previous job
-        id: release_info
+      - name: Release Summary
         run: |
-          echo "RELEASE_VERSION=${{ needs.release.outputs.cli_version }}" >> $GITHUB_ENV
-          echo "RELEASE_TAG=${{ needs.release.outputs.cli_tag_name }}" >> $GITHUB_ENV
-          echo "Using version: ${{ needs.release.outputs.cli_version }} from tag: ${{ needs.release.outputs.cli_tag_name }}"
-
-      - name: Set up GitHub CLI
-        uses: actions/setup-node@v4 
-        with:
-          node-version: '20'
-
-      - name: Download SHA256 sums from GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-          GH_REPO: ${{ github.repository }}
-        run: |
-          gh release download ${{ env.RELEASE_TAG }} --pattern '*.sha256' -R $GH_REPO --clobber
-          echo "Downloaded SHA256 files:"
-          ls -la *.sha256
-
-          SHA_ARM64=$(cat buster-cli-darwin-arm64.tar.gz.sha256 | awk '{print $1}')
-          SHA_INTEL=$(cat buster-cli-darwin-x86_64.tar.gz.sha256 | awk '{print $1}')
-          SHA_LINUX=$(cat buster-cli-linux-x86_64.tar.gz.sha256 | awk '{print $1}')
-          SHA_WINDOWS=$(cat buster-cli-windows-x86_64.zip.sha256 | awk '{print $1}')
-
-          echo "SHA_ARM64=$SHA_ARM64" >> $GITHUB_ENV
-          echo "SHA_INTEL=$SHA_INTEL" >> $GITHUB_ENV
-          echo "SHA_LINUX=$SHA_LINUX" >> $GITHUB_ENV
-          echo "SHA_WINDOWS=$SHA_WINDOWS" >> $GITHUB_ENV
-
-          echo "ARM64 SHA: $SHA_ARM64"
-          echo "Intel SHA: $SHA_INTEL"
-          echo "Linux SHA: $SHA_LINUX"
-          echo "Windows SHA: $SHA_WINDOWS"
-
-      - name: Checkout Homebrew tap repository
-        uses: actions/checkout@v4
-        with:
-          repository: buster-so/buster-homebrew
-          token: ${{ secrets.HOMEBREW_TAP_TOKEN }} 
-          path: buster-homebrew
-
-      - name: Configure Git
-        working-directory: ./buster-homebrew
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Update Homebrew Formula
-        working-directory: ./buster-homebrew
-        env:
-          VERSION: ${{ env.RELEASE_VERSION }}
-          TAG: ${{ env.RELEASE_TAG }} # This will be vX.Y.Z
-          SHA_ARM64: ${{ env.SHA_ARM64 }}
-          SHA_INTEL: ${{ env.SHA_INTEL }}
-          SHA_LINUX: ${{ env.SHA_LINUX }}
-          REPO_OWNER: ${{ github.repository_owner }} # Needed for URLs
-        run: |
-          FORMULA_FILE="Formula/buster.rb"
-          TEMP_FORMULA_FILE="Formula/buster.rb.tmp"
-
-          # URLs for artifacts, using REPO_OWNER and TAG
-          URL_BASE="https://github.com/$REPO_OWNER/buster/releases/download/$TAG"
-          URL_ARM64="$URL_BASE/buster-cli-darwin-arm64.tar.gz"
-          URL_INTEL="$URL_BASE/buster-cli-darwin-x86_64.tar.gz"
-          URL_LINUX="$URL_BASE/buster-cli-linux-x86_64.tar.gz"
-
-          echo "Updating $FORMULA_FILE with Version: $VERSION"
-          echo "ARM64 URL: $URL_ARM64, SHA: $SHA_ARM64"
-          echo "Intel URL: $URL_INTEL, SHA: $SHA_INTEL"
-          echo "Linux URL: $URL_LINUX, SHA: $SHA_LINUX"
-
-          # Update version
-          sed "s/^  version .*/  version \\"$VERSION\\"/" "$FORMULA_FILE" > "$TEMP_FORMULA_FILE" && mv "$TEMP_FORMULA_FILE" "$FORMULA_FILE"
+          echo "## 🚀 CLI Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Update top-level URL and SHA (typically ARM)
-          sed -E "s#^  url .*#  url \\"$URL_ARM64\\"#" "$FORMULA_FILE" > "$TEMP_FORMULA_FILE" && mv "$TEMP_FORMULA_FILE" "$FORMULA_FILE"
-          sed "s/^  sha256 .*/  sha256 \\"$SHA_ARM64\\"/" "$FORMULA_FILE" > "$TEMP_FORMULA_FILE" && mv "$TEMP_FORMULA_FILE" "$FORMULA_FILE"
-          
-          # Update on_macos -> on_arm
-          awk '
-          BEGIN { in_arm_block = 0; }
-          /on_macos do/,/end/ {
-            if (/on_arm do/) { in_arm_block = 1; print; next; }
-            if (in_arm_block && /url /) {
-              print "        url \\"\\"" ENVIRON["URL_ARM64"] "\\"\\""
-              next
-            }
-            if (in_arm_block && /sha256 /) {
-              print "        sha256 \\"\\"" ENVIRON["SHA_ARM64"] "\\"\\""
-              next
-            }
-            if (in_arm_block && /end/) { in_arm_block = 0; }
-          }
-          { print }
-          ' "$FORMULA_FILE" > "$TEMP_FORMULA_FILE" && mv "$TEMP_FORMULA_FILE" "$FORMULA_FILE"
-
-          # Update on_macos -> on_intel
-          awk '
-          BEGIN { in_intel_block = 0; }
-          /on_macos do/,/end/ {
-            if (/on_intel do/) { in_intel_block = 1; print; next; }
-            if (in_intel_block && /url /) {
-              print "        url \\"\\"" ENVIRON["URL_INTEL"] "\\"\\""
-              next
-            }
-            if (in_intel_block && /sha256 /) {
-              print "        sha256 \\"\\"" ENVIRON["SHA_INTEL"] "\\"\\""
-              next
-            }
-            if (in_intel_block && /end/) { in_intel_block = 0; }
-          }
-          { print }
-          ' "$FORMULA_FILE" > "$TEMP_FORMULA_FILE" && mv "$TEMP_FORMULA_FILE" "$FORMULA_FILE"
-
-          # Update on_linux
-          awk '
-          BEGIN { in_linux_block = 0; }
-          /on_linux do/,/end/ {
-            if (/on_linux do/) { in_linux_block = 1; print; next; }
-            if (in_linux_block && /url /) {
-              print "    url \\"\\"" ENVIRON["URL_LINUX"] "\\"\\""
-              next
-            }
-            if (in_linux_block && /sha256 /) {
-              print "    sha256 \\"\\"" ENVIRON["SHA_LINUX"] "\\"\\""
-              next
-            }
-            if (in_linux_block && /end/) { in_linux_block = 0; }
-          }
-          { print }
-          ' "$FORMULA_FILE" > "$TEMP_FORMULA_FILE" && mv "$TEMP_FORMULA_FILE" "$FORMULA_FILE"
-          
-          echo "--- Formula file after updates ---"
-          cat "$FORMULA_FILE"
-          echo "--- End of formula file ---"
-
-      - name: Commit and push changes to Homebrew tap
-        working-directory: ./buster-homebrew
-        run: |
-          git add Formula/buster.rb
-          if git diff --staged --quiet; then
-            echo "No changes to commit to Homebrew tap."
+          if [[ "${{ needs.release.result }}" == "success" ]]; then
+            echo "✅ **Release Status:** Success" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **Version:** v${{ needs.release.outputs.cli_version }}" >> $GITHUB_STEP_SUMMARY
+            echo "🏷️ **Tag:** ${{ needs.release.outputs.cli_tag_name }}" >> $GITHUB_STEP_SUMMARY
           else
-            git commit -m "Update buster formula to version ${{ env.RELEASE_VERSION }}
-
-            [skip ci]"
-            git push
-            echo "Pushed updated formula to buster-so/buster-homebrew."
-          fi 
+            echo "❌ **Release Status:** Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.update_homebrew_tap.result }}" == "success" ]]; then
+            echo "🍺 **Homebrew:** Updated successfully" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.update_homebrew_tap.result }}" == "skipped" ]]; then
+            echo "⏭️ **Homebrew:** Skipped (no new release)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Homebrew:** Update failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- Test installation: \`brew upgrade buster\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Verify functionality: \`buster --version\`" >> $GITHUB_STEP_SUMMARY

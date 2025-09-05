@@ -3,6 +3,7 @@ import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
 import { Sonnet4 } from '../../llm';
+import { DEFAULT_ANTHROPIC_OPTIONS } from '../../llm/providers/gateway';
 import { createExecuteSqlTool, createSequentialThinkingTool } from '../../tools';
 import {
   MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
@@ -25,14 +26,6 @@ import {
 } from './get-think-and-prep-agent-system-prompt';
 
 export const THINK_AND_PREP_AGENT_NAME = 'thinkAndPrepAgent';
-
-const DEFAULT_CACHE_OPTIONS = {
-  anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
-  openai: {
-    parallelToolCalls: false,
-    reasoningEffort: 'minimal',
-  },
-};
 
 const STOP_CONDITIONS = [
   stepCountIs(25),
@@ -80,7 +73,7 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
       thinkAndPrepAgentSchema.sql_dialect_guidance,
       (thinkAndPrepAgentSchema.analysisMode || 'standard') as AnalysisMode
     ),
-    providerOptions: DEFAULT_CACHE_OPTIONS,
+    providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
   } as ModelMessage;
 
   // Create second system message with datasets information
@@ -94,7 +87,7 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
     content: datasetsContent
       ? `<database_context>\n${datasetsContent}\n</database_context>`
       : '<database_context>\nNo datasets available\n</database_context>',
-    providerOptions: DEFAULT_CACHE_OPTIONS,
+    providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
   } as ModelMessage;
 
   async function stream({ messages }: ThinkAndPrepStreamOptions) {
@@ -141,6 +134,12 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
       () =>
         streamText({
           model: Sonnet4,
+          headers: {
+            'anthropic-beta':
+              'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+            anthropic_beta: 'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+          },
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
           tools: {
             [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
             [EXECUTE_SQL_TOOL_NAME]: executeSqlTool,

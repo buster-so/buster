@@ -34,7 +34,7 @@
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@electric-sql/client": "^1.0.7",
+    "@electric-sql/client": "^1.0.9",
     "@hono/zod-validator": "^0.7.2",
     "@supabase/supabase-js": "catalog:",
     "@trigger.dev/sdk": "catalog:",

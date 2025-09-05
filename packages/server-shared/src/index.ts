@@ -5,13 +5,16 @@ export * as AccessControls from './access-controls';
 
 // Export other modules
 export * from './assets';
+export * from './auth';
 export * from './chats';
 export * from './dashboards';
+export * from './datasets';
 export * from './dictionary';
 export * from './github';
 export * from './message';
 export * from './metrics';
 export * from './organization';
+export * from './public-chat';
 export * from './s3-integrations';
 export * from './security';
 // Export share module (has some naming conflicts with chats and metrics)

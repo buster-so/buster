@@ -1,0 +1,15 @@
+# Buster configuration file
+data_source_name: default_datasource
+schema: public
+database: main
+
+# Paths to search for model files
+model_paths:
+  - test-models
+  - models
+
+# Exclude certain files from deployment
+exclude_files:
+  - "**/draft-*.yml"
+  - "**/temp-*.yml"
+  - "**/_*.yml"

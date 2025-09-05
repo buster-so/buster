@@ -13,7 +13,7 @@ import type { SequentialThinkingState } from '../sequential-thinking-tool';
 export function createSequentialThinkingReasoningMessage(
   sequentialThinkingState: SequentialThinkingState,
   toolCallId?: string,
-  status: ChatMessageReasoning_status = 'loading'
+  overrideStatus?: ChatMessageReasoning_status
 ): ChatMessageReasoningMessage_Text | null {
   // Use entry_id from state or fallback to provided toolCallId
   const id = sequentialThinkingState.toolCallId || toolCallId;
@@ -21,6 +21,9 @@ export function createSequentialThinkingReasoningMessage(
   if (!id) {
     return null;
   }
+
+  // Determine status based on state.isComplete or override
+  const status = overrideStatus ?? (sequentialThinkingState.isComplete ? 'completed' : 'loading');
 
   // Determine title based on status
   const title = status === 'completed' ? 'Thought for a few seconds' : 'Thinking it through...';

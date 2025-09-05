@@ -31,6 +31,11 @@ export function createSequentialThinkingDelta(
   return async function sequentialThinkingDelta(
     options: { inputTextDelta: string } & ToolCallOptions
   ): Promise<void> {
+    // Skip delta updates if already complete
+    if (sequentialThinkingState.isComplete) {
+      return;
+    }
+
     // Accumulate the delta to the args
     sequentialThinkingState.args = (sequentialThinkingState.args || '') + options.inputTextDelta;
 

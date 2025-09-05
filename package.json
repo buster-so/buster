@@ -8,6 +8,10 @@
     "check": "biome check ${1:-.}",
     "check:fix": "biome check --write ${1:-.}",
     "ci:check": "pnpm run check && pnpm run typecheck",
+    "cli": "cd apps/cli && bun src/index.tsx",
+    "cli:dev": "cd apps/cli && bun run --watch src/index.tsx",
+    "cli:build": "pnpm --filter @buster-app/cli build",
+    "cli:prod": "cd apps/cli && bun run dist/index.js",
     "db:check": "pnpm --filter @buster/database run db:check",
     "db:generate": "pnpm --filter @buster/database run db:generate",
     "db:generate:custom": "pnpm --filter @buster/database run db:generate:custom",
@@ -53,15 +57,15 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^20.19.4",
-    "turbo": "^2.5.6",
     "tsx": "catalog:",
+    "turbo": "^2.5.6",
     "vitest": "catalog:"
   },
   "peerDependencies": {
     "bun": "^1.2.15",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@10.15.0",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [

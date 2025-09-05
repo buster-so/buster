@@ -1,0 +1,61 @@
+{
+  "name": "@buster-app/cli",
+  "version": "0.3.0",
+  "description": "Buster CLI - TypeScript version",
+  "type": "module",
+  "bin": {
+    "buster": "./dist/index.js"
+  },
+  "scripts": {
+    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
+    "dev": "bun run --watch src/index.tsx",
+    "build": "bun build src/index.tsx --outdir dist --target node",
+    "build:dry-run": "tsc --noEmit",
+    "build:standalone": "bun build src/index.tsx --compile --outfile dist/buster",
+    "start": "bun run dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check . --write",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run **/*.int.test.ts **/*.integration.test.ts",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@buster/sdk": "workspace:*",
+    "@buster/server-shared": "workspace:*",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "fast-glob": "^3.3.3",
+    "ink": "^5.0.1",
+    "ink-big-text": "^2.0.0",
+    "ink-gradient": "^3.0.0",
+    "ink-spinner": "^5.0.0",
+    "ink-text-input": "^6.0.0",
+    "js-yaml": "^4.1.0",
+    "micromatch": "^4.0.8",
+    "react": "^18.3.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@buster/env-utils": "workspace:*",
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@types/bun": "^1.1.14",
+    "@types/js-yaml": "^4.0.9",
+    "@types/micromatch": "^4.0.9",
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.17",
+    "@vitest/coverage-v8": "^2.1.8",
+    "ink-testing-library": "^4.0.0",
+    "react-devtools-core": "^6.1.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

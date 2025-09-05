@@ -24,7 +24,7 @@ This is a pnpm-based monorepo using Turborepo with the following structure:
 - `apps/trigger` - Background job processing with Trigger.dev v3
 - `apps/electric-server` - Electric SQL sync server
 - `apps/api` - Rust backend API (legacy)
-- `apps/cli` - Command-line tools (Rust)
+- `apps/cli` - Command-line tools (TypeScript)
 
 ### Packages (`@buster/*`)
 - `packages/ai` - AI agents, tools, and workflows
@@ -34,6 +34,7 @@ This is a pnpm-based monorepo using Turborepo with the following structure:
 - `packages/stored-values` - Stored values management
 - `packages/rerank` - Document reranking functionality
 - `packages/server-shared` - Shared server types and utilities
+- `packages/sdk` - TypeScript SDK for Buster API (functional programming patterns)
 - `packages/test-utils` - Shared testing utilities
 - `packages/vitest-config` - Shared Vitest configuration
 - `packages/typescript-config` - Shared TypeScript configuration
@@ -80,6 +81,31 @@ When writing code, follow this workflow to ensure code quality:
 - Combine modular functions to create complete features
 - Keep business logic separate from infrastructure concerns
 - Use proper error handling at each level
+
+## Core Development Principles
+
+### Functional Programming First - No Classes
+- **Pure functions only** - Commands and handlers are functions that accept input and return output
+- **Composable modules** - Build features by composing small, focused functions
+- **Immutable data** - Never mutate; always create new data structures
+- **Pattern from analyst-agent** - Follow the structure in `@packages/ai/src/agents/analyst-agent/analyst-agent.ts`
+- **Avoid OOP** - No classes for business logic, no inheritance, no `this` keyword
+- **Higher-order functions** - Use functions that return configured functions for dependency injection
+
+### Type Safety First - Zod Everything
+- **Zod schemas are the source of truth** - Define ALL data structures as Zod schemas first
+- **Export types from schemas** - Always use `z.infer<typeof Schema>` for TypeScript types
+- **Runtime validation everywhere** - Use `.parse()` for trusted data, `.safeParse()` for user input
+- **No implicit any** - Every variable, parameter, and return type must be explicitly typed
+- **Validate at boundaries** - All user input, API responses, and file reads must be validated
+- **Leverage shared types** - Import from `@buster/server-shared` for consistency
+
+### Module Organization
+- **Small files** - Each file should have a single, clear responsibility
+- **Colocate tests** - Keep `.test.ts` (unit) and `.int.test.ts` (integration) next to implementation
+- **Explicit exports** - Use named exports and create comprehensive index.ts files
+- **Deep nesting is OK** - Organize into logical subdirectories for clarity
+- **Functional module pattern** - Export factory functions that return configured function sets
 
 ### 3. Commit Code Frequently
 - **Commit frequently** - Make local commits often as you complete logical chunks of work

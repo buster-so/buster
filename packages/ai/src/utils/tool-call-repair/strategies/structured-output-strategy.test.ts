@@ -91,6 +91,7 @@ describe('structured-output-strategy', () => {
         schema: tool?.inputSchema,
         prompt: expect.stringContaining('Fix these tool arguments'),
         mode: 'json',
+        providerOptions: expect.any(Object),
       });
     });
 

@@ -1,15 +1,13 @@
 import { updateMessage, updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
 import type { UpdateMessageEntriesParams } from '../../../../../database/src/queries/messages/update-message-entries';
-import { createRawToolResultEntry } from '../../shared/create-raw-llm-tool-result-entry';
 import {
   createMessageUserClarifyingQuestionRawLlmMessageEntry,
   createMessageUserClarifyingQuestionResponseMessage,
 } from './helpers/message-user-clarifying-question-transform-helper';
-import {
-  MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
-  type MessageUserClarifyingQuestionContext,
-  type MessageUserClarifyingQuestionState,
+import type {
+  MessageUserClarifyingQuestionContext,
+  MessageUserClarifyingQuestionState,
 } from './message-user-clarifying-question';
 
 // Factory function that creates a type-safe callback for the specific agent context
@@ -34,16 +32,6 @@ export function createMessageUserClarifyingQuestionStart(
       options.toolCallId
     );
 
-    // Create the tool result immediately with success: true
-    // This ensures it's always present even if the stream terminates early
-    const rawToolResultEntry = createRawToolResultEntry(
-      options.toolCallId,
-      MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
-      {
-        success: true,
-      }
-    );
-
     const entries: UpdateMessageEntriesParams = {
       messageId: context.messageId,
     };
@@ -52,16 +40,10 @@ export function createMessageUserClarifyingQuestionStart(
       entries.responseMessages = [responseEntry];
     }
 
-    // Include both the tool call and tool result in raw LLM messages
-    // Since it's an upsert, sending both together ensures completeness
-    const rawLlmMessages = [];
+    // Only include the tool call message, not the result
+    // The result will be added in the execute function
     if (rawLlmMessage) {
-      rawLlmMessages.push(rawLlmMessage);
-    }
-    rawLlmMessages.push(rawToolResultEntry);
-
-    if (rawLlmMessages.length > 0) {
-      entries.rawLlmMessages = rawLlmMessages;
+      entries.rawLlmMessages = [rawLlmMessage];
     }
 
     try {

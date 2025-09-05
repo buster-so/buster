@@ -38,9 +38,7 @@
     "braintrust:push:tools:staged": "npx braintrust push evals/agents/analyst-agent/tool-order/staged-scorers.ts"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.0",
-    "@ai-sdk/google-vertex": "^3.0.0",
-    "@ai-sdk/openai": "^2.0.0",
+    "@ai-sdk/gateway": "^1.0.15",
     "@ai-sdk/provider": "^2.0.0",
     "@buster/access-controls": "workspace:*",
     "@buster/data-source": "workspace:*",

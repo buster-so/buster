@@ -1,0 +1,217 @@
+name: 'Buster Deploy Dry Run'
+description: 'Run a dry-run deployment to validate semantic models without deploying'
+author: 'Buster'
+branding:
+  icon: 'check-circle'
+  color: 'yellow'
+
+inputs:
+  api-key:
+    description: 'Buster API key (defaults to BUSTER_API_KEY env var)'
+    required: false
+    default: ''
+  host:
+    description: 'Buster API host URL (defaults to BUSTER_HOST env var or https://api.buster.so)'
+    required: false
+    default: ''
+  directory:
+    description: 'Directory containing buster.yml and models to validate'
+    required: false
+    default: '.'
+  environment:
+    description: 'Target environment for validation (e.g., production, staging)'
+    required: false
+    default: ''
+  verbose:
+    description: 'Enable verbose output'
+    required: false
+    default: 'true'
+  fail-on-warnings:
+    description: 'Fail the action if warnings are found'
+    required: false
+    default: 'false'
+
+outputs:
+  validation-status:
+    description: 'Validation status (success, warnings, failed)'
+    value: ${{ steps.dry-run.outputs.validation-status }}
+  models-validated:
+    description: 'Number of models validated'
+    value: ${{ steps.dry-run.outputs.models-validated }}
+  warnings-count:
+    description: 'Number of warnings found'
+    value: ${{ steps.dry-run.outputs.warnings-count }}
+  errors-count:
+    description: 'Number of errors found'
+    value: ${{ steps.dry-run.outputs.errors-count }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate Environment
+      id: validate
+      shell: bash
+      run: |
+        # Check for Buster CLI
+        if ! command -v buster &> /dev/null && ! command -v buster.exe &> /dev/null; then
+          echo "❌ Buster CLI not found. Please use buster-so/buster-actions/install first"
+          exit 1
+        fi
+        
+        # Set up API key
+        API_KEY="${{ inputs.api-key }}"
+        if [[ -z "$API_KEY" ]]; then
+          API_KEY="${BUSTER_API_KEY:-}"
+        fi
+        
+        if [[ -z "$API_KEY" ]]; then
+          echo "❌ No API key provided. Set BUSTER_API_KEY env var or pass api-key input"
+          exit 1
+        fi
+        
+        # Set up host
+        HOST="${{ inputs.host }}"
+        if [[ -z "$HOST" ]]; then
+          HOST="${BUSTER_HOST:-https://api.buster.so}"
+        fi
+        
+        echo "✅ Configuration validated"
+        echo "📍 Host: $HOST"
+        echo "🔑 API key: ****${API_KEY: -4}"
+        
+        # Export for next steps
+        echo "BUSTER_API_KEY=$API_KEY" >> $GITHUB_ENV
+        echo "BUSTER_HOST=$HOST" >> $GITHUB_ENV
+
+    - name: Check for buster.yml
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        if [[ ! -f "buster.yml" ]]; then
+          echo "❌ No buster.yml found in ${{ inputs.directory }}"
+          echo "💡 Run 'buster init' to create a project configuration"
+          exit 1
+        fi
+        
+        echo "✅ Found buster.yml"
+        
+        # Count model files
+        MODEL_COUNT=0
+        if [[ -d "models" ]]; then
+          MODEL_COUNT=$(find models -name "*.yml" -o -name "*.yaml" 2>/dev/null | wc -l | tr -d ' ')
+        fi
+        
+        echo "📊 Found $MODEL_COUNT model file(s)"
+
+    - name: Run Deployment Dry Run
+      id: dry-run
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        echo "🔍 Running deployment validation (dry run)..."
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+        # Build deploy command with dry-run flag
+        DEPLOY_CMD="buster deploy --dry-run"
+        
+        # Add optional flags
+        if [[ "${{ inputs.environment }}" != "" ]]; then
+          DEPLOY_CMD="$DEPLOY_CMD --environment ${{ inputs.environment }}"
+        fi
+        
+        if [[ "${{ inputs.verbose }}" == "true" ]]; then
+          DEPLOY_CMD="$DEPLOY_CMD --verbose"
+        fi
+        
+        echo "📟 Running: $DEPLOY_CMD"
+        echo ""
+        
+        # Execute dry run and capture output
+        set +e
+        OUTPUT_FILE="${RUNNER_TEMP}/dry-run-output.txt"
+        $DEPLOY_CMD 2>&1 | tee "$OUTPUT_FILE"
+        DRY_RUN_EXIT_CODE=$?
+        set -e
+        
+        # Parse output for validation results
+        WARNINGS_COUNT=$(grep -c "WARNING" "$OUTPUT_FILE" 2>/dev/null || echo "0")
+        ERRORS_COUNT=$(grep -c "ERROR" "$OUTPUT_FILE" 2>/dev/null || echo "0")
+        MODELS_COUNT=$(grep -oP 'Models validated: \K[0-9]+' "$OUTPUT_FILE" 2>/dev/null || echo "0")
+        
+        # Determine validation status
+        if [[ $ERRORS_COUNT -gt 0 ]]; then
+          VALIDATION_STATUS="failed"
+          STATUS_EMOJI="❌"
+          STATUS_TEXT="Failed"
+        elif [[ $WARNINGS_COUNT -gt 0 ]]; then
+          VALIDATION_STATUS="warnings"
+          STATUS_EMOJI="⚠️"
+          STATUS_TEXT="Passed with Warnings"
+        else
+          VALIDATION_STATUS="success"
+          STATUS_EMOJI="✅"
+          STATUS_TEXT="Passed"
+        fi
+        
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "$STATUS_EMOJI Validation $STATUS_TEXT"
+        echo ""
+        echo "📊 Validation Results:"
+        echo "   • Models validated: $MODELS_COUNT"
+        echo "   • Errors: $ERRORS_COUNT"
+        echo "   • Warnings: $WARNINGS_COUNT"
+        
+        # Set outputs
+        echo "validation-status=$VALIDATION_STATUS" >> $GITHUB_OUTPUT
+        echo "models-validated=$MODELS_COUNT" >> $GITHUB_OUTPUT
+        echo "warnings-count=$WARNINGS_COUNT" >> $GITHUB_OUTPUT
+        echo "errors-count=$ERRORS_COUNT" >> $GITHUB_OUTPUT
+        
+        # Create summary
+        echo "## 🔍 Buster Deployment Validation (Dry Run)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### $STATUS_EMOJI $STATUS_TEXT" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+        echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+        echo "| **Status** | $STATUS_TEXT |" >> $GITHUB_STEP_SUMMARY
+        echo "| **Environment** | ${{ inputs.environment || 'default' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| **Models Validated** | $MODELS_COUNT |" >> $GITHUB_STEP_SUMMARY
+        echo "| **Errors** | $ERRORS_COUNT |" >> $GITHUB_STEP_SUMMARY
+        echo "| **Warnings** | $WARNINGS_COUNT |" >> $GITHUB_STEP_SUMMARY
+        
+        # Add detailed issues if any
+        if [[ $ERRORS_COUNT -gt 0 ]] || [[ $WARNINGS_COUNT -gt 0 ]]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Issues Found" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ $ERRORS_COUNT -gt 0 ]]; then
+            echo "#### ❌ Errors" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep "ERROR" "$OUTPUT_FILE" | head -10 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ $WARNINGS_COUNT -gt 0 ]]; then
+            echo "#### ⚠️ Warnings" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep "WARNING" "$OUTPUT_FILE" | head -10 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+        
+        # Determine exit status
+        if [[ $DRY_RUN_EXIT_CODE -ne 0 ]]; then
+          echo ""
+          echo "❌ Dry run failed with exit code: $DRY_RUN_EXIT_CODE"
+          exit $DRY_RUN_EXIT_CODE
+        elif [[ "${{ inputs.fail-on-warnings }}" == "true" ]] && [[ $WARNINGS_COUNT -gt 0 ]]; then
+          echo ""
+          echo "⚠️ Failing due to warnings (fail-on-warnings is enabled)"
+          exit 1
+        else
+          echo ""
+          echo "✅ Validation complete"
+        fi

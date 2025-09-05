@@ -19,6 +19,7 @@ export function createSequentialThinkingStart(
     sequentialThinkingState.thought = undefined;
     sequentialThinkingState.nextThoughtNeeded = undefined;
     sequentialThinkingState.thoughtNumber = undefined;
+    sequentialThinkingState.isComplete = false;
 
     // Create initial reasoning entry with loading status
     const reasoningEntry = createSequentialThinkingReasoningMessage(

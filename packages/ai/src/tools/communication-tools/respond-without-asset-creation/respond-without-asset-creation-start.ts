@@ -1,15 +1,13 @@
 import { updateMessage, updateMessageEntries } from '@buster/database';
 import type { ToolCallOptions } from 'ai';
 import type { UpdateMessageEntriesParams } from '../../../../../database/src/queries/messages/update-message-entries';
-import { createRawToolResultEntry } from '../../shared/create-raw-llm-tool-result-entry';
 import {
   createRespondWithoutAssetCreationRawLlmMessageEntry,
   createRespondWithoutAssetCreationResponseMessage,
 } from './helpers/respond-without-asset-creation-transform-helper';
-import {
-  RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
-  type RespondWithoutAssetCreationContext,
-  type RespondWithoutAssetCreationState,
+import type {
+  RespondWithoutAssetCreationContext,
+  RespondWithoutAssetCreationState,
 } from './respond-without-asset-creation-tool';
 
 // Factory function that creates a type-safe callback for the specific agent context
@@ -32,16 +30,6 @@ export function createRespondWithoutAssetCreationStart(
       options.toolCallId
     );
 
-    // Create the tool result immediately with success: true
-    // This ensures it's always present even if the stream terminates early
-    const rawToolResultEntry = createRawToolResultEntry(
-      options.toolCallId,
-      RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
-      {
-        success: true,
-      }
-    );
-
     const entries: UpdateMessageEntriesParams = {
       messageId: context.messageId,
     };
@@ -50,16 +38,10 @@ export function createRespondWithoutAssetCreationStart(
       entries.responseMessages = [responseEntry];
     }
 
-    // Include both the tool call and tool result in raw LLM messages
-    // Since it's an upsert, sending both together ensures completeness
-    const rawLlmMessages = [];
+    // Only include the tool call message, not the result
+    // The result will be added in the execute function
     if (rawLlmMessage) {
-      rawLlmMessages.push(rawLlmMessage);
-    }
-    rawLlmMessages.push(rawToolResultEntry);
-
-    if (rawLlmMessages.length > 0) {
-      entries.rawLlmMessages = rawLlmMessages;
+      entries.rawLlmMessages = [rawLlmMessage];
     }
 
     try {

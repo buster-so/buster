@@ -288,6 +288,13 @@ describe('Sequential Thinking Tool Streaming Tests', () => {
         messages: [],
       });
 
+      // Should update state
+      expect(state.toolCallId).toBe('final-call');
+      expect(state.thought).toBe('Final thought');
+      expect(state.nextThoughtNeeded).toBe(false);
+      expect(state.thoughtNumber).toBe(5);
+
+      // Should update database with completed status
       expect(updateMessageEntries).toHaveBeenCalledWith(
         expect.objectContaining({
           messageId: mockContext.messageId,

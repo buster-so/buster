@@ -3,6 +3,7 @@ import type { ModelMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { GPT5Mini } from '../../../llm/gpt-5-mini';
+import { DEFAULT_OPENAI_OPTIONS } from '../../../llm/providers/gateway';
 import { formatAnalysisTypeRouterPrompt } from './format-analysis-type-router-prompt';
 
 // Zod schemas first - following Zod-first approach
@@ -61,13 +62,7 @@ async function generateAnalysisTypeWithLLM(messages: ModelMessage[]): Promise<{
           schema: llmOutputSchema,
           messages: llmMessages,
           temperature: 1,
-          providerOptions: {
-            openai: {
-              parallelToolCalls: false,
-              reasoningEffort: 'minimal',
-              verbosity: 'low',
-            },
-          },
+          providerOptions: DEFAULT_OPENAI_OPTIONS,
         });
 
         return object;

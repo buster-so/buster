@@ -95,12 +95,17 @@ function Install-BusterCLI {
         }
         
         # Move binary to install directory
-        $binaryPath = Join-Path $tempDir "$BINARY_NAME.exe"
+        # Note: The archive contains 'buster.exe' directly, not 'buster-cli.exe'
+        $binaryPath = Join-Path $tempDir "$INSTALL_NAME.exe"
         $targetPath = Join-Path $installDir "$INSTALL_NAME.exe"
         
         if (!(Test-Path $binaryPath)) {
-            Write-Error "Binary not found after extraction: $binaryPath"
-            exit 1
+            # Fallback to old naming for backward compatibility
+            $binaryPath = Join-Path $tempDir "$BINARY_NAME.exe"
+            if (!(Test-Path $binaryPath)) {
+                Write-Error "Binary not found after extraction. Looked for both $INSTALL_NAME.exe and $BINARY_NAME.exe"
+                exit 1
+            }
         }
         
         # Remove existing binary if it exists

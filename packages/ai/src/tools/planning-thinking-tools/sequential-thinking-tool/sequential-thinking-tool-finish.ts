@@ -20,31 +20,27 @@ export function createSequentialThinkingFinish(
     sequentialThinkingState.thought = normalizeEscapedText(options.input.thought);
     sequentialThinkingState.nextThoughtNeeded = options.input.nextThoughtNeeded;
     sequentialThinkingState.thoughtNumber = options.input.thoughtNumber;
+    sequentialThinkingState.isComplete = true;
 
-    // Create final reasoning entry with completed status
+    // Update the reasoning message - status will be determined by state.isComplete
     const reasoningEntry = createSequentialThinkingReasoningMessage(
       sequentialThinkingState,
-      options.toolCallId,
-      'completed' // Mark as completed when finish is called
+      options.toolCallId
     );
 
     try {
-      if (context.messageId) {
-        const reasoningMessages = reasoningEntry ? [reasoningEntry] : [];
+      if (context.messageId && reasoningEntry) {
+        await updateMessageEntries({
+          messageId: context.messageId,
+          reasoningMessages: [reasoningEntry],
+        });
 
-        if (reasoningMessages.length > 0) {
-          await updateMessageEntries({
-            messageId: context.messageId,
-            reasoningMessages,
-          });
-
-          console.info('[sequential-thinking] Completed sequential thinking:', {
-            messageId: context.messageId,
-            toolCallId: options.toolCallId,
-            thoughtNumber: options.input.thoughtNumber,
-            nextThoughtNeeded: options.input.nextThoughtNeeded,
-          });
-        }
+        console.info('[sequential-thinking] Completed sequential thinking:', {
+          messageId: context.messageId,
+          toolCallId: options.toolCallId,
+          thoughtNumber: options.input.thoughtNumber,
+          nextThoughtNeeded: options.input.nextThoughtNeeded,
+        });
       }
     } catch (error) {
       console.error('[sequential-thinking] Failed to update reasoning entry on finish:', error);

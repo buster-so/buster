@@ -2,6 +2,7 @@ import type { LanguageModelV2ToolCall } from '@ai-sdk/provider';
 import { InvalidToolInputError, generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { Sonnet4 } from '../../../llm';
+import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
 import type { RepairContext } from '../types';
 
 export function canHandleInvalidInput(error: Error): boolean {
@@ -41,6 +42,7 @@ export async function repairInvalidInput(
       try {
         const { object: repairedInput } = await generateObject({
           model: Sonnet4,
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
           schema: tool.inputSchema,
           prompt: `Fix these tool arguments to match the schema:\n${JSON.stringify(currentInput, null, 2)}`,
           mode: 'json',

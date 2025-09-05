@@ -67,5 +67,6 @@ export default {
   port,
   hostname: '0.0.0.0', // Bind to all interfaces for Docker
   fetch: app.fetch,
+  idleTimeout: 120, // 120 seconds idle timeout (resets on each SSE message)
 };
 export type AppType = typeof routes;

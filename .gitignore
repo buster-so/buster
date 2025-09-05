@@ -65,6 +65,7 @@ node_modules/
 .turbo
 
 .secrets
+.actrc
 
 /prds
 .DS_Store

@@ -1,0 +1,2 @@
+ALTER TABLE "datasets" DROP CONSTRAINT "datasets_database_name_data_source_id_key";--> statement-breakpoint
+ALTER TABLE "datasets" ADD CONSTRAINT "datasets_name_schema_database_identifier_data_source_id_key" UNIQUE("name","schema","database_identifier","data_source_id");

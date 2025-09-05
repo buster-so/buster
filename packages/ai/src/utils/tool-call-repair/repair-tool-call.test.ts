@@ -4,8 +4,17 @@ import { ANALYST_AGENT_NAME } from '../../agents';
 import { repairToolCall } from './repair-tool-call';
 import type { RepairContext } from './types';
 
+vi.mock('ai', async () => {
+  const actual = await vi.importActual('ai');
+  return {
+    ...actual,
+    wrapLanguageModel: vi.fn((options) => options.model),
+  };
+});
+
 vi.mock('braintrust', () => ({
   wrapTraced: (fn: any) => fn,
+  BraintrustMiddleware: vi.fn(() => ({})),
 }));
 
 // Mock the strategy functions

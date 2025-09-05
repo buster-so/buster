@@ -1,4 +1,5 @@
 import type { User as BusterUser } from '@buster/database';
+import type { ApiKeyContext } from '@buster/server-shared';
 import type { InstallationCallbackRequest } from '@buster/server-shared/github';
 import type { OrganizationRole } from '@buster/server-shared/organization';
 import type { User } from '@supabase/supabase-js';
@@ -26,5 +27,9 @@ declare module 'hono' {
      * GitHub webhook payload. Set by the githubWebhookValidator middleware.
      */
     readonly githubPayload?: InstallationCallbackRequest;
+    /**
+     * API key context for public API endpoints. Set by the createApiKeyAuthMiddleware.
+     */
+    readonly apiKey?: ApiKeyContext;
   }
 }

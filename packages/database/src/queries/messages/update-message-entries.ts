@@ -44,24 +44,29 @@ export async function updateMessageEntries({
       throw new Error(`Message not found: ${messageId}`);
     }
 
-    // Merge with new entries
+    // Merge all entries concurrently
+    const [mergedResponseMessages, mergedReasoning, mergedRawLlmMessages] = await Promise.all([
+      responseMessages
+        ? Promise.resolve(mergeResponseMessages(existingEntries.responseMessages, responseMessages))
+        : Promise.resolve(existingEntries.responseMessages),
+      reasoningMessages
+        ? Promise.resolve(mergeReasoningMessages(existingEntries.reasoning, reasoningMessages))
+        : Promise.resolve(existingEntries.reasoning),
+      rawLlmMessages
+        ? Promise.resolve(mergeRawLlmMessages(existingEntries.rawLlmMessages, rawLlmMessages))
+        : Promise.resolve(existingEntries.rawLlmMessages),
+    ]);
+
     const mergedEntries = {
-      responseMessages: responseMessages
-        ? mergeResponseMessages(existingEntries.responseMessages, responseMessages)
-        : existingEntries.responseMessages,
-      reasoning: reasoningMessages
-        ? mergeReasoningMessages(existingEntries.reasoning, reasoningMessages)
-        : existingEntries.reasoning,
-      rawLlmMessages: rawLlmMessages
-        ? mergeRawLlmMessages(existingEntries.rawLlmMessages, rawLlmMessages)
-        : existingEntries.rawLlmMessages,
+      responseMessages: mergedResponseMessages,
+      reasoning: mergedReasoning,
+      rawLlmMessages: mergedRawLlmMessages,
     };
 
     // Update cache immediately (cache is source of truth during streaming)
     messageEntriesCache.set(messageId, mergedEntries);
 
-    // Update database asynchronously for persistence (fire-and-forget)
-    // If this fails, cache still has the latest state for next update
+    // Build update data
     const updateData: Record<string, unknown> = {
       updatedAt: new Date().toISOString(),
     };
@@ -78,7 +83,7 @@ export async function updateMessageEntries({
       updateData.rawLlmMessages = mergedEntries.rawLlmMessages;
     }
 
-    // Update database for persistence
+    // Update database for persistence (after cache is updated)
     await db
       .update(messages)
       .set(updateData)

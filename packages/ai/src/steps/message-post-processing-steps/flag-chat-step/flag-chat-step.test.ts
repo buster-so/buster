@@ -9,6 +9,7 @@ import {
 // Mock the generateObject function to avoid actual LLM calls in unit tests
 vi.mock('ai', () => ({
   generateObject: vi.fn(),
+  wrapLanguageModel: vi.fn((options) => options.model),
 }));
 
 // Mock the Sonnet4 model
@@ -19,6 +20,7 @@ vi.mock('../../llm/sonnet-4', () => ({
 // Mock braintrust to avoid external dependencies in unit tests
 vi.mock('braintrust', () => ({
   wrapTraced: vi.fn((fn) => fn),
+  BraintrustMiddleware: vi.fn(() => ({})),
 }));
 
 describe('flag-chat-step', () => {

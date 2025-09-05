@@ -25,7 +25,8 @@ export function createRespondWithoutAssetCreationRawLlmMessageEntry(
   state: RespondWithoutAssetCreationState,
   toolCallId: string
 ): ModelMessage | undefined {
-  if (!state.args) {
+  // Follow the same pattern as done-tool - use the extracted value, not raw args
+  if (!state.final_response) {
     return undefined;
   }
 
@@ -36,7 +37,7 @@ export function createRespondWithoutAssetCreationRawLlmMessageEntry(
         type: 'tool-call',
         toolCallId,
         toolName: RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
-        input: state.args,
+        input: { final_response: state.final_response },
       },
     ],
   };

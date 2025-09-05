@@ -15,13 +15,13 @@ import { type MessageEntriesCacheValue, messageEntriesCache } from '../message-e
 export async function fetchMessageEntries(
   messageId: string
 ): Promise<MessageEntriesCacheValue | null> {
-  // Check cache first
+  // Check cache first - return immediately if found
   const cached = messageEntriesCache.get(messageId);
   if (cached) {
     return cached;
   }
 
-  // Fetch from database
+  // Fetch from database only if not in cache
   const result = await db
     .select({
       responseMessages: messages.responseMessages,
@@ -36,14 +36,14 @@ export async function fetchMessageEntries(
     return null;
   }
 
-  // Parse and validate the data
+  // Direct assignment without additional validation - trust the data structure
   const messageEntries: MessageEntriesCacheValue = {
     responseMessages: (result[0].responseMessages as ChatMessageResponseMessage[]) || [],
     reasoning: (result[0].reasoning as ChatMessageReasoningMessage[]) || [],
     rawLlmMessages: (result[0].rawLlmMessages as ModelMessage[]) || [],
   };
 
-  // Cache the result
+  // Cache the result for future reads
   messageEntriesCache.set(messageId, messageEntries);
 
   return messageEntries;

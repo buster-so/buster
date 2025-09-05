@@ -3,6 +3,7 @@ import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { Haiku35 } from '../../../llm/haiku-3-5';
+import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
 
 // Schema for what the LLM returns
 const llmOutputSchema = z.object({
@@ -94,6 +95,7 @@ export async function extractValuesWithLLM(
           schema: llmOutputSchema,
           messages,
           temperature: 0,
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
         });
 
         return object;

@@ -25,6 +25,7 @@ vi.mock('ai', () => {
     tool: vi.fn((config: any) => config),
     stepCountIs: vi.fn((count: number) => ({ type: 'stepCount', count })),
     hasToolCall: vi.fn((toolName: string) => ({ type: 'toolCall', toolName })),
+    wrapLanguageModel: vi.fn((options) => options.model),
   };
 });
 
@@ -35,6 +36,7 @@ import { canHandleNoSuchTool, repairWrongToolName } from './re-ask-strategy';
 
 vi.mock('braintrust', () => ({
   wrapTraced: (fn: any) => fn,
+  BraintrustMiddleware: vi.fn(() => ({})),
 }));
 
 vi.mock('../../../llm', () => ({

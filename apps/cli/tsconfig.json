@@ -1,0 +1,18 @@
+{
+  "extends": "@buster/typescript-config/base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment",
+    "module": "ESNext",
+    "target": "ES2022",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "types": ["bun", "node"]
+  },
+  "include": ["src/**/*", "env.d.ts"],
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
+}

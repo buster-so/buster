@@ -2,6 +2,7 @@ import { createAdapter } from '@buster/data-source';
 import { DataSourceType, getDynamicSampleSize, getStructuralMetadata } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
 import {
+  db,
   getDataSourceCredentials,
   getDataSourceWithDetails,
   upsertDataset,
@@ -63,17 +64,6 @@ export const introspectDataTask: ReturnType<
       return (Object.values(DataSourceType) as string[]).includes(type);
     }
 
-    function mapTableType(type: string): 'table' | 'view' | 'materializedView' {
-      switch (type) {
-        case 'VIEW':
-          return 'view';
-        case 'MATERIALIZED_VIEW':
-          return 'materializedView';
-        default:
-          return 'table';
-      }
-    }
-
     try {
       // Step 1: Fetch credentials from vault
       logger.log('Fetching credentials for data source', { dataSourceId: payload.dataSourceId });
@@ -128,18 +118,20 @@ export const introspectDataTask: ReturnType<
       });
 
       for (const table of filteredTables) {
-        await upsertDataset({
-          name: table.name,
-          databaseName: table.name,
-          databaseIdentifier: table.database,
-          schema: table.schema,
-          type: mapTableType(table.type),
-          definition: `SELECT * FROM ${table.database}.${table.schema}.${table.name}`,
-          dataSourceId: payload.dataSourceId,
-          organizationId: dataSourceDetails.organizationId,
-          createdBy: dataSourceDetails.createdBy,
-          updatedBy: dataSourceDetails.createdBy,
-        });
+        await upsertDataset(
+          db,
+          {
+            name: table.name,
+            data_source_name: payload.dataSourceId, // Use dataSourceId as the name
+            database: table.database,
+            schema: table.schema,
+            sql_definition: `SELECT * FROM ${table.database}.${table.schema}.${table.name}`,
+            columns: [], // Will be populated later during introspection
+          },
+          dataSourceDetails.createdBy,
+          dataSourceDetails.organizationId,
+          payload.dataSourceId
+        );
 
         logger.log('Dataset record created/updated', {
           table: `${table.database}.${table.schema}.${table.name}`,

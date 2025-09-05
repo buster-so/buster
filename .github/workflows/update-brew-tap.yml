@@ -1,4 +1,4 @@
-name: Release Homebrew Tap for Buster CLI
+name: Update Homebrew Tap
 
 on:
   workflow_call:
@@ -6,131 +6,224 @@ on:
       tag:
         required: true
         type: string
-    secrets:
-      homebrew_tap_rw: # Secret for pushing to buster-so/buster-homebrew
+        description: 'The release tag (e.g., v0.3.0)'
+      version:
         required: true
+        type: string
+        description: 'The version number (e.g., 0.3.0)'
+    secrets:
+      HOMEBREW_TAP_TOKEN:
+        required: true
+        description: 'Token with write access to the Homebrew tap repository'
   workflow_dispatch:
     inputs:
       tag:
-        description: 'The release tag to use (e.g., v0.1.0)'
+        description: 'The release tag to use (e.g., v0.3.0)'
+        required: true
+        type: string
+      version:
+        description: 'The version number (e.g., 0.3.0)'
         required: true
         type: string
 
 permissions:
-  contents: write # Allows the workflow to commit to the tap repository if using GITHUB_TOKEN, though homebrew_tap_rw is primary for cross-repo
+  contents: read
+  actions: read
 
 jobs:
-  release:
-    runs-on: blacksmith 
+  update-tap:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
-    - name: Checkout Homebrew tap repository
-      uses: actions/checkout@v4
-      with:
-        repository: buster-so/buster-homebrew # Target tap repository
-        ref: 'main' # Or your default branch for the tap
-        token: ${{ secrets.homebrew_tap_rw }}
+      - name: Validate inputs
+        run: |
+          echo "📋 Validating inputs..."
+          echo "Tag: ${{ inputs.tag }}"
+          echo "Version: ${{ inputs.version }}"
+          
+          if [[ -z "${{ inputs.tag }}" || -z "${{ inputs.version }}" ]]; then
+            echo "❌ Error: Both tag and version are required"
+            exit 1
+          fi
 
-    - name: Download macOS ARM64 package
-      uses: robinraju/release-downloader@v1.12
-      with:
-        repository: "buster-so/buster" # Source of the CLI releases
-        tag: ${{ inputs.tag }} # e.g., v0.1.0
-        fileName: "buster-cli-darwin-arm64.tar.gz" # Exact asset name
+      - name: Set up GitHub CLI
+        run: |
+          echo "🔧 GitHub CLI is pre-installed on runners"
+          gh --version
 
-    - name: Download macOS Intel package
-      uses: robinraju/release-downloader@v1.12
-      with:
-        repository: "buster-so/buster"
-        tag: ${{ inputs.tag }}
-        fileName: "buster-cli-darwin-x86_64.tar.gz"
+      - name: Download SHA256 sums from GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "📥 Downloading SHA256 checksums for release ${{ inputs.tag }}..."
+          
+          # Download all SHA256 files
+          gh release download ${{ inputs.tag }} --pattern '*.sha256' -R $GH_REPO --clobber || {
+            echo "❌ Failed to download SHA256 files. Checking if release exists..."
+            gh release view ${{ inputs.tag }} -R $GH_REPO || {
+              echo "❌ Release ${{ inputs.tag }} not found!"
+              exit 1
+            }
+          }
+          
+          echo "Downloaded SHA256 files:"
+          ls -la *.sha256
+          
+          # Extract SHA256 hashes
+          SHA_ARM64=$(cat buster-cli-darwin-arm64.tar.gz.sha256 | awk '{print $1}')
+          SHA_INTEL=$(cat buster-cli-darwin-x86_64.tar.gz.sha256 | awk '{print $1}')
+          SHA_LINUX=$(cat buster-cli-linux-x86_64.tar.gz.sha256 | awk '{print $1}')
+          SHA_WINDOWS=$(cat buster-cli-windows-x86_64.zip.sha256 | awk '{print $1}')
+          
+          # Export for later steps
+          echo "SHA_ARM64=$SHA_ARM64" >> $GITHUB_ENV
+          echo "SHA_INTEL=$SHA_INTEL" >> $GITHUB_ENV
+          echo "SHA_LINUX=$SHA_LINUX" >> $GITHUB_ENV
+          echo "SHA_WINDOWS=$SHA_WINDOWS" >> $GITHUB_ENV
+          
+          echo "✅ SHA256 checksums extracted:"
+          echo "  ARM64:   $SHA_ARM64"
+          echo "  Intel:   $SHA_INTEL"
+          echo "  Linux:   $SHA_LINUX"
+          echo "  Windows: $SHA_WINDOWS"
 
-    - name: Download Linux Intel package
-      uses: robinraju/release-downloader@v1.12
-      with:
-        repository: "buster-so/buster"
-        tag: ${{ inputs.tag }}
-        fileName: "buster-cli-linux-x86_64.tar.gz"
+      - name: Checkout Homebrew tap repository
+        uses: actions/checkout@v4
+        with:
+          repository: buster-so/buster-homebrew
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: buster-homebrew
 
-    - name: Generate and Push Formula File
-      run: |
-        set -e # Exit immediately if a command exits with a non-zero status.
+      - name: Configure Git
+        working-directory: ./buster-homebrew
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        echo "Calculating SHA256 checksums..."
-        darwin_arm64_hash=$(shasum -a 256 buster-cli-darwin-arm64.tar.gz | awk '{ print $1 }')
-        darwin_x86_64_hash=$(shasum -a 256 buster-cli-darwin-x86_64.tar.gz | awk '{ print $1 }')
-        linux_x86_64_hash=$(shasum -a 256 buster-cli-linux-x86_64.tar.gz | awk '{ print $1 }')
+      - name: Update Homebrew Formula
+        working-directory: ./buster-homebrew
+        env:
+          VERSION: ${{ inputs.version }}
+          TAG: ${{ inputs.tag }}
+          SHA_ARM64: ${{ env.SHA_ARM64 }}
+          SHA_INTEL: ${{ env.SHA_INTEL }}
+          SHA_LINUX: ${{ env.SHA_LINUX }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          echo "📝 Updating Homebrew formula for version $VERSION..."
+          
+          FORMULA_FILE="Formula/buster.rb"
+          
+          # Create or update the formula file
+          cat > "$FORMULA_FILE" << 'FORMULA'
+          # typed: false
+          # frozen_string_literal: true
+          
+          class Buster < Formula
+            desc "Command-line interface for Buster AI data platform"
+            homepage "https://github.com/buster-so/buster"
+            version "VERSION_PLACEHOLDER"
+            license "MIT"
+          
+            livecheck do
+              url :stable
+              strategy :github_latest
+              regex(/^v?(\d+(?:\.\d+)+)$/i)
+            end
+          
+            on_macos do
+              on_arm do
+                url "https://github.com/REPO_OWNER/buster/releases/download/TAG_PLACEHOLDER/buster-cli-darwin-arm64.tar.gz"
+                sha256 "SHA_ARM64_PLACEHOLDER"
+              end
+              on_intel do
+                url "https://github.com/REPO_OWNER/buster/releases/download/TAG_PLACEHOLDER/buster-cli-darwin-x86_64.tar.gz"
+                sha256 "SHA_INTEL_PLACEHOLDER"
+              end
+            end
+          
+            on_linux do
+              on_intel do
+                url "https://github.com/REPO_OWNER/buster/releases/download/TAG_PLACEHOLDER/buster-cli-linux-x86_64.tar.gz"
+                sha256 "SHA_LINUX_PLACEHOLDER"
+              end
+            end
+          
+            def install
+              bin.install "buster"
+            end
+          
+            test do
+              assert_match version.to_s, shell_output("#{bin}/buster --version 2>&1", 0)
+            end
+          end
+          FORMULA
+          
+          # Replace placeholders
+          sed -i "s/VERSION_PLACEHOLDER/$VERSION/g" "$FORMULA_FILE"
+          sed -i "s/TAG_PLACEHOLDER/$TAG/g" "$FORMULA_FILE"
+          sed -i "s/REPO_OWNER/$REPO_OWNER/g" "$FORMULA_FILE"
+          sed -i "s/SHA_ARM64_PLACEHOLDER/$SHA_ARM64/g" "$FORMULA_FILE"
+          sed -i "s/SHA_INTEL_PLACEHOLDER/$SHA_INTEL/g" "$FORMULA_FILE"
+          sed -i "s/SHA_LINUX_PLACEHOLDER/$SHA_LINUX/g" "$FORMULA_FILE"
+          
+          echo "--- Updated Formula ---"
+          cat "$FORMULA_FILE"
+          echo "--- End of Formula ---"
 
-        echo "Darwin ARM64 SHA: ${darwin_arm64_hash}"
-        echo "Darwin x86_64 SHA: ${darwin_x86_64_hash}"
-        echo "Linux x86_64 SHA: ${linux_x86_64_hash}"
+      - name: Test formula syntax
+        working-directory: ./buster-homebrew
+        run: |
+          echo "🧪 Testing formula syntax..."
+          # Basic Ruby syntax check
+          ruby -c Formula/buster.rb || {
+            echo "❌ Formula has syntax errors!"
+            exit 1
+          }
+          echo "✅ Formula syntax is valid"
 
-        input_tag="${{ inputs.tag }}"
-        # Strip the leading 'v' if present, to get the version number like "0.1.0"
-        version="${input_tag#v}"
-        echo "Input tag: ${input_tag}, Version: ${version}"
+      - name: Commit and push changes to Homebrew tap
+        working-directory: ./buster-homebrew
+        run: |
+          git add Formula/buster.rb
+          
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit - formula is already up to date"
+          else
+            echo "💾 Committing changes..."
+            git commit -m "Update Buster CLI to version ${{ inputs.version }}
 
-        formula_file="Formula/buster.rb" # Name of the formula file in the tap repository
+            Release: ${{ inputs.tag }}
+            Source: ${{ github.server_url }}/${{ github.repository }}
+            
+            [skip ci]"
+            
+            echo "📤 Pushing to Homebrew tap..."
+            git push
+            echo "✅ Successfully updated Homebrew tap!"
+          fi
 
-        echo "Generating ${formula_file}..."
-        echo '# typed: false' > "${formula_file}"
-        echo '# frozen_string_literal: true' >> "${formula_file}"
-        echo '' >> "${formula_file}"
-        echo 'class Buster < Formula' >> "${formula_file}"
-        echo '  desc "Command-line interface for using buster Buster"' >> "${formula_file}"
-        echo '  homepage "https://github.com/buster-so/buster"' >> "${formula_file}"
-        echo "  version \"${version}\"" >> "${formula_file}"
-        echo '  license "MIT"' >> "${formula_file}"
-        echo '' >> "${formula_file}"
-        echo '  livecheck do' >> "${formula_file}"
-        echo '    url :stable' >> "${formula_file}"
-        echo '    strategy :github_latest' >> "${formula_file}"
-        echo '    regex(/^v?(\d+(?:\.\d+)*)$/i)' >> "${formula_file}"
-        echo '  end' >> "${formula_file}"
-        echo '' >> "${formula_file}"
-        echo '  on_macos do' >> "${formula_file}"
-        echo '    on_arm do' >> "${formula_file}"
-        echo "      url \"https://github.com/buster-so/buster/releases/download/${input_tag}/buster-cli-darwin-arm64.tar.gz\"" >> "${formula_file}"
-        echo "      sha256 \"${darwin_arm64_hash}\"" >> "${formula_file}"
-        echo '    end' >> "${formula_file}"
-        echo '    on_intel do' >> "${formula_file}"
-        echo "      url \"https://github.com/buster-so/buster/releases/download/${input_tag}/buster-cli-darwin-x86_64.tar.gz\"" >> "${formula_file}"
-        echo "      sha256 \"${darwin_x86_64_hash}\"" >> "${formula_file}"
-        echo '    end' >> "${formula_file}"
-        echo '  end' >> "${formula_file}"
-        echo '' >> "${formula_file}"
-        echo '  on_linux do' >> "${formula_file}"
-        echo "    url \"https://github.com/buster-so/buster/releases/download/${input_tag}/buster-cli-linux-x86_64.tar.gz\"" >> "${formula_file}"
-        echo "    sha256 \"${linux_x86_64_hash}\"" >> "${formula_file}"
-        echo '  end' >> "${formula_file}"
-        echo '' >> "${formula_file}"
-        echo '  def install' >> "${formula_file}"
-        echo '    bin.install "buster-cli" => "buster"' >> "${formula_file}"
-        echo '  end' >> "${formula_file}"
-        echo '' >> "${formula_file}"
-        echo '  test do' >> "${formula_file}"
-        echo '    assert_match "buster", shell_output("#{bin}/buster --help")' >> "${formula_file}"
-        echo '  end' >> "${formula_file}"
-        echo 'end' >> "${formula_file}"
-        # Ensure a final newline, some linters prefer it
-        echo '' >> "${formula_file}"
-
-        echo "--- Generated ${formula_file} ---"
-        cat "${formula_file}"
-        echo "---------------------------"
-
-        echo "Configuring git..."
-        git config user.name "Buster CLI Release Workflow"
-        git config user.email "actions@github.com"
-
-        echo "Adding and committing ${formula_file}..."
-        git add "${formula_file}"
-        
-        # Check if there are changes to commit
-        if git diff --staged --quiet; then
-          echo "No changes to commit to ${formula_file}."
-        else
-          git commit -m "Update ${formula_file} for version ${input_tag}"
-          echo "Pushing changes..."
-          git push
-          echo "Pushed updated ${formula_file} for version ${input_tag} to buster-so/buster-homebrew"
-        fi
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## 🍺 Homebrew Tap Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository:** buster-so/buster-homebrew" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "✅ **Status:** Successfully updated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Installation" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo 'brew tap buster-so/buster-homebrew' >> $GITHUB_STEP_SUMMARY
+            echo 'brew install buster' >> $GITHUB_STEP_SUMMARY
+            echo '# or to upgrade:' >> $GITHUB_STEP_SUMMARY
+            echo 'brew upgrade buster' >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status:** Update failed" >> $GITHUB_STEP_SUMMARY
+            echo "Check the logs above for details." >> $GITHUB_STEP_SUMMARY
+          fi

@@ -3,15 +3,19 @@ description: Creating tan stack query options to be consuming in providers and a
 globs: src/api/query_keys/**/*
 alwaysApply: false
 ---
+
 # Query Keys Folder Rules
 
 ## Overview
+
 The `query-keys` folder is a structured directory that contains files, each serving as a **namespace** for a specific API. These files define TanStack React Query options, ensuring a consistent and maintainable approach to managing query keys.
 
 ## Structure
+
 Each file in this folder represents a distinct **namespace** corresponding to an API domain. Within these files, query options must be defined using the `queryOptions` utility from `@tanstack/react-query`.
 
 ### Example
+
 Below is an example of how query options should be structured within a file:
 
 ```ts
@@ -39,20 +43,55 @@ export const chatQueryKeys = {
 ```
 
 ## Naming Conventions
+
 - Each file should follow a **singular, lowercase** naming convention that represents the API namespace (e.g., `chats.ts`, `users.ts`).
 - Query keys should use a structured array format: `[namespace, action, identifier]`.
 - Exported objects should map endpoint-like keys to their respective query functions.
 
 ## Query Option Requirements
+
 - Every query must be wrapped in `queryOptions<T>()` to ensure type safety.
 - `queryKey` must be a **constant tuple** to prevent unnecessary re-renders.
 - `staleTime` should be explicitly set based on the expected data refresh frequency.
 - All query options must be **exported in a structured object**, similar to `chatQueryKeys`, to maintain consistency and ease of access across the application.
 
+## GET Query Hook Implementation
+
+When implementing GET query hooks (like `useGetReport`), follow this pattern to support options and select functionality:
+
+```ts
+export const useGetReport = <T = GetReportResponse>(
+  { reportId, versionNumber }: { reportId: string | undefined; versionNumber?: number },
+  options?: Omit<UseQueryOptions<GetReportResponse, RustApiError, T>, 'queryKey' | 'queryFn'>
+) => {
+  const queryFn = useMemoizedFn(() => {
+    return getReportById(reportId!);
+  });
+
+  return useQuery({
+    ...queryKeys.reportsGetReport(reportId!, versionNumber),
+    queryFn,
+    enabled: !!reportId,
+    select: options?.select,
+    ...options
+  });
+};
+```
+
+### GET Query Hook Requirements
+
+- **Generic Type Support**: Use a generic `<T = DefaultResponseType>` to allow data transformation through select
+- **Options Parameter**: Include an `options` parameter that omits `'queryKey'` and `'queryFn'` from `UseQueryOptions`
+- **Select Handling**: Explicitly handle `select: options?.select` in the useQuery call
+- **Options Spreading**: Spread `...options` at the end to allow all other query options to be customized
+- **Type Safety**: Ensure proper TypeScript types with `UseQueryOptions<ResponseType, ErrorType, TransformedType>`
+
 ## Common Query Keys File
+
 There is also a `common.ts` file that consolidates **all** namespaced query keys into a single exported object. All new query namespaces must be added to this file to ensure uniform access across the application.
 
 ### Example Structure of `common.ts`
+
 ```ts
 import { chatQueryKeys } from './chat';
 import { collectionQueryKeys } from './collection';
@@ -76,4 +115,3 @@ export const queryKeys = {
 ```
 
 By following these guidelines, we ensure consistency, readability, and optimal caching behavior in our TanStack React Query implementation.
-

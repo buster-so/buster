@@ -10,6 +10,7 @@
     { "path": "../packages/data-source" },
     { "path": "../packages/database" },
     { "path": "../packages/rerank" },
+    { "path": "../packages/sdk" },
     { "path": "../packages/server-shared" },
     { "path": "../packages/slack" },
     { "path": "../packages/stored-values" },

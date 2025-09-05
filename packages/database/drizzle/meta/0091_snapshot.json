@@ -1,5 +1,5 @@
 {
-  "id": "fb85e5c4-9a77-43d7-b19f-3d501bccba3f",
+  "id": "ca69431e-0a76-4006-ac7d-9f7ddb3706d3",
   "prevId": "eefeb910-f25f-41fd-a61d-8a2b035b7f13",
   "version": "7",
   "dialect": "postgresql",
@@ -2257,13 +2257,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
         }
       },
       "indexes": {},
@@ -2323,11 +2316,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "datasets_database_name_data_source_id_key": {
-          "name": "datasets_database_name_data_source_id_key",
+        "datasets_name_schema_database_identifier_data_source_id_key": {
+          "name": "datasets_name_schema_database_identifier_data_source_id_key",
           "nullsNotDistinct": false,
           "columns": [
-            "database_name",
+            "name",
+            "schema",
+            "database_identifier",
             "data_source_id"
           ]
         }

@@ -13,6 +13,9 @@ export * from './relations';
 // Export database helpers
 export * from './queries';
 
+// Export error parsing utilities
+export { parseDatabaseError, getErrorHint, type ParsedDatabaseError } from './helpers/error-parser';
+
 // Export vault functions
 export * from './vault';
 

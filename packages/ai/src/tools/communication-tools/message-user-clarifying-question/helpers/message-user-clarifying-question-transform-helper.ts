@@ -33,7 +33,8 @@ export function createMessageUserClarifyingQuestionRawLlmMessageEntry(
   state: MessageUserClarifyingQuestionState,
   toolCallId: string
 ): ModelMessage | undefined {
-  if (!state.args) {
+  // Follow the same pattern as done-tool - use the extracted value, not raw args
+  if (!state.clarifyingQuestion) {
     return undefined;
   }
 
@@ -44,7 +45,7 @@ export function createMessageUserClarifyingQuestionRawLlmMessageEntry(
         type: 'tool-call',
         toolCallId,
         toolName: MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
-        input: state.args,
+        input: { clarifying_question: state.clarifyingQuestion },
       },
     ],
   };

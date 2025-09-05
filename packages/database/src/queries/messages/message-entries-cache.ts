@@ -22,8 +22,8 @@ class MessageEntriesCache {
 
   private constructor(options: CacheOptions = {}) {
     this.cache = new LRUCache<string, MessageEntriesCacheValue>({
-      max: options.max ?? 100,
-      ttl: options.ttl ?? 1000 * 60 * 2, // 2 minutes TTL
+      max: options.max ?? 500, // Increased from 100 for better hit rate
+      ttl: options.ttl ?? 1000 * 60 * 5, // Increased to 5 minutes TTL
       updateAgeOnGet: true, // Refresh TTL on read
       updateAgeOnHas: true, // Refresh TTL on has check
     });

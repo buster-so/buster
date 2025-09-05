@@ -1,0 +1,61 @@
+name: users
+description: User demographics and activity data
+data_source_name: main_db
+schema: analytics
+database: production
+
+dimensions:
+  - name: user_id
+    description: Unique identifier for the user
+    type: string
+    searchable: true
+  
+  - name: username
+    description: User's display name
+    type: string
+    searchable: true
+  
+  - name: email
+    description: User's email address
+    type: string
+    searchable: true
+  
+  - name: created_at
+    description: When the user account was created
+    type: timestamp
+  
+  - name: country
+    description: User's country
+    type: string
+    searchable: true
+    options: ["USA", "Canada", "UK", "Germany", "France", "Japan", "Australia"]
+
+measures:
+  - name: total_users
+    description: Count of all users
+    type: number
+  
+  - name: active_users
+    description: Count of active users
+    type: number
+  
+  - name: revenue
+    description: Total revenue from user
+    type: number
+
+metrics:
+  - name: average_revenue_per_user
+    expr: "revenue / total_users"
+    description: Calculate ARPU
+
+filters:
+  - name: active_only
+    expr: "status = 'active'"
+    description: Filter for active users only
+
+relationships:
+  - name: user_orders
+    source_col: user_id
+    ref_col: orders.user_id
+    type: one_to_many
+    description: User has many orders

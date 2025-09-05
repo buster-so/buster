@@ -38,12 +38,11 @@ describe('Docs Agent Instructions', () => {
     const result = getDocsAgentSystemPrompt();
 
     // Check for key sections that should be in the prompt
-    expect(result).toContain('<intro>');
     expect(result).toContain('<event_stream>');
-    expect(result).toContain('<workflow_steps>');
+    expect(result).toContain('<repository_and_file_info>');
     expect(result).toContain('<persistence>');
-    expect(result).toContain('<playbook>');
-    expect(result).toContain('<system_limitations>');
+    expect(result).toContain('<todo_list_and_playbook>');
+    expect(result).toContain('<yaml_documentation_files>');
     expect(result).toContain('You are Buster');
   });
 

@@ -2,6 +2,7 @@ import { streamObject } from 'ai';
 import type { ModelMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
 import { Sonnet4 } from '../../../llm/sonnet-4';
 import { getCreateTodosSystemMessage } from './get-create-todos-system-message';
 
@@ -87,10 +88,16 @@ async function generateTodosWithLLM(
         await onStreamStart();
 
         const { object, textStream } = streamObject({
+          headers: {
+            'anthropic-beta':
+              'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+            anthropic_beta: 'fine-grained-tool-streaming-2025-05-14,extended-cache-ttl-2025-04-11',
+          },
           model: Sonnet4,
           schema: llmOutputSchema,
           messages: todosMessages,
           temperature: 0,
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
         });
 
         // Process text deltas for optimistic updates

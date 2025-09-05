@@ -171,10 +171,15 @@ install_unix() {
     mkdir -p "$install_dir"
     
     # Move binary to install directory
-    local binary_path="$(dirname "$archive_path")/$BINARY_NAME"
+    # Note: The archive contains 'buster' directly, not 'buster-cli'
+    local binary_path="$(dirname "$archive_path")/$INSTALL_NAME"
     if [[ ! -f "$binary_path" ]]; then
-        print_error "Binary not found after extraction: $binary_path"
-        exit 1
+        # Fallback to old naming for backward compatibility
+        binary_path="$(dirname "$archive_path")/$BINARY_NAME"
+        if [[ ! -f "$binary_path" ]]; then
+            print_error "Binary not found after extraction. Looked for both $INSTALL_NAME and $BINARY_NAME"
+            exit 1
+        fi
     fi
     
     if ! mv "$binary_path" "$install_dir/$INSTALL_NAME"; then
@@ -219,10 +224,15 @@ install_windows() {
     mkdir -p "$install_dir"
     
     # Move binary to install directory
-    local binary_path="$(dirname "$archive_path")/${BINARY_NAME}.exe"
+    # Note: The archive contains 'buster.exe' directly, not 'buster-cli.exe'
+    local binary_path="$(dirname "$archive_path")/${INSTALL_NAME}.exe"
     if [[ ! -f "$binary_path" ]]; then
-        print_error "Binary not found after extraction: $binary_path"
-        exit 1
+        # Fallback to old naming for backward compatibility
+        binary_path="$(dirname "$archive_path")/${BINARY_NAME}.exe"
+        if [[ ! -f "$binary_path" ]]; then
+            print_error "Binary not found after extraction. Looked for both ${INSTALL_NAME}.exe and ${BINARY_NAME}.exe"
+            exit 1
+        fi
     fi
     
     if ! mv "$binary_path" "$install_dir/${INSTALL_NAME}.exe"; then

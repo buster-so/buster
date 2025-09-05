@@ -835,7 +835,12 @@ export const datasets = pgTable(
       foreignColumns: [users.id],
       name: 'datasets_updated_by_fkey',
     }).onUpdate('cascade'),
-    unique('datasets_database_name_data_source_id_key').on(table.databaseName, table.dataSourceId),
+    unique('datasets_name_schema_database_identifier_data_source_id_key').on(
+      table.name,
+      table.schema,
+      table.databaseIdentifier,
+      table.dataSourceId
+    ),
   ]
 );
 

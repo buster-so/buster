@@ -8,11 +8,12 @@ packages:
   - "apps/electric-server"
   - "apps/trigger"
   - "apps/api"
+  - "apps/cli"
 
 catalog:
   "@supabase/supabase-js": "^2.50.0"
-  "@trigger.dev/build": "^4.0.0"
-  "@trigger.dev/sdk": "^4.0.0"
+  "@trigger.dev/build": "^4.0.2"
+  "@trigger.dev/sdk": "^4.0.2"
   "@platejs/autoformat": "^49.0.0"
   "@platejs/basic-nodes": "^49.0.0"
   ai: "^5.0.5"

@@ -2,6 +2,7 @@ import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
 import { Sonnet4 } from '../../../llm/sonnet-4';
 import { MessageHistorySchema } from '../../../utils/memory/types';
 import { getIdentifyAssumptionsSystemMessage } from './get-identify-assumptions-system-message';
@@ -186,6 +187,7 @@ No conversation history available for analysis.`,
           messages,
           temperature: 0,
           maxOutputTokens: 10000,
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
         });
         return object;
       },
