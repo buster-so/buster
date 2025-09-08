@@ -210,7 +210,6 @@ const InlineComboboxInput = React.forwardRef<
       })?.width + 8
     );
   }, [placeholder]);
-  console.log(placeHolderWidth);
 
   /**
    * To create an auto-resizing input, we render a visually hidden span

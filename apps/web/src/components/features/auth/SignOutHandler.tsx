@@ -4,8 +4,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { signOut } from '@/integrations/supabase/signOut';
 import { clearAllBrowserStorage } from '@/lib/storage';
 
-const navigate = useNavigate();
-
 export const useSignOut = () => {
   const { openErrorMessage } = useBusterNotifications();
   const navigate = useNavigate();

@@ -13,8 +13,6 @@ const isValidRedirectUrl = (url: string): boolean => {
   }
 };
 
-const fallbackCallbackUrl = `${env.VITE_PUBLIC_URL}/auth/callback`;
-
 // Common OAuth handler to reduce code duplication
 const handleOAuthSignIn = async (
   provider: 'google' | 'github' | 'azure',
@@ -55,6 +53,7 @@ export const signInWithEmailAndPassword = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient();
+
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,

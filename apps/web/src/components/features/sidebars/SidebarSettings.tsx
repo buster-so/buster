@@ -6,6 +6,7 @@ import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
 import { createSidebarGroup } from '@/components/ui/sidebar/create-sidebar-item';
 import LockCircle from '../../ui/icons/NucleoIconOutlined/lock-circle';
 import { type ISidebarGroup, Sidebar } from '../../ui/sidebar';
+import { ComponentErrorCard } from '../global/ComponentErrorCard';
 import { SidebarUserFooter } from './SidebarUserFooter';
 
 const accountItems: ISidebarGroup = createSidebarGroup({
@@ -107,12 +108,14 @@ export const SidebarSettings = () => {
   }, [isAdmin]);
 
   return (
-    <Sidebar
-      content={sidebarItems}
-      header={useMemo(() => <SidebarSettingsHeader />, [])}
-      footer={useMemo(() => <SidebarUserFooter />, [])}
-      useCollapsible={isUserRegistered}
-    />
+    <ComponentErrorCard header="Settings Sidebar">
+      <Sidebar
+        content={sidebarItems}
+        header={useMemo(() => <SidebarSettingsHeader />, [])}
+        footer={useMemo(() => <SidebarUserFooter />, [])}
+        useCollapsible={isUserRegistered}
+      />
+    </ComponentErrorCard>
   );
 };
 

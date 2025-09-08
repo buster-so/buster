@@ -3,8 +3,19 @@ import { usePostHog } from 'posthog-js/react';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Card, CardContent, CardFooter } from '@/components/ui/card/CardBase';
+import { useMount } from '../../../hooks/useMount';
 
-export const ErrorCard = () => {
+export const ErrorCard = ({
+  header = 'Looks like we hit an unexpected error',
+  message = "Our team has been notified via Slack. We'll take a look at the issue ASAP and get back to you.",
+}: {
+  header?: string;
+  message?: string;
+}) => {
+  useMount(() => {
+    console.error('Error in card:', header, message);
+  });
+
   return (
     <div
       className=" flex h-full w-full flex-col items-center absolute inset-0 justify-center bg-linear-to-br bg-background p-8 backdrop-blur-xs backdrop-filter"
@@ -13,11 +24,9 @@ export const ErrorCard = () => {
       <Card className="-mt-10 max-w-100">
         <CardContent>
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-medium">Looks like we hit an unexpected error</h1>
+            <h1 className="text-2xl font-medium">{header}</h1>
 
-            <h5 className="m-0 text-base font-medium text-gray-600">
-              {`Our team has been notified via Slack. We'll take a look at the issue ASAP and get back to you.`}
-            </h5>
+            <h5 className="m-0 text-base font-medium text-gray-600">{message}</h5>
           </div>
         </CardContent>
 
@@ -42,8 +51,6 @@ export const GlobalErrorCard: ErrorRouteComponent = ({ error }) => {
     if (isPosthogLoaded) {
       posthog.captureException(error);
     }
-
-    console.error('GlobalErrorCard error', error);
   }, [error]);
 
   return <ErrorCard />;

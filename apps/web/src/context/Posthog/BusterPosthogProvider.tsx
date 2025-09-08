@@ -7,6 +7,7 @@ import {
   useGetUserBasicInfo,
   useGetUserOrganization,
 } from '@/api/buster_rest/users/useGetUserInfo';
+import { ComponentErrorCard } from '@/components/features/global/ComponentErrorCard';
 import { isDev } from '@/config/dev';
 import { env } from '@/env';
 import packageJson from '../../../package.json';
@@ -16,16 +17,18 @@ const POSTHOG_KEY = env.VITE_PUBLIC_POSTHOG_KEY;
 const DEBUG_POSTHOG = false;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  console.log('POSTHOG_KEY', POSTHOG_KEY);
-  console.log('DEBUG_POSTHOG', DEBUG_POSTHOG);
   if ((isDev && !DEBUG_POSTHOG) || !POSTHOG_KEY) {
     return <>{children}</>;
   }
 
-  console.log('POSTHOG_KEY22', POSTHOG_KEY);
-  console.log('DEBUG_POSTHOG22', DEBUG_POSTHOG);
-
-  return <PosthogWrapper>{children}</PosthogWrapper>;
+  return (
+    <ComponentErrorCard
+      header="Posthog failed to load"
+      message="Our team has been notified via Slack. We'll take a look at the issue ASAP and get back to you."
+    >
+      <PosthogWrapper>{children}</PosthogWrapper>
+    </ComponentErrorCard>
+  );
 };
 BusterPosthogProvider.displayName = 'BusterPosthogProvider';
 
@@ -49,7 +52,6 @@ const options: Partial<PostHogConfig> = {
 };
 
 const PosthogWrapper: React.FC<PropsWithChildren> = ({ children }) => {
-  console.log('PosthogWrapper');
   const user = useGetUserBasicInfo();
   const { data: userTeams } = useGetUserTeams({ userId: user?.id ?? '' });
   const userOrganizations = useGetUserOrganization();
@@ -112,8 +114,6 @@ const PosthogWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   if (isServer) {
     return <>{children}</>;
   }
-
-  console.log('PostHogProvider!!!!', PostHogProvider);
 
   return (
     <ClientOnly>

@@ -10,7 +10,8 @@ const config = defineConfig(({ command, mode }) => {
   const isProduction = mode === 'production' || mode === 'staging';
   const isTypecheck = process.argv.includes('--typecheck') || process.env.TYPECHECK === 'true';
   const useChecker = !process.env.VITEST && isBuild;
-  const isLocalBuild = process.argv.includes('--local');
+  const isLocalBuild = process.argv.includes('--local') || mode === 'development';
+  const target = isLocalBuild ? ('bun' as const) : ('cloudflare-module' as const);
 
   return {
     server: { port: 3000 },
@@ -20,7 +21,7 @@ const config = defineConfig(({ command, mode }) => {
       tailwindcss(),
       tanstackStart({
         customViteReactPlugin: true,
-        target: isLocalBuild ? 'bun' : 'cloudflare-module',
+        target,
       }),
       viteReact(),
       useChecker

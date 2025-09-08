@@ -39,11 +39,11 @@ export const Route = createFileRoute('/app')({
         ]);
 
       console.log('initialLayout', initialLayout);
-      console.log('user', user);
-      console.log('userInfo', userInfo);
-      console.log('userFavorites', userFavorites);
-      console.log('listDatasources', listDatasources);
-      console.log('datasets', datasets);
+      console.log('user', user?.id);
+      console.log('userInfo', userInfo?.user?.id);
+      console.log('userFavorites', userFavorites?.length);
+      console.log('listDatasources', listDatasources?.length);
+      console.log('datasets', datasets?.length);
 
       if (!user) {
         throw redirect({ to: '/auth/login' });
@@ -63,8 +63,6 @@ export const Route = createFileRoute('/app')({
   },
   component: () => {
     const { user, accessToken } = Route.useLoaderData();
-    console.log('user', user);
-    console.log('accessToken', accessToken);
 
     return (
       <AppProviders user={user} accessToken={accessToken}>

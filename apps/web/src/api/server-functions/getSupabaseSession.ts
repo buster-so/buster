@@ -11,7 +11,6 @@ export const getSupabaseSessionServerFn = createServerFn({ method: 'GET' }).hand
     expires_at: session?.expires_at,
     expires_in: session?.expires_in,
   };
-  console.log('pickedSession', JSON.stringify(pickedSession));
 
   return {
     data: {

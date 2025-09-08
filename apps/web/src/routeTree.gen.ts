@@ -20,6 +20,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AppHealthcheckRouteImport } from './routes/app/healthcheck'
 import { Route as AppSettingsRouteImport } from './routes/app/_settings'
 import { Route as AppAppRouteImport } from './routes/app/_app'
 import { Route as EmbedReportReportIdRouteImport } from './routes/embed.report.$reportId'
@@ -29,6 +30,7 @@ import { Route as AppSettingsRestricted_layoutRouteImport } from './routes/app/_
 import { Route as AppSettingsPermissionsRouteImport } from './routes/app/_settings/_permissions'
 import { Route as AppAppHomeRouteImport } from './routes/app/_app/home'
 import { Route as AppAppAssetRouteImport } from './routes/app/_app/_asset'
+import { Route as AppSettingsSettingsIndexRouteImport } from './routes/app/_settings/settings.index'
 import { Route as AppAppReportsIndexRouteImport } from './routes/app/_app/reports.index'
 import { Route as AppAppMetricsIndexRouteImport } from './routes/app/_app/metrics.index'
 import { Route as AppAppLogsIndexRouteImport } from './routes/app/_app/logs.index'
@@ -198,6 +200,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AppHealthcheckRoute = AppHealthcheckRouteImport.update({
+  id: '/healthcheck',
+  path: '/healthcheck',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/_settings',
   getParentRoute: () => AppRoute,
@@ -240,6 +247,12 @@ const AppAppAssetRoute = AppAppAssetRouteImport.update({
   id: '/_asset',
   getParentRoute: () => AppAppRoute,
 } as any)
+const AppSettingsSettingsIndexRoute =
+  AppSettingsSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AppSettingsRoute,
+  } as any)
 const AppAppReportsIndexRoute = AppAppReportsIndexRouteImport.update({
   id: '/reports/',
   path: '/reports/',
@@ -913,6 +926,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppSettingsRestricted_layoutAdmin_onlyRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
+  '/app/healthcheck': typeof AppHealthcheckRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -929,6 +943,7 @@ export interface FileRoutesByFullPath {
   '/app/logs': typeof AppAppLogsIndexRoute
   '/app/metrics': typeof AppAppMetricsIndexRoute
   '/app/reports': typeof AppAppReportsIndexRoute
+  '/app/settings': typeof AppSettingsSettingsIndexRoute
   '/app/chats/$chatId': typeof AppAppAssetChatsChatIdRouteWithChildren
   '/app/datasets/$datasetId/editor': typeof AppAppDatasetsDatasetIdEditorRoute
   '/app/datasets/$datasetId/overview': typeof AppAppDatasetsDatasetIdOverviewRoute
@@ -1018,6 +1033,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
   '/app': typeof AppSettingsRestricted_layoutAdmin_onlyRouteWithChildren
+  '/app/healthcheck': typeof AppHealthcheckRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -1033,6 +1049,7 @@ export interface FileRoutesByTo {
   '/app/logs': typeof AppAppLogsIndexRoute
   '/app/metrics': typeof AppAppMetricsIndexRoute
   '/app/reports': typeof AppAppReportsIndexRoute
+  '/app/settings': typeof AppSettingsSettingsIndexRoute
   '/app/datasets/$datasetId/editor': typeof AppAppDatasetsDatasetIdEditorRoute
   '/app/datasets/$datasetId/overview': typeof AppAppDatasetsDatasetIdOverviewRoute
   '/app/settings/profile': typeof AppSettingsRestricted_layoutSettingsProfileRoute
@@ -1108,6 +1125,7 @@ export interface FileRoutesById {
   '/healthcheck': typeof HealthcheckRoute
   '/app/_app': typeof AppAppRouteWithChildren
   '/app/_settings': typeof AppSettingsRouteWithChildren
+  '/app/healthcheck': typeof AppHealthcheckRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -1128,6 +1146,7 @@ export interface FileRoutesById {
   '/app/_app/logs/': typeof AppAppLogsIndexRoute
   '/app/_app/metrics/': typeof AppAppMetricsIndexRoute
   '/app/_app/reports/': typeof AppAppReportsIndexRoute
+  '/app/_settings/settings/': typeof AppSettingsSettingsIndexRoute
   '/app/_app/_asset/chats/$chatId': typeof AppAppAssetChatsChatIdRouteWithChildren
   '/app/_app/datasets/$datasetId/editor': typeof AppAppDatasetsDatasetIdEditorRoute
   '/app/_app/datasets/$datasetId/overview': typeof AppAppDatasetsDatasetIdOverviewRoute
@@ -1229,6 +1248,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/healthcheck'
+    | '/app/healthcheck'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/reset-password'
@@ -1245,6 +1265,7 @@ export interface FileRouteTypes {
     | '/app/logs'
     | '/app/metrics'
     | '/app/reports'
+    | '/app/settings'
     | '/app/chats/$chatId'
     | '/app/datasets/$datasetId/editor'
     | '/app/datasets/$datasetId/overview'
@@ -1334,6 +1355,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/healthcheck'
     | '/app'
+    | '/app/healthcheck'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/reset-password'
@@ -1349,6 +1371,7 @@ export interface FileRouteTypes {
     | '/app/logs'
     | '/app/metrics'
     | '/app/reports'
+    | '/app/settings'
     | '/app/datasets/$datasetId/editor'
     | '/app/datasets/$datasetId/overview'
     | '/app/settings/profile'
@@ -1423,6 +1446,7 @@ export interface FileRouteTypes {
     | '/healthcheck'
     | '/app/_app'
     | '/app/_settings'
+    | '/app/healthcheck'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/reset-password'
@@ -1443,6 +1467,7 @@ export interface FileRouteTypes {
     | '/app/_app/logs/'
     | '/app/_app/metrics/'
     | '/app/_app/reports/'
+    | '/app/_settings/settings/'
     | '/app/_app/_asset/chats/$chatId'
     | '/app/_app/datasets/$datasetId/editor'
     | '/app/_app/datasets/$datasetId/overview'
@@ -1627,6 +1652,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/app/healthcheck': {
+      id: '/app/healthcheck'
+      path: '/healthcheck'
+      fullPath: '/app/healthcheck'
+      preLoaderRoute: typeof AppHealthcheckRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/_settings': {
       id: '/app/_settings'
       path: ''
@@ -1689,6 +1721,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app'
       preLoaderRoute: typeof AppAppAssetRouteImport
       parentRoute: typeof AppAppRoute
+    }
+    '/app/_settings/settings/': {
+      id: '/app/_settings/settings/'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsSettingsIndexRouteImport
+      parentRoute: typeof AppSettingsRoute
     }
     '/app/_app/reports/': {
       id: '/app/_app/reports/'
@@ -3120,12 +3159,14 @@ const AppSettingsRestricted_layoutRouteWithChildren =
 interface AppSettingsRouteChildren {
   AppSettingsPermissionsRoute: typeof AppSettingsPermissionsRouteWithChildren
   AppSettingsRestricted_layoutRoute: typeof AppSettingsRestricted_layoutRouteWithChildren
+  AppSettingsSettingsIndexRoute: typeof AppSettingsSettingsIndexRoute
 }
 
 const AppSettingsRouteChildren: AppSettingsRouteChildren = {
   AppSettingsPermissionsRoute: AppSettingsPermissionsRouteWithChildren,
   AppSettingsRestricted_layoutRoute:
     AppSettingsRestricted_layoutRouteWithChildren,
+  AppSettingsSettingsIndexRoute: AppSettingsSettingsIndexRoute,
 }
 
 const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
@@ -3135,12 +3176,14 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAppRoute: typeof AppAppRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
+  AppHealthcheckRoute: typeof AppHealthcheckRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAppRoute: AppAppRouteWithChildren,
   AppSettingsRoute: AppSettingsRouteWithChildren,
+  AppHealthcheckRoute: AppHealthcheckRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

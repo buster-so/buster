@@ -69,7 +69,6 @@ export const defaultAxiosRequestHandler = async (config: InternalAxiosRequestCon
       token = await getSupabaseSessionServerFn().then(
         ({ data: { session } }) => session.access_token
       );
-      console.log('token', token);
     } else {
       // Always check token validity before making requests
       const tokenResult = await checkTokenValidity();
