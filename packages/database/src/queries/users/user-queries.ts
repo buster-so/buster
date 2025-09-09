@@ -56,6 +56,7 @@ export async function findUserByEmailInOrganization(
         updatedAt: users.updatedAt,
         attributes: users.attributes,
         avatarUrl: users.avatarUrl,
+        suggestedPrompts: users.suggestedPrompts,
       })
       .from(users)
       .innerJoin(
