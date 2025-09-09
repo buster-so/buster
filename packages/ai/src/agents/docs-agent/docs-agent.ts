@@ -43,10 +43,12 @@ import { getDocsAgentSystemPrompt } from './get-docs-agent-system-prompt';
 export const DOCS_AGENT_NAME = 'docsAgent';
 
 const DEFAULT_CACHE_OPTIONS = {
-  anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } },
   openai: {
     parallelToolCalls: false,
-    reasoningEffort: 'medium',
+    reasoningEffort: 'high',
+  },
+  gateway: {
+    only: ['openai'],
   },
 };
 

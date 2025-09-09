@@ -407,5 +407,5 @@ describe('docs-agent-workflow integration', () => {
       `Total files processed: ${successfulResults}/${targetYamlFiles.length} YAML files`
     );
     console.info(`Final shared branch with all changes: ${sharedBranchName}`);
-  }, 900000); // 15 minute timeout for full workflow
+  }, 1200000); // 15 minute timeout for full workflow
 });
