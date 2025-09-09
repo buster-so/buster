@@ -1,11 +1,8 @@
-import type { ModelMessage } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { GPT5Nano } from '../../llm';
-import { DEFAULT_OPENAI_OPTIONS } from '../../llm/providers/gateway';
+import SUGGESTED_PROMPTS_SYSTEM_PROMPT from './suggested-prompts-system-prompt.txt';
 
 // Schema for LLM output
 const SuggestedMessagesOutputSchema = z.object({
@@ -18,22 +15,16 @@ const SuggestedMessagesOutputSchema = z.object({
 export type SuggestedMessagesOutput = z.infer<typeof SuggestedMessagesOutputSchema>;
 
 export interface GenerateSuggestedMessagesParams {
-  chatHistory: ModelMessage[];
+  chatHistoryText: string;
   databaseContext: string;
   userId: string;
 }
 
 /**
- * Load the system prompt from the text file
+ * Get the system prompt template
  */
-function loadSystemPrompt(): string {
-  try {
-    const promptPath = join(__dirname, 'suggested-prompts-system-prompt.txt');
-    return readFileSync(promptPath, 'utf-8');
-  } catch (error) {
-    console.warn('[GenerateSuggestedMessages] Failed to load system prompt file, using fallback');
-    return `You are a business intelligence suggestion engine. Generate 3-5 relevant, actionable prompts for each category (report, dashboard, visualization, help) based on the user's data and chat history.`;
-  }
+function getSystemPrompt(): string {
+  return SUGGESTED_PROMPTS_SYSTEM_PROMPT;
 }
 
 /**
@@ -42,54 +33,49 @@ function loadSystemPrompt(): string {
 export async function generateSuggestedMessages(
   params: GenerateSuggestedMessagesParams
 ): Promise<SuggestedMessagesOutput> {
-  const { chatHistory, databaseContext, userId } = params;
+  const { chatHistoryText, databaseContext, userId } = params;
 
   try {
-    const baseSystemPrompt = loadSystemPrompt();
-    
-    // Combine system prompt with database context
+    const baseSystemPrompt = getSystemPrompt();
     const systemPromptWithContext = baseSystemPrompt.replace('{{DOCUMENTATION}}', databaseContext);
-
-    // Format chat history for the user message
-    const chatHistoryText = chatHistory.length > 0 
-      ? chatHistory
-          .slice(-10) // Take last 10 messages to stay within token limits
-          .map((msg, index) => {
-            const role = msg.role.toUpperCase();
-            const content = typeof msg.content === 'string' 
-              ? msg.content 
-              : JSON.stringify(msg.content);
-            return `${index + 1}. ${role}: ${content}`;
-          })
-          .join('\n')
-      : 'No chat history available';
-
     const userMessage = `Based on this chat history, generate suggested prompts:
 
-<chat_history>
+##chat_history
 ${chatHistoryText}
-</chat_history>
 
 Generate suggestions that are relevant to the conversation context and available data.`;
 
     const tracedGeneration = wrapTraced(
       async () => {
-        const { object } = await generateObject({
-          model: GPT5Nano,
-          schema: SuggestedMessagesOutputSchema,
+        const result = await generateObject({
+          model: openai('gpt-5-nano'),
           prompt: userMessage,
-          temperature: 1,
-          maxOutputTokens: 2000,
+          temperature: 0.7,
+          maxOutputTokens: 10000,
           system: systemPromptWithContext,
-          providerOptions: DEFAULT_OPENAI_OPTIONS,
+          schema: SuggestedMessagesOutputSchema,
+          providerOptions: {
+            gateway: {
+              order: ['openai'],
+              openai: {
+                parallelToolCalls: false,
+                reasoningEffort: 'minimal',
+                verbosity: 'low',
+              },
+            },
+          },
         });
 
-        return object;
+        if (!result.object) {
+          throw new Error(`Model returned no object. Finish reason: ${result.finishReason}`);
+        }
+
+        return result.object;
       },
       {
         name: 'Generate Suggested Prompts',
         spanAttributes: {
-          chatHistoryLength: chatHistory.length,
+          chatHistoryLength: chatHistoryText.length,
           userId: userId,
         },
       }
@@ -120,14 +106,8 @@ Generate suggestions that are relevant to the conversation context and available
 
     return validatedSuggestions;
   } catch (error) {
-    console.error('[GenerateSuggestedMessages] Failed to generate suggestions:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      errorType: error instanceof Error ? error.name : 'Unknown',
-      chatHistoryLength: chatHistory.length,
-      userId: userId,
-    });
+    console.error('[GenerateSuggestedMessages] Failed to generate suggestions:', error);
 
-    // Return fallback suggestions on error
     return {
       report: getFallbackSuggestions('report'),
       dashboard: getFallbackSuggestions('dashboard'),

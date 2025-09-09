@@ -63,7 +63,7 @@ export async function updateUserSuggestedPrompts(
  */
 export async function getUserSuggestedPrompts(
   params: GetSuggestedPromptsInput
-): Promise<UserSuggestedPrompts | null> {
+): Promise<UserSuggestedPrompts> {
   try {
     const { userId } = GetSuggestedPromptsInputSchema.parse(params);
 
@@ -74,7 +74,12 @@ export async function getUserSuggestedPrompts(
       .limit(1);
 
     const user = result[0];
-    return user ? user.suggestedPrompts : null;
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user.suggestedPrompts;
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(`Invalid input: ${error.errors.map((e) => e.message).join(', ')}`);

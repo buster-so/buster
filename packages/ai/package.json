@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@ai-sdk/gateway": "^1.0.18",
+    "@ai-sdk/openai": "2.0.0-beta.16",
     "@ai-sdk/provider": "^2.0.0",
     "@buster/access-controls": "workspace:*",
     "@buster/data-source": "workspace:*",

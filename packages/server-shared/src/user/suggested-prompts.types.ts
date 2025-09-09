@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Core suggested prompts schema that matches the database schema
 export const SuggestedPromptsSchema = z.object({
   report: z.array(z.string()),
   dashboard: z.array(z.string()),
@@ -25,7 +24,6 @@ export const SuggestedPromptsResponseSchema = z.object({
   updatedAt: z.string(), // ISO timestamp string
 });
 
-// Inferred types
 export type GenerateSuggestedPromptsRequest = z.infer<typeof GenerateSuggestedPromptsRequestSchema>;
 export type GetSuggestedPromptsRequest = z.infer<typeof GetSuggestedPromptsRequestSchema>;
 export type SuggestedPromptsResponse = z.infer<typeof SuggestedPromptsResponseSchema>;

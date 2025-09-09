@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import suggestedPromptsRoutes from './id/suggested-prompts';
 
 const app = new Hono()
-  .get('/:id', (c) => {
+  .get('/', (c) => {
     const userId = c.req.param('id');
 
     // Stub data for individual user
@@ -17,7 +17,6 @@ const app = new Hono()
 
     return c.json(stubUser);
   })
-  // Mount suggested prompts routes
-  .route('/:id/suggested-prompts', suggestedPromptsRoutes);
+  .route('/suggested-prompts', suggestedPromptsRoutes);
 
 export default app;
