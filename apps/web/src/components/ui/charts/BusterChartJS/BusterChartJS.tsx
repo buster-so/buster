@@ -11,6 +11,7 @@ import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import type { BusterChartComponentProps } from '../interfaces';
 import { BusterChartJSComponent } from './BusterChartJSComponent';
 import { BusterChartJSLegendWrapper } from './BusterChartJSLegendWrapper';
+import { useSetupChartJS } from './ChartJsContextStore';
 import type { ChartJSOrUndefined } from './core/types';
 
 export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
@@ -43,6 +44,10 @@ export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
   const onInitialAnimationEndPreflight = useCallback(() => {
     if (chartRef.current?.attached) onInitialAnimationEnd?.();
   }, [onInitialAnimationEnd]);
+
+  const hasSetupChartJS = useSetupChartJS();
+
+  if (!hasSetupChartJS) return null;
 
   return (
     <BusterChartJSLegendWrapper

@@ -67,7 +67,6 @@ Only utilize the required/default fields unless the user specifically requests t
 #   - minimumFractionDigits: Min decimal places to show
 #   - maximumFractionDigits: Max decimal places to show
 #   - prefix: Text to show before the value
-#   - suffix: Text to show after the value
 #   - compactNumbers: Show as 1K, 1M, etc. (boolean)
 #   - currency: Currency code for currency style (e.g., USD, EUR)
 #   - dateFormat: Format string for dates (Day.js compatible)
@@ -711,9 +710,6 @@ definitions:
                   - columnId
                   - useValue
                 description: Configuration for a derived metric sub-header
-          metricValueLabel:
-            type: [string, 'null']
-            description: Custom label for metric value. If null, uses metricColumnId with metricValueAggregate. Default: null
         required:
           - selectedChartType
           - metricColumnId

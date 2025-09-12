@@ -1,3 +1,5 @@
+'use client';
+
 import { DEFAULT_CHART_THEME } from '@buster/server-shared/metrics';
 import {
   ArcElement,
@@ -31,6 +33,17 @@ import ChartTrendlinePlugin from './core/plugins/chartjs-plugin-trendlines';
 import './core/plugins/chartjs-plugin-dayjs';
 import './core/plugins/chartjs-scale-tick-duplicate';
 import './core/plugins/chartjs-plugin-trendlines';
+import { timeout } from '@/lib/timeout';
+
+export const DEFAULT_CHART_LAYOUT = {
+  autoPadding: true,
+  padding: {
+    top: 14,
+    bottom: 4,
+    left: 10,
+    right: 10,
+  },
+};
 
 const chartJSThemefontFamily = isServer
   ? 'Roobert_Pro'
@@ -126,16 +139,6 @@ for (const scale of [
   scale.ticks.autoSkipPadding = 2;
 }
 
-export const DEFAULT_CHART_LAYOUT = {
-  autoPadding: true,
-  padding: {
-    top: 14,
-    bottom: 4,
-    left: 10,
-    right: 10,
-  },
-};
-
 ChartJS.defaults.layout = {
   ...ChartJS.defaults.layout,
   ...DEFAULT_CHART_LAYOUT,
@@ -206,4 +209,13 @@ ChartJS.overrides.line = {
       borderWidth: 2,
     },
   },
+};
+
+export const setupChartJS = async () => {
+  // Import client-side only plugins
+  await Promise.all([
+    import('./core/plugins/chartjs-plugin-dayjs'),
+    import('./core/plugins/chartjs-scale-tick-duplicate'),
+    import('./core/plugins/chartjs-plugin-trendlines'),
+  ]);
 };

@@ -1,3 +1,4 @@
+import { ClientOnly } from '@tanstack/react-router';
 import type React from 'react';
 import { BusterChartJS } from './BusterChartJS';
 import { useDatasetOptions } from './chartHooks';
@@ -58,5 +59,9 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     trendlines,
   };
 
-  return <BusterChartJS {...chartProps} />;
+  return (
+    <ClientOnly>
+      <BusterChartJS {...chartProps} />
+    </ClientOnly>
+  );
 };

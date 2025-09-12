@@ -13,7 +13,7 @@ export const createSimpleAssetRoute = <
   if (asset.asset_type === 'chat') {
     return defineLink({
       to: '/app/chats/$chatId',
-      params: { chatId: '123' },
+      params: { chatId: asset.id },
     });
   }
 
