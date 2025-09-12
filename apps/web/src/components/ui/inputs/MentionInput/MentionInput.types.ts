@@ -1,14 +1,19 @@
+export type MentionOnSelectParams = Pick<
+  MentionTriggerItem,
+  'value' | 'onSelect' | 'doNotAddPipeOnSelect' | 'loading' | 'disabled' | 'selected'
+>;
+
 export type MentionTriggerItem<T = string> = {
   value: T;
   label: string | React.ReactNode;
   secondaryContent?: string | React.ReactNode;
   icon?: React.ReactNode;
-  onSelect: () => void;
-  disabled?: boolean;
+  onSelect: (d: MentionOnSelectParams) => void;
+  disabled?: boolean; //will inherit from if undefined
   loading?: boolean;
   type?: 'item';
   selected?: boolean;
-  doNotAddContentOnSelect?: boolean;
+  doNotAddPipeOnSelect?: boolean;
 };
 
 export type MentionInputTriggerGroup<T = string> = {
@@ -16,6 +21,7 @@ export type MentionInputTriggerGroup<T = string> = {
   label: string | React.ReactNode;
   icon?: React.ReactNode;
   type?: 'group';
+  disabled?: boolean;
 };
 
 export type MentionInputTriggerSeparator = {

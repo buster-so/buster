@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
 import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
 import { useFavoriteStar } from '@/components/features/favorites';
-import { createDropdownItem, type IDropdownItems } from '@/components/ui/dropdown';
+import { createDropdownItem } from '@/components/ui/dropdown';
 import { ArrowRight, DuplicatePlus, Pencil, ShareRight, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useBusterNotifications } from '@/context/BusterNotifications';

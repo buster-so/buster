@@ -207,3 +207,5 @@ ChartJS.overrides.line = {
     },
   },
 };
+
+console.log('ChartJS', ChartJS);
