@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use database::enums::{AssetPermissionRole, Verification, WorkspaceSharing};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use uuid::Uuid;
 
 use crate::metrics::types::{BusterMetric, Version};
@@ -91,6 +91,7 @@ pub struct DashboardConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DashboardRow {
+    #[serde(deserialize_with = "deserialize_string_or_number")]
     pub id: String,
     pub items: Vec<DashboardRowItem>,
     #[serde(alias = "rowHeight", skip_serializing_if = "Option::is_none")]
@@ -103,4 +104,65 @@ pub struct DashboardRow {
 #[serde(rename_all = "camelCase")]
 pub struct DashboardRowItem {
     pub id: String,
+}
+
+/// Custom deserializer that accepts either a string or a number and converts to string
+fn deserialize_string_or_number<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    use serde::de::{self, Visitor};
+    use std::fmt;
+
+    struct StringOrNumberVisitor;
+
+    impl<'de> Visitor<'de> for StringOrNumberVisitor {
+        type Value = String;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("a string or a number")
+        }
+
+        fn visit_str<E>(self, value: &str) -> Result<String, E>
+        where
+            E: de::Error,
+        {
+            Ok(value.to_string())
+        }
+
+        fn visit_string<E>(self, value: String) -> Result<String, E>
+        where
+            E: de::Error,
+        {
+            Ok(value)
+        }
+
+        fn visit_u64<E>(self, value: u64) -> Result<String, E>
+        where
+            E: de::Error,
+        {
+            Ok(value.to_string())
+        }
+
+        fn visit_i64<E>(self, value: i64) -> Result<String, E>
+        where
+            E: de::Error,
+        {
+            Ok(value.to_string())
+        }
+
+        fn visit_f64<E>(self, value: f64) -> Result<String, E>
+        where
+            E: de::Error,
+        {
+            // Handle floats that are actually integers
+            if value.fract() == 0.0 {
+                Ok((value as i64).to_string())
+            } else {
+                Ok(value.to_string())
+            }
+        }
+    }
+
+    deserializer.deserialize_any(StringOrNumberVisitor)
 }

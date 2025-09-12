@@ -16,7 +16,7 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should return the same config if no metrics to remove are provided', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }],
         columnSizes: [12],
         rowHeight: 320,
@@ -30,7 +30,7 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should remove a single metric from a single row', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }],
         columnSizes: [6, 6],
         rowHeight: 320,
@@ -48,7 +48,7 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should remove multiple metrics from a single row', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }, { id: 'metric3' }, { id: 'metric4' }],
         columnSizes: [3, 3, 3, 3],
         rowHeight: 320,
@@ -65,13 +65,13 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should remove entire row when all metrics in the row are removed', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }],
         columnSizes: [6, 6],
         rowHeight: 320,
       },
       {
-        id: 'row2',
+        id: 2,
         items: [{ id: 'metric3' }],
         columnSizes: [12],
         rowHeight: 320,
@@ -83,20 +83,20 @@ describe('removeMetricFromDashboardConfig', () => {
     expect(result.rows?.[0].items).toHaveLength(1);
     expect(result.rows?.[0].items.length).toBe(1);
     expect(result.rows?.[0].columnSizes).toEqual([12]);
-    expect(result.rows?.[0].id).toBe('row2');
+    expect(result.rows?.[0].id).toBe(2);
     expect(result.rows?.[0].items[0].id).toBe('metric3');
   });
 
   it('should handle removing metrics from multiple rows', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }],
         columnSizes: [6, 6],
         rowHeight: 320,
       },
       {
-        id: 'row2',
+        id: 2,
         items: [{ id: 'metric3' }, { id: 'metric4' }],
         columnSizes: [6, 6],
         rowHeight: 320,
@@ -116,7 +116,7 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should handle removing non-existent metrics', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }],
         columnSizes: [6, 6],
         rowHeight: 320,
@@ -139,7 +139,7 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should preserve row properties while updating items and columnSizes', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }, { id: 'metric3' }],
         columnSizes: [4, 4, 4],
         rowHeight: 320,
@@ -148,7 +148,7 @@ describe('removeMetricFromDashboardConfig', () => {
     const result = removeMetricFromDashboardConfig(['metric2'], config);
 
     expect(result.rows?.[0]).toMatchObject({
-      id: 'row1',
+      id: 1,
       rowHeight: 320,
     });
     expect(result.rows?.[0].items).toHaveLength(2);
@@ -158,13 +158,13 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should handle removing all metrics from config', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }],
         columnSizes: [6, 6],
         rowHeight: 320,
       },
       {
-        id: 'row2',
+        id: 2,
         items: [{ id: 'metric3' }],
         columnSizes: [12],
         rowHeight: 320,
@@ -178,31 +178,31 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should correctly remove metrics from a large config with multiple rows', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }],
         columnSizes: [6, 6],
         rowHeight: 320,
       },
       {
-        id: 'row2',
+        id: 2,
         items: [{ id: 'metric3' }, { id: 'metric4' }, { id: 'metric5' }],
         columnSizes: [4, 4, 4],
         rowHeight: 320,
       },
       {
-        id: 'row3',
+        id: 3,
         items: [{ id: 'metric6' }],
         columnSizes: [12],
         rowHeight: 320,
       },
       {
-        id: 'row4',
+        id: 4,
         items: [{ id: 'metric7' }, { id: 'metric8' }, { id: 'metric9' }, { id: 'metric10' }],
         columnSizes: [3, 3, 3, 3],
         rowHeight: 320,
       },
       {
-        id: 'row5',
+        id: 5,
         items: [{ id: 'metric11' }, { id: 'metric12' }],
         columnSizes: [6, 6],
         rowHeight: 320,
@@ -235,13 +235,13 @@ describe('removeMetricFromDashboardConfig', () => {
   it('should handle removing non-existent metrics while preserving existing structure', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }, { id: 'metric2' }, { id: 'metric3' }],
         columnSizes: [4, 4, 4],
         rowHeight: 320,
       },
       {
-        id: 'row2',
+        id: 2,
         items: [{ id: 'metric4' }, { id: 'metric5' }],
         columnSizes: [6, 6],
         rowHeight: 320,

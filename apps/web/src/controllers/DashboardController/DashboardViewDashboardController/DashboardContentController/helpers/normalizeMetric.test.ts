@@ -12,8 +12,11 @@ import { normalizeNewMetricsIntoGrid } from './normalizeMetric';
 describe('normalizeNewMetricsIntoGrid', () => {
   const mockMetric = (id: string): BusterMetric => createMockMetric(id);
 
-  const createMockRow = (itemIds: string[]): NonNullable<DashboardConfig['rows']>[0] => ({
-    id: `row-${itemIds[0]}`,
+  const createMockRow = (
+    itemIds: string[],
+    rowId?: number
+  ): NonNullable<DashboardConfig['rows']>[0] => ({
+    id: rowId ?? 1,
     columnSizes: Array(itemIds.length).fill(NUMBER_OF_COLUMNS / itemIds.length),
     rowHeight: MIN_ROW_HEIGHT,
     items: itemIds.map((id) => ({ id })),
@@ -115,8 +118,8 @@ describe('normalizeNewMetricsIntoGrid', () => {
 
   it('should remove empty rows after removing metrics', () => {
     const existingGrid: DashboardConfig['rows'] = [
-      createMockRow(['1', '2']),
-      createMockRow(['3', '4']),
+      createMockRow(['1', '2'], 1),
+      createMockRow(['3', '4'], 2),
     ];
 
     const metrics = {

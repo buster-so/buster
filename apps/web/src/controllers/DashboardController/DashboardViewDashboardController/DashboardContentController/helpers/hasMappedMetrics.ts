@@ -27,9 +27,12 @@ export const hasRemovedMetrics = (
   );
 };
 
-export const removeChildrenFromItems = (row: BusterResizeableGridRow[]) => {
+export const removeChildrenFromItems = (
+  row: BusterResizeableGridRow[]
+): DashboardConfig['rows'] => {
   return row.map((r) => ({
     ...r,
+    id: parseInt(r.id, 10) || 1, // Converting from string to number bc there is a lot of logic around dnd-kit that uses ids as strings.
     items: r.items.map((i) => omit(i, 'children')),
   }));
 };

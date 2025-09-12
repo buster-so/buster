@@ -4,8 +4,11 @@ import { NUMBER_OF_COLUMNS } from '@/components/ui/grid/helpers';
 import { createMockMetric } from '@/mocks/metric';
 import { hasRemovedMetrics, hasUnmappedMetrics } from './hasMappedMetrics';
 
-const createMockRow = (itemIds: string[]): NonNullable<DashboardConfig['rows']>[0] => ({
-  id: `row-${itemIds[0]}`,
+const createMockRow = (
+  itemIds: string[],
+  rowId?: number
+): NonNullable<DashboardConfig['rows']>[0] => ({
+  id: rowId ?? 1,
   columnSizes: Array(itemIds.length).fill(NUMBER_OF_COLUMNS / itemIds.length),
   items: itemIds.map((id) => ({ id })),
 });
@@ -22,7 +25,10 @@ describe('hasUnmappedMetrics', () => {
       '3': mockMetric3,
     };
 
-    const configRows: DashboardConfig['rows'] = [createMockRow(['1', '2']), createMockRow(['3'])];
+    const configRows: DashboardConfig['rows'] = [
+      createMockRow(['1', '2'], 1),
+      createMockRow(['3'], 2),
+    ];
 
     expect(hasUnmappedMetrics(metrics, configRows)).toBe(false);
   });
@@ -68,7 +74,7 @@ describe('hasRemovedMetrics', () => {
       '3': mockMetric3,
     };
 
-    const configRows = [createMockRow(['1', '2']), createMockRow(['3'])];
+    const configRows = [createMockRow(['1', '2'], 1), createMockRow(['3'], 2)];
 
     expect(hasRemovedMetrics(metrics, configRows)).toBe(false);
   });

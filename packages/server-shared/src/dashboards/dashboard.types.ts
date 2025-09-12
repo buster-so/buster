@@ -13,10 +13,10 @@ export const DashboardConfigSchema = z.object({
           })
           .optional(), // columns sizes 1 - 12. MUST add up to 12
         rowHeight: z.number().optional(), // pixel based!
-        id: z.string(),
+        id: z.number().int().positive(), // Row ID must be a positive integer
         items: z.array(
           z.object({
-            id: z.string(),
+            id: z.string(), // Metric UUID remains a string
           })
         ),
       })

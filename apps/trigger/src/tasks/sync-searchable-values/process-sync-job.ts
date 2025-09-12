@@ -374,10 +374,11 @@ async function queryDistinctColumnValues({
     FROM ${fullyQualifiedTable}
     WHERE "${columnName}" IS NOT NULL
       AND TRIM("${columnName}") != ''
-    ORDER BY "${columnName}"${limit
-      ? `
+    ORDER BY "${columnName}"${
+      limit
+        ? `
     LIMIT ${limit}`
-      : ''
+        : ''
     }
   `;
 
@@ -412,7 +413,8 @@ async function queryDistinctColumnValues({
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw new Error(
-      `Failed to query distinct values from ${fullyQualifiedTable}.${columnName}: ${error instanceof Error ? error.message : 'Unknown error'
+      `Failed to query distinct values from ${fullyQualifiedTable}.${columnName}: ${
+        error instanceof Error ? error.message : 'Unknown error'
       }`
     );
   }

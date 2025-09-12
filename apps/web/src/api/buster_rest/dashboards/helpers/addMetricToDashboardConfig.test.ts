@@ -55,7 +55,7 @@ describe('addMetricToDashboardConfig', () => {
   it('should not add duplicate metrics', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'metric1' }],
         columnSizes: [12],
         rowHeight: 320,
@@ -112,7 +112,7 @@ describe('addMetricToDashboardConfig', () => {
   it('should preserve existing rows when adding new metrics', () => {
     const config = createConfigWithRows([
       {
-        id: 'row1',
+        id: 1,
         items: [{ id: 'existing1' }],
         columnSizes: [12],
         rowHeight: 320,

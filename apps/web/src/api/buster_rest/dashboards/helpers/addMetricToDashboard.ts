@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
 import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
 import { MAX_NUMBER_OF_ITEMS, NUMBER_OF_COLUMNS } from '../../../asset_interfaces/dashboard/config';
+import { getNextRowId } from './dashboardRowUtils';
 
 export const addMetricToDashboardConfig = (
   metricIds: string[],
@@ -36,9 +36,9 @@ export const addMetricToDashboardConfig = (
     const columnSize = NUMBER_OF_COLUMNS / metricsInThisRow.length;
     const columnSizes = Array(metricsInThisRow.length).fill(columnSize);
 
-    // Create the new row
+    // Create the new row with an integer ID
     const newRow = {
-      id: uuidv4(),
+      id: getNextRowId(newConfig.rows) + i,
       items: metricsInThisRow.map((id) => ({ id })),
       columnSizes,
       rowHeight: 320, // Default row height

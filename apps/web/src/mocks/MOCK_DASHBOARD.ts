@@ -6,8 +6,8 @@ interface DashboardMockResponse {
   response: BusterDashboardResponse;
 }
 
-const createMockDashboardRow = (startIndex: number, metrics: string[], columnSizes: number[]) => ({
-  id: `row-${startIndex}`,
+const createMockDashboardRow = (rowId: number, metrics: string[], columnSizes: number[]) => ({
+  id: rowId,
   columnSizes,
   items: metrics.map((metricId) => ({ id: metricId })),
 });

@@ -1,6 +1,6 @@
 import type { DashboardConfig } from '@buster/server-shared/dashboards';
-import { v4 as uuidv4 } from 'uuid';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
+import { getNextRowId } from '@/api/buster_rest/dashboards/helpers';
 import {
   MAX_NUMBER_OF_ITEMS,
   MIN_ROW_HEIGHT,
@@ -25,7 +25,7 @@ export const normalizeNewMetricsIntoGrid = (
       const selectedRow = acc[rowIndex];
       if (!selectedRow) {
         acc[rowIndex] = {
-          id: uuidv4(),
+          id: getNextRowId([...grid, ...acc]),
           columnSizes: [NUMBER_OF_COLUMNS],
           rowHeight: MIN_ROW_HEIGHT,
           items: [{ id: metric.id }],
