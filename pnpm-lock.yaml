@@ -34,8 +34,8 @@ catalogs:
       specifier: ^5.0.39
       version: 5.0.39
     axios:
-      specifier: ^1.11.0
-      version: 1.11.0
+      specifier: ^1.12.0
+      version: 1.12.0
     braintrust:
       specifier: ^0.2.4
       version: 0.2.4
@@ -651,7 +651,7 @@ importers:
         version: 7.3.3(next@14.2.30(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.54.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(sass@1.92.1))(react@19.1.1)(uploadthing@7.7.4(express@5.1.0)(h3@1.15.4)(next@14.2.30(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.54.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(sass@1.92.1))(tailwindcss@4.1.13))
       axios:
         specifier: 'catalog:'
-        version: 1.11.0
+        version: 1.12.0
       canvas-confetti:
         specifier: ^1.9.3
         version: 1.9.3
@@ -6447,6 +6447,9 @@ packages:
 
   axios@1.11.0:
     resolution: {integrity: sha512-1Lx3WLFQWm3ooKDYZD1eXmoGO9fxYQjrycfHFC8P0sCfQVXyROp0p9PFWBehewBOdCwHc+f/b8I0fMto5eSfwA==}
+
+  axios@1.12.0:
+    resolution: {integrity: sha512-oXTDccv8PcfjZmPGlWsPSwtOJCZ/b6W5jAMCNcfwJbCzDckwG0jrYJFaWH1yvivfCXjVzV/SPDEhMB3Q+DSurg==}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -18323,6 +18326,14 @@ snapshots:
   axe-core@4.10.3: {}
 
   axios@1.11.0:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.4
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
+  axios@1.12.0:
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.4
