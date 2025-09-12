@@ -21,7 +21,7 @@ catalog:
   braintrust: ^0.2.4
   dotenv: ^17.2.2
   drizzle-orm: ^0.44.5
-  hono: ^4.9.6
+  hono: ^4.9.7
   js-yaml: ^4.1.0
   lodash-es: ^4.17.21
   pg: ^8.16.3
