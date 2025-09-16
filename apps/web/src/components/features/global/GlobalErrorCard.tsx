@@ -49,7 +49,12 @@ export const GlobalErrorCard: ErrorRouteComponent = ({ error }) => {
     const isPosthogLoaded = posthog.__loaded;
 
     if (isPosthogLoaded) {
-      posthog.captureException(error);
+      try {
+        posthog.captureException(error);
+      } catch (captureError) {
+        // Silently handle PostHog capture errors (likely due to ad blocker)
+        console.warn('PostHog capture failed:', captureError);
+      }
     }
   }, [error]);
 
