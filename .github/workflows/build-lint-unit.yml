@@ -12,16 +12,31 @@ env:
   CI: true
 
 jobs:
-  # Build job - runs in parallel
-  build:
-    name: Build
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    timeout-minutes: 10
+  # Setup job - runs once and sets up the environment
+  setup:
+    name: Setup Environment
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          cache-key: build-lint-unit
+
+  # Build job - runs in parallel after setup
+  build:
+    name: Build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment (restore from cache)
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: build-lint-unit
@@ -40,16 +55,17 @@ jobs:
           TURBO_CACHE_DIR: .turbo
           TURBO_TELEMETRY_DISABLED: 1
 
-  # Lint job - runs in parallel
+  # Lint job - runs in parallel after setup
   lint:
     name: Lint
     runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 5
+    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node Environment
+      - name: Setup Node Environment (restore from cache)
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: build-lint-unit
@@ -60,16 +76,17 @@ jobs:
           TURBO_CACHE_DIR: .turbo
           TURBO_TELEMETRY_DISABLED: 1
 
-  # Test job - runs after build completes
+  # Test job - runs in parallel after setup
   test:
     name: Test
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
+    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node Environment
+      - name: Setup Node Environment (restore from cache)
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: build-lint-unit
