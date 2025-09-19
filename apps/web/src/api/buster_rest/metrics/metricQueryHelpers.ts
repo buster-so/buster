@@ -26,11 +26,12 @@ export const useGetMetricDataMemoized = () => {
   const getMetricDataMemoized = useMemoizedFn(
     (
       metricId: string,
-      versionNumberProp?: number | 'LATEST'
+      versionNumberProp?: number | 'LATEST',
+      cacheId?: string
     ): BusterMetricDataExtended | undefined => {
       const versionNumber = versionNumberProp ?? 'LATEST';
       if (versionNumber == null) return undefined;
-      const options = metricsQueryKeys.metricsGetData(metricId, versionNumber);
+      const options = metricsQueryKeys.metricsGetData(metricId, versionNumber, cacheId);
       const data = queryClient.getQueryData(options.queryKey);
       return data;
     }

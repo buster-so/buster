@@ -141,11 +141,11 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
   {
     id = '',
     versionNumber: versionNumberProp,
-    reportFileId,
+    cacheId,
   }: {
     id: string | undefined;
     versionNumber?: number | 'LATEST';
-    reportFileId?: string;
+    cacheId?: string;
   },
   params?: Omit<UseQueryOptions<BusterMetricData, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
@@ -170,7 +170,7 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
       id,
       version_number: chosenVersionNumber || undefined,
       password,
-      report_file_id: reportFileId,
+      report_file_id: cacheId,
     });
     const latestVersionNumber = getLatestMetricVersion(id);
     const isLatest =
@@ -178,13 +178,16 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
       !versionNumberProp ||
       latestVersionNumber === chosenVersionNumber;
     if (isLatest) {
-      queryClient.setQueryData(metricsQueryKeys.metricsGetData(id, 'LATEST').queryKey, result);
+      queryClient.setQueryData(
+        metricsQueryKeys.metricsGetData(id, 'LATEST', cacheId).queryKey,
+        result
+      );
     }
     return result;
   };
 
   return useQuery({
-    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST'),
+    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST', cacheId),
     queryFn,
     enabled: () => {
       return (
@@ -202,15 +205,15 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
 };
 
 export const prefetchGetMetricDataClient = async (
-  { id, version_number }: { id: string; version_number: number },
+  { id, version_number, cache_id }: { id: string; version_number: number; cache_id?: string },
   queryClient: QueryClient
 ) => {
-  const options = metricsQueryKeys.metricsGetData(id, version_number);
+  const options = metricsQueryKeys.metricsGetData(id, version_number, cache_id);
   const existingData = queryClient.getQueryData(options.queryKey);
   if (!existingData && id) {
     await queryClient.prefetchQuery({
       ...options,
-      queryFn: () => getMetricData({ id, version_number }),
+      queryFn: () => getMetricData({ id, version_number, report_file_id: cache_id }),
     });
   }
 };
@@ -218,8 +221,9 @@ export const prefetchGetMetricDataClient = async (
 //used in list version histories
 export const usePrefetchGetMetricDataClient = () => {
   const queryClient = useQueryClient();
-  return useMemoizedFn(({ id, versionNumber }: { id: string; versionNumber: number }) =>
-    prefetchGetMetricDataClient({ id, version_number: versionNumber }, queryClient)
+  return useMemoizedFn(
+    ({ id, versionNumber, cache_id }: { id: string; versionNumber: number; cache_id?: string }) =>
+      prefetchGetMetricDataClient({ id, version_number: versionNumber, cache_id }, queryClient)
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { MetricChartCard } from '@/components/features/metrics/MetricChartCard';
 import { ReportMetricThreeDotMenu } from '@/components/features/metrics/ReportMetricItem';
+import { useGetReportParams } from '@/context/Reports/useGetReportParams';
 import { useInViewport } from '@/hooks/useInViewport';
 
 export const MetricContent = React.memo(
@@ -17,6 +18,7 @@ export const MetricContent = React.memo(
     isExportMode?: boolean;
     className?: string;
   }) => {
+    const { reportId } = useGetReportParams();
     const ref = useRef<HTMLDivElement>(null);
     const hasBeenInViewport = useRef(false);
 
@@ -32,6 +34,7 @@ export const MetricContent = React.memo(
       <MetricChartCard
         ref={ref}
         metricId={metricId}
+        cacheId={reportId}
         useHeaderLink={!readOnly}
         versionNumber={metricVersionNumber}
         readOnly
