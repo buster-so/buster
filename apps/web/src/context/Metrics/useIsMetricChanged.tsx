@@ -11,15 +11,17 @@ import { useGetOriginalMetric } from './useOriginalMetricStore';
 export const useIsMetricChanged = ({
   metricId,
   enabled = true,
+  cacheId,
 }: {
   metricId: string | undefined;
   enabled?: boolean;
+  cacheId?: string;
 }) => {
   const queryClient = useQueryClient();
   const originalMetric = useGetOriginalMetric(metricId);
 
   const { data: currentMetric, refetch: refetchCurrentMetric } = useGetMetric(
-    { id: metricId, versionNumber: undefined },
+    { id: metricId, cacheId, versionNumber: undefined },
     {
       enabled: false,
       select: (x) => ({

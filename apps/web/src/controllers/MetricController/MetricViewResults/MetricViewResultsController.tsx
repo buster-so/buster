@@ -1,22 +1,34 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { DataContainer } from '@/components/ui/layouts/AppVerticalCodeSplitter/DataContainer';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 export const MetricViewResultsController = React.memo(
-  ({ metricId, versionNumber }: { metricId: string; versionNumber: number | undefined }) => {
+  ({
+    metricId,
+    versionNumber,
+    cacheId,
+  }: {
+    metricId: string;
+    versionNumber: number | undefined;
+    cacheId?: string;
+  }) => {
     const { isFetched: isFetchedMetric } = useGetMetric(
-      { id: metricId, versionNumber },
+      { id: metricId, versionNumber, cacheId },
       {
-        select: ({ sql, data_source_id }) => ({
-          sql,
-          data_source_id,
-        }),
+        select: useCallback(
+          ({ sql, data_source_id }: BusterMetric) => ({
+            sql,
+            data_source_id,
+          }),
+          []
+        ),
       }
     );
     const { data: metricData, isFetched: isFetchedInitialData } = useGetMetricData(
-      { id: metricId, versionNumber },
+      { id: metricId, versionNumber, cacheId },
       { enabled: false }
     );
 

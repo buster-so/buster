@@ -29,7 +29,6 @@ import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
 import { canEdit } from '../../../lib/share';
 import { FollowUpWithAssetContent } from '../assets/FollowUpWithAsset';
 import { useFavoriteStar } from '../favorites';
-import { ASSET_ICONS } from '../icons/assetIcons';
 import { getShareAssetConfig } from '../ShareMenu/helpers';
 import { useListMetricVersionDropdownItems } from '../versionHistory/useListMetricVersionDropdownItems';
 import { METRIC_CHART_CONTAINER_ID } from './MetricChartCard/config';
@@ -37,11 +36,13 @@ import { METRIC_CHART_TITLE_INPUT_ID } from './MetricChartCard/MetricViewChartHe
 
 export const useMetricVersionHistorySelectMenu = ({
   metricId,
+  cacheId,
 }: {
   metricId: string;
+  cacheId?: string;
 }): IDropdownItem => {
   const { data } = useGetMetric(
-    { id: metricId },
+    { id: metricId, cacheId },
     {
       select: useCallback(
         (x: BusterMetric) => ({
@@ -75,8 +76,17 @@ export const useMetricVersionHistorySelectMenu = ({
   );
 };
 
-export const useFavoriteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
-  const { data: name } = useGetMetric({ id: metricId }, { select: (x) => x.name });
+export const useFavoriteMetricSelectMenu = ({
+  metricId,
+  cacheId,
+}: {
+  metricId: string;
+  cacheId?: string;
+}) => {
+  const { data: name } = useGetMetric(
+    { id: metricId, cacheId },
+    { select: useCallback((x: BusterMetric) => x.name, []) }
+  );
   const { isFavorited, onFavoriteClick } = useFavoriteStar({
     id: metricId,
     type: 'metric_file',
@@ -159,16 +169,21 @@ export const useRenameMetricOnPage = ({
 export const useDownloadMetricDataCSV = ({
   metricId,
   metricVersionNumber,
+  cacheId,
 }: {
   metricId: string;
   metricVersionNumber: number | undefined;
+  cacheId?: string;
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const { data: metricData } = useGetMetricData(
-    { id: metricId, versionNumber: metricVersionNumber },
+    { id: metricId, versionNumber: metricVersionNumber, cacheId },
     { enabled: false }
   );
-  const { data: name } = useGetMetric({ id: metricId }, { select: (x) => x.name });
+  const { data: name } = useGetMetric(
+    { id: metricId, cacheId },
+    { select: useCallback((x: BusterMetric) => x.name, []) }
+  );
 
   return useMemo(
     () => ({
@@ -192,18 +207,20 @@ export const useDownloadMetricDataCSV = ({
 export const useDownloadPNGSelectMenu = ({
   metricId,
   metricVersionNumber,
+  cacheId,
 }: {
   metricId: string;
   metricVersionNumber: number | undefined;
+  cacheId?: string;
 }) => {
   const { openErrorMessage } = useBusterNotifications();
   const { data: name } = useGetMetric(
-    { id: metricId, versionNumber: metricVersionNumber },
-    { select: (x) => x.name }
+    { id: metricId, versionNumber: metricVersionNumber, cacheId },
+    { select: useCallback((x: BusterMetric) => x.name, []) }
   );
   const { data: selectedChartType } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.chart_config?.selectedChartType }
+    { id: metricId, cacheId },
+    { select: useCallback((x: BusterMetric) => x.chart_config?.selectedChartType, []) }
   );
 
   const canDownload = selectedChartType && selectedChartType !== 'table';
@@ -376,9 +393,15 @@ export const useNavigateToDashboardMetricItem = ({
   }, [metricId, metricVersionNumber, dashboardId, dashboardVersionNumber]);
 };
 
-export const useEditMetricWithAI = ({ metricId }: { metricId: string }): IDropdownItem => {
+export const useEditMetricWithAI = ({
+  metricId,
+  cacheId,
+}: {
+  metricId: string;
+  cacheId?: string;
+}): IDropdownItem => {
   const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, cacheId },
     { select: getShareAssetConfig }
   );
   const isEditor = canEdit(shareAssetConfig?.permission);

@@ -24,6 +24,7 @@ export type MetricChartCardProps = {
   animate?: boolean;
   renderChartContent?: boolean; // we do this to avoid expensive rendering if off screen
   disableTooltip?: boolean;
+  cacheId?: string; //currently just supported in report, I think we will for sure be updating this in the future so I am keeping with generic
 };
 
 const stableMetricSelect = ({
@@ -60,18 +61,19 @@ export const MetricChartCard = React.memo(
         animate = true,
         renderChartContent = true,
         disableTooltip,
+        cacheId,
       },
       ref
     ) => {
       const { data: metric, isFetched: isFetchedMetric } = useGetMetric(
-        { id: metricId, versionNumber },
+        { id: metricId, versionNumber, cacheId },
         { select: stableMetricSelect, enabled: true }
       );
       const {
         data: metricData,
         isFetched: isFetchedMetricData,
         error: metricDataError,
-      } = useGetMetricData({ id: metricId, versionNumber });
+      } = useGetMetricData({ id: metricId, versionNumber, cacheId });
 
       //data config
       const loadingData = !isFetchedMetricData;

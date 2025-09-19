@@ -15,8 +15,8 @@ export const staticData = {
   assetType: 'metric_file' as AssetType,
 };
 
-export const loader = async <T extends { metricId: string }>({
-  params: { metricId },
+export const loader = async <T extends { metricId: string; reportId?: string }>({
+  params: { metricId, reportId },
   context: { queryClient },
   deps: { metric_version_number },
 }: {
@@ -29,6 +29,7 @@ export const loader = async <T extends { metricId: string }>({
   const data = await prefetchGetMetric(queryClient, {
     id: metricId,
     version_number: metric_version_number,
+    report_file_id: reportId,
   });
   return {
     title: data?.name,

@@ -13,8 +13,9 @@ import { useViewSQLBlocker } from './useViewSQLBlocker';
 export const MetricViewSQLController: React.FC<{
   metricId: string;
   versionNumber: number | undefined;
+  cacheId?: string;
   initialLayout: LayoutSize | null;
-}> = React.memo(({ metricId, versionNumber, initialLayout }) => {
+}> = React.memo(({ metricId, versionNumber, initialLayout, cacheId }) => {
   const appSplitterRef = React.useRef<AppSplitterRef>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -33,7 +34,7 @@ export const MetricViewSQLController: React.FC<{
   } = useMetricRunSQL();
 
   const { data: metric, isFetched: isFetchedMetric } = useGetMetric(
-    { id: metricId, versionNumber },
+    { id: metricId, versionNumber, cacheId },
     {
       select: useCallback(
         ({ sql, data_source_id }: BusterMetric) => ({
@@ -45,7 +46,7 @@ export const MetricViewSQLController: React.FC<{
     }
   );
   const { data: metricData, isFetched: isFetchedInitialData } = useGetMetricData(
-    { id: metricId, versionNumber },
+    { id: metricId, versionNumber, cacheId },
     { enabled: false }
   );
 

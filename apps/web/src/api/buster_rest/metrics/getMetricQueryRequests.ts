@@ -32,17 +32,20 @@ const getMetricQueryFn = async ({
   version,
   password,
   queryClient,
+  cacheId,
 }: {
   id: string | undefined;
   version: number | undefined | 'LATEST';
   password: string | undefined;
   queryClient: QueryClient;
+  cacheId?: string;
 }) => {
   const chosenVersionNumber: number | undefined = version === 'LATEST' ? undefined : version;
   const result = await getMetric({
     id: id || '',
     password,
     version_number: chosenVersionNumber,
+    report_file_id: cacheId,
   });
   const updatedMetric = upgradeMetricToIMetric(result, null);
   const isLatestVersion =
@@ -65,9 +68,11 @@ export const useGetMetric = <TData = BusterMetric>(
   {
     id,
     versionNumber: versionNumberProp,
+    cacheId,
   }: {
     id: string | undefined;
     versionNumber?: number | 'LATEST'; //if null it will not use a params from the query params
+    cacheId: string | undefined;
   },
   params?: Omit<UseQueryOptions<BusterMetric, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
@@ -81,7 +86,7 @@ export const useGetMetric = <TData = BusterMetric>(
 
   const { isFetched: isFetchedInitial, isError: isErrorInitial } = useQuery({
     ...metricsQueryKeys.metricsGetMetric(id || '', 'LATEST'),
-    queryFn: () => getMetricQueryFn({ id, version: 'LATEST', password, queryClient }),
+    queryFn: () => getMetricQueryFn({ id, version: 'LATEST', password, queryClient, cacheId }),
     retry(_failureCount, error) {
       if (error?.message !== undefined && id) {
         setProtectedAssetPasswordError({
@@ -99,7 +104,8 @@ export const useGetMetric = <TData = BusterMetric>(
   return useQuery({
     ...metricsQueryKeys.metricsGetMetric(id || '', selectedVersionNumber),
     enabled: !!id && !!latestVersionNumber && isFetchedInitial && !isErrorInitial,
-    queryFn: () => getMetricQueryFn({ id, version: selectedVersionNumber, password, queryClient }),
+    queryFn: () =>
+      getMetricQueryFn({ id, version: selectedVersionNumber, password, queryClient, cacheId }),
     select: params?.select,
   });
 };
@@ -107,8 +113,20 @@ export const useGetMetric = <TData = BusterMetric>(
 export const usePrefetchGetMetricClient = () => {
   const queryClient = useQueryClient();
   return useMemoizedFn(
-    async ({ id, versionNumber }: { id: string; versionNumber: number | undefined }) => {
-      return prefetchGetMetric(queryClient, { id, version_number: versionNumber });
+    async ({
+      id,
+      versionNumber,
+      cacheId,
+    }: {
+      id: string;
+      versionNumber: number | undefined;
+      cacheId?: string;
+    }) => {
+      return prefetchGetMetric(queryClient, {
+        id,
+        version_number: versionNumber,
+        report_file_id: cacheId,
+      });
     }
   );
 };
@@ -141,11 +159,11 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
   {
     id = '',
     versionNumber: versionNumberProp,
-    reportFileId,
+    cacheId,
   }: {
     id: string | undefined;
     versionNumber?: number | 'LATEST';
-    reportFileId?: string;
+    cacheId?: string;
   },
   params?: Omit<UseQueryOptions<BusterMetricData, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
@@ -159,7 +177,7 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
     dataUpdatedAt,
     data: metricId,
   } = useGetMetric(
-    { id, versionNumber: selectedVersionNumber },
+    { id, versionNumber: selectedVersionNumber, cacheId },
     { select: useCallback((x: BusterMetric) => x?.id, []), enabled: params?.enabled !== false }
   );
 
@@ -170,7 +188,7 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
       id,
       version_number: chosenVersionNumber || undefined,
       password,
-      report_file_id: reportFileId,
+      report_file_id: cacheId,
     });
     const latestVersionNumber = getLatestMetricVersion(id);
     const isLatest =
@@ -178,13 +196,16 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
       !versionNumberProp ||
       latestVersionNumber === chosenVersionNumber;
     if (isLatest) {
-      queryClient.setQueryData(metricsQueryKeys.metricsGetData(id, 'LATEST').queryKey, result);
+      queryClient.setQueryData(
+        metricsQueryKeys.metricsGetData(id, 'LATEST', cacheId).queryKey,
+        result
+      );
     }
     return result;
   };
 
   return useQuery({
-    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST'),
+    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST', cacheId),
     queryFn,
     enabled: () => {
       return (
@@ -202,15 +223,15 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
 };
 
 export const prefetchGetMetricDataClient = async (
-  { id, version_number }: { id: string; version_number: number },
+  { id, version_number, cache_id }: { id: string; version_number: number; cache_id?: string },
   queryClient: QueryClient
 ) => {
-  const options = metricsQueryKeys.metricsGetData(id, version_number);
+  const options = metricsQueryKeys.metricsGetData(id, version_number, cache_id);
   const existingData = queryClient.getQueryData(options.queryKey);
   if (!existingData && id) {
     await queryClient.prefetchQuery({
       ...options,
-      queryFn: () => getMetricData({ id, version_number }),
+      queryFn: () => getMetricData({ id, version_number, report_file_id: cache_id }),
     });
   }
 };
@@ -218,8 +239,9 @@ export const prefetchGetMetricDataClient = async (
 //used in list version histories
 export const usePrefetchGetMetricDataClient = () => {
   const queryClient = useQueryClient();
-  return useMemoizedFn(({ id, versionNumber }: { id: string; versionNumber: number }) =>
-    prefetchGetMetricDataClient({ id, version_number: versionNumber }, queryClient)
+  return useMemoizedFn(
+    ({ id, versionNumber, cache_id }: { id: string; versionNumber: number; cache_id?: string }) =>
+      prefetchGetMetricDataClient({ id, version_number: versionNumber, cache_id }, queryClient)
   );
 };
 

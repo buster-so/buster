@@ -33,9 +33,11 @@ export const ReportMetricThreeDotMenu = ({
 const useReportMetricThreeDotMenu = ({
   metricId,
   metricVersionNumber,
+  cacheId,
 }: {
   metricId: string;
   metricVersionNumber: number | undefined;
+  cacheId?: string;
 }): IDropdownItems => {
   const editor = useEditorRef();
   const element = useElement();
@@ -52,7 +54,7 @@ const useReportMetricThreeDotMenu = ({
     metricId,
     metricVersionNumber,
   });
-  const downloadCSV = useDownloadMetricDataCSV({ metricId, metricVersionNumber });
+  const downloadCSV = useDownloadMetricDataCSV({ metricId, metricVersionNumber, cacheId });
   const downloadPNG = useDownloadPNGSelectMenu({ metricId, metricVersionNumber });
   const renameMetric = useRenameMetricOnPage({
     metricId,
