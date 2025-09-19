@@ -23,11 +23,11 @@ export const MetricViewChart: React.FC<{
 }> = React.memo(
   ({ metricId, versionNumber, readOnly = false, className = '', cardClassName = '', cacheId }) => {
     const { data: metric } = useGetMetric(
-      { id: metricId, versionNumber },
+      { id: metricId, versionNumber, cacheId },
       { select: stableMetricSelect, enabled: true }
     );
     const { data: hasMoreRecords } = useGetMetricData(
-      { id: metricId, versionNumber },
+      { id: metricId, versionNumber, cacheId },
       { select: stableMetricDataSelect }
     );
 

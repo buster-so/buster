@@ -11,14 +11,15 @@ import { CollectionButton } from './CollectionsButton';
 
 export const SaveMetricToCollectionButton: React.FC<{
   metricId: string;
+  cacheId?: string;
   buttonType?: 'ghost' | 'default';
   useText?: boolean;
-}> = ({ metricId, buttonType = 'ghost', useText = false }) => {
+}> = ({ metricId, buttonType = 'ghost', cacheId, useText = false }) => {
   const { openInfoMessage } = useBusterNotifications();
   const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
   const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
   const { data: selectedCollections } = useGetMetric(
-    { id: metricId },
+    { id: metricId, cacheId },
     { select: (x) => x.collections?.map((x) => x.id) }
   );
 

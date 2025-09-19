@@ -19,14 +19,15 @@ import { useIsMetricEditMode, useMetricEditToggle } from './MetricContextProvide
 export const MetricContainerHeaderButtons: React.FC<{
   metricId: string;
   metricVersionNumber: number | undefined;
-}> = React.memo(({ metricId, metricVersionNumber }) => {
+  cacheId?: string;
+}> = React.memo(({ metricId, metricVersionNumber, cacheId }) => {
   const isChatMode = useIsChatMode();
   const isFileMode = useIsFileMode();
   const { isViewingOldVersion } = useIsMetricReadOnly({
     metricId: metricId || '',
   });
   const { error: metricError, data: permission } = useGetMetric(
-    { id: metricId },
+    { id: metricId, cacheId },
     { select: useCallback((x: BusterMetric) => x.permission, []) }
   );
 
@@ -76,14 +77,16 @@ const SaveToCollectionButton = React.memo(({ metricId }: { metricId: string }) =
 });
 SaveToCollectionButton.displayName = 'SaveToCollectionButton';
 
-const SaveToDashboardButton = React.memo(({ metricId }: { metricId: string }) => {
-  const { data: dashboardIds } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.dashboards?.map((x) => x.id) }
-  );
+const SaveToDashboardButton = React.memo(
+  ({ metricId, cacheId }: { metricId: string; cacheId?: string }) => {
+    const { data: dashboardIds } = useGetMetric(
+      { id: metricId, cacheId },
+      { select: useCallback((x: BusterMetric) => x.dashboards?.map((x) => x.id), []) }
+    );
 
-  return (
-    <SaveMetricToDashboardButton metricIds={[metricId]} selectedDashboards={dashboardIds || []} />
-  );
-});
+    return (
+      <SaveMetricToDashboardButton metricIds={[metricId]} selectedDashboards={dashboardIds || []} />
+    );
+  }
+);
 SaveToDashboardButton.displayName = 'SaveToDashboardButton';

@@ -66,7 +66,7 @@ export const MetricChartCard = React.memo(
       ref
     ) => {
       const { data: metric, isFetched: isFetchedMetric } = useGetMetric(
-        { id: metricId, versionNumber },
+        { id: metricId, versionNumber, cacheId },
         { select: stableMetricSelect, enabled: true }
       );
       const {

@@ -1,13 +1,36 @@
 import { useEffect, useMemo, useRef } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useInViewport } from '@/hooks/useInViewport';
 import { useDashboardContentControllerContextSelector } from '../../../../controllers/DashboardController/DashboardViewDashboardController/DashboardContentController/DashboardContentControllerContext';
 
+const stableMetricSelect = ({
+  name,
+  description,
+  time_frame,
+  chart_config,
+  permission,
+  error,
+  evaluation_score,
+  evaluation_summary,
+}: BusterMetric) => ({
+  name,
+  description,
+  time_frame,
+  chart_config,
+  permission,
+  error,
+  evaluation_score,
+  evaluation_summary,
+});
+
 export const useDashboardMetric = ({
   metricId,
   versionNumber,
+  cacheId,
 }: {
   metricId: string;
+  cacheId?: string;
   versionNumber: number | undefined;
 }) => {
   const {
@@ -15,28 +38,10 @@ export const useDashboardMetric = ({
     isFetched: isMetricFetched,
     error: metricError,
   } = useGetMetric(
-    { id: metricId, versionNumber },
+    { id: metricId, versionNumber, cacheId },
     {
       enabled: !!metricId,
-      select: ({
-        name,
-        description,
-        time_frame,
-        chart_config,
-        permission,
-        error,
-        evaluation_score,
-        evaluation_summary,
-      }) => ({
-        name,
-        error,
-        description,
-        time_frame,
-        permission,
-        evaluation_score,
-        evaluation_summary,
-        chart_config,
-      }),
+      select: stableMetricSelect,
     }
   );
   const {

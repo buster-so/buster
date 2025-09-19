@@ -108,9 +108,15 @@ const useRemoveFromDashboardItem = ({
   );
 };
 
-const useShareMenuSelectMenu = ({ metricId }: { metricId: string }): IDropdownItem | undefined => {
+const useShareMenuSelectMenu = ({
+  metricId,
+  cacheId,
+}: {
+  metricId: string;
+  cacheId?: string;
+}): IDropdownItem | undefined => {
   const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, cacheId },
     { select: getShareAssetConfig }
   );
   const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);

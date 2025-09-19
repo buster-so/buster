@@ -18,12 +18,18 @@ type MetricVersionHistoryModalProps = Pick<
   'onClose' | 'versionNumber'
 > & {
   metricId: string;
+  cacheId?: string;
 };
 
 export const MetricVersionHistoryModal = React.memo(
-  ({ onClose, versionNumber: versionNumberProp, metricId }: MetricVersionHistoryModalProps) => {
+  ({
+    onClose,
+    versionNumber: versionNumberProp,
+    metricId,
+    cacheId,
+  }: MetricVersionHistoryModalProps) => {
     const { data } = useGetMetric(
-      { id: metricId },
+      { id: metricId, cacheId },
       {
         select: useCallback(
           (x: BusterMetric) => ({

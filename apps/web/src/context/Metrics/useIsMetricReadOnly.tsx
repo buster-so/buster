@@ -17,9 +17,11 @@ const stableMetricSelect = (x: BusterMetric) => {
 export const useIsMetricReadOnly = ({
   metricId,
   readOnly,
+  cacheId,
 }: {
   metricId: string;
   readOnly?: boolean;
+  cacheId?: string;
 }) => {
   const isVersionHistoryMode = useChatIsVersionHistoryMode({ type: 'metric_file' });
   const { metricVersionNumber } = useGetMetricParams();
@@ -27,7 +29,7 @@ export const useIsMetricReadOnly = ({
     data: metricData,
     isFetched,
     isError,
-  } = useGetMetric({ id: metricId }, { select: stableMetricSelect });
+  } = useGetMetric({ id: metricId, cacheId }, { select: stableMetricSelect });
 
   const isViewingOldVersion = checkIfMetricIsViewingOldVersion(metricVersionNumber, metricData);
 

@@ -1,6 +1,7 @@
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
   useAddMetricsToDashboard,
   useRemoveMetricsFromDashboard,
@@ -48,20 +49,33 @@ import {
 
 interface MetricThreeDotMenuDropdownProps {
   metricId: string;
+  cacheId?: string;
   isViewingOldVersion: boolean;
   versionNumber: number | undefined;
   children: React.ReactNode;
 }
 
 export const MetricThreeDotMenuDropdown = React.memo(
-  ({ metricId, isViewingOldVersion, versionNumber, children }: MetricThreeDotMenuDropdownProps) => {
+  ({
+    metricId,
+    isViewingOldVersion,
+    versionNumber,
+    children,
+    cacheId,
+  }: MetricThreeDotMenuDropdownProps) => {
     const isChatMode = useIsChatMode();
-    const { data: permission } = useGetMetric({ id: metricId }, { select: (x) => x.permission });
-    const openFullScreenMetric = useOpenChartItem({ metricId, metricVersionNumber: versionNumber });
-    const dashboardSelectMenu = useDashboardSelectMenu({ metricId });
+    const { data: permission } = useGetMetric(
+      { id: metricId, cacheId },
+      { select: useCallback((x: BusterMetric) => x.permission, []) }
+    );
+    const openFullScreenMetric = useOpenChartItem({
+      metricId,
+      metricVersionNumber: versionNumber,
+    });
+    const dashboardSelectMenu = useDashboardSelectMenu({ metricId, cacheId });
     const versionHistoryItems = useMetricVersionHistorySelectMenu({ metricId });
     const collectionSelectMenu = useCollectionSelectMenu({ metricId });
-    const statusSelectMenu = useStatusSelectMenu({ metricId });
+    const statusSelectMenu = useStatusSelectMenu({ metricId, cacheId });
     const favoriteMetric = useFavoriteMetricSelectMenu({ metricId });
     const editChartMenu = useEditChartSelectMenu();
     const resultsViewMenu = useResultsViewSelectMenu({ metricId });
@@ -69,6 +83,7 @@ export const MetricThreeDotMenuDropdown = React.memo(
     const downloadCSVMenu = useDownloadMetricDataCSV({
       metricId,
       metricVersionNumber: versionNumber,
+      cacheId,
     });
     const downloadPNGMenu = useDownloadPNGSelectMenu({
       metricId,
@@ -154,10 +169,13 @@ export const MetricThreeDotMenuButton = React.memo(
   }
 );
 
-const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
+const useDashboardSelectMenu = ({ metricId, cacheId }: { metricId: string; cacheId?: string }) => {
   const { mutateAsync: saveMetricsToDashboard } = useAddMetricsToDashboard();
   const { mutateAsync: removeMetricsFromDashboard } = useRemoveMetricsFromDashboard();
-  const { data: dashboards } = useGetMetric({ id: metricId }, { select: (x) => x.dashboards });
+  const { data: dashboards } = useGetMetric(
+    { id: metricId, cacheId },
+    { select: useCallback((x: BusterMetric) => x.dashboards, []) }
+  );
   const { openInfoMessage } = useBusterNotifications();
 
   const onSaveToDashboard = async (dashboardIds: string[]) => {
@@ -209,12 +227,12 @@ const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
   return dashboardDropdownItem;
 };
 
-const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
+const useCollectionSelectMenu = ({ metricId, cacheId }: { metricId: string; cacheId?: string }) => {
   const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
   const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
   const { data: selectedCollections } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.collections?.map((x) => x.id) }
+    { id: metricId, cacheId },
+    { select: useCallback((x: BusterMetric) => x.collections?.map((x) => x.id), []) }
   );
   const { openInfoMessage } = useBusterNotifications();
 
@@ -261,8 +279,11 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
   return collectionDropdownItem;
 };
 
-const useStatusSelectMenu = ({ metricId }: { metricId: string }) => {
-  const { data: metricStatus } = useGetMetric({ id: metricId }, { select: (x) => x.status });
+const useStatusSelectMenu = ({ metricId, cacheId }: { metricId: string; cacheId?: string }) => {
+  const { data: metricStatus } = useGetMetric(
+    { id: metricId, cacheId },
+    { select: useCallback((x: BusterMetric) => x.status, []) }
+  );
   const { mutate: updateStatus } = useBulkUpdateMetricVerificationStatus();
   const isAdmin = useIsUserAdmin();
 
@@ -359,9 +380,15 @@ const useDeleteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
   );
 };
 
-export const useShareMenuSelectMenu = ({ metricId }: { metricId: string }) => {
+export const useShareMenuSelectMenu = ({
+  metricId,
+  cacheId,
+}: {
+  metricId: string;
+  cacheId?: string;
+}) => {
   const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, cacheId },
     { select: getShareAssetConfig }
   );
   const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);

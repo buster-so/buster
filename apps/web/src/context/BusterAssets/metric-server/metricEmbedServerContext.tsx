@@ -30,10 +30,13 @@ export const loader = async ({
   params,
   context: { queryClient },
 }: {
-  params: { metricId: string };
+  params: { metricId: string; reportId?: string };
   context: { queryClient: QueryClient };
 }) => {
-  const metric = await prefetchGetMetric(queryClient, { id: params.metricId });
+  const metric = await prefetchGetMetric(queryClient, {
+    id: params.metricId,
+    report_file_id: params.reportId,
+  });
   return {
     title: metric?.name,
   };
