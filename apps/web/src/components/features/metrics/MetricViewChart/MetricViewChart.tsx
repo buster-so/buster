@@ -16,11 +16,12 @@ const stableMetricDataSelect = (x: BusterMetricData) => x?.has_more_records;
 export const MetricViewChart: React.FC<{
   metricId: string;
   versionNumber?: number;
+  cacheId?: string;
   readOnly?: boolean;
   className?: string;
   cardClassName?: string;
 }> = React.memo(
-  ({ metricId, versionNumber, readOnly = false, className = '', cardClassName = '' }) => {
+  ({ metricId, versionNumber, readOnly = false, className = '', cardClassName = '', cacheId }) => {
     const { data: metric } = useGetMetric(
       { id: metricId, versionNumber },
       { select: stableMetricSelect, enabled: true }
@@ -36,6 +37,7 @@ export const MetricViewChart: React.FC<{
           <MetricChartCard
             metricId={metricId}
             versionNumber={versionNumber}
+            cacheId={cacheId}
             readOnly={readOnly}
             className={cardClassName}
           />

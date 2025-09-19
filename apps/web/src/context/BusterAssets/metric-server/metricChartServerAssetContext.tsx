@@ -3,6 +3,7 @@ import { lazy, Suspense, useRef, useTransition } from 'react';
 import { z } from 'zod';
 import { AppSplitter, type LayoutSize } from '@/components/ui/layouts/AppSplitter';
 import { useGetMetricParams } from '@/context/Metrics/useGetMetricParams';
+import { useGetReportParams } from '@/context/Reports/useGetReportParams';
 import { MetricViewChartController } from '@/controllers/MetricController/MetricViewChartController';
 import { useMount } from '@/hooks/useMount';
 import {
@@ -25,6 +26,7 @@ export const component = () => {
   const location = useLocation();
 
   const { metricId, metricVersionNumber } = useGetMetricParams();
+  const { reportId } = useGetReportParams();
   const editMode = useSearch({
     strict: false,
     select: (v) => v.editMode ?? false,
@@ -37,6 +39,7 @@ export const component = () => {
   const hasSeenMetricEditMode = useRef(editMode);
 
   const defaultLayout = isMetricEditMode ? defaultLayoutOpen : defaultLayoutClosed;
+  const cacheId = reportId;
 
   useMount(() => {
     if (editMode) {
@@ -65,7 +68,11 @@ export const component = () => {
         initialLayout={defaultLayout}
         preserveSide="right"
         leftChildren={
-          <MetricViewChartController metricId={metricId} versionNumber={metricVersionNumber} />
+          <MetricViewChartController
+            metricId={metricId}
+            versionNumber={metricVersionNumber}
+            cacheId={cacheId}
+          />
         }
         rightChildren={
           <RightChildren metricId={metricId} renderChart={hasSeenMetricEditMode.current} />

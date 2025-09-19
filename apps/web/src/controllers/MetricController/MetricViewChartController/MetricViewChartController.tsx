@@ -9,6 +9,7 @@ export const MetricViewChartController: React.FC<{
   readOnly?: boolean;
   className?: string;
   cardClassName?: string;
+  cacheId?: string;
 }> = React.memo(
   ({
     metricId,
@@ -16,6 +17,7 @@ export const MetricViewChartController: React.FC<{
     readOnly: readOnlyProp = false,
     className = '',
     cardClassName = '',
+    cacheId,
   }) => {
     const { isReadOnly, isVersionHistoryMode, isViewingOldVersion } = useIsMetricReadOnly({
       metricId,
@@ -30,6 +32,7 @@ export const MetricViewChartController: React.FC<{
           readOnly={isReadOnly}
           className={className}
           cardClassName={cardClassName}
+          cacheId={cacheId}
         />
         {!isReadOnly && !isVersionHistoryMode && !isViewingOldVersion && (
           <MetricSaveFilePopup metricId={metricId} />
