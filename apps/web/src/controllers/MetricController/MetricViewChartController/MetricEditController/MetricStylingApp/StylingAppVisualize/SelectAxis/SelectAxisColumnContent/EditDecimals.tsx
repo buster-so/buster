@@ -55,7 +55,7 @@ export const EditDecimals: React.FC<{
         />
         <InputNumber
           prefix="Max"
-          max={10}
+          max={7}
           defaultValue={max}
           className="w-full!"
           onChange={(value) => handleMaxChange(value)}
