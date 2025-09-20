@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ShareRoleSchema, VerificationStatusSchema } from '../share';
+import { VerificationStatusSchema } from '../share';
 import { ChartConfigPropsSchema } from './charts';
 
 export const GetMetricParamsSchema = z.object({
@@ -7,18 +7,11 @@ export const GetMetricParamsSchema = z.object({
 });
 
 export const GetMetricQuerySchema = z.object({
-  password: z.string().optional(),
-  version_number: z.coerce.number().optional(),
+  password: z.string().min(1).optional(),
+  version_number: z.coerce.number().int().min(1).optional(),
 });
 
-export const GetMetricRequestSchema = z.object({
-  id: z.string(),
-  password: z.string().optional(),
-  report_file_id: z.string().optional(),
-  version_number: z.number().optional(), //api will default to latest if not provided
-});
-
-export const GetMetricDataRequestSchema = GetMetricRequestSchema.extend({
+export const GetMetricDataRequestSchema = GetMetricQuerySchema.extend({
   limit: z.number().min(1).max(5000).default(5000).optional(),
 });
 
@@ -68,7 +61,6 @@ export const BulkUpdateMetricVerificationStatusRequestSchema = z.array(
 export type GetMetricParams = z.infer<typeof GetMetricParamsSchema>;
 export type GetMetricQuery = z.infer<typeof GetMetricQuerySchema>;
 export type GetMetricDataRequest = z.infer<typeof GetMetricDataRequestSchema>;
-export type GetMetricRequest = z.infer<typeof GetMetricRequestSchema>;
 export type GetMetricListRequest = z.infer<typeof GetMetricListRequestSchema>;
 export type UpdateMetricRequest = z.infer<typeof UpdateMetricRequestSchema>;
 export type DeleteMetricRequest = z.infer<typeof DeleteMetricRequestSchema>;

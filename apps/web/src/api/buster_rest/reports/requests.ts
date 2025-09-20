@@ -1,4 +1,6 @@
 import type {
+  GetReportParams,
+  GetReportQuery,
   GetReportResponse,
   GetReportsListRequest,
   GetReportsListResponse,
@@ -21,8 +23,8 @@ export const getReportsList = async (params?: GetReportsListRequest) => {
 /**
  * Get an individual report by ID
  */
-export const getReportById = async (reportId: string) => {
-  return mainApiV2.get<GetReportResponse>(`/reports/${reportId}`).then((res) => res.data);
+export const getReportById = async ({ id, ...params }: GetReportParams & GetReportQuery) => {
+  return mainApiV2.get<GetReportResponse>(`/reports/${id}`, { params }).then((res) => res.data);
 };
 
 /**

@@ -2,7 +2,7 @@ import {
   bulkCreateAssetPermissions,
   checkAssetPermission,
   findUsersByEmails,
-  getReport,
+  getReportFileById,
   getUserOrganizationId,
   updateReport,
 } from '@buster/database/queries';
@@ -37,7 +37,7 @@ export async function updateReportShareHandler(
   }
 
   // Check if report exists
-  const report = await getReport({ reportId, userId: user.id });
+  const report = await getReportFileById({ reportId, userId: user.id });
   if (!report) {
     throw new HTTPException(404, { message: 'Report not found' });
   }

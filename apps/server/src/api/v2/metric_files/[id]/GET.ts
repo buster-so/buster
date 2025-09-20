@@ -53,16 +53,13 @@ export default app;
  * This is the TypeScript equivalent of the Rust get_metric_handler
  */
 async function getMetricHandler(
-  params: GetMetricHandlerParams,
+  { metricId, ...params }: GetMetricHandlerParams,
   user: User
 ): Promise<GetMetricResponse> {
-  const { metricId, versionNumber, password } = params;
-
   // Use shared helper to fetch and process metric data
   const processedData = await fetchAndProcessMetricData(metricId, user, {
     publicAccessPreviouslyVerified: false,
-    password,
-    versionNumber,
+    ...params,
   });
 
   // Build and return the complete metric response

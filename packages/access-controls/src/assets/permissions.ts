@@ -204,7 +204,7 @@ export async function hasAssetPermission(params: {
   userId: string;
   assetId: string;
   assetType: AssetType;
-  requiredRole: AssetPermissionRole;
+  requiredRole: AssetPermissionRole | AssetPermissionRole[];
   organizationId?: string;
   workspaceSharing?: WorkspaceSharing;
 }): Promise<boolean> {

@@ -205,14 +205,14 @@ describe('Asset Permission Checks', () => {
         'user123',
         'asset123',
         'dashboard_file',
-        'can_view',
+        ['can_view'],
         { hasAccess: false }
       );
     });
   });
 
   describe('computeEffectivePermission', () => {
-    const mockOrgs = [{ id: 'org123', role: 'viewer' }];
+    const mockOrgs = [{ id: 'org123', role: 'viewer' as const }];
 
     it('should return owner for workspace_admin', () => {
       const result = computeEffectivePermission(null, 'none', 'org123', [

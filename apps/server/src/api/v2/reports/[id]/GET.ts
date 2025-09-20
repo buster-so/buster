@@ -1,65 +1,62 @@
-import { checkPermission } from '@buster/access-controls';
-import { getReport, getReportMetadata } from '@buster/database/queries';
-import type { GetReportResponse } from '@buster/server-shared/reports';
+import { getReportFileById } from '@buster/database/queries';
+import {
+  GetReportParamsSchema,
+  GetReportQuerySchema,
+  type GetReportResponse,
+} from '@buster/server-shared/reports';
+import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { checkAssetPublicAccess } from '../../../../shared-helpers/asset-public-access';
 import { standardErrorHandler } from '../../../../utils/response';
 
 export async function getReportHandler(
   reportId: string,
-  user: { id: string }
+  user: { id: string },
+  versionNumber?: number | undefined,
+  password?: string | undefined
 ): Promise<GetReportResponse> {
-  // Get report metadata for access control
-  let reportData: Awaited<ReturnType<typeof getReportMetadata>>;
-  try {
-    reportData = await getReportMetadata({ reportId });
-  } catch (error) {
-    console.error('Error getting report metadata:', error);
-    throw new HTTPException(404, { message: 'Report not found' });
-  }
-
-  if (!reportData) {
-    throw new HTTPException(404, { message: 'Report not found' });
-  }
-
-  // Check access using existing asset permission system
-  const assetPermissionResult = await checkPermission({
-    userId: user.id,
-    assetId: reportId,
-    assetType: 'report_file',
-    requiredRole: 'can_view',
-    organizationId: reportData.organizationId,
-    workspaceSharing: reportData.workspaceSharing,
-  });
-
-  if (!assetPermissionResult.hasAccess) {
-    throw new HTTPException(403, { message: 'You do not have access to this report' });
-  }
-
-  // If access is granted, get the full report data
-  const report = await getReport({
+  const report = await getReportFileById({
     reportId,
     userId: user.id,
-    permissionRole: assetPermissionResult.effectiveRole,
+    versionNumber,
   });
 
-  const response: GetReportResponse = report;
-
-  return response;
+  return await checkAssetPublicAccess<GetReportResponse>({
+    user,
+    assetId: reportId,
+    assetType: 'report_file',
+    organizationId: report.organization_id,
+    workspaceSharing: report.workspace_sharing,
+    password,
+    asset: report,
+  });
 }
 
 const app = new Hono()
-  .get('/', async (c) => {
-    const reportId = c.req.param('id');
-    const user = c.get('busterUser');
+  .get(
+    '/',
+    zValidator('param', GetReportParamsSchema),
+    zValidator('query', GetReportQuerySchema),
+    async (c) => {
+      const { id: reportId } = c.req.valid('param');
+      const query = c.req.valid('query');
+      const { password, version_number: versionNumber } = query;
+      const user = c.get('busterUser');
 
-    if (!reportId) {
-      throw new HTTPException(404, { message: 'Report ID is required' });
+      if (!reportId) {
+        throw new HTTPException(404, { message: 'Report ID is required' });
+      }
+
+      const response: GetReportResponse = await getReportHandler(
+        reportId,
+        user,
+        versionNumber,
+        password
+      );
+      return c.json(response);
     }
-
-    const response: GetReportResponse = await getReportHandler(reportId, user);
-    return c.json(response);
-  })
+  )
   .onError(standardErrorHandler);
 
 export default app;

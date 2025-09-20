@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { prefetchGetReportById } from '@/api/buster_rest/reports/queryRequests';
+import { prefetchGetReport } from '@/api/buster_rest/reports/queryRequests';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ReportPageController } from '@/controllers/ReportPageControllers';
 
@@ -11,8 +11,13 @@ const searchParamsSchema = z.object({
 export const Route = createFileRoute('/embed/report/$reportId')({
   component: RouteComponent,
   validateSearch: searchParamsSchema,
-  loader: async ({ params, context: { queryClient } }) => {
-    const report = await prefetchGetReportById(queryClient, params.reportId);
+  beforeLoad: ({ search }) => {
+    return {
+      report_version_number: search.report_version_number,
+    };
+  },
+  loader: async ({ params, context: { report_version_number, queryClient } }) => {
+    const report = await prefetchGetReport(queryClient, params.reportId, report_version_number);
     return {
       title: report?.name,
     };

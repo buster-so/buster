@@ -67,9 +67,9 @@ export const prefetchGetReportsListClient = async (
 };
 
 export const prefetchGetReport = async (
+  queryClient: QueryClient,
   reportId: string,
-  report_version_number: number | undefined,
-  queryClient: QueryClient
+  report_version_number: number | undefined
 ) => {
   const version_number = report_version_number || 'LATEST';
 
@@ -78,7 +78,11 @@ export const prefetchGetReport = async (
   if (!existingData) {
     await queryClient.prefetchQuery({
       ...reportsQueryKeys.reportsGetReport(reportId, version_number || 'LATEST'),
-      queryFn: () => getReportById(reportId),
+      queryFn: () =>
+        getReportById({
+          id: reportId,
+          version_number: typeof version_number === 'number' ? version_number : undefined,
+        }),
     });
   }
 
@@ -88,7 +92,7 @@ export const prefetchGetReport = async (
 export const usePrefetchGetReportClient = () => {
   const queryClient = useQueryClient();
   return (reportId: string, versionNumber?: number) => {
-    return prefetchGetReport(reportId, versionNumber, queryClient);
+    return prefetchGetReport(queryClient, reportId, versionNumber);
   };
 };
 
@@ -100,7 +104,10 @@ export const useGetReport = <T = GetReportResponse>(
   options?: Omit<UseQueryOptions<GetReportResponse, RustApiError, T>, 'queryKey' | 'queryFn'>
 ) => {
   const queryFn = () => {
-    return getReportById(id ?? '');
+    return getReportById({
+      id: id ?? '',
+      version_number: typeof versionNumber === 'number' ? versionNumber : undefined,
+    });
   };
 
   return useQuery({
@@ -110,18 +117,6 @@ export const useGetReport = <T = GetReportResponse>(
     select: options?.select,
     ...options,
   });
-};
-
-/**
- * Prefetch function for individual report (server-side)
- */
-export const prefetchGetReportById = async (queryClient: QueryClient, reportId: string) => {
-  await queryClient.prefetchQuery({
-    ...reportsQueryKeys.reportsGetReport(reportId, 'LATEST'),
-    queryFn: () => getReportById(reportId),
-  });
-
-  return queryClient.getQueryData(reportsQueryKeys.reportsGetReport(reportId, 'LATEST').queryKey);
 };
 
 export const useUpdateReport = () => {

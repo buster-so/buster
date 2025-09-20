@@ -1,7 +1,7 @@
 import {
   checkAssetPermission,
   findUsersByEmails,
-  getReport,
+  getReportFileById,
   removeAssetPermission,
 } from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
@@ -35,7 +35,7 @@ export async function deleteReportSharingHandler(
   }
 
   // Get the report to verify it exists and get owner info
-  const report = await getReport({ reportId, userId: user.id });
+  const report = await getReportFileById({ reportId, userId: user.id });
   if (!report) {
     throw new HTTPException(404, { message: 'Report not found' });
   }

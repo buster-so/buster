@@ -7,7 +7,8 @@ import type {
   DuplicateMetricResponse,
   GetMetricDataRequest,
   GetMetricListRequest,
-  GetMetricRequest,
+  GetMetricParams,
+  GetMetricQuery,
   GetMetricResponse,
   ListMetricsResponse,
   MetricDataResponse,
@@ -27,20 +28,16 @@ import { mainApi, mainApiV2 } from '../instances';
 export const getMetric = async ({
   id,
   ...params
-}: GetMetricRequest): Promise<GetMetricResponse> => {
-  return mainApiV2
-    .get<GetMetricResponse>(`/metric_files/${id}`, {
-      params,
-    })
-    .then((res) => {
-      return res.data;
-    });
+}: GetMetricParams & GetMetricQuery): Promise<GetMetricResponse> => {
+  return mainApiV2.get<GetMetricResponse>(`/metric_files/${id}`, { params }).then((res) => {
+    return res.data;
+  });
 };
 
 export const getMetricData = async ({
   id,
   ...params
-}: GetMetricDataRequest): Promise<MetricDataResponse> => {
+}: GetMetricDataRequest & GetMetricParams): Promise<MetricDataResponse> => {
   return mainApiV2
     .get<MetricDataResponse>(`/metric_files/${id}/data`, { params })
     .then((res) => res.data);

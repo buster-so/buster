@@ -23,7 +23,7 @@ export const loader = async ({
   params: { reportId: string; chatId?: string };
   context: { queryClient: QueryClient; report_version_number?: number };
 }): Promise<{ title: string | undefined }> => {
-  const data = await prefetchGetReport(reportId, report_version_number, queryClient);
+  const data = await prefetchGetReport(queryClient, reportId, report_version_number);
   return {
     title: data?.name,
   };

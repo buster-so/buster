@@ -1,4 +1,8 @@
-import { checkAssetPermission, getReport, listAssetPermissions } from '@buster/database/queries';
+import {
+  checkAssetPermission,
+  getReportFileById,
+  listAssetPermissions,
+} from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
 import type { ShareGetResponse } from '@buster/server-shared/reports';
 import { Hono } from 'hono';
@@ -9,7 +13,7 @@ export async function getReportSharingHandler(
   user: User
 ): Promise<ShareGetResponse> {
   // Check if report exists
-  const report = await getReport({ reportId, userId: user.id });
+  const report = await getReportFileById({ reportId, userId: user.id });
   if (!report) {
     throw new HTTPException(404, { message: 'Report not found' });
   }

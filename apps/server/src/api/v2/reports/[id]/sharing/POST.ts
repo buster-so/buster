@@ -2,7 +2,7 @@ import {
   bulkCreateAssetPermissions,
   checkAssetPermission,
   findUsersByEmails,
-  getReport,
+  getReportFileById,
 } from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
 import type { SharePostResponse } from '@buster/server-shared/reports';
@@ -35,7 +35,7 @@ export async function createReportSharingHandler(
   }
 
   // Get the report to verify it exists
-  const report = await getReport({ reportId, userId: user.id });
+  const report = await getReportFileById({ reportId, userId: user.id });
   if (!report) {
     throw new HTTPException(404, { message: 'Report not found' });
   }
