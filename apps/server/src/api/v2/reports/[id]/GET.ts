@@ -13,8 +13,8 @@ import { standardErrorHandler } from '../../../../utils/response';
 export async function getReportHandler(
   reportId: string,
   user: { id: string },
-  versionNumber: number | undefined,
-  password: string | undefined
+  versionNumber?: number | undefined,
+  password?: string | undefined
 ): Promise<GetReportResponse> {
   const report = await getReportFileById({
     reportId,

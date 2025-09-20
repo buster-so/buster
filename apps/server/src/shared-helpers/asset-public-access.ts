@@ -61,3 +61,34 @@ export const checkAssetPublicAccess = async <T extends PublicAccessAsset>({
 
   return asset;
 };
+
+export const checkIfAssetIsEditable = async ({
+  user,
+  assetId,
+  assetType,
+  organizationId,
+  workspaceSharing,
+  requiredRole = 'can_edit',
+}: {
+  user: {
+    id: string;
+  };
+  assetId: string;
+  assetType: AssetType;
+  organizationId: string;
+  workspaceSharing: WorkspaceSharing;
+  requiredRole?: AssetPermissionRole | AssetPermissionRole[];
+}) => {
+  const assetPermissionResult = await checkPermission({
+    userId: user.id,
+    assetId,
+    assetType,
+    requiredRole,
+    organizationId,
+    workspaceSharing,
+  });
+
+  if (!assetPermissionResult.hasAccess) {
+    throw new HTTPException(403, { message: 'You do not have permission to edit this asset' });
+  }
+};

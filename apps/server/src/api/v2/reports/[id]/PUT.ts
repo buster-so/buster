@@ -1,10 +1,16 @@
 import type { User } from '@buster/database/queries';
-import { getUserOrganizationId, updateReport } from '@buster/database/queries';
+import {
+  getReportFileById,
+  getReportWorkspaceSharing,
+  getUserOrganizationId,
+  updateReport,
+} from '@buster/database/queries';
 import type { UpdateReportRequest, UpdateReportResponse } from '@buster/server-shared/reports';
 import { UpdateReportRequestSchema } from '@buster/server-shared/reports';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { checkIfAssetIsEditable } from '../../../../shared-helpers/asset-public-access';
 import { getReportHandler } from './GET';
 
 async function updateReportHandler(
@@ -23,11 +29,15 @@ async function updateReportHandler(
     throw new HTTPException(403, { message: 'User is not associated with an organization' });
   }
 
-  const _hasPermissionToEditAsset = true; //DALLIN: Check if user has permission to edit asset
+  const workspaceSharing = await getReportWorkspaceSharing(reportId);
 
-  if (!_hasPermissionToEditAsset) {
-    throw new HTTPException(403, { message: 'User does not have permission to edit asset' });
-  }
+  checkIfAssetIsEditable({
+    user,
+    assetId: reportId,
+    assetType: 'report_file',
+    organizationId: userOrg.organizationId,
+    workspaceSharing,
+  });
 
   const { name, content, update_version = false } = request;
 

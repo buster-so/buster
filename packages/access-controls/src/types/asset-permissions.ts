@@ -70,6 +70,19 @@ export function isPermissionSufficient(
   return permissionLevelOrder[userRole] >= permissionLevelOrder[requiredRole];
 }
 
+/**
+ * Check if a user role is sufficient for ANY of the required roles
+ * Useful when checking if a user meets at least one of multiple permission requirements
+ */
+export function isPermissionSufficientForAny(
+  userRole: AssetPermissionRole | null,
+  requiredRoles: AssetPermissionRole | AssetPermissionRole[]
+): boolean {
+  if (!userRole) return false;
+  const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+  return roles.some((role) => isPermissionSufficient(userRole, role));
+}
+
 export function getHighestPermission(
   roles: (AssetPermissionRole | null)[]
 ): AssetPermissionRole | null {

@@ -164,3 +164,19 @@ export async function getReportFileById(input: GetReportInput) {
 
   return report;
 }
+
+export async function getReportWorkspaceSharing(reportId: string) {
+  const report = await db
+    .select({
+      workspace_sharing: reportFiles.workspaceSharing,
+    })
+    .from(reportFiles)
+    .where(eq(reportFiles.id, reportId))
+    .limit(1);
+
+  if (!report[0]) {
+    throw new Error('Report not found');
+  }
+
+  return report[0].workspace_sharing;
+}
