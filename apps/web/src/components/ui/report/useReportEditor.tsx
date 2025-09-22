@@ -31,12 +31,7 @@ export const useReportEditor = ({
       filteredKeys.push(FIXED_TOOLBAR_KIT_KEY);
     }
 
-    return [
-      ...EditorKit({ scrollAreaRef }),
-      GlobalVariablePlugin.configure({
-        options: { mode },
-      }),
-    ].filter((p) => !filteredKeys.includes(p.key));
+    return EditorKit({ scrollAreaRef, mode }).filter((p) => !filteredKeys.includes(p.key));
   }, []);
 
   const editor = usePlateEditor({

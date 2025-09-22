@@ -21,6 +21,7 @@ export const getSupabaseSession = async (): Promise<SimplifiedSupabaseSession> =
     : await extractSimplifiedSupabaseSession(supabase);
 
   if ((!sessionData.accessToken || sessionError) && !isServer) {
+    console.warn('No session data or error', sessionData, sessionError);
     return sessionData;
   }
 

@@ -1,9 +1,12 @@
 import type { Value } from 'platejs';
+import { createPlateEditor } from 'platejs/react';
 import { describe, expect, it } from 'vitest';
+import { EditorKit } from '../../editor-kit';
 import { markdownToPlatejs, platejsToMarkdown } from './platejs-conversions';
-import { SERVER_EDITOR } from './server-editor';
 
-const editor = SERVER_EDITOR;
+export const editor = createPlateEditor({
+  plugins: EditorKit({ scrollAreaRef: undefined, mode: 'default' }),
+});
 
 describe('markdownToPlatejs', () => {
   it('should convert elaborate markdown to platejs', async () => {
@@ -271,8 +274,7 @@ Here's an unordered list:
   it('callout and a metric', async () => {
     const markdown = `<metric metricId="33af38a8-c40f-437d-98ed-1ec78ce35232" width="100%" caption=""></metric>
 
-<callout icon="💡">Testing123
-</callout>`;
+<callout icon="💡">Testing123</callout>`;
     const elements = await markdownToPlatejs(editor, markdown);
     expect(elements).toBeDefined();
     const firstElement = elements[0];
@@ -1344,8 +1346,52 @@ describe('platejsToMarkdown', () => {
     const markdownFromPlatejs = await platejsToMarkdown(editor, elements);
     expect(markdownFromPlatejs).toBeDefined();
     expect(markdownFromPlatejs).toContain(
-      '<metric metricId="1234" versionNumber="undefined" width="100%" caption="This is a caption.. AND IT REALLY WORKS!"></metric>'
+      '<metric metricId="1234" versionNumber="" width="100%" caption="This is a caption.. AND IT REALLY WORKS!"></metric>'
     );
+  });
+
+  it('two metrics', async () => {
+    const elements: Value = [
+      {
+        type: 'metric',
+        children: [
+          {
+            text: '',
+          },
+        ],
+        metricId: 'nate-rulez',
+        caption: [
+          {
+            text: 'Cool',
+          },
+        ],
+        id: 'nate-rulez',
+      },
+      {
+        type: 'metric',
+        children: [
+          {
+            text: '',
+          },
+        ],
+        metricId: 'wells-droolz',
+        caption: [
+          {
+            text: 'Wow',
+          },
+        ],
+        id: 'wells-droolz',
+      },
+    ];
+    const markdownFromPlatejs = await platejsToMarkdown(editor, elements);
+    expect(markdownFromPlatejs).toBeDefined();
+    expect(markdownFromPlatejs).toContain(
+      '<metric metricId="nate-rulez" versionNumber="" width="100%" caption="Cool"></metric>'
+    );
+    expect(markdownFromPlatejs).toContain(
+      '<metric metricId="wells-droolz" versionNumber="" width="100%" caption="Wow"></metric>'
+    );
+    expect(markdownFromPlatejs).not.toContain('\\metric');
   });
 });
 
@@ -1507,5 +1553,300 @@ Nested
     expect(platejs[0].children[0].text).toBe('Toggle');
     expect(platejs[1].type).toBe('p');
     expect(platejs[1].children[0].text).toBe('Nested');
+  });
+});
+
+describe('metric escaping bug tests', () => {
+  it('should not add backslashes to metric tags during multiple conversions', async () => {
+    const originalMarkdown = `# Sales Report
+
+Our top performer this month shows impressive results.
+
+<metric metricId="abc-123-def" width="100%" caption="Sales Performance"></metric>
+
+## Summary
+Great performance across all metrics.`;
+
+    // First conversion cycle: markdown -> platejs -> markdown
+    const platejs = await markdownToPlatejs(editor, originalMarkdown);
+    const convertedMarkdown = await platejsToMarkdown(editor, platejs);
+
+    // Second conversion cycle: markdown -> platejs -> markdown (simulates save operation)
+    const platejs2 = await markdownToPlatejs(editor, convertedMarkdown);
+    const convertedMarkdown2 = await platejsToMarkdown(editor, platejs2);
+
+    // Third conversion cycle (simulates another save operation)
+    const platejs3 = await markdownToPlatejs(editor, convertedMarkdown2);
+    const convertedMarkdown3 = await platejsToMarkdown(editor, platejs3);
+
+    // Should not contain escaped metric tags
+    expect(convertedMarkdown3).not.toContain('\\<metric');
+    expect(convertedMarkdown3).not.toContain('\\<\\/metric');
+    expect(convertedMarkdown3).toContain('<metric metricId="abc-123-def"');
+    expect(convertedMarkdown3).toContain('</metric>');
+
+    // Verify the metric element is still properly parsed
+    const finalPlatejs = await markdownToPlatejs(editor, convertedMarkdown3);
+    const metricElement = finalPlatejs.find((el) => el.type === 'metric');
+    expect(metricElement).toBeDefined();
+    expect(metricElement?.metricId).toBe('abc-123-def');
+  });
+
+  it('should handle metric tags with special characters in attributes', async () => {
+    const markdown = `<metric metricId="test-123-with-&-special-chars" caption="Revenue & Profit Analysis" width="100%"></metric>`;
+
+    // Multiple conversion cycles
+    const platejs = await markdownToPlatejs(editor, markdown);
+    const convertedMarkdown = await platejsToMarkdown(editor, platejs);
+    const platejs2 = await markdownToPlatejs(editor, convertedMarkdown);
+    const convertedMarkdown2 = await platejsToMarkdown(editor, platejs2);
+
+    // Should not escape the metric tags themselves
+    expect(convertedMarkdown2).not.toContain('\\<metric');
+    expect(convertedMarkdown2).toContain('<metric metricId="test-123-with-&-special-chars"');
+  });
+
+  it('should handle multiple metric tags in a single document', async () => {
+    const markdown = `# Multi-Metric Report
+
+<metric metricId="first-metric" caption="First Metric"></metric>
+
+Some content between metrics.
+
+<metric metricId="second-metric" width="50%" caption="Second Metric"></metric>
+
+More content.
+
+<metric metricId="third-metric" versionNumber="1.2" caption="Third Metric"></metric>`;
+
+    // Simulate multiple save operations
+    let currentMarkdown = markdown;
+
+    for (let i = 0; i < 5; i++) {
+      const platejs = await markdownToPlatejs(editor, currentMarkdown);
+      currentMarkdown = await platejsToMarkdown(editor, platejs);
+    }
+
+    // None of the metrics should be escaped
+    expect(currentMarkdown).not.toContain('\\<metric');
+    expect(currentMarkdown).not.toContain('\\</metric>');
+
+    // All metrics should still be present
+    expect(currentMarkdown).toContain('<metric metricId="first-metric"');
+    expect(currentMarkdown).toContain('<metric metricId="second-metric"');
+    expect(currentMarkdown).toContain('<metric metricId="third-metric"');
+
+    // Final conversion should still work
+    const finalPlatejs = await markdownToPlatejs(editor, currentMarkdown);
+    const metricElements = finalPlatejs.filter((el) => el.type === 'metric');
+    expect(metricElements).toHaveLength(3);
+  });
+
+  it('should preserve metric functionality after content edits and saves', async () => {
+    // Simulate the workflow: create report -> edit -> save -> edit -> save
+    const initialMarkdown = `# Initial Report
+
+<metric metricId="initial-metric" caption="Initial Metric"></metric>`;
+
+    // First save cycle
+    const platejs1 = await markdownToPlatejs(editor, initialMarkdown);
+    const savedMarkdown1 = await platejsToMarkdown(editor, platejs1);
+
+    // Edit: add content
+    const editedMarkdown = savedMarkdown1 + `\n\n## New Section\nAdded content after save.`;
+
+    // Second save cycle
+    const platejs2 = await markdownToPlatejs(editor, editedMarkdown);
+    const savedMarkdown2 = await platejsToMarkdown(editor, platejs2);
+
+    // Edit: add another metric
+    const editedMarkdown2 = savedMarkdown2.replace(
+      '## New Section',
+      `<metric metricId="added-metric" caption="Added Later"></metric>\n\n## New Section`
+    );
+
+    // Third save cycle
+    const platejs3 = await markdownToPlatejs(editor, editedMarkdown2);
+    const savedMarkdown3 = await platejsToMarkdown(editor, platejs3);
+
+    // Neither metric should be escaped
+    expect(savedMarkdown3).not.toContain('\\<metric');
+    expect(savedMarkdown3).toContain('<metric metricId="initial-metric"');
+    expect(savedMarkdown3).toContain('<metric metricId="added-metric"');
+
+    // Both metrics should parse correctly
+    const finalPlatejs = await markdownToPlatejs(editor, savedMarkdown3);
+    const metrics = finalPlatejs.filter((el) => el.type === 'metric');
+    expect(metrics).toHaveLength(2);
+    expect(metrics[0].metricId).toBe('initial-metric');
+    expect(metrics[1].metricId).toBe('added-metric');
+  });
+
+  // Edge cases that might trigger the escaping bug
+  it('should handle metric tags when markdown processor sees angle brackets as special', async () => {
+    // This test specifically targets potential escaping during markdown processing
+    const markdown = `# Test Report
+
+Text before metric.
+
+<metric metricId="edge-case-test" caption="Test < and > in caption"></metric>
+
+Text after metric.`;
+
+    // Process through multiple serialization cycles to trigger any escaping behavior
+    let result = markdown;
+    for (let cycle = 0; cycle < 10; cycle++) {
+      const platejs = await markdownToPlatejs(editor, result);
+      result = await platejsToMarkdown(editor, platejs);
+
+      // After each cycle, metric tags should never be escaped
+      expect(result).not.toContain('\\<metric');
+      expect(result).not.toContain('\\</metric>');
+      expect(result).toContain('<metric metricId="edge-case-test"');
+    }
+  });
+
+  it('should handle metric tags when content contains backslashes already', async () => {
+    const markdown = `# Report with Existing Backslashes
+
+This is \\*escaped\\* markdown text.
+
+<metric metricId="backslash-test" caption="Test Metric"></metric>
+
+Some code: \`console.log("test\\n");\`
+
+Another escaped: \\<div\\>content\\</div\\>`;
+
+    // Process multiple times to see if existing backslashes interfere
+    let result = markdown;
+    for (let i = 0; i < 3; i++) {
+      const platejs = await markdownToPlatejs(editor, result);
+      result = await platejsToMarkdown(editor, platejs);
+      console.log(i, result);
+    }
+
+    // Metric should not be escaped
+    expect(result).not.toContain('\\<metric');
+    expect(result).toContain('<metric metricId="backslash-test"');
+
+    // Existing escaped content should remain
+    expect(result).toContain('\\*escaped\\*');
+    expect(result).toContain('<div>');
+  });
+
+  it('should reproduce the reported bug scenario: works initially but breaks after saves', async () => {
+    // Initial report creation - this should work fine
+    const initialContent = `# Sales Performance Report
+
+<metric metricId="sales-overview" caption="Q4 Sales Overview"></metric>
+
+## Analysis
+The data shows strong performance this quarter.`;
+
+    // Simulate initial save (first conversion)
+    const initialPlatejs = await markdownToPlatejs(editor, initialContent);
+    expect(initialPlatejs.find((el) => el.type === 'metric')).toBeDefined();
+
+    const firstSave = await platejsToMarkdown(editor, initialPlatejs);
+    expect(firstSave).toContain('<metric metricId="sales-overview"');
+    expect(firstSave).not.toContain('\\<metric');
+
+    // Simulate user editing and additional saves
+    let currentContent = firstSave;
+
+    // Multiple edit/save cycles (this is where the bug reportedly occurs)
+    for (let saveCount = 1; saveCount <= 10; saveCount++) {
+      // Convert to editor format
+      const platejs = await markdownToPlatejs(editor, currentContent);
+
+      // Simulate user adding some content (like what happens during editing)
+      platejs.push({
+        type: 'p',
+        children: [{ text: `Edit from save cycle ${saveCount}` }],
+      });
+
+      // Save back to markdown
+      currentContent = await platejsToMarkdown(editor, platejs);
+
+      // At NO point should the metric tag be escaped
+      expect(currentContent).not.toContain('\\<metric');
+      expect(currentContent).not.toContain('\\</metric>');
+      expect(currentContent).toContain('<metric metricId="sales-overview"');
+
+      // The metric should still be parseable
+      const testPlatejs = await markdownToPlatejs(editor, currentContent);
+      const metricEl = testPlatejs.find((el) => el.type === 'metric');
+      expect(metricEl).toBeDefined();
+      expect(metricEl?.metricId).toBe('sales-overview');
+    }
+  });
+
+  it('should handle JSON serialization scenarios that might escape content', async () => {
+    // This test targets potential escaping during JSON serialization/deserialization
+    // which might happen when content is sent to/from the server
+    const markdown = `# Report with JSON-Sensitive Content
+
+<metric metricId="json-test-metric" versionNumber="" width="100%" caption='Caption with "quotes" and special chars'></metric>
+
+Text with "quotes" and 'apostrophes'.`;
+
+    // Simulate JSON serialization/deserialization that might happen during API calls
+    const platejs = await markdownToPlatejs(editor, markdown);
+    const serializedPlateJS = JSON.parse(JSON.stringify(platejs));
+    const backToMarkdown = await platejsToMarkdown(editor, serializedPlateJS);
+    console.log('backToMarkdown', backToMarkdown);
+    expect(backToMarkdown).not.toContain('\\<metric');
+    expect(backToMarkdown).toContain('<metric metricId="json-test-metric"');
+
+    // Convert back to PlateJS again (simulating another round trip)
+    const platejs2 = await markdownToPlatejs(editor, backToMarkdown);
+    const serializedPlateJS2 = JSON.parse(JSON.stringify(platejs2));
+    const finalMarkdown = await platejsToMarkdown(editor, serializedPlateJS2);
+
+    console.log('finalMarkdown', finalMarkdown);
+
+    // Metric tags should never be escaped during JSON round trips
+    expect(finalMarkdown).not.toContain('\\<metric');
+    expect(finalMarkdown).toContain('<metric metricId="json-test-metric"');
+    expect(finalMarkdown).toContain(`caption="Caption with &quot;quotes&quot; and special chars"`);
+  });
+
+  it('should handle streaming content updates without escaping metrics', async () => {
+    // This simulates the streaming content updates that happen during report generation
+    const baseMarkdown = `# Streaming Report
+
+Initial content.`;
+
+    const streamedAddition = `
+
+<metric metricId="streamed-metric" caption="Added During Stream"></metric>
+
+More streamed content.`;
+
+    // Simulate initial content
+    let platejs = await markdownToPlatejs(editor, baseMarkdown);
+
+    // Simulate streaming addition (like what happens during AI content generation)
+    const streamedPlatejs = await markdownToPlatejs(editor, streamedAddition);
+    platejs = platejs.concat(streamedPlatejs);
+
+    // Convert back to markdown (simulating save)
+    const result = await platejsToMarkdown(editor, platejs);
+
+    // Multiple conversion cycles to simulate additional streaming and saves
+    let currentContent = result;
+    for (let i = 0; i < 5; i++) {
+      const tempPlatejs = await markdownToPlatejs(editor, currentContent);
+      // Add more streamed content
+      tempPlatejs.push({
+        type: 'p',
+        children: [{ text: `Stream update ${i}` }],
+      });
+      currentContent = await platejsToMarkdown(editor, tempPlatejs);
+    }
+
+    // Metric should not be escaped during streaming operations
+    expect(currentContent).not.toContain('\\<metric');
+    expect(currentContent).toContain('<metric metricId="streamed-metric"');
   });
 });

@@ -1,4 +1,4 @@
 import { StreamingText } from '../elements/StreamingText';
-import { StreamContentPlugin as BaseStreamContentPlugin } from './stream-content-plugin';
+import { StreamContentPlugin as OGStreamContentPlugin } from './stream-content-plugin';
 
-export const StreamContentPluginColored = BaseStreamContentPlugin.withComponent(StreamingText);
+export const StreamContentPluginColored = OGStreamContentPlugin.withComponent(StreamingText);

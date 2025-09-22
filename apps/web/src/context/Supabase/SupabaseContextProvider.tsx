@@ -1,8 +1,9 @@
 import type { User } from '@supabase/supabase-js';
 import React, { useRef, useState } from 'react';
-import { createContext } from 'use-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
 import { useMount } from '@/hooks/useMount';
+import { useWindowFocus } from '@/hooks/useWindowFocus';
 import { getBrowserClient } from '@/integrations/supabase/client';
 import type { SimplifiedSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
 
@@ -17,7 +18,7 @@ const useSupabaseContextInternal = ({ supabaseSession }: SupabaseContextType) =>
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const busterUser = useGetUserBasicInfo();
   const [supabaseUser, setSupabaseUser] = useState<null | User>(null);
-  const [accessToken, setAccessToken] = useState(supabaseSession?.accessToken || '');
+  const [accessToken, setAccessToken] = useState(supabaseSession?.accessToken || ''); //used in electric sql
 
   const isAnonymousUser: boolean = !busterUser?.id || supabaseUser?.is_anonymous === true;
 
@@ -26,8 +27,8 @@ const useSupabaseContextInternal = ({ supabaseSession }: SupabaseContextType) =>
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user ?? null;
-      const expiresAt = session?.expires_at ?? 0;
-      const timerMs = expiresAt - fiveMinutes;
+      const expiresIn = session?.expires_in ?? 0;
+      const timerMs = expiresIn * 1000 - fiveMinutes;
       const accessToken = session?.access_token ?? '';
 
       setSupabaseUser(user ?? null);
@@ -49,6 +50,10 @@ const useSupabaseContextInternal = ({ supabaseSession }: SupabaseContextType) =>
         clearTimeout(refreshTimerRef.current);
       }
     };
+  });
+
+  useWindowFocus(() => {
+    supabase.auth.refreshSession();
   });
 
   return {

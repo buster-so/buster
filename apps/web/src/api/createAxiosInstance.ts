@@ -6,7 +6,7 @@ import { Route as AuthRoute } from '@/routes/auth.login';
 import { BASE_URL_V2 } from './config';
 import { rustErrorHandler } from './errors';
 
-const AXIOS_TIMEOUT = 120000; // 2 minutes
+const AXIOS_TIMEOUT = 180000; // 3 minutes
 
 export const createAxiosInstance = (baseURL = BASE_URL_V2) => {
   const apiInstance = axios.create({
@@ -53,6 +53,8 @@ export const defaultAxiosRequestHandler = async (config: InternalAxiosRequestCon
 
     if (!token) {
       console.warn('No token found');
+      window.location.href = AuthRoute.to;
+      return Promise.reject(new Error('No token found'));
     }
 
     (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;

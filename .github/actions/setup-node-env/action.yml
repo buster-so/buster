@@ -9,7 +9,7 @@ inputs:
   pnpm-version:
     description: 'pnpm version to use'
     required: false
-    default: '10.15.1'
+    default: '10.17.1'
   bun-version:
     description: 'Bun version to use'
     required: false

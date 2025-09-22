@@ -1,5 +1,6 @@
 import type { MetricElement, TextElement } from '@buster/server-shared/reports';
-import { type MdRules, parseAttributes } from '@platejs/markdown';
+import { type MdRules, parseAttributes, serializeMd } from '@platejs/markdown';
+import { escapeHtmlAttribute, unescapeHtmlAttribute } from './escape-handlers';
 
 type MetricMdNode = MdRules['metric'];
 
@@ -23,9 +24,12 @@ export const metricSerializer: MetricMdNode = {
       width !== 'auto' &&
       width !== '0px';
 
+    // Escape special characters in caption for safe HTML attribute insertion
+    const escapedCaption = escapeHtmlAttribute(captionText);
+
     return {
       type: 'html',
-      value: `<metric metricId="${metricId}" versionNumber="${node.versionNumber}" width="${hasWidth ? width : '100%'}" caption="${captionText}"></metric>`,
+      value: `<metric metricId="${metricId}" versionNumber="${node.versionNumber || ''}" width="${hasWidth ? width : '100%'}" caption="${escapedCaption}"></metric>`,
     };
   },
   deserialize: (node): MetricElement => {
@@ -36,11 +40,16 @@ export const metricSerializer: MetricMdNode = {
       caption: string | undefined;
     };
 
+    // Unescape the caption if it exists
+    const unescapedCaption = typedAttributes.caption
+      ? unescapeHtmlAttribute(typedAttributes.caption)
+      : undefined;
+
     // Return the PlateJS node structure
     return {
       type: 'metric',
       metricId: typedAttributes.metricId,
-      caption: typedAttributes.caption ? [{ text: typedAttributes.caption }] : undefined,
+      caption: unescapedCaption ? [{ text: unescapedCaption }] : undefined,
       width: typedAttributes.width,
       children: [{ text: '' }],
     };

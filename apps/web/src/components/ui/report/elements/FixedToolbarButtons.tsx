@@ -4,11 +4,8 @@ import * as React from 'react';
 import { ToolbarGroup } from '@/components/ui/toolbar/Toolbar';
 import { NodeTypeIcons } from '../config/icons';
 import { createLabel } from '../config/labels';
-import { AIToolbarButton } from './AIToolbarButton';
 import { AlignToolbarButton } from './AlignToolbarButton';
-import { CommentToolbarButton } from './CommandToolbarButton';
 import { EmojiToolbarButton } from './EmojiToolbarButton';
-import { InlineEquationToolbarButton } from './EquationToolbarButton';
 import { ExportToolbarButton } from './ExportToolbarButton';
 import { FontColorToolbarButton } from './FontColorToolbarButton';
 import { FontSizeToolbarButton } from './FontSizeToolbarButton';
@@ -23,10 +20,6 @@ import {
   TodoListToolbarButton,
 } from './ListToolbarButton';
 import { MarkToolbarButton } from './MarktoolbarButton';
-import { MediaToolbarButton } from './MediaToolbarButton';
-import { ModeToolbarButton } from './ModeToolbarButton';
-import { MoreToolbarButton } from './MoreToolbarButton';
-import { SuggestionToolbarButton } from './SuggestionToolbarButton';
 import { TableToolbarButton } from './TableToolbarButton';
 import { ToggleToolbarButton } from './ToggleToolbarButton';
 import { TurnIntoToolbarButton } from './TurnIntoToolbarButton';

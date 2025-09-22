@@ -8,7 +8,7 @@ const isProduction = import.meta.env.PROD;
 // Only create lazy components if we're in the browser
 const LazyTanstackDevtools = !import.meta.env.SSR
   ? lazy(() =>
-      import('@tanstack/react-devtools/production').then((mod) => ({
+      import('@tanstack/react-devtools').then((mod) => ({
         default: mod.TanStackDevtools,
       }))
     )
@@ -16,7 +16,7 @@ const LazyTanstackDevtools = !import.meta.env.SSR
 
 const LazyTanstackDevtoolsInProd = !import.meta.env.SSR
   ? lazy(() =>
-      import('@tanstack/react-devtools/production').then((mod) => ({
+      import('@tanstack/react-devtools').then((mod) => ({
         default: mod.TanStackDevtools,
       }))
     )
