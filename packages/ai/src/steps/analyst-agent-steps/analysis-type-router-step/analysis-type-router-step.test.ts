@@ -33,7 +33,7 @@ describe('runAnalysisTypeRouterStep', () => {
     const result = await runAnalysisTypeRouterStep({ messages });
 
     // Since we're mocking, it will default to standard
-    expect(result.analysisType).toBe('standard');
+    expect(result.analysisMode).toBe('standard');
     expect(result.reasoning).toBeDefined();
   });
 
@@ -42,7 +42,7 @@ describe('runAnalysisTypeRouterStep', () => {
 
     const result = await runAnalysisTypeRouterStep({ messages });
 
-    expect(result.analysisType).toBe('standard');
+    expect(result.analysisMode).toBe('standard');
     expect(result.reasoning).toContain('Defaulting to standard');
   });
 
@@ -64,7 +64,7 @@ describe('runAnalysisTypeRouterStep', () => {
 
     const result = await runAnalysisTypeRouterStep({ messages });
 
-    expect(result.analysisType).toBeDefined();
+    expect(result.analysisMode).toBeDefined();
     expect(result.reasoning).toBeDefined();
   });
 
@@ -74,7 +74,7 @@ describe('runAnalysisTypeRouterStep', () => {
 
     const result = await runAnalysisTypeRouterStep({ messages });
 
-    expect(result.analysisType).toBe('standard');
+    expect(result.analysisMode).toBe('standard');
     expect(result.reasoning).toContain('Defaulting to standard');
   });
 });

@@ -1,11 +1,13 @@
 import { StatusSchema } from '@buster/server-shared/chats';
 import { tool } from 'ai';
 import { z } from 'zod';
+import { AnalysisModeSchema } from '../../../../types/analysis-mode.types';
 import { createCreateReportsDelta } from './create-reports-delta';
 import { createCreateReportsExecute } from './create-reports-execute';
 import { createCreateReportsFinish } from './create-reports-finish';
 import { createReportsStart } from './create-reports-start';
-import CREATE_REPORTS_TOOL_DESCRIPTION from './create-reports-tool-description.txt';
+import CREATE_REPORTS_TOOL_INVESTIGATION_DESCRIPTION from './create-reports-tool-investigation-description.txt';
+import CREATE_REPORTS_TOOL_STANDARD_DESCRIPTION from './create-reports-tool-standard-description.txt';
 
 export const CREATE_REPORTS_TOOL_NAME = 'createReports';
 
@@ -42,6 +44,7 @@ const CreateReportsContextSchema = z.object({
   chatId: z.string().describe('The chat ID'),
   organizationId: z.string().describe('The organization ID'),
   messageId: z.string().optional().describe('The message ID'),
+  analysisMode: AnalysisModeSchema.optional().describe('The analysis mode for report generation'),
 });
 
 const CreateReportStateFileSchema = z.object({
@@ -85,6 +88,12 @@ export function createCreateReportsTool(context: CreateReportsContext) {
     reportModifiedInMessage: false,
   };
 
+  // Select the appropriate description based on analysis mode
+  const description =
+    context.analysisMode === 'investigation'
+      ? CREATE_REPORTS_TOOL_INVESTIGATION_DESCRIPTION
+      : CREATE_REPORTS_TOOL_STANDARD_DESCRIPTION;
+
   // Create all functions with the context and state passed
   const execute = createCreateReportsExecute(context, state);
   const onInputStart = createReportsStart(context, state);
@@ -92,7 +101,7 @@ export function createCreateReportsTool(context: CreateReportsContext) {
   const onInputAvailable = createCreateReportsFinish(context, state);
 
   return tool({
-    description: CREATE_REPORTS_TOOL_DESCRIPTION,
+    description,
     inputSchema: CreateReportsInputSchema,
     outputSchema: CreateReportsOutputSchema,
     execute,

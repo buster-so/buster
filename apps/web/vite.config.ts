@@ -1,9 +1,12 @@
+import { execSync } from 'node:child_process';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
+
+const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 
 const config = defineConfig(({ command, mode }) => {
   const isBuild = command === 'build';
@@ -13,8 +16,23 @@ const config = defineConfig(({ command, mode }) => {
   const isLocalBuild = process.argv.includes('--local') || mode === 'development';
   const target = isLocalBuild ? ('bun' as const) : ('vercel' as const);
 
+  // Generate a unique version identifier for both build tracking and asset versioning
+  const buildId =
+    process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) ||
+    process.env.BUILD_ID ||
+    (isProduction ? commitHash : 'dev');
+  const buildAt = new Date().toString();
+
+  // Set the base URL for assets with versioning in production
+  const base = '/';
+
   return {
+    base,
     server: { port: 3000 },
+    define: {
+      'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId),
+      'import.meta.env.VITE_BUILD_AT': JSON.stringify(buildAt),
+    },
     plugins: [
       // this is the plugin that enables path aliases
       viteTsConfigPaths({ projects: ['./tsconfig.json'] }),

@@ -20,6 +20,7 @@ import { CREATE_METRICS_TOOL_NAME } from '../../tools/visualization-tools/metric
 import { MODIFY_METRICS_TOOL_NAME } from '../../tools/visualization-tools/metrics/modify-metrics-tool/modify-metrics-tool';
 import { CREATE_REPORTS_TOOL_NAME } from '../../tools/visualization-tools/reports/create-reports-tool/create-reports-tool';
 import { MODIFY_REPORTS_TOOL_NAME } from '../../tools/visualization-tools/reports/modify-reports-tool/modify-reports-tool';
+import { AnalysisModeSchema } from '../../types/analysis-mode.types';
 import { type AgentContext, repairToolCall } from '../../utils/tool-call-repair';
 import { analystAgentPrepareStep } from './analyst-agent-prepare-step';
 import { getAnalystAgentSystemPrompt } from './get-analyst-agent-system-prompt';
@@ -37,6 +38,7 @@ export const AnalystAgentOptionsSchema = z.object({
   messageId: z.string(),
   datasets: z.array(z.custom<PermissionedDataset>()),
   workflowStartTime: z.number(),
+  analysisMode: AnalysisModeSchema.optional().describe('The analysis mode for the workflow'),
   analystInstructions: z.string().optional(),
   organizationDocs: z
     .array(
@@ -107,7 +109,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     const modifyMetrics = createModifyMetricsTool(analystAgentOptions);
     const createDashboards = createCreateDashboardsTool(analystAgentOptions);
     const modifyDashboards = createModifyDashboardsTool(analystAgentOptions);
-    const createReports = createCreateReportsTool(analystAgentOptions);
+    const createReports = createCreateReportsTool({
+      ...analystAgentOptions,
+      analysisMode: analystAgentOptions.analysisMode || 'standard',
+    });
     const modifyReports = createModifyReportsTool(analystAgentOptions);
     const doneTool = createDoneTool(analystAgentOptions);
 

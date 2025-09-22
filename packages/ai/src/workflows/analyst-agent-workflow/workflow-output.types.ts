@@ -7,6 +7,7 @@ import { CREATE_METRICS_TOOL_NAME } from '../../tools/visualization-tools/metric
 import { MODIFY_METRICS_TOOL_NAME } from '../../tools/visualization-tools/metrics/modify-metrics-tool/modify-metrics-tool';
 import { CREATE_REPORTS_TOOL_NAME } from '../../tools/visualization-tools/reports/create-reports-tool/create-reports-tool';
 import { MODIFY_REPORTS_TOOL_NAME } from '../../tools/visualization-tools/reports/modify-reports-tool/modify-reports-tool';
+import { type AnalysisMode, AnalysisModeSchema } from '../../types/analysis-mode.types';
 
 // Tool call tracking
 export const ToolCallInfoSchema = z.object({
@@ -67,11 +68,6 @@ export const UserRequestSegmentSchema = z.object({
 });
 
 export type UserRequestSegment = z.infer<typeof UserRequestSegmentSchema>;
-
-// Analysis mode from the analysis type router
-export const AnalysisModeSchema = z.enum(['standard', 'investigation']);
-
-export type AnalysisMode = z.infer<typeof AnalysisModeSchema>;
 
 // Complete workflow output
 export const AnalystWorkflowOutputSchema = z.object({

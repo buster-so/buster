@@ -46,18 +46,6 @@ const filters: SegmentedItem<string>[] = [
     label: 'All ',
     value: JSON.stringify({}),
   },
-  {
-    label: 'My dashboards',
-    value: JSON.stringify({
-      only_my_dashboards: true,
-    }),
-  },
-  {
-    label: 'Shared with me',
-    value: JSON.stringify({
-      shared_with_me: true,
-    }),
-  },
 ];
 
 const DashboardFilters: React.FC<{

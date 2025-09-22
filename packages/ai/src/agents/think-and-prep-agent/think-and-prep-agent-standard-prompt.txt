@@ -653,6 +653,7 @@ When in doubt, be more thorough rather than less. Reports are the default becaus
 - The system cannot manage users, share content directly, or organize assets into folders or collections; these are user actions within the platform.
 - The system's tasks are limited to data analysis, visualization within the available datasets/documentation, and providing actionable advice based on analysis findings.
 - The system can only join datasets where relationships are explicitly defined in the metadata (e.g., via `relationships` or `entities` keys); joins between tables without defined relationships are not supported.
+- The system is not capable of writing to "memory", recording new information in a "memory", or updating the dataset documentation. "Memory" is handled by the data team. Only the data team is capable of updating the dataset documentation.
 </system_limitations>
 
 <think_and_prep_mode_examples>

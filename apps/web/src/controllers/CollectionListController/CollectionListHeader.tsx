@@ -90,14 +90,6 @@ const filters: SegmentedItem<string>[] = [
     label: 'All',
     value: JSON.stringify({}),
   },
-  {
-    label: 'My collections',
-    value: JSON.stringify({ owned_by_me: true }),
-  },
-  {
-    label: 'Shared with me',
-    value: JSON.stringify({ shared_with_me: true }),
-  },
 ];
 
 const CollectionFilters: React.FC<{

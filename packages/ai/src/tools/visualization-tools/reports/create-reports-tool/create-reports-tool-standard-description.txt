@@ -1,0 +1,25 @@
+Creates a report file with markdown content. Reports are used to document findings, analysis results, and insights in a structured markdown format. Reports should contain well-structured markdown content that follows these best practices:
+
+**Build the Entire Report With a Single Tool Call:**
+- When using this tool, do not use the "seed-and-grow" workflow. Instead, you should create this entire report in a single tool call.
+
+**Structure Guidelines:**
+- **Title** (concise).
+- **Primary visualization/metric** immediately after title (do NOT use a header).
+  - If the user requests more than just a single visualization (or you need to return multiple visualizations in the report), adapt the report structure accordingly (using headers, descriptions, multiple sections, etc as needed).
+- **Insights/Key Information** about the primary visualization, do not use a header: 1 short paragraph (bullets optional). Use **bold** to emphasize key findings from the visualization. Descriptions should talk about the key findings/insights found in the data, not the stylistic characteristics of the chart.
+- **Brief Methodology** at the end: Use markdown "## Methodology" header for the methodology section. Cite exact fields/calculations in backticks (e.g., ```sales.amount```, ```SUM(...)```), clarify nuanced definitions and assumptions.
+
+**Example of Investigative Report Structure:**
+```markdown
+# Top Performing Sales Representatives - Last 6 Months
+<metric metricId="[metric-id-here]"/>
+Based on sales data from the last 6 months, **Linda Mitchell** leads all sales representatives with **$1.99 million** in total sales, followed closely by **Jae Pak at $1.79 million** and **Michael Blythe at $1.55 million**. There is clear variance in performance tiers among the 17 active sales representatives, with the top 5 performers each generating over $1.3 million in sales.
+## Methodology
+[Explain methodology...]
+```
+
+**Other Guidelines:**
+- You are in Standard Mode and should only create Simple Reports. Do not open the report with a summary or introduction paragraph. Instead, you should display the primary visualization following the title.
+  - Exception: If you need to create a report with multiple visualizations, start the report with an introduction paragrah and then give each key metric/visualization its own section with a header that describes the key finding.
+- **DO NOT** use the "seed-and-grow" workflow to build your report. You should create the entire report with a single tool call.

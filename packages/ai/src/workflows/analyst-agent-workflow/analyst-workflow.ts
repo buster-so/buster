@@ -74,7 +74,7 @@ export async function runAnalystWorkflow(
   const userPersonalizationMessageContent =
     generatePersonalizationMessageContent(userPersonalizationConfig);
 
-  const { todos, values, analysisType } = await runAnalystPrepSteps(input);
+  const { todos, values, analysisMode } = await runAnalystPrepSteps(input);
 
   // Add all messages from extract-values step (tool call, result, and optional user message)
   messages.push(...values.messages);
@@ -93,7 +93,7 @@ export async function runAnalystWorkflow(
       sql_dialect_guidance: input.dataSourceSyntax,
       datasets: input.datasets,
       workflowStartTime,
-      analysisMode: analysisType,
+      analysisMode,
       analystInstructions,
       organizationDocs,
       userPersonalizationMessageContent,
@@ -132,6 +132,7 @@ export async function runAnalystWorkflow(
         userId: input.userId,
         datasets: input.datasets,
         workflowStartTime,
+        analysisMode,
         analystInstructions,
         organizationDocs,
         userPersonalizationMessageContent,
@@ -212,7 +213,7 @@ export async function runAnalystWorkflow(
     endTime: workflowEndTime,
     totalExecutionTimeMs: workflowEndTime - workflowStartTime,
 
-    analysisMode: analysisType === 'investigation' ? 'investigation' : 'standard',
+    analysisMode: analysisMode === 'investigation' ? 'investigation' : 'standard',
 
     messages,
 
@@ -265,10 +266,10 @@ async function runAnalystPrepSteps({
 }: AnalystPrepStepInput): Promise<{
   todos: CreateTodosResult;
   values: ExtractValuesSearchResult;
-  analysisType: AnalysisTypeRouterResult['analysisType'];
+  analysisMode: AnalysisTypeRouterResult['analysisMode'];
 }> {
   const shouldInjectUserPersonalizationTodo = Boolean(userPersonalizationConfig);
-  const [todos, values, , analysisType] = await Promise.all([
+  const [todos, values, , analysisMode] = await Promise.all([
     withStepRetry(
       () =>
         runCreateTodosStep({
@@ -345,7 +346,7 @@ async function runAnalystPrepSteps({
     ),
   ]);
 
-  return { todos, values, analysisType: analysisType.analysisType };
+  return { todos, values, analysisMode: analysisMode.analysisMode };
 }
 
 function generatePersonalizationMessageContent(

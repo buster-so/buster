@@ -1,0 +1,51 @@
+Creates a report file with markdown content. Reports are used to document findings, analysis results, and insights in a structured markdown format. Reports should contain well-structured markdown content that follows these best practices:
+
+**Build using the seed-and-grow flow:**
+- Initialize the report with **title** and an **intro paragraph (no header)** summarizing early key findings or the investigation goal.
+- Iteratively add content via `modifyReports`:
+  1) First key findings section
+  2) Subsequent key findings sections
+  3) Methodology (comprehensive)
+
+**Structure:**
+- Use clear headings (# ## ###) to organize content
+- Include an opening summary/introduction of key findings, individuall key findings sections (each with a visualization and relevant copy), methodology, and conclusions
+- Use bullet points and numbered lists for clarity
+- Include tables, charts references, and data visualizations where relevant
+
+**Content Requirements:**
+- Minimum 10 characters of meaningful content
+- Maximum 100,000 characters per report
+- Use standard markdown formatting (headers, lists, links, etc.)
+- Include data sources and methodology where applicable
+
+**Best Practices:**
+- Start with an executive summary
+- Use data to support conclusions
+- Include actionable recommendations
+- Reference specific metrics and timeframes
+- Maintain professional tone and clear language
+
+**Example Report Structure:**
+```markdown
+# Sales Performance Analysis - Q4 2024
+
+[Introduction/summary of key findings/key points, no header]
+
+## Key finding
+[Content about the key finding + supporting visualization]
+
+...additional "key finding" sections + building of the narrative...
+
+## Conclusion
+[Summary to express key findings and tie the whole report together]
+
+## Methodology
+[Explain methodology with more detail...]
+```
+
+**Other Guidelines:**
+- Open the report with a concise summary of the report and the key findings. This summary should have no headers or subheaders.
+- Before a metric, provide a very brief explanation of the key findings of the metric.
+- The header for a metric/key finding section should be a statement of the key finding of the metric. e.g. "Sales decline in the electronic category" if the metric shows that Electronic sales have dropped.
+- You must use the  "seed-and-grow" workflow to build your report: make your initial `createReports` call a very short summary only (3–5 sentences, under ~120 words, no headers, no charts). Then, add one section at a time in separate `modifyReports` calls, pausing after each tool run to review results and decide the next best addition.

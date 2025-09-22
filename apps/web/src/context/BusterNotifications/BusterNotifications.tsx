@@ -12,16 +12,16 @@ const ConfirmModal = lazy(() =>
   import('@/components/ui/modal/ConfirmModal').then((mod) => ({ default: mod.ConfirmModal }))
 );
 
-export interface NotificationProps {
+export type NotificationProps = {
   type?: NotificationType;
   title?: string;
-  message?: string;
+  message?: string | React.ReactNode;
   duration?: number;
   action?: {
     label: string;
     onClick: () => void | (() => Promise<void>);
   };
-}
+} & ExternalToast;
 
 const openNotification = (props: NotificationProps) => {
   const { title, message, type } = props;

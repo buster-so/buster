@@ -353,7 +353,7 @@ definitions:
             # - If SQL returns decimal ratios (e.g., 0.75 for 75%), use multiplier: 100
             # - If SQL returns percentage values (e.g., 75 for 75%), use multiplier: 1 (or omit it)
           - number
-          - date # Note: For date columns, consider setting xAxisTimeInterval in xAxisConfig to control date grouping (day, week, month, quarter, year)
+          - date # Note: For date columns, consider setting xAxisTimeInterval in xAxisConfig to control date grouping (day, week, month, quarter, year) if using the convertNumberTo field, you must also set the style to date.
           - string
       multiplier:
         type: number
@@ -405,7 +405,7 @@ definitions:
         description: Whether to interpret dates as UTC
       convertNumberTo:
         type: string
-        description: Optional. Convert numeric values to time units or date parts.  This is a necessity for time series data when numbers are passed instead of the date.
+        description: Optional. Convert numeric values to time units or date parts.  This is a necessity for time series data when numbers are passed instead of the date. If using this, the style must be set as date.
         enum:
           - day_of_week
           - month_of_year

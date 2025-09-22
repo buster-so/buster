@@ -1,3 +1,4 @@
+import type { AnalysisMode } from '../../types/analysis-mode.types';
 import thinkAndPrepInvestigationPrompt from './think-and-prep-agent-investigation-prompt.txt';
 import thinkAndPrepStandardPrompt from './think-and-prep-agent-standard-prompt.txt';
 
@@ -8,11 +9,6 @@ export interface ThinkAndPrepTemplateParams {
   sqlDialectGuidance: string;
   date: string;
 }
-
-/**
- * Analysis mode type
- */
-export type AnalysisMode = 'standard' | 'investigation';
 
 /**
  * Type-safe mapping of analysis modes to prompt content
