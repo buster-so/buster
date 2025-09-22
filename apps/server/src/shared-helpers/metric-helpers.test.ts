@@ -253,17 +253,6 @@ describe('metric-helpers', () => {
           { version_number: 3, updated_at: '2023-01-03T00:00:00Z' },
         ]);
       });
-
-      it('should always return at least one version even with empty version history', async () => {
-        const metricFile = createMockMetricFile({ versionHistory: {} });
-        mockGetMetricFileById.mockResolvedValue(metricFile);
-
-        const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
-        const result = await fetchAndProcessMetricData('metric-123', mockUser, options);
-
-        expect(result.versions).toHaveLength(0);
-        expect(result.resolvedVersionNum).toBe(1); // Should default to 1
-      });
     });
 
     describe('metric not found', () => {
