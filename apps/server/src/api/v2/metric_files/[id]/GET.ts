@@ -52,7 +52,7 @@ export default app;
  * Handler to retrieve a metric by ID with optional version number
  * This is the TypeScript equivalent of the Rust get_metric_handler
  */
-async function getMetricHandler(
+export async function getMetricHandler(
   { metricId, ...params }: GetMetricHandlerParams,
   user: User
 ): Promise<GetMetricResponse> {

@@ -62,7 +62,7 @@ export default app;
  * Handler to retrieve a dashboard by ID with optional version number
  * This is the TypeScript equivalent of the Rust get_dashboard_handler
  */
-async function getDashboardHandler(
+export async function getDashboardHandler(
   params: GetDashboardHandlerParams,
   user: User
 ): Promise<GetDashboardResponse> {
@@ -260,7 +260,7 @@ function extractMetricIds(content: DashboardYml): string[] {
   }
 }
 
-async function getMetricsFromDashboardMetricIds(
+export async function getMetricsFromDashboardMetricIds(
   metricIds: string[],
   user: User
 ): Promise<Record<string, Metric>> {
