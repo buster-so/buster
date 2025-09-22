@@ -18,11 +18,10 @@ use super::{DashboardYml, MetricYml};
 pub struct VersionHistory(pub std::collections::HashMap<String, Version>);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct Version {
-    #[serde(alias = "version_number")]
+    #[serde(alias = "versionNumber")]
     pub version_number: i32,
-    #[serde(alias = "updated_at")]
+    #[serde(alias = "updatedAt")]
     pub updated_at: DateTime<Utc>,
     pub content: VersionContent,
 }

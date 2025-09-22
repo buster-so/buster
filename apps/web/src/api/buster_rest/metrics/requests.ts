@@ -29,7 +29,7 @@ export const getMetric = async ({
   id,
   ...params
 }: GetMetricParams & GetMetricQuery): Promise<GetMetricResponse> => {
-  return mainApi.get<GetMetricResponse>(`/metric_files/${id}`, { params }).then((res) => {
+  return mainApiV2.get<GetMetricResponse>(`/metric_files/${id}`, { params }).then((res) => {
     return res.data;
   });
 };
