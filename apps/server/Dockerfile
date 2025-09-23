@@ -47,10 +47,10 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/server/package.json ./apps/server/
 COPY packages/*/package.json ./packages/*/
 
-# Install only production dependencies
-RUN npm install -g pnpm@9 && \
-    pnpm install --frozen-lockfile --prod --no-optional && \
-    npm uninstall -g pnpm
+# Install pnpm and production dependencies
+# Using pnpm to properly handle workspace dependencies
+RUN bun install --global pnpm@9 && \
+    pnpm install --frozen-lockfile --prod --no-optional
 
 # Copy built application
 COPY --from=builder /app/apps/server/dist ./dist
