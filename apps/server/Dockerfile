@@ -39,7 +39,7 @@ RUN bun build src/index.ts --outdir ./dist --target bun \
     --external @duckdb/node-bindings-win32-x64
 
 # Stage 4: Production image
-FROM oven/bun:latest-slim AS runtime
+FROM oven/bun:slim AS runtime
 WORKDIR /app
 
 # Install production dependencies in final image
