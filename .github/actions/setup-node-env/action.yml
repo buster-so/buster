@@ -36,27 +36,14 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'pnpm'
-    
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-          apps/*/node_modules
-          packages/*/node_modules
-        key: pnpm-workspace-v2-${{ inputs.cache-key }}-${{ github.ref_name }}-${{ hashFiles('pnpm-lock.yaml') }}
-        restore-keys: |
-          pnpm-workspace-v2-${{ inputs.cache-key }}-${{ github.ref_name }}-
-          pnpm-workspace-v2-${{ inputs.cache-key }}-
 
     - name: Cache Turbo
       uses: actions/cache@v4
       with:
         path: .turbo
-        key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+        key: turbo-${{ inputs.cache-key }}-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
-          turbo-${{ github.job }}-${{ github.ref_name }}-
-          turbo-${{ github.job }}-
+          turbo-${{ inputs.cache-key }}-
     
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
