@@ -109,6 +109,14 @@
         "NODE_ENV"
       ]
     },
+    "db:teardown": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "ENVIRONMENT",
+        "NODE_ENV"
+      ]
+    },
     "db:init": {
       "cache": false,
       "dependsOn": ["db:migrate"],

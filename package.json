@@ -14,6 +14,7 @@
     "cli:prod": "cd apps/cli && bun run dist/index.js",
     "db:init": "turbo run db:init --filter @buster/database",
     "db:seed": "turbo run db:seed --filter @buster/database",
+    "db:teardown": "turbo run db:teardown --filter @buster/database --",
     "db:dump": "turbo run db:dump --filter @buster/database",
     "db:migrate": "turbo run db:migrate --filter @buster/database",
     "db:generate": "turbo run db:generate --filter @buster/database",

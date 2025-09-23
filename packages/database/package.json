@@ -34,6 +34,7 @@
     "start": "supabase start",
     "db:reset": "supabase stop && supabase start && supabase db reset",
     "db:seed": "tsx scripts/seed.ts",
+    "db:teardown": "tsx scripts/teardown.ts",
     "db:dump": "tsx scripts/dump.ts",
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
