@@ -280,9 +280,18 @@ jobs:
         # Create or update the preview branch
         supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
         
-        # Get the branch database URL
+        # Get the branch database URL and settings
         BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
         BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        
+        # Get project settings to extract URLs and keys
+        PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
+        
+        # Extract the anon key and service role key
+        SUPABASE_ANON_KEY=$(echo $PROJECT_INFO | jq -r '.[] | select(.name == "anon") | .api_key')
+        
+        # The Supabase URL is standard format
+        SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
         
         # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
         # We'll construct it based on the branch
@@ -293,6 +302,8 @@ jobs:
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -376,9 +387,18 @@ jobs:
         # Create or update the preview branch
         supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
         
-        # Get the branch database URL
+        # Get the branch database URL and settings
         BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
         BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        
+        # Get project settings to extract URLs and keys
+        PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
+        
+        # Extract the anon key and service role key
+        SUPABASE_ANON_KEY=$(echo $PROJECT_INFO | jq -r '.[] | select(.name == "anon") | .api_key')
+        
+        # The Supabase URL is standard format
+        SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
         
         # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
         # We'll construct it based on the branch
@@ -389,6 +409,8 @@ jobs:
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -505,6 +527,15 @@ jobs:
           BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
         fi
         
+        # Get project settings to extract URLs and keys
+        PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
+        
+        # Extract the anon key
+        SUPABASE_ANON_KEY=$(echo $PROJECT_INFO | jq -r '.[] | select(.name == "anon") | .api_key')
+        
+        # The Supabase URL is standard format
+        SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
+        
         # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
         # We'll construct it based on the branch
         DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
@@ -514,6 +545,8 @@ jobs:
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -531,34 +564,27 @@ jobs:
     - name: Install Vercel CLI
       run: npm install --global vercel@latest
     
-    - name: Pull Vercel Environment Information
-      run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-      working-directory: ./apps/web
-    
-    - name: Build Project for Vercel
-      run: |
-        # Set environment variables for the build using actual deployed URLs
-        export DATABASE_URL="${{ steps.supabase-branch.outputs.database_url }}"
-        export VITE_API_URL="${{ needs.deploy-preview-api.outputs.api_url }}"
-        export VITE_SERVER_URL="${{ needs.deploy-preview-server.outputs.server_url }}"
-        export TRIGGER_PREVIEW_BRANCH="${{ github.head_ref }}"
-        
-        echo "Building with:"
-        echo "  API URL: $VITE_API_URL"
-        echo "  Server URL: $VITE_SERVER_URL"
-        
-        # Build with Vercel
-        vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      env:
-        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      working-directory: ./apps/web
-    
     - name: Deploy to Vercel Preview
       id: vercel-deploy
       run: |
-        # Deploy and capture the URL
-        DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} | tail -n 1)
+        cd apps/web
+        
+        # Get the PR number for constructing predictable URLs
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        
+        # Deploy to Vercel with environment variables set
+        # Vercel will handle the build process
+        DEPLOYMENT_URL=$(vercel deploy \
+          --env DATABASE_URL="${{ steps.supabase-branch.outputs.database_url }}" \
+          --env VITE_PUBLIC_API_URL="https://staging-legacy-pr-${PR_NUMBER}.porter.run" \
+          --env VITE_PUBLIC_API2_URL="https://staging-server-pr-${PR_NUMBER}.porter.run" \
+          --env VITE_PUBLIC_WEB_SOCKET_URL="wss://staging-legacy-pr-${PR_NUMBER}.porter.run" \
+          --env VITE_PUBLIC_URL="https://buster-web-pr-${PR_NUMBER}.vercel.app" \
+          --env VITE_PUBLIC_SUPABASE_URL="${{ steps.supabase-branch.outputs.supabase_url }}" \
+          --env VITE_PUBLIC_SUPABASE_ANON_KEY="${{ steps.supabase-branch.outputs.supabase_anon_key }}" \
+          --token=${{ secrets.VERCEL_TOKEN }} \
+          --yes | tail -n 1)
+        
         echo "deployment_url=${DEPLOYMENT_URL}" >> $GITHUB_OUTPUT
         
         # Add comment to PR with preview URL
@@ -567,7 +593,6 @@ jobs:
       env:
         VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      working-directory: ./apps/web
 
   # Deploy Electric server preview
   deploy-preview-electric:
@@ -616,8 +641,14 @@ jobs:
         # Direct connection URL for Electric (without pgbouncer)
         DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
         
+        # Supabase API URL and anon key are project-specific, not branch-specific
+        SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
+        SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+        
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
+        echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
