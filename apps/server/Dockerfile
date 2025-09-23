@@ -1,95 +1,68 @@
-# ================================================================
-# Optimized Dockerfile with proper layer caching
-# ================================================================
+# Multi-stage Dockerfile with optimized caching for TypeScript/Bun server
 
-# Stage 1: Dependencies
-# This stage only rebuilds when package files change
-FROM node:22-alpine AS deps
+# Stage 1: Base with pnpm
+FROM node:20-slim AS base
+RUN npm install -g pnpm@9 bun
 WORKDIR /app
 
-# Install pnpm and bun
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN npm install -g bun@1.2.21
-
-# Copy only package files for dependency resolution
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-COPY packages/*/package.json ./packages/*/
+# Stage 2: Install dependencies (cached layer)
+FROM base AS deps
+# Copy only package files for dependency installation
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/server/package.json ./apps/server/
+COPY packages/*/package.json ./packages/*/
 
-# Install dependencies with frozen lockfile
-# This layer is cached and only rebuilds when dependencies change
-RUN pnpm install --frozen-lockfile --ignore-scripts --no-optional
+# Install ALL dependencies once (both dev and prod)
+RUN pnpm install --frozen-lockfile
 
-# ================================================================
-# Stage 2: Builder
-# This stage rebuilds when source code changes
-FROM node:22-alpine AS builder
-WORKDIR /app
-
-# Install pnpm and bun
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN npm install -g bun@1.2.21
-
-# Set build environment
-ENV DOCKER_BUILD=true
-ENV CI=true
-ARG COMMIT_SHA
-ARG BUILD_DATE
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/*/node_modules ./packages/*/node_modules
-COPY --from=deps /app/apps/server/node_modules ./apps/server/node_modules
-
-# Copy all source files
+# Stage 3: Build application
+FROM deps AS builder
+# Copy source code
 COPY . .
 
-# Build with Turbo (Docker layer caching will cache this step)
-RUN echo "Building with Turbo..." && \
-    turbo run build --filter=@buster-app/server
+# Build with Turbo (uses cached dependencies)
+ENV NODE_ENV=production
+ENV DOCKER_BUILD=true
+ENV CI=true
+ENV TURBO_CACHE_DIR=.turbo
+ENV TURBO_TELEMETRY_DISABLED=1
+RUN pnpm turbo run build --filter=@buster-app/server...
 
-# Build the final server bundle
+# Bundle with Bun
 WORKDIR /app/apps/server
-RUN bun build src/index.ts --outdir ./dist --target bun --external pino-pretty && \
-    echo "Build complete - output:" && \
-    ls -la dist/
+RUN bun build src/index.ts --outdir ./dist --target bun \
+    --external pino-pretty \
+    --external @duckdb/node-bindings \
+    --external @duckdb/node-bindings-linux-arm64 \
+    --external @duckdb/node-bindings-darwin-arm64 \
+    --external @duckdb/node-bindings-darwin-x64 \
+    --external @duckdb/node-bindings-win32-x64
 
-# ================================================================
-# Stage 3: Production Runtime
-# Minimal image with only what's needed to run
-FROM oven/bun:1.2.21-alpine AS runtime
+# Stage 4: Production image
+FROM oven/bun:latest-slim AS runtime
 WORKDIR /app
 
-# Set production environment
+# Install production dependencies in final image
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY apps/server/package.json ./apps/server/
+COPY packages/*/package.json ./packages/*/
+
+# Install only production dependencies
+RUN npm install -g pnpm@9 && \
+    pnpm install --frozen-lockfile --prod --no-optional && \
+    npm uninstall -g pnpm
+
+# Copy built application
+COPY --from=builder /app/apps/server/dist ./dist
+COPY --from=builder /app/apps/server/package.json ./
+
+# Runtime configuration
 ENV NODE_ENV=production
-
-# Add build metadata as labels
-ARG COMMIT_SHA
-ARG BUILD_DATE
-LABEL org.opencontainers.image.revision="${COMMIT_SHA}"
-LABEL org.opencontainers.image.created="${BUILD_DATE}"
-
-# Create non-root user
-RUN addgroup --system --gid 1001 bunuser && \
-    adduser --system --uid 1001 bunuser
-
-# Copy only the necessary files from builder
-COPY --from=builder --chown=bunuser:bunuser /app/apps/server/dist ./dist
-COPY --from=builder --chown=bunuser:bunuser /app/apps/server/package.json ./
-COPY --from=builder --chown=bunuser:bunuser /app/node_modules ./node_modules
-
-# Show image size info
-RUN echo "=== Production image size ===" && \
-    du -sh /app && \
-    echo "Commit: ${COMMIT_SHA:-unknown}" && \
-    echo "Built: ${BUILD_DATE:-unknown}"
-
-USER bunuser
-EXPOSE 3002
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD bun -e "fetch('http://localhost:' + (process.env.SERVER_PORT || 3002) + '/healthcheck').then(r => r.ok ? process.exit(0) : process.exit(1))"
+    CMD bun --version || exit 1
 
-# Start the application
-CMD ["bun", "run", "dist/index.js"]
+# Run the application
+CMD ["bun", "dist/index.js"]

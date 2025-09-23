@@ -119,54 +119,11 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Setup Node Environment
-        uses: ./.github/actions/setup-node-env
-        with:
-          install-filter: "@buster-app/server..."
-          cache-key: docker-build-server-${{ github.ref_name }}
-      
-      - name: Mount Turbo cache sticky disk
+      - name: Mount Docker buildkit sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
-          key: ${{ github.repository }}-turbo-cache-${{ github.ref_name }}
-          path: ./.turbo
-      
-      - name: Build with Turbo
-        run: |
-          echo "🔨 Building server with Turbo..."
-          pnpm turbo run build --filter=@buster-app/server...
-          echo "✅ Build complete!"
-        env:
-          NODE_ENV: production
-          DOCKER_BUILD: true
-          CI: true
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
-      
-      - name: Build server bundle
-        run: |
-          echo "📦 Creating server bundle with bun..."
-          cd apps/server
-          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64
-          ls -la dist/
-          cd ../..
-      
-      - name: Prepare production dependencies
-        run: |
-          echo "🧹 Preparing production-only dependencies..."
-          mkdir -p /tmp/prod-deps/apps/server
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
-          cp -r packages /tmp/prod-deps/
-          cp apps/server/package.json /tmp/prod-deps/apps/server/
-          
-          cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod --no-optional
-          
-          cd -
-          mkdir -p docker-context
-          cp -r /tmp/prod-deps/node_modules docker-context/
-          cp -r apps/server/dist docker-context/
-          cp apps/server/package.json docker-context/
+          key: ${{ github.repository }}-buildkit-cache-server-${{ github.ref_name }}
+          path: /tmp/.buildkit-cache-server
       
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
@@ -210,8 +167,8 @@ jobs:
       - name: Build and push Server Docker image
         uses: useblacksmith/build-push-action@v2
         with:
-          context: ./docker-context
-          file: ./apps/server/Dockerfile.prebuilt
+          context: .
+          file: ./apps/server/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: |
