@@ -2,7 +2,7 @@
 
 # Stage 1: Base with pnpm
 FROM node:20-slim AS base
-RUN npm install -g pnpm@9 bun
+RUN npm install -g pnpm@10 bun
 WORKDIR /app
 
 # Stage 2: Install dependencies (cached layer)
@@ -13,7 +13,8 @@ COPY apps/server/package.json ./apps/server/
 COPY packages/*/package.json ./packages/*/
 
 # Install ALL dependencies once (both dev and prod)
-RUN pnpm install --frozen-lockfile
+# Using --ignore-scripts to speed up install in Docker
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Stage 3: Build application
 FROM deps AS builder
@@ -49,7 +50,7 @@ COPY packages/*/package.json ./packages/*/
 
 # Install pnpm and production dependencies
 # Using pnpm to properly handle workspace dependencies
-RUN bun install --global pnpm@9 && \
+RUN bun install --global pnpm@10 && \
     pnpm install --frozen-lockfile --prod --no-optional
 
 # Copy built application
