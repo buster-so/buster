@@ -42,3 +42,15 @@ jobs:
         PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
         PORTER_PR_NUMBER: ${{ github.event.number }}
         PORTER_REPO_NAME: ${{ github.event.repository.name }}
+    - name: Deploy electric server
+      timeout-minutes: 30
+      run: exec porter apply -f ./apps/electric-server/porter.yaml --preview
+      env:
+        PORTER_CLUSTER: 3155
+        PORTER_HOST: https://dashboard.porter.run
+        PORTER_PROJECT: 9309
+        PORTER_APP_NAME: electric
+        PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
+        PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
+        PORTER_PR_NUMBER: ${{ github.event.number }}
+        PORTER_REPO_NAME: ${{ github.event.repository.name }}
