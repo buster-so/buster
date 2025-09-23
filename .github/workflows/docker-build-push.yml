@@ -280,6 +280,13 @@ jobs:
         # Create or update the preview branch
         supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
         
+        # Enable IPv4 addon for the project (required for connectivity)
+        echo "🔧 Enabling IPv4 addon for the project..."
+        curl -X POST "https://api.supabase.com/v1/projects/${{ secrets.SUPABASE_PROJECT_ID }}/addons" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{ "addon_type": "ipv4" }' || echo "IPv4 addon may already be enabled"
+        
         # Get project settings to extract URLs and keys
         PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
         
@@ -377,6 +384,13 @@ jobs:
         
         # Create or update the preview branch
         supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
+        
+        # Enable IPv4 addon for the project (required for connectivity)
+        echo "🔧 Enabling IPv4 addon for the project..."
+        curl -X POST "https://api.supabase.com/v1/projects/${{ secrets.SUPABASE_PROJECT_ID }}/addons" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{ "addon_type": "ipv4" }' || echo "IPv4 addon may already be enabled"
         
         # Get project settings to extract URLs and keys
         PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
@@ -504,6 +518,13 @@ jobs:
         if [ -z "$BRANCH_EXISTS" ]; then
           echo "⚠️ Supabase branch not found. Creating new branch..."
           supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+          
+          # Enable IPv4 addon for the project (required for connectivity)
+          echo "🔧 Enabling IPv4 addon for the project..."
+          curl -X POST "https://api.supabase.com/v1/projects/${{ secrets.SUPABASE_PROJECT_ID }}/addons" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{ "addon_type": "ipv4" }' || echo "IPv4 addon may already be enabled"
         else
           echo "✅ Using existing Supabase branch: ${BRANCH_NAME}"
         fi
