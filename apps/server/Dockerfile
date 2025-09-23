@@ -2,34 +2,18 @@
 
 # Stage 1: Build everything
 FROM node:20-slim AS builder
-
-# Install pnpm and bun
 RUN npm install -g pnpm@10 bun
-
-# Accept build args for Turbo remote caching
-ARG TURBO_TOKEN
-ARG TURBO_TEAM
-
 WORKDIR /app
-
-# Copy lockfiles first for better caching
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
-COPY apps/server/package.json apps/server/
-COPY packages/*/package.json packages/*/
-
-# Install dependencies with cache mount
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy all source files
 COPY . .
 
-# Build with Turbo cache mounts and remote caching
+# Install ALL dependencies and build
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 ENV NODE_ENV=production
 ENV DOCKER_BUILD=true
 ENV CI=true
-RUN --mount=type=cache,target=.turbo \
-    TURBO_TOKEN=${TURBO_TOKEN} TURBO_TEAM=${TURBO_TEAM} \
-    pnpm turbo run build --filter=@buster-app/server...
+RUN pnpm turbo run build --filter=@buster-app/server...
 
 # Bundle with Bun
 WORKDIR /app/apps/server
@@ -41,9 +25,9 @@ RUN bun build src/index.ts --outdir ./dist --target bun \
     --external @duckdb/node-bindings-darwin-x64 \
     --external @duckdb/node-bindings-win32-x64
 
-# Prepare production node_modules with cache
+# Prepare production node_modules
 WORKDIR /app
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --ignore-scripts
+RUN pnpm install --prod --no-frozen-lockfile --ignore-scripts
 
 # Stage 2: Production runtime (matching prebuilt pattern)
 FROM oven/bun:alpine AS runtime

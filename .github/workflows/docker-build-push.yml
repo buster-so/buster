@@ -23,10 +23,11 @@ on:
         required: false
         default: 'false'
 
-# Only one build per ref at a time, queue others
+# Cancel in-progress runs when new commits are pushed to the same PR
+# Queue runs for main/staging branches
 concurrency:
-  group: docker-build-${{ github.ref }}
-  cancel-in-progress: false
+  group: docker-build-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   REGISTRY: ghcr.io
@@ -213,8 +214,6 @@ jobs:
           build-args: |
             COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
             BUILD_DATE=${{ steps.meta.outputs.timestamp }}
-            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
-            TURBO_TEAM=${{ vars.TURBO_TEAM }}
           platforms: linux/amd64
           cache-from: |
             type=registry,ref=${{ env.REGISTRY }}/buster-so/buster-server:buildcache
