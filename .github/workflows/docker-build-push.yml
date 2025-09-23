@@ -38,6 +38,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      sha_short: ${{ steps.meta.outputs.sha_short }}
     
     steps:
       - name: Checkout code
@@ -112,6 +114,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      sha_short: ${{ steps.meta.outputs.sha_short }}
     
     steps:
       - name: Checkout code
@@ -185,3 +189,162 @@ jobs:
           echo "✅ Server Docker image built and pushed!"
           echo "📦 Image tags:"
           echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+
+  # Deploy preview environment for PRs to staging
+  deploy-preview:
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging'
+    needs: [build-api, build-server]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Get PR number
+      id: pr
+      run: |
+        echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+        echo "sha_short=${{ needs.build-server.outputs.sha_short }}" >> $GITHUB_OUTPUT
+        
+        echo "🔍 PR: #${{ github.event.pull_request.number }}"
+        echo "🔍 SHA: ${{ needs.build-server.outputs.sha_short }}"
+    
+    - name: Setup porter
+      uses: porter-dev/setup-porter@v0.1.0
+    
+    - name: Deploy API preview
+      timeout-minutes: 30
+      run: |
+        cat > /tmp/porter-api.yaml <<EOF
+        version: v2
+        name: staging
+        services:
+        - name: api
+          run: ""
+          type: web
+          image:
+            repository: ghcr.io/buster-so/buster-api
+            tag: preview-${{ steps.pr.outputs.sha_short }}
+          instances: 1
+          cpuCores: 1
+          ramMegabytes: 2048
+          port: 3001
+        envGroups:
+        - staging
+        EOF
+        
+        porter apply -f /tmp/porter-api.yaml --preview
+      env:
+        PORTER_CLUSTER: 3155
+        PORTER_HOST: https://dashboard.porter.run
+        PORTER_PROJECT: 9309
+        PORTER_APP_NAME: staging
+        PORTER_TAG: preview-${{ steps.pr.outputs.sha_short }}
+        PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
+        PORTER_PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+        PORTER_REPO_NAME: ${{ github.event.repository.name }}
+    
+    - name: Deploy Server preview
+      timeout-minutes: 30
+      run: |
+        cat > /tmp/porter-server.yaml <<EOF
+        version: v2
+        name: staging-server
+        services:
+        - name: server
+          run: ""
+          type: web
+          image:
+            repository: ghcr.io/buster-so/buster-server
+            tag: preview-${{ steps.pr.outputs.sha_short }}
+          instances: 1
+          cpuCores: 2
+          ramMegabytes: 5000
+          port: 3002
+        envGroups:
+        - staging
+        EOF
+        
+        porter apply -f /tmp/porter-server.yaml --preview
+      env:
+        PORTER_CLUSTER: 3155
+        PORTER_HOST: https://dashboard.porter.run
+        PORTER_PROJECT: 9309
+        PORTER_APP_NAME: staging-server
+        PORTER_TAG: preview-${{ steps.pr.outputs.sha_short }}
+        PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
+        PORTER_PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+        PORTER_REPO_NAME: ${{ github.event.repository.name }}
+    
+    - name: Deploy Electric server preview
+      timeout-minutes: 30
+      run: porter apply -f ./apps/electric-server/porter.yaml --preview
+      env:
+        PORTER_CLUSTER: 3155
+        PORTER_HOST: https://dashboard.porter.run
+        PORTER_PROJECT: 9309
+        PORTER_APP_NAME: electric
+        PORTER_TAG: ${{ steps.pr.outputs.sha_short }}
+        PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
+        PORTER_PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+        PORTER_REPO_NAME: ${{ github.event.repository.name }}
+    
+    - name: Output deployment URLs
+      run: |
+        echo "✅ Preview environment deployed!"
+        echo ""
+        echo "🔗 Deployment URLs will be available in Porter dashboard"
+        echo "   PR #${{ steps.pr.outputs.pr_number }} - SHA: ${{ steps.pr.outputs.sha_short }}"
+
+  # Deploy to staging/main environments on merge
+  deploy-staging-main:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+    needs: [build-api, build-server]
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    
+    steps:
+    - name: Setup porter
+      uses: porter-dev/setup-porter@v0.1.0
+    
+    - name: Determine image tag
+      id: tag
+      run: |
+        SHA_SHORT="${{ needs.build-server.outputs.sha_short }}"
+        
+        if [[ "${{ github.ref_name }}" == "main" ]]; then
+          TAG="${SHA_SHORT}"
+        else
+          TAG="${{ github.ref_name }}-${SHA_SHORT}"
+        fi
+        
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+        echo "🚀 Deploying to ${{ github.ref_name }} environment"
+        echo "📦 Using image tag: ${TAG}"
+    
+    - name: Update API deployment
+      run: |
+        porter app update-tag staging --tag "${{ steps.tag.outputs.tag }}"
+      env:
+        PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+        PORTER_HOST: https://dashboard.porter.run
+        PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+        PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+    
+    - name: Update Server deployment
+      run: |
+        porter app update-tag staging-server --tag "${{ steps.tag.outputs.tag }}"
+      env:
+        PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+        PORTER_HOST: https://dashboard.porter.run
+        PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+        PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+    
+    - name: Create deployment summary
+      run: |
+        echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image Tag:** \`${{ steps.tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
