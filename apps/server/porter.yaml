@@ -1,0 +1,32 @@
+version: v2
+name: staging-server
+services:
+- name: server
+  run: ""
+  type: web
+  instances: 1
+  cpuCores: 2
+  ramMegabytes: 5000
+  terminationGracePeriodSeconds: 30
+  port: 3002
+  autoscaling:
+    enabled: true
+    minInstances: 1
+    maxInstances: 3
+    gpu: false
+    cpuThresholdPercent: 50
+    memoryThresholdPercent: 50
+    gpuThresholdPercent: 100
+    vramThresholdPercent: 100
+  ingressAnnotations:
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "900"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "900"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
+  sleep: false
+  serviceMeshEnabled: false
+image:
+  repository: ghcr.io/buster-so/buster-server
+  tag: staging
+envGroups:
+- staging
+deploymentStrategy: {}
