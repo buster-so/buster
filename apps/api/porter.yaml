@@ -1,9 +1,12 @@
 version: v2
 name: staging
 services:
-  - name: staging
+  - name: api
     run: ""
     type: web
+    image:
+      repository: ghcr.io/buster-so/buster-api
+      tag: staging
     instances: 1
     cpuCores: 1
     ramMegabytes: 1000
@@ -11,10 +14,6 @@ services:
     port: 3001
     sleep: false
     serviceMeshEnabled: false
-build:
-  context: ./apps/api
-  method: docker
-  dockerfile: ./apps/api/Dockerfile
 envGroups:
   - staging
 deploymentStrategy: {}
