@@ -53,7 +53,9 @@ jobs:
           instances: 1
           cpuCores: 1
           ramMegabytes: 2048
-          port: 3000
+          port: 3001
+        envGroups:
+        - staging
         EOF
         
         exec porter apply -f /tmp/porter-api.yaml --preview
@@ -82,9 +84,11 @@ jobs:
             repository: ghcr.io/buster-so/buster-server
             tag: preview-${{ steps.vars.outputs.sha_short }}
           instances: 1
-          cpuCores: 1
-          ramMegabytes: 2048
-          port: 3000
+          cpuCores: 2
+          ramMegabytes: 5000
+          port: 3002
+        envGroups:
+        - staging
         EOF
         
         exec porter apply -f /tmp/porter-server.yaml --preview
