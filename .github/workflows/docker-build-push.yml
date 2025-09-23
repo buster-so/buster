@@ -280,10 +280,6 @@ jobs:
         # Create or update the preview branch
         supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
         
-        # Get the branch database URL and settings
-        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
-        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
-        
         # Get project settings to extract URLs and keys
         PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
         
@@ -293,15 +289,10 @@ jobs:
         # The Supabase URL is standard format
         SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
         
-        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
-        # We'll construct it based on the branch
-        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
-        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
-        # Direct connection URL for Electric (without pgbouncer)
-        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
+        # Database URL - using direct connection on port 5432
+        DATABASE_URL="postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
-        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
         echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
@@ -387,10 +378,6 @@ jobs:
         # Create or update the preview branch
         supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
         
-        # Get the branch database URL and settings
-        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
-        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
-        
         # Get project settings to extract URLs and keys
         PROJECT_INFO=$(supabase projects api-keys --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json)
         
@@ -400,15 +387,10 @@ jobs:
         # The Supabase URL is standard format
         SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
         
-        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
-        # We'll construct it based on the branch
-        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
-        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
-        # Direct connection URL for Electric (without pgbouncer)
-        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
+        # Database URL - using direct connection on port 5432
+        DATABASE_URL="postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
-        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
         echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
@@ -516,15 +498,14 @@ jobs:
         BRANCH_NAME="${{ github.head_ref }}"
         echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
         
-        # Get the existing branch database URL (created by server deployment)
-        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
-        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        # Check if branch exists, create if it doesn't
+        BRANCH_EXISTS=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\") | .name")
         
-        if [ -z "$BRANCH_ID" ] || [ "$BRANCH_ID" == "null" ]; then
+        if [ -z "$BRANCH_EXISTS" ]; then
           echo "⚠️ Supabase branch not found. Creating new branch..."
           supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
-          BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        else
+          echo "✅ Using existing Supabase branch: ${BRANCH_NAME}"
         fi
         
         # Get project settings to extract URLs and keys
@@ -536,15 +517,10 @@ jobs:
         # The Supabase URL is standard format
         SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
         
-        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
-        # We'll construct it based on the branch
-        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
-        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
-        # Direct connection URL for Electric (without pgbouncer)
-        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
+        # Database URL - using direct connection on port 5432
+        DATABASE_URL="postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
-        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "supabase_url=${SUPABASE_URL}" >> $GITHUB_OUTPUT
         echo "supabase_anon_key=${SUPABASE_ANON_KEY}" >> $GITHUB_OUTPUT
         echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
@@ -634,12 +610,11 @@ jobs:
           BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
         fi
         
-        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
-        # We'll construct it based on the branch
-        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
-        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
-        # Direct connection URL for Electric (without pgbouncer)
-        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
+        # Database URLs - note that branches don't have separate hosts, they use the main project host
+        # Pooled connection (with pgbouncer) on port 6543
+        DATABASE_URL="postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:6543/postgres?pgbouncer=true"
+        # Direct connection (without pgbouncer) on port 5432
+        DIRECT_DATABASE_URL="postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co:5432/postgres"
         
         # Supabase API URL and anon key are project-specific, not branch-specific
         SUPABASE_URL="https://${{ secrets.SUPABASE_PROJECT_ID }}.supabase.co"
@@ -665,7 +640,7 @@ jobs:
         cat > /tmp/porter-electric.yaml <<EOF
         $(cat ./apps/electric-server/porter.yaml)
         env:
-          DATABASE_URL: ${{ steps.supabase-branch.outputs.direct_database_url }}
+          DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
         EOF
         
         exec porter apply -f /tmp/porter-electric.yaml --preview
