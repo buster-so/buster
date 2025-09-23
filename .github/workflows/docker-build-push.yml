@@ -35,12 +35,13 @@ env:
 jobs:
   # Build API (Rust)
   build-api:
-    runs-on: blacksmith-16vcpu-ubuntu-2404
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
       packages: write
     outputs:
       sha_short: ${{ steps.meta.outputs.sha_short }}
+      success: ${{ steps.build-status.outputs.success }}
     
     steps:
       - name: Checkout code
@@ -108,6 +109,16 @@ jobs:
           echo "✅ API Docker image built and pushed!"
           echo "📦 Image tags:"
           echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+      
+      - name: Set build status
+        id: build-status
+        if: always()
+        run: |
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
 
   # Build Server (TypeScript/Bun)
   build-server:
@@ -117,6 +128,7 @@ jobs:
       packages: write
     outputs:
       sha_short: ${{ steps.meta.outputs.sha_short }}
+      success: ${{ steps.build-status.outputs.success }}
     
     steps:
       - name: Checkout code
@@ -227,12 +239,22 @@ jobs:
           echo "✅ Server Docker image built and pushed!"
           echo "📦 Image tags:"
           echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+      
+      - name: Set build status
+        id: build-status
+        if: always()
+        run: |
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
 
   # Deploy API preview
   deploy-preview-api:
-    if: github.event_name == 'pull_request' && github.base_ref == 'staging'
-    needs: [build-api]
-    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
+    needs: [build-api, build-server]
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     
     steps:
     - name: Checkout code
@@ -251,7 +273,7 @@ jobs:
         
         cat > /tmp/porter-api.yaml <<EOF
         version: v2
-        name: staging
+        name: staging-legacy
         services:
         - name: api
           run: ""
@@ -267,13 +289,13 @@ jobs:
         - staging
         EOF
         
-        porter apply -f /tmp/porter-api.yaml --preview
+        exec porter apply -f /tmp/porter-api.yaml --preview
         echo "✅ API preview deployment initiated"
       env:
         PORTER_CLUSTER: 3155
         PORTER_HOST: https://dashboard.porter.run
         PORTER_PROJECT: 9309
-        PORTER_APP_NAME: staging
+        PORTER_APP_NAME: staging-legacy
         PORTER_TAG: preview-${{ needs.build-api.outputs.sha_short }}
         PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
         PORTER_PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -281,9 +303,9 @@ jobs:
 
   # Deploy Server preview
   deploy-preview-server:
-    if: github.event_name == 'pull_request' && github.base_ref == 'staging'
-    needs: [build-server]
-    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
+    needs: [build-api, build-server]
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     
     steps:
     - name: Checkout code
@@ -318,7 +340,7 @@ jobs:
         - staging
         EOF
         
-        porter apply -f /tmp/porter-server.yaml --preview
+        exec porter apply -f /tmp/porter-server.yaml --preview
         echo "✅ Server preview deployment initiated"
       env:
         PORTER_CLUSTER: 3155
@@ -332,9 +354,9 @@ jobs:
 
   # Deploy Electric server preview
   deploy-preview-electric:
-    if: github.event_name == 'pull_request' && github.base_ref == 'staging'
-    needs: [build-server]  # Electric depends on the main build completing
-    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
+    needs: [build-api, build-server]
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     
     steps:
     - name: Checkout code
@@ -351,7 +373,7 @@ jobs:
         
         echo "🚀 Deploying Electric preview for PR #${PR_NUMBER} (SHA: ${SHA_SHORT})"
         
-        porter apply -f ./apps/electric-server/porter.yaml --preview
+        exec porter apply -f ./apps/electric-server/porter.yaml --preview
         echo "✅ Electric preview deployment initiated"
       env:
         PORTER_CLUSTER: 3155
@@ -367,7 +389,7 @@ jobs:
   deploy-preview-summary:
     if: github.event_name == 'pull_request' && github.base_ref == 'staging'
     needs: [deploy-preview-api, deploy-preview-server, deploy-preview-electric]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     
     steps:
     - name: Output deployment summary
@@ -385,9 +407,9 @@ jobs:
 
   # Deploy to staging/main environments on merge
   deploy-staging-main:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main') && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
     needs: [build-api, build-server]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     environment: ${{ github.ref_name }}
     
     steps:
@@ -411,7 +433,7 @@ jobs:
     
     - name: Update API deployment
       run: |
-        porter app update-tag staging --tag "${{ steps.tag.outputs.tag }}"
+        porter app update-tag staging-legacy --tag "${{ steps.tag.outputs.tag }}"
       env:
         PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
         PORTER_HOST: https://dashboard.porter.run

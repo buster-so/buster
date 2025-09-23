@@ -1,5 +1,5 @@
 version: v2
-name: staging
+name: staging-legacy
 services:
   - name: api
     run: ""
@@ -16,4 +16,3 @@ services:
     serviceMeshEnabled: false
 envGroups:
   - staging
-deploymentStrategy: {}
