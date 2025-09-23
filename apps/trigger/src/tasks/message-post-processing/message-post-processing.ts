@@ -19,7 +19,7 @@ import type {
   ConfidenceScore,
   PostProcessingMessage,
 } from '@buster/server-shared/message';
-import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { logger, schemaTask } from '@trigger.dev/sdk';
 import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { z } from 'zod/v4';
 import {

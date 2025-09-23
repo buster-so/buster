@@ -1,5 +1,5 @@
 import { getDefaultProvider, getProviderForOrganization } from '@buster/data-source';
-import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { logger, schemaTask } from '@trigger.dev/sdk';
 import {
   type MigrateStorageAssetsInput,
   MigrateStorageAssetsInputSchema,

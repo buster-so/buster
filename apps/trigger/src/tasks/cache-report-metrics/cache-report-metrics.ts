@@ -6,7 +6,7 @@ import {
   getMetricWithDataSource,
 } from '@buster/database/queries';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
-import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { logger, schemaTask } from '@trigger.dev/sdk';
 import { CacheReportMetricsInputSchema, type CacheReportMetricsOutput } from './interfaces';
 
 /**

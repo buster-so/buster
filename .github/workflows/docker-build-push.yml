@@ -273,7 +273,8 @@ jobs:
     - name: Create Supabase preview branch
       id: supabase-branch
       run: |
-        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-api.outputs.sha_short }}"
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
         
         # Create or update the preview branch
@@ -287,8 +288,11 @@ jobs:
         # We'll construct it based on the branch
         DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
         DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        # Direct connection URL for Electric (without pgbouncer)
+        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -365,7 +369,8 @@ jobs:
     - name: Create Supabase preview branch
       id: supabase-branch
       run: |
-        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-server.outputs.sha_short }}"
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
         
         # Create or update the preview branch
@@ -379,8 +384,11 @@ jobs:
         # We'll construct it based on the branch
         DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
         DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        # Direct connection URL for Electric (without pgbouncer)
+        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -400,11 +408,12 @@ jobs:
     
     - name: Deploy Trigger.dev preview
       run: |
-        BRANCH_NAME="pr-${{ github.event.pull_request.number }}"
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         echo "🚀 Deploying Trigger.dev preview for branch: ${BRANCH_NAME}"
         
-        # Deploy to Trigger.dev preview environment
-        npx trigger.dev@latest deploy --env preview --branch ${BRANCH_NAME}
+        # Deploy to Trigger.dev preview environment from the trigger app directory
+        cd apps/trigger && npx trigger.dev@latest deploy --env preview --branch ${BRANCH_NAME}
         
         echo "✅ Trigger.dev preview deployment complete"
       env:
@@ -435,7 +444,7 @@ jobs:
           port: 3002
           env:
             DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
-            TRIGGER_PREVIEW_BRANCH: pr-${{ github.event.pull_request.number }}
+            TRIGGER_PREVIEW_BRANCH: ${{ github.head_ref }}
             TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
         envGroups:
         - staging
@@ -481,7 +490,8 @@ jobs:
     - name: Get Supabase preview branch URL
       id: supabase-branch
       run: |
-        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-server.outputs.sha_short }}"
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
         
         # Get the existing branch database URL (created by server deployment)
@@ -499,8 +509,11 @@ jobs:
         # We'll construct it based on the branch
         DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
         DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        # Direct connection URL for Electric (without pgbouncer)
+        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -528,7 +541,7 @@ jobs:
         export DATABASE_URL="${{ steps.supabase-branch.outputs.database_url }}"
         export VITE_API_URL="${{ needs.deploy-preview-api.outputs.api_url }}"
         export VITE_SERVER_URL="${{ needs.deploy-preview-server.outputs.server_url }}"
-        export TRIGGER_PREVIEW_BRANCH="pr-${{ github.event.pull_request.number }}"
+        export TRIGGER_PREVIEW_BRANCH="${{ github.head_ref }}"
         
         echo "Building with:"
         echo "  API URL: $VITE_API_URL"
@@ -581,7 +594,8 @@ jobs:
     - name: Get Supabase preview branch URL
       id: supabase-branch
       run: |
-        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-server.outputs.sha_short }}"
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
         
         # Get the existing branch database URL (created by server deployment)
@@ -599,8 +613,11 @@ jobs:
         # We'll construct it based on the branch
         DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
         DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        # Direct connection URL for Electric (without pgbouncer)
+        DIRECT_DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:5432/postgres"
         
         echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "direct_database_url=${DIRECT_DATABASE_URL}" >> $GITHUB_OUTPUT
         echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
       env:
         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -613,11 +630,11 @@ jobs:
         
         echo "🚀 Deploying Electric preview for PR #${PR_NUMBER} (SHA: ${SHA_SHORT})"
         
-        # Update Electric porter.yaml to use the preview database URL
+        # Update Electric porter.yaml to use the direct preview database URL (without pgbouncer)
         cat > /tmp/porter-electric.yaml <<EOF
         $(cat ./apps/electric-server/porter.yaml)
         env:
-          DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
+          DATABASE_URL: ${{ steps.supabase-branch.outputs.direct_database_url }}
         EOF
         
         exec porter apply -f /tmp/porter-electric.yaml --preview
@@ -787,12 +804,12 @@ jobs:
     
     - name: Delete Supabase preview branches
       run: |
-        # Get short SHA for the branch
-        SHA_SHORT=$(git rev-parse --short=7 HEAD)
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         
-        # Delete all branches for this PR
+        # Delete the branch for this PR
         BRANCH_NAMES=(
-          "pr-${{ github.event.pull_request.number }}-${SHA_SHORT}"
+          "${BRANCH_NAME}"
         )
         
         for BRANCH_NAME in "${BRANCH_NAMES[@]}"; do
@@ -819,11 +836,12 @@ jobs:
     
     - name: Archive Trigger.dev preview branch
       run: |
-        BRANCH_NAME="pr-${{ github.event.pull_request.number }}"
+        # Use the actual branch name from the PR
+        BRANCH_NAME="${{ github.head_ref }}"
         echo "📦 Archiving Trigger.dev preview branch: ${BRANCH_NAME}"
         
-        # Archive the preview branch
-        npx trigger.dev@latest preview archive --branch ${BRANCH_NAME} || true
+        # Archive the preview branch from the trigger app directory
+        cd apps/trigger && npx trigger.dev@latest preview archive --branch ${BRANCH_NAME} || true
         
         echo "✅ Trigger.dev preview branch archived"
       env:
