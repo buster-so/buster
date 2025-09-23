@@ -40,23 +40,28 @@ RUN bun build src/index.ts --outdir ./dist --target bun \
     --external @duckdb/node-bindings-darwin-x64 \
     --external @duckdb/node-bindings-win32-x64
 
-# Stage 4: Production image
+# Stage 4: Prune dependencies for production
+FROM base AS pruner
+WORKDIR /app
+# Copy lockfile and package files
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/apps/server/package.json ./apps/server/
+COPY --from=builder /app/packages/ ./packages/
+# Prune to production dependencies only
+RUN pnpm install --prod --no-frozen-lockfile --ignore-scripts
+
+# Stage 5: Production image
 FROM oven/bun:slim AS runtime
 WORKDIR /app
 
-# Install production dependencies in final image
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY apps/server/package.json ./apps/server/
-COPY packages/*/package.json ./packages/*/
-
-# Install pnpm and production dependencies
-# Using pnpm to properly handle workspace dependencies
-RUN bun install --global pnpm@10 && \
-    pnpm install --no-frozen-lockfile --prod --no-optional
-
-# Copy built application
+# Copy built application from builder
 COPY --from=builder /app/apps/server/dist ./dist
 COPY --from=builder /app/apps/server/package.json ./
+
+# Copy pruned production dependencies from pruner
+COPY --from=pruner /app/node_modules ./node_modules
+COPY --from=pruner /app/apps/server/node_modules ./apps/server/node_modules
+COPY --from=pruner /app/packages/*/node_modules ./packages/*/node_modules
 
 # Runtime configuration
 ENV NODE_ENV=production
