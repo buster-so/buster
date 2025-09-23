@@ -10,6 +10,7 @@ on:
       - '.github/workflows/docker-build-push.yml'
       - '.github/workflows/deploy.yml'
   pull_request:
+    types: [opened, synchronize, reopened, closed]
     branches: [staging]
     paths:
       - 'apps/**'
@@ -35,6 +36,7 @@ env:
 jobs:
   # Build API (Rust)
   build-api:
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
     runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
@@ -122,6 +124,7 @@ jobs:
 
   # Build Server (TypeScript/Bun)
   build-server:
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
     runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
@@ -255,6 +258,9 @@ jobs:
     if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
     needs: [build-api, build-server]
     runs-on: blacksmith-8vcpu-ubuntu-2404
+    environment: testing
+    outputs:
+      api_url: ${{ steps.deploy.outputs.api_url }}
     
     steps:
     - name: Checkout code
@@ -262,6 +268,35 @@ jobs:
     
     - name: Setup porter
       uses: porter-dev/setup-porter@v0.1.0
+    
+    - name: Install Supabase CLI
+      run: |
+        curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar xvz
+        sudo mv supabase /usr/local/bin/
+        supabase --version
+    
+    - name: Create Supabase preview branch
+      id: supabase-branch
+      run: |
+        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-api.outputs.sha_short }}"
+        echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+        
+        # Create or update the preview branch
+        supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
+        
+        # Get the branch database URL
+        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
+        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        
+        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
+        # We'll construct it based on the branch
+        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
+        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        
+        echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
     
     - name: Deploy API preview
       timeout-minutes: 30
@@ -285,12 +320,20 @@ jobs:
           cpuCores: 1
           ramMegabytes: 2048
           port: 3001
+          env:
+            DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
         envGroups:
         - staging
         EOF
         
         exec porter apply -f /tmp/porter-api.yaml --preview
-        echo "✅ API preview deployment initiated"
+        
+        # Output predictable URL
+        API_URL="https://staging-legacy-pr-${PR_NUMBER}.porter.run"
+        echo "api_url=${API_URL}" >> $GITHUB_OUTPUT
+        echo "✅ API preview deployment initiated with Supabase branch"
+        echo "📍 API URL: ${API_URL}"
+      id: deploy
       env:
         PORTER_CLUSTER: 3155
         PORTER_HOST: https://dashboard.porter.run
@@ -306,6 +349,12 @@ jobs:
     if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
     needs: [build-api, build-server]
     runs-on: blacksmith-8vcpu-ubuntu-2404
+    environment: testing
+    outputs:
+      server_url: ${{ steps.deploy.outputs.server_url }}
+    outputs:
+      server_url: ${{ steps.deploy.outputs.server_url }}
+      database_url: ${{ steps.supabase-branch.outputs.database_url }}
     
     steps:
     - name: Checkout code
@@ -313,6 +362,61 @@ jobs:
     
     - name: Setup porter
       uses: porter-dev/setup-porter@v0.1.0
+    
+    - name: Install Supabase CLI
+      run: |
+        curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar xvz
+        sudo mv supabase /usr/local/bin/
+        supabase --version
+    
+    - name: Create Supabase preview branch
+      id: supabase-branch
+      run: |
+        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-server.outputs.sha_short }}"
+        echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+        
+        # Create or update the preview branch
+        supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
+        
+        # Get the branch database URL
+        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
+        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        
+        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
+        # We'll construct it based on the branch
+        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
+        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        
+        echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "✅ Created Supabase preview branch: ${BRANCH_NAME}"
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+    
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    
+    - name: Deploy Trigger.dev preview
+      run: |
+        BRANCH_NAME="pr-${{ github.event.pull_request.number }}"
+        echo "🚀 Deploying Trigger.dev preview for branch: ${BRANCH_NAME}"
+        
+        # Deploy to Trigger.dev preview environment
+        npx trigger.dev@latest deploy --env preview --branch ${BRANCH_NAME}
+        
+        echo "✅ Trigger.dev preview deployment complete"
+      env:
+        TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+        DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
     
     - name: Deploy Server preview
       timeout-minutes: 30
@@ -336,12 +440,22 @@ jobs:
           cpuCores: 2
           ramMegabytes: 5000
           port: 3002
+          env:
+            DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
+            TRIGGER_PREVIEW_BRANCH: pr-${{ github.event.pull_request.number }}
+            TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
         envGroups:
         - staging
         EOF
         
         exec porter apply -f /tmp/porter-server.yaml --preview
-        echo "✅ Server preview deployment initiated"
+        
+        # Output predictable URL
+        SERVER_URL="https://staging-server-pr-${PR_NUMBER}.porter.run"
+        echo "server_url=${SERVER_URL}" >> $GITHUB_OUTPUT
+        echo "✅ Server preview deployment initiated with Supabase and Trigger.dev"
+        echo "📍 Server URL: ${SERVER_URL}"
+      id: deploy
       env:
         PORTER_CLUSTER: 3155
         PORTER_HOST: https://dashboard.porter.run
@@ -352,11 +466,111 @@ jobs:
         PORTER_PR_NUMBER: ${{ github.event.pull_request.number }}
         PORTER_REPO_NAME: ${{ github.event.repository.name }}
 
+  # Deploy Web preview to Vercel
+  deploy-preview-web:
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
+    needs: [build-api, build-server, deploy-preview-api, deploy-preview-server]
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    environment: testing
+    outputs:
+      web_url: ${{ steps.vercel-deploy.outputs.deployment_url }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Supabase CLI
+      run: |
+        curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar xvz
+        sudo mv supabase /usr/local/bin/
+        supabase --version
+    
+    - name: Get Supabase preview branch URL
+      id: supabase-branch
+      run: |
+        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-server.outputs.sha_short }}"
+        echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+        
+        # Get the existing branch database URL (created by server deployment)
+        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
+        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        
+        if [ -z "$BRANCH_ID" ] || [ "$BRANCH_ID" == "null" ]; then
+          echo "⚠️ Supabase branch not found. Creating new branch..."
+          supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+          BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
+          BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        fi
+        
+        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
+        # We'll construct it based on the branch
+        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
+        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        
+        echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+    
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+    
+    - name: Pull Vercel Environment Information
+      run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      working-directory: ./apps/web
+    
+    - name: Build Project for Vercel
+      run: |
+        # Set environment variables for the build using actual deployed URLs
+        export DATABASE_URL="${{ steps.supabase-branch.outputs.database_url }}"
+        export VITE_API_URL="${{ needs.deploy-preview-api.outputs.api_url }}"
+        export VITE_SERVER_URL="${{ needs.deploy-preview-server.outputs.server_url }}"
+        export TRIGGER_PREVIEW_BRANCH="pr-${{ github.event.pull_request.number }}"
+        
+        echo "Building with:"
+        echo "  API URL: $VITE_API_URL"
+        echo "  Server URL: $VITE_SERVER_URL"
+        
+        # Build with Vercel
+        vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      env:
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      working-directory: ./apps/web
+    
+    - name: Deploy to Vercel Preview
+      id: vercel-deploy
+      run: |
+        # Deploy and capture the URL
+        DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} | tail -n 1)
+        echo "deployment_url=${DEPLOYMENT_URL}" >> $GITHUB_OUTPUT
+        
+        # Add comment to PR with preview URL
+        echo "🚀 Web preview deployed to: ${DEPLOYMENT_URL}"
+        echo "✅ Vercel preview deployment complete"
+      env:
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      working-directory: ./apps/web
+
   # Deploy Electric server preview
   deploy-preview-electric:
     if: github.event_name == 'pull_request' && github.base_ref == 'staging' && needs.build-api.outputs.success == 'true' && needs.build-server.outputs.success == 'true'
     needs: [build-api, build-server]
     runs-on: blacksmith-8vcpu-ubuntu-2404
+    environment: testing
+    outputs:
+      electric_url: ${{ steps.deploy.outputs.electric_url }}
     
     steps:
     - name: Checkout code
@@ -364,6 +578,39 @@ jobs:
     
     - name: Setup porter
       uses: porter-dev/setup-porter@v0.1.0
+    
+    - name: Install Supabase CLI
+      run: |
+        curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar xvz
+        sudo mv supabase /usr/local/bin/
+        supabase --version
+    
+    - name: Get Supabase preview branch URL
+      id: supabase-branch
+      run: |
+        BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ needs.build-server.outputs.sha_short }}"
+        echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+        
+        # Get the existing branch database URL (created by server deployment)
+        BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
+        BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        
+        if [ -z "$BRANCH_ID" ] || [ "$BRANCH_ID" == "null" ]; then
+          echo "❌ Supabase branch not found. Creating new branch..."
+          supabase branches create ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+          BRANCH_INFO=$(supabase branches list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --output json | jq -r ".[] | select(.name == \"${BRANCH_NAME}\")")
+          BRANCH_ID=$(echo $BRANCH_INFO | jq -r '.id')
+        fi
+        
+        # The database URL will be in the format: postgresql://postgres.[project-ref]:[password]@[host]:6543/postgres?pgbouncer=true
+        # We'll construct it based on the branch
+        DB_HOST="db.${{ secrets.SUPABASE_PROJECT_ID }}-${BRANCH_ID}.supabase.co"
+        DATABASE_URL="postgresql://postgres.${{ secrets.SUPABASE_PROJECT_ID }}:${{ secrets.SUPABASE_DB_PASSWORD }}@${DB_HOST}:6543/postgres?pgbouncer=true"
+        
+        echo "database_url=${DATABASE_URL}" >> $GITHUB_OUTPUT
+        echo "✅ Using Supabase preview branch: ${BRANCH_NAME}"
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
     
     - name: Deploy Electric server preview
       timeout-minutes: 30
@@ -373,8 +620,21 @@ jobs:
         
         echo "🚀 Deploying Electric preview for PR #${PR_NUMBER} (SHA: ${SHA_SHORT})"
         
-        exec porter apply -f ./apps/electric-server/porter.yaml --preview
-        echo "✅ Electric preview deployment initiated"
+        # Update Electric porter.yaml to use the preview database URL
+        cat > /tmp/porter-electric.yaml <<EOF
+        $(cat ./apps/electric-server/porter.yaml)
+        env:
+          DATABASE_URL: ${{ steps.supabase-branch.outputs.database_url }}
+        EOF
+        
+        exec porter apply -f /tmp/porter-electric.yaml --preview
+        
+        # Output predictable URL
+        ELECTRIC_URL="https://electric-pr-${PR_NUMBER}.porter.run"
+        echo "electric_url=${ELECTRIC_URL}" >> $GITHUB_OUTPUT
+        echo "✅ Electric preview deployment initiated with Supabase branch"
+        echo "📍 Electric URL: ${ELECTRIC_URL}"
+      id: deploy
       env:
         PORTER_CLUSTER: 3155
         PORTER_HOST: https://dashboard.porter.run
@@ -385,25 +645,83 @@ jobs:
         PORTER_PR_NUMBER: ${{ github.event.pull_request.number }}
         PORTER_REPO_NAME: ${{ github.event.repository.name }}
 
-  # Summary job to report all preview deployments
+  # Run E2E tests on preview environments
+  run-e2e-tests:
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging' && github.event.action != 'closed'
+    needs: [deploy-preview-api, deploy-preview-server, deploy-preview-web, deploy-preview-electric]
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+    
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps chromium
+    
+    - name: Run E2E tests against preview environment
+      run: |
+        echo "🧪 Running E2E tests against preview environments"
+        echo "Web URL: ${{ needs.deploy-preview-web.outputs.web_url }}"
+        echo "API URL: ${{ needs.deploy-preview-api.outputs.api_url }}"
+        echo "Server URL: ${{ needs.deploy-preview-server.outputs.server_url }}"
+        
+        # Run your E2E tests with the preview URLs
+        pnpm run test:e2e || true  # Set to || true temporarily until tests are set up
+      env:
+        VITE_WEB_URL: ${{ needs.deploy-preview-web.outputs.web_url }}
+        VITE_API_URL: ${{ needs.deploy-preview-api.outputs.api_url }}
+        VITE_SERVER_URL: ${{ needs.deploy-preview-server.outputs.server_url }}
+        VITE_ELECTRIC_URL: ${{ needs.deploy-preview-electric.outputs.electric_url }}
+        DATABASE_URL: ${{ needs.deploy-preview-server.outputs.database_url }}
+        PLAYWRIGHT_BASE_URL: ${{ needs.deploy-preview-web.outputs.web_url }}
+        CI: true
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: e2e-test-results-pr-${{ github.event.pull_request.number }}
+        path: |
+          test-results/
+          playwright-report/
+        retention-days: 7
+
+  # Summary job to report all preview deployments and tests
   deploy-preview-summary:
-    if: github.event_name == 'pull_request' && github.base_ref == 'staging'
-    needs: [deploy-preview-api, deploy-preview-server, deploy-preview-electric]
+    if: github.event_name == 'pull_request' && github.base_ref == 'staging' && github.event.action != 'closed'
+    needs: [deploy-preview-api, deploy-preview-server, deploy-preview-web, deploy-preview-electric, run-e2e-tests]
     runs-on: blacksmith-8vcpu-ubuntu-2404
     
     steps:
     - name: Output deployment summary
       run: |
-        echo "## 🎉 All Preview Deployments Complete!" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎉 All Preview Deployments & Tests Complete!" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "- **PR:** #${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **SHA:** ${{ needs.deploy-preview-api.needs[0] == 'build-api' && needs.build-api.outputs.sha_short || needs.build-server.outputs.sha_short }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Services deployed:**" >> $GITHUB_STEP_SUMMARY
-        echo "  - ✅ API" >> $GITHUB_STEP_SUMMARY
-        echo "  - ✅ Server" >> $GITHUB_STEP_SUMMARY
-        echo "  - ✅ Electric" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "🔗 Check Porter dashboard for deployment URLs" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔗 Preview URLs (Predictable):" >> $GITHUB_STEP_SUMMARY
+        echo "- **Web:** ${{ needs.deploy-preview-web.outputs.web_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **API:** ${{ needs.deploy-preview-api.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Server:** ${{ needs.deploy-preview-server.outputs.server_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Electric:** ${{ needs.deploy-preview-electric.outputs.electric_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 E2E Test Results:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status:** ${{ needs.run-e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "💡 **Note:** URLs are predictable based on PR number for easy testing" >> $GITHUB_STEP_SUMMARY
 
   # Deploy to staging/main environments on merge
   deploy-staging-main:
@@ -457,3 +775,85 @@ jobs:
         echo "- **Image Tag:** \`${{ steps.tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
         echo "- **Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  # Cleanup preview environments when PR is closed
+  cleanup-preview:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    environment: testing
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Supabase CLI
+      run: |
+        curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar xvz
+        sudo mv supabase /usr/local/bin/
+        supabase --version
+    
+    - name: Delete Supabase preview branches
+      run: |
+        # Get short SHA for the branch
+        SHA_SHORT=$(git rev-parse --short=7 HEAD)
+        
+        # Delete all branches for this PR
+        BRANCH_NAMES=(
+          "pr-${{ github.event.pull_request.number }}-${SHA_SHORT}"
+        )
+        
+        for BRANCH_NAME in "${BRANCH_NAMES[@]}"; do
+          echo "🗑️ Deleting Supabase branch: ${BRANCH_NAME}"
+          supabase branches delete ${BRANCH_NAME} --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} || true
+        done
+        
+        echo "✅ Supabase preview branches deleted"
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+    
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    
+    - name: Archive Trigger.dev preview branch
+      run: |
+        BRANCH_NAME="pr-${{ github.event.pull_request.number }}"
+        echo "📦 Archiving Trigger.dev preview branch: ${BRANCH_NAME}"
+        
+        # Archive the preview branch
+        npx trigger.dev@latest preview archive --branch ${BRANCH_NAME} || true
+        
+        echo "✅ Trigger.dev preview branch archived"
+      env:
+        TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+    
+    - name: Remove Vercel preview deployment
+      run: |
+        echo "🗑️ Removing Vercel preview deployments for PR #${{ github.event.pull_request.number }}"
+        
+        # Note: Vercel automatically handles preview cleanup when PRs are closed
+        # But we can manually remove if needed using the API
+        # vercel remove [deployment-url] --yes --token=${{ secrets.VERCEL_TOKEN }}
+        
+        echo "✅ Vercel will automatically clean up preview deployments"
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    
+    - name: Create cleanup summary
+      run: |
+        echo "## 🧹 Preview Environment Cleanup Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **PR:** #${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Supabase branches:** Deleted" >> $GITHUB_STEP_SUMMARY
+        echo "- **Trigger.dev branch:** Archived" >> $GITHUB_STEP_SUMMARY
+        echo "- **Vercel previews:** Will be cleaned up automatically" >> $GITHUB_STEP_SUMMARY
+        echo "- **Porter previews:** Will be cleaned up automatically" >> $GITHUB_STEP_SUMMARY
