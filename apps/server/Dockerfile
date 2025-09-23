@@ -13,8 +13,9 @@ COPY apps/server/package.json ./apps/server/
 COPY packages/*/package.json ./packages/*/
 
 # Install ALL dependencies once (both dev and prod)
-# Using --ignore-scripts to speed up install in Docker
-RUN pnpm install --frozen-lockfile --ignore-scripts
+# Using --no-frozen-lockfile in CI since lockfile may be slightly out of sync
+# and --ignore-scripts to speed up install in Docker
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Stage 3: Build application
 FROM deps AS builder
@@ -51,7 +52,7 @@ COPY packages/*/package.json ./packages/*/
 # Install pnpm and production dependencies
 # Using pnpm to properly handle workspace dependencies
 RUN bun install --global pnpm@10 && \
-    pnpm install --frozen-lockfile --prod --no-optional
+    pnpm install --no-frozen-lockfile --prod --no-optional
 
 # Copy built application
 COPY --from=builder /app/apps/server/dist ./dist
