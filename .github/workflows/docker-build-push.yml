@@ -1,0 +1,363 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [main, staging]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docker-build-push.yml'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    branches: [staging]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docker-build-push.yml'
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Force a build even without changes'
+        required: false
+        default: 'false'
+
+# Only one build per ref at a time, queue others
+concurrency:
+  group: docker-build-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  # Determine which apps need building based on changed files
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.changes.outputs.api }}
+      server: ${{ steps.changes.outputs.server }}
+      web: ${{ steps.changes.outputs.web }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'packages/**'
+            server:
+              - 'apps/server/**'
+              - 'packages/**'
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+
+  # Build API (Rust)
+  build-api:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.api == 'true' || github.event.inputs.force_build == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Mount Docker buildkit sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-buildkit-cache-api-${{ github.ref_name }}
+          path: /tmp/.buildkit-cache-api
+      
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata and determine tags
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          
+          # Read version from Cargo.toml if on main
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            VERSION=$(grep '^version' apps/api/Cargo.toml | head -n 1 | sed 's/version = "\(.*\)"/\1/' || echo "")
+            if [ -n "$VERSION" ]; then
+              echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          # Determine tags based on context
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "tags=${{ env.REGISTRY }}/buster-so/buster-api:preview-${SHA_SHORT}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "main" ]]; then
+            TAGS="${{ env.REGISTRY }}/buster-so/buster-api:${SHA_SHORT},${{ env.REGISTRY }}/buster-so/buster-api:latest"
+            if [ -n "$VERSION" ]; then
+              TAGS="${TAGS},${{ env.REGISTRY }}/buster-so/buster-api:${VERSION}"
+            fi
+            echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "tags=${{ env.REGISTRY }}/buster-so/buster-api:staging-${SHA_SHORT},${{ env.REGISTRY }}/buster-so/buster-api:staging" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+      
+      - name: Build and push API Docker image
+        uses: useblacksmith/build-push-action@v2
+        with:
+          context: .
+          file: ./apps/api/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+          build-args: |
+            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
+            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
+          platforms: linux/amd64
+          cache-from: type=local,src=/tmp/.buildkit-cache-api
+          cache-to: type=local,dest=/tmp/.buildkit-cache-api,mode=max
+      
+      - name: Output image details
+        run: |
+          echo "✅ API Docker image built and pushed!"
+          echo "📦 Image tags:"
+          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+
+  # Build Server (TypeScript/Bun)
+  build-server:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.server == 'true' || github.event.inputs.force_build == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          install-filter: "@buster-app/server..."
+          cache-key: docker-build-server-${{ github.ref_name }}
+      
+      - name: Mount Turbo cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-turbo-cache-${{ github.ref_name }}
+          path: ./.turbo
+      
+      - name: Mount Docker buildkit sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-buildkit-cache-server-${{ github.ref_name }}
+          path: /tmp/.buildkit-cache-server
+      
+      - name: Build with Turbo
+        run: |
+          echo "🔨 Building server with Turbo..."
+          pnpm turbo run build --filter=@buster-app/server...
+          echo "✅ Build complete!"
+        env:
+          NODE_ENV: production
+          DOCKER_BUILD: true
+          CI: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+      
+      - name: Build server bundle
+        run: |
+          echo "📦 Creating server bundle with bun..."
+          cd apps/server
+          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64
+          ls -la dist/
+          cd ../..
+      
+      - name: Prepare production dependencies
+        run: |
+          echo "🧹 Preparing production-only dependencies..."
+          mkdir -p /tmp/prod-deps/apps/server
+          cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
+          cp -r packages /tmp/prod-deps/
+          cp apps/server/package.json /tmp/prod-deps/apps/server/
+          
+          cd /tmp/prod-deps
+          pnpm install --frozen-lockfile --prod --no-optional
+          
+          cd -
+          mkdir -p docker-context
+          cp -r /tmp/prod-deps/node_modules docker-context/
+          cp -r apps/server/dist docker-context/
+          cp apps/server/package.json docker-context/
+      
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata and determine tags
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          
+          # Read version from package.json if on main
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            VERSION=$(jq -r '.version // empty' apps/server/package.json || echo "")
+            if [ -n "$VERSION" ]; then
+              echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          # Determine tags based on context
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "tags=${{ env.REGISTRY }}/buster-so/buster-server:preview-${SHA_SHORT}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "main" ]]; then
+            TAGS="${{ env.REGISTRY }}/buster-so/buster-server:${SHA_SHORT},${{ env.REGISTRY }}/buster-so/buster-server:latest"
+            if [ -n "$VERSION" ]; then
+              TAGS="${TAGS},${{ env.REGISTRY }}/buster-so/buster-server:${VERSION}"
+            fi
+            echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "tags=${{ env.REGISTRY }}/buster-so/buster-server:staging-${SHA_SHORT},${{ env.REGISTRY }}/buster-so/buster-server:staging" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+      
+      - name: Build and push Server Docker image
+        uses: useblacksmith/build-push-action@v2
+        with:
+          context: ./docker-context
+          file: ./apps/server/Dockerfile.prebuilt
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+          build-args: |
+            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
+            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
+          platforms: linux/amd64
+          cache-from: type=local,src=/tmp/.buildkit-cache-server
+          cache-to: type=local,dest=/tmp/.buildkit-cache-server,mode=max
+      
+      - name: Output image details
+        run: |
+          echo "✅ Server Docker image built and pushed!"
+          echo "📦 Image tags:"
+          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+
+  # Build Web (React/Vite)
+  build-web:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.web == 'true' || github.event.inputs.force_build == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+    environment: ${{ github.ref_name == 'main' && 'main' || github.ref_name == 'staging' && 'staging' || 'preview' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Mount Docker buildkit sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-buildkit-cache-web-${{ github.ref_name }}
+          path: /tmp/.buildkit-cache-web
+      
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata and determine tags
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          
+          # Read version from package.json if on main
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            VERSION=$(jq -r '.version // empty' apps/web/package.json || echo "")
+            if [ -n "$VERSION" ]; then
+              echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          # Determine tags based on context
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "tags=${{ env.REGISTRY }}/buster-so/buster-web:preview-${SHA_SHORT}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "main" ]]; then
+            TAGS="${{ env.REGISTRY }}/buster-so/buster-web:${SHA_SHORT},${{ env.REGISTRY }}/buster-so/buster-web:latest"
+            if [ -n "$VERSION" ]; then
+              TAGS="${TAGS},${{ env.REGISTRY }}/buster-so/buster-web:${VERSION}"
+            fi
+            echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "tags=${{ env.REGISTRY }}/buster-so/buster-web:staging-${SHA_SHORT},${{ env.REGISTRY }}/buster-so/buster-web:staging" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+      
+      - name: Build and push Web Docker image
+        uses: useblacksmith/build-push-action@v2
+        with:
+          context: ./apps/web
+          file: ./apps/web/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+          build-args: |
+            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
+            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
+            VITE_PUBLIC_API_URL=${{ secrets.VITE_PUBLIC_API_URL }}
+            VITE_PUBLIC_URL=${{ secrets.VITE_PUBLIC_URL }}
+            VITE_PUBLIC_SUPABASE_URL=${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
+            VITE_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
+            VITE_PUBLIC_WEB_SOCKET_URL=${{ secrets.VITE_PUBLIC_WEB_SOCKET_URL }}
+          platforms: linux/amd64
+          cache-from: type=local,src=/tmp/.buildkit-cache-web
+          cache-to: type=local,dest=/tmp/.buildkit-cache-web,mode=max
+      
+      - name: Output image details
+        run: |
+          echo "✅ Web Docker image built and pushed!"
+          echo "📦 Image tags:"
+          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'

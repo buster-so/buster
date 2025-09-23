@@ -1,0 +1,17 @@
+version: v2
+name: electric
+services:
+  - name: electric
+    run: ""
+    type: web
+    instances: 1
+    cpuCores: 0.88
+    ramMegabytes: 256
+    terminationGracePeriodSeconds: 30
+    port: 3000
+    sleep: false
+    serviceMeshEnabled: false
+image:
+  repository: docker.io/electricsql/electric
+  tag: latest
+deploymentStrategy: {}

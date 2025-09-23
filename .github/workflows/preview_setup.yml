@@ -1,48 +1,104 @@
+name: Deploy Preview Environment
+
 on:
-  pull_request:
-    branches:
-    - staging
+  workflow_run:
+    workflows: ["Build and Push Docker Images"]
     types:
-    - opened
-    - synchronize
+      - completed
+    branches: [staging]
     
-name: Deploy to Preview Environment
 jobs:
-  porter-deploy:
+  deploy-preview:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Set Github tag
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.workflow_run.head_sha }}
+    
+    - name: Set Github variables
       id: vars
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      run: |
+        SHA_SHORT=$(git rev-parse --short=7 HEAD)
+        echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+        
+        # Get PR number from the workflow run
+        PR_NUMBER=$(gh api repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }}/pulls --jq '.[0].number' || echo "")
+        echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+        
+        echo "🔍 SHA: ${SHA_SHORT}"
+        echo "🔍 PR: ${PR_NUMBER}"
+      env:
+        GH_TOKEN: ${{ github.token }}
+    
     - name: Setup porter
       uses: porter-dev/setup-porter@v0.1.0
-    - name: Deploy staging API
+    
+    - name: Deploy API preview
       timeout-minutes: 30
-      run: exec porter apply -f ./apps/api/porter.yaml --preview
+      run: |
+        # Create temporary porter.yaml with the Docker image
+        cat > /tmp/porter-api.yaml <<EOF
+        version: v2
+        name: staging
+        services:
+        - name: api
+          run: ""
+          type: web
+          image:
+            repository: ghcr.io/buster-so/buster-api
+            tag: preview-${{ steps.vars.outputs.sha_short }}
+          instances: 1
+          cpuCores: 1
+          ramMegabytes: 2048
+          port: 3000
+        EOF
+        
+        exec porter apply -f /tmp/porter-api.yaml --preview
       env:
         PORTER_CLUSTER: 3155
         PORTER_HOST: https://dashboard.porter.run
         PORTER_PROJECT: 9309
         PORTER_APP_NAME: staging
-        PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
+        PORTER_TAG: preview-${{ steps.vars.outputs.sha_short }}
         PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
-        PORTER_PR_NUMBER: ${{ github.event.number }}
+        PORTER_PR_NUMBER: ${{ steps.vars.outputs.pr_number }}
         PORTER_REPO_NAME: ${{ github.event.repository.name }}
-    - name: Deploy staging server
+    
+    - name: Deploy Server preview
       timeout-minutes: 30
-      run: exec porter apply -f ./apps/server/porter.yaml --preview
+      run: |
+        # Create temporary porter.yaml with the Docker image
+        cat > /tmp/porter-server.yaml <<EOF
+        version: v2
+        name: staging-server
+        services:
+        - name: server
+          run: ""
+          type: web
+          image:
+            repository: ghcr.io/buster-so/buster-server
+            tag: preview-${{ steps.vars.outputs.sha_short }}
+          instances: 1
+          cpuCores: 1
+          ramMegabytes: 2048
+          port: 3000
+        EOF
+        
+        exec porter apply -f /tmp/porter-server.yaml --preview
       env:
         PORTER_CLUSTER: 3155
         PORTER_HOST: https://dashboard.porter.run
         PORTER_PROJECT: 9309
         PORTER_APP_NAME: staging-server
-        PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
+        PORTER_TAG: preview-${{ steps.vars.outputs.sha_short }}
         PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
-        PORTER_PR_NUMBER: ${{ github.event.number }}
+        PORTER_PR_NUMBER: ${{ steps.vars.outputs.pr_number }}
         PORTER_REPO_NAME: ${{ github.event.repository.name }}
-    - name: Deploy electric server
+    
+    - name: Deploy Electric server preview
       timeout-minutes: 30
       run: exec porter apply -f ./apps/electric-server/porter.yaml --preview
       env:
@@ -52,5 +108,12 @@ jobs:
         PORTER_APP_NAME: electric
         PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
         PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
-        PORTER_PR_NUMBER: ${{ github.event.number }}
+        PORTER_PR_NUMBER: ${{ steps.vars.outputs.pr_number }}
         PORTER_REPO_NAME: ${{ github.event.repository.name }}
+    
+    - name: Output deployment URLs
+      run: |
+        echo "✅ Preview environment deployed!"
+        echo ""
+        echo "🔗 Deployment URLs will be available in Porter dashboard"
+        echo "   PR #${{ steps.vars.outputs.pr_number }} - SHA: ${{ steps.vars.outputs.sha_short }}"
