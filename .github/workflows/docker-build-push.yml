@@ -347,8 +347,6 @@ jobs:
     environment: testing
     outputs:
       server_url: ${{ steps.deploy.outputs.server_url }}
-    outputs:
-      server_url: ${{ steps.deploy.outputs.server_url }}
       database_url: ${{ steps.supabase-branch.outputs.database_url }}
     
     steps:
