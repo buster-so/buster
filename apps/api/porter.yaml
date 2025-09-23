@@ -1,0 +1,20 @@
+version: v2
+name: staging
+services:
+  - name: staging
+    run: ""
+    type: web
+    instances: 1
+    cpuCores: 1
+    ramMegabytes: 1000
+    terminationGracePeriodSeconds: 30
+    port: 3001
+    sleep: false
+    serviceMeshEnabled: false
+build:
+  context: ./apps/api
+  method: docker
+  dockerfile: ./apps/api/Dockerfile
+envGroups:
+  - staging
+deploymentStrategy: {}
