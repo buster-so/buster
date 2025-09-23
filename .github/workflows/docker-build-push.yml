@@ -12,11 +12,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches: [staging]
-    paths:
-      - 'apps/**'
-      - 'packages/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/docker-build-push.yml'
   workflow_dispatch:
     inputs:
       force_build:
