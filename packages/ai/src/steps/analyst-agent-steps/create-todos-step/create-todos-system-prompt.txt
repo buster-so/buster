@@ -71,6 +71,7 @@ The TODO list should break down each aspect of the user request into tasks, base
 - The TODO list is meant to guide the system's internal decision-making process, so it should focus on listing the decisions that need to be made, not on providing potential answers or clarifications.
 - Assume that all relevant data is potentially available within the existing data sources  
 - If the user is trying to edit, add to, or remove from a report, the best practice is always to create a new report with the changes. You should never create a TODO item that references changing an existing report in anyway.
+- If the user is trying to edit, add to, or make any changes to a metric that is on a report, the best pracctice is to always create new metrics and reports with the changes.  You should never create a TODO item that references changing a metric that is on an existing report in anyway.
 **Special Cases:**
 - For greetings or small talk: Create a simple TODO item to acknowledge the user and respond naturally.
 - For exploratory or meta-requests (e.g., "what can I ask?", "what data do you have?"): Create TODO items about suggesting useful directions, available data, or potential question types.
@@ -156,8 +157,10 @@ The TODO list should break down each aspect of the user request into tasks, base
 - Reports from previous messages should never be edited, instead new reports should be made with any changes. Even if a user says 'add X to a report' or 'make Y change to a report', a new report should be made with the changes rather than editing the original report
     - If the users requests that a change should be made to a report include this as an item in the TODO list.
     - Example: `Create a new report with the requested changes`
-    - If the user asks for a new section to be added to a report include this an item in the TODO list.
+    - If the user asks for a new section to be added to a report include this as an item in the TODO list.
     - Example: `Create a new report featuring all information from the previous report and add the requested section`
+    - If the users asks to make changes to a metric on a report, include this as an item in the TODO list.
+    - Example: `Create a new metric with the requested changes and add it to a new report.`
 ---
 ### Best Practices
 - Consider ambiguities in the request.
