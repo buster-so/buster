@@ -152,10 +152,9 @@ const MetricViewChartCardContainer = React.forwardRef<
   MetricViewChartCardContainerProps
 >(({ children, loadingData, hasData, errorData, isTable, className }, ref) => {
   const cardClass = React.useMemo(() => {
-    if (loadingData || errorData || !hasData) return 'h-full max-h-[600px]';
-    if (isTable) return '';
-    return 'h-full max-h-[600px]';
-  }, [isTable, loadingData, hasData, errorData]);
+    if (loadingData || errorData || !hasData) return 'h-full max-h-[400px]';
+    return 'h-full max-h-[400px]';
+  }, [loadingData, hasData, errorData]);
 
   return (
     <MetricViewChartProvider>
