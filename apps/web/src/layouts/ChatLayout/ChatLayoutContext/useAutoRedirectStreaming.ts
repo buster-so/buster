@@ -9,6 +9,7 @@ import {
   useGetChatMessageIsFinishedReasoning,
   useGetChatMessageLastReasoningMessageId,
 } from '@/context/Chats/useGetChatMessage';
+import { useWindowFocus } from '@/hooks/useWindowFocus';
 import { assetParamsToRoute } from '@/lib/assets/assetParamsToRoute';
 
 export const useAutoRedirectStreaming = ({
@@ -28,6 +29,7 @@ export const useAutoRedirectStreaming = ({
   const hasResponseFile = useGetChatMessageHasResponseFile({ messageId: lastMessageId });
 
   const previousIsCompletedStream = useRef<boolean>(isStreamFinished);
+  const forceNavigationCheck = useRef<boolean>(false);
 
   const hasLoadedChat = useHasLoadedChat({ chatId: chatId || '' });
 
@@ -36,6 +38,12 @@ export const useAutoRedirectStreaming = ({
   useLayoutEffect(() => {
     previousIsCompletedStream.current = isStreamFinished;
   }, [hasLoadedChat]);
+
+  useWindowFocus(() => {
+    if (hasLoadedChat && chatId) {
+      forceNavigationCheck.current = true;
+    }
+  });
 
   //streaming logic to redirect
   useEffect(() => {
@@ -72,7 +80,7 @@ export const useAutoRedirectStreaming = ({
       navigate({
         to: '/app/chats/$chatId/reasoning/$messageId',
         params: {
-          chatId,
+          chatId: chatId,
           messageId: lastMessageId,
         },
         replace: true,
@@ -83,7 +91,7 @@ export const useAutoRedirectStreaming = ({
     else if (
       isFinishedReasoning &&
       isStreamFinished &&
-      previousIsCompletedStream.current === false &&
+      (previousIsCompletedStream.current === false || forceNavigationCheck.current) &&
       !firstFileId
     ) {
       //no file is found, so we need to collapse the chat
@@ -91,10 +99,12 @@ export const useAutoRedirectStreaming = ({
       navigate({
         to: '/app/chats/$chatId',
         params: {
-          chatId,
+          chatId: chatId,
         },
         replace: true,
       });
+      
+      forceNavigationCheck.current = false;
     }
-  }, [isStreamFinished, hasReasoning, hasResponseFile, chatId, lastMessageId, isFinishedReasoning]); //only use these values to trigger the useEffect
+  }, [isStreamFinished, hasReasoning, hasResponseFile, chatId, lastMessageId, isFinishedReasoning, forceNavigationCheck.current]); //only use these values to trigger the useEffect
 };
