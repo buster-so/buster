@@ -33,7 +33,7 @@ jobs:
           TURBO_TELEMETRY_DISABLED: 1
 
       - name: Deploy preview branch
-        run: npx trigger.dev@latest deploy --env preview
+        run: pnpm dlx trigger.dev@latest deploy --env preview
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
 
