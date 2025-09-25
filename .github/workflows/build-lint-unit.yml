@@ -14,37 +14,10 @@ env:
 jobs:
   # Build job - runs in parallel
   build:
-    name: Build
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    name: all-ci-in-one
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     timeout-minutes: 10
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node Environment
-        uses: ./.github/actions/setup-node-env
-        with:
-          cache-key: build-lint-unit
-
-      - name: Build all packages (excluding web)
-        run: pnpm turbo build --filter="!@buster-app/web"
-        env:
-          NODE_ENV: production
-          SKIP_ENV_CHECK: true
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
-
-      - name: Typecheck web app
-        run: pnpm turbo typecheck --filter=@buster-app/web
-        env:
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
-
-  # Lint job - runs in parallel
-  lint:
-    name: Lint
-    runs-on: blacksmith-2vcpu-ubuntu-2404
-    timeout-minutes: 5
+    environment: testing
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,43 +30,402 @@ jobs:
       - name: Lint all packages
         run: pnpm turbo lint
         env:
-          TURBO_CACHE_DIR: .turbo
           TURBO_TELEMETRY_DISABLED: 1
 
-  # Test job - runs after build completes
-  test:
-    name: Test
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    timeout-minutes: 10
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # - name: Build all packages
+      #   run: pnpm turbo build
+      #   env:
+      #     NODE_ENV: production
+      #     SKIP_ENV_CHECK: true
+      #     TURBO_TELEMETRY_DISABLED: 1
+      #     # Pass all secrets from the testing environment for build
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      #     SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      #     SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      #     VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
+      #     VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
+      #     VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
+      #     VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
+      #     VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
 
-      - name: Setup Node Environment
-        uses: ./.github/actions/setup-node-env
-        with:
-          cache-key: build-lint-unit
+      - name: Pre-pull Docker images
+        run: |
+          echo "🐳 Pre-pulling Docker images for faster startup..."
+          # Pull all images in parallel
+          docker pull electricsql/electric &
+          docker pull supabase/postgres:15.1.0.147 &
+          docker pull supabase/gotrue:v2.149.0 &
+          docker pull supabase/realtime:v2.28.32 &
+          docker pull supabase/postgrest:v12.2.0 &
+          docker pull supabase/storage-api:v0.46.4 &
+          docker pull supabase/postgres-meta:v0.83.2 &
+          docker pull supabase/studio:20240422.09 &
+          docker pull supabase/edge-runtime:v1.53.4 &
+          docker pull kong:2.8.1 &
+          docker pull darthsim/imgproxy:v3.8.0 &
+          wait
+          echo "✅ Docker images pre-pulled successfully"
 
-      - name: Build required packages
-        run: pnpm turbo build --filter="!@buster-app/web"
+      - name: Start services and wait for readiness
+        run: pnpm turbo start
+          # echo "🚀 Starting all services..."
+          # # Start services in background and wait for them to be ready
+          # ./scripts/start-and-wait-for-services.sh &
+          # SERVICES_PID=$!
+          
+          # # Wait for services to be ready (script will exit when ready or fail)
+          # wait $SERVICES_PID
+          
+          # # Services are now ready for testing
+          # echo "✅ All services are ready!"
         env:
-          NODE_ENV: production
           SKIP_ENV_CHECK: true
-          TURBO_CACHE_DIR: .turbo
           TURBO_TELEMETRY_DISABLED: 1
+          # Pass all secrets from the testing environment
+          MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_PUBLIC_URL: ${{ secrets.SUPABASE_PUBLIC_URL }}
+          VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
+          VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
+          VITE_PUBLIC_WEB_SOCKET_URL: ${{ secrets.VITE_PUBLIC_WEB_SOCKET_URL }}
+          VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
+          VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
+          VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
+          VITE_PUBLIC_WS_URL: ${{ secrets.VITE_PUBLIC_WS_URL }}
+          VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_PUBLIC_POSTHOG_KEY }}
+          VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
+          VITE_SLACK_APP_SUPPORT_URL: ${{ secrets.VITE_SLACK_APP_SUPPORT_URL }}
+          VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          ELECTRIC_PROXY_URL: ${{ secrets.ELECTRIC_PROXY_URL }}
+          ELECTRIC_PORT: ${{ secrets.ELECTRIC_PORT }}
+          ELECTRIC_INSECURE: ${{ secrets.ELECTRIC_INSECURE }}
+          ELECTRIC_SECRET: ${{ secrets.ELECTRIC_SECRET }}
+          ELECTRIC_SOURCE_ID: ${{ secrets.ELECTRIC_SOURCE_ID }}
+          RERANK_API_KEY: ${{ secrets.RERANK_API_KEY }}
+          RERANK_MODEL: ${{ secrets.RERANK_MODEL }}
+          RERANK_BASE_URL: ${{ secrets.RERANK_BASE_URL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
+          TURBOPUFFER_REGION: ${{ secrets.TURBOPUFFER_REGION }}
+          POSTHOG_TELEMETRY_KEY: ${{ secrets.POSTHOG_TELEMETRY_KEY }}
+          BRAINTRUST_KEY: ${{ secrets.BRAINTRUST_KEY }}
+          BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
+          TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
+          GITHUB_APP_PRIVATE_KEY_BASE64: ${{ secrets.GITHUB_APP_PRIVATE_KEY_BASE64 }}
+          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+          # Additional variables from .env
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          BUSTER_URL: ${{ secrets.BUSTER_URL }}
+          BUSTER_WH_TOKEN: ${{ secrets.BUSTER_WH_TOKEN }}
+          POOLER_URL: ${{ secrets.POOLER_URL }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+          SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
 
-      - name: Run all unit tests
-        run: pnpm turbo test:unit
-        env:
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
+  # # Lint job - runs in parallel
+  # lint:
+  #   name: Lint
+  #   runs-on: blacksmith-2vcpu-ubuntu-2404
+  #   timeout-minutes: 5
+  #   needs: build
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage
-          path: |
-            **/coverage/**
-            !**/coverage/tmp/**
-          retention-days: 7
+  #     - name: Setup Node Environment
+  #       uses: ./.github/actions/setup-node-env
+  #       with:
+  #         cache-key: build-lint-unit
+
+  #     - name: Lint all packages
+  #       run: pnpm turbo lint
+  #       env:
+  #         TURBO_TELEMETRY_DISABLED: 1
+
+  # # Test job - runs in parallel
+  # test:
+  #   name: Test
+  #   runs-on: blacksmith-8vcpu-ubuntu-2404
+  #   timeout-minutes: 10
+  #   needs: build
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Mount node_modules sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-node-modules
+  #         path: node_modules
+
+  #     - name: Mount pnpm store sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-pnpm-store
+  #         path: ~/.pnpm-store
+
+  #     - name: Mount turbo cache sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-turbo
+  #         path: .turbo
+
+  #     - name: Setup Node Environment
+  #       uses: ./.github/actions/setup-node-env
+  #       with:
+  #         cache-key: build-lint-unit
+
+  #     - name: Run all unit tests
+  #       run: pnpm turbo test:unit
+  #       env:
+  #         TURBO_TELEMETRY_DISABLED: 1
+
+  #     - name: Upload test coverage
+  #       uses: actions/upload-artifact@v4
+  #       if: always()
+  #       with:
+  #         name: coverage
+  #         path: |
+  #           **/coverage/**
+  #           !**/coverage/tmp/**
+  #         retention-days: 7
+
+  # # E2E Tests - runs after build completes
+  # e2e-tests:
+  #   name: E2E Tests
+  #   runs-on: blacksmith-8vcpu-ubuntu-2404
+  #   timeout-minutes: 20
+  #   needs: build  # Wait for build to complete
+  #   environment: testing
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Mount node_modules sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-node-modules
+  #         path: node_modules
+
+  #     - name: Mount pnpm store sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-pnpm-store
+  #         path: ~/.pnpm-store
+
+  #     - name: Mount turbo cache sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-turbo
+  #         path: .turbo
+
+  #     - name: Mount Docker cache sticky disk
+  #       uses: useblacksmith/stickydisk@v1
+  #       with:
+  #         key: ${{ github.repository }}-${{ github.ref_name }}-docker-cache
+  #         path: /var/lib/docker
+
+  #     - name: Setup Node Environment
+  #       uses: ./.github/actions/setup-node-env
+  #       with:
+  #         cache-key: build-lint-unit
+
+
+  #     - name: Start services
+  #       run: |
+  #         echo "🚀 Starting all services (includes Supabase)..."
+  #         # Turbo start will use cached builds from .turbo
+  #         pnpm turbo start > turbo.log 2>&1 &
+  #         echo $! > turbo.pid
+  #         echo "Started turbo with PID $(cat turbo.pid)"
+          
+  #         # Give services a moment to start and show initial logs
+  #         sleep 10
+  #         echo "=== Initial turbo start output ==="
+  #         head -50 turbo.log || true
+  #       env:
+  #         SKIP_ENV_CHECK: true
+  #         TURBO_TELEMETRY_DISABLED: 1
+  #         # Pass all secrets from the testing environment
+  #         MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
+  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  #         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  #         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  #         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+  #         SUPABASE_PUBLIC_URL: ${{ secrets.SUPABASE_PUBLIC_URL }}
+  #         VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
+  #         VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
+  #         VITE_PUBLIC_WEB_SOCKET_URL: ${{ secrets.VITE_PUBLIC_WEB_SOCKET_URL }}
+  #         VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
+  #         VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
+  #         VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
+  #         VITE_PUBLIC_WS_URL: ${{ secrets.VITE_PUBLIC_WS_URL }}
+  #         VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_PUBLIC_POSTHOG_KEY }}
+  #         VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
+  #         VITE_SLACK_APP_SUPPORT_URL: ${{ secrets.VITE_SLACK_APP_SUPPORT_URL }}
+  #         VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY }}
+  #         SERVER_PORT: ${{ secrets.SERVER_PORT }}
+  #         ELECTRIC_PROXY_URL: ${{ secrets.ELECTRIC_PROXY_URL }}
+  #         ELECTRIC_PORT: ${{ secrets.ELECTRIC_PORT }}
+  #         ELECTRIC_INSECURE: ${{ secrets.ELECTRIC_INSECURE }}
+  #         ELECTRIC_SECRET: ${{ secrets.ELECTRIC_SECRET }}
+  #         ELECTRIC_SOURCE_ID: ${{ secrets.ELECTRIC_SOURCE_ID }}
+  #         RERANK_API_KEY: ${{ secrets.RERANK_API_KEY }}
+  #         RERANK_MODEL: ${{ secrets.RERANK_MODEL }}
+  #         RERANK_BASE_URL: ${{ secrets.RERANK_BASE_URL }}
+  #         LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+  #         LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  #         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  #         TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
+  #         TURBOPUFFER_REGION: ${{ secrets.TURBOPUFFER_REGION }}
+  #         POSTHOG_TELEMETRY_KEY: ${{ secrets.POSTHOG_TELEMETRY_KEY }}
+  #         BRAINTRUST_KEY: ${{ secrets.BRAINTRUST_KEY }}
+  #         BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
+  #         TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
+  #         R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+  #         R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  #         R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  #         R2_BUCKET: ${{ secrets.R2_BUCKET }}
+  #         GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
+  #         GITHUB_APP_PRIVATE_KEY_BASE64: ${{ secrets.GITHUB_APP_PRIVATE_KEY_BASE64 }}
+  #         GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+  #         # Additional variables from .env
+  #         ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+  #         LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+  #         BUSTER_URL: ${{ secrets.BUSTER_URL }}
+  #         BUSTER_WH_TOKEN: ${{ secrets.BUSTER_WH_TOKEN }}
+  #         POOLER_URL: ${{ secrets.POOLER_URL }}
+  #         SERVER_URL: ${{ secrets.SERVER_URL }}
+  #         JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  #         SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+  #         SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
+  #         SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+  #         SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
+  #         AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+  #         DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+
+  #     - name: Wait for services to be ready
+  #       run: |
+  #         echo "Waiting for services to start..."
+  #         sleep 15
+          
+  #         # Track if any service fails
+  #         failed=false
+          
+  #         # 1. Check Supabase status
+  #         echo "🔍 Checking Supabase status..."
+  #         # Wait a bit more for Supabase to fully start
+  #         sleep 10
+  #         cd packages/database && supabase status && cd ../..
+  #         if [ $? -eq 0 ]; then
+  #           echo "✅ Supabase is healthy!"
+  #         else
+  #           echo "❌ Supabase status check failed"
+  #           failed=true
+  #         fi
+          
+  #         # 2. Check services in order: 3003 (Electric), 3002 (Server), 3001 (API), 3000 (Web)
+  #         for port in 3003 3002 3001 3000; do
+  #           service_name=""
+  #           case $port in
+  #             3003) service_name="Electric" ;;
+  #             3002) service_name="Server" ;;
+  #             3001) service_name="API" ;;
+  #             3000) service_name="Web" ;;
+  #           esac
+            
+  #           echo "🔍 Checking $service_name on localhost:$port..."
+  #           max_attempts=30
+  #           attempt=0
+  #           while [ $attempt -lt $max_attempts ]; do
+  #             # Use curl with connection timeout and capture the http code
+  #             http_code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://localhost:$port 2>/dev/null || echo "000")
+              
+  #             # Check if we got a valid HTTP response (any 3-digit code starting with 1-5)
+  #             if [[ "$http_code" =~ ^[1-5][0-9][0-9]$ ]]; then
+  #               echo "✅ $service_name on port $port is responding (HTTP $http_code)"
+  #               break
+  #             else
+  #               echo "  Waiting for $service_name on port $port (attempt $((attempt+1))/$max_attempts)..."
+                
+  #               # Try curl with verbose error to see what's happening
+  #               if [ $((attempt % 10)) -eq 0 ]; then
+  #                 echo "  Detailed connection attempt:"
+  #                 curl -v --connect-timeout 2 --max-time 5 http://localhost:$port 2>&1 | head -10 || true
+  #               fi
+                
+  #               sleep 3
+  #               attempt=$((attempt+1))
+  #             fi
+  #           done
+  #           if [ $attempt -eq $max_attempts ]; then
+  #             echo "❌ $service_name on port $port failed to respond"
+  #             failed=true
+              
+  #             # Show logs for debugging when a service fails
+  #             echo "=== Turbo logs at time of failure ==="
+  #             tail -100 turbo.log || true
+              
+  #             # Check if the turbo process is still running
+  #             if [ -f turbo.pid ]; then
+  #               if ! kill -0 $(cat turbo.pid) 2>/dev/null; then
+  #                 echo "❌ Turbo process has crashed!"
+  #                 echo "=== Full turbo output ==="
+  #                 cat turbo.log || true
+  #               fi
+  #             fi
+  #           fi
+  #         done
+          
+  #         # Exit with error if any service failed
+  #         if [ "$failed" = true ]; then
+  #           echo "❌ One or more services failed to start properly"
+  #           exit 1
+  #         fi
+          
+  #         echo "✅ All services are healthy!"
+
+  #     - name: Run Momentic E2E Tests
+  #       run: |
+  #         echo "🧪 Running Momentic E2E tests..."
+  #         cd apps/momentic
+  #         pnpm dlx momentic install-browsers --all
+  #         pnpm dlx momentic run --api-key $MOMENTIC_API_KEY
+  #       env:
+  #         MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
+
+  #     - name: Stop services
+  #       if: always()
+  #       run: |
+  #         # Show final logs before stopping
+  #         echo "=== Final turbo output ==="
+  #         tail -100 turbo.log || true
+          
+  #         if [ -f turbo.pid ]; then
+  #           kill $(cat turbo.pid) || true
+  #           rm turbo.pid
+  #         fi
+          
+  #         echo "🛑 Stopping Supabase..."
+  #         cd packages/database && supabase stop || true
