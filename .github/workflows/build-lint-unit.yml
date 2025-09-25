@@ -72,18 +72,12 @@ jobs:
           wait
           echo "✅ Docker images pre-pulled successfully"
 
-      - name: Start services and wait for readiness
-        run: pnpm turbo start
-          # echo "🚀 Starting all services..."
-          # # Start services in background and wait for them to be ready
-          # ./scripts/start-and-wait-for-services.sh &
-          # SERVICES_PID=$!
-          
-          # # Wait for services to be ready (script will exit when ready or fail)
-          # wait $SERVICES_PID
-          
-          # # Services are now ready for testing
-          # echo "✅ All services are ready!"
+      - name: Start services in background
+        run: |
+          echo "🚀 Starting all services in background..."
+          pnpm turbo start > turbo.log 2>&1 &
+          echo $! > turbo.pid
+          echo "Started turbo with PID $(cat turbo.pid)"
         env:
           SKIP_ENV_CHECK: true
           TURBO_TELEMETRY_DISABLED: 1
@@ -146,6 +140,124 @@ jobs:
           SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+
+      - name: Wait for services to be ready
+        run: |
+          echo "⏳ Waiting for services to be ready..."
+          
+          # Function to check if a service is ready
+          check_service() {
+            local port=$1
+            local service_name=$2
+            local max_attempts=60
+            local attempt=0
+
+            echo "🔍 Checking $service_name on port $port..."
+            
+            while [ $attempt -lt $max_attempts ]; do
+              if curl -s --connect-timeout 2 --max-time 5 http://localhost:$port > /dev/null 2>&1; then
+                echo "✅ $service_name is ready!"
+                return 0
+              fi
+              
+              echo "  Waiting for $service_name (attempt $((attempt+1))/$max_attempts)..."
+              sleep 3
+              attempt=$((attempt+1))
+            done
+            
+            echo "❌ $service_name failed to start on port $port"
+            return 1
+          }
+
+          # Function to check database
+          check_database() {
+            local max_attempts=40
+            local attempt=0
+            
+            echo "🔍 Checking database connectivity..."
+            
+            while [ $attempt -lt $max_attempts ]; do
+              if pg_isready -h localhost -p 54322 -U postgres > /dev/null 2>&1; then
+                echo "✅ Database is ready!"
+                return 0
+              fi
+              
+              echo "  Waiting for database (attempt $((attempt+1))/$max_attempts)..."
+              sleep 2
+              attempt=$((attempt+1))
+            done
+            
+            echo "❌ Database failed to start"
+            return 1
+          }
+
+          # Check database first
+          if ! check_database; then
+            echo "💥 Database startup failed"
+            echo "=== Turbo logs ==="
+            tail -50 turbo.log || true
+            exit 1
+          fi
+
+          # Check services in order
+          services=(
+            "3003:Electric"
+            "3002:Server" 
+            "3001:API"
+            "3000:Web"
+          )
+
+          failed_services=()
+          for service in "${services[@]}"; do
+            port=$(echo $service | cut -d: -f1)
+            name=$(echo $service | cut -d: -f2)
+            
+            if ! check_service $port "$name"; then
+              failed_services+=("$name")
+            fi
+          done
+
+          # Report results
+          if [ ${#failed_services[@]} -eq 0 ]; then
+            echo "🎉 All services are ready!"
+            echo "📊 Service Status:"
+            echo "  Database: ✅ (port 54322)"
+            for service in "${services[@]}"; do
+              port=$(echo $service | cut -d: -f1)
+              name=$(echo $service | cut -d: -f2)
+              echo "  $name: ✅ (port $port)"
+            done
+          else
+            echo "💥 Some services failed to start: ${failed_services[*]}"
+            echo "=== Turbo logs ==="
+            tail -50 turbo.log || true
+            exit 1
+          fi
+
+      - name: Install browsers
+        run: npx momentic install-browsers --all
+
+      - name: Test
+        run: npx momentic run
+        continue-on-error: true
+        env:
+          MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
+
+      - name: Upload results
+        run: npx momentic results upload test-results
+        env:
+          MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
+
+      - name: Stop services
+        if: always()
+        run: |
+          echo "🛑 Stopping services..."
+          if [ -f turbo.pid ]; then
+            kill $(cat turbo.pid) || true
+            rm turbo.pid
+          fi
+          echo "=== Final turbo output ==="
+          tail -100 turbo.log || true
 
   # # Lint job - runs in parallel
   # lint:
