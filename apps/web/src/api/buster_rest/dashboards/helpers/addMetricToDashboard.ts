@@ -1,6 +1,6 @@
+import { MAX_NUMBER_OF_ITEMS, NUMBER_OF_COLUMNS } from '@buster/server-shared/dashboards';
 import { v4 as uuidv4 } from 'uuid';
 import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
-import { MAX_NUMBER_OF_ITEMS, NUMBER_OF_COLUMNS } from '../../../asset_interfaces/dashboard/config';
 
 export const addMetricToDashboardConfig = (
   metricIds: string[],

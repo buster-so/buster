@@ -1,6 +1,6 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSearch } from '@tanstack/react-router';
-import { useCallback, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useGetAssetVersionNumber } from '@/api/response-helpers/common-version-number';
 import type { BusterDashboardResponse } from '../../asset_interfaces/dashboard/interfaces';
 import { dashboardQueryKeys } from '../../query_keys/dashboard';
 
@@ -10,33 +10,13 @@ const stableVersionSearchSelector = (state: { dashboard_version_number?: number 
 
 export const useGetDashboardVersionNumber = (
   dashboardId: string,
-  versionNumber: number | 'LATEST' = 'LATEST'
+  versionNumber: number | 'LATEST' | undefined
 ) => {
-  const { data: latestVersionNumber } = useQuery({
-    ...dashboardQueryKeys.dashboardGetDashboard(dashboardId, 'LATEST'),
-    enabled: false,
-    select: stableVersionDataSelector,
-  });
-
-  // Get the dashboard_version_number query param from the route
-  const paramVersionNumber = useSearch({
-    select: stableVersionSearchSelector,
-    strict: false,
-  });
-
-  const isLatest = versionNumber === 'LATEST' || latestVersionNumber === versionNumber;
-
-  const selectedVersionNumber = isLatest
-    ? ('LATEST' as const)
-    : (versionNumber ?? paramVersionNumber ?? 'LATEST');
-
-  return useMemo(
-    () => ({
-      selectedVersionNumber,
-      latestVersionNumber,
-      paramVersionNumber,
-    }),
-    [latestVersionNumber, selectedVersionNumber, paramVersionNumber]
+  return useGetAssetVersionNumber(
+    dashboardQueryKeys.dashboardGetDashboard(dashboardId, 'LATEST'),
+    versionNumber,
+    stableVersionDataSelector,
+    stableVersionSearchSelector
   );
 };
 

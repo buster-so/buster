@@ -18,15 +18,19 @@ import { StylingAppVisualize } from './StylingAppVisualize';
 
 export const MetricStylingApp: React.FC<{
   metricId: string;
-}> = ({ metricId }) => {
+  metricVersionNumber: number | undefined | 'LATEST';
+}> = ({ metricId, metricVersionNumber }) => {
   const [segment, setSegment] = useState<MetricStylingAppSegments>(
     MetricStylingAppSegments.VISUALIZE
   );
   const { data: chartConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, versionNumber: metricVersionNumber },
     { select: useCallback((x: BusterMetric) => x.chart_config, []) }
   );
-  const { data: metricData } = useGetMetricData({ id: metricId }, { enabled: true });
+  const { data: metricData } = useGetMetricData(
+    { id: metricId, versionNumber: metricVersionNumber },
+    { enabled: true }
+  );
   const colors = useSelectedColorPalette(chartConfig?.colors);
 
   if (!chartConfig) return null;

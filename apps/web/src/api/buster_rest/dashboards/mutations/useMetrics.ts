@@ -1,7 +1,7 @@
+import { MAX_NUMBER_OF_ITEMS_ON_DASHBOARD } from '@buster/server-shared/dashboards';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { create } from 'mutative';
 import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
-import { MAX_NUMBER_OF_ITEMS_ON_DASHBOARD } from '@/api/asset_interfaces/dashboard/config';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { createDashboardFullConfirmModal } from '@/components/features/modals/createDashboardFullConfirmModal';
 import { useBusterNotifications } from '@/context/BusterNotifications';

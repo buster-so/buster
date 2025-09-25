@@ -39,6 +39,7 @@ export const Default: Story = {
     open: true,
     onClose: fn(),
     dashboardId: 'dashboard-1',
+    dashboardVersionNumber: 1,
   },
 };
 
@@ -47,5 +48,6 @@ export const EmptyState: Story = {
     open: true,
     onClose: fn(),
     dashboardId: 'dashboard-1',
+    dashboardVersionNumber: undefined,
   },
 };

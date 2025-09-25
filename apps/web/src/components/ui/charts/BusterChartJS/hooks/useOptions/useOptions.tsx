@@ -141,6 +141,7 @@ export const useOptions = ({
     y2AxisScaleType,
     y2AxisStartAxisAtZero,
     columnMetadata,
+    yAxis,
   });
 
   const isHorizontalBar = useMemo(() => {

@@ -77,7 +77,7 @@ export const PolicyCheck: React.FC<{
       },
       {
         text: 'Passwords match',
-        check: password === password2 || password2 === undefined,
+        check: (password && password === password2) || password2 === undefined,
       },
     ];
 

@@ -5,7 +5,7 @@ import { MetricSaveFilePopup } from './MetricSaveFilePopup';
 
 export const MetricViewChartController: React.FC<{
   metricId: string;
-  versionNumber?: number;
+  versionNumber: number | undefined;
   readOnly?: boolean;
   className?: string;
   cardClassName?: string;

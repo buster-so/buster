@@ -177,22 +177,18 @@ async function processEditOperations(
 
   // Write all changes to database in one operation
   try {
-    // Wait for ALL pending delta writes to complete before doing final update
-    if (state?.pendingDbWrites && state.pendingDbWrites.length > 0) {
-      console.info(
-        `[modify-reports-execute] Waiting for ${state.pendingDbWrites.length} pending delta writes to complete`
-      );
+    // Wait for the last delta write to complete before doing final update
+    if (state?.lastUpdate) {
+      console.info('[modify-reports-execute] Waiting for last delta write to complete');
       try {
-        // Wait for all writes to complete (some may fail, that's OK)
-        await Promise.allSettled(state.pendingDbWrites);
-        // Add small delay to ensure we're absolutely last
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        // Wait for the last write in the chain to complete
+        await state.lastUpdate;
         console.info(
-          '[modify-reports-execute] All delta writes completed, proceeding with final update'
+          '[modify-reports-execute] Last delta write completed, proceeding with final update'
         );
       } catch (error) {
         console.warn(
-          '[modify-reports-execute] Error waiting for delta writes, proceeding with final update:',
+          '[modify-reports-execute] Error waiting for last delta write, proceeding with final update:',
           error
         );
       }
@@ -325,7 +321,7 @@ const modifyReportsFile = wrapTraced(
       messageId,
       snapshotContent, // Pass immutable snapshot
       versionHistory, // Pass snapshot version history
-      state // Pass state to access lastDbWritePromise
+      state // Pass state to access lastUpdate
     );
 
     // Track file associations if this is a new version (not part of same turn)
@@ -417,7 +413,7 @@ export function createModifyReportsExecute(
           context,
           state.snapshotContent, // Pass immutable snapshot from state
           state.versionHistory, // Pass snapshot version history from state
-          state // Pass state to access lastDbWritePromise
+          state // Pass state to access lastUpdate
         );
 
         if (!result) {

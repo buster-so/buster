@@ -26,7 +26,7 @@ export const MetricContainerHeaderButtons: React.FC<{
     metricId: metricId || '',
   });
   const { error: metricError, data: permission } = useGetMetric(
-    { id: metricId },
+    { id: metricId, versionNumber: metricVersionNumber },
     { select: useCallback((x: BusterMetric) => x.permission, []) }
   );
 
@@ -39,7 +39,9 @@ export const MetricContainerHeaderButtons: React.FC<{
   return (
     <FileButtonContainer>
       {isEditor && !isViewingOldVersion && <EditChartButton />}
-      {isEffectiveOwner && !isViewingOldVersion && <ShareMetricButton metricId={metricId} />}
+      {isEffectiveOwner && !isViewingOldVersion && (
+        <ShareMetricButton metricId={metricId} metricVersionNumber={metricVersionNumber} />
+      )}
       <MetricThreeDotMenuButton
         metricId={metricId}
         isViewingOldVersion={isViewingOldVersion}
@@ -71,19 +73,37 @@ const EditChartButton = React.memo(() => {
 });
 EditChartButton.displayName = 'EditChartButton';
 
-const SaveToCollectionButton = React.memo(({ metricId }: { metricId: string }) => {
-  return <SaveMetricToCollectionButton metricId={metricId} />;
-});
+const SaveToCollectionButton = React.memo(
+  ({
+    metricId,
+    metricVersionNumber,
+  }: {
+    metricId: string;
+    metricVersionNumber: number | undefined;
+  }) => {
+    return (
+      <SaveMetricToCollectionButton metricId={metricId} metricVersionNumber={metricVersionNumber} />
+    );
+  }
+);
 SaveToCollectionButton.displayName = 'SaveToCollectionButton';
 
-const SaveToDashboardButton = React.memo(({ metricId }: { metricId: string }) => {
-  const { data: dashboardIds } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.dashboards?.map((x) => x.id) }
-  );
+const SaveToDashboardButton = React.memo(
+  ({
+    metricId,
+    metricVersionNumber,
+  }: {
+    metricId: string;
+    metricVersionNumber: number | undefined;
+  }) => {
+    const { data: dashboardIds } = useGetMetric(
+      { id: metricId, versionNumber: metricVersionNumber },
+      { select: useCallback((x: BusterMetric) => x.dashboards?.map((x) => x.id), []) }
+    );
 
-  return (
-    <SaveMetricToDashboardButton metricIds={[metricId]} selectedDashboards={dashboardIds || []} />
-  );
-});
+    return (
+      <SaveMetricToDashboardButton metricIds={[metricId]} selectedDashboards={dashboardIds || []} />
+    );
+  }
+);
 SaveToDashboardButton.displayName = 'SaveToDashboardButton';

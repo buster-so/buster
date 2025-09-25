@@ -329,11 +329,7 @@ importers:
         specifier: ^4.17.12
         version: 4.17.12
 
-  apps/supabase:
-    dependencies:
-      '@buster/database':
-        specifier: workspace:*
-        version: link:../../packages/database
+  apps/supabase: {}
 
   apps/trigger:
     dependencies:
@@ -1159,6 +1155,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@buster-app/supabase':
+        specifier: workspace:*
+        version: link:../../apps/supabase
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../env-utils

@@ -1,5 +1,6 @@
 import type { ErrorRouteComponent } from '@tanstack/react-router';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { LazyErrorBoundary } from './LazyErrorBoundary';
 
 // Lazy load the GlobalErrorCard component
 const GlobalErrorCard = lazy(() =>
@@ -27,16 +28,20 @@ export const LazyGlobalErrorCard: ErrorRouteComponent = (props) => {
   }
 
   return (
-    <Suspense fallback={<ErrorLoadingFallback />}>
-      <GlobalErrorCard {...props} />
-    </Suspense>
+    <LazyErrorBoundary>
+      <Suspense fallback={<ErrorLoadingFallback />}>
+        <GlobalErrorCard {...props} />
+      </Suspense>
+    </LazyErrorBoundary>
   );
 };
 
 export const LazyCatchErrorCard = (error: Error) => {
   return (
-    <Suspense fallback={<ErrorLoadingFallback />}>
-      <GlobalErrorCard error={error} reset={() => {}} />
-    </Suspense>
+    <LazyErrorBoundary>
+      <Suspense fallback={<ErrorLoadingFallback />}>
+        <GlobalErrorCard error={error} reset={() => {}} />
+      </Suspense>
+    </LazyErrorBoundary>
   );
 };

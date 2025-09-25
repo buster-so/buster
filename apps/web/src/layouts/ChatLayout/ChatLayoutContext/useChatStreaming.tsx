@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import type { BusterChat, BusterChatMessage, IBusterChat } from '@/api/asset_interfaces/chat';
-import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
+import { useGetChat, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { prefetchGetMetricDataClient } from '@/api/buster_rest/metrics';
 import { useTrackAndUpdateChatChanges } from '@/api/buster-electric/chats';
 import {
@@ -11,10 +11,11 @@ import {
 import { chatQueryKeys } from '@/api/query_keys/chat';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useBlackboxMessage } from '@/context/BlackBox/useBlackboxMessage';
+import { updateDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { useMount } from '@/hooks/useMount';
 import { updateChatToIChat } from '@/lib/chat';
 
+const stableChatTitleSelector = (chat: IBusterChat) => chat.title;
 export const useChatStreaming = ({
   chatId,
   isStreamingMessage,
@@ -27,6 +28,10 @@ export const useChatStreaming = ({
   const { checkBlackBoxMessage, removeBlackBoxMessage } = useBlackboxMessage();
   const queryClient = useQueryClient();
   const getChatMessageMemoized = useGetChatMessageMemoized();
+  const { data: chatTitle } = useGetChat(
+    { id: chatId || '' },
+    { select: stableChatTitleSelector, notifyOnChangeProps: ['data'] }
+  );
 
   const _prefetchLastMessageMetricData = (
     iChat: IBusterChat,

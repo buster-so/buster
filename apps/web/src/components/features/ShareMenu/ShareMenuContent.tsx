@@ -1,8 +1,9 @@
 import type { ShareAssetType, ShareConfig } from '@buster/server-shared/share';
-import { useRouter } from '@tanstack/react-router';
-import React, { useState } from 'react';
+import { type ParsedLocation, useRouter } from '@tanstack/react-router';
+import React, { useMemo, useState } from 'react';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { createFullURL } from '@/lib/routes';
 import { getIsEffectiveOwner } from '@/lib/share';
 import { ShareMenuContentBody } from './ShareMenuContentBody';
 import { ShareMenuContentEmbedFooter } from './ShareMenuContentEmbed';
@@ -23,51 +24,96 @@ export const ShareMenuContent: React.FC<{
   const canEditPermissions = getIsEffectiveOwner(permission);
   const { buildLocation } = useRouter();
 
-  const onCopyLink = useMemoizedFn(() => {
-    let url = '';
+  const embedlinkUrl: string = useMemo(() => {
+    let url: ParsedLocation | string = '';
     if (!assetId) {
-      return;
+      return '';
     }
     if (assetType === 'metric_file') {
       url = buildLocation({
-        to: '/app/metrics/$metricId/chart',
+        to: '/embed/metric/$metricId',
         params: {
           metricId: assetId,
         },
-      }).href;
+      });
+    } else if (assetType === 'dashboard_file') {
+      url = buildLocation({
+        to: '/embed/dashboard/$dashboardId',
+        params: {
+          dashboardId: assetId,
+        },
+      });
+    } else if (assetType === 'collection') {
+      url = buildLocation({
+        to: '/auth/login',
+      });
+    } else if (assetType === 'report_file') {
+      url = buildLocation({
+        to: '/embed/report/$reportId',
+        params: {
+          reportId: assetId,
+        },
+      });
+    } else if (assetType === 'chat') {
+      url = buildLocation({
+        to: '/auth/login',
+      });
+    } else {
+      const _exhaustiveCheck: never = assetType;
+    }
+
+    const urlWithDomain: string = createFullURL(url);
+    return urlWithDomain;
+  }, [assetId, assetType, buildLocation]);
+
+  const linkUrl: string = useMemo(() => {
+    let url: ParsedLocation | string = '';
+    if (!assetId) {
+      return '';
+    }
+    if (assetType === 'metric_file') {
+      url = buildLocation({
+        to: '/app/metrics/$metricId',
+        params: {
+          metricId: assetId,
+        },
+      });
     } else if (assetType === 'dashboard_file') {
       url = buildLocation({
         to: '/app/dashboards/$dashboardId',
         params: {
           dashboardId: assetId,
         },
-      }).href;
+      });
     } else if (assetType === 'collection') {
       url = buildLocation({
         to: '/app/collections/$collectionId',
         params: {
           collectionId: assetId,
         },
-      }).href;
+      });
     } else if (assetType === 'report_file') {
       url = buildLocation({
         to: '/app/reports/$reportId',
         params: {
           reportId: assetId,
         },
-      }).href;
+      });
     } else if (assetType === 'chat') {
       url = buildLocation({
         to: '/app/chats/$chatId',
         params: {
           chatId: assetId,
         },
-      }).href;
-    } else {
-      const _exhaustiveCheck: never = assetType;
+      });
     }
-    const urlWithDomain = window.location.origin + url;
-    navigator.clipboard.writeText(urlWithDomain);
+
+    const urlWithDomain: string = createFullURL(url);
+    return urlWithDomain;
+  }, [assetId, buildLocation]);
+
+  const onCopyLink = useMemoizedFn((isEmbed: boolean) => {
+    navigator.clipboard.writeText(isEmbed ? embedlinkUrl : linkUrl);
     openSuccessMessage('Link copied to clipboard');
   });
 
@@ -78,7 +124,7 @@ export const ShareMenuContent: React.FC<{
           assetType={assetType}
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
-          onCopyLink={onCopyLink}
+          onCopyLink={() => onCopyLink(false)}
           canEditPermissions={canEditPermissions}
         />
       )}
@@ -88,6 +134,7 @@ export const ShareMenuContent: React.FC<{
         assetType={assetType}
         assetId={assetId}
         selectedOptions={selectedOptions}
+        embedLinkURL={embedlinkUrl}
         onCopyLink={onCopyLink}
         canEditPermissions={canEditPermissions}
         className="px-3 py-2.5"

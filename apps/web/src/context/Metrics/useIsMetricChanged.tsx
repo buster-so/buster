@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import last from 'lodash/last';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useGetMetric } from '@/api/buster_rest/metrics';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -22,15 +23,18 @@ export const useIsMetricChanged = ({
     { id: metricId, versionNumber: undefined },
     {
       enabled: false,
-      select: (x) => ({
-        name: x.name,
-        description: x.description,
-        chart_config: x.chart_config,
-        file: x.file,
-        version_number: x.version_number,
-        versions: x.versions,
-        permission: x.permission,
-      }),
+      select: useCallback(
+        (x: BusterMetric) => ({
+          name: x.name,
+          description: x.description,
+          chart_config: x.chart_config,
+          file: x.file,
+          version_number: x.version_number,
+          versions: x.versions,
+          permission: x.permission,
+        }),
+        []
+      ),
     }
   );
   const isLatestVersion =

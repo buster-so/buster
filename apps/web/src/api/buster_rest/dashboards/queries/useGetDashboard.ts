@@ -12,6 +12,7 @@ import {
   setProtectedAssetPasswordError,
   useProtectedAssetPassword,
 } from '@/context/BusterAssets/useProtectedAssetStore';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { isQueryStale } from '@/lib/query';
 import { hasOrganizationId } from '../../users/userQueryHelpers';
 import {
@@ -29,8 +30,8 @@ import { dashboardsGetList } from '../requests';
 export const useGetDashboard = <TData = GetDashboardResponse>(
   {
     id: idProp,
-    versionNumber: versionNumberProp = 'LATEST',
-  }: { id: string | undefined; versionNumber?: number | 'LATEST' },
+    versionNumber: versionNumberProp,
+  }: { id: string | undefined; versionNumber: number | 'LATEST' | undefined },
   params?: Omit<UseQueryOptions<GetDashboardResponse, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const id = idProp || '';
@@ -43,7 +44,7 @@ export const useGetDashboard = <TData = GetDashboardResponse>(
     ...dashboardQueryKeys.dashboardGetDashboard(id, 'LATEST'),
     queryFn: () =>
       queryFn({ id, version_number: 'LATEST', shouldInitializeMetrics: true, password }),
-    enabled: false,
+    enabled: true,
     retry(_failureCount, error) {
       if (error?.message !== undefined) {
         setProtectedAssetPasswordError({
@@ -79,8 +80,8 @@ export const usePrefetchGetDashboardClient = <TData = GetDashboardResponse>(
   params?: Omit<UseQueryOptions<GetDashboardResponse, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const queryClient = useQueryClient();
-  const queryFn = useGetDashboardAndInitializeMetrics({ prefetchData: false });
-  return (id: string, versionNumber: number | 'LATEST' = 'LATEST') => {
+  return useMemoizedFn((id: string, versionNumber: number | 'LATEST') => {
+    const queryFn = useGetDashboardAndInitializeMetrics({ prefetchData: false });
     const getDashboardQueryKey = dashboardQueryKeys.dashboardGetDashboard(id, versionNumber);
     const isStale = isQueryStale(getDashboardQueryKey, queryClient) || params?.staleTime === 0;
     if (!isStale) return;
@@ -95,7 +96,7 @@ export const usePrefetchGetDashboardClient = <TData = GetDashboardResponse>(
         }),
       ...params,
     });
-  };
+  });
 };
 
 /**
@@ -153,6 +154,7 @@ export const prefetchGetDashboard = async ({
   version_number,
 }: Parameters<typeof getDashboardAndInitializeMetrics>[0]) => {
   const chosenVersionNumber = version_number || 'LATEST';
+  console.log('prefetchGetDashboard', chosenVersionNumber);
   const queryFn = async () =>
     getDashboardAndInitializeMetrics({
       id,

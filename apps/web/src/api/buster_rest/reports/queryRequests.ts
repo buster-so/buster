@@ -9,7 +9,7 @@ import {
 import { create } from 'mutative';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { reportsQueryKeys } from '@/api/query_keys/reports';
-import { silenceAssetErrors } from '@/api/repsonse-helpers/silenece-asset-errors';
+import { silenceAssetErrors } from '@/api/response-helpers/silenece-asset-errors';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
 import type { RustApiError } from '../../errors';
 import {

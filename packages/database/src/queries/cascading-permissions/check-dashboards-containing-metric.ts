@@ -7,6 +7,9 @@ export interface DashboardWithSharing {
   id: string;
   organizationId: string;
   workspaceSharing: WorkspaceSharing | null;
+  publiclyAccessible: boolean;
+  publicExpiryDate: string | null;
+  publicPassword: string | null;
 }
 
 export async function checkDashboardsContainingMetric(
@@ -17,6 +20,9 @@ export async function checkDashboardsContainingMetric(
       id: dashboardFiles.id,
       organizationId: dashboardFiles.organizationId,
       workspaceSharing: dashboardFiles.workspaceSharing,
+      publiclyAccessible: dashboardFiles.publiclyAccessible,
+      publicExpiryDate: dashboardFiles.publicExpiryDate,
+      publicPassword: dashboardFiles.publicPassword,
     })
     .from(metricFilesToDashboardFiles)
     .innerJoin(dashboardFiles, eq(dashboardFiles.id, metricFilesToDashboardFiles.dashboardFileId))

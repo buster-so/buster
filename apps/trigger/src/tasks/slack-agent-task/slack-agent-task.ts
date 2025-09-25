@@ -752,11 +752,11 @@ export const slackAgentTask: ReturnType<
           chatFileInfo?.mostRecentVersionNumber !== null
         ) {
           if (chatFileInfo.mostRecentFileType === 'dashboard_file') {
-            buttonUrl = `${busterUrl}/app/dashboards/${chatFileInfo.mostRecentFileId}?dashboard_version_number=${chatFileInfo.mostRecentVersionNumber}`;
+            buttonUrl += `/dashboards/${chatFileInfo.mostRecentFileId}?dashboard_version_number=${chatFileInfo.mostRecentVersionNumber}`;
           } else if (chatFileInfo.mostRecentFileType === 'metric_file') {
-            buttonUrl = `${busterUrl}/app/metrics/${chatFileInfo.mostRecentFileId}?metric_version_number=${chatFileInfo.mostRecentVersionNumber}`;
+            buttonUrl += `/metrics/${chatFileInfo.mostRecentFileId}?metric_version_number=${chatFileInfo.mostRecentVersionNumber}`;
           } else if (chatFileInfo.mostRecentFileType === 'report_file') {
-            buttonUrl = `${busterUrl}/app/reports/${chatFileInfo.mostRecentFileId}?report_version_number=${chatFileInfo.mostRecentVersionNumber}`;
+            buttonUrl += `/reports/${chatFileInfo.mostRecentFileId}?report_version_number=${chatFileInfo.mostRecentVersionNumber}`;
           } else {
             const _exhaustiveCheck: 'chat' | 'collection' = chatFileInfo.mostRecentFileType;
             buttonUrl = `${busterUrl}/app/chats/${payload.chatId}`;

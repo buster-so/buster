@@ -8,3 +8,9 @@ export const useDocumentTitle = (title: string | undefined) => {
     }, 25);
   }, [title]);
 };
+
+export const updateDocumentTitle = (callback: (currentTitle: string) => string) => {
+  const currentTitle = document.title;
+  const newTitle = callback(currentTitle);
+  document.title = newTitle;
+};

@@ -4,9 +4,25 @@ import { getProviderForOrganization } from '../storage';
 const CACHE_PREFIX = 'static-report-assets';
 
 /**
- * Generate cache key for metric data
+ * Generate cache key for metric data with version
  */
 export function generateCacheKey(
+  organizationId: string,
+  metricId: string,
+  reportId: string,
+  version?: number
+): string {
+  if (version !== undefined) {
+    return `${CACHE_PREFIX}/${organizationId}/${metricId}-${reportId}-v${version}.json`;
+  }
+  // Legacy format for backward compatibility
+  return `${CACHE_PREFIX}/${organizationId}/${metricId}-${reportId}.json`;
+}
+
+/**
+ * Generate legacy cache key for backward compatibility
+ */
+function generateLegacyCacheKey(
   organizationId: string,
   metricId: string,
   reportId: string
@@ -37,13 +53,21 @@ function jsonToData(buffer: Buffer): MetricDataResponse {
 export async function checkCacheExists(
   organizationId: string,
   metricId: string,
-  reportId: string
+  reportId: string,
+  version?: number
 ): Promise<boolean> {
   try {
     const storageProvider = await getProviderForOrganization(organizationId);
-    const key = generateCacheKey(organizationId, metricId, reportId);
+    const key = generateCacheKey(organizationId, metricId, reportId, version);
 
     const exists = await storageProvider.exists(key);
+
+    // If versioned key doesn't exist and no version was specified, check legacy key
+    if (!exists && version === undefined) {
+      const legacyKey = generateLegacyCacheKey(organizationId, metricId, reportId);
+      return await storageProvider.exists(legacyKey);
+    }
+
     return exists;
   } catch (error: unknown) {
     console.error('[metric-cache] Error checking cache existence:', error);
@@ -57,26 +81,41 @@ export async function checkCacheExists(
 export async function getCachedMetricData(
   organizationId: string,
   metricId: string,
-  reportId: string
+  reportId: string,
+  version?: number
 ): Promise<MetricDataResponse | null> {
   try {
     const storageProvider = await getProviderForOrganization(organizationId);
-    const key = generateCacheKey(organizationId, metricId, reportId);
+    const key = generateCacheKey(organizationId, metricId, reportId, version);
 
     console.info('[metric-cache] Fetching cached data', {
       organizationId,
       metricId,
       reportId,
+      version,
       key,
     });
 
-    const downloadResult = await storageProvider.download(key);
+    let downloadResult = await storageProvider.download(key);
+
+    // If versioned key doesn't exist and version was provided, try without version for backward compatibility
+    if ((!downloadResult.success || !downloadResult.data) && version !== undefined) {
+      const legacyKey = generateLegacyCacheKey(organizationId, metricId, reportId);
+      console.info('[metric-cache] Trying legacy cache key', {
+        organizationId,
+        metricId,
+        reportId,
+        legacyKey,
+      });
+      downloadResult = await storageProvider.download(legacyKey);
+    }
 
     if (!downloadResult.success || !downloadResult.data) {
       console.info('[metric-cache] Cache miss', {
         organizationId,
         metricId,
         reportId,
+        version,
       });
       return null;
     }
@@ -89,6 +128,7 @@ export async function getCachedMetricData(
       organizationId,
       metricId,
       reportId,
+      version,
       rowCount: data.data?.length || 0,
     });
 
@@ -106,16 +146,18 @@ export async function setCachedMetricData(
   organizationId: string,
   metricId: string,
   reportId: string,
-  data: MetricDataResponse
+  data: MetricDataResponse,
+  version?: number
 ): Promise<void> {
   try {
     const storageProvider = await getProviderForOrganization(organizationId);
-    const key = generateCacheKey(organizationId, metricId, reportId);
+    const key = generateCacheKey(organizationId, metricId, reportId, version);
 
     console.info('[metric-cache] Caching metric data', {
       organizationId,
       metricId,
       reportId,
+      version,
       key,
       rowCount: data.data?.length || 0,
     });
@@ -129,6 +171,7 @@ export async function setCachedMetricData(
         'organization-id': organizationId,
         'metric-id': metricId,
         'report-id': reportId,
+        'metric-version': version !== undefined ? String(version) : 'unversioned',
         'row-count': String(data.data?.length || 0),
         'cached-at': new Date().toISOString(),
       },
@@ -139,6 +182,7 @@ export async function setCachedMetricData(
         organizationId,
         metricId,
         reportId,
+        version,
         sizeBytes: jsonBuffer.length,
       });
     } else {
@@ -155,7 +199,7 @@ export async function setCachedMetricData(
  */
 export async function batchCheckCacheExists(
   organizationId: string,
-  metricReportPairs: Array<{ metricId: string; reportId: string }>
+  metricReportPairs: Array<{ metricId: string; reportId: string; version?: number }>
 ): Promise<Map<string, boolean>> {
   const results = new Map<string, boolean>();
 
@@ -164,9 +208,11 @@ export async function batchCheckCacheExists(
   for (let i = 0; i < metricReportPairs.length; i += BATCH_SIZE) {
     const batch = metricReportPairs.slice(i, i + BATCH_SIZE);
     const checks = await Promise.all(
-      batch.map(async ({ metricId, reportId }) => {
-        const exists = await checkCacheExists(organizationId, metricId, reportId);
-        return { key: `${metricId}-${reportId}`, exists };
+      batch.map(async ({ metricId, reportId, version }) => {
+        const exists = await checkCacheExists(organizationId, metricId, reportId, version);
+        const key =
+          version !== undefined ? `${metricId}-${reportId}-v${version}` : `${metricId}-${reportId}`;
+        return { key, exists };
       })
     );
 

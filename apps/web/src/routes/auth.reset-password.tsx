@@ -1,17 +1,16 @@
+import type { User } from '@supabase/supabase-js';
 import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
 import { z } from 'zod';
-import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
 import { ResetEmailForm } from '@/components/features/auth/ResetEmailForm';
 import { ResetPasswordForm } from '@/components/features/auth/ResetPasswordForm';
-import { useGetSupabaseUser } from '@/context/Supabase';
+import { CircleSpinnerLoaderContainer } from '@/components/ui/loaders';
+import { useMount } from '@/hooks/useMount';
+import { getBrowserClient } from '@/integrations/supabase/client';
+import { getSupabaseUser } from '@/integrations/supabase/getSupabaseUserClient';
 
 export const Route = createFileRoute('/auth/reset-password')({
-  loader: async ({ context }) => {
-    const user = await prefetchGetMyUserInfo(context.queryClient);
-    return {
-      user,
-    };
-  },
+  ssr: true,
   head: () => ({
     meta: [
       { title: 'Reset Password' },
@@ -20,28 +19,61 @@ export const Route = createFileRoute('/auth/reset-password')({
       { name: 'og:description', content: 'Reset your Buster account password' },
     ],
   }),
+  beforeLoad: async () => {
+    const supabaseUser = await getSupabaseUser();
+    return { supabaseUser };
+  },
+  loader: async ({ context }) => {
+    const { supabaseUser } = context;
+    return { supabaseUser };
+  },
+
   component: RouteComponent,
   validateSearch: z.object({
-    email: z.string(),
+    email: z.string().optional(),
   }),
 });
 
+const supabase = getBrowserClient();
+
 function RouteComponent() {
-  const { user } = Route.useLoaderData();
   const { email } = Route.useSearch();
-  const supabaseUser = useGetSupabaseUser();
+  const supabaseUserLoader = Route.useLoaderData();
+  const [mounting, setMounting] = useState(true);
 
-  if (email) {
-    return <ResetEmailForm queryEmail={email} />;
+  const [supabaseUser, setSupabaseUser] = useState<null | Pick<User, 'email' | 'is_anonymous'>>(
+    supabaseUserLoader?.supabaseUser ?? null
+  );
+
+  useMount(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setMounting(false);
+      if (session?.user) {
+        setSupabaseUser({
+          email: session.user.email ?? '',
+          is_anonymous: session.user.is_anonymous ?? true,
+        });
+      }
+    });
+
+    setTimeout(() => {
+      setMounting(false);
+    }, 500);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
+
+  if (mounting) {
+    return <CircleSpinnerLoaderContainer />;
   }
 
-  if (!supabaseUser || !user) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center p-10">
-        We were unable to find your account
-      </div>
-    );
+  if (email || !supabaseUser || supabaseUser.is_anonymous) {
+    return <ResetEmailForm queryEmail={email || ''} />;
   }
 
-  return <ResetPasswordForm supabaseUser={supabaseUser} busterUser={user} />;
+  return <ResetPasswordForm supabaseUser={supabaseUser} />;
 }

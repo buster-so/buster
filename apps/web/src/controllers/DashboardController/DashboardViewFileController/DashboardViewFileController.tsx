@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { useGetDashboard, useUpdateDashboard } from '@/api/buster_rest/dashboards';
 import { EditFileContainer } from '@/components/features/files/EditFileContainer';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -7,11 +8,12 @@ import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 export const DashboardViewFileController: React.FC<{
   dashboardId: string;
+  dashboardVersionNumber: number | undefined;
   chatId?: string | undefined;
-}> = React.memo(({ dashboardId }) => {
+}> = React.memo(({ dashboardId, dashboardVersionNumber }) => {
   const { data: dashboard } = useGetDashboard(
-    { id: dashboardId },
-    { select: (data) => data.dashboard }
+    { id: dashboardId, versionNumber: dashboardVersionNumber },
+    { select: useCallback((data: BusterDashboardResponse) => data.dashboard, []) }
   );
   const { openSuccessMessage } = useBusterNotifications();
   const {

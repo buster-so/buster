@@ -47,9 +47,30 @@ describe('checkDashboardsContainingMetric', () => {
 
   it('should return dashboards with organizationId and workspaceSharing', async () => {
     const mockDashboards = [
-      { id: 'dash1', organizationId: 'org1', workspaceSharing: 'can_view' },
-      { id: 'dash2', organizationId: 'org2', workspaceSharing: 'none' },
-      { id: 'dash3', organizationId: 'org1', workspaceSharing: null },
+      {
+        id: 'dash1',
+        organizationId: 'org1',
+        workspaceSharing: 'can_view',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'dash2',
+        organizationId: 'org2',
+        workspaceSharing: 'none',
+        publiclyAccessible: true,
+        publicExpiryDate: '2024-12-31T23:59:59Z',
+        publicPassword: 'secret456',
+      },
+      {
+        id: 'dash3',
+        organizationId: 'org1',
+        workspaceSharing: null,
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
     ];
 
     mockQueryChain.where.mockResolvedValue(mockDashboards);
@@ -61,6 +82,9 @@ describe('checkDashboardsContainingMetric', () => {
       id: expect.anything(),
       organizationId: expect.anything(),
       workspaceSharing: expect.anything(),
+      publiclyAccessible: expect.anything(),
+      publicExpiryDate: expect.anything(),
+      publicPassword: expect.anything(),
     });
     expect(mockQueryChain.from).toHaveBeenCalled();
     expect(mockQueryChain.innerJoin).toHaveBeenCalled();
@@ -76,21 +100,67 @@ describe('checkDashboardsContainingMetric', () => {
   });
 
   it('should handle null workspace sharing values', async () => {
-    const mockDashboards = [{ id: 'dash1', organizationId: 'org1', workspaceSharing: null }];
+    const mockDashboards = [
+      {
+        id: 'dash1',
+        organizationId: 'org1',
+        workspaceSharing: null,
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+    ];
 
     mockQueryChain.where.mockResolvedValue(mockDashboards);
 
     const result = await checkDashboardsContainingMetric('metric123');
 
-    expect(result).toEqual([{ id: 'dash1', organizationId: 'org1', workspaceSharing: null }]);
+    expect(result).toEqual([
+      {
+        id: 'dash1',
+        organizationId: 'org1',
+        workspaceSharing: null,
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+    ]);
   });
 
   it('should handle all workspace sharing levels', async () => {
     const mockDashboards = [
-      { id: 'dash1', organizationId: 'org1', workspaceSharing: 'none' },
-      { id: 'dash2', organizationId: 'org1', workspaceSharing: 'can_view' },
-      { id: 'dash3', organizationId: 'org1', workspaceSharing: 'can_edit' },
-      { id: 'dash4', organizationId: 'org1', workspaceSharing: 'full_access' },
+      {
+        id: 'dash1',
+        organizationId: 'org1',
+        workspaceSharing: 'none',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'dash2',
+        organizationId: 'org1',
+        workspaceSharing: 'can_view',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'dash3',
+        organizationId: 'org1',
+        workspaceSharing: 'can_edit',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'dash4',
+        organizationId: 'org1',
+        workspaceSharing: 'full_access',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
     ];
 
     mockQueryChain.where.mockResolvedValue(mockDashboards);

@@ -7,14 +7,14 @@
       "outputs": ["dist/**"]
     },
     "start": {
-      "dependsOn": ["@buster/database#start", "build"],
+      "dependsOn": ["@buster-app/supabase#start", "build"],
       "cache": true,
       "persistent": true
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["@buster/database#start", "^build"],
+      "dependsOn": ["@buster-app/supabase#start", "^build"],
       "with": [
         "@buster/ai#dev",
         "@buster/server-shared#dev",
@@ -28,7 +28,7 @@
     "dev:fast": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["@buster/database#start", "^build"],
+      "dependsOn": ["@buster-app/supabase#start", "^build"],
       "with": [
         "@buster/ai#dev:fast",
         "@buster/server-shared#dev:fast",

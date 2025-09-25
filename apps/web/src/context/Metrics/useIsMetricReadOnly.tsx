@@ -27,7 +27,7 @@ export const useIsMetricReadOnly = ({
     data: metricData,
     isFetched,
     isError,
-  } = useGetMetric({ id: metricId }, { select: stableMetricSelect });
+  } = useGetMetric({ id: metricId, versionNumber: 'LATEST' }, { select: stableMetricSelect });
 
   const isViewingOldVersion = checkIfMetricIsViewingOldVersion(metricVersionNumber, metricData);
 

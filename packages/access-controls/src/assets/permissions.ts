@@ -207,6 +207,10 @@ export async function hasAssetPermission(params: {
   requiredRole: AssetPermissionRole;
   organizationId?: string;
   workspaceSharing?: WorkspaceSharing;
+  publiclyAccessible?: boolean;
+  publicExpiryDate?: string | undefined;
+  publicPassword?: string | undefined;
+  userSuppliedPassword?: string | undefined;
 }): Promise<boolean> {
   const { checkPermission } = await import('./checks');
 

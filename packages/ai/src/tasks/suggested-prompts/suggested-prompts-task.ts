@@ -1,6 +1,7 @@
+import { getUser } from '@buster/database/queries';
 import { DEFAULT_USER_SUGGESTED_PROMPTS } from '@buster/database/schema-types';
 import { generateObject } from 'ai';
-import { wrapTraced } from 'braintrust';
+import { currentSpan, wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { GPT5Nano } from '../../llm';
 import SUGGESTED_PROMPTS_SYSTEM_PROMPT from './suggested-prompts-system-prompt.txt';
@@ -46,8 +47,19 @@ ${chatHistoryText}
 
 Generate suggestions that are relevant to the conversation context and available data.`;
 
+    const userInfo = await getUser({ id: userId });
+
     const tracedGeneration = wrapTraced(
       async () => {
+        currentSpan().log({
+          metadata: {
+            userName: userInfo.name || 'Unknown',
+            userEmail: userInfo.email,
+            userId: userId,
+            chatHistoryTextLength: chatHistoryText.length,
+          },
+        });
+
         const result = await generateObject({
           model: GPT5Nano,
           prompt: userMessage,
@@ -74,10 +86,6 @@ Generate suggestions that are relevant to the conversation context and available
       },
       {
         name: 'Generate Suggested Prompts',
-        spanAttributes: {
-          chatHistoryLength: chatHistoryText.length,
-          userId: userId,
-        },
       }
     );
 

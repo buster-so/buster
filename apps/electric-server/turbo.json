@@ -3,19 +3,19 @@
   "extends": ["//"],
   "tasks": {
     "start": {
-      "dependsOn": ["@buster/database#start"],
-      "cache": false,
-      "persistent": true,
+      "dependsOn": ["@buster-app/supabase#start"],
+      "cache": true,
+      "persistent": false,
       "outputs": []
     },
     "dev": {
-      "dependsOn": ["@buster/database#start"],
+      "dependsOn": ["@buster-app/supabase#start"],
       "cache": false,
       "persistent": true,
       "outputs": []
     },
     "dev:fast": {
-      "dependsOn": ["@buster/database#start"],
+      "dependsOn": ["@buster-app/supabase#start"],
       "cache": false,
       "persistent": true,
       "outputs": []

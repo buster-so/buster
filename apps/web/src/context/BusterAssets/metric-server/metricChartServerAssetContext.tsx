@@ -1,5 +1,5 @@
 import { ClientOnly, Outlet, useLocation, useNavigate, useSearch } from '@tanstack/react-router';
-import { lazy, Suspense, useRef, useTransition } from 'react';
+import { lazy, Suspense, useRef } from 'react';
 import { z } from 'zod';
 import { LazyErrorBoundary } from '@/components/features/global/LazyErrorBoundary';
 import { AppSplitter, type LayoutSize } from '@/components/ui/layouts/AppSplitter';
@@ -21,6 +21,7 @@ export const validateSearch = z.object({
   editMode: z.boolean().optional(),
 });
 
+const stableEditModeSearchSelector = (state: { editMode?: boolean }) => state.editMode ?? false;
 export const component = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +29,7 @@ export const component = () => {
   const { metricId, metricVersionNumber } = useGetMetricParams();
   const editMode = useSearch({
     strict: false,
-    select: (v) => v.editMode ?? false,
+    select: stableEditModeSearchSelector,
   });
 
   const isMetricEditMode = useIsMetricEditMode();
@@ -69,7 +70,11 @@ export const component = () => {
           <MetricViewChartController metricId={metricId} versionNumber={metricVersionNumber} />
         }
         rightChildren={
-          <RightChildren metricId={metricId} renderChart={hasSeenMetricEditMode.current} />
+          <RightChildren
+            metricId={metricId}
+            metricVersionNumber={metricVersionNumber}
+            renderChart={hasSeenMetricEditMode.current}
+          />
         }
         rightPanelMinSize={'250px'}
         rightPanelMaxSize={'500px'}
@@ -88,11 +93,19 @@ const MetricEditController = lazy(() =>
   )
 );
 
-const RightChildren = ({ metricId, renderChart }: { metricId: string; renderChart: boolean }) => {
+const RightChildren = ({
+  metricId,
+  metricVersionNumber,
+  renderChart,
+}: {
+  metricId: string;
+  metricVersionNumber: number | undefined;
+  renderChart: boolean;
+}) => {
   return renderChart ? (
     <LazyErrorBoundary>
       <Suspense fallback={<CircleSpinnerLoaderContainer />}>
-        <MetricEditController metricId={metricId} />
+        <MetricEditController metricId={metricId} metricVersionNumber={metricVersionNumber} />
       </Suspense>
     </LazyErrorBoundary>
   ) : null;

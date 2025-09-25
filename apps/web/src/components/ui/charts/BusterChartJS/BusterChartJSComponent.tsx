@@ -4,7 +4,6 @@ import React, { useMemo, useState } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { useMount } from '@/hooks/useMount';
 import { usePreviousRef } from '@/hooks/usePrevious';
-import { useColors } from '../chartHooks';
 import type { BusterChartTypeComponentProps } from '../interfaces/chartComponentInterfaces';
 import {
   Chart,
@@ -29,7 +28,7 @@ export const BusterChartJSComponent = React.memo(
         selectedChartType,
         selectedAxis,
         className = '',
-        colors: colorsProp,
+        colors,
         pieDonutWidth,
         pieInnerLabelTitle,
         pieInnerLabelAggregate,
@@ -74,14 +73,6 @@ export const BusterChartJSComponent = React.memo(
       },
       ref
     ) => {
-      const colors = useColors({
-        colors: colorsProp,
-        yAxisKeys,
-        y2AxisKeys,
-        datasetOptions: datasetOptions.datasets,
-        selectedChartType,
-      });
-
       const data: ChartProps<ChartJSChartType>['data'] = useSeriesOptions({
         selectedChartType,
         y2AxisKeys,

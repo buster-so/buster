@@ -25,6 +25,7 @@ describe('Metric Cache', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.restoreAllMocks();
 
     mockProvider = {
       upload: vi.fn(),
@@ -264,6 +265,7 @@ describe('Metric Cache', () => {
             'organization-id': 'org-123',
             'metric-id': 'metric-456',
             'report-id': 'report-789',
+            'metric-version': 'unversioned',
             'row-count': '2',
             'cached-at': '2024-01-15T12:00:00.000Z',
           },
@@ -303,6 +305,7 @@ describe('Metric Cache', () => {
         expect.any(Buffer),
         expect.objectContaining({
           metadata: expect.objectContaining({
+            'metric-version': 'unversioned',
             'row-count': '0',
           }),
         })
@@ -327,6 +330,7 @@ describe('Metric Cache', () => {
         expect.any(Buffer),
         expect.objectContaining({
           metadata: expect.objectContaining({
+            'metric-version': 'unversioned',
             'row-count': '0',
           }),
         })
@@ -388,11 +392,14 @@ describe('Metric Cache', () => {
   });
 
   describe('batchCheckCacheExists', () => {
-    it('should check multiple cache entries', async () => {
-      mockProvider.exists
-        .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(false)
-        .mockResolvedValueOnce(true);
+    it('should check multiple cache entries without version', async () => {
+      // Setup function-based mocking to control return values per key
+      mockProvider.exists.mockImplementation(async (key: string) => {
+        if (key.includes('metric-1')) return true;
+        if (key.includes('metric-2')) return false; // both versioned and legacy return false
+        if (key.includes('metric-3')) return true;
+        return false;
+      });
 
       const pairs = [
         { metricId: 'metric-1', reportId: 'report-1' },
@@ -402,10 +409,11 @@ describe('Metric Cache', () => {
 
       const results = await batchCheckCacheExists('org-123', pairs);
 
+      expect(results.size).toBe(3);
       expect(results.get('metric-1-report-1')).toBe(true);
       expect(results.get('metric-2-report-2')).toBe(false);
       expect(results.get('metric-3-report-3')).toBe(true);
-      expect(mockProvider.exists).toHaveBeenCalledTimes(3);
+      expect(mockProvider.exists).toHaveBeenCalledTimes(4); // metric-2 will check both primary and legacy
     });
 
     it('should process in batches', async () => {
@@ -470,6 +478,91 @@ describe('Metric Cache', () => {
 
       expect(results.get('metric.with.dots-report_with_underscores')).toBe(true);
       expect(results.get('metric-with-dashes-report-123')).toBe(true);
+    });
+
+    it('should handle versioned metrics correctly', async () => {
+      mockProvider.exists
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(false)
+        .mockResolvedValueOnce(true);
+
+      const pairs = [
+        { metricId: 'metric-1', reportId: 'report-1', version: 1 },
+        { metricId: 'metric-2', reportId: 'report-2', version: 2 },
+        { metricId: 'metric-3', reportId: 'report-3', version: undefined },
+      ];
+
+      const results = await batchCheckCacheExists('org-123', pairs);
+
+      expect(results.get('metric-1-report-1-v1')).toBe(true);
+      expect(results.get('metric-2-report-2-v2')).toBe(false);
+      expect(results.get('metric-3-report-3')).toBe(true);
+      expect(mockProvider.exists).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('version-aware caching', () => {
+    it('should check legacy cache when version is provided but not found', async () => {
+      const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+
+      mockProvider.download
+        .mockResolvedValueOnce({
+          success: false, // versioned key download fails
+        })
+        .mockResolvedValueOnce({
+          success: true, // legacy key download succeeds
+          data: Buffer.from(JSON.stringify({ metricId: 'metric-123', data: [] })),
+          contentType: 'application/json',
+          size: 100,
+        });
+
+      const result = await getCachedMetricData('org-123', 'metric-123', 'report-456', 2);
+
+      expect(result).toBeTruthy();
+      expect(result?.metricId).toBe('metric-123');
+      expect(mockProvider.download).toHaveBeenCalledTimes(2);
+      expect(mockProvider.download).toHaveBeenNthCalledWith(
+        1,
+        'static-report-assets/org-123/metric-123-report-456-v2.json'
+      );
+      expect(mockProvider.download).toHaveBeenNthCalledWith(
+        2,
+        'static-report-assets/org-123/metric-123-report-456.json'
+      );
+
+      consoleInfoSpy.mockRestore();
+    });
+
+    it('should write cache with version metadata', async () => {
+      mockProvider.upload.mockResolvedValue({
+        success: true,
+        key: 'test-key',
+        size: 100,
+      });
+
+      const dateSpy = vi
+        .spyOn(Date.prototype, 'toISOString')
+        .mockReturnValue('2024-01-15T12:00:00.000Z');
+
+      await setCachedMetricData(
+        'org-123',
+        'metric-456',
+        'report-789',
+        { metricId: 'metric-456', data: [] },
+        3
+      );
+
+      expect(mockProvider.upload).toHaveBeenCalledWith(
+        'static-report-assets/org-123/metric-456-report-789-v3.json',
+        expect.any(Buffer),
+        expect.objectContaining({
+          metadata: expect.objectContaining({
+            'metric-version': '3',
+          }),
+        })
+      );
+
+      dateSpy.mockRestore();
     });
   });
 });

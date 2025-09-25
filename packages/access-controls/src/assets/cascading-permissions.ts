@@ -15,7 +15,11 @@ import { hasAssetPermission } from './permissions';
  * Check if a user has access to a metric through any dashboard that contains it.
  * If a user has access to a dashboard (direct, public, or workspace), they can view the metrics in it.
  */
-export async function checkMetricDashboardAccess(metricId: string, user: User): Promise<boolean> {
+export async function checkMetricDashboardAccess(
+  metricId: string,
+  user: User,
+  userSuppliedPassword?: string
+): Promise<boolean> {
   try {
     // Get all dashboards containing this metric with their workspace sharing info
     const dashboards = await checkDashboardsContainingMetric(metricId);
@@ -33,6 +37,10 @@ export async function checkMetricDashboardAccess(metricId: string, user: User): 
         requiredRole: 'can_view' as AssetPermissionRole,
         organizationId: dashboard.organizationId,
         workspaceSharing: (dashboard.workspaceSharing as WorkspaceSharing) ?? 'none',
+        publiclyAccessible: dashboard.publiclyAccessible,
+        publicExpiryDate: dashboard.publicExpiryDate ?? undefined,
+        publicPassword: dashboard.publicPassword ?? undefined,
+        userSuppliedPassword: userSuppliedPassword,
       });
 
       if (hasAccess) {
@@ -72,6 +80,10 @@ export async function checkMetricChatAccess(metricId: string, user: User): Promi
         requiredRole: 'can_view' as AssetPermissionRole,
         organizationId: chat.organizationId,
         workspaceSharing: (chat.workspaceSharing as WorkspaceSharing) ?? 'none',
+        publiclyAccessible: chat.publiclyAccessible,
+        publicExpiryDate: chat.publicExpiryDate ?? undefined,
+        publicPassword: undefined, // We don't support passwords on the chats table
+        userSuppliedPassword: undefined, // We don't support passwords on the chats table
       });
 
       if (hasAccess) {
@@ -93,7 +105,11 @@ export async function checkMetricChatAccess(metricId: string, user: User): Promi
  * Check if a user has access to a metric through any report that contains it.
  * If a user has access to a report (direct, public, or workspace), they can view the metrics in it.
  */
-export async function checkMetricReportAccess(metricId: string, user: User): Promise<boolean> {
+export async function checkMetricReportAccess(
+  metricId: string,
+  user: User,
+  userSuppliedPassword?: string
+): Promise<boolean> {
   try {
     // Get all reports containing this metric with their workspace sharing info
     const reports = await checkReportsContainingMetric(metricId);
@@ -111,6 +127,10 @@ export async function checkMetricReportAccess(metricId: string, user: User): Pro
         requiredRole: 'can_view' as AssetPermissionRole,
         organizationId: report.organizationId,
         workspaceSharing: (report.workspaceSharing as WorkspaceSharing) ?? 'none',
+        publiclyAccessible: report.publiclyAccessible,
+        publicExpiryDate: report.publicExpiryDate ?? undefined,
+        publicPassword: report.publicPassword ?? undefined,
+        userSuppliedPassword: userSuppliedPassword,
       });
 
       if (hasAccess) {
@@ -150,6 +170,10 @@ export async function checkDashboardChatAccess(dashboardId: string, user: User):
         requiredRole: 'can_view' as AssetPermissionRole,
         organizationId: chat.organizationId,
         workspaceSharing: (chat.workspaceSharing as WorkspaceSharing) ?? 'none',
+        publiclyAccessible: chat.publiclyAccessible,
+        publicExpiryDate: chat.publicExpiryDate ?? undefined,
+        publicPassword: undefined, // We don't support passwords on the chats table
+        userSuppliedPassword: undefined, // We don't support passwords on the chats table
       });
 
       if (hasAccess) {
@@ -294,7 +318,8 @@ export async function checkChatCollectionAccess(chatId: string, user: User): Pro
 export async function checkCascadingPermissions(
   assetId: string,
   assetType: AssetType,
-  user: User
+  user: User,
+  userSuppliedPassword?: string
 ): Promise<boolean> {
   // Check cache first
   const cached = getCachedCascadingPermission(user.id, assetId, assetType);
@@ -308,7 +333,11 @@ export async function checkCascadingPermissions(
     switch (assetType) {
       case 'metric_file': {
         // Check access through dashboards, chats, collections, and reports
-        const dashboardAccess = await checkMetricDashboardAccess(assetId, user);
+        const dashboardAccess = await checkMetricDashboardAccess(
+          assetId,
+          user,
+          userSuppliedPassword
+        );
         if (dashboardAccess) {
           hasAccess = true;
           break;
@@ -326,7 +355,7 @@ export async function checkCascadingPermissions(
           break;
         }
 
-        const reportAccess = await checkMetricReportAccess(assetId, user);
+        const reportAccess = await checkMetricReportAccess(assetId, user, userSuppliedPassword);
         if (reportAccess) {
           hasAccess = true;
           break;

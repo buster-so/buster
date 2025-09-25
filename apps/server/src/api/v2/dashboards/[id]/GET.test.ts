@@ -175,6 +175,10 @@ describe('getDashboardHandler', () => {
         requiredRole: 'can_view',
         organizationId: mockDashboard.organizationId,
         workspaceSharing: 'none',
+        publiclyAccessible: false,
+        publicExpiryDate: undefined,
+        publicPassword: undefined,
+        userSuppliedPassword: undefined,
       });
     });
 

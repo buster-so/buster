@@ -1,5 +1,5 @@
+import { NUMBER_OF_COLUMNS } from '@buster/server-shared/dashboards';
 import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
-import { NUMBER_OF_COLUMNS } from '../../../asset_interfaces/dashboard/config';
 
 export const removeMetricFromDashboardConfig = (
   metricIds: string[],

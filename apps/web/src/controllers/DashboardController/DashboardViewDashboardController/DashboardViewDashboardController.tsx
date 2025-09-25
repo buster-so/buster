@@ -13,7 +13,7 @@ import { DashboardSaveFilePopup } from './DashboardSaveFilePopup';
 export const DashboardViewDashboardController: React.FC<{
   dashboardId: string;
   readOnly?: boolean;
-  dashboardVersionNumber?: number;
+  dashboardVersionNumber: number | undefined;
   animate?: boolean;
 }> = ({ dashboardId, dashboardVersionNumber, readOnly: readOnlyProp = false, animate = true }) => {
   const {
@@ -76,6 +76,7 @@ export const DashboardViewDashboardController: React.FC<{
           open={openDashboardContentModal}
           onClose={onCloseDashboardContentModal}
           dashboardId={dashboardId}
+          dashboardVersionNumber={dashboardVersionNumber}
         />
       )}
     </ClientOnly>

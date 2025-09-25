@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import type React from 'react';
 import { useState } from 'react';
@@ -5,32 +6,26 @@ import { Button } from '@/components/ui/buttons';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
 import { Input } from '@/components/ui/inputs';
 import { Text, Title } from '@/components/ui/typography';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { resetPasswordEmailSend } from '@/integrations/supabase/resetPassword';
 import { cn } from '@/lib/classMerge';
 import { isValidEmail } from '@/lib/email';
-import { timeout } from '@/lib/timeout';
 
 export const ResetEmailForm: React.FC<{
   queryEmail: string;
 }> = ({ queryEmail }) => {
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState(queryEmail);
   const [emailSent, setEmailSent] = useState(false);
-  const { openErrorNotification } = useBusterNotifications();
+  const { mutateAsync: resetPasswordEmailSendMutation, isPending: loading } = useMutation({
+    mutationFn: resetPasswordEmailSend,
+  });
 
   const disabled = !email || !isValidEmail(email);
 
   const handleResetPassword = async () => {
     if (disabled) return;
-    setLoading(true);
-    const [res] = await Promise.all([resetPasswordEmailSend({ data: { email } }), timeout(450)]);
-    if (res?.error) {
-      openErrorNotification(res.error);
-    } else {
-      setEmailSent(true);
-    }
-    setLoading(false);
+    const [res] = await Promise.all([resetPasswordEmailSendMutation({ data: { email } })]);
+
+    setEmailSent(true);
   };
 
   if (emailSent) {

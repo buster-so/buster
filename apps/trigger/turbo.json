@@ -15,8 +15,8 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["^build"],
-      "with": ["@buster-app/supabase#start"]
+      "dependsOn": ["^build", "@buster-app/supabase#start"],
+      "with": ["@buster/database#dev"]
     },
     "dev:fast": {
       "cache": false,

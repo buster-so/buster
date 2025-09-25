@@ -12,7 +12,7 @@ export const DashboardSaveFilePopup: React.FC<{ dashboardId: string }> = React.m
     const chatId = useGetChatId();
     // const chatId = useChatLayoutContextSelector((x) => x.chatId);
     const { data: dashboard } = useGetDashboard(
-      { id: dashboardId },
+      { id: dashboardId, versionNumber: 'LATEST' },
       {
         select: useCallback(
           (x: BusterDashboardResponse) => ({

@@ -508,6 +508,81 @@ describe('done-tool-file-selection - report filtering functionality', () => {
   });
 
   describe('BUG-1885: Metrics used in reports appearing in response messages', () => {
+    it('should filter out metric when content has escaped quotes (actual production bug)', () => {
+      // This test reproduces the EXACT bug scenario from production where escaped quotes
+      // in the report content were causing the metric ID regex to fail
+      const messages: ModelMessage[] = [
+        // Create a metric first
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolName: 'createMetrics',
+              toolCallId: 'toolu_01R7jSBNXiNd1mdN162Kk5To',
+              output: {
+                type: 'json',
+                value: {
+                  files: [
+                    {
+                      id: '229f7b5d-c660-42a9-b4f2-46a0bf1f8726',
+                      name: 'Total Customers',
+                      version_number: 1,
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+        // Create report with ESCAPED quotes in the content (as seen in production)
+        {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool-call',
+              toolName: 'createReports',
+              toolCallId: 'toolu_019dwAk5Ls2XHMpCfZVJg9z3',
+              input: {
+                name: 'Total Customers',
+                // This is the exact format from production with escaped quotes
+                content:
+                  '<metric metricId=\\"229f7b5d-c660-42a9-b4f2-46a0bf1f8726\\"/>\\n\\nAdventure Works has **19,820 total customers** in their database.',
+              },
+            },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolName: 'createReports',
+              toolCallId: 'toolu_019dwAk5Ls2XHMpCfZVJg9z3',
+              output: {
+                type: 'json',
+                value: {
+                  file: {
+                    id: 'a41ae0e9-2215-4ba8-8045-7b5e68e6f4b8',
+                    name: 'Total Customers',
+                    version_number: 1,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ];
+
+      const files = extractFilesFromToolCalls(messages);
+
+      // The metric should be filtered out because it's referenced in the report
+      // The report should also be filtered out (all reports are filtered)
+      expect(files).toHaveLength(0);
+      expect(files.find((f) => f.id === '229f7b5d-c660-42a9-b4f2-46a0bf1f8726')).toBeUndefined();
+      expect(files.find((f) => f.id === 'a41ae0e9-2215-4ba8-8045-7b5e68e6f4b8')).toBeUndefined();
+    });
+
     it('should filter out metric when using new single-file report structure (user reported bug)', () => {
       // This test reproduces the exact bug scenario reported by the user
       const messages: ModelMessage[] = [

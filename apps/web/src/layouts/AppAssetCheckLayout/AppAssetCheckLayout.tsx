@@ -36,14 +36,14 @@ export const AppAssetCheckLayout: React.FC<
     return null;
   } else if (!assetId || !assetType) {
     return <AppAssetNotFound assetId={assetId} type={assetType} />;
-  } else if (!hasAccess && !isPublic) {
-    content = <AppNoPageAccess assetId={assetId} type={assetType} />;
-  } else if (isPublic && passwordRequired) {
+  } else if (isPublic && passwordRequired && !hasAccess) {
     content = (
       <AppPasswordAccess assetId={assetId} type={assetType}>
         {children}
       </AppPasswordAccess>
     );
+  } else if (!hasAccess) {
+    content = <AppNoPageAccess assetId={assetId} type={assetType} />;
   } else {
     content = children;
   }

@@ -1,6 +1,7 @@
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
   useAddMetricsToDashboard,
   useRemoveMetricsFromDashboard,
@@ -56,13 +57,16 @@ interface MetricThreeDotMenuDropdownProps {
 export const MetricThreeDotMenuDropdown = React.memo(
   ({ metricId, isViewingOldVersion, versionNumber, children }: MetricThreeDotMenuDropdownProps) => {
     const isChatMode = useIsChatMode();
-    const { data: permission } = useGetMetric({ id: metricId }, { select: (x) => x.permission });
+    const { data: permission } = useGetMetric(
+      { id: metricId, versionNumber },
+      { select: useCallback((x: BusterMetric) => x.permission, []) }
+    );
     const openFullScreenMetric = useOpenChartItem({ metricId, metricVersionNumber: versionNumber });
-    const dashboardSelectMenu = useDashboardSelectMenu({ metricId });
+    const dashboardSelectMenu = useDashboardSelectMenu({ metricId, versionNumber });
     const versionHistoryItems = useMetricVersionHistorySelectMenu({ metricId });
-    const collectionSelectMenu = useCollectionSelectMenu({ metricId });
-    const statusSelectMenu = useStatusSelectMenu({ metricId });
-    const favoriteMetric = useFavoriteMetricSelectMenu({ metricId });
+    const collectionSelectMenu = useCollectionSelectMenu({ metricId, versionNumber });
+    const statusSelectMenu = useStatusSelectMenu({ metricId, versionNumber });
+    const favoriteMetric = useFavoriteMetricSelectMenu({ metricId, versionNumber });
     const editChartMenu = useEditChartSelectMenu();
     const resultsViewMenu = useResultsViewSelectMenu({ metricId });
     const sqlEditorMenu = useSQLEditorSelectMenu({ metricId });
@@ -79,8 +83,8 @@ export const MetricThreeDotMenuDropdown = React.memo(
       metricId,
       metricVersionNumber: versionNumber,
     });
-    const editWithAI = useEditMetricWithAI({ metricId });
-    const shareMenu = useShareMenuSelectMenu({ metricId });
+    const editWithAI = useEditMetricWithAI({ metricId, versionNumber });
+    const shareMenu = useShareMenuSelectMenu({ metricId, versionNumber });
     const drilldownItem = useMetricDrilldownItem({ metricId });
 
     const isEditor = canEdit(permission);
@@ -154,10 +158,19 @@ export const MetricThreeDotMenuButton = React.memo(
   }
 );
 
-const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
+const useDashboardSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
   const { mutateAsync: saveMetricsToDashboard } = useAddMetricsToDashboard();
   const { mutateAsync: removeMetricsFromDashboard } = useRemoveMetricsFromDashboard();
-  const { data: dashboards } = useGetMetric({ id: metricId }, { select: (x) => x.dashboards });
+  const { data: dashboards } = useGetMetric(
+    { id: metricId, versionNumber },
+    { select: useCallback((x: BusterMetric) => x.dashboards, []) }
+  );
   const { openInfoMessage } = useBusterNotifications();
 
   const onSaveToDashboard = async (dashboardIds: string[]) => {
@@ -209,12 +222,18 @@ const useDashboardSelectMenu = ({ metricId }: { metricId: string }) => {
   return dashboardDropdownItem;
 };
 
-const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
+const useCollectionSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
   const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
   const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
   const { data: selectedCollections } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.collections?.map((x) => x.id) }
+    { id: metricId, versionNumber },
+    { select: useCallback((x: BusterMetric) => x.collections?.map((x) => x.id), []) }
   );
   const { openInfoMessage } = useBusterNotifications();
 
@@ -261,8 +280,17 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
   return collectionDropdownItem;
 };
 
-const useStatusSelectMenu = ({ metricId }: { metricId: string }) => {
-  const { data: metricStatus } = useGetMetric({ id: metricId }, { select: (x) => x.status });
+const useStatusSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
+  const { data: metricStatus } = useGetMetric(
+    { id: metricId, versionNumber },
+    { select: useCallback((x: BusterMetric) => x.status, []) }
+  );
   const { mutate: updateStatus } = useBulkUpdateMetricVerificationStatus();
   const isAdmin = useIsUserAdmin();
 
@@ -359,9 +387,15 @@ const useDeleteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
   );
 };
 
-export const useShareMenuSelectMenu = ({ metricId }: { metricId: string }) => {
+export const useShareMenuSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
   const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, versionNumber },
     { select: getShareAssetConfig }
   );
   const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);

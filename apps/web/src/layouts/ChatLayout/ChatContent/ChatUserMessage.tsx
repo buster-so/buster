@@ -38,22 +38,16 @@ export const ChatUserMessage: React.FC<{
     (e?: React.ClipboardEvent) => {
       // Check if user has selected text
       const selection = window.getSelection();
-      const hasSelection = selection && selection.toString().length > 0;
+      const selectedText = selection?.toString().trim() || '';
+      const hasSelection = selectedText.length > 0;
 
-      // If user has selected text, let browser handle it naturally
-      if (hasSelection && e?.clipboardData) {
-        // Don't prevent default - let browser copy the selected text
-        return;
-      }
-
-      // Only override copy behavior when no text is selected
-      // This handles the case where user presses Ctrl+C without selection
-      // or when the copy button is clicked
+      // Always override copy behavior to provide clean text
       if (e?.clipboardData) {
         e.preventDefault();
-        e.clipboardData.setData('text/plain', request || '');
+        // Copy selected text if there is a selection, otherwise copy full message
+        e.clipboardData.setData('text/plain', hasSelection ? selectedText : request || '');
       } else {
-        navigator.clipboard.writeText(request || '');
+        navigator.clipboard.writeText(hasSelection ? selectedText : request || '');
       }
       openSuccessMessage('Copied to clipboard');
     },
@@ -77,11 +71,10 @@ export const ChatUserMessage: React.FC<{
         />
       ) : (
         <>
-          <div>
-            <Paragraph className="break-words whitespace-pre-wrap" onCopy={handleCopy}>
-              {request}
-            </Paragraph>
-          </div>
+          <Paragraph className="break-words whitespace-pre-line" onCopy={handleCopy}>
+            {request}
+          </Paragraph>
+
           {isStreamFinished && canEditChat && (
             <RequestMessageTooltip
               isTooltipOpen={isTooltipOpen}

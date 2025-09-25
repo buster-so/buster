@@ -20,7 +20,7 @@ export const useIsDashboardReadOnly = ({
     isFetched,
     isError,
   } = useGetDashboard(
-    { id: dashboardId },
+    { id: dashboardId, versionNumber: 'LATEST' },
     {
       select: useCallback((x: BusterDashboardResponse) => {
         return {

@@ -85,6 +85,10 @@ export async function getDashboardHandler(
     requiredRole: 'can_view',
     organizationId: dashboardFile.organizationId,
     workspaceSharing: dashboardFile.workspaceSharing || 'none',
+    publiclyAccessible: dashboardFile.publiclyAccessible,
+    publicExpiryDate: dashboardFile.publicExpiryDate ?? undefined,
+    publicPassword: dashboardFile.publicPassword ?? undefined,
+    userSuppliedPassword: password,
   });
 
   // Check public access

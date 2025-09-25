@@ -1,42 +1,46 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useInViewport } from '@/hooks/useInViewport';
 import { useDashboardContentControllerContextSelector } from '../../../../controllers/DashboardController/DashboardViewDashboardController/DashboardContentController/DashboardContentControllerContext';
 
 export const useDashboardMetric = ({
   metricId,
-  versionNumber,
+  metricVersionNumber,
 }: {
   metricId: string;
-  versionNumber: number | undefined;
+  metricVersionNumber: number | undefined;
 }) => {
   const {
     data: metric,
     isFetched: isMetricFetched,
     error: metricError,
   } = useGetMetric(
-    { id: metricId, versionNumber },
+    { id: metricId, versionNumber: metricVersionNumber },
     {
       enabled: !!metricId,
-      select: ({
-        name,
-        description,
-        time_frame,
-        chart_config,
-        permission,
-        error,
-        evaluation_score,
-        evaluation_summary,
-      }) => ({
-        name,
-        error,
-        description,
-        time_frame,
-        permission,
-        evaluation_score,
-        evaluation_summary,
-        chart_config,
-      }),
+      select: useCallback(
+        ({
+          name,
+          description,
+          time_frame,
+          chart_config,
+          permission,
+          error,
+          evaluation_score,
+          evaluation_summary,
+        }: BusterMetric) => ({
+          name,
+          error,
+          description,
+          time_frame,
+          permission,
+          evaluation_score,
+          evaluation_summary,
+          chart_config,
+        }),
+        []
+      ),
     }
   );
   const {
@@ -44,7 +48,7 @@ export const useDashboardMetric = ({
     isFetched: isFetchedMetricData,
     dataUpdatedAt: metricDataUpdatedAt,
     error: metricDataError,
-  } = useGetMetricData({ id: metricId, versionNumber });
+  } = useGetMetricData({ id: metricId, versionNumber: metricVersionNumber });
   const dashboard = useDashboardContentControllerContextSelector(({ dashboard }) => dashboard);
   const metricMetadata = useDashboardContentControllerContextSelector(
     ({ metricMetadata }) => metricMetadata[metricId]

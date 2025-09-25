@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import last from 'lodash/last';
 import { create } from 'mutative';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
@@ -23,15 +23,19 @@ export const useIsDashboardChanged = ({
   const { data: currentDashboard, refetch: refetchCurrentDashboard } = useGetDashboard(
     { id: dashboardId, versionNumber: undefined },
     {
-      select: (x) => ({
-        name: x.dashboard.name,
-        description: x.dashboard.description,
-        config: x.dashboard.config,
-        file: x.dashboard.file,
-        permission: x.permission,
-        versions: x.versions,
-        version_number: x.dashboard.version_number,
-      }),
+      select: useCallback(
+        (x: BusterDashboardResponse) => ({
+          name: x.dashboard.name,
+          description: x.dashboard.description,
+          config: x.dashboard.config,
+          file: x.dashboard.file,
+          permission: x.permission,
+          versions: x.versions,
+          version_number: x.dashboard.version_number,
+        }),
+        []
+      ),
+      enabled: false,
     }
   );
 

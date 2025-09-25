@@ -1,16 +1,13 @@
 import type React from 'react';
 import type { PropsWithChildren } from 'react';
-import { lazy, Suspense, useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 import { type ExternalToast, toast } from 'sonner';
 import { createContext, useContextSelector } from 'use-context-selector';
+import { ConfirmModal } from '@/components/ui/modal/ConfirmModal';
 import { Toaster } from '@/components/ui/toaster/Toaster';
 import { useConfirmModalContext } from './useConfirmModal';
 
 export type NotificationType = 'success' | 'info' | 'warning' | 'error';
-
-const ConfirmModal = lazy(() =>
-  import('@/components/ui/modal/ConfirmModal').then((mod) => ({ default: mod.ConfirmModal }))
-);
 
 export type NotificationProps = {
   type?: NotificationType;
@@ -136,9 +133,7 @@ export const BusterNotificationsProvider: React.FC<PropsWithChildren> = ({ child
     <BusterNotifications.Provider value={{ ...value, openConfirmModal }}>
       {children}
       <Toaster />
-      <Suspense fallback={<span className="hidden">...</span>}>
-        <ConfirmModal {...confirmModalProps} />
-      </Suspense>
+      <ConfirmModal {...confirmModalProps} />
     </BusterNotifications.Provider>
   );
 };

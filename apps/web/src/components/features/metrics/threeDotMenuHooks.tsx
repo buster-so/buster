@@ -40,7 +40,7 @@ export const useMetricVersionHistorySelectMenu = ({
   metricId: string;
 }): IDropdownItem => {
   const { data } = useGetMetric(
-    { id: metricId },
+    { id: metricId, versionNumber: 'LATEST' },
     {
       select: useCallback(
         (x: BusterMetric) => ({
@@ -74,8 +74,17 @@ export const useMetricVersionHistorySelectMenu = ({
   );
 };
 
-export const useFavoriteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
-  const { data: name } = useGetMetric({ id: metricId }, { select: (x) => x.name });
+export const useFavoriteMetricSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
+  const { data: name } = useGetMetric(
+    { id: metricId, versionNumber },
+    { select: useCallback((x: BusterMetric) => x.name, []) }
+  );
   const { isFavorited, onFavoriteClick } = useFavoriteStar({
     id: metricId,
     type: 'metric_file',
@@ -196,11 +205,11 @@ export const useDownloadPNGSelectMenu = ({
   const { openErrorMessage } = useBusterNotifications();
   const { data: name } = useGetMetric(
     { id: metricId, versionNumber: metricVersionNumber },
-    { select: (x) => x.name }
+    { select: useCallback((x: BusterMetric) => x.name, []) }
   );
   const { data: selectedChartType } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.chart_config?.selectedChartType }
+    { id: metricId, versionNumber: metricVersionNumber },
+    { select: useCallback((x: BusterMetric) => x.chart_config?.selectedChartType, []) }
   );
 
   const canDownload = selectedChartType && selectedChartType !== 'table';
@@ -373,9 +382,15 @@ export const useNavigateToDashboardMetricItem = ({
   }, [metricId, metricVersionNumber, dashboardId, dashboardVersionNumber]);
 };
 
-export const useEditMetricWithAI = ({ metricId }: { metricId: string }): IDropdownItem => {
+export const useEditMetricWithAI = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}): IDropdownItem => {
   const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, versionNumber },
     { select: getShareAssetConfig }
   );
   const isEditor = canEdit(shareAssetConfig?.permission);

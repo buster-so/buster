@@ -25,7 +25,6 @@ export const useGetMyUserInfo = <TData = UserResponse>(
   return useQuery({
     ...userQueryKeys.userGetUserMyself,
     queryFn: getMyUserInfo,
-    enabled: false, //This is a server only query,
     select: props?.select,
     ...props,
   });

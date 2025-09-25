@@ -23,7 +23,7 @@ export async function createReportSharingHandler(
     assetId: reportId,
     assetType: 'report_file',
     workspaceSharing: getReportWorkspaceSharing,
-    requiredRole: ['full_access', 'owner', 'can_edit'],
+    requiredRole: 'can_edit',
   });
 
   // Get the report to verify it exists

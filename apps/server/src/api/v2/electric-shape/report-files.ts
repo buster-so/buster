@@ -67,6 +67,10 @@ export const reportFilesProxyRouter = async (
     requiredRole: 'can_view',
     organizationId: reportData.organizationId,
     workspaceSharing: reportData.workspaceSharing,
+    publiclyAccessible: reportData.publiclyAccessible,
+    publicExpiryDate: reportData.publicExpiryDate ?? undefined,
+    publicPassword: reportData.publicPassword ?? undefined,
+    userSuppliedPassword: undefined,
   });
 
   if (!hasAccess) {

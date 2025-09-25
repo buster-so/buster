@@ -4,7 +4,7 @@ import { BraintrustMiddleware } from 'braintrust';
 
 export const DEFAULT_ANTHROPIC_OPTIONS = {
   gateway: {
-    order: ['anthropic', 'bedrock', 'vertex'],
+    order: ['bedrock', 'anthropic', 'vertex'],
   },
   headers: {},
   anthropic: { cacheControl: { type: 'ephemeral' } },
@@ -13,11 +13,11 @@ export const DEFAULT_ANTHROPIC_OPTIONS = {
 export const DEFAULT_OPENAI_OPTIONS = {
   gateway: {
     order: ['openai'],
-    openai: {
-      parallelToolCalls: false,
-      reasoningEffort: 'minimal',
-      verbosity: 'low',
-    },
+  },
+  openai: {
+    parallelToolCalls: false,
+    reasoningEffort: 'minimal',
+    verbosity: 'low',
   },
 };
 

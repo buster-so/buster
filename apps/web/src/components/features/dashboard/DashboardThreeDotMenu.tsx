@@ -29,24 +29,30 @@ export const DashboardThreeDotMenu = React.memo(
     isViewingOldVersion: boolean;
     dashboardVersionNumber: number | undefined;
   }) => {
-    const versionHistoryItems = useDashboardVersionHistorySelectMenu({ dashboardId });
+    const versionHistoryItems = useDashboardVersionHistorySelectMenu({
+      dashboardId,
+      dashboardVersionNumber,
+    });
     const chatId = useGetChatId();
-    const collectionSelectMenu = useCollectionSelectMenu({ dashboardId });
+    const collectionSelectMenu = useCollectionSelectMenu({ dashboardId, dashboardVersionNumber });
     const openFullScreenDashboard = useOpenFullScreenDashboard({ dashboardId });
-    const favoriteDashboard = useFavoriteDashboardSelectMenu({ dashboardId });
+    const favoriteDashboard = useFavoriteDashboardSelectMenu({
+      dashboardId,
+      dashboardVersionNumber,
+    });
     const deleteDashboardMenu = useDeleteDashboardSelectMenu({ dashboardId });
     const renameDashboardMenu = useRenameDashboardSelectMenu({
       dashboardId,
       dashboardVersionNumber,
     });
-    const shareMenu = useShareMenuSelectMenu({ dashboardId });
+    const shareMenu = useShareMenuSelectMenu({ dashboardId, dashboardVersionNumber });
     const addContentToDashboardMenu = useAddContentToDashboardSelectMenu();
     const filterDashboardMenu = useFilterDashboardSelectMenu();
     const { data: permission } = useGetDashboard(
-      { id: dashboardId },
+      { id: dashboardId, versionNumber: dashboardVersionNumber },
       { select: useCallback((x: GetDashboardResponse) => x.permission, []) }
     );
-    const editDashboardWithAI = useEditDashboardWithAI({ dashboardId });
+    const editDashboardWithAI = useEditDashboardWithAI({ dashboardId, dashboardVersionNumber });
     const isEffectiveOwner = getIsEffectiveOwner(permission);
     const isFilter = canFilter(permission);
     const isEditor = canEdit(permission);

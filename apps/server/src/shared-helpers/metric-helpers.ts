@@ -76,46 +76,18 @@ export async function fetchAndProcessMetricData(
     requiredRole: 'can_view',
     organizationId: metricFile.organizationId,
     workspaceSharing: metricFile.workspaceSharing || 'none',
+    publiclyAccessible: metricFile.publiclyAccessible ?? false,
+    publicExpiryDate: metricFile.publicExpiryDate ?? undefined,
+    publicPassword: metricFile.publicPassword ?? undefined,
+    userSuppliedPassword: password,
   });
 
   effectiveRole = permissionResult.effectiveRole ? permissionResult.effectiveRole : effectiveRole;
 
-  // Check public access if needed
-  if (!effectiveRole) {
-    if (!metricFile.publiclyAccessible) {
-      console.warn(`Permission denied for user ${user.id} to metric ${metricId}`);
-      throw new HTTPException(403, {
-        message: "You don't have permission to view this metric",
-      });
-    }
-
-    // Check if public access has expired
-    const today = new Date();
-    if (metricFile.publicExpiryDate && new Date(metricFile.publicExpiryDate) < today) {
-      console.warn(`Public access expired for metric ${metricId}`);
-      throw new HTTPException(403, {
-        message: 'Public access to this metric has expired',
-      });
-    }
-
-    // Check password if required
-    if (metricFile.publicPassword) {
-      if (!password) {
-        console.warn(`Public password required for metric ${metricId}`);
-        throw new HTTPException(418, {
-          message: 'Password required for public access',
-        });
-      }
-
-      if (password !== metricFile.publicPassword) {
-        console.warn(`Incorrect public password for metric ${metricId}`);
-        throw new HTTPException(403, {
-          message: 'Incorrect password for public access',
-        });
-      }
-    }
-
-    effectiveRole = 'can_view';
+  if (!permissionResult.hasAccess || !effectiveRole) {
+    throw new HTTPException(403, {
+      message: "You don't have permission to view this metric",
+    });
   }
 
   // Parse version history

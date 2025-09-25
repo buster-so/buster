@@ -2,7 +2,6 @@ import type { AssetType } from '@buster/server-shared/assets';
 import type { RegisteredRouter } from '@tanstack/react-router';
 import type { FileType } from '@/api/asset_interfaces';
 import { defineLink } from '@/lib/routes';
-import type { ILinkProps } from '@/types/routes';
 
 export const createSimpleAssetRoute = <
   TRouter extends RegisteredRouter = RegisteredRouter,

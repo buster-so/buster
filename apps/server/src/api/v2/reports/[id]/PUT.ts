@@ -22,7 +22,7 @@ async function updateReportHandler(
     assetId: reportId,
     assetType: 'report_file',
     workspaceSharing: getReportWorkspaceSharing,
-    requiredRole: ['full_access', 'owner', 'can_edit'],
+    requiredRole: 'can_edit',
   });
 
   const { name, content, update_version = false } = request;

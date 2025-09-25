@@ -1,6 +1,7 @@
 import { ClientOnly } from '@tanstack/react-router';
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { LazyErrorBoundary } from '@/components/features/global/LazyErrorBoundary';
 import { isDev } from '@/config/dev';
 import { env } from '@/env';
 import { isServer } from '@/lib/window';
@@ -43,9 +44,11 @@ export const TanstackDevtools: React.FC = React.memo(() => {
 
   return (
     <ClientOnly>
-      <Suspense fallback={<span className="hidden">...</span>}>
-        <LazyTanstackDevtools />
-      </Suspense>
+      <LazyErrorBoundary>
+        <Suspense fallback={<span className="hidden">...</span>}>
+          <LazyTanstackDevtools />
+        </Suspense>
+      </LazyErrorBoundary>
     </ClientOnly>
   );
 });

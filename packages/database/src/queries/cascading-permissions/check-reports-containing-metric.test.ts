@@ -47,9 +47,30 @@ describe('checkReportsContainingMetric', () => {
 
   it('should return reports with organizationId and workspaceSharing', async () => {
     const mockReports = [
-      { id: 'report1', organizationId: 'org1', workspaceSharing: 'can_view' },
-      { id: 'report2', organizationId: 'org2', workspaceSharing: 'full_access' },
-      { id: 'report3', organizationId: 'org1', workspaceSharing: null },
+      {
+        id: 'report1',
+        organizationId: 'org1',
+        workspaceSharing: 'can_view',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'report2',
+        organizationId: 'org2',
+        workspaceSharing: 'full_access',
+        publiclyAccessible: true,
+        publicExpiryDate: '2024-12-31T23:59:59Z',
+        publicPassword: 'secret123',
+      },
+      {
+        id: 'report3',
+        organizationId: 'org1',
+        workspaceSharing: null,
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
     ];
 
     mockQueryChain.where.mockResolvedValue(mockReports);
@@ -61,6 +82,9 @@ describe('checkReportsContainingMetric', () => {
       id: expect.anything(),
       organizationId: expect.anything(),
       workspaceSharing: expect.anything(),
+      publiclyAccessible: expect.anything(),
+      publicExpiryDate: expect.anything(),
+      publicPassword: expect.anything(),
     });
     expect(mockQueryChain.from).toHaveBeenCalled();
     expect(mockQueryChain.innerJoin).toHaveBeenCalled();
@@ -76,21 +100,67 @@ describe('checkReportsContainingMetric', () => {
   });
 
   it('should handle null workspace sharing values', async () => {
-    const mockReports = [{ id: 'report1', organizationId: 'org1', workspaceSharing: null }];
+    const mockReports = [
+      {
+        id: 'report1',
+        organizationId: 'org1',
+        workspaceSharing: null,
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+    ];
 
     mockQueryChain.where.mockResolvedValue(mockReports);
 
     const result = await checkReportsContainingMetric('metric123');
 
-    expect(result).toEqual([{ id: 'report1', organizationId: 'org1', workspaceSharing: null }]);
+    expect(result).toEqual([
+      {
+        id: 'report1',
+        organizationId: 'org1',
+        workspaceSharing: null,
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+    ]);
   });
 
   it('should handle all workspace sharing levels', async () => {
     const mockReports = [
-      { id: 'report1', organizationId: 'org1', workspaceSharing: 'none' },
-      { id: 'report2', organizationId: 'org1', workspaceSharing: 'can_view' },
-      { id: 'report3', organizationId: 'org1', workspaceSharing: 'can_edit' },
-      { id: 'report4', organizationId: 'org1', workspaceSharing: 'full_access' },
+      {
+        id: 'report1',
+        organizationId: 'org1',
+        workspaceSharing: 'none',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'report2',
+        organizationId: 'org1',
+        workspaceSharing: 'can_view',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'report3',
+        organizationId: 'org1',
+        workspaceSharing: 'can_edit',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+      {
+        id: 'report4',
+        organizationId: 'org1',
+        workspaceSharing: 'full_access',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
     ];
 
     mockQueryChain.where.mockResolvedValue(mockReports);
@@ -103,7 +173,16 @@ describe('checkReportsContainingMetric', () => {
   it('should filter out deleted reports and deleted relationships', async () => {
     // This test validates that the query conditions are set up correctly
     // In a real implementation, deleted items would be filtered by the database
-    const activeReports = [{ id: 'report1', organizationId: 'org1', workspaceSharing: 'can_view' }];
+    const activeReports = [
+      {
+        id: 'report1',
+        organizationId: 'org1',
+        workspaceSharing: 'can_view',
+        publiclyAccessible: false,
+        publicExpiryDate: null,
+        publicPassword: null,
+      },
+    ];
 
     mockQueryChain.where.mockResolvedValue(activeReports);
 

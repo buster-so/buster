@@ -2,7 +2,6 @@ import type { ModelMessage } from 'ai';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type StreamExecutor,
-  analyzeError,
   calculateBackoffDelay,
   composeMiddleware,
   createMockAgent,
@@ -81,22 +80,6 @@ describe('with-agent-retry', () => {
         expect(calculateBackoffDelay(1, 500)).toBe(500);
         expect(calculateBackoffDelay(2, 500)).toBe(1000);
         expect(calculateBackoffDelay(3, 500)).toBe(2000);
-      });
-    });
-
-    describe('analyzeError', () => {
-      it('should correctly identify retryable errors', () => {
-        const overloadedError = createOverloadedError();
-        const result = analyzeError(overloadedError);
-        expect(result.isRetryable).toBe(true);
-        expect(result.error).toEqual(overloadedError);
-      });
-
-      it('should treat all errors as retryable', () => {
-        const regularError = new Error('Regular error');
-        const result = analyzeError(regularError);
-        expect(result.isRetryable).toBe(true);
-        expect(result.error).toEqual(regularError);
       });
     });
 
@@ -238,19 +221,23 @@ describe('with-agent-retry', () => {
         expect(mockFetchMessageEntries).not.toHaveBeenCalled();
       });
 
-      it('should not retry when recovery fails', async () => {
+      it('should continue with original messages when recovery fails', async () => {
         mockFetchMessageEntries.mockRejectedValue(new Error('DB error'));
+        const originalMessages: ModelMessage[] = [{ role: 'user', content: 'original' }];
 
         const result = await handleFailedAttempt(
           createOverloadedError(),
           1,
           3,
           'test-id',
-          [],
+          originalMessages,
           1000
         );
 
-        expect(result.shouldRetry).toBe(false);
+        // We now continue with original messages when recovery fails
+        expect(result.shouldRetry).toBe(true);
+        expect(result.nextMessages).toEqual(originalMessages);
+        expect(result.delayMs).toBe(1000);
       });
     });
   });

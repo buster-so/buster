@@ -14,6 +14,7 @@ export {
 export {
   getMetricWithDataSource,
   extractSqlFromMetricContent,
+  getLatestMetricVersion,
   // Schemas (Zod-first)
   GetMetricWithDataSourceInputSchema,
   MetricContentSchema,

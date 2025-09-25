@@ -1,14 +1,41 @@
 import type { HealthCheckResponse } from '@buster/server-shared/healthcheck';
+import type { User } from '@supabase/supabase-js';
 import { createFileRoute } from '@tanstack/react-router';
 import { useHealthcheck } from '@/api/buster_rest/healthcheck/queryRequests';
-import type { RustApiError } from '../api/errors';
+import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
+import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
+import type { RustApiError } from '@/api/errors';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/CardBase';
+import { Text } from '@/components/ui/typography/Text';
+import { useAppVersionMeta } from '@/context/AppVersion/useAppVersion';
+import { getSupabaseUser } from '@/integrations/supabase/getSupabaseUserClient';
+import { formatDate } from '@/lib/date';
 
 export const Route = createFileRoute('/healthcheck')({
   component: RouteComponent,
+  beforeLoad: async () => {
+    const supabaseUser = await getSupabaseUser();
+    return { supabaseUser };
+  },
+  loader: async ({ context }) => {
+    await prefetchGetMyUserInfo(context.queryClient);
+    const { supabaseUser } = context;
+    return { supabaseUser };
+  },
 });
 
 function RouteComponent() {
   const { data, isLoading, error } = useHealthcheck();
+  const supabaseUser = Route.useLoaderData().supabaseUser;
+  const user = useGetUserBasicInfo();
+  const appVersionData = useAppVersionMeta();
 
   if (isLoading) {
     return <LoadingState />;
@@ -22,65 +49,92 @@ function RouteComponent() {
     return <ErrorState error={new Error('No data received')} />;
   }
 
-  return <HealthcheckDashboard data={data} />;
+  return (
+    <HealthcheckDashboard
+      data={data}
+      supabaseUser={supabaseUser}
+      user={user}
+      appVersionData={appVersionData}
+    />
+  );
 }
 
 function LoadingState() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Checking system health...</p>
-      </div>
+      <Card className="text-center max-w-md mx-4">
+        <CardContent className="pt-6">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400 mx-auto mb-4"></div>
+          <Text variant="secondary" size="base">
+            Checking system health...
+          </Text>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 function ErrorState({ error }: { error: Error | RustApiError }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-white flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
-        <div className="flex items-center mb-4">
-          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-            <svg
-              className="w-6 h-6 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+      <Card className="max-w-md w-full mx-4">
+        <CardHeader>
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+              <svg
+                className="w-6 h-6 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <div>
+              <CardTitle>Health Check Failed</CardTitle>
+              <CardDescription>Unable to retrieve system status</CardDescription>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Health Check Failed</h2>
-            <p className="text-gray-600">Unable to retrieve system status</p>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+            <Text variant="secondary" size="sm">
+              {error.message}
+            </Text>
           </div>
-        </div>
-        <div className="bg-red-50 border border-red-200 rounded-md p-3">
-          <p className="text-sm text-red-800">{error.message}</p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-function HealthcheckDashboard({ data }: { data: HealthCheckResponse }) {
+function HealthcheckDashboard({
+  data,
+  supabaseUser,
+  user,
+  appVersionData,
+}: {
+  data: HealthCheckResponse;
+  supabaseUser: Pick<User, 'email' | 'is_anonymous'>;
+  user: ReturnType<typeof useGetUserBasicInfo>;
+  appVersionData: ReturnType<typeof useAppVersionMeta>;
+}) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy':
       case 'pass':
-        return 'text-green-600 bg-green-100';
+        return 'text-gray-700 bg-gray-200';
       case 'degraded':
       case 'warn':
-        return 'text-yellow-600 bg-yellow-100';
+        return 'text-gray-600 bg-gray-100';
       case 'unhealthy':
       case 'fail':
-        return 'text-red-600 bg-red-100';
+        return 'text-gray-800 bg-gray-300';
       default:
         return 'text-gray-600 bg-gray-100';
     }
@@ -148,157 +202,302 @@ function HealthcheckDashboard({ data }: { data: HealthCheckResponse }) {
   };
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
+    return formatDate({ date: timestamp, format: 'LLL' });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-6 flex flex-col gap-4">
+      <div className="max-w-6xl mx-auto flex flex-col gap-4">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">System Health Dashboard</h1>
-          <p className="text-gray-600">Real-time monitoring of system components</p>
+        <div className="mb-4 flex flex-col gap-1">
+          <Text size="4xl" className="font-bold">
+            System Health Dashboard
+          </Text>
+          <Text variant="secondary" size="lg">
+            Real-time monitoring of system components
+          </Text>
+        </div>
+
+        {/* User Data Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Supabase User Data */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg
+                    className="w-4 h-4 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                Supabase User
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gray-50 rounded-md p-4">
+                <pre className="text-sm text-gray-800 whitespace-pre-wrap overflow-auto">
+                  {JSON.stringify(supabaseUser, null, 2)}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* User Basic Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg
+                    className="w-4 h-4 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                User Basic Info
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gray-50 rounded-md p-4">
+                <pre className="text-sm text-gray-800 whitespace-pre-wrap overflow-auto">
+                  {JSON.stringify(user, null, 2)}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Overall Status Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${getStatusColor(
-                  data.status
-                )}`}
-              >
-                {getStatusIcon(data.status)}
+        <Card>
+          <CardContent size="default">
+            <div className="flex items-center justify-between py-4">
+              <div className="flex items-center">
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center mr-6 ${getStatusColor(
+                    data.status
+                  )}`}
+                >
+                  {getStatusIcon(data.status)}
+                </div>
+                <div className="flex flex-col">
+                  <Text size="3xl" className="font-semibold capitalize">
+                    {data.status}
+                  </Text>
+                  <Text variant="secondary" size="lg">
+                    Overall System Status
+                  </Text>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900 capitalize">{data.status}</h2>
-                <p className="text-gray-600">Overall System Status</p>
+              <div className="text-right flex flex-col gap-0">
+                <Text variant="tertiary" size="sm" className="mb-0">
+                  Last checked
+                </Text>
+                <Text className="font-medium" size="lg">
+                  {formatTimestamp(data.timestamp)}
+                </Text>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Last checked</p>
-              <p className="text-gray-900 font-medium">{formatTimestamp(data.timestamp)}</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                <svg
-                  className="w-5 h-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent size="default">
+              <div className="flex items-center py-2">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg
+                    className="w-6 h-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <Text variant="tertiary" size="sm" className="">
+                    Uptime
+                  </Text>
+                  <Text size="xl" className="font-semibold">
+                    {formatUptime(data.uptime)}
+                  </Text>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Uptime</p>
-                <p className="text-xl font-semibold text-gray-900">{formatUptime(data.uptime)}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                <svg
-                  className="w-5 h-5 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 011 1v1a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V7H3a1 1 0 01-1-1V5a1 1 0 011-1h4z"
-                  />
-                </svg>
+          <Card>
+            <CardContent size="default">
+              <div className="flex items-center py-2">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg
+                    className="w-6 h-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 011 1v1a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V7H3a1 1 0 01-1-1V5a1 1 0 011-1h4z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <Text variant="tertiary" size="sm" className="">
+                    Server Version
+                  </Text>
+                  <Text size="xl" className="font-semibold">
+                    {data.version}
+                  </Text>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Version</p>
-                <p className="text-xl font-semibold text-gray-900">{data.version}</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
-                  />
-                </svg>
+          <Card>
+            <CardContent size="default">
+              <div className="flex items-center py-2">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg
+                    className="w-6 h-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <Text variant="tertiary" size="sm" className="">
+                    Environment
+                  </Text>
+                  <Text size="xl" className="font-semibold capitalize">
+                    {data.environment}
+                  </Text>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Environment</p>
-                <p className="text-xl font-semibold text-gray-900 capitalize">{data.environment}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent size="default">
+              <div className="flex items-center py-2">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg
+                    className="w-6 h-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <Text variant="tertiary" size="sm" className="">
+                    App Builds
+                  </Text>
+                  <Text size="sm" className="font-mono">
+                    Browser: {appVersionData.browserBuild || 'N/A'}
+                  </Text>
+
+                  <Text variant="tertiary" size="xs" className="">
+                    Server: {appVersionData.buildId}
+                  </Text>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Component Checks */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">Component Health Checks</h3>
-          <div className="space-y-4">
-            {Object.entries(data.checks).map(([componentName, check]) => (
-              <div key={componentName} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${getStatusColor(
-                        check.status
-                      )}`}
-                    >
-                      {getStatusIcon(check.status)}
+        <Card>
+          <CardHeader size="default">
+            <CardTitle>Component Health Checks</CardTitle>
+          </CardHeader>
+          <CardContent size="default">
+            <div className="space-y-3">
+              {Object.entries(data.checks).map(([componentName, check]) => (
+                <div key={componentName} className="border border-gray-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${getStatusColor(
+                          check.status
+                        )}`}
+                      >
+                        {getStatusIcon(check.status)}
+                      </div>
+                      <div className="flex flex-col gap-0">
+                        <Text className="font-medium capitalize" size="lg">
+                          {componentName}
+                        </Text>
+                        {check.message && (
+                          <Text variant="secondary" size="sm" className="">
+                            {check.message}
+                          </Text>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900 capitalize">{componentName}</h4>
-                      {check.message && <p className="text-sm text-gray-600">{check.message}</p>}
+                    <div className="text-right">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(
+                          check.status
+                        )}`}
+                      >
+                        {check.status}
+                      </span>
+                      {check.responseTime && (
+                        <Text variant="tertiary" size="sm" className="mt-2 ml-3">
+                          {check.responseTime}ms
+                        </Text>
+                      )}
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(
-                        check.status
-                      )}`}
-                    >
-                      {check.status}
-                    </span>
-                    {check.responseTime && (
-                      <p className="text-sm text-gray-500 mt-1">{check.responseTime}ms</p>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>System health is monitored continuously. Data refreshes automatically.</p>
+        <div className="mt-12 text-center">
+          <Text variant="tertiary" size="sm">
+            System health is monitored continuously. Data refreshes automatically.
+          </Text>
         </div>
       </div>
     </div>

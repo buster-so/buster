@@ -20,8 +20,8 @@ export const DashboardContainerHeaderButtons: React.FC<{
   const { isViewingOldVersion } = useIsDashboardReadOnly({
     dashboardId: dashboardId || '',
   });
-  const { error: dashboardError, data: permission } = useGetDashboard(
-    { id: dashboardId },
+  const { data: permission } = useGetDashboard(
+    { id: dashboardId, versionNumber: dashboardVersionNumber },
     { select: useCallback((x: BusterDashboardResponse) => x.permission, []) }
   );
 
@@ -31,7 +31,10 @@ export const DashboardContainerHeaderButtons: React.FC<{
   return (
     <FileButtonContainer>
       {isEffectiveOwner && !isViewingOldVersion && (
-        <ShareDashboardButton dashboardId={dashboardId} />
+        <ShareDashboardButton
+          dashboardId={dashboardId}
+          dashboardVersionNumber={dashboardVersionNumber}
+        />
       )}
       <DashboardThreeDotMenu
         dashboardId={dashboardId}

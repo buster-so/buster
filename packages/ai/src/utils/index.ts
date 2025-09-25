@@ -15,7 +15,6 @@ export {
   recoverMessages,
   executeStreamAttempt,
   handleFailedAttempt,
-  analyzeError,
   createRetryExecutor,
   composeMiddleware,
   retryMiddleware,

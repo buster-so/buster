@@ -58,20 +58,7 @@ export const cacheReportMetrics: ReturnType<
       await Promise.all(
         batch.map(async (metricId) => {
           try {
-            // Check if already cached
-            const exists = await checkCacheExists(organizationId, metricId, reportId);
-            if (exists) {
-              logger.info('Metric already cached, skipping', { metricId, reportId });
-              cached.push({
-                metricId,
-                success: true,
-                rowCount: 0, // Already cached, don't know the count
-              });
-              successCount++;
-              return;
-            }
-
-            // Fetch metric definition
+            // Fetch metric definition first to get the version
             const metric = await getMetricWithDataSource({ metricId });
             if (!metric) {
               logger.warn('Metric not found', { metricId });
@@ -81,6 +68,31 @@ export const cacheReportMetrics: ReturnType<
                 error: 'Metric not found',
               });
               failureCount++;
+              return;
+            }
+
+            const metricVersion = metric.versionNumber;
+
+            // Check if already cached with version
+            const exists = await checkCacheExists(
+              organizationId,
+              metricId,
+              reportId,
+              metricVersion
+            );
+            if (exists) {
+              logger.info('Metric already cached, skipping', {
+                metricId,
+                reportId,
+                version: metricVersion,
+              });
+              cached.push({
+                metricId,
+                success: true,
+                rowCount: 0, // Already cached, don't know the count
+                version: metricVersion,
+              });
+              successCount++;
               return;
             }
 
@@ -136,19 +148,27 @@ export const cacheReportMetrics: ReturnType<
               retryDelays: [1000, 3000],
             });
 
-            // Cache the data
+            // Cache the data with version
             const metricData: MetricDataResponse = {
               data: result.data,
               data_metadata: result.dataMetadata,
               metricId,
               has_more_records: result.hasMoreRecords,
+              ...(metricVersion !== undefined && { version: metricVersion }),
             };
 
-            await setCachedMetricData(organizationId, metricId, reportId, metricData);
+            await setCachedMetricData(
+              organizationId,
+              metricId,
+              reportId,
+              metricData,
+              metricVersion
+            );
 
             logger.info('Successfully cached metric', {
               metricId,
               reportId,
+              version: metricVersion,
               rowCount: result.data.length,
             });
 
@@ -156,6 +176,7 @@ export const cacheReportMetrics: ReturnType<
               metricId,
               success: true,
               rowCount: result.data.length,
+              version: metricVersion,
             });
             successCount++;
           } catch (error) {

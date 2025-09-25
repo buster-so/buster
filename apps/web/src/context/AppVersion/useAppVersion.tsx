@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { versionGetAppVersion } from '@/api/query_keys/version';
 import { Text } from '@/components/ui/typography';
 import { useWindowFocus } from '@/hooks/useWindowFocus';
@@ -18,6 +18,7 @@ export const useAppVersion = () => {
     ...versionGetAppVersion,
     refetchOnReconnect: true,
     refetchOnMount: true,
+    notifyOnChangeProps: ['data'],
   });
   const isChanged = checkNewVersion(data?.buildId);
 
@@ -53,17 +54,6 @@ export const useAppVersion = () => {
 };
 
 const AppVersionMessage = () => {
-  // const [countdown, setCountdown] = useState(180);
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setCountdown((prev) => Math.max(prev - 1, 0));
-  //     if (countdown === 0) {
-  //       window.location.reload();
-  //     }
-  //   }, 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
-
   return (
     <Text>
       A new version of the app is available. Please refresh the page to get the latest features.
@@ -75,6 +65,15 @@ export const useIsVersionChanged = () => {
   const { data = false } = useQuery({
     ...versionGetAppVersion,
     select: useCallback((data: { buildId: string }) => checkNewVersion(data.buildId), []),
+    notifyOnChangeProps: ['data'],
   });
   return data;
+};
+
+export const useAppVersionMeta = () => {
+  const { data } = useQuery({
+    ...versionGetAppVersion,
+    notifyOnChangeProps: ['data'],
+  });
+  return useMemo(() => ({ ...data, browserBuild }), [data]);
 };

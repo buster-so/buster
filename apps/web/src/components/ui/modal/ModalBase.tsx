@@ -1,6 +1,6 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as React from 'react';
-import { Xmark } from '@/components/ui/icons';
+import Xmark from '@/components/ui/icons/NucleoIconOutlined/xmark';
 
 import { cn } from '@/lib/utils';
 import { Button } from '../buttons/Button';

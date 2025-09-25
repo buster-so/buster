@@ -10,73 +10,15 @@ import { Input } from '@/components/ui/inputs';
 import { Text } from '@/components/ui/typography';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { cn } from '@/lib/classMerge';
-import { createFullURL } from '@/lib/routes';
-import { useBuildLocation } from '../../../context/Routes/useRouteBuilder';
 import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 
 export const ShareMenuContentEmbed: React.FC<ShareMenuContentBodyProps> = React.memo(
-  ({ className, assetType, assetId }) => {
-    const buildLocation = useBuildLocation();
-    const { openSuccessMessage } = useBusterNotifications();
-
-    const embedURL = useMemo(() => {
-      if (assetType === 'metric_file') {
-        return createFullURL(
-          buildLocation({
-            to: '/embed/metric/$metricId',
-            params: {
-              metricId: assetId,
-            },
-          })
-        );
-      }
-
-      if (assetType === 'dashboard_file') {
-        return createFullURL(
-          buildLocation({
-            to: '/embed/dashboard/$dashboardId',
-            params: {
-              dashboardId: assetId,
-            },
-          })
-        );
-      }
-
-      if (assetType === 'report_file') {
-        return createFullURL(
-          buildLocation({
-            to: '/embed/report/$reportId',
-            params: {
-              reportId: assetId,
-            },
-          })
-        );
-      }
-
-      if (assetType === 'chat') {
-        return '';
-      }
-
-      if (assetType === 'collection') {
-        return '';
-      }
-
-      const _exhaustiveCheck: never = assetType;
-
-      return '';
-    }, [assetType, assetId, buildLocation]);
-
-    const onCopyLink = () => {
-      const url = window.location.origin + embedURL;
-      navigator.clipboard.writeText(url);
-      openSuccessMessage('Link copied to clipboard');
-    };
-
+  ({ className, embedLinkURL, onCopyLink }) => {
     return (
       <div className={cn('flex flex-col', className)}>
         <div className="flex w-full items-center space-x-1">
-          <Input size="small" defaultValue={createIframe(embedURL)} readOnly />
-          <Button prefix={<Link />} className="flex" onClick={onCopyLink} />
+          <Input size="small" defaultValue={createIframe(embedLinkURL)} readOnly />
+          <Button prefix={<Link />} className="flex" onClick={() => onCopyLink(true)} />
         </div>
       </div>
     );

@@ -2,12 +2,12 @@
   "name": "@buster-app/supabase",
   "version": "0.0.1",
   "private": false,
-  "dependencies": {
-    "@buster/database": "workspace:*"
-  },
+  "dependencies": {},
   "scripts": {
     "lint": "biome check . --write",
     "lint:fix": "biome check . --write",
-    "start": "echo 'Please run this command through Turbo from the root: turbo start'"
+    "start": "supabase start",
+    "stop": "supabase stop",
+    "reset": "supabase stop && supabase start && supabase db reset"
   }
 }

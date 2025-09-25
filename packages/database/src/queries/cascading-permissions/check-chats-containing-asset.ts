@@ -7,6 +7,8 @@ export interface ChatWithSharing {
   id: string;
   organizationId: string;
   workspaceSharing: WorkspaceSharing | null;
+  publiclyAccessible: boolean;
+  publicExpiryDate: string | null;
 }
 
 export async function checkChatsContainingAsset(
@@ -18,6 +20,8 @@ export async function checkChatsContainingAsset(
       id: chats.id,
       organizationId: chats.organizationId,
       workspaceSharing: chats.workspaceSharing,
+      publiclyAccessible: chats.publiclyAccessible,
+      publicExpiryDate: chats.publicExpiryDate,
     })
     .from(messagesToFiles)
     .innerJoin(messages, eq(messages.id, messagesToFiles.messageId))

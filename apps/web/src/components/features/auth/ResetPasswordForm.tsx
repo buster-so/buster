@@ -1,29 +1,33 @@
-import type { UserResponse } from '@buster/server-shared/user';
 import type { User } from '@supabase/supabase-js';
-import { useRouter } from '@tanstack/react-router';
+import { useMutation } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
 import type React from 'react';
 import { useCallback, useState } from 'react';
+import { useGetMyUserInfo } from '@/api/buster_rest/users';
 import { Button } from '@/components/ui/buttons';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
 import { Input } from '@/components/ui/inputs';
-import { Title } from '@/components/ui/typography';
-import { useBusterNotifications } from '@/context/BusterNotifications';
+import { Text, Title } from '@/components/ui/typography';
+import { openErrorNotification } from '@/context/BusterNotifications';
 import { resetPassword } from '@/integrations/supabase/resetPassword';
 import { PolicyCheck } from './PolicyCheck';
 
 export const ResetPasswordForm: React.FC<{
   supabaseUser: Pick<User, 'email'>;
-  busterUser: UserResponse;
-}> = ({ supabaseUser, busterUser }) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+}> = ({ supabaseUser }) => {
+  const { data: busterUser } = useGetMyUserInfo();
+  const navigate = useNavigate();
   const [resetSuccess, setResetSuccess] = useState(false);
   const email = busterUser?.user?.email || supabaseUser?.email;
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [goodPassword, setGoodPassword] = useState(false);
-  const { openErrorMessage, openSuccessMessage } = useBusterNotifications();
   const [countdown, setCountdown] = useState(5);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const { mutateAsync: resetPasswordMutation, isPending: loading } = useMutation({
+    mutationFn: resetPassword,
+  });
 
   const disabled = !goodPassword || loading || !password || !password2 || password !== password2;
 
@@ -33,7 +37,7 @@ export const ResetPasswordForm: React.FC<{
       setCountdown((prev) => {
         if (prev === 0) {
           clearInterval(interval);
-          router.navigate({ to: '/' });
+          navigate({ to: '/app/home', replace: true, reloadDocument: true });
           return 0;
         }
         return prev - 1;
@@ -43,21 +47,37 @@ export const ResetPasswordForm: React.FC<{
   }, []);
 
   const handleResetPassword = useCallback(async () => {
-    setLoading(true);
+    if (loading) {
+      return;
+    }
+
+    if (!password || !password2 || password !== password2 || !goodPassword) {
+      openErrorNotification('Password and confirm password do not match');
+      return;
+    }
+
     setResetSuccess(false);
+    setErrorMessage('');
+
     try {
-      const res = await resetPassword({ data: { password } });
-      setLoading(false);
-      if (res?.error) {
-        throw res;
-      }
+      await resetPasswordMutation({ data: { password } });
       setResetSuccess(true);
-      openSuccessMessage('Password reset successfully');
       startCountdown();
     } catch (error) {
-      openErrorMessage(error as string);
+      openErrorNotification(error as string);
+      setErrorMessage(error as string);
     }
-  }, [resetPassword, password, openErrorMessage, openSuccessMessage]);
+  }, [
+    resetPassword,
+    password,
+    password2,
+    goodPassword,
+    loading,
+    setResetSuccess,
+    startCountdown,
+    resetPasswordMutation,
+    openErrorNotification,
+  ]);
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4">
@@ -100,6 +120,12 @@ export const ResetPasswordForm: React.FC<{
               autoComplete="new-password"
             />
 
+            {errorMessage && (
+              <Text size="xs" variant="danger">
+                {errorMessage}
+              </Text>
+            )}
+
             <PolicyCheck
               password={password}
               password2={password2}
@@ -127,6 +153,13 @@ export const ResetPasswordForm: React.FC<{
           <SuccessCard
             title="Password reset successfully"
             message={`Navigating to app in ${countdown} seconds`}
+            extra={
+              <Link to="/app/home" reloadDocument replace>
+                <Button block variant="black">
+                  Go to app now
+                </Button>
+              </Link>
+            }
           />
         </div>
       )}

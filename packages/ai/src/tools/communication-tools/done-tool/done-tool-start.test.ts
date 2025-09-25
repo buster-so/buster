@@ -254,6 +254,28 @@ describe('done-tool-start', () => {
             },
           ],
         },
+        // Add assistant message that references the metric in report modification
+        {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool-call',
+              toolName: MODIFY_REPORTS_TOOL_NAME,
+              toolCallId: 'report-call',
+              input: {
+                id: reportId,
+                name: 'Report with Metrics',
+                edits: [
+                  {
+                    code: `<metric metricId="${absorbedMetricId}" />`,
+                    operation: 'append',
+                    code_to_replace: '',
+                  },
+                ],
+              },
+            },
+          ],
+        },
         {
           role: 'tool',
           content: [

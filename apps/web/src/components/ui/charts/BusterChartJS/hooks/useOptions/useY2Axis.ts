@@ -7,7 +7,13 @@ import {
   DEFAULT_CHART_CONFIG,
   DEFAULT_COLUMN_LABEL_FORMAT,
 } from '@buster/server-shared/metrics';
-import type { Scale, ScaleChartOptions } from 'chart.js';
+import { fa } from '@faker-js/faker';
+import type {
+  CartesianScaleTypeRegistry,
+  Scale,
+  ScaleChartOptions,
+  ScaleOptionsByType,
+} from 'chart.js';
 import { useMemo } from 'react';
 import type { DeepPartial } from 'utility-types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -15,7 +21,7 @@ import type { BusterChartProps } from '../../../BusterChart.types';
 import { formatYAxisLabel, yAxisSimilar } from '../../../commonHelpers';
 import { useY2AxisTitle } from './axisHooks/useY2AxisTitle';
 
-export const DEFAULT_Y2_AXIS_COUNT = 7;
+export const DEFAULT_Y2_AXIS_COUNT = 9;
 
 export const useY2Axis = ({
   columnLabelFormats,
@@ -26,6 +32,7 @@ export const useY2Axis = ({
   y2AxisShowAxisLabel,
   y2AxisStartAxisAtZero,
   y2AxisScaleType,
+  yAxis,
 }: {
   columnLabelFormats: NonNullable<ChartConfigProps['columnLabelFormats']>;
   selectedAxis: ChartEncodes;
@@ -36,9 +43,12 @@ export const useY2Axis = ({
   y2AxisStartAxisAtZero: BusterChartProps['y2AxisStartAxisAtZero'];
   y2AxisScaleType: BusterChartProps['y2AxisScaleType'];
   columnMetadata: NonNullable<BusterChartProps['columnMetadata']>;
+  yAxis: DeepPartial<ScaleOptionsByType<keyof CartesianScaleTypeRegistry> | undefined>;
 }): DeepPartial<ScaleChartOptions<'bar'>['scales']['y2']> | undefined => {
   const selectedAxis = selectedAxisProp as ComboChartAxis;
   const y2AxisKeys = selectedAxis.y2 || [];
+  const yAxisMinValue = yAxis?.min;
+  const yAxisMaxValue = yAxis?.max;
 
   const y2AxisKeysString = useMemo(() => {
     return y2AxisKeys.join(',');
@@ -107,6 +117,8 @@ export const useY2Axis = ({
           callback: tickCallback,
           includeBounds: true,
         },
+        min: yAxisMinValue,
+        max: yAxisMaxValue,
         grid: {
           drawOnChartArea: false, // only want the grid lines for one axis to show up
         },
@@ -116,6 +128,7 @@ export const useY2Axis = ({
     }, [
       tickCallback,
       title,
+      yAxisMinValue,
       y2AxisKeysString,
       isSupportedType,
       y2AxisShowAxisLabel,

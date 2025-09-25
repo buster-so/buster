@@ -1,4 +1,4 @@
-import { MAX_NUMBER_OF_ITEMS_ON_DASHBOARD } from '@/api/asset_interfaces/dashboard/config';
+import { MAX_NUMBER_OF_ITEMS_ON_DASHBOARD } from '@buster/server-shared/dashboards';
 import { cn } from '@/lib/classMerge';
 import { Text } from '../../ui/typography/Text';
 import { Title } from '../../ui/typography/Title';

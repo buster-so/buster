@@ -58,7 +58,6 @@ const config = defineConfig(({ command, mode }) => {
     build: {
       chunkSizeWarningLimit: 1250,
       minify: isProduction ? 'esbuild' : false,
-      sourcemap: false, // Disable source maps to reduce cache size
       reportCompressedSize: false, // Disable gzip size reporting to speed up build
       rollupOptions: {
         // Exclude test and stories files from build

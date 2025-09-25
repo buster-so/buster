@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { checkPermission, computeEffectivePermission, hasAnyAccess } from './checks';
+import { checkPermission, computeEffectivePermission } from './checks';
 import type { AssetPermissionResult } from './checks';
 
 // Mock database queries
@@ -257,35 +257,6 @@ describe('Asset Permission Checks', () => {
       );
 
       expect(result).toBe(null);
-    });
-  });
-
-  describe('hasAnyAccess', () => {
-    it('should check for minimum can_view permission', async () => {
-      mockGetUserOrganizationsByUserId.mockResolvedValue([]);
-      mockCheckAssetPermission.mockResolvedValue({
-        hasAccess: true,
-        role: 'can_view',
-        accessPath: 'direct',
-      });
-
-      const result = await hasAnyAccess('user123', 'asset123', 'dashboard_file');
-
-      expect(result).toBe(true);
-      expect(mockCheckAssetPermission).toHaveBeenCalled();
-    });
-
-    it('should return false if no access', async () => {
-      mockGetCachedPermission.mockReturnValue(undefined);
-      mockGetUserOrganizationsByUserId.mockResolvedValue([]);
-      mockCheckAssetPermission.mockResolvedValue({
-        hasAccess: false,
-      });
-      mockCheckCascadingPermissions.mockResolvedValue(false);
-
-      const result = await hasAnyAccess('user123', 'asset123', 'dashboard_file');
-
-      expect(result).toBe(false);
     });
   });
 });

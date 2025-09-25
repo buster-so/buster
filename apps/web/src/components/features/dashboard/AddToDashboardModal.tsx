@@ -8,8 +8,12 @@ export const AddToDashboardModal: React.FC<{
   open: boolean;
   onClose: () => void;
   dashboardId: string;
-}> = ({ open, onClose, dashboardId }) => {
-  const { data: dashboard, isFetched: isFetchedDashboard } = useGetDashboard({ id: dashboardId });
+  dashboardVersionNumber: number | undefined;
+}> = ({ open, onClose, dashboardId, dashboardVersionNumber }) => {
+  const { data: dashboard, isFetched: isFetchedDashboard } = useGetDashboard({
+    id: dashboardId,
+    versionNumber: dashboardVersionNumber,
+  });
   const { mutateAsync: addAndRemoveMetricsFromDashboard } = useAddAndRemoveMetricsFromDashboard();
 
   const initialSelectedMetrics = useMemo(

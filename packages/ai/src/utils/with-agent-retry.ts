@@ -38,14 +38,6 @@ interface RetryOptions {
   onRetry?: (attempt: number, recoveredMessageCount: number) => void;
 }
 
-/**
- * Result of checking if an error is retryable
- */
-interface RetryableCheck {
-  isRetryable: boolean;
-  error: unknown;
-}
-
 // ===== Pure Functions =====
 
 /**
@@ -97,16 +89,6 @@ export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Check if an error is retryable and return structured result
- * Now treats ALL errors as retryable to handle various provider errors
- * Pure function for error analysis
- */
-export const analyzeError = (error: unknown): RetryableCheck => ({
-  isRetryable: true, // All errors are now retryable
-  error,
-});
-
-/**
  * Recover messages from database
  * Returns either recovered messages or original messages
  */
@@ -137,6 +119,8 @@ export const recoverMessages = async (
     console.error('[Agent Retry] Failed to recover from database', {
       messageId,
       error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: error instanceof Error ? error.name : typeof error,
     });
     throw error;
   }
@@ -177,12 +161,12 @@ export const handleFailedAttempt = async (
     messageId,
     error: error instanceof Error ? error.message : 'Unknown error',
     errorType: error instanceof Error ? error.name : typeof error,
+    stack: error instanceof Error ? error.stack : undefined,
   });
 
-  const { isRetryable } = analyzeError(error);
-
-  if (!isRetryable || attempt === maxAttempts) {
-    console.error('[Agent Retry] Non-retryable error or max attempts reached', {
+  // Check if we've reached max attempts
+  if (attempt === maxAttempts) {
+    console.error('[Agent Retry] Max attempts reached', {
       messageId,
       attempt,
       maxAttempts,
@@ -190,7 +174,7 @@ export const handleFailedAttempt = async (
     return { shouldRetry: false, nextMessages: currentMessages, delayMs: 0 };
   }
 
-  console.warn('[Agent Retry] Error detected, preparing retry', {
+  console.warn('[Agent Retry] Preparing retry', {
     messageId,
     attempt,
     remainingAttempts: maxAttempts - attempt,
@@ -215,9 +199,30 @@ export const handleFailedAttempt = async (
       nextMessages: recoveredMessages,
       delayMs,
     };
-  } catch (_recoveryError) {
-    // If recovery fails, don't retry
-    return { shouldRetry: false, nextMessages: currentMessages, delayMs: 0 };
+  } catch (recoveryError) {
+    // Log the recovery failure with full context
+    console.error('[Agent Retry] Failed to recover messages from database', {
+      messageId,
+      attempt,
+      recoveryError: recoveryError instanceof Error ? recoveryError.message : 'Unknown error',
+      recoveryErrorType: recoveryError instanceof Error ? recoveryError.name : typeof recoveryError,
+      recoveryStack: recoveryError instanceof Error ? recoveryError.stack : undefined,
+      originalError: error instanceof Error ? error.message : 'Unknown error',
+    });
+
+    // Continue with original messages if recovery fails
+    console.warn('[Agent Retry] Continuing with original messages after recovery failure', {
+      messageId,
+      messageCount: currentMessages.length,
+    });
+
+    const delayMs = calculateBackoffDelay(attempt, baseDelayMs);
+
+    return {
+      shouldRetry: true,
+      nextMessages: currentMessages,
+      delayMs,
+    };
   }
 };
 
@@ -271,19 +276,13 @@ export function withAgentRetry<
   TStreamResult = unknown,
   TAgent extends Agent<TStreamResult> = Agent<TStreamResult>,
 >(agent: TAgent, options: RetryOptions): TAgent {
-  // Create a new object with the same prototype
-  const wrappedAgent = Object.create(Object.getPrototypeOf(agent)) as TAgent;
-
-  // Copy all properties except stream
-  for (const key in agent) {
-    if (key !== 'stream' && Object.prototype.hasOwnProperty.call(agent, key)) {
-      wrappedAgent[key] = agent[key];
-    }
-  }
-
-  // Wrap the stream method with retry logic
-  wrappedAgent.stream = (streamOptions: StreamOptions) =>
-    retryStream(agent, streamOptions.messages, options);
+  // Create a new agent with all properties spread from the original
+  // This ensures type safety and copies all properties correctly
+  const wrappedAgent = {
+    ...agent,
+    // Override the stream method with retry logic
+    stream: (streamOptions: StreamOptions) => retryStream(agent, streamOptions.messages, options),
+  };
 
   return wrappedAgent;
 }
@@ -305,7 +304,7 @@ export const createRetryExecutor = <TStreamResult>(
 ): StreamExecutor<TStreamResult> => {
   return async (messages: ModelMessage[]) => {
     const agent: Agent<TStreamResult> = {
-      stream: async ({ messages }) => executor(messages),
+      stream: async (streamOptions: StreamOptions) => executor(streamOptions.messages),
     };
     return retryStream(agent, messages, options);
   };

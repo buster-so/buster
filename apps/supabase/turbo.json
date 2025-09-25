@@ -3,7 +3,19 @@
   "extends": ["//"],
   "tasks": {
     "start": {
-      "dependsOn": ["@buster/database#start"],
+      "dependsOn": [],
+      "cache": false,
+      "persistent": false,
+      "outputs": []
+    },
+    "stop": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": false,
+      "outputs": []
+    },
+    "reset": {
+      "dependsOn": ["stop"],
       "cache": false,
       "persistent": false,
       "outputs": []

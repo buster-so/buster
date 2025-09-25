@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
+import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParams';
 import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
 
 export const Route = createFileRoute('/embed/dashboard/$dashboardId')({
@@ -30,6 +31,13 @@ export const Route = createFileRoute('/embed/dashboard/$dashboardId')({
 });
 
 function RouteComponent() {
-  const { dashboardId } = Route.useParams();
-  return <DashboardViewDashboardController dashboardId={dashboardId} readOnly />;
+  const { dashboardId, dashboardVersionNumber } = useGetDashboardParams();
+
+  return (
+    <DashboardViewDashboardController
+      dashboardId={dashboardId}
+      dashboardVersionNumber={dashboardVersionNumber}
+      readOnly
+    />
+  );
 }

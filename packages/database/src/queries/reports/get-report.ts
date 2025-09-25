@@ -98,13 +98,11 @@ export async function getReportFileById(input: GetReportInput) {
     reportCollectionsResult,
     individualPermissionsResult,
     workspaceMemberCount,
-    userPermission,
   ] = await Promise.all([
     reportDataQuery,
     isOrganizationMember ? reportCollectionsQuery : Promise.resolve([]),
     isOrganizationMember ? individualPermissionsQuery : Promise.resolve([]),
     isOrganizationMember ? getOrganizationMemberCount(organizationId) : Promise.resolve(0),
-    getAssetPermission(userId, reportId, 'report_file'),
   ]);
   const reportData = reportDataResult[0];
 
@@ -137,7 +135,6 @@ export async function getReportFileById(input: GetReportInput) {
     versions: versionHistoryArray,
     collections: reportCollectionsResult,
     individual_permissions: individualPermissionsResult,
-    permission: userPermission ?? 'can_view',
     workspace_member_count: workspaceMemberCount,
   };
 

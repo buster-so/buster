@@ -12,7 +12,7 @@ import { useGetOriginalReport } from './useOriginalReportStore';
 
 export const useIsReportChanged = ({
   reportId,
-  enabled = true,
+  enabled = false,
 }: {
   reportId: string | undefined;
   enabled?: boolean;

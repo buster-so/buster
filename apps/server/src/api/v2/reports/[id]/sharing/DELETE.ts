@@ -23,7 +23,7 @@ export async function deleteReportSharingHandler(
     assetId: reportId,
     assetType: 'report_file',
     workspaceSharing: getReportWorkspaceSharing,
-    requiredRole: ['full_access', 'owner'],
+    requiredRole: 'full_access',
   });
 
   // Get the report to verify it exists and get owner info

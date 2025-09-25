@@ -1,4 +1,6 @@
 import type React from 'react';
+import { useCallback } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
   useGetMetric,
   useRemoveMetricFromCollection,
@@ -11,15 +13,16 @@ import { CollectionButton } from './CollectionsButton';
 
 export const SaveMetricToCollectionButton: React.FC<{
   metricId: string;
+  metricVersionNumber: number | undefined;
   buttonType?: 'ghost' | 'default';
   useText?: boolean;
-}> = ({ metricId, buttonType = 'ghost', useText = false }) => {
+}> = ({ metricId, metricVersionNumber, buttonType = 'ghost', useText = false }) => {
   const { openInfoMessage } = useBusterNotifications();
   const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
   const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
   const { data: selectedCollections } = useGetMetric(
-    { id: metricId },
-    { select: (x) => x.collections?.map((x) => x.id) }
+    { id: metricId, versionNumber: metricVersionNumber },
+    { select: useCallback((x: BusterMetric) => x.collections?.map((x) => x.id), []) }
   );
 
   const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {

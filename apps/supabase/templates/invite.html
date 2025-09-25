@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You've been invited to join Buster</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f3f4 100%);
+            padding: 40px 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6c757d;
+            font-size: 16px;
+            margin: 0;
+        }
+        .content {
+            padding: 40px;
+        }
+        .greeting {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 20px;
+        }
+        .message {
+            font-size: 16px;
+            color: #495057;
+            margin: 0 0 30px;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #007bff;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background: #0056b3;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer-text {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0 0 10px;
+        }
+        .footer-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .security-note {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                margin: 0 -20px;
+            }
+            .header,
+            .content,
+            .footer {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Buster</div>
+            <p class="subtitle">You've been invited to join our platform</p>
+        </div>
+        
+        <div class="content">
+            <h1 class="greeting">Welcome!</h1>
+            
+            <p class="message">
+                You've been invited to join Buster. Click the button below to accept your invitation and set up your account.
+            </p>
+            
+            <div style="text-align: center;">
+                <a href="{{ .ConfirmationURL }}" class="cta-button">Accept Invitation</a>
+            </div>
+            
+            <div class="security-note">
+                <strong>Security note:</strong> This invitation link will expire in 24 hours. If you didn't expect this invitation, you can safely ignore this email.
+            </div>
+            
+            <p class="message">
+                If the button doesn't work, you can copy and paste this link into your browser:<br>
+                <a href="{{ .ConfirmationURL }}" style="color: #007bff; word-break: break-all;">{{ .ConfirmationURL }}</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p class="footer-text">
+                This email was sent by Buster. If you have any questions, please contact our support team.
+            </p>
+            <p class="footer-text">
+                <a href="#" class="footer-link">Privacy Policy</a> • 
+                <a href="#" class="footer-link">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

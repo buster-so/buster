@@ -7,6 +7,9 @@ export interface ReportWithSharing {
   id: string;
   organizationId: string;
   workspaceSharing: WorkspaceSharing | null;
+  publiclyAccessible: boolean;
+  publicExpiryDate: string | null;
+  publicPassword: string | null;
 }
 
 export async function checkReportsContainingMetric(metricId: string): Promise<ReportWithSharing[]> {
@@ -15,6 +18,9 @@ export async function checkReportsContainingMetric(metricId: string): Promise<Re
       id: reportFiles.id,
       organizationId: reportFiles.organizationId,
       workspaceSharing: reportFiles.workspaceSharing,
+      publiclyAccessible: reportFiles.publiclyAccessible,
+      publicExpiryDate: reportFiles.publicExpiryDate,
+      publicPassword: reportFiles.publicPassword,
     })
     .from(metricFilesToReportFiles)
     .innerJoin(reportFiles, eq(reportFiles.id, metricFilesToReportFiles.reportFileId))

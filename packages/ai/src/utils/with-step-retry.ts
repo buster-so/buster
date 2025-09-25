@@ -46,6 +46,7 @@ export async function withStepRetry<T>(
       console.error(`[${stepName}] Error on attempt ${attempt}:`, {
         error: error instanceof Error ? error.message : 'Unknown error',
         errorType: error instanceof Error ? error.name : typeof error,
+        stack: error instanceof Error ? error.stack : undefined,
       });
 
       // If this was the last attempt, throw the error

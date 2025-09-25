@@ -33,7 +33,7 @@ const getAssetAccess = (
       passwordRequired: true,
       isPublic: true,
       isDeleted: false,
-      isFetched,
+      isFetched: true,
     };
   }
 
@@ -44,7 +44,7 @@ const getAssetAccess = (
       passwordRequired: false,
       isPublic: false,
       isDeleted: true,
-      isFetched,
+      isFetched: true,
     };
   }
 
@@ -55,7 +55,7 @@ const getAssetAccess = (
       passwordRequired: false,
       isPublic: false,
       isDeleted: false,
-      isFetched,
+      isFetched: true,
     };
   }
 
@@ -65,7 +65,7 @@ const getAssetAccess = (
       passwordRequired: false,
       isPublic: false,
       isDeleted: false,
-      isFetched,
+      isFetched: true,
     };
   }
 

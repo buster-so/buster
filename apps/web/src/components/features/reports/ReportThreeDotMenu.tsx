@@ -1,4 +1,4 @@
-import type { GetReportResponse } from '@buster/server-shared/reports';
+import type { GetReportResponse, ReportResponse } from '@buster/server-shared/reports';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import React, { useCallback, useMemo } from 'react';
 import {
@@ -150,7 +150,7 @@ const useSaveToLibrary = ({ reportId }: { reportId: string }): IDropdownItem => 
 
   const { data: selectedCollections } = useGetReport(
     { id: reportId },
-    { select: (x) => x.collections?.map((x) => x.id) }
+    { select: useCallback((x: ReportResponse) => x.collections?.map((x) => x.id), []) }
   );
   const { openInfoMessage } = useBusterNotifications();
 
@@ -196,8 +196,9 @@ const useSaveToLibrary = ({ reportId }: { reportId: string }): IDropdownItem => 
 };
 
 // Favorites for report (toggle add/remove)
+const stableReportNameSelector = (state: ReportResponse) => state.name;
 const useFavoriteReportSelectMenu = ({ reportId }: { reportId: string }): IDropdownItem => {
-  const { data: name } = useGetReport({ id: reportId }, { select: (x) => x.name });
+  const { data: name } = useGetReport({ id: reportId }, { select: stableReportNameSelector });
   const { isFavorited, onFavoriteClick } = useFavoriteStar({
     id: reportId,
     type: 'report_file',
@@ -341,7 +342,7 @@ const useDownloadPdfSelectMenu = ({
   exportPdfContainer: React.ReactNode;
 } => {
   const { openErrorMessage } = useBusterNotifications();
-  const { data: reportName } = useGetReport({ id: reportId }, { select: (x) => x.name });
+  const { data: reportName } = useGetReport({ id: reportId }, { select: stableReportNameSelector });
   const { exportReportAsPDF, cancelExport, ExportContainer } = useReportPageExport({
     reportId,
     reportName: reportName || '',

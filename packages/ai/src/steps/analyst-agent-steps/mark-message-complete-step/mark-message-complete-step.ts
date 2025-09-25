@@ -1,5 +1,6 @@
 import { updateChat, updateMessage } from '@buster/database/queries';
 import { z } from 'zod';
+import { AssetTypeSchema } from '../../../../../database/src/schema-types/asset';
 
 // Input schema with all necessary parameters
 export const MarkMessageCompleteInputSchema = z.object({
@@ -12,7 +13,7 @@ export const MarkMessageCompleteInputSchema = z.object({
   selectedFile: z
     .object({
       fileId: z.string().uuid().optional(),
-      fileType: z.string().optional(),
+      fileType: AssetTypeSchema.optional(),
       versionNumber: z.number().optional(),
     })
     .optional()
@@ -55,7 +56,7 @@ export async function markMessageComplete(
     if (input.selectedFile?.fileId && input.chatId) {
       await updateChat(input.chatId, {
         mostRecentFileId: input.selectedFile.fileId,
-        mostRecentFileType: input.selectedFile.fileType, //TODO: scope to actually be the enum file type
+        mostRecentFileType: input.selectedFile.fileType,
         mostRecentVersionNumber: input.selectedFile.versionNumber,
       });
     }

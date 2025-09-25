@@ -9,25 +9,17 @@
     "db:init": {
       "cache": false,
       "persistent": false,
-      "dependsOn": ["db:seed"]
-    },
-    "start": {
-      "cache": false,
-      "persistent": false,
-      "outputs": []
-    },
-    "db:reset": {
-      "cache": false,
-      "persistent": false
+      "dependsOn": ["db:seed", "@buster-app/supabase#start"]
     },
     "db:migrate": {
       "cache": false,
-      "persistent": false
+      "persistent": false,
+      "dependsOn": ["@buster-app/supabase#start"]
     },
     "db:seed": {
       "cache": false,
       "persistent": false,
-      "dependsOn": ["db:migrate"]
+      "dependsOn": ["db:migrate", "@buster-app/supabase#start"]
     },
     "db:dump": {
       "cache": false,
@@ -45,14 +37,9 @@
       "cache": false,
       "persistent": true
     },
-    "db:stop": {
-      "cache": false,
-      "persistent": false
-    },
     "dev": {
       "cache": false,
-      "persistent": true,
-      "dependsOn": ["start"]
+      "persistent": true
     }
   }
 }

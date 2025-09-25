@@ -42,7 +42,10 @@ export const MetricWithDataSourceSchema = z.object({
   versionHistory: z.record(VersionHistoryEntrySchema),
   secretId: z.string(),
   dataSourceType: z.string(),
-  versionNumber: z.number().optional(),
+  versionNumber: z
+    .number()
+    .optional()
+    .describe('The version number of the metric content being used'),
   workspaceSharing: z.enum(['none', 'can_view', 'can_edit', 'full_access']).nullable(),
   workspaceSharingEnabledBy: z.string().nullable(),
   workspaceSharingEnabledAt: z.string().nullable(),
@@ -121,6 +124,7 @@ export async function getMetricWithDataSource(
   let content = parsedContent.data;
   let versionNumber: number | undefined;
 
+  // If version number was specified, try to use that version
   if (validated.versionNumber !== undefined && versionHistory) {
     const versionKey = validated.versionNumber.toString();
     const versionData = versionHistory[versionKey];
@@ -128,8 +132,13 @@ export async function getMetricWithDataSource(
     if (versionData?.content) {
       content = versionData.content;
       versionNumber = validated.versionNumber;
+    } else {
+      // If specified version not found, use latest version
+      versionNumber = getLatestMetricVersion(versionHistory);
     }
-    // If version not found, fall back to current content
+  } else {
+    // No version specified, determine the latest version
+    versionNumber = getLatestMetricVersion(versionHistory);
   }
 
   // Parse and validate dataMetadata
@@ -167,4 +176,26 @@ export async function getMetricWithDataSource(
  */
 export function extractSqlFromMetricContent(content: MetricContent): string {
   return content.sql;
+}
+
+/**
+ * Get the latest version number for a metric
+ * Returns the highest version number from the version history
+ */
+export function getLatestMetricVersion(
+  versionHistory: Record<string, VersionHistoryEntry> | null
+): number | undefined {
+  if (!versionHistory || Object.keys(versionHistory).length === 0) {
+    return undefined;
+  }
+
+  const versions = Object.keys(versionHistory)
+    .map((key) => Number.parseInt(key, 10))
+    .filter((num) => !Number.isNaN(num));
+
+  if (versions.length === 0) {
+    return undefined;
+  }
+
+  return Math.max(...versions);
 }

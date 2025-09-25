@@ -2,7 +2,12 @@ import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParam
 import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
 
 export const component = () => {
-  const { dashboardId } = useGetDashboardParams();
+  const { dashboardId, dashboardVersionNumber } = useGetDashboardParams();
 
-  return <DashboardViewDashboardController dashboardId={dashboardId} />;
+  return (
+    <DashboardViewDashboardController
+      dashboardId={dashboardId}
+      dashboardVersionNumber={dashboardVersionNumber}
+    />
+  );
 };

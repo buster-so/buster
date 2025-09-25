@@ -1,3 +1,4 @@
+import { checkPermission } from '@buster/access-controls';
 import { getReportFileById } from '@buster/database/queries';
 import {
   GetReportParamsSchema,
@@ -7,7 +8,6 @@ import {
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { checkAssetPublicAccess } from '../../../../shared-helpers/asset-public-access';
 import { standardErrorHandler } from '../../../../utils/response';
 
 export async function getReportHandler(
@@ -22,15 +22,29 @@ export async function getReportHandler(
     versionNumber,
   });
 
-  return await checkAssetPublicAccess<GetReportResponse>({
-    user,
+  const permission = await checkPermission({
+    userId: user.id,
     assetId: reportId,
     assetType: 'report_file',
-    organizationId: report.organization_id,
+    requiredRole: 'can_view',
     workspaceSharing: report.workspace_sharing,
-    password,
-    asset: report,
+    organizationId: report.organization_id,
+    publiclyAccessible: report.publicly_accessible,
+    publicExpiryDate: report.public_expiry_date ?? undefined,
+    publicPassword: report.public_password ?? undefined,
+    userSuppliedPassword: password,
   });
+
+  if (!permission.hasAccess || !permission.effectiveRole) {
+    throw new HTTPException(403, { message: 'You do not have permission to view this report' });
+  }
+
+  const response: GetReportResponse = {
+    ...report,
+    permission: permission.effectiveRole,
+  };
+
+  return response;
 }
 
 const app = new Hono()

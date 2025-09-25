@@ -20,7 +20,7 @@ export const useSignOut = () => {
         console.error('Error clearing browser storage', error);
       }
     } finally {
-      navigate({ to: '/auth/login' });
+      navigate({ to: '/auth/login', reloadDocument: true, replace: true });
     }
   }, [navigate, openErrorMessage]);
 

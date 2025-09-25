@@ -24,6 +24,9 @@ export async function getReportMetadata(params: GetReportMetadataInput) {
     .select({
       organizationId: reportFiles.organizationId,
       workspaceSharing: reportFiles.workspaceSharing,
+      publiclyAccessible: reportFiles.publiclyAccessible,
+      publicExpiryDate: reportFiles.publicExpiryDate,
+      publicPassword: reportFiles.publicPassword,
     })
     .from(reportFiles)
     .where(and(eq(reportFiles.id, validated.reportId), isNull(reportFiles.deletedAt)))

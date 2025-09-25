@@ -3,7 +3,7 @@ import type React from 'react';
 import { useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Button } from '@/components/ui/buttons';
-import { Paragraph, Text, Title } from '@/components/ui/typography';
+import { Paragraph, Title } from '@/components/ui/typography';
 import { useIsVersionChanged } from '@/context/AppVersion/useAppVersion';
 import { useMount } from '@/hooks/useMount';
 import { cn } from '@/lib/utils';
@@ -16,17 +16,19 @@ export const LazyErrorBoundary: React.FC<React.PropsWithChildren> = ({ children 
     <ErrorBoundary
       fallbackRender={() => {
         if (isChanged) {
-          return (
-            <ComponentErrorCard
-              highlightType="info"
-              message="The app has been updated. Please reload the page."
-              title="New version available"
-              buttonText="Reload"
-              onButtonClick={() => {
-                navigate({ reloadDocument: true });
-              }}
-            />
-          );
+          window.location.reload();
+          return null;
+          // return (
+          //   <ComponentErrorCard
+          //     highlightType="info"
+          //     message="The app has been updated. Please reload the page."
+          //     title="New version available"
+          //     buttonText="Reload"
+          //     onButtonClick={() => {
+          //       navigate({ reloadDocument: true });
+          //     }}
+          //   />
+          // );
         }
 
         return (

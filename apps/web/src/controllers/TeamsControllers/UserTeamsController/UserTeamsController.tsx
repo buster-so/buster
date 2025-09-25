@@ -1,6 +1,7 @@
 import type React from 'react';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { useGetUserTeams } from '@/api/buster_rest/users/permissions';
+import { LazyErrorBoundary } from '@/components/features/global/LazyErrorBoundary';
 import { PermissionSearchAndListWrapper } from '@/components/features/permissions';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
@@ -49,9 +50,11 @@ export const UserTeamsController: React.FC<{ userId: string }> = ({ userId }) =>
         <UserTeamsListContainer filteredTeams={filteredItems} userId={userId} />
       </PermissionSearchAndListWrapper>
 
-      <Suspense fallback={<span className="hidden">...</span>}>
-        <NewTeamModal isOpen={isNewTeamModalOpen} onClose={onCloseNewTeamModal} />
-      </Suspense>
+      <LazyErrorBoundary>
+        <Suspense fallback={<span className="hidden">...</span>}>
+          <NewTeamModal isOpen={isNewTeamModalOpen} onClose={onCloseNewTeamModal} />
+        </Suspense>
+      </LazyErrorBoundary>
     </>
   );
 };

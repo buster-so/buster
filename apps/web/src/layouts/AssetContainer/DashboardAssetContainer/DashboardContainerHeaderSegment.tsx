@@ -12,11 +12,11 @@ export const DashboardContainerHeaderSegment: React.FC<DashboardContainerHeaderS
   React.memo((props) => {
     const { dashboardId, dashboardVersionNumber } = props;
 
-    const { isFetched, isError } = useIsDashboardReadOnly({
+    const { isError } = useIsDashboardReadOnly({
       dashboardId,
     });
 
-    if (!isFetched || isError) return null;
+    if (isError) return <div />; //needed for sizing
 
     return <DashboardSegments {...props} />;
   });

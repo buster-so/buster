@@ -24,6 +24,7 @@ export const CacheReportMetricsOutputSchema = z.object({
       success: z.boolean(),
       rowCount: z.number().optional(),
       error: z.string().optional(),
+      version: z.number().optional().describe('The version number of the cached metric'),
     })
   ),
   totalMetrics: z.number(),

@@ -1,10 +1,20 @@
 import Cookies from 'js-cookie';
+import { getQueryClient } from '@/integrations/tanstack-query/query-client';
 
 /**
- * Clears all browser storage including localStorage, sessionStorage, and cookies
+ * Clears all browser storage including localStorage, sessionStorage, cookies, and React Query cache
  * @returns void
  */
 export const clearAllBrowserStorage = (): void => {
+  // Clear React Query cache first
+  try {
+    const queryClient = getQueryClient();
+    queryClient.clear(); // Removes all cached queries and mutations
+    queryClient.getQueryCache().clear(); // Additional cleanup of query cache
+    queryClient.getMutationCache().clear(); // Additional cleanup of mutation cache
+  } catch (error) {
+    console.warn('Failed to clear React Query cache:', error);
+  }
   // Clear localStorage
   localStorage.clear();
 

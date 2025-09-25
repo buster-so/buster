@@ -259,8 +259,9 @@ export const useXAxis = ({
         ticks: {
           ...rotation,
           major: {
-            enabled: false, //test
+            enabled: false,
           },
+          source: type === 'time' ? ('data' as const) : undefined,
           autoSkip: true,
           maxTicksLimit: type === 'time' ? (timeUnit === 'month' ? 18 : 18) : undefined,
           //  sampleSize: type === 'time' ? 28 : undefined, //DO NOT USE THIS. IT BREAK TIME SCALES
@@ -270,6 +271,7 @@ export const useXAxis = ({
           time: {
             unit: timeUnit,
           },
+          includeBounds: true,
         },
         grid,
       } satisfies DeepPartial<ScaleChartOptions<'bar'>['scales']['x']>;

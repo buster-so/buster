@@ -9,7 +9,7 @@ const stableMetricDataSelect = (x: BusterMetricData) => x?.has_more_records;
 
 export const MetricViewChart: React.FC<{
   metricId: string;
-  versionNumber?: number;
+  versionNumber: number | undefined;
   readOnly?: boolean;
   className?: string;
   cardClassName?: string;

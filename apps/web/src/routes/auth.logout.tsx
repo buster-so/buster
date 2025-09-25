@@ -14,6 +14,6 @@ export const Route = createFileRoute('/auth/logout')({
   preload: false,
   loader: async () => {
     await signOutServerFn();
-    throw redirect({ to: '/auth/login', statusCode: 307 });
+    throw redirect({ to: '/auth/login', statusCode: 307, reloadDocument: true, replace: true });
   },
 });

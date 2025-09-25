@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
 import { useGetChat } from '@/api/buster_rest/chats';
 import { useGetChatId } from './useGetChatId';
@@ -20,7 +21,10 @@ export const useGetCurrentMessageId = () => {
   const { data: currentMessageId } = useGetChat(
     { id: chatId || '' },
     {
-      select: (data) => data?.message_ids[data?.message_ids.length - 1],
+      select: useCallback(
+        (data: IBusterChat) => data?.message_ids[data?.message_ids.length - 1],
+        []
+      ),
     }
   );
 

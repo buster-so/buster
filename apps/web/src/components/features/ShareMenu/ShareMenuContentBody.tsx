@@ -22,7 +22,8 @@ import { WorkspaceAvatar } from './WorkspaceAvatar';
 
 export const ShareMenuContentBody: React.FC<{
   selectedOptions: ShareMenuTopBarOptions;
-  onCopyLink: () => void;
+  onCopyLink: (isEmbed: boolean) => void;
+  embedLinkURL: string;
   shareAssetConfig: ShareConfig;
   assetId: string;
   assetType: ShareAssetType;
@@ -37,6 +38,7 @@ export const ShareMenuContentBody: React.FC<{
     canEditPermissions,
     assetType,
     className = '',
+    embedLinkURL,
   }) => {
     const Component = ContentRecord[selectedOptions];
     const individual_permissions = shareAssetConfig.individual_permissions;
@@ -56,6 +58,7 @@ export const ShareMenuContentBody: React.FC<{
         canEditPermissions={canEditPermissions}
         className={className}
         shareAssetConfig={shareAssetConfig}
+        embedLinkURL={embedLinkURL}
       />
     );
   }
@@ -198,7 +201,8 @@ const ShareMenuContentShare: React.FC<ShareMenuContentBodyProps> = React.memo(
 ShareMenuContentShare.displayName = 'ShareMenuContentShare';
 
 export interface ShareMenuContentBodyProps {
-  onCopyLink: () => void;
+  onCopyLink: (isEmbed: boolean) => void;
+  embedLinkURL: string;
   individual_permissions: ShareConfig['individual_permissions'];
   publicly_accessible: boolean;
   publicExpirationDate: string | null | undefined;

@@ -6,20 +6,14 @@ import {
   useMetricDrilldownItem,
   useMetricVersionHistorySelectMenu,
   useNavigateToDashboardMetricItem,
-  useNavigatetoMetricItem,
   useOpenChartItem,
   useRenameMetricOnPage,
 } from '@/components/features/metrics/threeDotMenuHooks';
 import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
 import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
-import {
-  createDropdownItem,
-  type IDropdownItem,
-  type IDropdownItems,
-} from '@/components/ui/dropdown';
-import { Code, PenSparkle, ShareRight, SquareChartPen, Trash } from '@/components/ui/icons';
+import type { IDropdownItem, IDropdownItems } from '@/components/ui/dropdown';
+import { PenSparkle, ShareRight, Trash } from '@/components/ui/icons';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
-import { useGetChatId } from '@/context/Chats/useGetChatId';
 import { getIsEffectiveOwner } from '@/lib/share';
 
 export const useDashboardMetricCardThreeDotMenuItems = ({
@@ -31,13 +25,12 @@ export const useDashboardMetricCardThreeDotMenuItems = ({
   dashboardId: string;
   metricId: string;
   metricVersionNumber: number | undefined;
-  dashboardVersionNumber?: number | undefined;
+  dashboardVersionNumber: number | undefined;
 }) => {
-  const chatId = useGetChatId();
   const removeFromDashboardItem = useRemoveFromDashboardItem({ dashboardId, metricId });
   const openChartItem = useOpenChartItem({ metricId, metricVersionNumber });
   const drilldownItem = useMetricDrilldownItem({ metricId });
-  const shareMenu = useShareMenuSelectMenu({ metricId });
+  const shareMenu = useShareMenuSelectMenu({ metricId, metricVersionNumber });
   const editWithAI = useEditWithAI({ metricId });
   const navigateToDashboardMetricItem = useNavigateToDashboardMetricItem({
     metricId,
@@ -46,7 +39,10 @@ export const useDashboardMetricCardThreeDotMenuItems = ({
     dashboardVersionNumber,
   });
   const versionHistoryButton = useMetricVersionHistorySelectMenu({ metricId });
-  const favoriteMetricButton = useFavoriteMetricSelectMenu({ metricId });
+  const favoriteMetricButton = useFavoriteMetricSelectMenu({
+    metricId,
+    versionNumber: metricVersionNumber,
+  });
   const renameMetric = useRenameMetricOnPage({ metricId, metricVersionNumber });
 
   const dropdownItems: IDropdownItems = useMemo(
@@ -108,9 +104,15 @@ const useRemoveFromDashboardItem = ({
   );
 };
 
-const useShareMenuSelectMenu = ({ metricId }: { metricId: string }): IDropdownItem | undefined => {
+const useShareMenuSelectMenu = ({
+  metricId,
+  metricVersionNumber,
+}: {
+  metricId: string;
+  metricVersionNumber: number | undefined;
+}): IDropdownItem | undefined => {
   const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId },
+    { id: metricId, versionNumber: metricVersionNumber },
     { select: getShareAssetConfig }
   );
   const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);

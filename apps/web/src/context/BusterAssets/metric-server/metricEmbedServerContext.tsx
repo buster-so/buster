@@ -8,11 +8,12 @@ import { AppAssetCheckLayout } from '@/layouts/AppAssetCheckLayout';
 export const ssr = true;
 
 export const component = () => {
-  const { metricId } = useGetMetricParams();
+  const { metricId, metricVersionNumber } = useGetMetricParams();
   return (
     <AppAssetCheckLayout assetType={'metric_file'}>
       <MetricViewChartController
         metricId={metricId}
+        versionNumber={metricVersionNumber}
         className="h-full w-full"
         cardClassName="max-h-full!"
         readOnly

@@ -25,12 +25,6 @@ export const createAxiosInstance = (baseURL = BASE_URL_V2) => {
     async (error: AxiosError) => {
       const errorCode = error.response?.status;
 
-      //402 is the payment required error code
-      if (errorCode === 402) {
-        window.location.href = AuthRoute.to;
-        return Promise.reject(rustErrorHandler(error));
-      }
-
       // Handle 401 Unauthorized - token might be expired
       if (errorCode === 401 && !isServer) {
         console.info(

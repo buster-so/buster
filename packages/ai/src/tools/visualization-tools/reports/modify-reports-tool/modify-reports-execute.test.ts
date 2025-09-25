@@ -412,6 +412,104 @@ Updated content with metrics.`;
       expect(updateCall.responseMessages).toBeUndefined();
     });
 
+    it('should wait for lastUpdate promise before executing final write', async () => {
+      // This test validates the fix for the race condition where delta writes
+      // could complete out of order, causing data inconsistency
+
+      // Create a delayed promise to simulate an in-progress delta write
+      let resolveLastUpdate: () => void;
+      const lastUpdatePromise = new Promise<void>((resolve) => {
+        resolveLastUpdate = resolve;
+      });
+
+      // Set up state with an in-progress lastUpdate
+      state.lastUpdate = lastUpdatePromise;
+      state.snapshotContent = '# Original Report';
+
+      mockDbLimit.mockResolvedValue([
+        {
+          content: '# Original Report',
+          versionHistory: null,
+        },
+      ]);
+
+      const input: ModifyReportsInput = {
+        id: 'report-concurrent',
+        name: 'Concurrent Write Test',
+        edits: [
+          {
+            operation: 'replace' as const,
+            code_to_replace: '# Original Report',
+            code: '# Final Version',
+          },
+        ],
+      };
+
+      const execute = createModifyReportsExecute(context, state);
+
+      // Start the execute (it should wait for lastUpdate)
+      const executePromise = execute(input);
+
+      // Give it a moment to ensure it's waiting
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // batchUpdateReport should not have been called yet
+      const mockBatchUpdateReport = vi.mocked(
+        await import('@buster/database/queries').then((m) => m.batchUpdateReport)
+      );
+      expect(mockBatchUpdateReport).not.toHaveBeenCalled();
+
+      // Now resolve the lastUpdate promise
+      resolveLastUpdate!();
+
+      // Wait for execute to complete
+      const result = await executePromise;
+
+      // Now batchUpdateReport should have been called
+      expect(mockBatchUpdateReport).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(result.file.content).toContain('# Final Version');
+    });
+
+    it('should handle lastUpdate promise rejection gracefully', async () => {
+      // Create a rejected promise to simulate a failed delta write
+      const lastUpdatePromise = Promise.reject(new Error('Delta write failed'));
+
+      // Set up state with a rejected lastUpdate
+      state.lastUpdate = lastUpdatePromise;
+      state.snapshotContent = '# Original Report';
+
+      mockDbLimit.mockResolvedValue([
+        {
+          content: '# Original Report',
+          versionHistory: null,
+        },
+      ]);
+
+      const input: ModifyReportsInput = {
+        id: 'report-error-handling',
+        name: 'Error Handling Test',
+        edits: [
+          {
+            operation: 'replace' as const,
+            code_to_replace: '# Original Report',
+            code: '# Updated Report',
+          },
+        ],
+      };
+
+      const execute = createModifyReportsExecute(context, state);
+
+      // Execute should still complete successfully despite the failed lastUpdate
+      const result = await execute(input);
+
+      expect(result.success).toBe(true);
+      expect(result.file.content).toContain('# Updated Report');
+
+      // Should log a warning about the failed delta write
+      // (In a real test, you might spy on console.warn)
+    });
+
     it('should only check metrics on successful modifications', async () => {
       // Setup two reports - one success, one failure
       mockDbLimit

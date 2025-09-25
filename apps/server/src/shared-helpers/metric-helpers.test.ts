@@ -286,8 +286,9 @@ describe('metric-helpers', () => {
         const metricFile = createMockMetricFile({ publiclyAccessible: true });
         mockGetMetricFileById.mockResolvedValue(metricFile);
         mockCheckPermission.mockResolvedValue({
-          hasAccess: false,
-          effectiveRole: undefined,
+          hasAccess: true,
+          effectiveRole: 'can_view',
+          accessPath: 'public',
         });
 
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
@@ -315,8 +316,8 @@ describe('metric-helpers', () => {
         const metricFile = createMockMetricFile({ publiclyAccessible: false });
         mockGetMetricFileById.mockResolvedValue(metricFile);
         mockCheckPermission.mockResolvedValue({
-          hasAccess: false,
-          effectiveRole: undefined,
+          hasAccess: true,
+          effectiveRole: 'can_view',
         });
 
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: true };
@@ -344,7 +345,7 @@ describe('metric-helpers', () => {
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(403, { message: 'Public access to this metric has expired' })
+          new HTTPException(403, { message: "You don't have permission to view this metric" })
         );
       });
 
@@ -362,7 +363,7 @@ describe('metric-helpers', () => {
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(418, { message: 'Password required for public access' })
+          new HTTPException(403, { message: "You don't have permission to view this metric" })
         );
       });
 
@@ -383,7 +384,7 @@ describe('metric-helpers', () => {
         };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(403, { message: 'Incorrect password for public access' })
+          new HTTPException(403, { message: "You don't have permission to view this metric" })
         );
       });
 
@@ -394,8 +395,9 @@ describe('metric-helpers', () => {
         });
         mockGetMetricFileById.mockResolvedValue(metricFile);
         mockCheckPermission.mockResolvedValue({
-          hasAccess: false,
-          effectiveRole: undefined,
+          hasAccess: true,
+          effectiveRole: 'can_view',
+          accessPath: 'public',
         });
 
         const options: MetricAccessOptions = {

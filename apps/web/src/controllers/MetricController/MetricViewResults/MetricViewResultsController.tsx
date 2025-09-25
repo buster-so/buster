@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { DataContainer } from '@/components/ui/layouts/AppVerticalCodeSplitter/DataContainer';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
@@ -9,10 +10,13 @@ export const MetricViewResultsController = React.memo(
     const { isFetched: isFetchedMetric } = useGetMetric(
       { id: metricId, versionNumber },
       {
-        select: ({ sql, data_source_id }) => ({
-          sql,
-          data_source_id,
-        }),
+        select: useCallback(
+          ({ sql, data_source_id }: BusterMetric) => ({
+            sql,
+            data_source_id,
+          }),
+          []
+        ),
       }
     );
     const { data: metricData, isFetched: isFetchedInitialData } = useGetMetricData(
