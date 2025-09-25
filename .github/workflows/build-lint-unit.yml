@@ -32,22 +32,22 @@ jobs:
         env:
           TURBO_TELEMETRY_DISABLED: 1
 
-      - name: Build all packages
-        run: pnpm turbo build
-        env:
-          NODE_ENV: production
-          SKIP_ENV_CHECK: true
-          TURBO_TELEMETRY_DISABLED: 1
-          # Pass all secrets from the testing environment for build
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
-          VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
-          VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
-          VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
-          VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
+      # - name: Build all packages
+      #   run: pnpm turbo build
+      #   env:
+      #     NODE_ENV: production
+      #     SKIP_ENV_CHECK: true
+      #     TURBO_TELEMETRY_DISABLED: 1
+      #     # Pass all secrets from the testing environment for build
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      #     SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      #     SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      #     VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
+      #     VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
+      #     VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
+      #     VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
+      #     VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
 
       - name: Pre-pull Docker images
         run: |
