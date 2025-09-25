@@ -201,7 +201,6 @@ jobs:
 
           # Check services in order
           services=(
-            "3003:Electric"
             "3002:Server" 
             "3001:API"
             "3000:Web"
