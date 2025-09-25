@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
 // Database connection details from docker-compose.yml
-const DB_HOST = 'host.docker.internal';
+const DB_HOST = 'localhost';
 const DB_PORT = '54322';
 const DB_USER = 'postgres';
 
