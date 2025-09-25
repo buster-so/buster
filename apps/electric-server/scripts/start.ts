@@ -11,23 +11,27 @@ const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
 // Database connection details from docker-compose.yml
-const DB_HOST = 'host.docker.internal';
+const DB_HOST = 'localhost';
 const DB_PORT = '54322';
-const DB_NAME = 'postgres';
 const DB_USER = 'postgres';
-const DB_PASSWORD = 'postgres';
 
 // Function to check if database is accessible
-function isDatabaseRunning(): boolean {
+async function isDatabaseRunning(): Promise<boolean> {
   try {
     // Use pg_isready to check if PostgreSQL is accepting connections
-    execSync(`docker run --rm postgres:15 pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}`, {
+    const result = execSync(`pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}`, {
       stdio: 'pipe',
       timeout: 45000
     });
+    console.info('pg_isready result:', result);
+    return true;
+  } catch (error) {
+    try {
+    await waitForDatabaseReady();
     return true;
   } catch (error) {
     return false;
+  }
   }
 }
 
@@ -38,6 +42,7 @@ function isElectricRunning(): boolean {
       encoding: 'utf8',
       cwd: projectRoot 
     });
+    console.info(result);
     return result.includes('electric-server-electric-1') || result.includes('electric-server_electric_1');
   } catch (error) {
     console.error('⚠️  Error checking docker containers:', error);
@@ -53,7 +58,7 @@ async function waitForDatabaseReady(timeoutSeconds: number = 60): Promise<void> 
   const timeoutMs = timeoutSeconds * 1000;
 
   while (Date.now() - startTime < timeoutMs) {
-    if (isDatabaseRunning()) {
+    if (await isDatabaseRunning()) {
       console.log('✅ Database is now accessible!');
       return;
     }
@@ -130,7 +135,7 @@ async function main(): Promise<void> {
     console.log('🔍 Checking system status...');
 
     // Check if database is accessible
-    if (!isDatabaseRunning()) {
+    if (!await isDatabaseRunning()) {
       console.log('🔌 Database not accessible. Please ensure PostgreSQL is running on port 54322');
       console.log('💡 You may need to start your local Supabase or PostgreSQL instance first');
       process.exit(1);

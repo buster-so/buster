@@ -32,7 +32,7 @@
       "outputs": [".output/**", ".vercel/**"]
     },
     "start": {
-      "dependsOn": ["build", "@buster-app/supabase#start"],
+      "dependsOn": ["build", "@buster-app/supabase#start", "@buster/database#start"],
       "cache": true,
       "persistent": true,
       "with": ["@buster-app/server#start", "@buster-app/api-legacy#start"]

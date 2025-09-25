@@ -9,8 +9,7 @@
         "!src/**/*.spec.{ts,tsx,js,jsx}",
         "package.json",
         "tsconfig.json"
-      ],
-      "outputs": ["dist/**/*"]
+      ]
     },
     "dev": {
       "cache": false,

@@ -1,0 +1,76 @@
+fileType: momentic/test
+id: f0f9b7ff-ed35-43f1-bacd-2b6c3eb457c7
+name: share-each-asset-type
+description: Share a report with another user and make sure that they can view it as well
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: 90190516-2ac2-4c62-99ca-ad489694182c
+    type: MODULE
+    moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
+  - id: 120c51a6-4a5a-485d-9603-0a5f5a1f6b15
+    type: PRESET_ACTION
+    command:
+      id: 5038aa2a-8eea-4e19-ad77-ed8f008bc8a4
+      loadTimeout: 2
+      type: NAVIGATE
+      url: "{{env.BASE_URL}}/app/metrics"
+  - id: 6a9a21b7-f989-4aa1-84d0-846038d6a72f
+    type: PRESET_ACTION
+    command:
+      id: 17579c61-f67e-43d7-b963-aee0012453dc
+      type: WAIT_FOR_URL
+      matcher:
+        type: SUBSTRING
+        url: /metrics
+      timeout: 2
+  - id: 4d62512b-6748-49a2-a8d5-11c4489f0376
+    type: PRESET_ACTION
+    command:
+      id: 7bf9208d-a6a9-40b0-96fa-6a0b20b8029b
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: any Metric title that is private and has a C for the owner
+  - id: bdfb3001-afef-4f7e-9767-e01a7a39f0cf
+    type: PRESET_ACTION
+    command:
+      id: 5f8ae3e7-932e-4cad-b1c9-c0f4edfbeb7c
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Three dot icon ... above the asset
+  - id: c8e96d19-a83d-4532-bdf0-262ec0251f98
+    type: PRESET_ACTION
+    command:
+      id: f3fb21f8-d7c6-4ded-a536-8509d99e8ca0
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: '"Share metric| dashboard | report" from the dropdown'
+      doubleClick: true
+  - id: 8faabc6c-282d-4bf3-b6a6-af2bdd1e7012
+    type: PRESET_ACTION
+    command:
+      id: 0e048159-7540-4e98-bc13-58ceda51ba70
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the 'not shared' span in the workspace share row
+      doubleClick: false
+  - id: 1c549d2b-c954-4e07-921e-dc38efcf664e
+    type: PRESET_ACTION
+    command:
+      id: 3211ed30-52da-4919-977d-50164387e415
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the 'can edit, but not share with others' span
