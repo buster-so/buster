@@ -236,9 +236,13 @@ jobs:
       - name: Start services in background
         run: |
           echo "🚀 Starting all services in background..."
-          pnpm turbo start > turbo.log 2>&1 &
+          pnpm turbo start 2>&1 | tee turbo.log &
           echo $! > turbo.pid
           echo "Started turbo with PID $(cat turbo.pid)"
+          echo "Showing initial startup logs..."
+          sleep 5
+          echo "=== Latest logs ==="
+          tail -20 turbo.log || echo "No logs yet"
         env:
           TURBO_CACHE_DIR: .turbo
           SKIP_ENV_CHECK: true
@@ -301,6 +305,36 @@ jobs:
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
 
+      - name: Wait for services to be ready
+        run: |
+          echo "⏳ Waiting for services to be ready..."
+          
+          # Function to check if a port is ready
+          check_port() {
+            local port=$1
+            local service_name=$2
+            echo "Checking $service_name (localhost:$port)..."
+            
+            for i in {1..60}; do
+              if curl -f -s -o /dev/null http://localhost:$port; then
+                echo "✅ $service_name is ready (localhost:$port)"
+                return 0
+              fi
+              echo "⏳ Attempt $i/60: $service_name not ready yet..."
+              sleep 5
+            done
+            
+            echo "❌ $service_name failed to start on localhost:$port"
+            return 1
+          }
+          
+          # Check all required services
+          echo "Checking required services..."
+          check_port 3000 "Frontend (Web)"
+          check_port 3001 "Backend APIV1"
+          check_port 3002 "Api V2"
+          
+          echo "🎉 All services are ready!"
 
       - name: Run Momentic E2E Tests
         id: momentic-tests
