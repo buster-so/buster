@@ -307,8 +307,8 @@ jobs:
         run: |
           echo "🧪 Running Momentic E2E tests..."
           cd apps/momentic
-          # pnpm dlx momentic install-browsers --all
-          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --wait-on http://localhost:3000 --wait-on-timeout 3000 --exclude "llm-calls/*" --upload-results
+          pnpm dlx momentic install-browsers --all
+          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --wait-on http://localhost:3000 --wait-on-timeout 30000 --exclude "llm-calls/*" --upload-results
         env:
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
 
