@@ -65,6 +65,8 @@ export function validateEnv(
   } = options;
 
   console.info('🔍 Validating environment variables...');
+  console.info(process.env.NODE_ENV);
+  console.info(process.env.CI);
 
   // Skip validation in certain environments
   if (

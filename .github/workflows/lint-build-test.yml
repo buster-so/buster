@@ -249,7 +249,7 @@ jobs:
           pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --wait-on http://localhost:3000 --wait-on-timeout 300000 --exclude "llm-calls/*" --upload-results
         env:
           TURBO_CACHE_DIR: .turbo
-          SKIP_ENV_CHECK: true
+          NODE_ENV: production
           TURBO_TELEMETRY_DISABLED: 1
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
