@@ -40,6 +40,11 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["db:migrate", "@buster-app/supabase#start"]
     }
   }
 }
