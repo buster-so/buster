@@ -335,6 +335,9 @@ jobs:
           check_port 3002 "Api V2"
           
           echo "🎉 All services are ready!"
+          echo "⏳ Waiting 2 minutes for services to fully stabilize..."
+          sleep 120
+          echo "✅ Stabilization period complete, ready for tests!"
 
       - name: Run Momentic E2E Tests
         id: momentic-tests
