@@ -4,11 +4,13 @@
   "concurrency": "20",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".output/**", ".vercel/**", "target/release/**"]
     },
     "build:dry-run": {
       "dependsOn": ["^build:dry-run"],
-      "env": ["SKIP_ENV_CHECK"]
+      "env": ["SKIP_ENV_CHECK"],
+      "outputs": ["dist/**", ".output/**", ".vercel/**", "target/release/**"]
     },
     "dev": {
       "cache": false,

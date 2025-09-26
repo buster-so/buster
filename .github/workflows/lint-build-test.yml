@@ -215,23 +215,23 @@ jobs:
         with:
           cache-key: lint-build-test
 
-      - name: Pre-pull Docker images
-        run: |
-          echo "🐳 Pre-pulling Docker images for faster startup..."
-          # Pull all images in parallel
-          docker pull electricsql/electric &
-          docker pull supabase/postgres:15.1.0.147 &
-          docker pull supabase/gotrue:v2.149.0 &
-          docker pull supabase/realtime:v2.28.32 &
-          docker pull supabase/postgrest:v12.2.0 &
-          docker pull supabase/storage-api:v0.46.4 &
-          docker pull supabase/postgres-meta:v0.83.2 &
-          docker pull supabase/studio:20240422.09 &
-          docker pull supabase/edge-runtime:v1.53.4 &
-          docker pull kong:2.8.1 &
-          docker pull darthsim/imgproxy:v3.8.0 &
-          wait
-          echo "✅ Docker images pre-pulled successfully"
+      # - name: Pre-pull Docker images
+      #   run: |
+      #     echo "🐳 Pre-pulling Docker images for faster startup..."
+      #     # Pull all images in parallel
+      #     docker pull electricsql/electric &
+      #     docker pull supabase/postgres:15.1.0.147 &
+      #     docker pull supabase/gotrue:v2.149.0 &
+      #     docker pull supabase/realtime:v2.28.32 &
+      #     docker pull supabase/postgrest:v12.2.0 &
+      #     docker pull supabase/storage-api:v0.46.4 &
+      #     docker pull supabase/postgres-meta:v0.83.2 &
+      #     docker pull supabase/studio:20240422.09 &
+      #     docker pull supabase/edge-runtime:v1.53.4 &
+      #     docker pull kong:2.8.1 &
+      #     docker pull darthsim/imgproxy:v3.8.0 &
+      #     wait
+      #     echo "✅ Docker images pre-pulled successfully"
 
       - name: Start services in background
         run: |
@@ -307,8 +307,8 @@ jobs:
         run: |
           echo "🧪 Running Momentic E2E tests..."
           cd apps/momentic
-          pnpm dlx momentic install-browsers --all
-          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --wait-on http://localhost:3000 --wait-on-timeout 300000 --exclude "llm-calls/*" --upload-results
+          # pnpm dlx momentic install-browsers --all
+          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --wait-on http://localhost:3000 --wait-on-timeout 3000 --exclude "llm-calls/*" --upload-results
         env:
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
 
