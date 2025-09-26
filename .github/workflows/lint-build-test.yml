@@ -12,7 +12,7 @@ env:
   CI: true
 
 jobs:
-  # # Lint job - runs first
+  # Lint job - runs first
   # lint:
   #   name: Lint
   #   runs-on: blacksmith-2vcpu-ubuntu-2404
@@ -234,7 +234,11 @@ jobs:
           echo "✅ Docker images pre-pulled successfully"
 
       - name: Start services in background
-        run: pnpm turbo start
+        run: |
+          echo "🚀 Starting all services in background..."
+          pnpm turbo start > turbo.log 2>&1 &
+          echo $! > turbo.pid
+          echo "Started turbo with PID $(cat turbo.pid)"
         env:
           TURBO_CACHE_DIR: .turbo
           SKIP_ENV_CHECK: true
@@ -296,10 +300,7 @@ jobs:
           SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
-          # echo "🚀 Starting all services in background..."
-          # pnpm turbo start > turbo.log 2>&1 &
-          # echo $! > turbo.pid
-          # echo "Started turbo with PID $(cat turbo.pid)"
+
 
       - name: Run Momentic E2E Tests
         id: momentic-tests
