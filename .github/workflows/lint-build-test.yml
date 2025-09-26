@@ -35,6 +35,7 @@ jobs:
     needs: lint
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
+    environment: testing
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -114,6 +115,7 @@ jobs:
     needs: build
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
+    environment: testing
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

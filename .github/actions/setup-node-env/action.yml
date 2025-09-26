@@ -56,7 +56,6 @@ runs:
         key: turbo-${{ inputs.cache-key }}-${{ github.ref_name }}-${{ github.sha }}
         restore-keys: |
           turbo-${{ inputs.cache-key }}-${{ github.ref_name }}-
-          turbo-${{ inputs.cache-key }}-main-
     
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
