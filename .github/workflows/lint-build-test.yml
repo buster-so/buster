@@ -203,7 +203,6 @@ jobs:
   # E2E test job - runs after build completes
   e2e_test:
     name: End-to-End Test
-    # needs: build
     runs-on: blacksmith-8vcpu-ubuntu-2404
     timeout-minutes: 30
     environment: testing
@@ -247,7 +246,7 @@ jobs:
           echo "🧪 Running Momentic E2E tests..."
           cd apps/momentic
           pnpm dlx momentic install-browsers --all
-          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --upload-results --parallel 5 --wait-on http://localhost:3000 --wait-on-timeout 300000 --include "simple*"
+          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --wait-on http://localhost:3000 --wait-on-timeout 300000 --exclude "llm-calls/*" --upload-results
         env:
           TURBO_CACHE_DIR: .turbo
           SKIP_ENV_CHECK: true
