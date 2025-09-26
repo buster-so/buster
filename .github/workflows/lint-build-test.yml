@@ -349,6 +349,13 @@ jobs:
         env:
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
 
+      - name: Keep job alive on failure for debugging
+        if: failure()
+        run: |
+          echo "Job failed. Keeping VM alive for 30 minutes for debugging..."
+          echo "SSH connection info is available in the Setup runner step above"
+          sleep 1800
+
 
       - name: Stop services
         if: always()
