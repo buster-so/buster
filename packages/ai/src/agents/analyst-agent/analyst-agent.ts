@@ -98,10 +98,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
 
   const docsSystemMessage = docsContent
     ? ({
-      role: 'system',
-      content: `<data_catalog_docs>\n${docsContent}\n</data_catalog_docs>`,
-      providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
-    } as ModelMessage)
+        role: 'system',
+        content: `<data_catalog_docs>\n${docsContent}\n</data_catalog_docs>`,
+        providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+      } as ModelMessage)
     : null;
 
   async function stream({ messages }: AnalystStreamOptions) {
@@ -134,19 +134,19 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     // Create analyst instructions system message with proper escaping
     const analystInstructionsMessage = analystInstructions
       ? ({
-        role: 'system',
-        content: `<organization_instructions>\n${analystInstructions}\n</organization_instructions>`,
-        providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
-      } as ModelMessage)
+          role: 'system',
+          content: `<organization_instructions>\n${analystInstructions}\n</organization_instructions>`,
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+        } as ModelMessage)
       : null;
 
     // Create user personalization system message
     const userPersonalizationSystemMessage = userPersonalizationMessageContent
       ? ({
-        role: 'system',
-        content: userPersonalizationMessageContent,
-        providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
-      } as ModelMessage)
+          role: 'system',
+          content: userPersonalizationMessageContent,
+          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+        } as ModelMessage)
       : null;
 
     return wrapTraced(

@@ -17,6 +17,7 @@ jobs:
     name: Lint
     runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 5
+    environment: testing
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

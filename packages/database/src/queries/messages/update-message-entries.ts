@@ -97,7 +97,7 @@ async function performUpdate({
 /**
  * Updates message entries with cache-first approach for streaming.
  * Cache is the source of truth during streaming, DB is updated for persistence.
- * 
+ *
  * Updates are queued per messageId to ensure they execute in order.
  *
  * Merge logic:
@@ -109,18 +109,18 @@ export async function updateMessageEntries(
   params: UpdateMessageEntriesParams
 ): Promise<{ success: boolean }> {
   const { messageId } = params;
-  
+
   // Get the current promise for this messageId, or use a resolved promise as the starting point
   const currentQueue = updateQueues.get(messageId) ?? Promise.resolve({ success: true });
-  
+
   // Chain the new update to run after the current queue completes
   const newQueue = currentQueue
     .then(() => performUpdate(params))
     .catch(() => performUpdate(params)); // Still try to run even if previous failed
-  
+
   // Update the queue for this messageId
   updateQueues.set(messageId, newQueue);
-  
+
   // Clean up the queue entry once this update completes
   newQueue.finally(() => {
     // Only remove if this is still the current queue
@@ -128,6 +128,6 @@ export async function updateMessageEntries(
       updateQueues.delete(messageId);
     }
   });
-  
+
   return newQueue;
 }

@@ -32,20 +32,21 @@ type VersionHistoryEntry = {
 type VersionHistory = Record<string, VersionHistoryEntry>;
 
 // Simple in-memory queue for each reportId
-const updateQueues = new Map<string, Promise<{
-  id: string;
-  name: string;
-  content: string;
-  versionHistory: VersionHistory | null;
-}>>();
+const updateQueues = new Map<
+  string,
+  Promise<{
+    id: string;
+    name: string;
+    content: string;
+    versionHistory: VersionHistory | null;
+  }>
+>();
 
 /**
  * Internal function that performs the actual update logic.
  * This is separated so it can be queued.
  */
-async function performUpdate(
-  params: BatchUpdateReportInput
-): Promise<{
+async function performUpdate(params: BatchUpdateReportInput): Promise<{
   id: string;
   name: string;
   content: string;
@@ -106,7 +107,7 @@ async function performUpdate(
 /**
  * Updates a report with new content, optionally name, and version history in a single operation
  * This is more efficient than multiple individual updates
- * 
+ *
  * Updates are queued per reportId to ensure they execute in order.
  */
 export const batchUpdateReport = async (
@@ -118,23 +119,25 @@ export const batchUpdateReport = async (
   versionHistory: VersionHistory | null;
 }> => {
   const { reportId } = params;
-  
+
   // Get the current promise for this reportId, or use a resolved promise as the starting point
-  const currentQueue = updateQueues.get(reportId) ?? Promise.resolve({
-    id: '',
-    name: '',
-    content: '',
-    versionHistory: null
-  });
-  
+  const currentQueue =
+    updateQueues.get(reportId) ??
+    Promise.resolve({
+      id: '',
+      name: '',
+      content: '',
+      versionHistory: null,
+    });
+
   // Chain the new update to run after the current queue completes
   const newQueue = currentQueue
     .then(() => performUpdate(params))
     .catch(() => performUpdate(params)); // Still try to run even if previous failed
-  
+
   // Update the queue for this reportId
   updateQueues.set(reportId, newQueue);
-  
+
   // Clean up the queue entry once this update completes
   newQueue.finally(() => {
     // Only remove if this is still the current queue
@@ -142,6 +145,6 @@ export const batchUpdateReport = async (
       updateQueues.delete(reportId);
     }
   });
-  
+
   return newQueue;
 };

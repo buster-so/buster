@@ -14,7 +14,7 @@ export const DEFAULT_ANTHROPIC_OPTIONS = {
     additionalModelRequestFields: {
       anthropic_beta: ['fine-grained-tool-streaming-2025-05-14'],
     },
-  }
+  },
 };
 
 export const DEFAULT_OPENAI_OPTIONS = {

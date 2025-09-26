@@ -83,10 +83,14 @@ describe('Analyst Agent Instructions', () => {
     expect(result).toContain('MANDATORY SQL NAMING CONVENTIONS');
 
     // Ensure table references require full qualification
-    expect(result).toContain('All Table References: MUST be fully qualified: `DATABASE_NAME.SCHEMA_NAME.TABLE_NAME`');
+    expect(result).toContain(
+      'All Table References: MUST be fully qualified: `DATABASE_NAME.SCHEMA_NAME.TABLE_NAME`'
+    );
 
     // Ensure column references use table aliases (not full qualifiers)
-    expect(result).toContain('All Column References: MUST be qualified with their table alias (e.g., `c.customerid`)');
+    expect(result).toContain(
+      'All Column References: MUST be qualified with their table alias (e.g., `c.customerid`)'
+    );
 
     // Ensure examples show table alias usage without full qualification
     expect(result).toContain('c.customerid');
