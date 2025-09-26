@@ -47,7 +47,7 @@ jobs:
         with:
           cache-key: lint-build-test
 
-      - name: Build all packages (excluding web)
+      - name: Build all packages
         run: pnpm turbo build
         env:
           NODE_ENV: production
@@ -69,14 +69,6 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
-
-      - name: Build required packages
-        run: pnpm turbo build --filter="!@buster-app/web" --filter="!@buster-app/api-legacy"
-        env:
-          NODE_ENV: production
-          SKIP_ENV_CHECK: true
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
 
       - name: Run all unit tests
         run: pnpm turbo test:unit
