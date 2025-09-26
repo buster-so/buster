@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node Environment
-        uses: ./.github/actions/setup-node-enfv
+        uses: ./.github/actions/setup-node-env
         with:
           cache-key: build-lint-unit
 
