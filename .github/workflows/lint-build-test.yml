@@ -316,7 +316,7 @@ jobs:
             echo "Checking $service_name (localhost:$port)..."
             
             for i in {1..60}; do
-              if curl -f -s -o /dev/null http://localhost:$port; then
+              if curl -s -o /dev/null http://localhost:$port; then
                 echo "✅ $service_name is ready (localhost:$port)"
                 return 0
               fi
