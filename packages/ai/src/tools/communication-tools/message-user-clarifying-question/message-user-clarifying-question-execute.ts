@@ -1,5 +1,6 @@
-import { updateMessageEntries } from '@buster/database/queries';
+import { updateMessage, updateMessageEntries } from '@buster/database/queries';
 import { wrapTraced } from 'braintrust';
+import { cleanupState } from '../../shared/cleanup-state';
 import { createRawToolResultEntry } from '../../shared/create-raw-llm-tool-result-entry';
 import { createMessageUserClarifyingQuestionRawLlmMessageEntry } from './helpers/message-user-clarifying-question-transform-helper';
 import {
@@ -38,6 +39,11 @@ async function processMessageUserClarifyingQuestion(
       messageId,
       rawLlmMessages,
     });
+
+    // Mark the message as completed
+    await updateMessage(messageId, {
+      isCompleted: true,
+    });
   } catch (error) {
     console.error('[message-user-clarifying-question] Error updating message entries:', error);
   }
@@ -52,13 +58,22 @@ export function createMessageUserClarifyingQuestionExecute(
 ) {
   return wrapTraced(
     async (
-      _input: MessageUserClarifyingQuestionInput
+      _input: MessageUserClarifyingQuestionInput,
+      options?: { toolCallId?: string }
     ): Promise<MessageUserClarifyingQuestionOutput> => {
-      if (!state.toolCallId) {
+      // Use toolCallId from state if available, otherwise from options
+      const toolCallId = state.toolCallId || options?.toolCallId;
+      if (!toolCallId) {
         throw new Error('Tool call ID is required');
       }
 
-      return processMessageUserClarifyingQuestion(state, state.toolCallId, context.messageId);
+      const result = await processMessageUserClarifyingQuestion(
+        state,
+        toolCallId,
+        context.messageId
+      );
+      cleanupState(state);
+      return result;
     },
     { name: 'Message User Clarifying Question' }
   );

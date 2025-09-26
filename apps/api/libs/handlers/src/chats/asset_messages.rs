@@ -277,10 +277,9 @@ pub async fn create_message_file_association(
         .await;
 
     if let Ok(chat_id) = message_result {
-        // Determine file type string
+        // Check if this is a supported file type
         let file_type = match asset_type {
-            AssetType::MetricFile => "metric_file".to_string(),
-            AssetType::DashboardFile => "dashboard".to_string(),
+            AssetType::MetricFile | AssetType::DashboardFile | AssetType::ReportFile => asset_type,
             _ => return Ok(()),
         };
 

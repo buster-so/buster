@@ -1,4 +1,5 @@
 import type { PermissionedDataset } from '@buster/access-controls';
+import { waitForPendingUpdates } from '@buster/database/queries';
 import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
@@ -229,6 +230,11 @@ export function createThinkAndPrepAgent(thinkAndPrepAgentSchema: ThinkAndPrepAge
               toolCalls: event.toolCalls?.length || 0,
               hasToolResults: !!event.toolResults,
             });
+          },
+          onFinish: async () => {
+            console.info('Think and Prep Agent finished');
+            // Ensure all pending database updates complete before stream terminates
+            await waitForPendingUpdates(messageId);
           },
         }),
       {

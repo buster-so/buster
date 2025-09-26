@@ -19,6 +19,7 @@ export function createDoneToolFinish(context: DoneToolContext, doneToolState: Do
       messageId: context.messageId,
     };
 
+    // Only add the final text response here; by now files have been inserted via delta
     if (doneToolResponseEntry) {
       entries.responseMessages = [doneToolResponseEntry];
     }

@@ -220,7 +220,7 @@ export const useRenameDashboardSelectMenu = ({
             setTimeout(() => {
               input.focus();
               input.select();
-            }, 50);
+            }, 200);
           }
         },
       }),

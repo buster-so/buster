@@ -11,6 +11,12 @@ vi.mock('braintrust', () => ({
   wrapTraced: (fn: unknown) => fn,
 }));
 
+// Mock database operations for tests
+vi.mock('@buster/database/queries', () => ({
+  updateMessage: vi.fn().mockResolvedValue({ success: true }),
+  updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
+}));
+
 describe('Respond Without Asset Creation Tool Integration Tests', () => {
   describe('Tool Creation and Configuration', () => {
     test('should create tool with minimal context', () => {
@@ -130,7 +136,7 @@ describe('Respond Without Asset Creation Tool Integration Tests', () => {
         } as ToolCallOptions);
 
         expect(result).toBeDefined();
-        expect(result).toEqual({});
+        expect(result).toEqual({ success: true });
       }
     });
 
@@ -152,7 +158,7 @@ describe('Respond Without Asset Creation Tool Integration Tests', () => {
         } as ToolCallOptions);
 
         expect(result).toBeDefined();
-        expect(result).toEqual({});
+        expect(result).toEqual({ success: true });
       }
     });
 
@@ -177,7 +183,7 @@ Escaped: \n \t \\ \" \'
         } as ToolCallOptions);
 
         expect(result).toBeDefined();
-        expect(result).toEqual({});
+        expect(result).toEqual({ success: true });
       }
     });
 
@@ -198,7 +204,7 @@ Escaped: \n \t \\ \" \'
         } as ToolCallOptions);
 
         expect(result).toBeDefined();
-        expect(result).toEqual({});
+        expect(result).toEqual({ success: true });
       }
     });
   });
@@ -238,28 +244,31 @@ Escaped: \n \t \\ \" \'
           tool2.execute(input2, { toolCallId: 'tc-2', messages: [] } as ToolCallOptions),
         ]);
 
-        expect(result1).toEqual({});
-        expect(result2).toEqual({});
+        expect(result1).toEqual({ success: true });
+        expect(result2).toEqual({ success: true });
       }
     });
   });
 
   describe('Output Schema Validation', () => {
-    test('should have empty output schema', () => {
+    test('should validate output schema with success field', () => {
       const outputSchema = RespondWithoutAssetCreationOutputSchema;
 
-      const emptyOutput = {};
-      expect(() => outputSchema.parse(emptyOutput)).not.toThrow();
+      const validOutput = { success: true };
+      expect(() => outputSchema.parse(validOutput)).not.toThrow();
     });
 
-    test('should accept empty output only', () => {
+    test('should require success field in output', () => {
       const outputSchema = RespondWithoutAssetCreationOutputSchema;
 
-      // The output schema is z.object({}) which accepts empty objects
-      // Additional properties are allowed in Zod by default unless strict() is used
+      // The output schema requires a success boolean field
+      const validOutput = { success: true };
+      const result = outputSchema.parse(validOutput);
+      expect(result).toEqual({ success: true });
+
+      // Should throw for empty object
       const emptyOutput = {};
-      const result = outputSchema.parse(emptyOutput);
-      expect(result).toEqual({});
+      expect(() => outputSchema.parse(emptyOutput)).toThrow();
     });
   });
 

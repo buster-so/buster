@@ -30,7 +30,6 @@ export const getListLogs = async (params?: GetLogsListRequest): Promise<GetLogsL
     .then((res) => res.data);
 };
 
-// Client-side fetch version
 export const getChat = async ({ id }: GetChatRequest): Promise<GetChatResponse> => {
   return mainApi.get<GetChatResponse>(`${CHATS_BASE}/${id}`).then((res) => res.data);
 };

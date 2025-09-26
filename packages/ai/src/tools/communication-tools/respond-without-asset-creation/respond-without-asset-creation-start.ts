@@ -64,7 +64,6 @@ export function createRespondWithoutAssetCreationStart(
         }
 
         await updateMessage(context.messageId, {
-          isCompleted: true,
           finalReasoningMessage: `Reasoned for ${timeString}`,
         });
       }

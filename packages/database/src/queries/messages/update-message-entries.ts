@@ -25,6 +25,17 @@ export type UpdateMessageEntriesParams = z.infer<typeof UpdateMessageEntriesSche
 const updateQueues = new Map<string, Promise<{ success: boolean }>>();
 
 /**
+ * Wait for all pending updates for a given messageId to complete.
+ * This ensures all queued updates are flushed to the database before proceeding.
+ */
+export async function waitForPendingUpdates(messageId: string): Promise<void> {
+  const pendingQueue = updateQueues.get(messageId);
+  if (pendingQueue) {
+    await pendingQueue;
+  }
+}
+
+/**
  * Internal function that performs the actual update logic.
  * This is separated so it can be queued.
  */

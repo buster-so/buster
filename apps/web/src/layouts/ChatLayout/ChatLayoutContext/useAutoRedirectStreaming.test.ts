@@ -305,6 +305,6 @@ describe('useAutoRedirectStreaming', () => {
 
     renderHook(() => useAutoRedirectStreaming(defaultProps));
 
-    expect(mockNavigateFn).not.toHaveBeenCalled();
+    expect(mockNavigateFn).toHaveBeenCalled();
   });
 });

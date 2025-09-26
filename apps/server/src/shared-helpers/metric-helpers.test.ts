@@ -308,7 +308,7 @@ describe('metric-helpers', () => {
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(403, { message: "You don't have permission to view this metric" })
+          new HTTPException(403, { message: 'You do not have permission to access this asset' })
         );
       });
 
@@ -345,7 +345,7 @@ describe('metric-helpers', () => {
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(403, { message: "You don't have permission to view this metric" })
+          new HTTPException(403, { message: 'Public access expired' })
         );
       });
 
@@ -363,7 +363,7 @@ describe('metric-helpers', () => {
         const options: MetricAccessOptions = { publicAccessPreviouslyVerified: false };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(403, { message: "You don't have permission to view this metric" })
+          new HTTPException(418, { message: 'Password required for public access' })
         );
       });
 
@@ -384,7 +384,7 @@ describe('metric-helpers', () => {
         };
 
         await expect(fetchAndProcessMetricData('metric-123', mockUser, options)).rejects.toThrow(
-          new HTTPException(403, { message: "You don't have permission to view this metric" })
+          new HTTPException(403, { message: 'Incorrect password for public access' })
         );
       });
 

@@ -5,6 +5,7 @@ import {
 } from '@buster/database/queries';
 import type { ChatMessageResponseMessage } from '@buster/server-shared/chats';
 import { wrapTraced } from 'braintrust';
+import { cleanupState } from '../../../shared/cleanup-state';
 import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-result-entry';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import {
@@ -334,6 +335,7 @@ export function createCreateReportsExecute(
           failed: !!result?.error,
         });
 
+        cleanupState(state);
         return result as CreateReportsOutput;
       } catch (error) {
         const executionTime = Date.now() - startTime;
@@ -397,10 +399,12 @@ export function createCreateReportsExecute(
         // Only throw for critical errors (auth, database connection)
         // For other errors, return them in the response
         if (isAuthError || isDatabaseError) {
+          cleanupState(state);
           throw error;
         }
 
         // Return error information to the agent
+        cleanupState(state);
         return {
           message: `Failed to create report: ${errorMessage}`,
           error: state.file?.error || errorMessage,

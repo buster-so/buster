@@ -46,6 +46,8 @@ const ResponseMessage_FileSchema = z.object({
   metadata: z.array(ResponseMessage_FileMetadataSchema).optional(),
 });
 
+export { ResponseMessageFileTypeSchema };
+
 export const ResponseMessageSchema = z.discriminatedUnion('type', [
   ResponseMessage_TextSchema,
   ResponseMessage_FileSchema,

@@ -16,7 +16,10 @@ export const getAssetIdAndVersionNumber = (
     dashboard_version_number?: number;
     report_version_number?: number;
   }
-) => {
+): {
+  assetId: string;
+  versionNumber: number | undefined;
+} => {
   if (assetType === 'chat') {
     return { assetId: params.chatId ?? '', versionNumber: undefined };
   }

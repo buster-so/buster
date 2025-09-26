@@ -36,7 +36,8 @@ export async function getMetricDataHandler(
   user: User,
   limit = 5000,
   versionNumber?: number,
-  reportFileId?: string
+  reportFileId?: string,
+  password?: string
 ): Promise<MetricDataResponse> {
   // Retrieve metric definition from database with data source info
   const metric = await getMetricWithDataSource({ metricId, versionNumber });
@@ -63,7 +64,7 @@ export async function getMetricDataHandler(
     publiclyAccessible: metric.publiclyAccessible,
     publicExpiryDate: metric.publicExpiryDate ?? undefined,
     publicPassword: metric.publicPassword ?? undefined,
-    userSuppliedPassword: undefined,
+    userSuppliedPassword: password,
   });
 
   if (!hasAccess) {

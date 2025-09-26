@@ -1,6 +1,11 @@
 import dayjs from 'dayjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatDate, numberDateFallback, valueIsValidMonth } from './date';
+import {
+  extractDateForFormatting,
+  formatDate,
+  numberDateFallback,
+  valueIsValidMonth,
+} from './date';
 
 describe('formatDate', () => {
   // Test 1: Basic date string formatting
@@ -184,6 +189,23 @@ describe('numberDateFallback', () => {
     const result = numberDateFallback(1, 'month');
     expect(dayjs.isDayjs(result) ? result.format('YYYY-MM') : result).toBe('2024-01');
   });
+
+  it('should handle 13-digit millisecond timestamp', () => {
+    const timestamp = 1710921600000; // 2024-03-20 00:00:00 in milliseconds
+    const result = numberDateFallback(timestamp);
+
+    expect(dayjs.isDayjs(result)).toBe(true);
+    expect((result as dayjs.Dayjs).format('YYYY-MM-DD')).toBe('2024-03-20');
+  });
+
+  it('should return string for quarter convertNumberTo with non-timestamp number', () => {
+    const result = numberDateFallback(15, undefined, 'quarter');
+
+    // Since there's no specific quarter logic in numberDateFallback,
+    // 15 is not a valid month (>12), and not a valid timestamp, it should return as string
+    expect(result).toBe('15');
+    expect(typeof result).toBe('string');
+  });
 });
 
 describe('valueIsValidMonth', () => {
@@ -225,5 +247,86 @@ describe('valueIsValidMonth', () => {
 
   it('should return true for valid string month "12"', () => {
     expect(valueIsValidMonth('12')).toBe(true);
+  });
+});
+
+describe('extractDateForFormatting', () => {
+  beforeEach(() => {
+    // Mock the current date to ensure consistent test results
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-01-15T00:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // Test 1: Date object input should return new Date(date)
+  it('should return new Date when input is a Date object', () => {
+    const inputDate = new Date('2024-03-20T10:30:00Z');
+    const result = extractDateForFormatting(inputDate);
+
+    expect(result).toBeInstanceOf(Date);
+    expect(result).toEqual(new Date(inputDate));
+  });
+
+  // Test 2: Number input should call numberDateFallback
+  it('should call numberDateFallback when input is a number', () => {
+    const result = extractDateForFormatting(1710921600); // 10-digit timestamp
+
+    // Should return a dayjs object from numberDateFallback for timestamps
+    expect(dayjs.isDayjs(result)).toBe(true);
+    expect((result as dayjs.Dayjs).format('YYYY-MM-DD')).toBe('2024-03-20');
+  });
+
+  // Test 3: String input with convertNumberTo set (non-'number') should parse and call numberDateFallback
+  it('should parse string to int and call numberDateFallback when convertNumberTo is set', () => {
+    const result = extractDateForFormatting('3', undefined, 'month_of_year');
+
+    expect(dayjs.isDayjs(result)).toBe(true);
+    expect((result as dayjs.Dayjs).format('YYYY-MM')).toBe('2024-03');
+  });
+
+  // Test 4: String input with convertNumberTo set to 'number' should return string as-is
+  it('should return string as-is when convertNumberTo is "number"', () => {
+    const result = extractDateForFormatting('123', undefined, 'number');
+
+    expect(result).toBe('123');
+    expect(typeof result).toBe('string');
+  });
+
+  // Test 5: String input without convertNumberTo should return string as-is
+  it('should return string as-is when convertNumberTo is not set', () => {
+    const testString = '2024-03-20';
+    const result = extractDateForFormatting(testString);
+
+    expect(result).toBe(testString);
+    expect(typeof result).toBe('string');
+  });
+
+  // Test 6: String input that can't be parsed to int with convertNumberTo should return string
+  it('should return string when input cannot be parsed as integer with convertNumberTo', () => {
+    const result = extractDateForFormatting('not-a-number', undefined, 'day_of_week');
+
+    expect(result).toBe('not-a-number');
+    expect(typeof result).toBe('string');
+  });
+
+  // Test 7: Non-string, non-number, non-date input should convert to string
+  it('should convert non-string, non-number, non-date input to string', () => {
+    const objectInput = { test: 'value' };
+    const result = extractDateForFormatting(objectInput as any);
+
+    expect(typeof result).toBe('string');
+    expect(result).toBe('[object Object]');
+  });
+
+  // Test 8: String input with convertNumberTo 'day_of_week' should parse and call numberDateFallback
+  it('should handle day_of_week conversion from string number', () => {
+    const result = extractDateForFormatting('1', undefined, 'day_of_week');
+
+    expect(dayjs.isDayjs(result)).toBe(true);
+    // Day 1 (Monday) starting from current mock date (2024-01-15 which is Monday)
+    expect((result as dayjs.Dayjs).format('YYYY-MM-DD')).toBe('2024-01-15');
   });
 });

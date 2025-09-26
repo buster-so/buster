@@ -1,9 +1,7 @@
-import { ClientOnly } from '@tanstack/react-router';
 import { cva, type VariantProps } from 'class-variance-authority';
-import React, { useEffect, useRef } from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import TextareaAutosize, { type TextareaAutosizeProps } from 'react-textarea-autosize';
 import { cn } from '@/lib/classMerge';
-import { useMounted } from '../../../hooks/useMount';
 import { inputVariants } from './Input';
 
 const inputTextAreaVariants = inputVariants;
@@ -30,7 +28,11 @@ export interface InputTextAreaProps
   onPressEnter?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 }
 
-export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextAreaProps>(
+export interface InputTextAreaRef extends HTMLTextAreaElement {
+  forceRecalculateHeight?: () => void;
+}
+
+export const InputTextArea = React.forwardRef<InputTextAreaRef, InputTextAreaProps>(
   (
     {
       className,
@@ -46,14 +48,20 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-    const combinedRef = (node: HTMLTextAreaElement) => {
-      textareaRef.current = node;
-      if (typeof ref === 'function') {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
+    useImperativeHandle(ref, () => {
+      if (!textareaRef.current) {
+        return null as unknown as InputTextAreaRef;
       }
-    };
+      return Object.assign(textareaRef.current, {
+        forceRecalculateHeight: () => {
+          if (textareaRef.current) {
+            // Force a recalculation by triggering an input event
+            const event = new Event('input', { bubbles: true });
+            textareaRef.current.dispatchEvent(event);
+          }
+        },
+      });
+    }, []);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter') {
@@ -70,16 +78,16 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
 
     return (
       <TextareaAutosize
-        ref={combinedRef}
+        ref={textareaRef}
         className={cn(
           inputTextAreaVariants({ variant }),
           textAreaVariants({ rounding }),
           'px-2.5 py-2.5 resize-none! box-border',
           className
         )}
-        value={props.value}
         onKeyDown={handleKeyDown}
         style={style as Omit<React.CSSProperties, 'height'>}
+        cacheMeasurements={false}
         {...props}
       />
     );

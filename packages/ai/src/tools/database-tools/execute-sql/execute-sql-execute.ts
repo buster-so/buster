@@ -3,6 +3,7 @@ import { type DataSource, withRateLimit } from '@buster/data-source';
 import { updateMessageEntries } from '@buster/database/queries';
 import { wrapTraced } from 'braintrust';
 import { getDataSource } from '../../../utils/get-data-source';
+import { cleanupState } from '../../shared/cleanup-state';
 import { createRawToolResultEntry } from '../../shared/create-raw-llm-tool-result-entry';
 import {
   EXECUTE_SQL_TOOL_NAME,
@@ -360,10 +361,12 @@ export function createExecuteSqlExecute(state: ExecuteSqlState, context: Execute
           }
         }
 
+        cleanupState(state);
         return { results };
       } catch (error) {
         // If we can't get data source, return error for all statements
         console.error('[execute-sql] Failed to get data source:', error);
+        cleanupState(state);
         return {
           results: statements.map((sql) => ({
             status: 'error' as const,
@@ -372,6 +375,7 @@ export function createExecuteSqlExecute(state: ExecuteSqlState, context: Execute
           })),
         };
       } finally {
+        cleanupState(state);
         // Always close the data source to clean up connections
         if (dataSource) {
           try {

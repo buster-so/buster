@@ -41,7 +41,7 @@ export const ChatInput: React.FC = React.memo(() => {
   useEffect(() => {
     if (hasChat) {
       requestAnimationFrame(() => {
-        textAreaRef.current?.focus();
+        textAreaRef.current?.focus?.();
       });
     }
   }, [hasChat, textAreaRef]);

@@ -34,6 +34,23 @@ vi.mock('../../../shared/create-raw-llm-tool-result-entry', () => ({
   }),
 }));
 
+vi.mock('../../../shared/cleanup-state', () => ({
+  cleanupState: vi.fn(),
+}));
+
+vi.mock('../../file-tracking-helper', () => ({
+  trackFileAssociations: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../helpers/metric-extraction', () => ({
+  extractAndCacheMetricsWithUserContext: vi.fn().mockResolvedValue(undefined),
+  extractMetricIds: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('../report-snapshot-cache', () => ({
+  updateCachedSnapshot: vi.fn(),
+}));
+
 import { updateMessageEntries } from '@buster/database/queries';
 
 describe('create-reports-execute', () => {
@@ -141,7 +158,7 @@ describe('create-reports-execute', () => {
     });
 
     it('should create initial entries on first execution', async () => {
-      state.initialEntriesCreated = undefined;
+      state.initialEntriesCreated = false;
       state.file = undefined;
 
       const input: CreateReportsInput = {

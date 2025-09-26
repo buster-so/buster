@@ -82,7 +82,7 @@ pub async fn duplicate_chat_handler(
         publicly_enabled_by: None,
         public_expiry_date: None,
         most_recent_file_id: source_chat.most_recent_file_id,
-        most_recent_file_type: source_chat.most_recent_file_type.clone(),
+        most_recent_file_type: source_chat.most_recent_file_type,
         most_recent_version_number: source_chat.most_recent_version_number,
         workspace_sharing: WorkspaceSharing::None,
         workspace_sharing_enabled_at: None,

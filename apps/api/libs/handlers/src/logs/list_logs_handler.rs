@@ -51,7 +51,7 @@ struct ChatWithUser {
     pub updated_at: DateTime<Utc>,
     pub created_by: Uuid,
     pub most_recent_file_id: Option<Uuid>,
-    pub most_recent_file_type: Option<String>,
+    pub most_recent_file_type: Option<database::enums::AssetType>,
     pub most_recent_version_number: Option<i32>,
     // User fields
     pub user_name: Option<String>,
@@ -141,7 +141,7 @@ pub async fn list_logs_handler(
                 created_by_avatar: chat.user_avatar_url,
                 last_edited: chat.updated_at.to_rfc3339(),
                 latest_file_id: chat.most_recent_file_id.map(|id| id.to_string()),
-                latest_file_type: chat.most_recent_file_type,
+                latest_file_type: chat.most_recent_file_type.map(|t| t.to_string().to_string()),
                 latest_version_number: chat.most_recent_version_number,
             }
         })

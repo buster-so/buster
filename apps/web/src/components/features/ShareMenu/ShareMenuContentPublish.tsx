@@ -15,6 +15,7 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useBuildLocation } from '@/context/Routes/useRouteBuilder';
 import { cn } from '@/lib/classMerge';
 import { createDayjsDate } from '@/lib/date';
+import { timeout } from '@/lib/timeout';
 import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 
 export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = React.memo(
@@ -73,6 +74,8 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
       } else {
         const _exhaustiveCheck: never = assetType;
       }
+      await timeout(100);
+      if (v) onCopyLink(true);
     };
 
     const onSetPasswordProtected = async (v: boolean) => {
@@ -198,7 +201,7 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
 );
 ShareMenuContentPublish.displayName = 'ShareMenuContentPublish';
 
-const IsPublishedInfo: React.FC<{ isPublished: boolean }> = React.memo(({ isPublished }) => {
+const IsPublishedInfo: React.FC<{ isPublished: boolean }> = ({ isPublished }) => {
   if (!isPublished) return null;
 
   return (
@@ -207,8 +210,7 @@ const IsPublishedInfo: React.FC<{ isPublished: boolean }> = React.memo(({ isPubl
       <Text variant="link">Live on the web</Text>
     </div>
   );
-});
-IsPublishedInfo.displayName = 'IsPublishedInfo';
+};
 
 const LinkExpiration: React.FC<{
   linkExpiry: Date | null;

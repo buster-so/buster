@@ -54,8 +54,9 @@ export type MetricDataParams = z.infer<typeof MetricDataParamsSchema>;
  */
 export const MetricDataQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(5000).default(5000).optional(),
-  version_number: z.coerce.number().optional(),
+  version_number: z.coerce.number().int().min(1).optional(),
   report_file_id: z.string().uuid().optional(),
+  password: z.string().min(1).optional(),
 });
 
 export type MetricDataQuery = z.infer<typeof MetricDataQuerySchema>;

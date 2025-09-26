@@ -5,6 +5,7 @@ import { reportFiles } from '@buster/database/schema';
 import type { ChatMessageResponseMessage } from '@buster/server-shared/chats';
 import { wrapTraced } from 'braintrust';
 import { and, eq, isNull } from 'drizzle-orm';
+import { cleanupState } from '../../../shared/cleanup-state';
 import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-result-entry';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import {
@@ -529,6 +530,7 @@ export function createModifyReportsExecute(
         });
 
         // Return the result directly
+        cleanupState(state);
         return result;
       } catch (error) {
         const executionTime = Date.now() - startTime;
@@ -604,10 +606,12 @@ export function createModifyReportsExecute(
         // Only throw for critical errors (auth, database connection)
         // For other errors, return them in the response
         if (isAuthError || isDatabaseError) {
+          cleanupState(state);
           throw error;
         }
 
         // Return error information to the agent
+        cleanupState(state);
         return {
           success: false,
           message: `Failed to modify report: ${errorMessage}`,

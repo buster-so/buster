@@ -4,7 +4,7 @@ import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons/Button';
 import ShapeSquare from '../icons/NucleoIconFilled/shape-square';
 import { ArrowUp } from '../icons/NucleoIconOutlined';
-import { InputTextArea, type InputTextAreaProps } from './InputTextArea';
+import { InputTextArea, type InputTextAreaProps, type InputTextAreaRef } from './InputTextArea';
 
 const inputTextAreaButtonVariants = cva(
   'relative flex flex-col w-full items-center overflow-visible rounded-xl cursor-text border border-border transition-all duration-200',
@@ -29,7 +29,7 @@ export interface InputTextAreaButtonProps extends Omit<InputTextAreaProps, 'vari
   inputClassName?: string;
 }
 
-export const InputTextAreaButton = forwardRef<HTMLTextAreaElement, InputTextAreaButtonProps>(
+export const InputTextAreaButton = forwardRef<InputTextAreaRef, InputTextAreaButtonProps>(
   (
     {
       className,
@@ -51,7 +51,7 @@ export const InputTextAreaButton = forwardRef<HTMLTextAreaElement, InputTextArea
   ) => {
     const onSubmitPreflight = () => {
       if (disabled) return;
-      const text = (textRef as React.RefObject<HTMLTextAreaElement | null>).current?.value || '';
+      const text = (textRef as React.RefObject<InputTextAreaRef | null>).current?.value || '';
       onSubmit(text);
     };
 

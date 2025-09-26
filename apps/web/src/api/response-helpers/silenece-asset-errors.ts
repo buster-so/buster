@@ -14,6 +14,10 @@ export const silenceAssetErrors = (_count: number, error: RustApiError): boolean
     return false;
   }
 
+  if (error.status === 412) {
+    return false;
+  }
+
   openErrorNotification(error);
 
   return false;

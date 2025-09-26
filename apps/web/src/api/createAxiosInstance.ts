@@ -3,7 +3,6 @@ import type { AxiosRequestHeaders } from 'axios';
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { getSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
-import { Route as AuthRoute } from '@/routes/auth.login';
 import { BASE_URL_V2 } from './config';
 import { rustErrorHandler } from './errors';
 
@@ -50,7 +49,7 @@ export const defaultAxiosRequestHandler = async (config: InternalAxiosRequestCon
     const { accessToken: token } = session;
 
     if (!token) {
-      console.warn('No token found', config);
+      console.warn('No token found', config.url, session);
       //embed route were having an issue with this...
       //window.location.href = AuthRoute.to;
       //return Promise.reject(new Error('No token found'));

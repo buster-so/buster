@@ -48,7 +48,7 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
   } = check;
 
   // Check cache first (only for single role checks)
-  const cached = getCachedPermission(userId, assetId, assetType, requiredRole);
+  const cached = getCachedPermission(userId, assetId, assetType, requiredRole, userSuppliedPassword);
   if (cached !== undefined) {
     return cached;
   }
@@ -81,10 +81,7 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
       if (dbResult.accessPath !== undefined) {
         result.accessPath = dbResult.accessPath;
       }
-      // Only cache single role checks
-      if (!Array.isArray(requiredRole)) {
-        setCachedPermission(userId, assetId, assetType, requiredRole, result);
-      }
+      setCachedPermission(userId, assetId, assetType, requiredRole, result);
       return result;
     }
   }
@@ -127,7 +124,7 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
           effectiveRole: accessRole,
           accessPath: 'public' as const,
         };
-        setCachedPermission(userId, assetId, assetType, requiredRole, result);
+        setCachedPermission(userId, assetId, assetType, requiredRole, result, userSuppliedPassword);
         return result;
       }
     }

@@ -15,6 +15,7 @@ import {
   type DashboardYml,
   DashboardYmlSchema,
 } from '../../../../../../server-shared/src/dashboards/dashboard.types';
+import { cleanupState } from '../../../shared/cleanup-state';
 import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-result-entry';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import {
@@ -557,6 +558,7 @@ export function createCreateDashboardsExecute(
           filesFailed: result?.failed_files?.length || 0,
         });
 
+        cleanupState(state);
         return result as CreateDashboardsOutput;
       } catch (error) {
         const executionTime = Date.now() - startTime;
@@ -606,6 +608,7 @@ export function createCreateDashboardsExecute(
           }
         }
 
+        cleanupState(state);
         throw error;
       }
     },

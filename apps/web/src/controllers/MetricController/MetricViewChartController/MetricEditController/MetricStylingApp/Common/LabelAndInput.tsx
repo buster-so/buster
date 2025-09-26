@@ -13,7 +13,7 @@ export const LabelAndInput: React.FC<{
   return (
     <div
       data-testid={dataTestId}
-      className={cn('grid w-full grid-cols-[minmax(115px,115px)_1fr] items-center gap-2', 'h-7')}
+      className={cn('grid w-full grid-cols-[minmax(35px,115px)_1fr] items-center gap-2 h-7')}
     >
       <div className="flex items-center gap-x-1">
         <Text size="sm" variant="secondary">

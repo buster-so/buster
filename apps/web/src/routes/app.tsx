@@ -30,15 +30,16 @@ export const Route = createFileRoute('/app')({
       if (user && user?.organizations?.length === 0) {
         throw redirect({ href: BUSTER_SIGN_UP_URL, replace: true, statusCode: 307 });
       }
+
       return {
         supabaseSession,
       };
     } catch (error) {
-      // Re-throw redirect Responses so the router can handle them (e.g., getting-started)
-      if (error instanceof Response) {
-        throw error;
+      if (error instanceof Response && error.status === 307) {
+        return {
+          supabaseSession,
+        };
       }
-      console.error('Error in app route loader:', error);
       throw redirect({ to: '/auth/login', replace: true, statusCode: 307 });
     }
   },

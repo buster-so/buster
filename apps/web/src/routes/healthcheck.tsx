@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card/CardBase';
@@ -61,7 +60,7 @@ function RouteComponent() {
 
 function LoadingState() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+    <div className="min-h-screen  flex items-center justify-center">
       <Card className="text-center max-w-md mx-4">
         <CardContent className="pt-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400 mx-auto mb-4"></div>
@@ -76,7 +75,7 @@ function LoadingState() {
 
 function ErrorState({ error }: { error: Error | RustApiError }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+    <div className="min-h-screen  flex items-center justify-center">
       <Card className="max-w-md w-full mx-4">
         <CardHeader>
           <div className="flex items-center">
@@ -206,8 +205,8 @@ function HealthcheckDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-6 flex flex-col gap-4">
-      <div className="max-w-6xl mx-auto flex flex-col gap-4">
+    <div className="min-h-screen  p-6 flex flex-col gap-4 items-center">
+      <div className="w-full max-w-5xl flex flex-col gap-4">
         {/* Header */}
         <div className="mb-4 flex flex-col gap-1">
           <Text size="4xl" className="font-bold">
@@ -274,10 +273,16 @@ function HealthcheckDashboard({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 rounded-md p-4">
-                <pre className="text-sm text-gray-800 whitespace-pre-wrap overflow-auto">
-                  {JSON.stringify(user, null, 2)}
-                </pre>
+              <div className="bg-gray-50 rounded-md p-4 h-full">
+                {user ? (
+                  <pre className="text-sm text-gray-800 whitespace-pre-wrap overflow-auto">
+                    {JSON.stringify(user, null, 2)}
+                  </pre>
+                ) : (
+                  <Text variant="secondary" className="h-full" size="sm">
+                    No user data available
+                  </Text>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -473,6 +478,11 @@ function HealthcheckDashboard({
                       </div>
                     </div>
                     <div className="text-right">
+                      {check.responseTime && (
+                        <Text variant="tertiary" size="sm" className="mt-2 mr-3">
+                          {check.responseTime}ms
+                        </Text>
+                      )}
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(
                           check.status
@@ -480,11 +490,6 @@ function HealthcheckDashboard({
                       >
                         {check.status}
                       </span>
-                      {check.responseTime && (
-                        <Text variant="tertiary" size="sm" className="mt-2 ml-3">
-                          {check.responseTime}ms
-                        </Text>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -494,9 +499,9 @@ function HealthcheckDashboard({
         </Card>
 
         {/* Footer */}
-        <div className="mt-12 text-center">
+        <div className="mt-4 text-center">
           <Text variant="tertiary" size="sm">
-            System health is monitored continuously. Data refreshes automatically.
+            System health is monitored continuously. Data refreshes about every 30 seconds.
           </Text>
         </div>
       </div>

@@ -80,8 +80,9 @@ export const usePrefetchGetDashboardClient = <TData = GetDashboardResponse>(
   params?: Omit<UseQueryOptions<GetDashboardResponse, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const queryClient = useQueryClient();
+  const queryFn = useGetDashboardAndInitializeMetrics({ prefetchData: false });
+
   return useMemoizedFn((id: string, versionNumber: number | 'LATEST') => {
-    const queryFn = useGetDashboardAndInitializeMetrics({ prefetchData: false });
     const getDashboardQueryKey = dashboardQueryKeys.dashboardGetDashboard(id, versionNumber);
     const isStale = isQueryStale(getDashboardQueryKey, queryClient) || params?.staleTime === 0;
     if (!isStale) return;

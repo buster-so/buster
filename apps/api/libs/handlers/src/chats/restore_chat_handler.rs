@@ -297,7 +297,7 @@ pub async fn restore_chat_handler(
             .set((
                 chats::most_recent_file_id.eq(Some(file_id_clone)),
                 chats::most_recent_version_number.eq(Some(version_number)), // version_number is Copy
-                chats::most_recent_file_type.eq(Some(request_asset_type_clone.to_string())),
+                chats::most_recent_file_type.eq(Some(request_asset_type_clone)),
                 chats::updated_at.eq(now), // now is Copy
             ))
             .execute(&mut conn)

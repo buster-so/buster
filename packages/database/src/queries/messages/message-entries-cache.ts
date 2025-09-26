@@ -22,10 +22,10 @@ class MessageEntriesCache {
 
   private constructor(options: CacheOptions = {}) {
     this.cache = new LRUCache<string, MessageEntriesCacheValue>({
-      max: options.max ?? 500, // Increased from 100 for better hit rate
-      ttl: options.ttl ?? 1000 * 60 * 5, // Increased to 5 minutes TTL
-      updateAgeOnGet: true, // Refresh TTL on read
-      updateAgeOnHas: true, // Refresh TTL on has check
+      max: options.max ?? 10, // Reduced to only keep last 10 messages for active streaming
+      ttl: options.ttl ?? 1000 * 60 * 20, // 20 minutes TTL to cover 15-minute streams + buffer
+      updateAgeOnGet: true, // Refresh TTL on read during active streaming
+      updateAgeOnHas: false, // Don't refresh TTL on existence checks
     });
   }
 

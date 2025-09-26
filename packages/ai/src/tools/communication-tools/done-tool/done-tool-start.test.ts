@@ -7,12 +7,14 @@ import { CREATE_METRICS_TOOL_NAME } from '../../visualization-tools/metrics/crea
 import { CREATE_REPORTS_TOOL_NAME } from '../../visualization-tools/reports/create-reports-tool/create-reports-tool';
 import { MODIFY_REPORTS_TOOL_NAME } from '../../visualization-tools/reports/modify-reports-tool/modify-reports-tool';
 import type { DoneToolContext, DoneToolState } from './done-tool';
+import { createDoneToolDelta } from './done-tool-delta';
 import { createDoneToolStart } from './done-tool-start';
 
 vi.mock('@buster/database/queries', () => ({
   updateChat: vi.fn(),
   updateMessage: vi.fn(),
   updateMessageEntries: vi.fn(),
+  getAssetLatestVersion: vi.fn().mockResolvedValue(1),
 }));
 
 describe('done-tool-start', () => {
@@ -121,9 +123,29 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
+      // Start phase - initializes state
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - streams in the assets and final response
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: reportId,
+            assetName: 'Quarterly Report',
+            assetType: 'report_file',
+          },
+        ],
+        finalResponse: 'Report created successfully',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -208,9 +230,28 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - stream in the first metric as the asset to return
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: metricId1,
+            assetName: 'Revenue Growth',
+            assetType: 'metric_file',
+          },
+        ],
+        finalResponse: 'Metrics created successfully',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       // Should select the first metric (first in extractedFiles)
@@ -300,9 +341,33 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - stream in the report and standalone metric as assets to return
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: reportId,
+            assetName: 'Monthly Report',
+            assetType: 'report_file',
+          },
+          {
+            assetId: standaloneMetricId,
+            assetName: 'Standalone Metric',
+            assetType: 'metric_file',
+          },
+        ],
+        finalResponse: 'Report created with embedded metrics',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       // Report should be selected as mostRecentFile
@@ -376,9 +441,28 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - stream in the first metric
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: metricId1,
+            assetName: 'Revenue Metric',
+            assetType: 'metric_file',
+          },
+        ],
+        finalResponse: 'Multiple metrics created',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       // Should select the first metric
@@ -424,9 +508,28 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - stream in the first dashboard
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: dashboardId1,
+            assetName: 'Main Dashboard',
+            assetType: 'dashboard_file',
+          },
+        ],
+        finalResponse: 'Multiple dashboards created',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       // Should select the first dashboard
@@ -491,9 +594,28 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - stream in the dashboard
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: dashboardId,
+            assetName: 'Analytics Dashboard',
+            assetType: 'dashboard_file',
+          },
+        ],
+        finalResponse: 'Dashboard and metrics created',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       // Should select the dashboard (first in extractedFiles)
@@ -557,9 +679,28 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
+      } as ToolCallOptions);
+
+      // Delta phase - stream in the report
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: reportId,
+            assetName: 'Analysis Report',
+            assetType: 'report_file',
+          },
+        ],
+        finalResponse: 'Report created',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
       } as ToolCallOptions);
 
       // Report should still be selected as mostRecentFile
@@ -629,15 +770,34 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
+      const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
+
       await doneToolStart({
         toolCallId: 'done-call',
         messages: mockMessages,
       } as ToolCallOptions);
 
-      // Should select the standalone metric (first in extractedFiles after filtering)
+      // Delta phase - stream in the dashboard (metrics are embedded)
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: dashboardId,
+            assetName: 'Main Dashboard',
+            assetType: 'dashboard_file',
+          },
+        ],
+        finalResponse: 'Dashboard with metrics created',
+      });
+
+      await doneToolDelta({
+        inputTextDelta: deltaInput,
+        toolCallId: 'done-call',
+      } as ToolCallOptions);
+
+      // Should select the dashboard since that's what we're returning
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
-        mostRecentFileId: standaloneMetricId,
-        mostRecentFileType: 'metric_file',
+        mostRecentFileId: dashboardId,
+        mostRecentFileType: 'dashboard_file',
         mostRecentVersionNumber: 1,
       });
     });

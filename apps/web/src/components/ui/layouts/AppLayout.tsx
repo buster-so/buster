@@ -75,7 +75,9 @@ const PageLayout: React.FC<
         className
       )}
     >
-      <div className={cn('bg-background h-full overflow-hidden', floating && 'rounded border')}>
+      <div
+        className={cn('bg-page-background h-full overflow-hidden', floating && 'rounded border')}
+      >
         {children}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import type { PermissionedDataset } from '@buster/access-controls';
+import { waitForPendingUpdates } from '@buster/database/queries';
 import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
@@ -199,8 +200,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
               hasToolResults: !!event.toolResults,
             });
           },
-          onFinish: () => {
+          onFinish: async () => {
             console.info('Analyst Agent finished');
+            // Ensure all pending database updates complete before stream terminates
+            await waitForPendingUpdates(analystAgentOptions.messageId);
           },
         }),
       {

@@ -12,6 +12,7 @@ vi.mock('@buster/database/queries', () => ({
   updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
   updateMessage: vi.fn().mockResolvedValue({ success: true }),
   updateChat: vi.fn().mockResolvedValue({ success: true }),
+  getAssetLatestVersion: vi.fn().mockResolvedValue(1),
 }));
 
 describe('Done Tool Streaming Tests', () => {
@@ -143,9 +144,12 @@ describe('Done Tool Streaming Tests', () => {
         toolCallId: undefined,
         args: undefined,
         finalResponse: undefined,
+        addedAssetIds: [],
+        addedAssets: [],
       };
 
       const startHandler = createDoneToolStart(mockContext, state);
+      const deltaHandler = createDoneToolDelta(mockContext, state);
 
       const reportId = 'report-1';
       const messages: ModelMessage[] = [
@@ -186,6 +190,22 @@ describe('Done Tool Streaming Tests', () => {
 
       await startHandler({ toolCallId: 'call-1', messages });
 
+      // Now call delta with the asset data and final response
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: reportId,
+            assetName: 'Quarterly Report',
+            assetType: 'report_file',
+          },
+        ],
+        finalResponse: 'Report created successfully',
+      });
+      await deltaHandler({
+        inputTextDelta: deltaInput,
+        toolCallId: 'call-1',
+      } as ToolCallOptions);
+
       const queries = await import('@buster/database/queries');
 
       // mostRecent should be set to the report
@@ -218,9 +238,12 @@ describe('Done Tool Streaming Tests', () => {
         toolCallId: undefined,
         args: undefined,
         finalResponse: undefined,
+        addedAssetIds: [],
+        addedAssets: [],
       };
 
       const startHandler = createDoneToolStart(mockContext, state);
+      const deltaHandler = createDoneToolDelta(mockContext, state);
 
       const reportId = 'report-2';
       const metricId = 'metric-1';
@@ -285,9 +308,30 @@ describe('Done Tool Streaming Tests', () => {
 
       await startHandler({ toolCallId: 'call-2', messages });
 
+      // Now call delta with the asset data and final response
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: reportId,
+            assetName: 'Key Metrics Report',
+            assetType: 'report_file',
+          },
+          {
+            assetId: metricId,
+            assetName: 'Revenue',
+            assetType: 'metric_file',
+          },
+        ],
+        finalResponse: 'Report and metrics created successfully',
+      });
+      await deltaHandler({
+        inputTextDelta: deltaInput,
+        toolCallId: 'call-2',
+      } as ToolCallOptions);
+
       const queries = await import('@buster/database/queries');
 
-      // mostRecent should prefer the report
+      // mostRecent should prefer the report (first asset returned)
       const updateArgs = ((queries.updateChat as unknown as { mock: { calls: unknown[][] } }).mock
         .calls?.[0]?.[1] || {}) as Record<string, unknown>;
       expect(updateArgs).toMatchObject({
@@ -295,7 +339,7 @@ describe('Done Tool Streaming Tests', () => {
         mostRecentFileType: 'report_file',
       });
 
-      // Response messages should include the metric file
+      // Response messages should include both files
       const fileResponseCall = (
         queries.updateMessageEntries as unknown as { mock: { calls: [Record<string, any>][] } }
       ).mock.calls.find(
@@ -322,9 +366,12 @@ describe('Done Tool Streaming Tests', () => {
         toolCallId: undefined,
         args: undefined,
         finalResponse: undefined,
+        addedAssetIds: [],
+        addedAssets: [],
       };
 
       const startHandler = createDoneToolStart(mockContext, state);
+      const deltaHandler = createDoneToolDelta(mockContext, state);
 
       const dashboardId = 'dash-1';
       const metricId = 'metric-2';
@@ -377,6 +424,27 @@ describe('Done Tool Streaming Tests', () => {
       ];
 
       await startHandler({ toolCallId: 'call-3', messages });
+
+      // Now call delta with the asset data and final response
+      const deltaInput = JSON.stringify({
+        assetsToReturn: [
+          {
+            assetId: dashboardId,
+            assetName: 'Sales Dashboard',
+            assetType: 'dashboard_file',
+          },
+          {
+            assetId: metricId,
+            assetName: 'Margin',
+            assetType: 'metric_file',
+          },
+        ],
+        finalResponse: 'Dashboard and metrics created successfully',
+      });
+      await deltaHandler({
+        inputTextDelta: deltaInput,
+        toolCallId: 'call-3',
+      } as ToolCallOptions);
 
       const queries = await import('@buster/database/queries');
       const updateArgs = ((queries.updateChat as unknown as { mock: { calls: unknown[][] } }).mock

@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useUpdateDashboard } from '@/api/buster_rest/dashboards';
-import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
+import { InputTextArea, type InputTextAreaRef } from '@/components/ui/inputs/InputTextArea';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useMount } from '@/hooks/useMount';
+import { useSize } from '@/hooks/useSize';
 
 export const DASHBOARD_TITLE_INPUT_ID = (dashboardId: string) => `${dashboardId}-title-input`;
 
@@ -15,6 +17,9 @@ export const DashboardEditTitles: React.FC<{
   dashboardId: string;
 }> = React.memo(({ readOnly, title, description, dashboardId }) => {
   const titleRef = useRef<HTMLInputElement>(null);
+  const inputTextAreaRef = useRef<InputTextAreaRef>(null);
+  const size = useSize(titleRef);
+  const debouncedWidth = useDebounce(size?.width, { wait: 50, maxWait: 85 });
   const { mutateAsync: onUpdateDashboard } = useUpdateDashboard({
     saveToServer: false,
   });
@@ -37,6 +42,12 @@ export const DashboardEditTitles: React.FC<{
     }
   });
 
+  useEffect(() => {
+    if (debouncedWidth) {
+      inputTextAreaRef.current?.forceRecalculateHeight?.();
+    }
+  }, [debouncedWidth]);
+
   return (
     <div className="flex flex-col space-y-1.5">
       <EditableTitle
@@ -54,8 +65,9 @@ export const DashboardEditTitles: React.FC<{
 
       {(description || !readOnly) && (
         <InputTextArea
+          ref={inputTextAreaRef}
           variant="ghost"
-          readOnly={readOnly}
+          readOnly={false}
           onChange={onChangeDashboardDescription}
           value={description}
           minRows={1}

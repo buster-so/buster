@@ -143,7 +143,7 @@ pub struct Chat {
     pub publicly_enabled_by: Option<Uuid>,
     pub public_expiry_date: Option<DateTime<Utc>>,
     pub most_recent_file_id: Option<Uuid>,
-    pub most_recent_file_type: Option<String>,
+    pub most_recent_file_type: Option<AssetType>,
     pub most_recent_version_number: Option<i32>,
     pub workspace_sharing: WorkspaceSharing,
     pub workspace_sharing_enabled_by: Option<Uuid>,

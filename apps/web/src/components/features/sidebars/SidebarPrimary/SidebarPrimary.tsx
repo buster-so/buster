@@ -41,7 +41,6 @@ import {
   toggleInviteModal,
   useInviteModalStore,
 } from '@/context/GlobalStore/useInviteModalStore';
-import { useGetSelectedAssetTypeLoose } from '@/context/Routes/useAppRoutes';
 import { cn } from '@/lib/classMerge';
 import { InvitePeopleModal } from '../../modals/InvitePeopleModal';
 import { SupportModal } from '../../modals/SupportModal';
@@ -73,50 +72,49 @@ const topItems: ISidebarList = createSidebarList({
   ],
 });
 
-const yourStuff = (selectedAssetType?: AssetType): ISidebarGroup =>
-  createSidebarGroup({
-    label: 'Your stuff',
-    id: 'your-stuff',
-    items: createSidebarItems(
-      [
-        {
-          label: 'Metrics',
-          assetType: 'metric_file' satisfies AssetType,
-          icon: <ASSET_ICONS.metrics />,
-          link: { to: '/app/metrics' },
-          id: '/app/metrics',
-        },
-        {
-          label: 'Dashboards',
-          assetType: 'dashboard_file' satisfies AssetType,
-          icon: <ASSET_ICONS.dashboards />,
-          link: { to: '/app/dashboards' },
-          id: '/app/dashboards/',
-        },
-        {
-          label: 'Collections',
-          assetType: 'collection' satisfies AssetType,
-          icon: <ASSET_ICONS.collections />,
-          link: { to: '/app/collections' },
-          id: '/app/collections/',
-        },
-        {
-          label: 'Reports',
-          assetType: 'report_file' satisfies AssetType,
-          icon: <ASSET_ICONS.reports />,
-          link: { to: '/app/reports' },
-          id: '/app/reports/',
-        },
-      ].map(({ assetType, ...item }) => ({
-        ...item,
-        link: {
-          ...item.link,
-          activeOptions: { exact: true },
-        },
-        //  active: selectedAssetType === assetType,
-      }))
-    ),
-  });
+const yourStuff: ISidebarGroup = createSidebarGroup({
+  label: 'Your stuff',
+  id: 'your-stuff',
+  items: createSidebarItems(
+    [
+      {
+        label: 'Metrics',
+        assetType: 'metric_file' satisfies AssetType,
+        icon: <ASSET_ICONS.metrics />,
+        link: { to: '/app/metrics' },
+        id: '/app/metrics',
+      },
+      {
+        label: 'Dashboards',
+        assetType: 'dashboard_file' satisfies AssetType,
+        icon: <ASSET_ICONS.dashboards />,
+        link: { to: '/app/dashboards' },
+        id: '/app/dashboards/',
+      },
+      {
+        label: 'Collections',
+        assetType: 'collection' satisfies AssetType,
+        icon: <ASSET_ICONS.collections />,
+        link: { to: '/app/collections' },
+        id: '/app/collections/',
+      },
+      {
+        label: 'Reports',
+        assetType: 'report_file' satisfies AssetType,
+        icon: <ASSET_ICONS.reports />,
+        link: { to: '/app/reports' },
+        id: '/app/reports/',
+      },
+    ].map(({ assetType, ...item }) => ({
+      ...item,
+      link: {
+        ...item.link,
+        activeOptions: { exact: true },
+      },
+      //  active: selectedAssetType === assetType,
+    }))
+  ),
+});
 
 const adminTools: ISidebarGroup = createSidebarGroup({
   label: 'Admin tools',
@@ -167,13 +165,11 @@ const makeSidebarItems = ({
   isAdmin,
   favoritesDropdownItems,
   tryGroupMemoized,
-  selectedAssetType,
 }: {
   isUserRegistered: boolean;
   isAdmin: boolean;
   favoritesDropdownItems: ISidebarGroup | null;
   tryGroupMemoized: ISidebarGroup;
-  selectedAssetType?: AssetType;
 }) => {
   if (!isUserRegistered) return [];
 
@@ -183,7 +179,7 @@ const makeSidebarItems = ({
     items.push(adminTools);
   }
 
-  items.push(yourStuff(selectedAssetType));
+  items.push(yourStuff);
 
   if (favoritesDropdownItems) {
     items.push(favoritesDropdownItems);
@@ -200,7 +196,7 @@ export const SidebarPrimary = React.memo(() => {
   const isUserRegistered = useIsUserRegistered();
 
   const favoritesDropdownItems = useFavoriteSidebarPanel();
-  const selectedAssetType = useGetSelectedAssetTypeLoose();
+  //  const selectedAssetType = useGetSelectedAssetTypeLoose();
 
   const tryGroupMemoized = useMemo(
     () => tryGroup(!restrictNewUserInvitations),
@@ -212,7 +208,6 @@ export const SidebarPrimary = React.memo(() => {
     isAdmin,
     favoritesDropdownItems,
     tryGroupMemoized,
-    selectedAssetType,
   });
 
   return (

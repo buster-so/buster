@@ -12,6 +12,7 @@ import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import { chatQueryKeys } from '@/api/query_keys/chat';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { silenceAssetErrors } from '@/api/response-helpers/silenece-asset-errors';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { updateChatToIChat } from '@/lib/chat';
@@ -146,6 +147,7 @@ export const prefetchGetChat = async (
     await queryClient.prefetchQuery({
       ...query,
       queryFn: () => getChatQueryFn(params, queryClient),
+      retry: silenceAssetErrors,
     });
   }
   return existingData || queryClient.getQueryData(query.queryKey);

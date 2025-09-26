@@ -33,8 +33,12 @@ export function getPermissionCacheKey(
   userId: string,
   assetId: string,
   assetType: AssetType,
-  requiredRole: AssetPermissionRole
+  requiredRole: AssetPermissionRole,
+  password?: string
 ): CacheKey {
+  if (password) {
+    return `${userId}:${assetId}:${assetType}:${requiredRole}:${password}`;
+  }
   return `${userId}:${assetId}:${assetType}:${requiredRole}`;
 }
 
@@ -45,9 +49,10 @@ export function getCachedPermission(
   userId: string,
   assetId: string,
   assetType: AssetType,
-  requiredRole: AssetPermissionRole
+  requiredRole: AssetPermissionRole,
+  password?: string
 ): AssetPermissionResult | undefined {
-  const key = getPermissionCacheKey(userId, assetId, assetType, requiredRole);
+  const key = getPermissionCacheKey(userId, assetId, assetType, requiredRole, password);
   const cached = permissionCache.get(key);
 
   if (cached !== undefined) {
@@ -67,9 +72,10 @@ export function setCachedPermission(
   assetId: string,
   assetType: AssetType,
   requiredRole: AssetPermissionRole,
-  result: AssetPermissionResult
+  result: AssetPermissionResult,
+  password?: string
 ): void {
-  const key = getPermissionCacheKey(userId, assetId, assetType, requiredRole);
+  const key = getPermissionCacheKey(userId, assetId, assetType, requiredRole, password);
   permissionCache.set(key, result);
 }
 

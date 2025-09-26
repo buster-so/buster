@@ -66,7 +66,6 @@ export function createMessageUserClarifyingQuestionStart(
         }
 
         await updateMessage(context.messageId, {
-          isCompleted: true,
           finalReasoningMessage: `Reasoned for ${timeString}`,
         });
       }

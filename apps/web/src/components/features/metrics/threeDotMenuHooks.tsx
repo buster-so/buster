@@ -155,8 +155,10 @@ export const useRenameMetricOnPage = ({
           () => document.getElementById(METRIC_CHART_TITLE_INPUT_ID) as HTMLInputElement
         );
         if (input) {
-          input.focus();
-          input.select();
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 250);
         }
       },
     }),

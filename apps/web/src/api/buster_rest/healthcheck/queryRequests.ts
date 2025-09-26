@@ -3,7 +3,7 @@ import { getHealthcheck } from './requests';
 
 export const useHealthcheck = () => {
   return useQuery({
-    queryKey: ['healthcheck'],
+    queryKey: ['healthcheck'] as const,
     queryFn: getHealthcheck,
     refetchInterval: 1000 * 30, // 30 seconds
   });

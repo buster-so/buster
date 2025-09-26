@@ -89,8 +89,7 @@ export const useAutoRedirectStreaming = ({
 
     //this happen will when the chat is completed and it WAS streaming
     else if (
-      isFinishedReasoning &&
-      isStreamFinished &&
+      (isFinishedReasoning || isStreamFinished) &&
       previousIsCompletedStream.current === false &&
       !firstFileId
     ) {

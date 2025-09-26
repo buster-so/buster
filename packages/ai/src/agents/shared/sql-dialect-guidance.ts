@@ -41,10 +41,15 @@ export const SQL_DIALECT_GUIDANCE = {
     GROUP BY ds.period_date
     ORDER BY ds.period_date;
     \`\`\`
-  - **Common Gotchas**: 
+  - **Common Gotchas**:
     - \`NOW()\` returns timestamp with timezone, \`CURRENT_TIMESTAMP\` is standard SQL
     - String concatenation: Use \`||\` not \`+\`
-    - \`NULL\` comparisons: Use \`IS NULL\`/\`IS NOT NULL\`, never \`= NULL\``,
+    - \`NULL\` comparisons: Use \`IS NULL\`/\`IS NOT NULL\`, never \`= NULL\`
+
+  - **AI/ML and Statistical Capabilities**:
+    - **Native stats**: strong analytical/window functions and aggregates like \`CORR()\`, \`COVAR_POP()\`, \`COVAR_SAMP()\`, \`REGR_SLOPE()\`, \`REGR_INTERCEPT()\`, \`PERCENTILE_CONT()\`, \`PERCENTILE_DISC()\`.
+    - **Forecasting/ML**: no native forecasting/ML/LLM functions.
+    - **Sentiment/LLM**: not built-in.`,
 
   snowflake: `- **Date/Time Functions (Snowflake)**:
   - **\`DATE_TRUNC\`**: Similar usage: \`DATE_TRUNC('DAY', column)\`, \`DATE_TRUNC('WEEK', column)\`, \`DATE_TRUNC('MONTH', column)\`. Week start depends on \`WEEK_START\` parameter (default Sunday).
@@ -81,7 +86,11 @@ export const SQL_DIALECT_GUIDANCE = {
   - **Common Gotchas**:
     - Column names are case-insensitive but stored uppercase unless quoted
     - Use \`||\` for string concatenation, not \`+\`
-    - \`GENERATOR()\` is powerful but can consume credits quickly with large row counts`,
+    - \`GENERATOR()\` is powerful but can consume credits quickly with large row counts
+
+  - **AI/ML and LLM (Cortex)**:
+    - **Cortex AI SQL**: \`SNOWFLAKE.CORTEX.COMPLETE()\`, \`SNOWFLAKE.CORTEX.SUMMARIZE()\`, \`SNOWFLAKE.CORTEX.SENTIMENT()\`, \`SNOWFLAKE.CORTEX.TRANSLATE()\`, \`SNOWFLAKE.CORTEX.EXTRACT_ANSWER()\`, \`SNOWFLAKE.CORTEX.SEARCH_PREVIEW()\` for prompts, summarization, sentiment, translation, answer extraction, and search validation in SQL.
+    - **Statistical functions**: native correlation and regression functions available.`,
 
   bigquery: `- **Date/Time Functions (BigQuery)**:
   - **\`DATE_TRUNC\`**: \`DATE_TRUNC(column, DAY)\`, \`DATE_TRUNC(column, WEEK)\`, \`DATE_TRUNC(column, MONTH)\`, etc. Week starts Sunday by default, use \`WEEK(MONDAY)\` for Monday start.
@@ -125,7 +134,11 @@ export const SQL_DIALECT_GUIDANCE = {
   - **Common Gotchas**:
     - Table names must be quoted with backticks: \`project.dataset.table\`
     - String concatenation with \`CONCAT()\` function, not \`||\`
-    - Slots are the currency - optimize for slot usage, not just time`,
+    - Slots are the currency - optimize for slot usage, not just time
+
+  - **AI/ML**:
+    - **Native statistical functions**: \`CORR\`, \`COVAR_POP\`, \`APPROX_*\` for scalable analytics.
+    - **Forecasting**: \`ML.FORECAST\` function available for time series predictions on existing models.`,
 
   redshift: `- **Date/Time Functions (Redshift)**:
   - **\`DATE_TRUNC\`**: Similar to PostgreSQL: \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`. Week starts Monday.
@@ -167,9 +180,13 @@ export const SQL_DIALECT_GUIDANCE = {
     \`\`\`
   - **Common Gotchas**:
     - No support for arrays or complex data types
-    - Limited regex support compared to PostgreSQL  
+    - Limited regex support compared to PostgreSQL
     - Case-sensitive string comparisons by default
-    - \`LIMIT\` without \`ORDER BY\` returns unpredictable results`,
+    - \`LIMIT\` without \`ORDER BY\` returns unpredictable results
+
+  - **AI/ML**:
+    - **Statistical functions**: built-in \`CORR\`, \`COVAR_*\`, \`REGR_*\` for analysis.
+    - **Prediction**: \`PREDICT\` function available for inference on trained models.`,
 
   mysql: `- **Date/Time Functions (MySQL/MariaDB)**:
   - **\`DATE_FORMAT\`**: Use \`DATE_FORMAT(column, '%Y-%m-01')\` for month truncation. For week, use \`STR_TO_DATE(CONCAT(YEAR(column),'-',WEEK(column, 1),' Monday'), '%X-%V %W')\` (Mode 1 starts week on Monday).
@@ -206,7 +223,11 @@ export const SQL_DIALECT_GUIDANCE = {
     - \`LIMIT\` without \`ORDER BY\` returns unpredictable results
     - String comparison is case-insensitive by default (depends on collation)
     - Use \`CONCAT()\` for string concatenation, not \`+\`
-    - \`GROUP BY\` behavior differs from standard SQL (sql_mode affects this)`,
+    - \`GROUP BY\` behavior differs from standard SQL (sql_mode affects this)
+
+  - **AI/ML**:
+    - **HeatWave AutoML (Enterprise/HeatWave)**: PREDICT function available for inference on trained models (requires existing models).
+    - **Community MySQL**: no native ML/LLM functions.`,
 
   mariadb: `- **Date/Time Functions (MySQL/MariaDB)**:
   - **\`DATE_FORMAT\`**: Use \`DATE_FORMAT(column, '%Y-%m-01')\` for month truncation. For week, use \`STR_TO_DATE(CONCAT(YEAR(column),'-',WEEK(column, 1),' Monday'), '%X-%V %W')\` (Mode 1 starts week on Monday).
@@ -239,7 +260,11 @@ export const SQL_DIALECT_GUIDANCE = {
     GROUP BY ds.period_date
     ORDER BY ds.period_date;
     \`\`\`
-  - **Common Gotchas**: Generally more standards-compliant than MySQL, but same basic patterns apply`,
+  - **Common Gotchas**: Generally more standards-compliant than MySQL, but same basic patterns apply
+
+  - **AI/ML**:
+    - No built-in ML/LLM/forecasting in core MariaDB.
+    - **Statistical functions**: basic correlation and regression functions available.`,
 
   sqlserver: `- **Date/Time Functions (SQL Server)**:
   - **\`DATE_TRUNC\`**: Available in recent versions: \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`. Week start depends on \`DATEFIRST\` setting.
@@ -276,7 +301,11 @@ export const SQL_DIALECT_GUIDANCE = {
     - Square bracket notation for reserved words: \`[order]\`, \`[user]\`
     - String concatenation with \`+\` can return NULL if any operand is NULL
     - \`ISNULL()\` function vs \`IS NULL\` condition
-    - \`TOP\` clause requires \`ORDER BY\` for deterministic results`,
+    - \`TOP\` clause requires \`ORDER BY\` for deterministic results
+
+  - **AI/ML**:
+    - **Native prediction**: \`PREDICT\` function available for inference on trained ONNX models.
+    - **Statistical functions**: rich window/analytic functions; correlation functions available.`,
 
   databricks: `- **Date/Time Functions (Databricks SQL)**:
   - **\`DATE_TRUNC\`**: \`DATE_TRUNC('DAY', column)\`, \`DATE_TRUNC('WEEK', column)\`, \`DATE_TRUNC('MONTH', column)\`. Week starts Monday.
@@ -312,7 +341,11 @@ export const SQL_DIALECT_GUIDANCE = {
     - Case-sensitive column names by default (unlike some SQL dialects)
     - Use \`concat()\` function for string concatenation, not \`||\` or \`+\`
     - \`sequence()\` function is powerful but can be memory-intensive for large ranges
-    - Delta Lake tables require explicit \`REFRESH TABLE\` after external writes`,
+    - Delta Lake tables require explicit \`REFRESH TABLE\` after external writes
+
+  - **AI/ML and LLM**:
+    - **AI functions (Databricks SQL)**: \`ai_generate_text()\`, \`ai_summarize()\`, \`ai_translate()\`, \`ai_analyze_sentiment()\` provide LLM/NLP in SQL.
+    - **Model prediction**: \`PREDICT\` function available for inference on registered models.`,
 
   supabase: `- **Date/Time Functions (PostgreSQL/Supabase)**:
   - **\`DATE_TRUNC\`**: Prefer \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`, etc., for grouping time series data. Note that \`'week'\` starts on Monday.
@@ -341,7 +374,11 @@ export const SQL_DIALECT_GUIDANCE = {
     LEFT JOIN schema.transactions t ON DATE_TRUNC('month', t.date) = ds.period_date
     GROUP BY ds.period_date
     ORDER BY ds.period_date;
-    \`\`\``,
+    \`\`\`
+
+  - **AI/ML Notes (Supabase)**:
+    - Supabase is PostgreSQL: leverage the same native capabilities and statistical functions.
+    - Extension availability and compute limits vary by project plan—validate before relying on heavy analytics`,
 } as const;
 
 export type SqlDialect = keyof typeof SQL_DIALECT_GUIDANCE;

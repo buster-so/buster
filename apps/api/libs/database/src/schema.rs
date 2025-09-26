@@ -89,6 +89,7 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::WorkspaceSharingEnum;
+    use super::sql_types::AssetTypeEnum;
 
     chats (id) {
         id -> Uuid,
@@ -103,8 +104,7 @@ diesel::table! {
         publicly_enabled_by -> Nullable<Uuid>,
         public_expiry_date -> Nullable<Timestamptz>,
         most_recent_file_id -> Nullable<Uuid>,
-        #[max_length = 255]
-        most_recent_file_type -> Nullable<Varchar>,
+        most_recent_file_type -> Nullable<AssetTypeEnum>,
         most_recent_version_number -> Nullable<Int4>,
         workspace_sharing -> WorkspaceSharingEnum,
         workspace_sharing_enabled_by -> Nullable<Uuid>,

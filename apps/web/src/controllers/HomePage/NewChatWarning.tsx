@@ -1,6 +1,8 @@
 import type { UserOrganizationRole } from '@buster/server-shared/organization';
 import { Link } from '@tanstack/react-router';
 import React from 'react';
+import { useListDatasources } from '@/api/buster_rest/data_source';
+import { useGetDatasets } from '@/api/buster_rest/datasets';
 import { Button } from '@/components/ui/buttons';
 import { AlertWarning, ArrowUpRight, CircleCheck } from '@/components/ui/icons';
 import { Paragraph, Text } from '@/components/ui/typography';
@@ -25,14 +27,14 @@ export const NewChatWarning = React.memo(
     const progressPercentage = (progress / 2) * 100;
 
     return (
-      <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex flex-col rounded border  bg-white p-6 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
           <Text className="text-xl font-medium text-gray-800">Setup Checklist</Text>
           <div className="flex items-center gap-2">
             <div className="text-sm font-medium text-gray-500">{progress}/2 completed</div>
-            <div className="h-2 w-20 rounded-full bg-gray-100">
+            <div className="h-2 w-20 rounded-full bg-item-hover">
               <div
-                className="h-full rounded-full bg-purple-500 transition-all duration-500 ease-in-out"
+                className="h-full rounded-full bg-gray-600 transition-all duration-500 ease-in-out"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -65,8 +67,8 @@ export const NewChatWarning = React.memo(
 
         <div
           className={cn(
-            'mt-5 flex items-center rounded-lg border p-4',
-            allCompleted ? 'border-gray-200 bg-gray-50' : 'border-gray-200 bg-gray-50'
+            'mt-5 flex items-center rounded border p-4',
+            allCompleted ? ' bg-gray-50' : ' bg-gray-50'
           )}
         >
           <div
@@ -114,14 +116,14 @@ const SetupItem = ({ number, status, title, description, link, linkText }: Setup
   return (
     <div
       className={cn(
-        'group relative flex items-start space-x-4 rounded-lg border p-4 transition-all duration-200 hover:shadow-sm',
-        status ? 'border-purple-700/30 bg-purple-50' : 'border-gray-200'
+        'group relative flex items-start space-x-4 rounded border p-4 transition-all duration-200 hover:shadow-sm',
+        status ? 'border-gray-400/30 bg-gray-50' : ''
       )}
     >
       <div
         className={cn(
           'text-md flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full font-medium',
-          status ? 'bg-purple-200/60 text-purple-700' : 'bg-gray-100 text-gray-500'
+          status ? 'bg-gray-200 text-gray-700' : 'bg-item-hover text-gray-500'
         )}
       >
         {status ? <CircleCheck title="Complete" /> : number}
@@ -131,7 +133,7 @@ const SetupItem = ({ number, status, title, description, link, linkText }: Setup
         <div className="flex items-center justify-between">
           <Text className="font-medium text-gray-800">{title}</Text>
           {status && (
-            <span className="rounded-full bg-purple-200/60 px-2 py-1 text-xs font-medium text-purple-700">
+            <span className="rounded-full bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700">
               Complete
             </span>
           )}
@@ -159,19 +161,60 @@ const SetupItem = ({ number, status, title, description, link, linkText }: Setup
   );
 };
 
+interface ResourceSectionProps {
+  title: string;
+  items?: Array<{ id: string; name: string }>;
+  emptyMessage: string;
+  pluralName: string;
+}
+
+const ResourceSection = ({ title, items, emptyMessage, pluralName }: ResourceSectionProps) => {
+  const itemCount = items?.length || 0;
+
+  return (
+    <div className="rounded border  bg-gray-50 p-3">
+      <div className="flex items-center justify-between mb-2">
+        <Text className="text-sm font-medium text-gray-700">{title}</Text>
+        <span className="rounded bg-item-select px-2 py-0.5 text-xs font-medium text-gray-600 border">
+          {itemCount} available
+        </span>
+      </div>
+      {items && items.length > 0 ? (
+        <div className="space-y-1">
+          {items.slice(0, 3).map((item) => (
+            <div key={item.id} className="flex items-center text-sm text-gray-600">
+              <div className="h-1.5 w-1.5 rounded-full bg-gray-400 mr-2" />
+              {item.name}
+            </div>
+          ))}
+          {items.length > 3 && (
+            <Text className="text-xs text-gray-500">
+              +{items.length - 3} more {pluralName}
+            </Text>
+          )}
+        </div>
+      ) : (
+        <Text className="text-sm text-gray-500">{emptyMessage}</Text>
+      )}
+    </div>
+  );
+};
+
 interface ContactAdminCardProps {
   userRole?: UserOrganizationRole;
 }
 
 const ContactAdminCard = ({ userRole }: ContactAdminCardProps) => {
   const roleLabel = userRole ? translateRole(userRole) : 'User';
+  const { data: datasets = [] } = useGetDatasets();
+  const { data: datasources = [] } = useListDatasources();
 
   return (
-    <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="flex flex-col rounded border  bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
         <Text className="text-xl font-medium text-gray-800">Contact Admin Required</Text>
-        <div className="rounded-full bg-blue-100 px-3 py-1">
-          <Text className="text-sm font-medium text-blue-700">{roleLabel}</Text>
+        <div className="rounded bg-item-hover px-3 py-1 border">
+          <Text className="text-sm font-medium text-gray-700">{roleLabel}</Text>
         </div>
       </div>
 
@@ -180,26 +223,45 @@ const ContactAdminCard = ({ userRole }: ContactAdminCardProps) => {
       </Paragraph>
 
       <div className="space-y-4">
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <div className="rounded border  bg-gray-50 p-4">
           <div className="flex items-start space-x-3">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200">
-              <Text className="text-sm font-medium text-blue-700">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-200">
+              <Text className="text-sm font-medium text-gray-700">
                 <AlertWarning />
               </Text>
             </div>
             <div className="min-w-0 flex-1">
-              <Text className="font-medium text-blue-800">Permission Required</Text>
-              <Paragraph className="mt-1 text-sm text-blue-700">
+              <Text className="font-medium text-gray-800">Permission Required</Text>
+              <Paragraph className="mt-1 text-sm text-gray-700">
                 Your current role is <span className="font-semibold">{roleLabel}</span>. To start
                 asking questions, an admin needs to:
               </Paragraph>
-              <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-blue-700">
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-gray-700">
                 <li>Connect data sources to your organization</li>
                 <li>Create datasets from those data sources</li>
                 <li>Grant you access to the relevant datasets</li>
               </ul>
             </div>
           </div>
+        </div>
+
+        {/* Available Resources */}
+        <div className="space-y-3 max-h-[500px] overflow-y-auto">
+          <Paragraph className="text-sm font-medium text-gray-800">Your Current Access</Paragraph>
+
+          <ResourceSection
+            title="Datasets"
+            items={datasets}
+            emptyMessage="No datasets available"
+            pluralName="datasets"
+          />
+
+          <ResourceSection
+            title="Data Sources"
+            items={datasources}
+            emptyMessage="No data sources available"
+            pluralName="data sources"
+          />
         </div>
       </div>
     </div>

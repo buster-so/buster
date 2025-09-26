@@ -59,6 +59,20 @@ export const ShareMenuContentEmbedFooter = ({
     openSuccessMessage('Succuessfully published');
   };
 
+  const text = useMemo(() => {
+    if (assetType === 'metric_file') {
+      return 'Your metric currently isn’t published.';
+    } else if (assetType === 'dashboard_file') {
+      return 'Your dashboard currently isn’t published.';
+    } else if (assetType === 'chat') {
+      return 'Your chat currently isn’t published.';
+    } else if (assetType === 'report_file') {
+      return 'Your report currently isn’t published.';
+    } else {
+      return 'Your item currently isn’t published.';
+    }
+  }, [assetType]);
+
   return (
     <div className="bg-item-hover flex justify-start overflow-hidden rounded-b px-3 py-2.5">
       <Text variant="secondary" className="text-xs!">

@@ -34,7 +34,7 @@ pre {
 
 html,
 body {
-  background-color: #f3f3f3;
+  background-color: var(--color-background-secondary);
   min-width: 800px;
   /* // @media (prefers-color-scheme: dark) {
   //   background-color: #000000;

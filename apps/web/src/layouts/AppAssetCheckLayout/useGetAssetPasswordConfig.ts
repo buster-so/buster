@@ -20,7 +20,8 @@ interface AssetAccess {
 const getAssetAccess = (
   error: RustApiError | null,
   isFetched: boolean,
-  selectedQuery: QueryKey
+  selectedQuery: QueryKey,
+  hasData: boolean
 ): AssetAccess => {
   if (error) {
     console.error('Error in getAssetAccess', error, isFetched, selectedQuery);
@@ -59,7 +60,7 @@ const getAssetAccess = (
     };
   }
 
-  if (typeof error?.status === 'number') {
+  if (typeof error?.status === 'number' || !hasData) {
     return {
       hasAccess: false,
       passwordRequired: false,
@@ -85,34 +86,45 @@ export const useGetAssetPasswordConfig = (
 ) => {
   const chosenVersionNumber = versionNumber || 'LATEST';
 
-  const selectedQuery = useMemo(() => {
-    if (type === 'metric_file') {
-      return metricsQueryKeys.metricsGetMetric(assetId, chosenVersionNumber);
-    }
-    if (type === 'dashboard_file') {
-      return dashboardQueryKeys.dashboardGetDashboard(assetId, chosenVersionNumber);
-    }
-    if (type === 'report_file') {
-      return reportsQueryKeys.reportsGetReport(assetId, chosenVersionNumber);
-    }
-    if (type === 'collection') {
-      return collectionQueryKeys.collectionsGetCollection(assetId);
-    }
-    if (type === 'reasoning') {
-      return chatQueryKeys.chatsGetChat(assetId);
-    }
+  const selectedQuery = useMemo(
+    () => getSelectedQuery(type, assetId, chosenVersionNumber),
+    [type, assetId, chosenVersionNumber]
+  );
 
-    const _exhaustiveCheck: 'chat' = type;
-
-    return chatQueryKeys.chatsGetChat(assetId);
-  }, [type, assetId, chosenVersionNumber]);
-
-  const { error, isFetched, data } = useQuery({
+  const { error, isFetched, data, ...rest } = useQuery({
     queryKey: selectedQuery.queryKey,
     enabled: true,
     select: useCallback((v: unknown) => !!v, []),
     notifyOnChangeProps: ['error', 'isFetched', 'data'],
+    retry: false,
+    initialData: false,
   });
 
-  return getAssetAccess(error, isFetched, selectedQuery.queryKey);
+  return getAssetAccess(error, isFetched, selectedQuery.queryKey, !!data);
+};
+
+const getSelectedQuery = (
+  type: AssetType | ResponseMessageFileType,
+  assetId: string,
+  chosenVersionNumber: number | 'LATEST'
+) => {
+  if (type === 'metric_file') {
+    return metricsQueryKeys.metricsGetMetric(assetId, chosenVersionNumber);
+  }
+  if (type === 'dashboard_file') {
+    return dashboardQueryKeys.dashboardGetDashboard(assetId, chosenVersionNumber);
+  }
+  if (type === 'report_file') {
+    return reportsQueryKeys.reportsGetReport(assetId, chosenVersionNumber);
+  }
+  if (type === 'collection') {
+    return collectionQueryKeys.collectionsGetCollection(assetId);
+  }
+  if (type === 'reasoning') {
+    return chatQueryKeys.chatsGetChat(assetId);
+  }
+
+  const _exhaustiveCheck: 'chat' = type;
+
+  return chatQueryKeys.chatsGetChat(assetId);
 };

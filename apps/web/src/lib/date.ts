@@ -96,14 +96,20 @@ export const numberDateFallback = (
   return String(date);
 };
 
-const extractDateForFormatting = (
+export const extractDateForFormatting = (
   date: string | number | Date,
   dateKey?: string,
   convertNumberTo?: ColumnLabelFormat['convertNumberTo']
 ) => {
-  if (isString(date)) return date;
-  if (isNumber(date)) return numberDateFallback(date, dateKey, convertNumberTo);
   if (isDate(date)) return new Date(date);
+  if (isNumber(date)) return numberDateFallback(date, dateKey, convertNumberTo);
+  if (convertNumberTo && convertNumberTo !== 'number') {
+    //this will happen when the date is a string and we need to convert it to a number like '1' -> 1
+    const parsedInt = parseInt(date as string);
+    if (Number.isNaN(parsedInt)) return String(date);
+    return numberDateFallback(parsedInt, dateKey, convertNumberTo);
+  }
+  if (isString(date)) return date;
   return String(date);
 };
 

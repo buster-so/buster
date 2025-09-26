@@ -20,6 +20,7 @@ import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
 import { z } from 'zod';
 import { getPubliclyEnabledByUser } from './get-publicly-enabled-by-user';
+import { throwUnauthorizedError } from './asset-public-access';
 
 export const MetricAccessOptionsSchema = z.object({
   /** If public access has been verified by a parent resource set to true */
@@ -86,8 +87,11 @@ export async function fetchAndProcessMetricData(
   effectiveRole = permissionResult.effectiveRole ? permissionResult.effectiveRole : effectiveRole;
 
   if (!permissionResult.hasAccess || !effectiveRole) {
-    throw new HTTPException(403, {
-      message: "You don't have permission to view this metric",
+    throwUnauthorizedError({
+      publiclyAccessible: metricFile.publiclyAccessible ?? false,
+      publicExpiryDate: metricFile.publicExpiryDate ?? undefined,
+      publicPassword: metricFile.publicPassword ?? undefined,
+      userSuppliedPassword: password,
     });
   }
 

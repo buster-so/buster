@@ -319,26 +319,25 @@ pub async fn post_chat_handler(
 
         // Explicitly update the chat in the database with most_recent_file information
         // to ensure it behaves like files generated in a chat
-        let asset_type_string = match asset_type_value {
-            AssetType::MetricFile => Some("metric_file".to_string()),
-            AssetType::DashboardFile => Some("dashboard".to_string()),
+        let asset_type_for_db = match asset_type_value {
+            AssetType::MetricFile | AssetType::DashboardFile | AssetType::ReportFile => Some(asset_type_value),
             _ => None,
         };
 
-        if let Some(file_type) = asset_type_string {
+        if let Some(file_type) = asset_type_for_db {
             // Update the chat directly to ensure it has the most_recent_file information
             let mut conn = get_pg_pool().get().await?;
             diesel::update(chats::table.find(chat_id))
                 .set((
                     chats::most_recent_file_id.eq(Some(asset_id_value)),
-                    chats::most_recent_file_type.eq(Some(file_type.clone())),
+                    chats::most_recent_file_type.eq(Some(file_type)),
                     chats::updated_at.eq(Utc::now()),
                 ))
                 .execute(&mut conn)
                 .await?;
 
             tracing::info!(
-                "Updated chat {} with most_recent_file_id: {}, most_recent_file_type: {}",
+                "Updated chat {} with most_recent_file_id: {}, most_recent_file_type: {:?}",
                 chat_id,
                 asset_id_value,
                 file_type
@@ -1118,8 +1117,9 @@ async fn process_completed_files(
 
                             // Determine file type for chat update
                             let file_type_for_chat = match file_content.file_type.as_str() {
-                                "dashboard" => Some("dashboard".to_string()),
-                                "metric_file" => Some("metric_file".to_string()),
+                                "dashboard" | "dashboard_file" => Some(AssetType::DashboardFile),
+                                "metric" | "metric_file" => Some(AssetType::MetricFile),
+                                "report" | "report_file" => Some(AssetType::ReportFile),
                                 _ => None,
                             };
 
