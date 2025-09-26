@@ -1,0 +1,89 @@
+fileType: momentic/test
+id: 7d2cc566-9911-4d72-a058-659fc27d40cc
+name: workspace-color-palette-click-through
+description: should be able to go to settings > workspace and click through the
+  color palette
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: 0829f8db-9522-4318-a4fa-fa5ffddccf5a
+    type: MODULE
+    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+  - id: ec708ac1-9a26-44db-8280-7ae61d0ae07e
+    type: MODULE
+    moduleId: e9a183c5-556a-4621-b640-577e955c8a26
+  - id: 5d9dacc2-5a0c-43e4-ab44-3b94a6ea902d
+    type: PRESET_ACTION
+    command:
+      id: ff8b09b3-fe06-4883-9bb4-d6f32bd494c5
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the workspace link in the left sidebar
+  - id: 65940f8e-2c20-496b-8a84-9f6c28c98f79
+    type: PRESET_ACTION
+    command:
+      id: dfe73fae-86f7-482c-81d3-b25dcb2ea321
+      type: AI_ASSERTION
+      assertion: confirm you are in a workspace pane that has general settings and no
+        errors.
+  - id: b1162746-1d49-4ed1-8207-d99d94d90256
+    type: PRESET_ACTION
+    command:
+      id: d1d0a970-f7fb-406b-8b53-dedb6162e77d
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the color theme selector
+  - id: 771c3617-bab0-4649-a236-4f1cc8fa58ce
+    type: PRESET_ACTION
+    command:
+      id: 47adc30a-6565-4950-a657-5d50ea3aea1a
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the rainbow color palette
+  - id: 4e37ea07-fcb0-448b-a1cf-91700c1d230c
+    type: PRESET_ACTION
+    command:
+      id: c01966ee-236c-4e81-a3e9-63f119d513b4
+      type: REFRESH
+  - id: 7ca34f64-aed6-40fa-a142-529a1b2081c8
+    type: PRESET_ACTION
+    command:
+      id: b1d7bafb-8d8d-43f8-a0a6-99f16ac7d2ba
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the color theme selector
+  - id: 4ccdd703-53fe-422a-b606-b9c1e48f63cf
+    type: PRESET_ACTION
+    command:
+      id: 9cd739e7-aca7-4dd8-be73-b2ba018ebde8
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the rainbow color palette
+  - id: fcab3bf0-72b6-40f0-83ea-2b546b617291
+    type: PRESET_ACTION
+    command:
+      id: b3fb9f91-fb88-4380-957f-73dbd24c9fa2
+      type: AI_ASSERTION
+      assertion: The rainbow color palette should be selected
+afterSteps:
+  - id: e32fe6f7-3e86-4ad9-801e-4f8218e589a5
+    type: PRESET_ACTION
+    command:
+      id: ac86ac1f-0e61-4732-86fe-43d7f4d3eeea
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the buster color theme

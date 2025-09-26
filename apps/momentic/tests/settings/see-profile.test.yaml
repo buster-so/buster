@@ -1,0 +1,29 @@
+fileType: momentic/test
+id: 11f75501-e879-4a4f-9ddd-1756da14ad89
+name: see-profile
+description: should be able to click settings and see profile
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: 0c900352-79c3-44c0-bf51-26c6a9e1c65b
+    type: MODULE
+    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+  - id: 3177d899-9baf-499f-8dc3-edc2270ccb64
+    type: MODULE
+    moduleId: e9a183c5-556a-4621-b640-577e955c8a26
+  - id: e2ac94ae-dc64-4cec-8be7-d3d1d7e58862
+    type: PRESET_ACTION
+    command:
+      id: 1c3392cd-015e-43d6-8920-2d9a43844d3f
+      type: AI_ASSERTION
+      assertion: You should see be in a pane that has profile selected and you shoul
+        dbe able to see the user name, email and other information about them
+        with no errors.

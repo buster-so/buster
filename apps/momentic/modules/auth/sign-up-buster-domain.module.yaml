@@ -1,0 +1,107 @@
+fileType: momentic/module
+schemaVersion: 1.0.21
+moduleId: 6188a6e7-cf79-4f6a-b0bc-f68a4fa09118
+name: sign-up-buster-domain
+description: a user with a buster domain can sign up
+enabled: true
+steps:
+  - id: 415bf406-3ca0-43c8-8108-290ba8f1f8eb
+    type: PRESET_ACTION
+    command:
+      id: f93c87e7-c41c-45d6-9501-61a183b38b85
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the 'sign up' link
+  - id: 9ce5f2a4-8430-43d0-a477-b12a616dd46f
+    type: PRESET_ACTION
+    command:
+      id: ddd238d9-2fc5-438c-80f5-51ca64d13e52
+      clearContent: true
+      forceClearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the email textbox
+      value: johnny@buster.so
+  - id: c8af091e-755a-4a12-b9e5-14d01afe21ac
+    type: PRESET_ACTION
+    command:
+      id: a85ee3a0-df4c-49c6-a9bf-eccbe5241e88
+      clearContent: true
+      forceClearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the password input field
+      value: Password123!
+  - id: d1d2dbe7-302c-4875-b184-4ba2cbff078d
+    type: PRESET_ACTION
+    command:
+      id: 7feb6fb4-51e0-4030-8b87-986cdc7a2143
+      clearContent: true
+      forceClearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the confirm password input field
+      value: Password123!
+  - id: a6db99af-2b81-4907-9887-2ce13cc1193c
+    type: PRESET_ACTION
+    command:
+      id: 2bf9cef1-b8ec-431d-a91e-967384fe30e6
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the sign up button
+  - id: 64a0270a-edfb-4001-b3f0-c13152c0e2df
+    type: PRESET_ACTION
+    command:
+      id: 4cb2dcce-9bcf-45a7-a68d-474cbe80f332
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the go to login button
+  - id: 93f40ee8-be4b-42ff-b47d-7e6556dab445
+    type: PRESET_ACTION
+    command:
+      id: c06fa81b-1526-4c90-8554-decd9f4db369
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the 'Sign in' span in the 'Already have an account?' text
+  - id: d94247f5-e94d-44e8-9f7f-41608ee9e2e4
+    type: PRESET_ACTION
+    command:
+      id: c54de708-490c-4c5d-9319-cbb25fa09253
+      clearContent: true
+      forceClearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the email textbox
+      value: johnny@buster.so
+  - id: 5c45d9f9-2d94-44ef-9430-9067e813631b
+    type: PRESET_ACTION
+    command:
+      id: 294d47e8-c1bf-4f55-b81f-71a4007cdd29
+      clearContent: true
+      forceClearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the password input field
+      value: Password123!
+  - id: 2508697d-6f24-4775-a069-063d194998aa
+    type: PRESET_ACTION
+    command:
+      id: 2da8ea96-12f0-4f64-bd7e-4cd315afe365
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the sign in button
+  - id: c2f1e8bc-5a19-4ddb-8840-727e0275cdf1
+    type: PRESET_ACTION
+    command:
+      id: 656a7532-f0b0-4d3d-93ed-8995f86e3c3c
+      type: REFRESH

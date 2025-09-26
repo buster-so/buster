@@ -1,0 +1,67 @@
+fileType: momentic/test
+id: cb70c7e8-97d4-4a77-a1ba-67ff391157a6
+name: security-settings-click-through
+description: user should be able to click through the security page of settings.
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: d9608c58-b53a-4ef1-bb11-8aea2301b7a3
+    type: MODULE
+    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+  - id: eafec31c-bab0-4d2e-bdaf-535c11ca4564
+    type: MODULE
+    moduleId: e9a183c5-556a-4621-b640-577e955c8a26
+  - id: 59f12131-d935-4966-ac4c-6e569a66580f
+    type: PRESET_ACTION
+    command:
+      id: 89948de7-8f42-4455-929c-94e78c44c9f1
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the security link in the left sidebar
+  - id: 6c452959-dc30-48ef-acf9-a31229c8238c
+    type: PRESET_ACTION
+    command:
+      id: 6f2ea89a-0641-48f7-87e1-33b8a60cf786
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the add domain button
+  - id: 7e210bbc-25d4-452d-9f78-8b93a9e0d225
+    type: PRESET_ACTION
+    command:
+      id: 182130de-09e2-4b6d-b1b9-227ad4f88710
+      clearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the textbox with placeholder 'enter domain (e.g., company.com)'
+      value: buster.so
+  - id: 6eeeac39-ae73-4f68-a65f-2de467b56eab
+    type: PRESET_ACTION
+    command:
+      id: 8dc20a5b-5c45-493c-b2d9-cd51889e6c0b
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the add button next to the domain input field
+  - id: 31cdbf8e-7a84-4636-a217-700c78bf17b9
+    type: MODULE
+    moduleId: d5944b6b-f9c3-4952-8f0e-bec9bc31da95
+  - id: 1554f3eb-7b62-436b-83b2-061347c583cd
+    type: MODULE
+    moduleId: 6188a6e7-cf79-4f6a-b0bc-f68a4fa09118
+  - id: fad08df2-443f-4630-b1c5-40a6e7999e17
+    type: PRESET_ACTION
+    command:
+      id: 8a8f874b-988d-499b-9175-6b0d220378cc
+      type: AI_ASSERTION
+      assertion: Should be in a page that shows Restricted Querier.

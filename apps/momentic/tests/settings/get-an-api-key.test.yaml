@@ -1,0 +1,74 @@
+fileType: momentic/test
+id: 991f84d2-5a09-4efd-95ea-9887b5224a85
+name: get-an-api-key
+description: a user should be able to log in and go to settings to get an api key
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: 2e410c6f-7191-42dd-9a3c-505386ba6d15
+    type: MODULE
+    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+  - id: 9f7438cb-de54-4ecd-8232-98f9f0b8459a
+    type: PRESET_ACTION
+    command:
+      id: 3f1a2f55-5435-4676-ad09-cc2082b597e7
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: settings profile button with circle icon
+  - id: 4911b93f-ef66-4b14-bf5d-55833568f1c4
+    type: PRESET_ACTION
+    command:
+      id: 186a70e5-4709-44d2-a83e-eab8df852d38
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: API Keys link in the sidebar
+  - id: aaf15cb4-e51c-4c70-880c-5689da8061b2
+    type: PRESET_ACTION
+    command:
+      id: fed23c5a-0ea0-4971-a45c-ed33b280f316
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Create New API Key button
+  - id: ef060429-67e6-456e-a3bb-c50b10b859cc
+    type: PRESET_ACTION
+    command:
+      id: aef1d103-fbc6-44af-88bc-3def678ce871
+      type: AI_ASSERTION
+      assertion: A dialog appears showing 'New API key created' and displays an API
+        key that starts with 'eyJ'
+afterSteps:
+  - id: 0998db93-f678-485a-9c60-ed9dc1471e4c
+    type: PRESET_ACTION
+    command:
+      id: 1bac9c36-45db-49e5-be19-0122f0434a9e
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the new api key created modal
+  - id: 7c9d5ae4-d22a-4509-aee8-45997b9eeab3
+    type: PRESET_ACTION
+    command:
+      id: 4125927c-a240-43ac-bb4f-7e1e68f25a32
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: delete the most recently created key
+  - id: db702450-7a53-4a51-a500-7c8c5687160e
+    type: PRESET_ACTION
+    command:
+      id: 6e391f43-e4c9-440d-b874-1af73bcba0a5
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: submit button

@@ -1,0 +1,15 @@
+fileType: momentic/module
+schemaVersion: 1.0.21
+moduleId: e9a183c5-556a-4621-b640-577e955c8a26
+name: navigate-to-settings
+description: single action to navigate to settings
+enabled: true
+steps:
+  - id: b463897f-eeb1-443a-b227-11981455625f
+    type: PRESET_ACTION
+    command:
+      id: ccf58969-4345-49e9-8db3-a418651bd894
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: settings icon or element that says settings

@@ -1,0 +1,15 @@
+fileType: momentic/module
+schemaVersion: 1.0.21
+moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+name: click-sign-in
+description: just need to click sign-in
+enabled: true
+steps:
+  - id: 5d2f3a52-41e3-4b2e-b6b4-3da492550c29
+    type: PRESET_ACTION
+    command:
+      id: 13a475e6-86e3-4be2-ae77-085b4c3e3771
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the sign in button
