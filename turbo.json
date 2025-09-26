@@ -51,6 +51,7 @@
     }
   },
   "globalEnv": [
+    "SKIP_ENV_CHECK",
     "NODE_ENV",
     "NODE_TLS_REJECT_UNAUTHORIZED",
     "CI",

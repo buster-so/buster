@@ -13,6 +13,7 @@ retries: 0
 envs:
   - name: development
     default: true
+disabled: true
 steps:
   - id: 6e2bd037-2ad8-46f7-bca7-fa8dce20b1f3
     envKey: CHATS_RESPONSE
