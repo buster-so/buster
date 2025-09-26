@@ -1,5 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
-import { getReportFileById } from '@buster/database/queries';
+import { type User, getMetricIdsInReport, getReportFileById } from '@buster/database/queries';
 import {
   GetReportParamsSchema,
   GetReportQuerySchema,
@@ -8,19 +8,23 @@ import {
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { getMetricsInAncestorAssetFromMetricIds } from '../../../../shared-helpers/metric-helpers';
 import { standardErrorHandler } from '../../../../utils/response';
 
 export async function getReportHandler(
   reportId: string,
-  user: { id: string },
+  user: User,
   versionNumber?: number | undefined,
   password?: string | undefined
 ): Promise<GetReportResponse> {
-  const report = await getReportFileById({
-    reportId,
-    userId: user.id,
-    versionNumber,
-  });
+  const [report, metricIds] = await Promise.all([
+    getReportFileById({
+      reportId,
+      userId: user.id,
+      versionNumber,
+    }),
+    getMetricIdsInReport({ reportId }),
+  ]);
 
   const permission = await checkPermission({
     userId: user.id,
@@ -39,9 +43,12 @@ export async function getReportHandler(
     throw new HTTPException(403, { message: 'You do not have permission to view this report' });
   }
 
+  const metrics = await getMetricsInAncestorAssetFromMetricIds(metricIds, user);
+
   const response: GetReportResponse = {
     ...report,
     permission: permission.effectiveRole,
+    metrics,
   };
 
   return response;

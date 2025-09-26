@@ -38,30 +38,12 @@ export async function getMetricDataHandler(
   versionNumber?: number,
   reportFileId?: string
 ): Promise<MetricDataResponse> {
-  // Get user's organization
-  const userOrg = await getUserOrganizationId(user.id);
-
-  if (!userOrg) {
-    throw new HTTPException(403, {
-      message: 'You must be part of an organization to access metric data',
-    });
-  }
-
-  const { organizationId } = userOrg;
-
   // Retrieve metric definition from database with data source info
   const metric = await getMetricWithDataSource({ metricId, versionNumber });
 
   if (!metric) {
     throw new HTTPException(404, {
       message: 'Metric not found',
-    });
-  }
-
-  // Verify metric belongs to user's organization
-  if (metric.organizationId !== organizationId) {
-    throw new HTTPException(403, {
-      message: 'You do not have permission to view this metric',
     });
   }
 
@@ -76,7 +58,7 @@ export async function getMetricDataHandler(
     assetId: metricId,
     assetType: 'metric_file',
     requiredRole: 'can_view',
-    organizationId,
+    organizationId: metric.organizationId,
     workspaceSharing: metric.workspaceSharing ?? 'none',
     publiclyAccessible: metric.publiclyAccessible,
     publicExpiryDate: metric.publicExpiryDate ?? undefined,
@@ -98,13 +80,13 @@ export async function getMetricDataHandler(
     console.info('Checking R2 cache for metric data', {
       metricId,
       reportFileId,
-      organizationId,
+      organizationId: metric.organizationId,
       version: resolvedVersion,
     });
 
     try {
       const cachedData = await getCachedMetricData(
-        organizationId,
+        metric.organizationId,
         metricId,
         reportFileId,
         resolvedVersion
@@ -184,22 +166,26 @@ export async function getMetricDataHandler(
       console.info('Writing metric data to cache', {
         metricId,
         reportFileId,
-        organizationId,
+        organizationId: metric.organizationId,
         version: resolvedVersion,
         rowCount: trimmedData.length,
       });
 
       // Fire and forget - don't wait for cache write
-      setCachedMetricData(organizationId, metricId, reportFileId, response, resolvedVersion).catch(
-        (error) => {
-          console.error('Failed to cache metric data', {
-            metricId,
-            reportFileId,
-            version: resolvedVersion,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
-        }
-      );
+      setCachedMetricData(
+        metric.organizationId,
+        metricId,
+        reportFileId,
+        response,
+        resolvedVersion
+      ).catch((error) => {
+        console.error('Failed to cache metric data', {
+          metricId,
+          reportFileId,
+          version: resolvedVersion,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      });
     }
 
     return response;

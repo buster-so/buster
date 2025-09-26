@@ -11,7 +11,6 @@ import {
 import { chatQueryKeys } from '@/api/query_keys/chat';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useBlackboxMessage } from '@/context/BlackBox/useBlackboxMessage';
-import { updateDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { updateChatToIChat } from '@/lib/chat';
 

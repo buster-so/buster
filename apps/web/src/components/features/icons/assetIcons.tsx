@@ -11,7 +11,6 @@ import {
   SquareChart,
   Table,
 } from '@/components/ui/icons';
-import type { iconProps } from '@/components/ui/icons/NucleoIconOutlined/iconProps';
 import SquareChartPlus from '@/components/ui/icons/NucleoIconOutlined/square-chart-plus';
 
 export const ASSET_ICONS = {

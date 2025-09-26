@@ -4,10 +4,10 @@ import { flexRender } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
 import type React from 'react';
 import type { CSSProperties } from 'react';
+import CaretDown from '@/components/ui/icons/NucleoIconFilled/caret-down';
+import CaretUp from '@/components/ui/icons/NucleoIconFilled/caret-up';
 import { cn } from '@/lib/classMerge';
 import { HEADER_HEIGHT } from './constants';
-import CaretDown from './icons/caret-down';
-import CaretUp from './icons/caret-up';
 import { useSortColumnContext } from './SortColumnWrapper';
 
 interface DraggableHeaderProps {
@@ -82,12 +82,12 @@ const DraggableHeader: React.FC<DraggableHeaderProps> = ({
         {sortable && (
           <>
             {header.column.getIsSorted() === 'asc' && (
-              <span className="text-icon-color text-xs">
+              <span className="text-icon-color text-[9px]">
                 <CaretUp />
               </span>
             )}
             {header.column.getIsSorted() === 'desc' && (
-              <span className="text-icon-color text-xs">
+              <span className="text-icon-color text-[9px]">
                 <CaretDown />
               </span>
             )}

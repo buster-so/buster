@@ -2,9 +2,12 @@ import { type InferSelectModel, and, count, desc, eq, gte, isNull, like, lte } f
 import { z } from 'zod';
 import { db } from '../../connection';
 import { reportFiles, users } from '../../schema';
+import {
+  type PaginatedResponse,
+  createPaginatedResponse,
+  withPagination,
+} from '../../schema-types';
 import { getUserOrganizationId } from '../organizations';
-import { type PaginatedResponse, createPaginatedResponse } from '../shared-types';
-import { withPagination } from '../shared-types/with-pagination';
 
 export const GetReportsListInputSchema = z.object({
   userId: z.string().uuid('User ID must be a valid UUID'),

@@ -20,6 +20,5 @@ export function defineLinkFromFactory<TFrom extends string>(fromOptions: { from:
 }
 
 export const createFullURL = (location: ParsedLocation | string): string =>
-  window.location.origin + typeof location === 'string'
-    ? (location as string)
-    : (location as ParsedLocation).href;
+  window.location.origin +
+  (typeof location === 'string' ? (location as string) : (location as ParsedLocation).href);

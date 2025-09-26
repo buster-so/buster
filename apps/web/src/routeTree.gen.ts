@@ -22,8 +22,6 @@ import { Route as InfoGettingStartedRouteImport } from './routes/info/getting-st
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
-import { Route as AppThrow2RouteImport } from './routes/app.throw2'
-import { Route as AppThrowRouteImport } from './routes/app.throw'
 import { Route as AppSettingsRouteImport } from './routes/app/_settings'
 import { Route as AppAppRouteImport } from './routes/app/_app'
 import { Route as EmbedReportReportIdRouteImport } from './routes/embed/report.$reportId'
@@ -213,16 +211,6 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
-} as any)
-const AppThrow2Route = AppThrow2RouteImport.update({
-  id: '/throw2',
-  path: '/throw2',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppThrowRoute = AppThrowRouteImport.update({
-  id: '/throw',
-  path: '/throw',
-  getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/_settings',
@@ -951,8 +939,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/embed': typeof EmbedRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
-  '/app/throw': typeof AppThrowRoute
-  '/app/throw2': typeof AppThrow2Route
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -1061,8 +1047,6 @@ export interface FileRoutesByTo {
   '/embed': typeof EmbedRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
   '/app': typeof AppSettingsRestricted_layoutAdmin_onlyRouteWithChildren
-  '/app/throw': typeof AppThrowRoute
-  '/app/throw2': typeof AppThrow2Route
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -1156,8 +1140,6 @@ export interface FileRoutesById {
   '/healthcheck': typeof HealthcheckRoute
   '/app/_app': typeof AppAppRouteWithChildren
   '/app/_settings': typeof AppSettingsRouteWithChildren
-  '/app/throw': typeof AppThrowRoute
-  '/app/throw2': typeof AppThrow2Route
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -1282,8 +1264,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/embed'
     | '/healthcheck'
-    | '/app/throw'
-    | '/app/throw2'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/reset-password'
@@ -1392,8 +1372,6 @@ export interface FileRouteTypes {
     | '/embed'
     | '/healthcheck'
     | '/app'
-    | '/app/throw'
-    | '/app/throw2'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/reset-password'
@@ -1486,8 +1464,6 @@ export interface FileRouteTypes {
     | '/healthcheck'
     | '/app/_app'
     | '/app/_settings'
-    | '/app/throw'
-    | '/app/throw2'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/reset-password'
@@ -1710,20 +1686,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
-    }
-    '/app/throw2': {
-      id: '/app/throw2'
-      path: '/throw2'
-      fullPath: '/app/throw2'
-      preLoaderRoute: typeof AppThrow2RouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/throw': {
-      id: '/app/throw'
-      path: '/throw'
-      fullPath: '/app/throw'
-      preLoaderRoute: typeof AppThrowRouteImport
-      parentRoute: typeof AppRoute
     }
     '/app/_settings': {
       id: '/app/_settings'
@@ -3249,16 +3211,12 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAppRoute: typeof AppAppRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
-  AppThrowRoute: typeof AppThrowRoute
-  AppThrow2Route: typeof AppThrow2Route
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAppRoute: AppAppRouteWithChildren,
   AppSettingsRoute: AppSettingsRouteWithChildren,
-  AppThrowRoute: AppThrowRoute,
-  AppThrow2Route: AppThrow2Route,
   AppIndexRoute: AppIndexRoute,
 }
 

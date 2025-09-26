@@ -28,7 +28,8 @@ export const SearchTextRequestSchema = z
         }
         return Boolean(val);
       }, z.boolean())
-      .default(false),
+      .default(false)
+      .optional(),
     endDate: z.string().datetime().optional(),
     startDate: z.string().datetime().optional(),
   })

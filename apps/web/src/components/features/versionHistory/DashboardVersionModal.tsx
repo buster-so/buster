@@ -26,6 +26,7 @@ export const DashboardVersionModal = React.memo(
     );
     const { mutateAsync: updateDashboard, isPending: isRestoringVersion } = useSaveDashboard({
       updateOnSave: true,
+      updateVersion: true,
     });
 
     const {

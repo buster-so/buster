@@ -3,6 +3,7 @@ import { MetricChartCard } from '@/components/features/metrics/MetricChartCard';
 import { ReportMetricThreeDotMenu } from '@/components/features/metrics/ReportMetricItem';
 import { useGetReportParams } from '@/context/Reports/useGetReportParams';
 import { useInViewport } from '@/hooks/useInViewport';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 export const MetricContent = React.memo(
   ({
@@ -30,6 +31,10 @@ export const MetricContent = React.memo(
     }
     const renderChart = inViewport || isExportMode || hasBeenInViewport.current;
 
+    const handleCopy = useMemoizedFn((e: React.ClipboardEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+    });
+
     return (
       <MetricChartCard
         ref={ref}
@@ -50,6 +55,7 @@ export const MetricContent = React.memo(
             />
           )
         }
+        onCopy={handleCopy}
       />
     );
   }

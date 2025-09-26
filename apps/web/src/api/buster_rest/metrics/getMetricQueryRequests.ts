@@ -83,7 +83,9 @@ export const useGetMetric = <TData = BusterMetric>(
 
   const { isFetched: isFetchedInitial, isError: isErrorInitial } = useQuery({
     ...metricsQueryKeys.metricsGetMetric(id || '', 'LATEST'),
-    queryFn: () => getMetricQueryFn({ id, version: 'LATEST', queryClient, password }),
+    queryFn: () => {
+      return getMetricQueryFn({ id, version: 'LATEST', queryClient, password });
+    },
     retry(_failureCount, error) {
       if (error?.message !== undefined && id) {
         setProtectedAssetPasswordError({
@@ -93,16 +95,19 @@ export const useGetMetric = <TData = BusterMetric>(
       }
       return false;
     },
-    enabled: (params?.enabled ?? true) && !!id,
     select: undefined,
     ...params,
+    enabled: (params?.enabled ?? true) && !!id,
   });
 
   return useQuery({
     ...metricsQueryKeys.metricsGetMetric(id || '', selectedVersionNumber),
-    enabled: !!id && !!latestVersionNumber && isFetchedInitial && !isErrorInitial,
-    queryFn: () => getMetricQueryFn({ id, version: selectedVersionNumber, queryClient, password }),
+    queryFn: () => {
+      return getMetricQueryFn({ id, version: selectedVersionNumber, queryClient, password });
+    },
+    ...params,
     select: params?.select,
+    enabled: !!id && !!latestVersionNumber && isFetchedInitial && !isErrorInitial,
   });
 };
 

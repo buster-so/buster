@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AssetCollectionsSchema } from '../collections/shared-asset-collections';
+import { MetricSchema } from '../metrics';
 import { ShareConfigSchema } from '../share';
 import { VersionsSchema } from '../version-shared';
 
@@ -30,6 +31,7 @@ export const ReportResponseSchema = z.object({
   collections: AssetCollectionsSchema,
   content: z.string(),
   ...ShareConfigSchema.shape,
+  metrics: z.record(z.string(), MetricSchema),
 });
 
 export type ReportListItem = z.infer<typeof ReportListItemSchema>;

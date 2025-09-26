@@ -51,13 +51,13 @@ export const ServerRoute = createServerFileRoute('/auth/callback').methods({
       return new Response('Missing authorization code', { status: 400 });
     }
 
-    console.log('Using auth code:', code ? 'code' : 'code_challenge');
+    console.info('Using auth code:', code ? 'code' : 'code_challenge');
 
     try {
       const supabase = getSupabaseServerClient();
 
       // Exchange the authorization code for a session
-      console.log('Attempting to exchange authorization code for session');
+      console.info('Attempting to exchange authorization code for session');
       const { data: sessionData, error: exchangeError } = await supabase.auth
         .exchangeCodeForSession(authCode)
         .catch((authError) => {
@@ -77,9 +77,9 @@ export const ServerRoute = createServerFileRoute('/auth/callback').methods({
       }
 
       if (sessionData?.session) {
-        console.log('Successfully exchanged code for session, user:', sessionData.user?.email);
+        console.info('Successfully exchanged code for session, user:', sessionData.user?.email);
       } else {
-        console.warn('Code exchange succeeded but no session data received');
+        console.info('Code exchange succeeded but no session data received');
       }
 
       // Construct the redirect URL
@@ -100,7 +100,7 @@ export const ServerRoute = createServerFileRoute('/auth/callback').methods({
         redirectUrl = `${origin}${safePath}`;
       }
 
-      console.log('Redirecting to:', redirectUrl);
+      console.info('Redirecting to:', redirectUrl);
 
       return new Response(null, {
         status: 302,

@@ -13,13 +13,14 @@ export const DataGridRow: React.FC<DataGridRowProps> = ({ row, virtualRow }) => 
   return (
     <tr
       className={cn(
-        'hover:bg-item-hover absolute inset-x-0 flex border-b',
+        'hover:bg-item-hover absolute inset-x-0 border-b flex',
         row.getIsSelected() && 'bg-primary/10'
-        //last:border-b-0
+        //   'last:border-b-0' //don't do it
       )}
       style={{
         transform: `translateY(${virtualRow.start}px)`,
         height: `${virtualRow.size}px`,
+        width: '100%',
       }}
     >
       {row.getVisibleCells().map((cell) => (

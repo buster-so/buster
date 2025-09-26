@@ -1,11 +1,7 @@
-import type { AssetType } from '@buster/server-shared/assets';
-import type { BusterSearchResult } from '@/api/asset_interfaces/search';
-import { mainApi } from '../instances';
+import type { SearchTextRequest, SearchTextResponse } from '@buster/server-shared/search';
+import qs from 'qs';
+import { mainApiV2 } from '../instances';
 
-export const search = async (params: {
-  query: string;
-  asset_types: Extract<AssetType, 'dashboard_file' | 'metric_file' | 'collection'>[];
-  num_results?: number;
-}) => {
-  return mainApi.post<BusterSearchResult[]>('/search', params).then((res) => res.data);
+export const search = async (params: SearchTextRequest) => {
+  return mainApiV2.get<SearchTextResponse>('/search', { params }).then((res) => res.data);
 };

@@ -12,6 +12,7 @@ import {
   DEFAULT_CHART_THEME,
   type DataMetadata,
   type GetMetricResponse,
+  type Metric,
   type MetricYml,
 } from '@buster/server-shared/metrics';
 import type { AssetPermissionRole, VerificationStatus } from '@buster/server-shared/share';
@@ -269,4 +270,40 @@ export async function buildMetricResponse(
   };
 
   return response;
+}
+
+export async function getMetricsInAncestorAssetFromMetricIds(
+  metricIds: string[],
+  user: User
+): Promise<Record<string, Metric>> {
+  const metricsObj: Record<string, Metric> = {};
+
+  // Process metrics in chunks of 4 to manage concurrency
+  const results = [];
+  const chunkSize = 4;
+
+  for (let i = 0; i < metricIds.length; i += chunkSize) {
+    const chunk = metricIds.slice(i, i + chunkSize);
+    const chunkPromises = chunk.map(async (metricId) => {
+      const processedData = await fetchAndProcessMetricData(metricId, user, {
+        publicAccessPreviouslyVerified: true, // Access is inherited from dashboard access at a minimum
+      });
+
+      // Build the metric response
+      const metric = await buildMetricResponse(processedData, user.id);
+      return { metricId, metric };
+    });
+
+    const chunkResults = await Promise.all(chunkPromises);
+    results.push(...chunkResults);
+  }
+
+  // Filter out failed metrics and build the response object
+  for (const result of results) {
+    if (result) {
+      metricsObj[result.metricId] = result.metric;
+    }
+  }
+
+  return metricsObj;
 }

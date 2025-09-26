@@ -99,6 +99,10 @@
     "./healthcheck": {
       "types": "./dist/healthcheck/index.d.ts",
       "default": "./dist/healthcheck/index.js"
+    },
+    "./search": {
+      "types": "./dist/search/index.d.ts",
+      "default": "./dist/search/index.js"
     }
   },
   "module": "src/index.ts",

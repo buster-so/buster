@@ -14,6 +14,7 @@ import { getPubliclyEnabledByUser } from '../../../../shared-helpers/get-publicl
 import {
   buildMetricResponse,
   fetchAndProcessMetricData,
+  getMetricsInAncestorAssetFromMetricIds,
 } from '../../../../shared-helpers/metric-helpers';
 import { getDashboardHandler } from './GET';
 
@@ -36,6 +37,7 @@ vi.mock('../../../../shared-helpers/get-publicly-enabled-by-user', () => ({
 vi.mock('../../../../shared-helpers/metric-helpers', () => ({
   fetchAndProcessMetricData: vi.fn(),
   buildMetricResponse: vi.fn(),
+  getMetricsInAncestorAssetFromMetricIds: vi.fn(),
 }));
 
 vi.mock('js-yaml', () => ({
@@ -53,6 +55,7 @@ describe('getDashboardHandler', () => {
   const mockGetPubliclyEnabledByUser = getPubliclyEnabledByUser as Mock;
   const mockFetchAndProcessMetricData = fetchAndProcessMetricData as Mock;
   const mockBuildMetricResponse = buildMetricResponse as Mock;
+  const mockGetMetricsInAncestorAssetFromMetricIds = getMetricsInAncestorAssetFromMetricIds as Mock;
 
   // Mock data
   const mockUser: User = {
@@ -108,6 +111,7 @@ describe('getDashboardHandler', () => {
     mockGetOrganizationMemberCount.mockResolvedValue(5);
     mockGetCollectionsAssociatedWithDashboard.mockResolvedValue([]);
     mockGetPubliclyEnabledByUser.mockResolvedValue(null);
+    mockGetMetricsInAncestorAssetFromMetricIds.mockResolvedValue([]);
     mockFetchAndProcessMetricData.mockResolvedValue({
       metricFile: { id: 'metric-1' },
       resolvedContent: { name: 'Test Metric' },

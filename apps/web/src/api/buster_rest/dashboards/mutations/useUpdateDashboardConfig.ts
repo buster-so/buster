@@ -3,13 +3,14 @@ import { create } from 'mutative';
 import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { useSaveDashboard } from './useSaveDashboard';
+import { useUpdateDashboard } from './useUpdateDashboard';
 
 /**
  * useUpdateDashboardConfig
  * Client-optmistic update for the dashboard.config field, then persists.
  */
 export const useUpdateDashboardConfig = () => {
-  const { mutateAsync: dashboardsUpdateDashboard } = useSaveDashboard({
+  const { mutateAsync: dashboardsUpdateDashboard } = useUpdateDashboard({
     updateOnSave: true,
   });
   const queryClient = useQueryClient();

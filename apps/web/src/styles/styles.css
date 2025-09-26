@@ -53,3 +53,8 @@ p {
 th {
   @apply text-base font-normal;
 }
+
+strong,
+b {
+  @apply font-semibold;
+}

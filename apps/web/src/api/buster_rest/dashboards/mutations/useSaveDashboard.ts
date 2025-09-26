@@ -10,13 +10,19 @@ import { dashboardsUpdateDashboard } from '../requests';
  * useSaveDashboard
  * Saves the dashboard to the server and updates cache optionally.
  */
-export const useSaveDashboard = (params?: { updateOnSave?: boolean }) => {
+export const useSaveDashboard = (params?: { updateOnSave?: boolean; updateVersion?: boolean }) => {
   const updateOnSave = params?.updateOnSave || false;
+  const updateVersion = params?.updateVersion || true;
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: dashboardsUpdateDashboard,
+    mutationFn: (variables: Parameters<typeof dashboardsUpdateDashboard>[0]) =>
+      dashboardsUpdateDashboard({
+        ...variables,
+        update_version: variables.update_version ?? updateVersion,
+      }),
     onMutate: (variables) => {
       const options = dashboardQueryKeys.dashboardGetDashboard(variables.id, 'LATEST');
       queryClient.setQueryData(options.queryKey, (old) => {

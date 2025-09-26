@@ -75,4 +75,35 @@ describe('Analyst Agent Instructions', () => {
       getAnalystAgentSystemPrompt('   '); // whitespace only
     }).toThrow('SQL dialect guidance is required');
   });
+
+  it('should contain mandatory SQL naming conventions', () => {
+    const result = getAnalystAgentSystemPrompt('Test guidance');
+
+    // Check for MANDATORY SQL NAMING CONVENTIONS section
+    expect(result).toContain('MANDATORY SQL NAMING CONVENTIONS');
+
+    // Ensure table references require full qualification
+    expect(result).toContain('All Table References: MUST be fully qualified: `DATABASE_NAME.SCHEMA_NAME.TABLE_NAME`');
+
+    // Ensure column references use table aliases (not full qualifiers)
+    expect(result).toContain('All Column References: MUST be qualified with their table alias (e.g., `c.customerid`)');
+
+    // Ensure examples show table alias usage without full qualification
+    expect(result).toContain('c.customerid');
+    expect(result).not.toContain('postgres.ont_ont.customer.customerid');
+
+    // Ensure CTE examples use table aliases correctly
+    expect(result).toContain('SELECT c.customerid FROM DATABASE.SCHEMA.TABLE1 c');
+    expect(result).toContain('c.customerid`, not just `customerid`');
+  });
+
+  it('should use column names qualified with table aliases', () => {
+    const result = getAnalystAgentSystemPrompt('Test guidance');
+
+    // Check for the updated description
+    expect(result).toContain('Use column names qualified with table aliases');
+
+    // Ensure the old verbose description is not present
+    expect(result).not.toContain('Use fully qualified column names with table aliases');
+  });
 });

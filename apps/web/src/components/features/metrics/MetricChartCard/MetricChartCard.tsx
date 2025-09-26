@@ -16,7 +16,6 @@ export type MetricChartCardProps = {
   metricId: string;
   versionNumber: number | undefined;
   readOnly?: boolean;
-  className?: string;
   attributes?: DraggableAttributes;
   listeners?: DraggableSyntheticListeners;
   headerSecondaryContent?: React.ReactNode;
@@ -25,7 +24,7 @@ export type MetricChartCardProps = {
   renderChartContent?: boolean; // we do this to avoid expensive rendering if off screen
   disableTooltip?: boolean;
   cacheDataId?: string;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 const stableMetricSelect = ({
   chart_config,
@@ -62,6 +61,7 @@ export const MetricChartCard = React.memo(
         renderChartContent = true,
         disableTooltip,
         cacheDataId,
+        ...rest
       },
       ref
     ) => {
@@ -102,6 +102,7 @@ export const MetricChartCard = React.memo(
           errorData={errorData}
           isTable={isTable}
           className={className}
+          {...rest}
         >
           <MetricViewChartHeader
             name={name}
@@ -144,13 +145,12 @@ type MetricViewChartCardContainerProps = {
   hasData: boolean;
   errorData: boolean;
   isTable: boolean;
-  className?: string;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 const MetricViewChartCardContainer = React.forwardRef<
   HTMLDivElement,
   MetricViewChartCardContainerProps
->(({ children, loadingData, hasData, errorData, isTable, className }, ref) => {
+>(({ children, loadingData, hasData, errorData, isTable, className, ...divProps }, ref) => {
   const cardClass = React.useMemo(() => {
     if (loadingData || errorData || !hasData) return 'h-full max-h-[600px]';
     if (isTable) return 'h-full';
@@ -161,6 +161,7 @@ const MetricViewChartCardContainer = React.forwardRef<
     <MetricViewChartProvider>
       <div
         ref={ref}
+        {...divProps}
         className={cn(
           'bg-background flex flex-col overflow-hidden rounded border shadow',
           cardClass,

@@ -33,6 +33,7 @@ export const useTrackAndUpdateMessageChanges = (
   {
     chatId,
     messageId,
+    isStreamingMessage,
   }: {
     chatId: string | undefined;
     messageId: string;
@@ -45,7 +46,7 @@ export const useTrackAndUpdateMessageChanges = (
   const getChatMemoized = useGetChatMemoized();
   const queryClient = useQueryClient();
 
-  const subscribe = !!chatId && !!messageId && messageId !== 'undefined';
+  const subscribe = !!chatId && !!messageId && messageId !== 'undefined' && isStreamingMessage;
 
   const shape = useMemo(() => {
     return messageShape({ chatId: chatId || '', messageId });

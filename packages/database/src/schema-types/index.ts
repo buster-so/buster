@@ -37,3 +37,5 @@ export * from './github';
 export * from './search';
 
 export * from './chat';
+
+export * from './pagination';

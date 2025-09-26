@@ -7,14 +7,14 @@ import { useGetChatId } from '@/context/Chats/useGetChatId';
 export const ChatHeader: React.FC = React.memo(() => {
   const chatId = useGetChatId();
   const chatTitle = useGetActiveChatTitle();
-  const isStreamFinished = useIsStreamingMessage();
+  const isStreamingMessage = useIsStreamingMessage();
 
   return (
     <>
       <ChatHeaderTitle
         chatTitle={chatTitle || ''}
         chatId={chatId || ''}
-        isStreamFinished={isStreamFinished}
+        isStreamingMessage={isStreamingMessage}
       />
       <ChatHeaderOptions />
     </>

@@ -1,161 +1,133 @@
-import type { ColumnLabelFormat } from '@buster/server-shared/metrics';
-import type {
-  BarControllerDatasetOptions,
-  Chart,
-  ChartDatasetProperties,
-  TooltipItem,
-} from 'chart.js';
-import { describe, expect, it } from 'vitest';
+import type { ChartConfigProps } from '@buster/server-shared/metrics';
+import type { Chart, ChartTypeRegistry, TooltipItem } from 'chart.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { formatLabel } from '@/lib/columnFormatter';
 import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
+import { getPercentage } from './helpers';
 
-type MockDataset = Partial<
-  ChartDatasetProperties<'bar', number[]> & BarControllerDatasetOptions
-> & {
-  type: 'bar';
-  label: string;
-  data: number[];
-  tooltipData: { key: string; value: number }[][];
-  yAxisKey: string;
-  xAxisKeys: string[];
-};
+// Mock dependencies
+vi.mock('@/lib/columnFormatter', () => ({
+  formatLabel: vi.fn(),
+}));
+
+vi.mock('./helpers', () => ({
+  getPercentage: vi.fn(),
+}));
+
+const mockFormatLabel = vi.mocked(formatLabel);
+const mockGetPercentage = vi.mocked(getPercentage);
 
 describe('barAndLineTooltipHelper', () => {
-  // Mock data setup
-  const mockChart = {
-    data: {
-      datasets: [
-        {
-          data: [100, 200, 300],
-          label: 'Dataset 1',
-          type: 'bar' as const,
-          hidden: false,
-          isTrendline: false,
-        },
-        {
-          data: [150, 250, 350],
-          label: 'Dataset 2',
-          type: 'bar' as const,
-          hidden: false,
-          isTrendline: false,
-        },
-      ],
-    },
-    $totalizer: {
-      stackTotals: [250, 450, 650],
-      seriesTotals: [600, 750],
-    },
-    scales: {
-      x: {
-        getPixelForValue: () => 0,
-      },
-      y: {
-        getPixelForValue: () => 0,
-      },
-    },
-  } as unknown as Chart;
+  const mockChart = {} as Chart;
+  const mockColumnLabelFormats = {} as NonNullable<ChartConfigProps['columnLabelFormats']>;
+  const mockKeyToUsePercentage = ['percentage_metric'];
 
-  const mockColumnLabelFormats: Record<string, ColumnLabelFormat> = {
-    value: {
-      columnType: 'number',
-      style: 'number',
-    } as ColumnLabelFormat,
-    percentage: {
-      columnType: 'number',
-      style: 'percent',
-    } as ColumnLabelFormat,
-    label: {
-      columnType: 'text',
-      style: 'string',
-    } as ColumnLabelFormat,
-  };
-
-  const createMockDataset = (overrides = {}): MockDataset => ({
-    type: 'bar',
-    label: 'Test Dataset',
-    backgroundColor: '#FF0000',
-    borderColor: '#FF0000',
-    yAxisKey: 'value',
-    data: [250, 300, 350],
-    xAxisKeys: ['x'],
-    barPercentage: 0.9,
-    categoryPercentage: 0.8,
-    tooltipData: [
-      [
-        { key: 'value', value: 250 },
-        { key: 'percentage', value: 25 },
-      ],
-    ],
-    hidden: false,
-    ...overrides,
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFormatLabel.mockReturnValue('formatted_value');
+    mockGetPercentage.mockReturnValue('25%');
   });
 
-  const createMockDataPoint = (overrides = {}): TooltipItem<'bar'> => ({
-    datasetIndex: 0,
-    dataIndex: 0,
-    dataset: createMockDataset(),
-    parsed: { x: 0, y: 250 },
-    raw: 250,
-    formattedValue: '250',
-    label: 'Test Dataset',
-    chart: mockChart,
-    element: {} as any,
-    ...overrides,
-  });
+  it('should format single dataset tooltip correctly when hasMultipleShownDatasets is false', () => {
+    // Arrange
+    const mockDataPoints: TooltipItem<keyof ChartTypeRegistry>[] = [
+      {
+        dataset: {
+          label: 'Revenue Dataset',
+          backgroundColor: '#ff0000',
+          tooltipData: [[{ key: 'revenue', value: 1000 }]],
+          yAxisKey: 'revenue',
+        },
+        dataIndex: 0,
+        datasetIndex: 0,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+    ];
 
-  it('should correctly format tooltip items', () => {
-    const keyToUsePercentage = ['percentage'];
-    const hasMultipleShownDatasets = true;
-    const mockDataPoint = createMockDataPoint();
+    mockFormatLabel
+      .mockReturnValueOnce('Revenue') // for formattedLabel
+      .mockReturnValueOnce('$1,000'); // for formattedValue
+    mockGetPercentage.mockReturnValue('50%');
 
+    // Act
     const result = barAndLineTooltipHelper(
-      [mockDataPoint],
+      mockDataPoints,
       mockChart,
       mockColumnLabelFormats,
-      keyToUsePercentage,
-      hasMultipleShownDatasets,
+      [],
+      false, // hasMultipleShownDatasets = false
       undefined
     );
 
-    expect(result).toHaveLength(2);
-
-    // Check the value item
+    // Assert
+    expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       seriesType: 'bar',
-      color: '#FF0000',
+      color: '#ff0000',
       usePercentage: false,
-      formattedLabel: 'Test Dataset',
+      formattedLabel: 'Revenue',
       values: [
         {
-          formattedValue: '250',
-          formattedLabel: 'Test Dataset',
-          formattedPercentage: '100%',
+          formattedValue: '$1,000',
+          formattedLabel: 'Revenue',
+          formattedPercentage: '50%',
         },
       ],
     });
   });
 
-  it('should handle stacked percentage mode', () => {
+  it('should use dataset label when hasMultipleShownDatasets is true', () => {
+    // Arrange
+    const mockDataPoints: TooltipItem<keyof ChartTypeRegistry>[] = [
+      {
+        dataset: {
+          label: 'Revenue Dataset',
+          backgroundColor: '#ff0000',
+          tooltipData: [[{ key: 'revenue', value: 1000 }]],
+          yAxisKey: 'revenue',
+        },
+        dataIndex: 0,
+        datasetIndex: 0,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+    ];
+
+    mockFormatLabel.mockReturnValue('$1,000');
+    mockGetPercentage.mockReturnValue('25%');
+
+    // Act
     const result = barAndLineTooltipHelper(
-      [createMockDataPoint()],
+      mockDataPoints,
       mockChart,
       mockColumnLabelFormats,
       [],
-      true,
-      'stacked'
+      true, // hasMultipleShownDatasets = true
+      undefined
     );
 
-    expect(result.every((item) => item.usePercentage)).toBe(true);
-    result.forEach((item) => {
-      expect(item.values[0].formattedPercentage).toBeDefined();
-    });
+    // Assert
+    expect(mockFormatLabel).toHaveBeenCalledTimes(1); // Only for formattedValue
+    expect(result).toHaveLength(1);
+    expect(result[0].formattedLabel).toBe('Revenue Dataset'); // Uses dataset.label
+    expect(result[0].values[0].formattedLabel).toBe('Revenue Dataset');
   });
 
-  it('should handle empty tooltip data', () => {
-    const emptyDataset = createMockDataset({ tooltipData: [[]] });
-    const emptyDataPoint = createMockDataPoint({ dataset: emptyDataset });
+  it('should return empty array when tooltipData is missing', () => {
+    // Arrange
+    const mockDataPoints: TooltipItem<keyof ChartTypeRegistry>[] = [
+      {
+        dataset: {
+          label: 'Revenue Dataset',
+          backgroundColor: '#ff0000',
+          tooltipData: [null], // No data at this index
+          yAxisKey: 'revenue',
+        },
+        dataIndex: 0,
+        datasetIndex: 0,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+    ];
 
+    // Act
     const result = barAndLineTooltipHelper(
-      [emptyDataPoint],
+      mockDataPoints,
       mockChart,
       mockColumnLabelFormats,
       [],
@@ -163,15 +135,33 @@ describe('barAndLineTooltipHelper', () => {
       undefined
     );
 
+    // Assert
     expect(result).toHaveLength(0);
+    expect(mockFormatLabel).not.toHaveBeenCalled();
   });
 
-  it('should use default color when yAxisKey does not match item key', () => {
-    const modifiedDataset = createMockDataset({ yAxisKey: 'different_key' });
-    const modifiedDataPoint = createMockDataPoint({ dataset: modifiedDataset });
+  it('should use backgroundColor when yAxisKey matches item key', () => {
+    // Arrange
+    const mockDataPoints: TooltipItem<keyof ChartTypeRegistry>[] = [
+      {
+        dataset: {
+          label: 'Revenue Dataset',
+          backgroundColor: '#ff0000',
+          borderColor: '#00ff00',
+          tooltipData: [[{ key: 'revenue', value: 1000 }]],
+          yAxisKey: 'revenue', // Matches item.key
+        },
+        dataIndex: 0,
+        datasetIndex: 0,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+    ];
 
+    mockFormatLabel.mockReturnValue('formatted');
+    mockGetPercentage.mockReturnValue('30%');
+
+    // Act
     const result = barAndLineTooltipHelper(
-      [modifiedDataPoint],
+      mockDataPoints,
       mockChart,
       mockColumnLabelFormats,
       [],
@@ -179,6 +169,93 @@ describe('barAndLineTooltipHelper', () => {
       undefined
     );
 
-    expect(result.every((item) => item.color === undefined)).toBe(true);
+    // Assert
+    expect(result[0].color).toBe('#ff0000'); // Uses backgroundColor since yAxisKey matches
+  });
+
+  it('should use undefined color when yAxisKey does not match item key', () => {
+    // Arrange
+    const mockDataPoints: TooltipItem<keyof ChartTypeRegistry>[] = [
+      {
+        dataset: {
+          label: 'Revenue Dataset',
+          backgroundColor: '#ff0000',
+          tooltipData: [[{ key: 'revenue', value: 1000 }]],
+          yAxisKey: 'different_key', // Does NOT match item.key
+        },
+        dataIndex: 0,
+        datasetIndex: 0,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+    ];
+
+    mockFormatLabel.mockReturnValue('formatted');
+    mockGetPercentage.mockReturnValue('30%');
+
+    // Act
+    const result = barAndLineTooltipHelper(
+      mockDataPoints,
+      mockChart,
+      mockColumnLabelFormats,
+      [],
+      false,
+      undefined
+    );
+
+    // Assert
+    expect(result[0].color).toBeUndefined(); // Color is undefined when yAxisKey doesn't match
+  });
+
+  it('should handle percentage mode with data reversal and usePercentage flags', () => {
+    // Arrange
+    const mockDataPoints: TooltipItem<keyof ChartTypeRegistry>[] = [
+      {
+        dataset: {
+          label: 'First Dataset',
+          backgroundColor: '#ff0000',
+          tooltipData: [[{ key: 'revenue', value: 500 }]],
+          yAxisKey: 'revenue',
+        },
+        dataIndex: 0,
+        datasetIndex: 0,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+      {
+        dataset: {
+          label: 'percentage_metric', // This should trigger usePercentage via keyToUsePercentage
+          backgroundColor: '#00ff00',
+          tooltipData: [[{ key: 'percentage', value: 75 }]],
+          yAxisKey: 'percentage',
+        },
+        dataIndex: 0,
+        datasetIndex: 1,
+      } as unknown as TooltipItem<keyof ChartTypeRegistry>,
+    ];
+
+    mockFormatLabel.mockReturnValue('formatted');
+    mockGetPercentage.mockReturnValue('40%');
+
+    // Act
+    const result = barAndLineTooltipHelper(
+      mockDataPoints,
+      mockChart,
+      mockColumnLabelFormats,
+      ['percentage_metric'],
+      true,
+      'stacked' // percentageMode = 'stacked'
+    );
+
+    // Assert
+    expect(result).toHaveLength(2);
+
+    // Due to percentageMode='stacked', dataPoints are reversed
+    // First result should be from 'percentage_metric' dataset (originally second)
+    expect(result[0].usePercentage).toBe(true); // Due to both percentageMode AND keyToUsePercentage
+    expect(result[0].formattedLabel).toBe('percentage_metric');
+
+    // Second result should be from 'First Dataset' (originally first)
+    expect(result[1].usePercentage).toBe(true); // Due to percentageMode
+    expect(result[1].formattedLabel).toBe('First Dataset');
+
+    // Verify getPercentage was called for both items
+    expect(mockGetPercentage).toHaveBeenCalledTimes(2);
   });
 });

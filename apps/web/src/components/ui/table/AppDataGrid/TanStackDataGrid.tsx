@@ -17,6 +17,7 @@ import { DataGridHeader } from './DataGridHeader';
 import { DataGridRow } from './DataGridRow';
 import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';
 import { createDefaultTableColumnWidths } from './helpers/createDefaultTableColumnWidths';
+import { handleTableCopy } from './helpers/handleTableCopy';
 import { SortColumnWrapper } from './SortColumnWrapper';
 
 export interface TanStackDataGridProps {
@@ -150,6 +151,12 @@ export const AppDataGrid: React.FC<TanStackDataGridProps> = React.memo(
       if (onReady) onReady();
     }, [onReady]);
 
+    // Handle clipboard copy events to preserve table structure
+    const handleCopy = (event: React.ClipboardEvent) => {
+      // Convert React event to native ClipboardEvent for handleTableCopy
+      handleTableCopy(event.nativeEvent, { table, parentRef });
+    };
+
     return (
       <div ref={parentRef} className={cn('h-full w-full overflow-auto', className)} style={style}>
         <SortColumnWrapper
@@ -159,7 +166,11 @@ export const AppDataGrid: React.FC<TanStackDataGridProps> = React.memo(
           setColOrder={setColOrder}
           onReorderColumns={onReorderColumns}
         >
-          <table className="bg-background w-full">
+          <table
+            className="bg-background w-full"
+            style={{ borderCollapse: 'separate', borderSpacing: 0 }}
+            onCopy={handleCopy}
+          >
             <DataGridHeader
               table={table}
               sortable={sortable}
@@ -170,7 +181,11 @@ export const AppDataGrid: React.FC<TanStackDataGridProps> = React.memo(
 
             <tbody
               className="relative"
-              style={{ display: 'grid', height: `${rowVirtualizer.getTotalSize()}px` }}
+              style={{
+                display: 'block',
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                position: 'relative',
+              }}
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const row = table.getRowModel().rows[virtualRow.index];

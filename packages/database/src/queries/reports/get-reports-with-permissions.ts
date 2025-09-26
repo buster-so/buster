@@ -2,9 +2,12 @@ import { type SQL, and, count, desc, eq, exists, isNull, ne, or, sql } from 'dri
 import { z } from 'zod';
 import { db } from '../../connection';
 import { assetPermissions, reportFiles, teamsToUsers, users } from '../../schema';
+import {
+  type PaginatedResponse,
+  createPaginatedResponse,
+  withPagination,
+} from '../../schema-types';
 import { getUserOrganizationId } from '../organizations';
-import { type PaginatedResponse, createPaginatedResponse } from '../shared-types';
-import { withPagination } from '../shared-types/with-pagination';
 
 export const GetReportsWithPermissionsInputSchema = z.object({
   userId: z.string().uuid('User ID must be a valid UUID'),

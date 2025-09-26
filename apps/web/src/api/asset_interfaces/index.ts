@@ -7,7 +7,6 @@ export type * from './datasources';
 export type * from './metric';
 export type * from './permission';
 export type * from './permission_groups';
-export type * from './search';
 export type * from './sql';
 export type * from './teams';
 export type * from './terms';

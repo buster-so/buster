@@ -4,8 +4,6 @@ import type {
   DuplicateChatResponse,
   GetChatRequest,
   GetChatResponse,
-  GetChatsListRequest,
-  GetChatsListResponse,
   GetLogsListRequest,
   GetLogsListResponse,
   ShareChatResponse,
@@ -22,16 +20,6 @@ import type {
 import { mainApi, mainApiV2 } from '../instances';
 
 const CHATS_BASE = '/chats';
-
-// Client-side fetch version
-export const getListChats = async (params?: GetChatsListRequest): Promise<GetChatsListResponse> => {
-  const { page_token = 0, page_size = 3500 } = params || {};
-  return mainApi
-    .get<GetChatsListResponse>(`${CHATS_BASE}`, {
-      params: { page_token, page_size },
-    })
-    .then((res) => res.data);
-};
 
 export const getListLogs = async (params?: GetLogsListRequest): Promise<GetLogsListResponse> => {
   const { page_token = 0, page_size = 3500 } = params || {};

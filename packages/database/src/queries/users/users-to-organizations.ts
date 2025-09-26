@@ -8,9 +8,12 @@ import {
   usersToOrganizations,
 } from '../../schema';
 import { UserOrganizationRoleSchema, UserOrganizationStatusSchema } from '../../schema-types';
+import {
+  type PaginatedResponse,
+  createPaginatedResponse,
+  withPagination,
+} from '../../schema-types';
 import { getUserOrganizationId } from '../organizations/organizations';
-import { type PaginatedResponse, createPaginatedResponse } from '../shared-types';
-import { withPagination } from '../shared-types/with-pagination';
 
 // Type-safe schema types
 type User = InferSelectModel<typeof users>;

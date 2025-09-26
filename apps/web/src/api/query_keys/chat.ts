@@ -2,7 +2,8 @@ import type { ChatListItem } from '@buster/server-shared/chats';
 import { queryOptions } from '@tanstack/react-query';
 import type { BusterChatMessage, IBusterChat } from '@/api/asset_interfaces/chat';
 import type { BusterMetricData } from '@/api/asset_interfaces/metric/metricDataInterfaces';
-import type { getListChats, getListLogs } from '@/api/buster_rest/chats/requests';
+import type { getListLogs } from '@/api/buster_rest/chats/requests';
+import type { getListChats } from '@/api/buster_rest/chats/requestsV2';
 
 const chatsGetChat = (chatId: string) =>
   queryOptions<IBusterChat>({
@@ -25,9 +26,7 @@ const chatsMessagesFetchingData = (messageId: string) =>
     enabled: !!messageId,
   });
 
-const chatsGetList = (
-  filters?: Omit<Parameters<typeof getListChats>[0], 'page_token' | 'page_size'>
-) =>
+const chatsGetList = (filters?: Omit<Parameters<typeof getListChats>[0], 'page' | 'page_size'>) =>
   queryOptions<ChatListItem[]>({
     queryKey: [
       'chats',

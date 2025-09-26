@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
 import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
@@ -7,12 +7,11 @@ import { createDropdownItem } from '@/components/ui/dropdown';
 import { ArrowRight, DuplicatePlus, Pencil, ShareRight, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { ensureElementExists } from '@/lib/element';
 import { getIsEffectiveOwner } from '@/lib/share';
 import { timeout } from '@/lib/timeout';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 import { CHAT_HEADER_TITLE_ID } from './ChatHeaderTitle';
-
-const stablePermissionSelector = (chat: IBusterChat) => chat.permission;
 
 export const useShareMenuSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
   const { data: shareAssetConfig } = useGetChat({ id: chatId }, { select: getShareAssetConfig });
@@ -47,12 +46,18 @@ export const useRenameChatTitle = () => {
         label: 'Rename',
         value: 'edit-chat-title',
         icon: <Pencil />,
-        onClick: async () => {
-          const input = document.getElementById(CHAT_HEADER_TITLE_ID) as HTMLInputElement;
+        onClick: async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const input = await ensureElementExists(
+            () => document.getElementById(CHAT_HEADER_TITLE_ID) as HTMLInputElement
+          );
           if (input) {
-            await timeout(25);
+            // Focus first, then select after a small delay to ensure focus completes
             input.focus();
-            input.select();
+            setTimeout(() => {
+              input.select(); //i think this is related to how the dropdown is closing and taking away focus
+            }, 200);
           }
         },
       }),
@@ -84,17 +89,23 @@ export const useFavoriteChatSelectMenu = ({ chatId = '' }: { chatId: string | un
 };
 
 export const useOpenInNewTabSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
+  const router = useRouter();
   return useMemo(() => {
     return createDropdownItem({
       label: 'Open in new tab',
       value: 'open-in-new-tab',
       icon: <ArrowRight />,
-      link: {
-        to: '/app/chats/$chatId',
-        params: { chatId: chatId },
+      onClick: () => {
+        if (chatId) {
+          const link = router.buildLocation({
+            to: '/app/chats/$chatId',
+            params: { chatId: chatId },
+          });
+          window.open(link.href, '_blank');
+        }
       },
     });
-  }, []);
+  }, [chatId, router.buildLocation]);
 };
 
 export const useDuplicateChatSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {

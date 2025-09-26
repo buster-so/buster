@@ -15,9 +15,10 @@ export const CHAT_HEADER_TITLE_ID = 'chat-header-title';
 export const ChatHeaderTitle: React.FC<{
   chatTitle: string;
   chatId: string;
-  isStreamFinished: boolean;
-}> = ({ chatTitle, chatId, isStreamFinished }) => {
+  isStreamingMessage: boolean;
+}> = ({ chatTitle, chatId, isStreamingMessage }) => {
   const { mutateAsync: updateChat } = useUpdateChat();
+  const isStreamFinished = !isStreamingMessage;
 
   if (!chatTitle) {
     return <div />; //we need to return something for alignment
@@ -26,8 +27,11 @@ export const ChatHeaderTitle: React.FC<{
   return (
     <AnimatePresence mode="wait" initial={isStreamFinished}>
       <motion.div
-        {...(!isStreamFinished ? animation : {})}
+        {...(isStreamFinished ? {} : animation)}
         key={chatTitle || 'initial'}
+        transition={{
+          duration: isStreamFinished ? 0 : 0.2,
+        }}
         className="flex w-full items-center overflow-hidden"
       >
         <EditableTitle

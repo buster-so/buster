@@ -12,17 +12,13 @@ import {
   type GetDashboardResponse,
 } from '@buster/server-shared/dashboards';
 import type { DashboardYml } from '@buster/server-shared/dashboards';
-import type { Metric } from '@buster/server-shared/metrics';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
 import { getPubliclyEnabledByUser } from '../../../../shared-helpers/get-publicly-enabled-by-user';
-import {
-  buildMetricResponse,
-  fetchAndProcessMetricData,
-} from '../../../../shared-helpers/metric-helpers';
+import { getMetricsInAncestorAssetFromMetricIds } from '../../../../shared-helpers/metric-helpers';
 
 interface GetDashboardHandlerParams {
   dashboardId: string;
@@ -200,7 +196,7 @@ export async function getDashboardHandler(
   // Extract metric IDs from dashboard config
   const metricIds = extractMetricIds(resolvedContent);
 
-  const metrics = await getMetricsFromDashboardMetricIds(metricIds, user);
+  const metrics = await getMetricsInAncestorAssetFromMetricIds(metricIds, user);
 
   // Get the extra dashboard info concurrently
   const [individualPermissions, workspaceMemberCount, collections, publicEnabledBy] =
@@ -262,40 +258,4 @@ export function extractMetricIds(content: DashboardYml): string[] {
       message: `Error extracting metric IDs from dashboard content: ${error}`,
     });
   }
-}
-
-export async function getMetricsFromDashboardMetricIds(
-  metricIds: string[],
-  user: User
-): Promise<Record<string, Metric>> {
-  const metricsObj: Record<string, Metric> = {};
-
-  // Process metrics in chunks of 4 to manage concurrency
-  const results = [];
-  const chunkSize = 4;
-
-  for (let i = 0; i < metricIds.length; i += chunkSize) {
-    const chunk = metricIds.slice(i, i + chunkSize);
-    const chunkPromises = chunk.map(async (metricId) => {
-      const processedData = await fetchAndProcessMetricData(metricId, user, {
-        publicAccessPreviouslyVerified: true, // Access is inherited from dashboard access at a minimum
-      });
-
-      // Build the metric response
-      const metric = await buildMetricResponse(processedData, user.id);
-      return { metricId, metric };
-    });
-
-    const chunkResults = await Promise.all(chunkPromises);
-    results.push(...chunkResults);
-  }
-
-  // Filter out failed metrics and build the response object
-  for (const result of results) {
-    if (result) {
-      metricsObj[result.metricId] = result.metric;
-    }
-  }
-
-  return metricsObj;
 }

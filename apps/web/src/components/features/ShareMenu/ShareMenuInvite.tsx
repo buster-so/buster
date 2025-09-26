@@ -49,7 +49,11 @@ export const ShareMenuInvite: React.FC<ShareMenuInviteProps> = React.memo(
 
     const disableSubmit = !inputHasText(inputValue) || !isValidEmail(inputValue);
     const isInviting =
-      isInvitingMetric || isInvitingDashboard || isInvitingCollection || isInvitingChat;
+      isInvitingMetric ||
+      isInvitingDashboard ||
+      isInvitingCollection ||
+      isInvitingChat ||
+      isInvitingReport;
 
     const options: SelectItem<string>[] = useMemo(() => {
       return (

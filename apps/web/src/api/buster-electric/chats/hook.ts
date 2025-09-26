@@ -13,6 +13,7 @@ const updateOperations: Array<`insert` | `update` | `delete`> = ['update'];
 export const useTrackAndUpdateChatChanges = (
   {
     chatId,
+    isStreamingMessage,
   }: {
     chatId: string | undefined;
     isStreamingMessage: boolean;
@@ -23,7 +24,7 @@ export const useTrackAndUpdateChatChanges = (
   const shape = useMemo(() => {
     return chatShape({ chatId: chatId || '' });
   }, [chatId]);
-  const subscribe = !!chatId;
+  const subscribe = !!chatId && isStreamingMessage;
 
   return useShapeStream(
     shape,

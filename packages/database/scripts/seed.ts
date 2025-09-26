@@ -42,9 +42,9 @@ async function upsertData(tx: any, tableName: string, table: any, data: any[]) {
   try {
     // Fix YAML content in datasets table by converting literal \n to actual newlines
     if (tableName === 'datasets') {
-      data = data.map(record => ({
+      data = data.map((record) => ({
         ...record,
-        ymlFile: record.ymlFile ? record.ymlFile.replace(/\\n/g, '\n') : record.ymlFile
+        ymlFile: record.ymlFile ? record.ymlFile.replace(/\\n/g, '\n') : record.ymlFile,
       }));
     }
     // For tables that should always use ON CONFLICT DO NOTHING instead of updating

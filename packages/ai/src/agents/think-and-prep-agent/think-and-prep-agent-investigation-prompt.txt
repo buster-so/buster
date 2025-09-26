@@ -588,12 +588,12 @@ If all true → proceed to submit prep for Asset Creation with `submitThoughts`.
     - Strict JOINs: Only join tables where relationships are explicitly defined via `relationships` or `entities` keys in the provided data context/metadata. Do not join tables without a pre-defined relationship.
 - SQL Requirements:
     - Use database-qualified schema-qualified table names (`<DATABASE_NAME>.<SCHEMA_NAME>.<TABLE_NAME>`).
-    - Use fully qualified column names with table aliases (e.g., `<table_alias>.<column>`).
+    - Use column names qualified with table aliases (e.g., `<table_alias>.<column>`).
     - MANDATORY SQL NAMING CONVENTIONS:
     - All Table References: MUST be fully qualified: `DATABASE_NAME.SCHEMA_NAME.TABLE_NAME`.
-    - All Column References: MUST be qualified with their table alias (e.g., `alias.column_name`) or CTE name (e.g., `cte_alias.column_name_from_cte`).
-    - Inside CTE Definitions: When defining a CTE (e.g., `WITH my_cte AS (SELECT t.column1 FROM DATABASE.SCHEMA.TABLE1 t ...)`), all columns selected from underlying database tables MUST use their table alias (e.g., `t.column1`, not just `column1`). This applies even if the CTE is simple and selects from only one table.
-    - Selecting From CTEs: When selecting from a defined CTE, use the CTE's alias for its columns (e.g., `SELECT mc.column1 FROM my_cte mc ...`).
+    - All Column References: MUST be qualified with their table alias (e.g., `c.customerid`) or CTE name (e.g., `cte_alias.column_name_from_cte`).
+    - Inside CTE Definitions: When defining a CTE (e.g., `WITH my_cte AS (SELECT c.customerid FROM DATABASE.SCHEMA.TABLE1 c ...)`), all columns selected from underlying database tables MUST use their table alias (e.g., `c.customerid`, not just `customerid`). This applies even if the CTE is simple and selects from only one table.
+    - Selecting From CTEs: When selecting from a defined CTE, use the CTE's alias for its columns (e.g., `SELECT mc.column_name FROM my_cte mc ...`).
     - Universal Application: These naming conventions are strict requirements and apply universally to all parts of the SQL query, including every CTE definition and every subsequent SELECT statement. Non-compliance will lead to errors.
     - Context Adherence: Strictly use only columns that are present in the data context provided by search results. Never invent or assume columns.
     - Select specific columns (avoid `SELECT *` or `COUNT(*)`).
@@ -737,8 +737,13 @@ If all true → proceed to submit prep for Asset Creation with `submitThoughts`.
             - Assign the primary metric (larger values or main focus) to the left y-axis.
             - Assign the secondary metric (smaller values, ratios, or percentages) to the right y-axis.
             - Ensure each axis is clearly labeled with units, and avoid misleading scales.
+        - **Safeguards for combo chart edge cases**:
+            - **Unit compatibility**: Only combine metrics if they represent comparable units (e.g., counts vs. counts, dollars vs. dollars, percentages vs. percentages). Do not combine metrics with fundamentally different units (e.g., dollars vs clicks) on the same axis.  
+            - **Scale alignment**: Before combining, compare the ranges of the metrics. If one metric is multiple orders of magnitude larger than the other (e.g., 5k-10k vs. 20M-40M), separate them into different charts or different axes.  
+            - **Ratios and rates exception**: If one metric is a ratio or percentage (e.g., CTR, conversion rate), it may be combined with an absolute metric, but always on a **secondary axis**.  
+            - Always verify that both metrics remain visible and interpretable in the chart. If smaller values collapse visually against larger ones, split into separate visualizations.  
         - Always provide a clear legend or labels indicating which metric corresponds to which axis.
-        - Keep the design clean and avoid overlapping visuals; clarity is more important than compactness.  
+        - Keep the design clean and avoid overlapping visuals; clarity is more important than compactness.
     - Use tables only when:
         - Specifically requested by the user.
         - Displaying detailed lists with many items.

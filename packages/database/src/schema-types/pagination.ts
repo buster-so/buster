@@ -1,6 +1,36 @@
 import type { SQL } from 'drizzle-orm';
 import type { PgColumn, PgSelect } from 'drizzle-orm/pg-core';
-import type { PaginatedResponse, PaginationMetadata } from './pagination.types';
+import { z } from 'zod';
+
+// Pagination input schema for validation
+export const PaginationInputSchema = z.object({
+  page: z.coerce.number().min(1).optional().default(1),
+  page_size: z.coerce.number().min(1).max(5000).optional().default(250),
+});
+
+export type PaginationInput = z.infer<typeof PaginationInputSchema>;
+
+export const PaginationSchema = z.object({
+  page: z.number(),
+  page_size: z.number(),
+  total: z.number(),
+  total_pages: z.number(),
+});
+
+export type PaginationMetadata = z.infer<typeof PaginationSchema>;
+
+// Generic paginated response type
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: PaginationMetadata;
+}
+
+// Type helper for creating paginated API responses
+export type WithPagination<T> = {
+  [K in keyof T]: T[K];
+} & {
+  pagination: PaginationMetadata;
+};
 
 /**
  * Adds pagination to a Drizzle query using the dynamic query builder pattern

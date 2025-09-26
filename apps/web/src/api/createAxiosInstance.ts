@@ -1,6 +1,7 @@
 import { isServer } from '@tanstack/react-query';
 import type { AxiosRequestHeaders } from 'axios';
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import qs from 'qs';
 import { getSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
 import { Route as AuthRoute } from '@/routes/auth.login';
 import { BASE_URL_V2 } from './config';
@@ -14,6 +15,9 @@ export const createAxiosInstance = (baseURL = BASE_URL_V2) => {
     timeout: AXIOS_TIMEOUT,
     headers: {
       'Content-Type': 'application/json',
+    },
+    paramsSerializer: (params) => {
+      return qs.stringify(params, { arrayFormat: 'repeat' }); //💰
     },
   });
 
@@ -46,9 +50,10 @@ export const defaultAxiosRequestHandler = async (config: InternalAxiosRequestCon
     const { accessToken: token } = session;
 
     if (!token) {
-      console.warn('No token found');
-      window.location.href = AuthRoute.to;
-      return Promise.reject(new Error('No token found'));
+      console.warn('No token found', config);
+      //embed route were having an issue with this...
+      //window.location.href = AuthRoute.to;
+      //return Promise.reject(new Error('No token found'));
     }
 
     (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;

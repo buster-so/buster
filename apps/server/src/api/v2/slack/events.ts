@@ -3,6 +3,7 @@ import { getSecretByName } from '@buster/database/queries';
 import { chats, slackIntegrations } from '@buster/database/schema';
 import type { SlackEventsResponse } from '@buster/server-shared/slack';
 import {
+  SlackMessagingService,
   type SlackWebhookPayload,
   addReaction,
   isAppMentionEvent,
@@ -17,6 +18,41 @@ import {
   authenticateSlackUser,
   getUserIdFromAuthResult,
 } from './services/slack-authentication';
+
+/**
+ * Helper function to get Slack access token from vault
+ */
+async function getSlackAccessToken(
+  teamId: string,
+  organizationId?: string
+): Promise<string | null> {
+  const filters = [eq(slackIntegrations.teamId, teamId), eq(slackIntegrations.status, 'active')];
+  if (organizationId) {
+    filters.push(eq(slackIntegrations.organizationId, organizationId));
+  }
+
+  try {
+    // Fetch Slack integration to get token vault key
+    const slackIntegration = await db
+      .select({
+        tokenVaultKey: slackIntegrations.tokenVaultKey,
+      })
+      .from(slackIntegrations)
+      .where(and(...filters))
+      .limit(1);
+
+    if (slackIntegration.length > 0 && slackIntegration[0]?.tokenVaultKey) {
+      // Get the access token from vault
+      const vaultSecret = await getSecretByName(slackIntegration[0].tokenVaultKey);
+      return vaultSecret?.secret || null;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Failed to get Slack access token from vault:', error);
+    return null;
+  }
+}
 
 /**
  * Map authentication result type to database enum value
@@ -176,9 +212,9 @@ export async function handleSlackEventsEndpoint(c: Context) {
 
     return c.json(response);
   } catch (error) {
-    // Handle authentication errors
+    // Handle authentication errors with 200 status code to prevent Slack from retrying the webhook
     if (error instanceof Error && error.message.includes('Unauthorized')) {
-      return c.json({ error: 'Unauthorized' }, 401);
+      return c.json({ error: 'Unauthorized' }, 200);
     }
     // Re-throw other errors
     throw error;
@@ -212,19 +248,41 @@ export async function eventsHandler(payload: SlackWebhookPayload): Promise<Slack
         // Authenticate the Slack user
         const authResult = await authenticateSlackUser(event.user, payload.team_id);
 
-        // Check if authentication was successful
-        const userId = getUserIdFromAuthResult(authResult);
-        if (!userId) {
-          console.warn('Slack user authentication failed:', {
-            slackUserId: event.user,
-            teamId: payload.team_id,
-            reason: authResult.type === 'unauthorized' ? authResult.reason : 'Unknown',
-          });
-          // Throw unauthorized error
+        if (authResult.type === 'unauthorized') {
+          if (authResult.reason.toLowerCase().includes('bot')) {
+            return { success: true };
+          }
+
+          try {
+            const accessToken = await getSlackAccessToken(payload.team_id);
+            if (accessToken) {
+              const messagingService = new SlackMessagingService();
+              const threadTs = event.thread_ts || event.ts;
+
+              await messagingService.sendMessage(accessToken, event.channel, {
+                text: 'Sorry, you are unauthorized to chat with Buster. Please contact your Workspace Administrator for access.',
+                thread_ts: threadTs,
+              });
+
+              console.info('Sent unauthorized message to Slack user', {
+                channel: event.channel,
+                user: event.user,
+                threadTs,
+              });
+            }
+          } catch (error) {
+            console.warn('Failed to send unauthorized message to Slack user', {
+              error: error instanceof Error ? error.message : 'Unknown error',
+              channel: event.channel,
+              user: event.user,
+              threadTs: event.thread_ts || event.ts,
+            });
+          }
           throw new Error('Unauthorized: Slack user authentication failed');
         }
 
-        const organizationId = authResult.type === 'unauthorized' ? '' : authResult.organization.id;
+        const userId = authResult.user.id;
+        const organizationId = authResult.organization.id;
 
         // Extract thread timestamp - if no thread_ts, this is a new thread so use ts
         const threadTs = event.thread_ts || event.ts;
@@ -232,39 +290,21 @@ export async function eventsHandler(payload: SlackWebhookPayload): Promise<Slack
         // Add hourglass reaction immediately after authentication
         if (organizationId) {
           try {
-            // Fetch Slack integration to get token vault key
-            const slackIntegration = await db
-              .select({
-                tokenVaultKey: slackIntegrations.tokenVaultKey,
-              })
-              .from(slackIntegrations)
-              .where(
-                and(
-                  eq(slackIntegrations.organizationId, organizationId),
-                  eq(slackIntegrations.teamId, payload.team_id),
-                  eq(slackIntegrations.status, 'active')
-                )
-              )
-              .limit(1);
+            const accessToken = await getSlackAccessToken(payload.team_id, organizationId);
 
-            if (slackIntegration.length > 0 && slackIntegration[0]?.tokenVaultKey) {
-              // Get the access token from vault
-              const vaultSecret = await getSecretByName(slackIntegration[0].tokenVaultKey);
+            if (accessToken) {
+              // Add the hourglass reaction
+              await addReaction({
+                accessToken,
+                channelId: event.channel,
+                messageTs: event.ts,
+                emoji: 'hourglass_flowing_sand',
+              });
 
-              if (vaultSecret?.secret) {
-                // Add the hourglass reaction
-                await addReaction({
-                  accessToken: vaultSecret.secret,
-                  channelId: event.channel,
-                  messageTs: event.ts,
-                  emoji: 'hourglass_flowing_sand',
-                });
-
-                console.info('Added hourglass reaction to app mention', {
-                  channel: event.channel,
-                  messageTs: event.ts,
-                });
-              }
+              console.info('Added hourglass reaction to app mention', {
+                channel: event.channel,
+                messageTs: event.ts,
+              });
             }
           } catch (error) {
             // Log but don't fail the entire process if reaction fails

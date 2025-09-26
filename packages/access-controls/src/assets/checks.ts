@@ -48,11 +48,9 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
   } = check;
 
   // Check cache first (only for single role checks)
-  if (!Array.isArray(requiredRole)) {
-    const cached = getCachedPermission(userId, assetId, assetType, requiredRole);
-    if (cached !== undefined) {
-      return cached;
-    }
+  const cached = getCachedPermission(userId, assetId, assetType, requiredRole);
+  if (cached !== undefined) {
+    return cached;
   }
 
   // Get user's organization memberships
@@ -111,6 +109,8 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
       }
     }
   }
+
+  console.info('publiclyAccessible', publiclyAccessible);
 
   if (publiclyAccessible) {
     const hasPublicAccessCheck = hasPublicAccess(

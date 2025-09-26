@@ -22,9 +22,12 @@ export const useIsStreamingMessage = () => {
   const isStreamingMessage = useQueries({
     queries: stableQueries,
     combine: useCallback(
-      (result: { data: boolean | undefined }[]) => result.some((res) => res.data === false),
-      []
+      (result: { data: boolean | undefined }[]) => {
+        return result.some((res) => res.data === false);
+      },
+      [stableQueries]
     ),
   });
+
   return isStreamingMessage;
 };

@@ -1,6 +1,6 @@
+import type { SearchTextResponse } from '@buster/server-shared/search';
 import type { ShareAssetType } from '@buster/server-shared/share';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
-import type { BusterSearchResult } from '@/api/asset_interfaces/search';
 import {
   useAddAndRemoveAssetsFromCollection,
   useGetCollection,
@@ -33,8 +33,9 @@ export const AddToCollectionModal: React.FC<{
 
   const { data: searchResults } = useSearch({
     query: debouncedSearchTerm,
-    asset_types: ['metric_file', 'dashboard_file'],
-    num_results: 100,
+    assetTypes: ['metric_file', 'dashboard_file', 'report_file'],
+    page_size: 50,
+    page: 1,
   });
 
   const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
@@ -42,13 +43,13 @@ export const AddToCollectionModal: React.FC<{
     return selectedAssets.map((asset) => asset.id);
   }, [selectedAssets]);
 
-  const columns = useMemo<InputSelectModalProps<BusterSearchResult>['columns']>(
+  const columns = useMemo<InputSelectModalProps<SearchTextResponse['data'][number]>['columns']>(
     () => [
       {
         title: 'Name',
-        dataIndex: 'name',
-        render: (name, data) => {
-          const Icon = assetTypeToIcon(data.type) || ASSET_ICONS.metrics;
+        dataIndex: 'title',
+        render: (name, record) => {
+          const Icon = assetTypeToIcon(record.assetType) || ASSET_ICONS.metrics;
           return (
             <div className="flex items-center gap-1.5">
               <span className="text-icon-color">
@@ -61,7 +62,7 @@ export const AddToCollectionModal: React.FC<{
       },
       {
         title: 'Updated',
-        dataIndex: 'updated_at',
+        dataIndex: 'updatedAt',
         width: 140,
         render: (value: string) => {
           return formatDate({
@@ -74,10 +75,10 @@ export const AddToCollectionModal: React.FC<{
     []
   );
 
-  const rows: BusterListRowItem<BusterSearchResult>[] = useMemo(() => {
+  const rows: BusterListRowItem<SearchTextResponse['data'][number]>[] = useMemo(() => {
     return (
-      searchResults?.map((asset) => ({
-        id: asset.id,
+      searchResults?.data?.map((asset) => ({
+        id: asset.assetId,
         data: asset,
       })) || []
     );
@@ -86,7 +87,7 @@ export const AddToCollectionModal: React.FC<{
   const createKeySearchResultMap = useMemoizedFn(() => {
     const map = new Map<string, SelectedAsset>();
     rows.forEach((asset) => {
-      if (asset.data?.type) map.set(asset.id, { type: asset.data?.type, id: asset.id });
+      if (asset.data?.assetType) map.set(asset.id, { type: asset.data?.assetType, id: asset.id });
     });
     return map;
   });

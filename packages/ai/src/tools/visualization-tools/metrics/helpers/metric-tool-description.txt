@@ -121,6 +121,9 @@ Only utilize the required/default fields unless the user specifically requests t
 #
 # DATE PART RULES
 #   - year → columnType: number, style: number, numberSeparatorStyle: null (no thousands separators).
+#   - second → columnType: number, style: number, numberSeparatorStyle: null
+#   - minute → columnType: number, style: number, numberSeparatorStyle: null
+#   - hour → columnType: number, style: number, numberSeparatorStyle: null
 #   - month/quarter/day_of_week → columnType: number, style: date, with convertNumberTo + makeLabelHumanReadable.
 #   - When X-axis = [month, year] across multiple years → month.dateFormat: 'MMM' (renderer composes 'MMM YYYY' with the year part).
 #   - Full date/timestamp columns → columnType: date, style: date, include explicit dateFormat appropriate to the interval.
@@ -156,15 +159,51 @@ properties:
     type: string
     description: |
       Human-readable time period covered by the SQL query, similar to a filter in a BI tool.
-      RULE: Must accurately reflect the date/time filter used in the `sql` field. Do not misrepresent the time range.
-      Examples:
+
+      ## CRITICAL RULES
+      - Each metric/visualization should have its own unique timeframe string based on the date filters used in the metric's `sql` field
+      - The timeframe must be derived directly and only from that metric’s `sql` field.
+      - Never generalize across metrics or apply a “one size fits all” timeframe for multiple charts. If charts are on the same report or dashboard but utilize different date filters, you must display the correct timeFrame for each metric/visualization.
+      - Must accurately reflect both the date filters and the grouping granularity used in the SQL.
+
+      ## Allowed Formats
       - Fixed Dates: "January 1, 2020 - December 31, 2020", "2024", "Q2 2024", "June 1, 2025"
-      - Relative Dates: "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", "Last 12 Months", "Year to Date", "All time"
-      - Comparisons: Use the format "Comparison: [Period 1] vs [Period 2]". Examples:
-        - "Comparison: Last 30 days vs Previous 30 days"
-        - "Comparison: June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025"
-      RULE: Use full month names for dates, e.g., "January", not "Jan".
-      RULE: Follow general quoting rules. CANNOT contain ':'.
+      - Relative Dates: "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", 
+        "Last 12 Months", "Year to Date", "Quarter to Date", "Month to Date", "Week to Date", "All time"
+      - Comparisons: "Comparison - [Period 1] vs [Period 2]"
+        Examples:
+          - "Comparison - Last 30 days vs Previous 30 days"
+          - "Comparison - Last 12 Months vs Previous 12 Months"
+          - "Comparison - June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025"
+      - Fiscal Periods: "FY2024", "FQ3 2024"
+      - Forecast/Future: "Next 12 Months", "Next Quarter"
+
+      ## Edge Case Rules
+      - **Incomplete start date only** (`WHERE date >= '2023-01-01'`) → "Since January 1, 2023"
+      - **Incomplete end date only** (`WHERE date <= '2024-06-30'`) → "Through June 30, 2024"
+      - **Current partial period** (`WHERE YEAR(order_date) = 2024` during 2024) → "Year to Date"
+      - **Custom rolling windows** (`WHERE date >= CURRENT_DATE - INTERVAL '90 days'`) → "Last 90 days"
+      - **Future projections** (`WHERE date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '12 months'`) → "Next 12 Months"
+      - **Short fixed spans** (3 months of data: Jan–Mar 2025) → "January 2025 - March 2025"
+      - **Fiscal calendar filters** (`WHERE fiscal_quarter = 'FQ3 2024'`) → "FQ3 2024"
+      - **Rolling to-date filters** (`DATE_TRUNC('quarter', CURRENT_DATE)`) → "Quarter to Date"
+      - **Relative offsets** (`WHERE date BETWEEN CURRENT_DATE - INTERVAL '60 days' AND CURRENT_DATE - INTERVAL '30 days'`) → "30–60 Days Ago"
+
+      ## Formatting Rules
+      - Always use full month names ("January", not "Jan").
+      - Do not include ":" inside the timeframe string.
+      - Timeframe string must match SQL exactly (filters and grouping).
+      - Never reuse the same timeframe across unrelated metrics unless the SQL is identical.
+
+      ## Examples
+      - Query grouped by month, filtered last 12 months → "Last 12 Months"
+      - Query grouped by quarter, filtered current year → "Q1 2025 - Q3 2025"
+      - Query with WHERE order_date BETWEEN '2021-01-01' AND '2021-12-31' → "January 1, 2021 - December 31, 2021"
+      - Query with no date filter → "All time"
+      - Comparison of rolling periods → "Comparison - Last 30 days vs Previous 30 days"
+      - Open-ended filter (`>= 2023-01-01`) → "Since January 1, 2023"
+      - Forecasting 1 year ahead → "Next 12 Months"
+      - Fiscal quarter filter → "FQ3 2024"
 
   # SQL QUERY
   sql:

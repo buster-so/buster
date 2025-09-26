@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { create } from 'mutative';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { getOriginalDashboard } from '@/context/Dashboards/useOriginalDashboardStore';
-import type { dashboardsUpdateDashboard } from '../requests';
 import { useSaveDashboard } from './useSaveDashboard';
 
 /**
@@ -16,7 +15,10 @@ export const useUpdateDashboard = (params?: {
 }) => {
   const { updateOnSave = false, updateVersion = false, saveToServer = false } = params || {};
   const queryClient = useQueryClient();
-  const { mutateAsync: dashboardsUpdateDashboard } = useSaveDashboard({ updateOnSave });
+  const { mutateAsync: dashboardsUpdateDashboard } = useSaveDashboard({
+    updateOnSave,
+    updateVersion,
+  });
 
   const mutationFn = async (variables: Parameters<typeof dashboardsUpdateDashboard>[0]) => {
     if (saveToServer) {

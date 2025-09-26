@@ -1,4 +1,3 @@
-import { DEFAULT_DATE_FORMAT_QUARTER } from '@buster/server-shared/metrics';
 import type { TimeUnit } from 'chart.js';
 import { _adapters } from 'chart.js';
 import dayjs, { type QUnitType } from 'dayjs';

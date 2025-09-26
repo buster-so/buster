@@ -1,11 +1,16 @@
 import type { ChatListItem } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mainApi } from '../instances';
+import { mainApiV2 } from '../instances';
 
-// Mock the mainApi
+// Mock the mainApi and mainApiV2
 vi.mock('../instances', () => ({
   mainApi: {
     get: vi.fn(),
+  },
+  mainApiV2: {
+    get: vi.fn(),
+    post: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -36,17 +41,19 @@ describe('Chat API Requests', () => {
       ];
 
       // Setup mock response
-      (mainApi.get as any).mockResolvedValueOnce({ data: mockChats });
+      (mainApiV2.get as any).mockResolvedValueOnce({
+        data: { data: mockChats },
+      });
 
       // Import the function we want to test
-      const { getListChats } = await import('./requests');
+      const { getListChats } = await import('./requestsV2');
 
       // Execute the function
       const result = await getListChats();
 
       // Verify the API was called with correct parameters
-      expect(mainApi.get).toHaveBeenCalledWith('/chats', {
-        params: { page_token: 0, page_size: 3500 },
+      expect(mainApiV2.get).toHaveBeenCalledWith('/chats', {
+        params: { page: 1, page_size: 3500 },
       });
 
       // Verify the result matches the mock data
