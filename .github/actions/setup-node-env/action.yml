@@ -53,15 +53,19 @@ runs:
       uses: actions/cache@v4
       with:
         path: .turbo
-        key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+        key: turbo-${{ inputs.cache-key }}-${{ github.ref_name }}-${{ github.sha }}
         restore-keys: |
-          turbo-${{ github.job }}-${{ github.ref_name }}-
-          turbo-${{ github.job }}-
+          turbo-${{ inputs.cache-key }}-${{ github.ref_name }}-
     
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
       with:
         bun-version: ${{ inputs.bun-version }}
+
+    - name: Setup Supabase CLI
+      uses: supabase/setup-cli@v1
+      with:
+        version: latest
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile${{ inputs.install-filter && format(' --filter={0}', inputs.install-filter) || '' }}

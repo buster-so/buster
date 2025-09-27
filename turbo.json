@@ -4,11 +4,13 @@
   "concurrency": "20",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".output/**", ".vercel/**", "target/release/**"]
     },
     "build:dry-run": {
       "dependsOn": ["^build:dry-run"],
-      "env": ["SKIP_ENV_CHECK"]
+      "env": ["SKIP_ENV_CHECK"],
+      "outputs": ["dist/**", ".output/**", ".vercel/**", "target/release/**"]
     },
     "dev": {
       "cache": false,
@@ -51,6 +53,7 @@
     }
   },
   "globalEnv": [
+    "SKIP_ENV_CHECK",
     "NODE_ENV",
     "NODE_TLS_REJECT_UNAUTHORIZED",
     "CI",
@@ -97,6 +100,7 @@
     "AI_GATEWAY_API_KEY",
     "BRAINTRUST_KEY",
     "TRIGGER_SECRET_KEY",
+    "TRIGGER_ACCESS_TOKEN",
     "R2_ACCOUNT_ID",
     "R2_ACCESS_KEY_ID",
     "R2_SECRET_ACCESS_KEY",
