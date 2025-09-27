@@ -13,7 +13,6 @@ retries: 0
 envs:
   - name: development
     default: true
-disabled: true
 steps:
   - id: 6e2bd037-2ad8-46f7-bca7-fa8dce20b1f3
     envKey: CHATS_RESPONSE
@@ -104,6 +103,22 @@ steps:
       id: cf0281d3-dae7-4ca2-b547-7c9ac9682ecc
       type: REQUEST
       url: http://localhost:3002/api/v2/docs?page_size=10
+      method: GET
+      headers:
+        Authorization: Bearer
+          eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMmRkNjRjZC1mN2YzLTQ4ODQtYmM5MS1kNDZhZTQzMTkwMWUiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MjUxODU1NTMyNiwiYXVkIjoiYXV0aGVudGljYXRlZCJ9.uRs5OVyYErQ1iSQwAXVUD6TFolOu31ejPhcBS41ResA
+        Accept-Encoding: gzip, deflate, br, zstd
+        Accept: application/json, text/plain, */*
+        Accept-Language: en-US,en;
+        Connection: keep-alive
+        Host: localhost:3002
+        Origin: http://localhost:3000
+  - id: 8bdaac11-13e0-4d1d-ba71-fa5cda74bfe0
+    type: PRESET_ACTION
+    command:
+      id: 7a00478b-c363-43c5-909f-07e7909003b7
+      type: REQUEST
+      url: http://localhost:3001/api/v1/data_sources
       method: GET
       headers:
         Authorization: Bearer
