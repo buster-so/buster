@@ -203,7 +203,7 @@ jobs:
   # E2E test job - runs after build completes
   e2e_test:
     name: End-to-End Test
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: blacksmith-32vcpu-ubuntu-2404
     timeout-minutes: 30
     environment: testing
     steps:
@@ -249,6 +249,8 @@ jobs:
           TURBO_TELEMETRY_DISABLED: 1
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_POOL_SIZE: 100
+          SQLX_POOL_SIZE: 100
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -308,7 +310,7 @@ jobs:
       - name: Wait for services to be ready
         run: |
           echo "⏳ Waiting for services to be ready..."
-          
+
           # Function to check if a port is ready
           check_port() {
             local port=$1
@@ -327,13 +329,13 @@ jobs:
             echo "❌ $service_name failed to start on localhost:$port"
             return 1
           }
-          
+
           # Check all required services
           echo "Checking required services..."
           check_port 3000 "Frontend (Web)"
           check_port 3001 "Backend APIV1"
           check_port 3002 "Api V2"
-          
+
           echo "🎉 All services are ready!"
           echo "⏳ Waiting 2 minutes for services to fully stabilize..."
           sleep 120
@@ -355,7 +357,6 @@ jobs:
           echo "Job failed. Keeping VM alive for 30 minutes for debugging..."
           echo "SSH connection info is available in the Setup runner step above"
           sleep 1800
-
 
       - name: Stop services
         if: always()
