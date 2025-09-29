@@ -31,7 +31,7 @@ export const getListLogs = async (params?: GetLogsListRequest): Promise<GetLogsL
 };
 
 export const getChat = async ({ id }: GetChatRequest): Promise<GetChatResponse> => {
-  return mainApiV2.get<GetChatResponse>(`${CHATS_BASE}/${id}`).then((res) => res.data);
+  return mainApi.get<GetChatResponse>(`${CHATS_BASE}/${id}`).then((res) => res.data);
 };
 
 export const deleteChat = async (data: DeleteChatsRequest): Promise<void> => {
