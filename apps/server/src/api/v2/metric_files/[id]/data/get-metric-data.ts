@@ -3,6 +3,7 @@ import { executeMetricQuery, getCachedMetricData, setCachedMetricData } from '@b
 import type { Credentials } from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import {
+  compileSqlWithDefaults,
   extractSqlFromMetricContent,
   getDataSourceCredentials,
   getMetricWithDataSource,
@@ -119,8 +120,11 @@ export async function getMetricDataHandler(
   // Ensure limit is within bounds
   const queryLimit = Math.min(Math.max(limit, 1), 5000);
 
-  // Extract SQL query from metric content
-  const sql = extractSqlFromMetricContent(metric.content);
+  // Compile SQL with defaults to remove filter tokens
+  const compiledSql = compileSqlWithDefaults(metric.content);
+
+  // Extract SQL query from metric content (for backwards compatibility if no filters)
+  const sql = compiledSql || extractSqlFromMetricContent(metric.content);
 
   // Get data source credentials from vault
   let credentials: Credentials;

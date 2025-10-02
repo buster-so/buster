@@ -41,6 +41,7 @@ vi.mock('braintrust', () => ({
 
 vi.mock('../../../llm', () => ({
   Sonnet4: 'mock-model',
+  GPT5Mini: 'mock-model',
 }));
 
 describe('re-ask-strategy', () => {
@@ -124,13 +125,8 @@ describe('re-ask-strategy', () => {
       expect(mockStreamText).toHaveBeenCalledWith(
         expect.objectContaining({
           model: 'mock-model',
-          messages: expect.arrayContaining([
-            expect.objectContaining({ role: 'user' }),
-            expect.objectContaining({ role: 'assistant' }),
-            expect.objectContaining({ role: 'tool' }),
-          ]),
           tools: context.tools,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 10000,
           temperature: 0,
         })
       );

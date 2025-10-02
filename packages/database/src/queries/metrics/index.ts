@@ -27,6 +27,8 @@ export {
   type VersionHistoryEntry,
 } from './get-metric-with-data-source';
 
+export { compileSqlWithDefaults } from './compile-sql-with-defaults';
+
 export {
   getMetricFileById,
   type MetricFile,

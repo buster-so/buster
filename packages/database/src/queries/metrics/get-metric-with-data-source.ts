@@ -18,6 +18,44 @@ export const MetricContentSchema = z.object({
   timeFrame: z.string().optional(),
   sql: z.string(),
   chartConfig: z.record(z.unknown()).optional(),
+  filters: z
+    .array(
+      z.object({
+        key: z.string(),
+        column: z.string(),
+        type: z.enum([
+          'string',
+          'number',
+          'date',
+          'timestamp',
+          'boolean',
+          'string_list',
+          'number_list',
+          'daterange',
+          'timestamp_range',
+        ]),
+        mode: z.enum([
+          'predicate',
+          'range',
+          'in_list',
+          'join_predicate',
+          'qualify',
+          'having',
+          'order_by_item',
+          'partition_by',
+          'select_expr',
+          'limit',
+          'predicate_switch',
+          'predicate_complex',
+          'value',
+        ]),
+        op: z.string().optional(),
+        default: z.unknown().optional(),
+        required: z.boolean().optional(),
+        needsLeadingAnd: z.boolean().optional(),
+      })
+    )
+    .optional(),
 });
 
 export type MetricContent = z.infer<typeof MetricContentSchema>;

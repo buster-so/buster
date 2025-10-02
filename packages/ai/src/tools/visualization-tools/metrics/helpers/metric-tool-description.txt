@@ -2,6 +2,34 @@ Creates metric configuration files with YAML content following the metric schema
 
 Only utilize the required/default fields unless the user specifically requests that optional fields be added.
 
+## Dynamic Filters
+
+- Declare filters inside the `filters` array. Each filter entry maps directly to a `{{key}}` token in your SQL and should include:
+  - `key`: Identifier that also appears in SQL as `{{key}}`.
+  - `column`: Approved SQL column or expression. Can use qualified column names with table aliases (e.g., `o.order_date`, `c.customer_id`, `orders.status`). May be empty when the mode supplies the expression.
+  - `type`: One of `string`, `number`, `boolean`, `string_list`, `number_list`, `date`, `timestamp`, `daterange`, `timestamp_range`.
+  - `op` (optional): Comparison operator (`=`, `!=`, `>`, `>=`, `<`, `<=`, `like`, `ilike`). Defaults to `=`.
+  - `required` (optional): `true` if the metric cannot run without a value. Required filters must provide a `default`.
+  - `null_behavior` (optional): `omit` (default) or `no_op`.
+  - `validate` (optional): Constraints such as `{ enum: ["US", "CA"], regex: "^[A-Z]{2}$" }`.
+  - `mode`: Controls how the fragment renders (`predicate`, `range`, `in_list`, `join_predicate`, `partition_by`, `qualify`, `having`, `order_by_item`, `select_expr`, `limit`, `predicate_switch`, `predicate_complex`).
+  - `needsLeadingAnd` (optional): Override the default `AND` prefix behaviour for predicate-style modes.
+  - `default` (optional): The runtime default used during validation when no user input is supplied (for example `default: 10`, `default: ["2025-01-01", "2025-02-01"]`).
+
+- All metric SQL must support dynamic filters through explicit brace tokens placed exactly where runtime fragments belong.
+- A single filter key can map to multiple tokens (for example reuse `region` across CTE and outer query). Each placement must produce a unique parameter namespace derived from `<slot>` and `<key>`.
+- All metric SQL must support dynamic filters through explicit brace tokens placed exactly where runtime fragments belong. Use `{{key}}` that matches the filter definition.
+- Place tokens exactly where fragments must render: inside `WHERE`, `JOIN ON`, window `PARTITION BY`, `QUALIFY`, `HAVING`, `ORDER BY`, or `LIMIT` clauses.
+- Avoid nullable-parameter OR patterns unless explicitly required; prefer omitting predicates when filters are missing.
+
+- Place tokens exactly where fragments must render: inside `WHERE`, `JOIN ON`, window `PARTITION BY`, `QUALIFY`, `HAVING`, `ORDER BY`, or `LIMIT` clauses.
+- LIST filters should expand according to warehouse:
+  - Postgres: `= ANY(:param)`.
+  - BigQuery: `IN UNNEST(@param)`.
+  - Snowflake: `IN (SELECT value::variant FROM TABLE(FLATTEN(input => PARSE_JSON(:param))))`.
+- Window partition tokens should render the full comma-separated list (with trailing comma/space when required) or nothing.
+- LIMIT tokens should expand to a single bound parameter (no leading `AND`), for example `LIMIT :limit_rows_limit`.
+
 ## COMPLETE METRIC YAML SCHEMA SPECIFICATION
 
 ```

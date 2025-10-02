@@ -7,7 +7,7 @@ describe('Analyst Agent Instructions', () => {
     const content = analystAgentPrompt;
 
     // Expected template variables
-    const expectedVariables = ['sql_dialect_guidance', 'date'];
+    const expectedVariables = ['sql_dialect_guidance', 'date', 'value', 'key'];
 
     // Find all template variables in the file
     const templateVariablePattern = /\{\{([^}]+)\}\}/g;

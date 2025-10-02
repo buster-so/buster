@@ -20,6 +20,7 @@ import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-re
 import { truncateQueryResults } from '../../../shared/smart-truncate';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import { validateAndAdjustBarLineAxes } from '../helpers/bar-line-axis-validator';
+import { compileSqlWithDefaults } from '../helpers/metric-sql-token-compiler';
 import { ensureTimeFrameQuoted } from '../helpers/time-frame-helper';
 import {
   createModifyMetricsRawLlmMessageEntry,
@@ -219,9 +220,12 @@ async function processMetricFile(
     // Check if SQL has changed to avoid unnecessary validation
     const existingContent = existingFile.content as MetricYml | null;
     const sqlChanged = existingContent?.sql !== finalMetricYml.sql;
+    const filtersChanged =
+      JSON.stringify(existingContent?.filters ?? null) !==
+      JSON.stringify(finalMetricYml.filters ?? null);
 
     // If SQL hasn't changed and we have metadata, skip validation
-    if (!sqlChanged && existingFile.dataMetadata) {
+    if (!sqlChanged && !filtersChanged && existingFile.dataMetadata) {
       const metricFile: FileWithId = {
         id: existingFile.id,
         name: finalMetricYml.name,
@@ -243,8 +247,10 @@ async function processMetricFile(
     }
 
     // Validate SQL if it has changed or if metadata is missing
+    const compiledSql = compileSqlWithDefaults(finalMetricYml);
+
     const sqlValidationResult = await validateSql(
-      finalMetricYml.sql,
+      compiledSql,
       dataSourceId,
       userId,
       dataSourceDialect

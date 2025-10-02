@@ -20,6 +20,7 @@ import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-re
 import { truncateQueryResults } from '../../../shared/smart-truncate';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import { validateAndAdjustBarLineAxes } from '../helpers/bar-line-axis-validator';
+import { compileSqlWithDefaults } from '../helpers/metric-sql-token-compiler';
 import { ensureTimeFrameQuoted } from '../helpers/time-frame-helper';
 import type {
   CreateMetricsContext,
@@ -116,8 +117,10 @@ async function processMetricFile(
     const id = metricId || randomUUID();
 
     // Validate SQL by running it
+    const compiledSql = compileSqlWithDefaults(finalMetricYml);
+
     const sqlValidationResult = await validateSql(
-      finalMetricYml.sql,
+      compiledSql,
       dataSourceId,
       userId,
       dataSourceDialect

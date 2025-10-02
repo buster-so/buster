@@ -363,12 +363,33 @@ You operate in a loop to complete tasks:
   - Maintain a consistent data structure across requests unless changes are required.
   - Use explicit ordering for custom buckets or categories.
   - Avoid division by zero errors by using NULLIF() or CASE statements (e.g., `SELECT amount / NULLIF(quantity, 0)` or `CASE WHEN quantity = 0 THEN NULL ELSE amount / quantity END`).
-  - Generate SQL queries using only native SQL constructs, such as CURRENT_DATE, that can be directly executed in a SQL environment without requiring prepared statements, parameterized queries, or string formatting like {{variable}}.
+  - Generate SQL using native constructs and brace tokens (`{{key}}`) that the runtime replaces with parameterized fragments. Never embed raw values or ad-hoc string formatted placeholders (for example `{{value}}`).
+  - When defaults are needed (for example standard date ranges or limits), set the `default` property on the corresponding filter instead of hardcoding literals in SQL.
   - You are not able to build interactive dashboards and metrics that allow users to change the filters, you can only build static dashboards and metrics.
   - Consider potential data duplication and apply deduplication techniques (e.g., `DISTINCT`, `GROUP BY`) where necessary.
   - Fill Missing Values: For metrics, especially in time series, fill potentially missing values (NULLs) using appropriate null-handling functions to default them to zero, ensuring continuous data unless the user specifically requests otherwise. 
   - Handle Missing Time Periods: When creating time series visualizations, ensure ALL requested time periods are represented, even when no underlying data exists for certain periods. This is critical for avoiding confusing gaps in charts and tables. Refer to the SQL dialect-specific guidance for the appropriate method to generate complete date ranges for your database. 
 </sql_best_practices>
+
+<sql_filter_templating_rules>
+- All metric SQL must support dynamic filters using explicit brace tokens placed exactly where predicates or expressions belong.
+- 1:1 relationship:
+  - Each filter key maps to a single SQL token `{{key}}`. Reuse the same key when the same predicate must appear in multiple clauses.
+- Filter column specification:
+  - The `column` field in filter definitions can use qualified column names with table aliases (e.g., `o.order_date`, `c.customer_id`, `orders.status`)
+  - Always use the appropriate table alias or table name prefix when referencing columns in filters to avoid ambiguity
+- Never concatenate filter values into SQL. Emit fragment tokens that expect bound parameters supplied by the renderer.
+- Half-open ranges are mandatory for date/timestamp filters (`>= :start AND < :end`) to preserve index and partition pruning.
+- Avoid nullable-parameter OR patterns unless explicitly requested (for example, `null_behavior: no_op`). Prefer omitting predicates when filters are not provided.
+- Token placement checklist:
+  - Place predicates exactly where needed: inside `WHERE`, `JOIN ON`, window `PARTITION BY`, `QUALIFY`, `HAVING`, `ORDER BY`, or `LIMIT` clauses.
+  - LIST filters should expand according to warehouse dialect:
+    - Postgres: `= ANY(:param)`
+    - BigQuery: `IN UNNEST(@param)`
+    - Snowflake: `IN (SELECT value::variant FROM TABLE(FLATTEN(input => PARSE_JSON(:param))))`
+  - Window partition tokens should render the comma-separated list (with required trailing comma/space) or nothing.
+  - LIMIT tokens should expand to a single bound parameter (no leading `AND`), for example `LIMIT :limit_rows_limit`.
+</sql_filter_templating_rules>
 
 <visualization_and_charting_guidelines>
 - General Preference
