@@ -9,6 +9,7 @@ import { ClosePageButton } from '@/components/features/chat/ClosePageButton';
 import { MetricThreeDotMenuButton } from '@/components/features/metrics/MetricThreeDotMenu';
 import { SelectableButton } from '@/components/ui/buttons/SelectableButton';
 import { SquareChartPen } from '@/components/ui/icons';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { useIsChatMode, useIsFileMode } from '@/context/Chats/useMode';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
@@ -22,6 +23,7 @@ export const MetricContainerHeaderButtons: React.FC<{
 }> = React.memo(({ metricId, metricVersionNumber }) => {
   const isChatMode = useIsChatMode();
   const isFileMode = useIsFileMode();
+  const isEmbed = useIsEmbed();
   const { isViewingOldVersion } = useIsMetricReadOnly({
     metricId: metricId || '',
   });
@@ -42,15 +44,17 @@ export const MetricContainerHeaderButtons: React.FC<{
       {isEffectiveOwner && !isViewingOldVersion && (
         <ShareMetricButton metricId={metricId} metricVersionNumber={metricVersionNumber} />
       )}
-      <MetricThreeDotMenuButton
-        metricId={metricId}
-        isViewingOldVersion={isViewingOldVersion}
-        versionNumber={metricVersionNumber}
-      />
+      {!isEmbed && (
+        <MetricThreeDotMenuButton
+          metricId={metricId}
+          isViewingOldVersion={isViewingOldVersion}
+          versionNumber={metricVersionNumber}
+        />
+      )}
       <HideButtonContainer show={isFileMode && isEditor}>
         <CreateChatButton assetId={metricId} assetType="metric_file" />
       </HideButtonContainer>
-      {isChatMode && <ClosePageButton />}
+      {isChatMode && <ClosePageButton isEmbed={isEmbed} />}
     </FileButtonContainer>
   );
 });

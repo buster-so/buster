@@ -75,6 +75,14 @@ const DoneToolStateSchema = z.object({
     .boolean()
     .optional()
     .describe('Indicates the execute phase has started so further deltas should be ignored'),
+  latestSequenceNumber: z
+    .number()
+    .optional()
+    .describe('Highest message update sequence number observed during streaming'),
+  finalSequenceNumber: z
+    .number()
+    .optional()
+    .describe('Sequence number for the final execute message update'),
 });
 
 export type DoneToolInput = z.infer<typeof DoneToolInputSchema>;
@@ -90,6 +98,8 @@ export function createDoneTool(context: DoneToolContext) {
     addedAssetIds: [],
     addedAssets: [],
     isFinalizing: false,
+    latestSequenceNumber: undefined,
+    finalSequenceNumber: undefined,
   };
 
   const execute = createDoneToolExecute(context, state);

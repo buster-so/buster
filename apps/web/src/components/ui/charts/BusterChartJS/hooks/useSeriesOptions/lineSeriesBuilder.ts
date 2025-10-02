@@ -216,13 +216,9 @@ export const lineSeriesBuilder_labels = ({
   xAxisKeys,
   columnLabelFormats,
 }: LabelBuilderProps): (string | Date)[] => {
-  const dateTicks = createTickDates(datasetOptions.ticks, xAxisKeys, columnLabelFormats);
-  if (dateTicks) {
-    return dateTicks;
-  }
-
   return barSeriesBuilder_labels({
     datasetOptions,
     columnLabelFormats,
+    xAxisKeys,
   });
 };

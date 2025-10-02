@@ -10,10 +10,15 @@ export const barAndLineTooltipHelper = (
   columnLabelFormats: NonNullable<ChartConfigProps['columnLabelFormats']>,
   keyToUsePercentage: string[],
   hasMultipleShownDatasets: boolean,
-  percentageMode: undefined | 'stacked'
+  percentageMode: undefined | 'stacked',
+  skipNull: boolean
 ): ITooltipItem[] => {
   if (percentageMode) {
     dataPoints.reverse(); //we do this because the data points are in reverse order and it looks better
+  }
+
+  if (skipNull) {
+    dataPoints = dataPoints.filter((dataPoint) => dataPoint.raw !== null);
   }
 
   const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {

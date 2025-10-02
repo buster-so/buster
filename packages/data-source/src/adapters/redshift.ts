@@ -225,4 +225,171 @@ export class RedshiftAdapter extends BaseAdapter {
     }
     return this.introspector;
   }
+
+  /**
+   * Check if a table exists in Redshift
+   */
+  async tableExists(database: string, schema: string, tableName: string): Promise<boolean> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('Redshift client not initialized');
+    }
+
+    try {
+      const sql = `
+        SELECT COUNT(*) as count
+        FROM information_schema.tables
+        WHERE table_catalog = $1
+        AND table_schema = $2
+        AND table_name = $3
+      `;
+
+      const result = await this.client.query(sql, [
+        database,
+        schema.toLowerCase(),
+        tableName.toLowerCase(),
+      ]);
+      const firstRow = result.rows[0] as { count?: string } | undefined;
+      return !!firstRow && Number.parseInt(firstRow.count ?? '0') > 0;
+    } catch (error) {
+      console.error('Error checking table existence:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Create the Buster logs table in Redshift
+   */
+  async createLogsTable(
+    _database: string,
+    schema: string,
+    tableName = 'buster_query_logs'
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('Redshift client not initialized');
+    }
+
+    const createTableSQL = `
+      CREATE TABLE IF NOT EXISTS "${schema}"."${tableName}" (
+        message_id VARCHAR(255),
+        user_email VARCHAR(500),
+        user_name VARCHAR(500),
+        chat_id VARCHAR(255),
+        chat_link VARCHAR(500),
+        request_message VARCHAR(MAX),
+        created_at TIMESTAMPTZ,
+        duration_seconds INTEGER,
+        confidence_score VARCHAR(50),
+        assumptions SUPER,
+        inserted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    try {
+      await this.client.query(createTableSQL);
+      console.info(`Table ${schema}.${tableName} created successfully`);
+    } catch (error) {
+      throw new Error(
+        `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Insert a log record into the Redshift table
+   */
+  override async insertLogRecord(
+    _database: string,
+    schema: string,
+    tableName: string,
+    record: {
+      messageId: string;
+      userEmail: string;
+      userName: string;
+      chatId: string;
+      chatLink: string;
+      requestMessage: string;
+      createdAt: Date;
+      durationSeconds: number;
+      confidenceScore: string;
+      assumptions: unknown[];
+    }
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('Redshift client not initialized');
+    }
+
+    const insertSQL = `
+      INSERT INTO "${schema}"."${tableName}" (
+        message_id, 
+        user_email, 
+        user_name, 
+        chat_id,
+        chat_link,
+        request_message,
+        created_at, 
+        duration_seconds, 
+        confidence_score, 
+        assumptions
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, JSON_PARSE($10))
+    `;
+
+    const params = [
+      record.messageId,
+      record.userEmail,
+      record.userName,
+      record.chatId,
+      record.chatLink,
+      record.requestMessage,
+      record.createdAt,
+      record.durationSeconds,
+      record.confidenceScore,
+      JSON.stringify(record.assumptions),
+    ];
+
+    try {
+      await this.client.query(insertSQL, params);
+      console.info(`Log record inserted for message ${record.messageId}`);
+    } catch (error) {
+      throw new Error(
+        `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Execute a write operation (INSERT, UPDATE, DELETE)
+   */
+  override async executeWrite(
+    sql: string,
+    params?: QueryParameter[],
+    timeout?: number
+  ): Promise<{ rowCount: number }> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('Redshift client not initialized');
+    }
+
+    try {
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
+      await this.client.query(`SET statement_timeout = ${timeoutMs}`);
+
+      const result = await this.client.query(sql, params);
+
+      return {
+        rowCount: result.rowCount ?? 0,
+      };
+    } catch (error) {
+      throw new Error(
+        `Redshift write operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
 }

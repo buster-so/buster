@@ -63,7 +63,7 @@ describe('Analyst Agent Instructions', () => {
     expect(result).toContain('<intro>');
     expect(result).toContain('<sql_best_practices>');
     expect(result).toContain('<visualization_and_charting_guidelines>');
-    expect(result).toContain('You are a Buster');
+    expect(result).toContain('You are an agent');
   });
 
   it('should throw an error for empty SQL dialect guidance', () => {

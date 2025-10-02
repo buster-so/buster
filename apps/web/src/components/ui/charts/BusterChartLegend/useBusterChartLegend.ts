@@ -1,4 +1,5 @@
 import type {
+  BarAndLineAxis,
   ChartEncodes,
   ChartType,
   ComboChartAxis,
@@ -52,11 +53,17 @@ export const useBusterChartLegend = ({
     [(selectedAxis as ScatterAxis)?.category?.join('')]
   );
 
+  const colorByColumnNames = useMemo(
+    () => (selectedAxis as BarAndLineAxis)?.colorBy ?? [],
+    [(selectedAxis as BarAndLineAxis)?.colorBy?.join('')]
+  );
+
   const showLegend = useLegendAutoShow({
     selectedChartType,
     showLegendProp,
     categoryAxisColumnNames,
     allYAxisColumnNames,
+    colorByColumnNames,
   });
 
   const renderLegend = useMemo(() => {

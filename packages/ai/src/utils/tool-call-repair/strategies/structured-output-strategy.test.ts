@@ -87,14 +87,14 @@ describe('structured-output-strategy', () => {
       });
 
       const tool = context.tools.testTool as any;
-      expect(mockGenerateObject).toHaveBeenCalledWith(
-        expect.objectContaining({
-          model: 'mock-model',
-          schema: tool?.inputSchema,
-          prompt: expect.stringContaining('Fix these tool arguments'),
-          mode: 'json',
-        })
-      );
+      expect(mockGenerateObject).toHaveBeenCalledWith({
+        model: 'mock-model',
+        schema: tool?.inputSchema,
+        prompt: expect.stringContaining('Fix these tool arguments'),
+        mode: 'json',
+        maxOutputTokens: 10000,
+        providerOptions: expect.any(Object),
+      });
     });
 
     it('should return null if tool not found', async () => {

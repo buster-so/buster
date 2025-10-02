@@ -297,6 +297,7 @@ const LabelSettings: React.FC<{
     columnType,
     displayName,
     replaceMissingDataWith,
+    isUTC,
   } = columnLabelFormat;
 
   const isPieChart = selectedChartType === 'pie';
@@ -391,6 +392,7 @@ const LabelSettings: React.FC<{
           dateFormat={dateFormat}
           convertNumberTo={convertNumberTo}
           columnType={columnType}
+          isUTC={isUTC}
           onUpdateColumnConfig={onUpdateColumnConfig}
         />
       ),

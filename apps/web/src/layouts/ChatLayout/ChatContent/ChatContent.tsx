@@ -7,66 +7,70 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useMount } from '@/hooks/useMount';
 import { cn } from '@/lib/utils';
 import { CHAT_CONTAINER_ID } from '../ChatContainer';
-import { ChatInput } from './ChatInput';
 import { ChatMessageBlock } from './ChatMessageBlock';
+import { FollowUpChatInput } from './FollowupChatInput';
 
 const autoClass = 'mx-auto max-w-[600px] w-full';
 
-export const ChatContent: React.FC<{ chatId: string | undefined }> = React.memo(({ chatId }) => {
-  const chatMessageIds = useGetChatMessageIds(chatId);
-  const containerRef = useRef<HTMLElement>(null);
+export const ChatContent: React.FC<{ chatId: string | undefined; isEmbed: boolean }> = React.memo(
+  ({ chatId, isEmbed }) => {
+    const chatMessageIds = useGetChatMessageIds(chatId);
+    const containerRef = useRef<HTMLElement>(null);
 
-  const { isAutoScrollEnabled, isMountedAutoScrollObserver, scrollToBottom, enableAutoScroll } =
-    useAutoScroll(containerRef, {
-      observeSubTree: true,
-      enabled: false,
+    const { isAutoScrollEnabled, isMountedAutoScrollObserver, scrollToBottom, enableAutoScroll } =
+      useAutoScroll(containerRef, {
+        observeSubTree: true,
+        enabled: false,
+      });
+
+    useMount(() => {
+      const container = document
+        .getElementById(CHAT_CONTAINER_ID)
+        ?.querySelector(`.${SCROLL_AREA_VIEWPORT_CLASS}`) as HTMLElement;
+      if (!container) return;
+      containerRef.current = container;
+      enableAutoScroll();
     });
 
-  useMount(() => {
-    const container = document
-      .getElementById(CHAT_CONTAINER_ID)
-      ?.querySelector(`.${SCROLL_AREA_VIEWPORT_CLASS}`) as HTMLElement;
-    if (!container) return;
-    containerRef.current = container;
-    enableAutoScroll();
-  });
+    const showScrollToBottomButton = isMountedAutoScrollObserver && containerRef.current;
 
-  const showScrollToBottomButton = isMountedAutoScrollObserver && containerRef.current;
+    return (
+      <>
+        <div
+          className={cn(
+            'mb-48 flex h-full w-full flex-col',
+            !isMountedAutoScrollObserver && 'invisible'
+          )}
+        >
+          <ClientOnly>
+            {chatMessageIds?.map((messageId, index) => (
+              <div key={messageId} className={autoClass}>
+                <ChatMessageBlock
+                  key={messageId}
+                  messageId={messageId}
+                  chatId={chatId || ''}
+                  messageIndex={index}
+                />
+              </div>
+            ))}
+          </ClientOnly>
+        </div>
 
-  return (
-    <>
-      <div
-        className={cn(
-          'mb-48 flex h-full w-full flex-col',
-          !isMountedAutoScrollObserver && 'invisible'
-        )}
-      >
-        <ClientOnly>
-          {chatMessageIds?.map((messageId, index) => (
-            <div key={messageId} className={autoClass}>
-              <ChatMessageBlock
-                key={messageId}
-                messageId={messageId}
-                chatId={chatId || ''}
-                messageIndex={index}
+        {!isEmbed && (
+          <ChatInputWrapper>
+            {showScrollToBottomButton && (
+              <ScrollToBottomButton
+                isAutoScrollEnabled={isAutoScrollEnabled}
+                scrollToBottom={scrollToBottom}
+                className={'absolute -top-10'}
               />
-            </div>
-          ))}
-        </ClientOnly>
-      </div>
-
-      <ChatInputWrapper>
-        {showScrollToBottomButton && (
-          <ScrollToBottomButton
-            isAutoScrollEnabled={isAutoScrollEnabled}
-            scrollToBottom={scrollToBottom}
-            className={'absolute -top-10'}
-          />
+            )}
+          </ChatInputWrapper>
         )}
-      </ChatInputWrapper>
-    </>
-  );
-});
+      </>
+    );
+  }
+);
 
 ChatContent.displayName = 'ChatContent';
 
@@ -77,7 +81,7 @@ const ChatInputWrapper: React.FC<{
     <div className="bg-page-background absolute bottom-0 w-full overflow-visible">
       <div className="from-page-background pointer-events-none absolute -top-16 h-16 w-full bg-gradient-to-t to-transparent" />
       <div className={cn(autoClass, 'relative')}>
-        <ChatInput />
+        <FollowUpChatInput />
         {children}
       </div>
     </div>

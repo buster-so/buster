@@ -1,13 +1,9 @@
-import {
-  type ColumnLabelFormat,
-  DEFAULT_COLUMN_LABEL_FORMAT,
-  DEFAULT_COLUMN_SETTINGS,
-} from '@buster/server-shared/metrics';
+import { type ColumnLabelFormat, DEFAULT_COLUMN_SETTINGS } from '@buster/server-shared/metrics';
 import { describe, expect, it } from 'vitest';
 import type { BusterChartProps } from '../../../BusterChart.types';
 import type { DatasetOption } from '../../../chartHooks';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks/useDatasetOptions/interfaces';
-import { barSeriesBuilder } from './barSeriesBuilder';
+import { barSeriesBuilder, barSeriesBuilder_labels } from './barSeriesBuilder';
 import type { SeriesBuilderProps } from './interfaces';
 
 describe('barSeriesBuilder', () => {
@@ -311,5 +307,212 @@ describe('percentage mode logic', () => {
   it('should return false when no percentage conditions are met', () => {
     const result = getPercentageMode('group', false);
     expect(result).toBe(false);
+  });
+});
+
+describe('barSeriesBuilder_labels - dateTicks', () => {
+  it('should return date ticks when columnLabelFormat has date style and single xAxis', () => {
+    // Arrange
+    const mockDatasetOptions: DatasetOptionsWithTicks = {
+      datasets: [],
+      ticks: [['2024-01-01'], ['2024-02-01'], ['2024-03-01']],
+      ticksKey: [{ key: 'date', value: '' }],
+    };
+
+    const columnLabelFormats = {
+      date: {
+        columnType: 'date',
+        style: 'date',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        multiplier: 1,
+        prefix: '',
+        suffix: '',
+        replaceMissingDataWith: 0,
+        makeLabelHumanReadable: true,
+      } as ColumnLabelFormat,
+    };
+
+    // Act
+    const result = barSeriesBuilder_labels({
+      datasetOptions: mockDatasetOptions,
+      columnLabelFormats,
+      xAxisKeys: ['date'],
+    });
+
+    // Assert
+    expect(result).toHaveLength(3);
+    expect(result[0]).toBeInstanceOf(Date);
+    expect(result[1]).toBeInstanceOf(Date);
+    expect(result[2]).toBeInstanceOf(Date);
+  });
+
+  it('should return quarter ticks when columnLabelFormat has quarter convertNumberTo and single xAxis', () => {
+    // Arrange
+    const mockDatasetOptions: DatasetOptionsWithTicks = {
+      datasets: [],
+      ticks: [[1], [2], [3], [4]],
+      ticksKey: [{ key: 'quarter', value: '' }],
+    };
+
+    const columnLabelFormats = {
+      quarter: {
+        columnType: 'number',
+        style: 'date',
+        convertNumberTo: 'quarter',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        multiplier: 1,
+        prefix: '',
+        suffix: '',
+        replaceMissingDataWith: 0,
+        makeLabelHumanReadable: true,
+      } as ColumnLabelFormat,
+    };
+
+    // Act
+    const result = barSeriesBuilder_labels({
+      datasetOptions: mockDatasetOptions,
+      columnLabelFormats,
+      xAxisKeys: ['quarter'],
+    });
+
+    // Assert
+    expect(result).toHaveLength(4);
+    expect(result[0]).toBe('Q1');
+    expect(result[1]).toBe('Q2');
+    expect(result[2]).toBe('Q3');
+    expect(result[3]).toBe('Q4');
+  });
+
+  it('should return quarter ticks with double xAxis when one is quarter and one is number', () => {
+    // Arrange
+    const mockDatasetOptions: DatasetOptionsWithTicks = {
+      datasets: [],
+      ticks: [
+        [1, 2023],
+        [2, 2023],
+        [3, 2023],
+      ],
+      ticksKey: [
+        { key: 'quarter', value: '' },
+        { key: 'year', value: '' },
+      ],
+    };
+
+    const columnLabelFormats = {
+      quarter: {
+        columnType: 'number',
+        style: 'date',
+        convertNumberTo: 'quarter',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        multiplier: 1,
+        prefix: '',
+        suffix: '',
+        replaceMissingDataWith: 0,
+        makeLabelHumanReadable: true,
+      } as ColumnLabelFormat,
+      year: {
+        columnType: 'number',
+        style: 'number',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        multiplier: 1,
+        prefix: '',
+        suffix: '',
+        numberSeparatorStyle: null,
+        replaceMissingDataWith: 0,
+        makeLabelHumanReadable: true,
+      } as ColumnLabelFormat,
+    };
+
+    // Act
+    const result = barSeriesBuilder_labels({
+      datasetOptions: mockDatasetOptions,
+      columnLabelFormats,
+      xAxisKeys: ['quarter', 'year'],
+    });
+
+    console.log('result', result[0]);
+
+    // Assert
+    expect(result).toHaveLength(3);
+    expect(result[0]).toContain('Q1');
+    expect(result[0]).toContain('2023');
+    expect(result[1]).toContain('Q2');
+    expect(result[2]).toContain('Q3');
+  });
+
+  it('should return null dateTicks when columnLabelFormat does not have date style', () => {
+    // Arrange
+    const mockDatasetOptions: DatasetOptionsWithTicks = {
+      datasets: [],
+      ticks: [['Product A'], ['Product B'], ['Product C']],
+      ticksKey: [{ key: 'product', value: '' }],
+    };
+
+    const columnLabelFormats = {
+      product: {
+        columnType: 'string',
+        style: 'string',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        multiplier: 1,
+        prefix: '',
+        suffix: '',
+        replaceMissingDataWith: 0,
+        makeLabelHumanReadable: true,
+      } as unknown as ColumnLabelFormat,
+    };
+
+    // Act
+    const result = barSeriesBuilder_labels({
+      datasetOptions: mockDatasetOptions,
+      columnLabelFormats,
+      xAxisKeys: ['product'],
+    });
+
+    // Assert
+    expect(result).toHaveLength(3);
+    expect(result[0]).toBe('Product A');
+    expect(result[1]).toBe('Product B');
+    expect(result[2]).toBe('Product C');
+  });
+
+  it('should return date ticks when columnType is number but style is date', () => {
+    // Arrange
+    const mockDatasetOptions: DatasetOptionsWithTicks = {
+      datasets: [],
+      ticks: [['2024-01-15'], ['2024-01-16'], ['2024-01-17']],
+      ticksKey: [{ key: 'timestamp', value: '' }],
+    };
+
+    const columnLabelFormats = {
+      timestamp: {
+        columnType: 'number',
+        style: 'date',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+        multiplier: 1,
+        prefix: '',
+        suffix: '',
+        replaceMissingDataWith: 0,
+        makeLabelHumanReadable: true,
+      } as ColumnLabelFormat,
+    };
+
+    // Act
+    const result = barSeriesBuilder_labels({
+      datasetOptions: mockDatasetOptions,
+      columnLabelFormats,
+      xAxisKeys: ['timestamp'],
+    });
+
+    // Assert
+    expect(result).toHaveLength(3);
+    expect(result[0]).toBeInstanceOf(Date);
+    expect(result[1]).toBeInstanceOf(Date);
+    expect(result[2]).toBeInstanceOf(Date);
   });
 });

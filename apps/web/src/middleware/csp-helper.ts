@@ -48,6 +48,7 @@ export const createCspHeader = (isEmbed = false): string => {
     (() => {
       const connectSources = [
         "'self'",
+        'blob:',
         'data:', // Allow data URLs for PDF exports and other data URI downloads
         localDomains,
         supabaseOrigin,
@@ -63,6 +64,15 @@ export const createCspHeader = (isEmbed = false): string => {
         'https://eu-assets.i.posthog.com',
         'https://*.cloudflareinsights.com',
         'https://*.slack.com',
+        // Speech recognition API and Google services
+        'https://*.google.com',
+        'https://*.googleapis.com',
+        'https://apis.google.com',
+        'https://ssl.gstatic.com',
+        'https://www.google.com',
+        'https://www.googletagmanager.com',
+        'https://www.gstatic.com',
+        'https://www.google-analytics.com',
         // Social media and video platform APIs for embeds
         'https://*.twitter.com',
         'https://twitter.com',
@@ -115,6 +125,6 @@ export const createSecurityHeaders = (isEmbed = false) => {
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'X-XSS-Protection': '1; mode=block',
-    'Permissions-Policy': 'microphone=()',
+    'Permissions-Policy': 'microphone=(self)',
   };
 };

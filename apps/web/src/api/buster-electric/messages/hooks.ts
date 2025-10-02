@@ -158,13 +158,19 @@ const useCheckIfWeHaveAFollowupDashboard = (messageId: string) => {
   return useMemoizedFn(method);
 };
 
-export const useTrackAndUpdateNewMessages = ({ chatId }: { chatId: string | undefined }) => {
+export const useTrackAndUpdateNewMessages = ({
+  chatId,
+  isEmbed,
+}: {
+  chatId: string | undefined;
+  isEmbed: boolean;
+}) => {
   const { onUpdateChat } = useChatUpdate();
   const getChatMemoized = useGetChatMemoized();
   const getChatMessageMemoized = useGetChatMessageMemoized();
   const queryClient = useQueryClient();
 
-  const subscribe = !!chatId;
+  const subscribe = !!chatId && !isEmbed;
 
   const shape = useMemo(() => {
     return messagesShape({ chatId: chatId || '', columns: ['id'] });

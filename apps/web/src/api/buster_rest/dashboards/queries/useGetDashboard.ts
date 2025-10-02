@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import type { RustApiError } from '@/api/errors';
+import type { ApiError } from '@/api/errors';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import {
   setProtectedAssetPasswordError,
@@ -15,10 +15,7 @@ import {
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { isQueryStale } from '@/lib/query';
 import { hasOrganizationId } from '../../users/userQueryHelpers';
-import {
-  getDashboardAndInitializeMetrics,
-  useGetDashboardAndInitializeMetrics,
-} from '../dashboardQueryHelpers';
+import { getDashboardAndInitializeMetrics } from '../dashboardQueryHelpers';
 import { useGetDashboardVersionNumber } from '../dashboardVersionNumber';
 import { dashboardsGetList } from '../requests';
 
@@ -32,18 +29,26 @@ export const useGetDashboard = <TData = GetDashboardResponse>(
     id: idProp,
     versionNumber: versionNumberProp,
   }: { id: string | undefined; versionNumber: number | 'LATEST' | undefined },
-  params?: Omit<UseQueryOptions<GetDashboardResponse, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  params?: Omit<UseQueryOptions<GetDashboardResponse, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const id = idProp || '';
   const password = useProtectedAssetPassword(id);
-  const queryFn = useGetDashboardAndInitializeMetrics();
+  const queryClient = useQueryClient();
+  // const queryFn = useGetDashboardAndInitializeMetrics();
 
   const { selectedVersionNumber } = useGetDashboardVersionNumber(id, versionNumberProp);
 
   const { isFetched: isFetchedInitial, isError: isErrorInitial } = useQuery({
     ...dashboardQueryKeys.dashboardGetDashboard(id, 'LATEST'),
     queryFn: () =>
-      queryFn({ id, version_number: 'LATEST', shouldInitializeMetrics: true, password }),
+      getDashboardAndInitializeMetrics({
+        id,
+        version_number: 'LATEST',
+        password,
+        queryClient,
+        shouldInitializeMetrics: true,
+        prefetchMetricsData: true,
+      }),
     enabled: true,
     retry(_failureCount, error) {
       if (error?.message !== undefined) {
@@ -61,11 +66,13 @@ export const useGetDashboard = <TData = GetDashboardResponse>(
   return useQuery({
     ...dashboardQueryKeys.dashboardGetDashboard(id, selectedVersionNumber),
     queryFn: () =>
-      queryFn({
+      getDashboardAndInitializeMetrics({
         id,
         version_number: selectedVersionNumber,
-        shouldInitializeMetrics: true,
         password,
+        queryClient,
+        shouldInitializeMetrics: true,
+        prefetchMetricsData: true,
       }),
     enabled: isFetchedInitial && !isErrorInitial,
     select: params?.select,
@@ -77,10 +84,9 @@ export const useGetDashboard = <TData = GetDashboardResponse>(
  * Returns a function that will prefetch a dashboard if its cache entry is stale.
  */
 export const usePrefetchGetDashboardClient = <TData = GetDashboardResponse>(
-  params?: Omit<UseQueryOptions<GetDashboardResponse, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  params?: Omit<UseQueryOptions<GetDashboardResponse, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const queryClient = useQueryClient();
-  const queryFn = useGetDashboardAndInitializeMetrics({ prefetchData: false });
 
   return useMemoizedFn((id: string, versionNumber: number | 'LATEST') => {
     const getDashboardQueryKey = dashboardQueryKeys.dashboardGetDashboard(id, versionNumber);
@@ -89,11 +95,13 @@ export const usePrefetchGetDashboardClient = <TData = GetDashboardResponse>(
     return queryClient.prefetchQuery({
       ...dashboardQueryKeys.dashboardGetDashboard(id, versionNumber),
       queryFn: () =>
-        queryFn({
+        getDashboardAndInitializeMetrics({
           id,
-          version_number: versionNumber,
-          shouldInitializeMetrics: true,
+          version_number: 'LATEST',
           password: undefined,
+          queryClient,
+          shouldInitializeMetrics: true,
+          prefetchMetricsData: false,
         }),
       ...params,
     });
@@ -107,7 +115,7 @@ export const usePrefetchGetDashboardClient = <TData = GetDashboardResponse>(
 export const useGetDashboardsList = (
   params: Omit<Parameters<typeof dashboardsGetList>[0], 'page_token' | 'page_size'>,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof dashboardsGetList>>, RustApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof dashboardsGetList>>, ApiError>,
     'queryKey' | 'queryFn' | 'initialData'
   >
 ) => {

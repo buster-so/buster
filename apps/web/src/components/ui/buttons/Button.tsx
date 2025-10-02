@@ -7,7 +7,8 @@ import { CircleSpinnerLoader } from '../loaders/CircleSpinnerLoader';
 export const buttonTypeClasses = {
   default:
     'bg-background border hover:bg-item-hover disabled:bg-disabled disabled:text-gray-light active:bg-item-active data-[selected=true]:bg-item-select',
-  black: 'bg-black text-white hover:bg-foreground-hover disabled:bg-black/60',
+  black:
+    'bg-black text-white hover:bg-foreground-hover disabled:bg-background disabled:text-gray-light disabled:ring-[0.5px] ring-border ',
   outlined:
     'bg-transparent border border-border text-gray-dark hover:bg-item-hover disabled:bg-transparent disabled:text-gray-light active:bg-item-active data-[selected=true]:bg-item-select',
   primary:
@@ -111,7 +112,7 @@ export const buttonIconVariants = cva('', {
     {
       variant: 'black',
       disabled: true,
-      className: 'text-white',
+      className: 'text-gray-light',
     },
     {
       variant: 'outlined',

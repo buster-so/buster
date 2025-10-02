@@ -21,18 +21,120 @@ const UpdateMessageEntriesSchema = z.object({
 
 export type UpdateMessageEntriesParams = z.infer<typeof UpdateMessageEntriesSchema>;
 
-// Simple in-memory queue for each messageId
-const updateQueues = new Map<string, Promise<{ success: boolean }>>();
+type Deferred<T> = {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: unknown) => void;
+};
+
+function createDeferred<T>(): Deferred<T> {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  promise.catch(() => undefined);
+
+  return { promise, resolve, reject };
+}
+
+type MessageUpdateQueueState = {
+  tailPromise: Promise<void>;
+  nextSequence: number;
+  pending: Map<number, Deferred<void>>;
+  lastCompletedSequence: number;
+  finalSequence?: number;
+  closed: boolean;
+};
+
+const updateQueues = new Map<string, MessageUpdateQueueState>();
+
+function getOrCreateQueueState(messageId: string): MessageUpdateQueueState {
+  const existing = updateQueues.get(messageId);
+  if (existing) {
+    return existing;
+  }
+
+  const initialState: MessageUpdateQueueState = {
+    tailPromise: Promise.resolve(),
+    nextSequence: 0,
+    pending: new Map(),
+    lastCompletedSequence: -1,
+    closed: false,
+  };
+
+  updateQueues.set(messageId, initialState);
+  return initialState;
+}
+
+function cleanupQueueIfIdle(messageId: string, state: MessageUpdateQueueState): void {
+  if (
+    state.closed &&
+    state.finalSequence !== undefined &&
+    state.lastCompletedSequence >= state.finalSequence &&
+    state.pending.size === 0
+  ) {
+    updateQueues.delete(messageId);
+  }
+}
+
+export function isMessageUpdateQueueClosed(messageId: string): boolean {
+  const queue = updateQueues.get(messageId);
+  return queue?.closed ?? false;
+}
+
+type WaitForPendingUpdateOptions = {
+  upToSequence?: number;
+};
 
 /**
- * Wait for all pending updates for a given messageId to complete.
- * This ensures all queued updates are flushed to the database before proceeding.
+ * Wait for pending updates for a given messageId to complete.
+ * Optionally provide a sequence number to wait through.
  */
-export async function waitForPendingUpdates(messageId: string): Promise<void> {
-  const pendingQueue = updateQueues.get(messageId);
-  if (pendingQueue) {
-    await pendingQueue;
+export async function waitForPendingUpdates(
+  messageId: string,
+  options?: WaitForPendingUpdateOptions
+): Promise<void> {
+  const queue = updateQueues.get(messageId);
+  if (!queue) {
+    return;
   }
+
+  const targetSequence = options?.upToSequence ?? queue.finalSequence;
+
+  if (targetSequence === undefined) {
+    await queue.tailPromise;
+    cleanupQueueIfIdle(messageId, queue);
+    return;
+  }
+
+  const maxKnownSequence = queue.nextSequence - 1;
+  const effectiveTarget = Math.min(targetSequence, maxKnownSequence);
+
+  if (effectiveTarget <= queue.lastCompletedSequence) {
+    cleanupQueueIfIdle(messageId, queue);
+    return;
+  }
+
+  const waits: Promise<unknown>[] = [];
+
+  for (let sequence = queue.lastCompletedSequence + 1; sequence <= effectiveTarget; sequence += 1) {
+    const deferred = queue.pending.get(sequence);
+    if (deferred) {
+      waits.push(deferred.promise.catch(() => undefined));
+    }
+  }
+
+  if (waits.length > 0) {
+    await Promise.all(waits);
+  } else {
+    await queue.tailPromise;
+  }
+
+  cleanupQueueIfIdle(messageId, queue);
 }
 
 /**
@@ -116,29 +218,79 @@ async function performUpdate({
  * - reasoningMessages: upsert by 'id' field, maintaining order
  * - rawLlmMessages: upsert by combination of 'role' and 'toolCallId', maintaining order
  */
+type UpdateMessageEntriesOptions = {
+  isFinal?: boolean;
+};
+
+type UpdateMessageEntriesResult = {
+  success: boolean;
+  sequenceNumber: number;
+  skipped?: boolean;
+};
+
 export async function updateMessageEntries(
-  params: UpdateMessageEntriesParams
-): Promise<{ success: boolean }> {
+  params: UpdateMessageEntriesParams,
+  options?: UpdateMessageEntriesOptions
+): Promise<UpdateMessageEntriesResult> {
   const { messageId } = params;
 
-  // Get the current promise for this messageId, or use a resolved promise as the starting point
-  const currentQueue = updateQueues.get(messageId) ?? Promise.resolve({ success: true });
+  const queue = getOrCreateQueueState(messageId);
 
-  // Chain the new update to run after the current queue completes
-  const newQueue = currentQueue
-    .then(() => performUpdate(params))
-    .catch(() => performUpdate(params)); // Still try to run even if previous failed
+  if (queue.closed) {
+    const lastKnownSequence = queue.finalSequence ?? queue.nextSequence - 1;
+    return {
+      success: false,
+      sequenceNumber: lastKnownSequence >= 0 ? lastKnownSequence : -1,
+      skipped: true,
+    };
+  }
 
-  // Update the queue for this messageId
-  updateQueues.set(messageId, newQueue);
+  const isFinal = options?.isFinal ?? false;
 
-  // Clean up the queue entry once this update completes
-  newQueue.finally(() => {
-    // Only remove if this is still the current queue
-    if (updateQueues.get(messageId) === newQueue) {
-      updateQueues.delete(messageId);
+  if (isFinal) {
+    queue.closed = true;
+  }
+
+  const sequenceNumber = queue.nextSequence;
+  queue.nextSequence += 1;
+
+  const deferred = createDeferred<void>();
+  queue.pending.set(sequenceNumber, deferred);
+
+  const runUpdate = () => performUpdate(params);
+
+  const runPromise = queue.tailPromise.then(runUpdate, runUpdate);
+
+  queue.tailPromise = runPromise.then(
+    () => undefined,
+    () => undefined
+  );
+
+  const finalize = (success: boolean) => {
+    queue.pending.delete(sequenceNumber);
+    queue.lastCompletedSequence = Math.max(queue.lastCompletedSequence, sequenceNumber);
+    if (isFinal) {
+      queue.finalSequence = sequenceNumber;
     }
-  });
+    cleanupQueueIfIdle(messageId, queue);
+    return success;
+  };
 
-  return newQueue;
+  const resultPromise = runPromise
+    .then((result) => {
+      deferred.resolve();
+      finalize(true);
+      return {
+        ...result,
+        sequenceNumber,
+        skipped: false as const,
+      };
+    })
+    .catch((error) => {
+      deferred.reject(error);
+      finalize(false);
+      throw error;
+    });
+
+  return resultPromise;
 }

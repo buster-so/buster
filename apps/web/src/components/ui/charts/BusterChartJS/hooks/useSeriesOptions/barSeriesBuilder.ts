@@ -11,6 +11,7 @@ import { DEFAULT_CHART_LAYOUT } from '../../ChartJSTheme';
 import type { ChartProps } from '../../core';
 import { dataLabelFontColorContrast, formatBarAndLineDataLabel } from '../../helpers';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
+import { createTickDates } from './createTickDate';
 import { createTrendlineOnSeries } from './createTrendlines';
 import type { SeriesBuilderProps } from './interfaces';
 import type { LabelBuilderProps } from './useSeriesOptions';
@@ -352,8 +353,12 @@ const getFormattedValueAndSetBarDataLabels = (
 export const barSeriesBuilder_labels = ({
   datasetOptions,
   columnLabelFormats,
-}: Pick<LabelBuilderProps, 'datasetOptions' | 'columnLabelFormats'>) => {
-  const ticksKey = datasetOptions.ticksKey;
+  xAxisKeys,
+}: Pick<LabelBuilderProps, 'datasetOptions' | 'columnLabelFormats' | 'xAxisKeys'>) => {
+  const dateTicks = createTickDates(datasetOptions.ticks, xAxisKeys, columnLabelFormats);
+  if (dateTicks) {
+    return dateTicks;
+  }
 
   const containsADateStyle = datasetOptions.ticksKey.some((tick) => {
     const selectedColumnLabelFormat = columnLabelFormats[tick.key];
@@ -364,7 +369,7 @@ export const barSeriesBuilder_labels = ({
   const labels = datasetOptions.ticks.flatMap((item) => {
     return item
       .map<string>((item, index) => {
-        const key = ticksKey[index]?.key || '';
+        const key = datasetOptions.ticksKey[index]?.key || '';
         const columnLabelFormat = columnLabelFormats[key];
         return formatLabel(item, columnLabelFormat);
       })

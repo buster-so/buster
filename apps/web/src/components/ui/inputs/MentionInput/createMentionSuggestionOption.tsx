@@ -1,4 +1,4 @@
-import { posToDOMRect, ReactRenderer } from '@tiptap/react';
+import { type Editor, posToDOMRect, ReactRenderer } from '@tiptap/react';
 import { defaultQueryMentionsFilter } from './defaultQueryMentionsFilter';
 import type {
   MentionInputTriggerItem,
@@ -16,29 +16,46 @@ export const createMentionSuggestionExtension = ({
   trigger,
   items,
   popoverContent,
+  onChangeTransform,
   pillStyling,
+  popoverClassName,
 }: {
   trigger: string;
-  items: MentionInputTriggerItem[] | ((props: { query: string }) => MentionInputTriggerItem[]); //if no function is provided we will use a literal string match
+  items:
+    | React.RefObject<MentionInputTriggerItem[]>
+    | ((props: {
+        query: string;
+        defaultQueryMentionsFilter: typeof defaultQueryMentionsFilter;
+        editor: Editor;
+      }) => MentionInputTriggerItem[]); //if no function is provided we will use a literal string match
   popoverContent?: MentionPopoverContentCallback;
   pillStyling?: MentionStylePillProps;
+  popoverClassName?: string;
+  onChangeTransform?: MentionSuggestionExtension['onChangeTransform'];
 }): MentionSuggestionExtension => ({
   char: trigger,
   items:
-    typeof items === 'function' ? items : ({ query }) => defaultQueryMentionsFilter(query, items),
+    //beware of stale closures here. We should use a ref to get the latest items
+    typeof items === 'function'
+      ? (props) => {
+          return items({ ...props, defaultQueryMentionsFilter });
+        }
+      : ({ query }) => defaultQueryMentionsFilter(query, items.current),
   render: () => {
     let component: ReactRenderer<MentionListImperativeHandle, MentionListProps<string>>;
 
     return {
       onBeforeStart: ({ editor }) => {
-        if (popoverContent) editor.commands.setPopoverByTrigger(trigger, popoverContent);
-        if (pillStyling) editor.commands.setPillStylingByTrigger(trigger, pillStyling);
+        if (popoverContent && editor.commands.setPopoverByTrigger)
+          editor.commands.setPopoverByTrigger(trigger, popoverContent);
+        if (pillStyling && editor.commands.setPillStylingByTrigger)
+          editor.commands.setPillStylingByTrigger(trigger, pillStyling);
       },
       onStart: (props) => {
         const { editor } = props;
         component = new ReactRenderer(
           MentionList as React.ComponentType<MentionListProps<string>>,
-          { props: { ...props, trigger }, editor: props.editor }
+          { props: { ...props, trigger, className: popoverClassName }, editor: props.editor }
         );
 
         if (!props.clientRect) {
@@ -55,6 +72,8 @@ export const createMentionSuggestionExtension = ({
         element.style.left = `${rect.left}px`;
         element.style.top = `${rect.top}px`;
         element.style.transform = `translateY(1.15lh)`;
+        element.classList.add('z-50');
+        element.classList.add('shadow');
 
         document.body.appendChild(component.element);
       },
@@ -96,4 +115,5 @@ export const createMentionSuggestionExtension = ({
       ])
       .run();
   },
+  onChangeTransform,
 });

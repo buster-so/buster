@@ -22,3 +22,4 @@ export * from './shortcuts';
 export * from './search';
 export * from './metrics-to-reports';
 export * from './vault';
+export * from './logs-writeback';

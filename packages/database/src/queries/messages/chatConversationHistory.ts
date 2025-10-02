@@ -325,6 +325,80 @@ export type ChatConversationHistoryInput = z.infer<typeof ChatConversationHistor
 export type ChatConversationHistoryOutput = z.infer<typeof ChatConversationHistoryOutputSchema>;
 
 /**
+ * Removes orphaned assistant messages with tool calls that have no matching tool results
+ * An orphaned message is an assistant message where ALL its tool calls lack corresponding tool results
+ */
+function removeOrphanedToolCalls(messages: ModelMessage[]): ModelMessage[] {
+  // Build a Set of all tool call IDs that have results (from tool role messages)
+  const toolCallIdsWithResults = new Set<string>();
+
+  for (const message of messages) {
+    if (message.role === 'tool' && Array.isArray(message.content)) {
+      for (const part of message.content) {
+        if (
+          typeof part === 'object' &&
+          part !== null &&
+          'type' in part &&
+          part.type === 'tool-result' &&
+          'toolCallId' in part &&
+          typeof part.toolCallId === 'string'
+        ) {
+          toolCallIdsWithResults.add(part.toolCallId);
+        }
+      }
+    }
+  }
+
+  // Filter out assistant messages where ALL tool calls are orphaned
+  const filteredMessages: ModelMessage[] = [];
+
+  for (const message of messages) {
+    // Only check assistant messages with array content
+    if (message.role === 'assistant' && Array.isArray(message.content)) {
+      // Extract tool call IDs from this message
+      const toolCallIds: string[] = [];
+
+      for (const part of message.content) {
+        if (
+          typeof part === 'object' &&
+          part !== null &&
+          'type' in part &&
+          part.type === 'tool-call' &&
+          'toolCallId' in part &&
+          typeof part.toolCallId === 'string'
+        ) {
+          toolCallIds.push(part.toolCallId);
+        }
+      }
+
+      // If this message has no tool calls, keep it
+      if (toolCallIds.length === 0) {
+        filteredMessages.push(message);
+        continue;
+      }
+
+      // Check if ANY of the tool calls have results
+      const hasAnyResults = toolCallIds.some((id) => toolCallIdsWithResults.has(id));
+
+      if (hasAnyResults) {
+        // At least one tool call has a result, keep the message
+        filteredMessages.push(message);
+      } else {
+        // ALL tool calls are orphaned, skip this message entirely
+        console.warn('[chatConversationHistory] Removing orphaned assistant message:', {
+          orphanedToolCallIds: toolCallIds,
+        });
+      }
+    } else {
+      // Keep all non-assistant messages (including tool role messages)
+      filteredMessages.push(message);
+    }
+  }
+
+  return filteredMessages;
+}
+
+/**
  * Get conversation history for a chat up to and including a specific message
  * Finds the chat from the given messageId, then merges and deduplicates all rawLlmMessages
  * from messages up to and including the specified message to create the conversation history
@@ -389,9 +463,12 @@ export async function getChatConversationHistory(
     // Since we're merging from multiple messages, we should preserve the order they appear
     const deduplicatedMessages = Array.from(uniqueMessagesMap.values());
 
+    // Remove orphaned tool calls (tool calls without matching tool results)
+    const cleanedMessages = removeOrphanedToolCalls(deduplicatedMessages);
+
     // Validate output
     try {
-      return ChatConversationHistoryOutputSchema.parse(deduplicatedMessages);
+      return ChatConversationHistoryOutputSchema.parse(cleanedMessages);
     } catch (validationError) {
       throw new Error(
         `Output validation failed: ${validationError instanceof Error ? validationError.message : 'Invalid output format'}`

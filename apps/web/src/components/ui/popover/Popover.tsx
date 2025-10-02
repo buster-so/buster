@@ -9,7 +9,7 @@ import {
 
 export interface PopoverProps
   extends React.ComponentProps<typeof PopoverBase>,
-    Pick<React.ComponentProps<typeof PopoverContent>, 'align' | 'side'> {
+    Pick<React.ComponentProps<typeof PopoverContent>, 'align' | 'side' | 'onOpenAutoFocus'> {
   children: React.ReactNode;
   content: React.ReactNode;
   className?: string;
@@ -28,6 +28,7 @@ export const Popover = React.memo<PopoverProps>(
     trigger = 'click',
     size = 'default',
     sideOffset,
+    onOpenAutoFocus,
     ...props
   }) => {
     return (
@@ -41,6 +42,7 @@ export const Popover = React.memo<PopoverProps>(
           className={className}
           size={size}
           sideOffset={sideOffset}
+          onOpenAutoFocus={onOpenAutoFocus}
         >
           {content}
         </PopoverContent>

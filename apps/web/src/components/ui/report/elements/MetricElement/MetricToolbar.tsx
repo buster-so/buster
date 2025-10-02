@@ -72,10 +72,6 @@ export function MetricToolbar({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="box-content flex items-center space-x-2">
-          {/* <Button onClick={onOpenEdit} variant="ghost">
-            {NodeTypeLabels.editMetric?.label}
-          </Button> */}
-
           <CaptionButton />
 
           <Separator orientation="vertical" className=" h-6" />

@@ -1,7 +1,7 @@
 import { openErrorNotification } from '@/context/BusterNotifications';
-import type { RustApiError } from '../errors';
+import type { ApiError } from '../errors';
 
-export const silenceAssetErrors = (_count: number, error: RustApiError): boolean => {
+export const silenceAssetErrors = (_count: number, error: ApiError): boolean => {
   if (error.status === 418) {
     return false;
   }

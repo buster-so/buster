@@ -1,7 +1,8 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type { ResponseMessageFileType } from '@buster/server-shared/chats';
 import { Link, type LinkProps, useLocation } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Button } from '@/components/ui/buttons';
 import { Title } from '@/components/ui/typography';
@@ -19,7 +20,7 @@ const translationRecord: Record<AssetType | ResponseMessageFileType, string> = {
 export const AppNoPageAccess: React.FC<{
   assetId: string;
   type: AssetType | ResponseMessageFileType;
-}> = React.memo(({ type }) => {
+}> = ({ type }) => {
   const isAnonymousUser = useIsAnonymousSupabaseUser();
   const location = useLocation();
 
@@ -66,6 +67,4 @@ export const AppNoPageAccess: React.FC<{
       </div>
     </div>
   );
-});
-
-AppNoPageAccess.displayName = 'AppNoPageAccess';
+};

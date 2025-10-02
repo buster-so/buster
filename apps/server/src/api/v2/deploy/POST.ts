@@ -1,18 +1,25 @@
+import { type Credentials, createAdapter, toCredentials } from '@buster/data-source';
 import { db } from '@buster/database/connection';
 import {
+  deleteLogsWriteBackConfig,
   getDataSourceByName,
+  getDataSourceCredentials,
   getUserOrganizationId,
   upsertDataset,
   upsertDoc,
+  upsertLogsWriteBackConfig,
 } from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
+import { dataSources } from '@buster/database/schema';
 import type { deploy } from '@buster/server-shared';
+import { and, eq, isNull } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 type UnifiedDeployRequest = deploy.UnifiedDeployRequest;
 type UnifiedDeployResponse = deploy.UnifiedDeployResponse;
 type ModelDeployResult = deploy.ModelDeployResult;
 type DocDeployResult = deploy.DocDeployResult;
+type LogsWritebackResult = deploy.LogsWritebackResult;
 
 /**
  * Deploy handler for unified model and doc deployment
@@ -158,9 +165,18 @@ export async function deployHandler(
       // if (request.deleteAbsentModels) { ... }
       // if (request.deleteAbsentDocs) { ... }
 
+      // Handle logs writeback configuration
+      // Always call this to handle both presence and absence of logs config
+      const logsWritebackResult = await handleLogsWritebackConfig(
+        request.logsWriteback,
+        userOrg.organizationId,
+        tx
+      );
+
       return {
         models: modelResult,
         docs: docResult,
+        logsWriteback: logsWritebackResult,
       };
     });
 
@@ -177,5 +193,133 @@ export async function deployHandler(
     throw new HTTPException(500, {
       message: error instanceof Error ? error.message : 'Deployment failed',
     });
+  }
+}
+
+/**
+ * Handle logs writeback configuration
+ */
+async function handleLogsWritebackConfig(
+  config: deploy.LogsWritebackConfig | undefined,
+  organizationId: string,
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0]
+): Promise<LogsWritebackResult> {
+  try {
+    // If config is undefined, null, or disabled, delete existing configuration
+    // This handles the case where logs section is removed from buster.yml
+    if (!config || !config.enabled) {
+      const deleted = await deleteLogsWriteBackConfig(organizationId);
+
+      if (deleted) {
+        console.info('Logs writeback configuration removed (soft deleted)');
+      }
+
+      return {
+        configured: false,
+        error: deleted ? undefined : 'No existing configuration to remove',
+      };
+    }
+
+    // Get the appropriate data source for logs writeback
+    let dataSource: Awaited<ReturnType<typeof getDataSourceByName>> | undefined;
+
+    if (config.dataSource) {
+      // Use the specified data source
+      dataSource = await getDataSourceByName(tx, config.dataSource, organizationId);
+
+      if (!dataSource) {
+        return {
+          configured: false,
+          error: `Data source '${config.dataSource}' not found`,
+        };
+      }
+    } else {
+      // Get the first available data source for the organization
+      // Prefer Snowflake, but accept any data source type
+      const [firstDataSource] = await tx
+        .select()
+        .from(dataSources)
+        .where(and(eq(dataSources.organizationId, organizationId), isNull(dataSources.deletedAt)))
+        .orderBy(dataSources.type) // This will prioritize alphabetically, so BigQuery, MySQL, PostgreSQL, Redshift, Snowflake, SQLServer
+        .limit(1);
+
+      dataSource = firstDataSource;
+    }
+
+    if (!dataSource) {
+      return {
+        configured: false,
+        error: 'No data source found for organization',
+      };
+    }
+
+    // Upsert the configuration
+    await upsertLogsWriteBackConfig({
+      organizationId,
+      dataSourceId: dataSource.id,
+      database: config.database,
+      schema: config.schema,
+      tableName: config.tableName || 'buster_query_logs',
+    });
+
+    // Get credentials and create adapter to check/create table
+    const credentials = await getDataSourceCredentials({
+      dataSourceId: dataSource.id,
+    });
+
+    if (!credentials) {
+      return {
+        configured: true,
+        database: config.database,
+        schema: config.schema,
+        tableName: config.tableName || 'buster_query_logs',
+        error: 'Could not retrieve data source credentials',
+      };
+    }
+
+    // Verify adapter supports logs writeback
+    // Safely validate and convert credentials
+    let validatedCredentials: Credentials;
+    try {
+      validatedCredentials = toCredentials(credentials);
+    } catch (error) {
+      return {
+        configured: true,
+        database: config.database,
+        schema: config.schema,
+        tableName: config.tableName || 'buster_query_logs',
+        error: `Invalid credentials: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+
+    const adapter = await createAdapter(validatedCredentials);
+
+    try {
+      await adapter.initialize(validatedCredentials);
+
+      // Just verify the adapter supports insertLogRecord
+      if (!adapter.insertLogRecord) {
+        return {
+          configured: false,
+          error: 'Data source type does not support logs writeback',
+        };
+      }
+
+      return {
+        configured: true,
+        database: config.database,
+        schema: config.schema,
+        tableName: config.tableName || 'buster_query_logs',
+      };
+    } finally {
+      // Clean up adapter connection
+      await adapter.close();
+    }
+  } catch (error) {
+    console.error('Failed to configure logs writeback:', error);
+    return {
+      configured: false,
+      error: error instanceof Error ? error.message : 'Configuration failed',
+    };
   }
 }

@@ -13,7 +13,7 @@ import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { isQueryStale } from '@/lib/query';
-import type { RustApiError } from '../../errors';
+import type { ApiError } from '../../errors';
 import { hasOrganizationId } from '../users/userQueryHelpers';
 import {
   addAssetToCollection,
@@ -31,7 +31,7 @@ import {
 export const useGetCollectionsList = (
   filters: Omit<Parameters<typeof collectionsGetList>[0], 'page_token' | 'page_size'>,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof collectionsGetList>>, RustApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof collectionsGetList>>, ApiError>,
     'queryKey' | 'queryFn' | 'initialData'
   >
 ) => {
@@ -67,7 +67,7 @@ export const prefetchGetCollectionsList = async (
 
 export const useGetCollection = <T = BusterCollection>(
   collectionId: string | undefined,
-  params?: Omit<UseQueryOptions<BusterCollection, RustApiError, T>, 'queryKey' | 'queryFn'>
+  params?: Omit<UseQueryOptions<BusterCollection, ApiError, T>, 'queryKey' | 'queryFn'>
 ) => {
   const password = useProtectedAssetPassword(collectionId || '');
   return useQuery({

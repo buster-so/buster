@@ -31,18 +31,120 @@ type VersionHistoryEntry = {
 
 type VersionHistory = Record<string, VersionHistoryEntry>;
 
-// Simple in-memory queue for each reportId
-const updateQueues = new Map<string, Promise<void>>();
+type Deferred<T> = {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: unknown) => void;
+};
+
+function createDeferred<T>(): Deferred<T> {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  promise.catch(() => undefined);
+
+  return { promise, resolve, reject };
+}
+
+type ReportUpdateQueueState = {
+  tailPromise: Promise<void>;
+  nextSequence: number;
+  pending: Map<number, Deferred<void>>;
+  lastCompletedSequence: number;
+  finalSequence?: number;
+  closed: boolean;
+};
+
+const updateQueues = new Map<string, ReportUpdateQueueState>();
+
+function getOrCreateQueueState(reportId: string): ReportUpdateQueueState {
+  const existing = updateQueues.get(reportId);
+  if (existing) {
+    return existing;
+  }
+
+  const initialState: ReportUpdateQueueState = {
+    tailPromise: Promise.resolve(),
+    nextSequence: 0,
+    pending: new Map(),
+    lastCompletedSequence: -1,
+    closed: false,
+  };
+
+  updateQueues.set(reportId, initialState);
+  return initialState;
+}
+
+function cleanupQueueIfIdle(reportId: string, state: ReportUpdateQueueState): void {
+  if (
+    state.closed &&
+    state.finalSequence !== undefined &&
+    state.lastCompletedSequence >= state.finalSequence &&
+    state.pending.size === 0
+  ) {
+    updateQueues.delete(reportId);
+  }
+}
+
+export function isReportUpdateQueueClosed(reportId: string): boolean {
+  const queue = updateQueues.get(reportId);
+  return queue?.closed ?? false;
+}
+
+type WaitForPendingReportUpdateOptions = {
+  upToSequence?: number;
+};
 
 /**
  * Wait for all pending updates for a given reportId to complete.
  * This ensures all queued updates are flushed to the database before proceeding.
  */
-export async function waitForPendingReportUpdates(reportId: string): Promise<void> {
-  const pendingQueue = updateQueues.get(reportId);
-  if (pendingQueue) {
-    await pendingQueue;
+export async function waitForPendingReportUpdates(
+  reportId: string,
+  options?: WaitForPendingReportUpdateOptions
+): Promise<void> {
+  const queue = updateQueues.get(reportId);
+  if (!queue) {
+    return;
   }
+
+  const targetSequence = options?.upToSequence ?? queue.finalSequence;
+
+  if (targetSequence === undefined) {
+    await queue.tailPromise;
+    cleanupQueueIfIdle(reportId, queue);
+    return;
+  }
+
+  const maxKnownSequence = queue.nextSequence - 1;
+  const effectiveTarget = Math.min(targetSequence, maxKnownSequence);
+
+  if (effectiveTarget <= queue.lastCompletedSequence) {
+    cleanupQueueIfIdle(reportId, queue);
+    return;
+  }
+
+  const waits: Promise<unknown>[] = [];
+
+  for (let sequence = queue.lastCompletedSequence + 1; sequence <= effectiveTarget; sequence += 1) {
+    const deferred = queue.pending.get(sequence);
+    if (deferred) {
+      waits.push(deferred.promise.catch(() => undefined));
+    }
+  }
+
+  if (waits.length > 0) {
+    await Promise.all(waits);
+  } else {
+    await queue.tailPromise;
+  }
+
+  cleanupQueueIfIdle(reportId, queue);
 }
 
 /**
@@ -93,27 +195,74 @@ async function performUpdate(params: BatchUpdateReportInput): Promise<void> {
  * Updates a report's content, name, and version history in a single operation.
  * Updates are queued per reportId to ensure they execute in order.
  */
-export const updateReportWithVersion = async (params: BatchUpdateReportInput): Promise<void> => {
+type UpdateReportWithVersionOptions = {
+  isFinal?: boolean;
+};
+
+type UpdateReportWithVersionResult = {
+  sequenceNumber: number;
+  skipped?: boolean;
+};
+
+export const updateReportWithVersion = async (
+  params: BatchUpdateReportInput,
+  options?: UpdateReportWithVersionOptions
+): Promise<UpdateReportWithVersionResult> => {
   const { reportId } = params;
+  const queue = getOrCreateQueueState(reportId);
 
-  // Get the current promise for this reportId, or use a resolved promise as the starting point
-  const currentQueue = updateQueues.get(reportId) ?? Promise.resolve();
+  if (queue.closed) {
+    const lastKnownSequence = queue.finalSequence ?? queue.nextSequence - 1;
+    return {
+      sequenceNumber: lastKnownSequence >= 0 ? lastKnownSequence : -1,
+      skipped: true,
+    };
+  }
 
-  // Chain the new update to run after the current queue completes
-  const newQueue = currentQueue
-    .then(() => performUpdate(params))
-    .catch(() => performUpdate(params)); // Still try to run even if previous failed
+  const isFinal = options?.isFinal ?? false;
 
-  // Update the queue for this reportId
-  updateQueues.set(reportId, newQueue);
+  if (isFinal) {
+    queue.closed = true;
+  }
 
-  // Clean up the queue entry once this update completes
-  newQueue.finally(() => {
-    // Only remove if this is still the current queue
-    if (updateQueues.get(reportId) === newQueue) {
-      updateQueues.delete(reportId);
+  const sequenceNumber = queue.nextSequence;
+  queue.nextSequence += 1;
+
+  const deferred = createDeferred<void>();
+  queue.pending.set(sequenceNumber, deferred);
+
+  const runUpdate = () => performUpdate(params);
+
+  const runPromise = queue.tailPromise.then(runUpdate, runUpdate);
+
+  queue.tailPromise = runPromise.then(
+    () => undefined,
+    () => undefined
+  );
+
+  const finalize = () => {
+    queue.pending.delete(sequenceNumber);
+    queue.lastCompletedSequence = Math.max(queue.lastCompletedSequence, sequenceNumber);
+    if (isFinal) {
+      queue.finalSequence = sequenceNumber;
     }
-  });
+    cleanupQueueIfIdle(reportId, queue);
+  };
 
-  return newQueue;
+  const resultPromise = runPromise
+    .then(() => {
+      deferred.resolve();
+      finalize();
+      return {
+        sequenceNumber,
+        skipped: false as const,
+      };
+    })
+    .catch((error) => {
+      deferred.reject(error);
+      finalize();
+      throw error;
+    });
+
+  return resultPromise;
 };

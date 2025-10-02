@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import last from 'lodash/last';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { setOriginalDashboard } from '@/context/Dashboards/useOriginalDashboardStore';
-import { initializeMetrics } from '../dashboardQueryHelpers';
+import { initializeMetrics } from '../../metrics/metricQueryHelpers';
 import { dashboardsUpdateDashboard } from '../requests';
 
 /**

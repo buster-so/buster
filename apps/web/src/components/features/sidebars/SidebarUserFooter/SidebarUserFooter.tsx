@@ -76,6 +76,14 @@ const topItems = ({ isAdmin }: { isAdmin: boolean }) =>
         show: isAdmin,
       },
       {
+        label: 'Shortcuts',
+        value: 'shortcuts',
+        link: {
+          to: '/app/home/shortcuts',
+        },
+        icon: <div className="w-4 h-4 flex items-center justify-center">/</div>,
+      },
+      {
         label: 'Invite & manage members',
         value: 'invite-manage-members',
         icon: <UserGroup />,

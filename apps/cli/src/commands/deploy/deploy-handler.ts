@@ -1,4 +1,5 @@
 import { relative, resolve } from 'node:path';
+import type { deploy } from '@buster/server-shared';
 import { getConfigBaseDir, loadBusterConfig, resolveConfiguration } from './config/config-loader';
 import {
   formatDeploymentSummary,
@@ -27,6 +28,8 @@ import {
 import type { CLIDeploymentResult, DeployOptions, Model, ProjectContext } from './schemas';
 import { createDeploymentValidationError, isDeploymentValidationError } from './utils/errors';
 
+type LogsConfig = deploy.LogsConfig;
+
 /**
  * Main deploy handler that orchestrates the entire deployment pipeline
  * using functional composition
@@ -53,10 +56,18 @@ export async function deployHandler(options: DeployOptions): Promise<CLIDeployme
       ? createDryRunDeployer(options.verbose)
       : await createAuthenticatedDeployer();
 
+    // Debug: Check if logs config is present
+    if (busterConfig.logs) {
+      console.info('\nLogs writeback configured in buster.yml:');
+      console.info('  Database:', busterConfig.logs.database);
+      console.info('  Schema:', busterConfig.logs.schema);
+      console.info('  Table:', busterConfig.logs.table_name || 'buster_query_logs');
+    }
+
     // 4. Process all projects in parallel
     const projectResults = await Promise.all(
       busterConfig.projects.map((project) =>
-        processProject(project, configBaseDir, deploy, options)
+        processProject(project, configBaseDir, deploy, options, busterConfig.logs)
       )
     );
 
@@ -85,7 +96,8 @@ async function processProject(
   project: ProjectContext,
   configBaseDir: string,
   deploy: DeployFunction,
-  options: DeployOptions
+  options: DeployOptions,
+  logsConfig?: LogsConfig
 ): Promise<CLIDeploymentResult> {
   console.info(`\nProcessing ${project.name} project...`);
 
@@ -198,7 +210,13 @@ async function processProject(
   }
 
   // 7. Prepare unified deployment request (pure)
-  const deployRequest = prepareDeploymentRequest(validModels, docs);
+  const deployRequest = prepareDeploymentRequest(
+    validModels,
+    docs,
+    true, // deleteAbsentModels
+    true, // deleteAbsentDocs
+    logsConfig // Pass logs config from buster.yml
+  );
 
   // 8. Create model-to-file mapping for result processing (pure)
   const modelFileMap = createModelFileMap(

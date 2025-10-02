@@ -26,11 +26,26 @@ interface QueuedModal<T = unknown> extends Omit<ConfirmProps<T>, 'onOk' | 'onCan
   onClose: () => void;
   onOk: () => Promise<void>;
   onCancel?: () => Promise<void>;
+  closing?: boolean;
 }
 
 export const useConfirmModalContext = () => {
   const [modalQueue, setModalQueue] = useState<QueuedModal[]>([]);
   const currentModal = modalQueue[0]; // Get the first modal in the queue
+
+  // Common handler to close modal and then remove from queue after animation
+  const closeModalWithDelay = () => {
+    // Mark modal as closing (triggers close animation)
+    setModalQueue((prev) => {
+      if (prev.length === 0) return prev;
+      return [{ ...prev[0], closing: true }, ...prev.slice(1)];
+    });
+
+    // Remove from queue after animation completes
+    setTimeout(() => {
+      setModalQueue((prev) => prev.slice(1));
+    }, 250);
+  };
 
   const openConfirmModal = <T = unknown, C = unknown>(
     props: ConfirmProps<T>
@@ -47,8 +62,7 @@ export const useConfirmModalContext = () => {
           } catch (error) {
             reject(error);
           } finally {
-            // Remove the current modal from the queue
-            setModalQueue((prev) => prev.slice(1));
+            closeModalWithDelay();
           }
         },
         onCancel:
@@ -60,14 +74,13 @@ export const useConfirmModalContext = () => {
                 } catch (error) {
                   reject(error);
                 } finally {
-                  // Remove the current modal from the queue
-                  setModalQueue((prev) => prev.slice(1));
+                  closeModalWithDelay();
                 }
               }
             : undefined,
         onClose: () => {
           resolve(undefined);
-          setModalQueue((prev) => prev.slice(1));
+          closeModalWithDelay();
         },
       };
 
@@ -79,7 +92,7 @@ export const useConfirmModalContext = () => {
     return currentModal
       ? {
           ...currentModal,
-          open: true,
+          open: !currentModal.closing,
         }
       : {
           ...defaultConfirmModalProps,

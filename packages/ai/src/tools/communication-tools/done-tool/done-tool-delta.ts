@@ -1,10 +1,5 @@
-import {
-  type UpdateMessageEntriesParams,
-  getAssetLatestVersion,
-  updateChat,
-  updateMessage,
-  updateMessageEntries,
-} from '@buster/database/queries';
+import type { UpdateMessageEntriesParams } from '@buster/database/queries';
+import * as databaseQueries from '@buster/database/queries';
 import {
   type ResponseMessageFileType,
   ResponseMessageFileTypeSchema,
@@ -26,12 +21,30 @@ const FINAL_RESPONSE_KEY = 'finalResponse' as const satisfies keyof DoneToolInpu
 const ASSETS_TO_RETURN_KEY = 'assetsToReturn' as const satisfies keyof DoneToolInput;
 
 export function createDoneToolDelta(context: DoneToolContext, doneToolState: DoneToolState) {
+  const { getAssetLatestVersion, updateChat, updateMessage, updateMessageEntries } =
+    databaseQueries;
+
+  const isMessageUpdateQueueClosed = databaseQueries.isMessageUpdateQueueClosed ?? (() => false);
+
   return async function doneToolDelta(
     options: { inputTextDelta: string } & ToolCallOptions
   ): Promise<void> {
     if (doneToolState.isFinalizing) {
       return;
     }
+
+    if (isMessageUpdateQueueClosed(context.messageId)) {
+      return;
+    }
+
+    const recordSequence = (sequenceNumber: number, skipped?: boolean) => {
+      if (skipped || sequenceNumber < 0) {
+        return;
+      }
+
+      const current = doneToolState.latestSequenceNumber ?? -1;
+      doneToolState.latestSequenceNumber = Math.max(current, sequenceNumber);
+    };
     // Accumulate the delta to the args
     doneToolState.args = (doneToolState.args || '') + options.inputTextDelta;
 
@@ -155,7 +168,8 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
         };
 
         try {
-          await updateMessageEntries(entriesForAssets);
+          const result = await updateMessageEntries(entriesForAssets);
+          recordSequence(result.sequenceNumber, result.skipped);
           // Update state to prevent duplicates on next deltas
           doneToolState.addedAssetIds = [
             ...(doneToolState.addedAssetIds || []),
@@ -166,11 +180,15 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
         }
       }
 
-      // Store ALL assets (including reports) for chat update later
-      if (newAssets.length > 0) {
+      // Store assets for chat update later (excluding reasoning which is not an asset type)
+      const assetsForChatUpdate = newAssets.filter(
+        (a): a is typeof a & { assetType: Exclude<typeof a.assetType, 'reasoning'> } =>
+          a.assetType !== 'reasoning'
+      );
+      if (assetsForChatUpdate.length > 0) {
         doneToolState.addedAssets = [
           ...(doneToolState.addedAssets || []),
-          ...newAssets.map((a) => ({
+          ...assetsForChatUpdate.map((a) => ({
             assetId: a.assetId,
             assetType: a.assetType,
             versionNumber: a.versionNumber,
@@ -247,7 +265,8 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
 
       try {
         if (entries.responseMessages || entries.rawLlmMessages) {
-          await updateMessageEntries(entries);
+          const result = await updateMessageEntries(entries);
+          recordSequence(result.sequenceNumber, result.skipped);
         }
       } catch (error) {
         console.error('[done-tool] Failed to update done tool raw LLM message:', error);

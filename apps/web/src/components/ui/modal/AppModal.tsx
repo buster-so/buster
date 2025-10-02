@@ -2,6 +2,7 @@ import type React from 'react';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/classMerge';
 import { Button, type ButtonProps } from '../buttons/Button';
+import { AppTooltip } from '../tooltip';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ export interface ModalProps<T = unknown> {
       variant?: ButtonProps['variant'];
       loading?: boolean;
       disabled?: boolean;
+      tooltip?: string;
     };
     secondaryButton?: {
       text: string;
@@ -32,6 +34,7 @@ export interface ModalProps<T = unknown> {
       variant?: ButtonProps['variant'];
       loading?: boolean;
       disabled?: boolean;
+      tooltip?: string;
     };
   };
   header: {
@@ -127,23 +130,27 @@ export const AppModal = <T,>({
             {footer.left && footer.left}
             <div className={cn('flex items-center space-x-2')}>
               {footer.secondaryButton && (
-                <Button
-                  onClick={onSecondaryButtonClickPreflight}
-                  variant={footer.secondaryButton.variant ?? 'ghost'}
-                  loading={footer.secondaryButton.loading ?? isLoadingSecondaryButton}
-                  disabled={footer.secondaryButton.disabled}
-                >
-                  {footer.secondaryButton.text}
-                </Button>
+                <AppTooltip title={footer.secondaryButton.tooltip}>
+                  <Button
+                    onClick={onSecondaryButtonClickPreflight}
+                    variant={footer.secondaryButton.variant ?? 'ghost'}
+                    loading={footer.secondaryButton.loading ?? isLoadingSecondaryButton}
+                    disabled={footer.secondaryButton.disabled}
+                  >
+                    {footer.secondaryButton.text}
+                  </Button>
+                </AppTooltip>
               )}
-              <Button
-                onClick={onPrimaryButtonClickPreflight}
-                variant={footer.primaryButton.variant ?? 'black'}
-                loading={footer.primaryButton.loading ?? isLoadingPrimaryButton}
-                disabled={footer.primaryButton.disabled}
-              >
-                {footer.primaryButton.text}
-              </Button>
+              <AppTooltip title={footer.primaryButton.tooltip}>
+                <Button
+                  onClick={onPrimaryButtonClickPreflight}
+                  variant={footer.primaryButton.variant ?? 'black'}
+                  loading={footer.primaryButton.loading ?? isLoadingPrimaryButton}
+                  disabled={footer.primaryButton.disabled}
+                >
+                  {footer.primaryButton.text}
+                </Button>
+              </AppTooltip>
             </div>
           </DialogFooter>
         )}

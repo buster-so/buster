@@ -13,29 +13,52 @@ interface PopoverProps extends React.ComponentPropsWithoutRef<typeof PopoverBase
   trigger?: PopoverTriggerType;
   children: React.ReactNode;
   open?: boolean;
+  delayDuration?: number;
 }
 
-const PopoverRoot: React.FC<PopoverProps> = ({ children, trigger = 'click', ...props }) => {
+const PopoverRoot: React.FC<PopoverProps> = ({
+  children,
+  trigger = 'click',
+  delayDuration = 0,
+  ...props
+}) => {
   const [isOpen, setIsOpen] = React.useState(props.open ?? false);
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseEnter = () => {
     if (trigger === 'hover') {
-      setIsOpen(true);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        setIsOpen(true);
+      }, delayDuration);
     }
   };
 
   const handleMouseLeave = () => {
     if (trigger === 'hover') {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setIsOpen(false);
     }
   };
 
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const content =
     trigger === 'hover' ? (
-      <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        <div className="absolute -inset-1" />
-        <div className="relative z-10">{children}</div>
-      </div>
+      <span className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <span className="relative z-10">{children}</span>
+      </span>
     ) : (
       children
     );

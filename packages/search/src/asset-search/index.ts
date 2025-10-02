@@ -1,2 +1,2 @@
 export * from './search';
-export * from './get-search-result-ancestors';
+export * from './get-asset-screenshot';

@@ -7,12 +7,14 @@ export const useLegendAutoShow = ({
   selectedChartType,
   showLegendProp = null,
   categoryAxisColumnNames,
+  colorByColumnNames,
   allYAxisColumnNames,
 }: {
   selectedChartType: BusterChartProps['selectedChartType'];
   showLegendProp: BusterChartProps['showLegend'];
   categoryAxisColumnNames: string[] | null | undefined;
   allYAxisColumnNames: string[];
+  colorByColumnNames: string[];
 }) => {
   const showLegend = useMemo(() => {
     if (UNSUPPORTED_CHART_TYPES.includes(selectedChartType)) {
@@ -38,10 +40,16 @@ export const useLegendAutoShow = ({
       return true;
     }
 
-    const defaultShowLegend = !!categoryAxisColumnNames?.length;
+    const defaultShowLegend = !!categoryAxisColumnNames?.length || !!colorByColumnNames?.length;
 
     return defaultShowLegend;
-  }, [selectedChartType, allYAxisColumnNames, categoryAxisColumnNames, showLegendProp]);
+  }, [
+    selectedChartType,
+    allYAxisColumnNames,
+    categoryAxisColumnNames,
+    showLegendProp,
+    colorByColumnNames,
+  ]);
 
   return showLegend;
 };

@@ -30,7 +30,11 @@ export function createDoneToolFinish(context: DoneToolContext, doneToolState: Do
 
     try {
       if (entries.responseMessages || entries.rawLlmMessages) {
-        await updateMessageEntries(entries);
+        const result = await updateMessageEntries(entries);
+        if (!result.skipped && result.sequenceNumber >= 0) {
+          const current = doneToolState.latestSequenceNumber ?? -1;
+          doneToolState.latestSequenceNumber = Math.max(current, result.sequenceNumber);
+        }
       }
     } catch (error) {
       console.error('[done-tool] Failed to update done tool raw LLM message:', error);

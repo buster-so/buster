@@ -10,11 +10,27 @@ import {
   createCreateMetricsTool,
   createCreateReportsTool,
   createDoneTool,
+  createExecuteSqlTool,
   createModifyDashboardsTool,
   createModifyMetricsTool,
   createModifyReportsTool,
+  createSequentialThinkingTool,
 } from '../../tools';
 import { DONE_TOOL_NAME } from '../../tools/communication-tools/done-tool/done-tool';
+import {
+  MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
+  createMessageUserClarifyingQuestionTool,
+} from '../../tools/communication-tools/message-user-clarifying-question/message-user-clarifying-question';
+import {
+  RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
+  createRespondWithoutAssetCreationTool,
+} from '../../tools/communication-tools/respond-without-asset-creation/respond-without-asset-creation-tool';
+import {
+  SUBMIT_THOUGHTS_TOOL_NAME,
+  createSubmitThoughtsTool,
+} from '../../tools/communication-tools/submit-thoughts-tool/submit-thoughts-tool';
+import { EXECUTE_SQL_TOOL_NAME } from '../../tools/database-tools/execute-sql/execute-sql';
+import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
 import { CREATE_DASHBOARDS_TOOL_NAME } from '../../tools/visualization-tools/dashboards/create-dashboards-tool/create-dashboards-tool';
 import { MODIFY_DASHBOARDS_TOOL_NAME } from '../../tools/visualization-tools/dashboards/modify-dashboards-tool/modify-dashboards-tool';
 import { CREATE_METRICS_TOOL_NAME } from '../../tools/visualization-tools/metrics/create-metrics-tool/create-metrics-tool';
@@ -28,13 +44,22 @@ import { getAnalystAgentSystemPrompt } from './get-analyst-agent-system-prompt';
 
 export const ANALYST_AGENT_NAME = 'analystAgent';
 
-const STOP_CONDITIONS = [stepCountIs(25), hasToolCall(DONE_TOOL_NAME)];
+const STOP_CONDITIONS = [
+  stepCountIs(25),
+  hasToolCall(DONE_TOOL_NAME),
+  hasToolCall(RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME),
+  hasToolCall(MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME),
+];
 
 export const AnalystAgentOptionsSchema = z.object({
   userId: z.string(),
   chatId: z.string(),
   dataSourceId: z.string(),
   dataSourceSyntax: z.string(),
+  sql_dialect_guidance: z
+    .string()
+    .describe('The SQL dialect guidance for the analyst agent.')
+    .optional(),
   organizationId: z.string(),
   messageId: z.string(),
   datasets: z.array(z.custom<PermissionedDataset>()),
@@ -72,7 +97,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
 
   const systemMessage = {
     role: 'system',
-    content: getAnalystAgentSystemPrompt(analystAgentOptions.dataSourceSyntax),
+    content: getAnalystAgentSystemPrompt(
+      analystAgentOptions.dataSourceSyntax,
+      analystAgentOptions.analysisMode || 'standard'
+    ),
     providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
   } as ModelMessage;
 
@@ -106,6 +134,26 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     : null;
 
   async function stream({ messages }: AnalystStreamOptions) {
+    // Think-and-prep tools
+    const sequentialThinking = createSequentialThinkingTool({
+      messageId: analystAgentOptions.messageId,
+    });
+    const executeSqlTool = createExecuteSqlTool({
+      messageId: analystAgentOptions.messageId,
+      dataSourceId: analystAgentOptions.dataSourceId,
+      dataSourceSyntax: analystAgentOptions.dataSourceSyntax,
+      userId: analystAgentOptions.userId,
+    });
+    const respondWithoutAssetCreation = createRespondWithoutAssetCreationTool({
+      messageId: analystAgentOptions.messageId,
+      workflowStartTime: analystAgentOptions.workflowStartTime,
+    });
+    const messageUserClarifyingQuestion = createMessageUserClarifyingQuestionTool({
+      messageId: analystAgentOptions.messageId,
+      workflowStartTime: analystAgentOptions.workflowStartTime,
+    });
+
+    // Visualization tools
     const createMetrics = createCreateMetricsTool(analystAgentOptions);
     const modifyMetrics = createModifyMetricsTool(analystAgentOptions);
     const createDashboards = createCreateDashboardsTool(analystAgentOptions);
@@ -118,6 +166,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     const doneTool = createDoneTool(analystAgentOptions);
 
     const availableTools = [
+      SEQUENTIAL_THINKING_TOOL_NAME,
+      EXECUTE_SQL_TOOL_NAME,
+      RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
+      MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME,
       CREATE_METRICS_TOOL_NAME,
       MODIFY_METRICS_TOOL_NAME,
       CREATE_DASHBOARDS_TOOL_NAME,
@@ -160,6 +212,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
             anthropic_beta: 'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07',
           },
           tools: {
+            [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
+            [EXECUTE_SQL_TOOL_NAME]: executeSqlTool,
+            [RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME]: respondWithoutAssetCreation,
+            [MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME]: messageUserClarifyingQuestion,
             [CREATE_METRICS_TOOL_NAME]: createMetrics,
             [MODIFY_METRICS_TOOL_NAME]: modifyMetrics,
             [CREATE_DASHBOARDS_TOOL_NAME]: createDashboards,

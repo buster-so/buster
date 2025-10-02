@@ -108,6 +108,7 @@ describe('Done Tool Integration Tests', () => {
       await startHandler({ toolCallId, messages: [] });
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: 'This is the complete final response',
       };
 
@@ -168,6 +169,7 @@ All operations completed successfully.`;
       expect(state.finalResponse).toBe(expectedResponse);
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: expectedResponse,
       };
 
@@ -207,14 +209,14 @@ All operations completed successfully.`;
 
       await startHandler1({ toolCallId: toolCallId1, messages: [] });
       await finishHandler1({
-        input: { finalResponse: 'First response' },
+        input: { assetsToReturn: [], finalResponse: 'First response' },
         toolCallId: toolCallId1,
         messages: [],
       });
 
       await startHandler2({ toolCallId: toolCallId2, messages: [] });
       await finishHandler2({
-        input: { finalResponse: 'Second response' },
+        input: { assetsToReturn: [], finalResponse: 'Second response' },
         toolCallId: toolCallId2,
         messages: [],
       });

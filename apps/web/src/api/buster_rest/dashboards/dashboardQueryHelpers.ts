@@ -1,22 +1,16 @@
-import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
 import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import last from 'lodash/last';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
-import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { setOriginalDashboard } from '@/context/Dashboards/useOriginalDashboardStore';
-import { setOriginalMetric } from '@/context/Metrics/useOriginalMetricStore';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { upgradeMetricToIMetric } from '@/lib/metrics/upgradeToIMetric';
-import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
+import { initializeMetrics } from '../metrics/metricQueryHelpers';
 import { getDashboardById } from './requests';
 
 export const useEnsureDashboardConfig = (params?: { prefetchData?: boolean }) => {
   const { prefetchData = true } = params || {};
   const queryClient = useQueryClient();
-  const prefetchDashboard = useGetDashboardAndInitializeMetrics({
-    prefetchData,
-  });
+
   const { openErrorMessage } = useBusterNotifications();
 
   const method = useMemoizedFn(
@@ -24,11 +18,13 @@ export const useEnsureDashboardConfig = (params?: { prefetchData?: boolean }) =>
       const options = dashboardQueryKeys.dashboardGetDashboard(dashboardId, 'LATEST');
       let dashboardResponse = queryClient.getQueryData(options.queryKey);
       if (!dashboardResponse) {
-        const res = await prefetchDashboard({
+        const res = await getDashboardAndInitializeMetrics({
           id: dashboardId,
           version_number: 'LATEST',
-          shouldInitializeMetrics: initializeMetrics,
           password,
+          queryClient,
+          shouldInitializeMetrics: initializeMetrics,
+          prefetchMetricsData: prefetchData,
         }).catch(() => {
           openErrorMessage('Failed to save metrics to dashboard. Dashboard not found');
         });
@@ -48,63 +44,6 @@ export const useEnsureDashboardConfig = (params?: { prefetchData?: boolean }) =>
   return method;
 };
 
-export const initializeMetrics = (
-  metrics: GetDashboardResponse['metrics'],
-  queryClient: QueryClient,
-  prefetchData: boolean
-) => {
-  for (const metric of Object.values(metrics)) {
-    const upgradedMetric = upgradeMetricToIMetric(metric, null);
-    queryClient.setQueryData(
-      metricsQueryKeys.metricsGetMetric(metric.id, metric.version_number).queryKey,
-      upgradedMetric
-    );
-    const isLatestVersion = metric.version_number === last(metric.versions)?.version_number;
-    if (isLatestVersion) {
-      setOriginalMetric(upgradedMetric);
-      queryClient.setQueryData(
-        metricsQueryKeys.metricsGetMetric(metric.id, 'LATEST').queryKey,
-        upgradedMetric
-      );
-    }
-    if (prefetchData) {
-      prefetchGetMetricDataClient(
-        { id: metric.id, version_number: metric.version_number },
-        queryClient
-      );
-    }
-  }
-};
-
-export const useGetDashboardAndInitializeMetrics = (params?: { prefetchData?: boolean }) => {
-  const { prefetchData = true } = params || {};
-  const queryClient = useQueryClient();
-
-  return useMemoizedFn(
-    async ({
-      id,
-      version_number,
-      shouldInitializeMetrics = true,
-      password,
-    }: {
-      id: string;
-      version_number: number | 'LATEST';
-      shouldInitializeMetrics?: boolean;
-      password: string | undefined;
-    }) => {
-      return getDashboardAndInitializeMetrics({
-        id,
-        version_number,
-        password,
-        queryClient,
-        shouldInitializeMetrics,
-        prefetchMetricsData: prefetchData,
-      });
-    }
-  );
-};
-
-//Can use this in server side
 export const getDashboardAndInitializeMetrics = async ({
   id,
   version_number,

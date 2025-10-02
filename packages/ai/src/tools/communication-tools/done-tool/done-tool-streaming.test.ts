@@ -1,5 +1,5 @@
 import type { ModelMessage, ToolCallOptions } from 'ai';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { CREATE_DASHBOARDS_TOOL_NAME } from '../../visualization-tools/dashboards/create-dashboards-tool/create-dashboards-tool';
 import { CREATE_METRICS_TOOL_NAME } from '../../visualization-tools/metrics/create-metrics-tool/create-metrics-tool';
 import { CREATE_REPORTS_TOOL_NAME } from '../../visualization-tools/reports/create-reports-tool/create-reports-tool';
@@ -8,12 +8,61 @@ import { createDoneToolDelta } from './done-tool-delta';
 import { createDoneToolFinish } from './done-tool-finish';
 import { createDoneToolStart } from './done-tool-start';
 
-vi.mock('@buster/database/queries', () => ({
-  updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
-  updateMessage: vi.fn().mockResolvedValue({ success: true }),
-  updateChat: vi.fn().mockResolvedValue({ success: true }),
-  getAssetLatestVersion: vi.fn().mockResolvedValue(1),
-}));
+const queriesMock = vi.hoisted(() => {
+  let sequence = 0;
+
+  const updateMessageEntries = vi.fn(async () => ({
+    success: true,
+    sequenceNumber: sequence++,
+    skipped: false as const,
+  }));
+  const waitForPendingUpdates = vi.fn().mockResolvedValue(undefined);
+  const isMessageUpdateQueueClosed = vi.fn().mockReturnValue(false);
+  const updateMessage = vi.fn().mockResolvedValue({ success: true });
+  const updateChat = vi.fn().mockResolvedValue({ success: true });
+  const getAssetLatestVersion = vi.fn().mockResolvedValue(1);
+
+  return {
+    updateMessageEntries,
+    waitForPendingUpdates,
+    isMessageUpdateQueueClosed,
+    updateMessage,
+    updateChat,
+    getAssetLatestVersion,
+    reset() {
+      sequence = 0;
+      updateMessageEntries.mockClear();
+      waitForPendingUpdates.mockClear();
+      isMessageUpdateQueueClosed.mockClear();
+      updateMessage.mockClear();
+      updateChat.mockClear();
+      getAssetLatestVersion.mockClear();
+      waitForPendingUpdates.mockResolvedValue(undefined);
+      isMessageUpdateQueueClosed.mockReturnValue(false);
+      getAssetLatestVersion.mockResolvedValue(1);
+    },
+  };
+});
+
+vi.mock('@buster/database/queries', async () => {
+  const actual = await vi.importActual<typeof import('@buster/database/queries')>(
+    '@buster/database/queries'
+  );
+
+  return {
+    ...actual,
+    updateMessageEntries: queriesMock.updateMessageEntries,
+    waitForPendingUpdates: queriesMock.waitForPendingUpdates,
+    isMessageUpdateQueueClosed: queriesMock.isMessageUpdateQueueClosed,
+    updateMessage: queriesMock.updateMessage,
+    updateChat: queriesMock.updateChat,
+    getAssetLatestVersion: queriesMock.getAssetLatestVersion,
+  };
+});
+
+beforeEach(() => {
+  queriesMock.reset();
+});
 
 describe('Done Tool Streaming Tests', () => {
   const mockContext: DoneToolContext = {
@@ -21,6 +70,15 @@ describe('Done Tool Streaming Tests', () => {
     chatId: 'test-chat-id-456',
     workflowStartTime: Date.now(),
   };
+
+  // Helper to create mock ToolCallOptions
+  const createMockToolCallOptions = (
+    overrides: Partial<ToolCallOptions> = {}
+  ): ToolCallOptions => ({
+    messages: [],
+    toolCallId: 'test-call-id',
+    ...overrides,
+  });
 
   describe('createDoneToolStart', () => {
     test('should initialize state with entry_id on start', async () => {
@@ -203,8 +261,8 @@ describe('Done Tool Streaming Tests', () => {
       });
       await deltaHandler({
         inputTextDelta: deltaInput,
-        toolCallId: 'call-1',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'call-1' }),
+      });
 
       const queries = await import('@buster/database/queries');
 
@@ -326,8 +384,8 @@ describe('Done Tool Streaming Tests', () => {
       });
       await deltaHandler({
         inputTextDelta: deltaInput,
-        toolCallId: 'call-2',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'call-2' }),
+      });
 
       const queries = await import('@buster/database/queries');
 
@@ -443,8 +501,8 @@ describe('Done Tool Streaming Tests', () => {
       });
       await deltaHandler({
         inputTextDelta: deltaInput,
-        toolCallId: 'call-3',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'call-3' }),
+      });
 
       const queries = await import('@buster/database/queries');
       const updateArgs = ((queries.updateChat as unknown as { mock: { calls: unknown[][] } }).mock
@@ -639,6 +697,7 @@ describe('Done Tool Streaming Tests', () => {
       const finishHandler = createDoneToolFinish(mockContext, state);
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: 'This is the final response message',
       };
 
@@ -661,6 +720,7 @@ describe('Done Tool Streaming Tests', () => {
       const finishHandler = createDoneToolFinish(mockContext, state);
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: 'Response without prior start',
       };
 
@@ -697,6 +757,7 @@ The following items were processed:
 `;
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: markdownResponse,
       };
 
@@ -761,6 +822,7 @@ The following items were processed:
       expect(state.finalResponse).toBeTypeOf('string');
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: 'Final test',
       };
       await finishHandler({ input, toolCallId: 'test-123', messages: [] });
@@ -810,6 +872,7 @@ The following items were processed:
       );
 
       const input: DoneToolInput = {
+        assetsToReturn: [],
         finalResponse: 'This is a streaming response that comes in multiple chunks',
       };
       await finishHandler({ input, toolCallId, messages: [] });

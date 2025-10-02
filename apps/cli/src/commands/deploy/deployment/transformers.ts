@@ -2,6 +2,8 @@ import type { deploy } from '@buster/server-shared';
 
 type DeployDoc = deploy.DeployDoc;
 type UnifiedDeployRequest = deploy.UnifiedDeployRequest;
+type LogsConfig = deploy.LogsConfig;
+type LogsWritebackConfig = deploy.LogsWritebackConfig;
 
 import yaml from 'js-yaml';
 import { generateDefaultSQL } from '../models/parsing';
@@ -14,13 +16,36 @@ export function prepareDeploymentRequest(
   models: Model[],
   docs: DeployDoc[] = [],
   deleteAbsentModels = true,
-  deleteAbsentDocs = true
+  deleteAbsentDocs = true,
+  logsConfig?: LogsConfig
 ): UnifiedDeployRequest {
+  // Transform logs config to logsWriteback format if present
+  const logsWriteback: LogsWritebackConfig | undefined = logsConfig
+    ? {
+        enabled: true,
+        dataSource: logsConfig.data_source,
+        database: logsConfig.database,
+        schema: logsConfig.schema,
+        tableName: logsConfig.table_name || 'buster_query_logs',
+      }
+    : undefined;
+
+  if (logsConfig) {
+    console.info('  ✓ Logs writeback configuration found:', {
+      database: logsConfig.database,
+      schema: logsConfig.schema,
+      table_name: logsConfig.table_name || 'buster_query_logs',
+    });
+  } else {
+    console.info('  ℹ No logs writeback configuration found - will remove any existing config');
+  }
+
   return {
     models: models.map(modelToDeployModel),
     docs,
     deleteAbsentModels,
     deleteAbsentDocs,
+    logsWriteback,
   };
 }
 

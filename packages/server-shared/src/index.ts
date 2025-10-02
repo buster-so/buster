@@ -22,6 +22,7 @@ export * from './metrics';
 export * from './organization';
 export * from './public-chat';
 export * from './s3-integrations';
+export * from './screenshots';
 export * from './search';
 export * from './security';
 // Export share module (has some naming conflicts with chats and metrics)
@@ -35,3 +36,5 @@ export * from './user';
 export * from './shortcuts';
 export * from './healthcheck';
 export * from './sql';
+export * from './logs-writeback';
+export * from './library';

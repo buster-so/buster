@@ -1,4 +1,9 @@
-import type { ChartConfigProps, ChartEncodes, ScatterAxis } from '@buster/server-shared/metrics';
+import type {
+  BarAndLineAxis,
+  ChartConfigProps,
+  ChartEncodes,
+  ScatterAxis,
+} from '@buster/server-shared/metrics';
 import React from 'react';
 import { useLegendAutoShow } from '@/components/ui/charts-shared/useLegendAutoShow';
 import { Switch } from '@/components/ui/switch';
@@ -12,6 +17,7 @@ export const EditShowLegend: React.FC<{
 }> = React.memo(
   ({ showLegend: showLegendProp, selectedAxis, selectedChartType, onUpdateChartConfig }) => {
     const categoryAxisColumnNames = (selectedAxis as ScatterAxis)?.category;
+    const colorByColumnNames = (selectedAxis as BarAndLineAxis)?.colorBy;
     const allYAxisColumnNames = (selectedAxis as ScatterAxis)?.y;
 
     const showLegend = useLegendAutoShow({
@@ -19,6 +25,7 @@ export const EditShowLegend: React.FC<{
       showLegendProp,
       categoryAxisColumnNames,
       allYAxisColumnNames,
+      colorByColumnNames,
     });
 
     return (

@@ -62,7 +62,7 @@ export const AddMetricModal: React.FC<{
           render: (value, record) => {
             const Icon = assetTypeToIcon(record.assetType);
             return (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 search-bold">
                 <span className="text-icon-color">
                   <Icon />
                 </span>

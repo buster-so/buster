@@ -48,17 +48,37 @@ export const BusterChartJSTooltip: React.FC<{
     return undefined;
   }, [isBar, barGroupType, isLine, lineGroupType]);
 
+  //@ts-expect-error - skipNull is not typed, only for some charts but yolo
+  const skipNull = chart.options.skipNull === true;
+
+  const hasMultipleShownDatasets = useMemo(() => {
+    const nonHiddenDatasets = datasets.filter((dataset) => !dataset.hidden);
+    if (nonHiddenDatasets.length <= 1) return false;
+
+    if (!skipNull) return nonHiddenDatasets.length > 1; //color by will skip nulls
+
+    // Collect unique yAxisKeys from non-hidden datasets
+    const uniqueYAxisKeys = new Set<string>();
+
+    nonHiddenDatasets.forEach((dataset) => {
+      if (dataset.yAxisKey) {
+        uniqueYAxisKeys.add(dataset.yAxisKey as string);
+      }
+    });
+
+    return !(uniqueYAxisKeys.size > 1);
+  }, [datasets]);
+
   const tooltipItems: ITooltipItem[] = useMemo(() => {
     if (isBar || isLine || isComboChart) {
-      const hasMultipleShownDatasets = datasets.filter((dataset) => !dataset.hidden).length > 1;
-
       return barAndLineTooltipHelper(
         dataPoints,
         chart,
         columnLabelFormats,
         keyToUsePercentage,
         hasMultipleShownDatasets,
-        percentageMode
+        percentageMode,
+        skipNull
       );
     }
 

@@ -1668,6 +1668,8 @@ More content.
     const savedMarkdown1 = await platejsToMarkdown(editor, platejs1);
 
     // Edit: add content
+
+    // biome-ignore lint/style/useTemplate: tests don't matter
     const editedMarkdown = savedMarkdown1 + `\n\n## New Section\nAdded content after save.`;
 
     // Second save cycle

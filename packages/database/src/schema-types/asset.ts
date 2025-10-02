@@ -28,3 +28,10 @@ export const AncestorSchema = z.object({
 });
 
 export type Ancestor = z.infer<typeof AncestorSchema>;
+
+export interface AssetAncestors {
+  chats: Ancestor[];
+  collections: Ancestor[];
+  dashboards: Ancestor[];
+  reports: Ancestor[];
+}

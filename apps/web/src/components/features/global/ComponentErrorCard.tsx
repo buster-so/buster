@@ -1,5 +1,5 @@
 import { ErrorBoundary } from 'react-error-boundary';
-import { rustErrorHandler } from '@/api/errors';
+import { apiErrorHandler } from '@/api/errors';
 import { ErrorCard } from './GlobalErrorCard';
 
 export const ComponentErrorCard = ({
@@ -14,7 +14,7 @@ export const ComponentErrorCard = ({
   return (
     <ErrorBoundary
       fallbackRender={(e) => {
-        const errorMessage: string | undefined = rustErrorHandler(e).message || undefined;
+        const errorMessage: string | undefined = apiErrorHandler(e).message || undefined;
         return <ErrorCard header={header} message={errorMessage || message} />;
       }}
     >

@@ -1,4 +1,4 @@
-import type { ChartConfigProps, ChartEncodes } from '@buster/server-shared/metrics';
+import type { BarAndLineAxis, ChartConfigProps, ChartEncodes } from '@buster/server-shared/metrics';
 import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
 import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useMemo } from 'react';
@@ -203,9 +203,10 @@ export const useOptions = ({
   const options: ChartProps<ChartJSChartType>['options'] = useMemo(() => {
     const chartAnnotations = chartPlugins?.annotation?.annotations;
     const isLargeDataset = numberOfDataPoints > LINE_DECIMATION_THRESHOLD;
+    const hasColorBy = (selectedAxis as BarAndLineAxis).colorBy?.length > 0;
 
     return {
-      skipNull: true,
+      skipNull: hasColorBy,
       indexAxis: isHorizontalBar ? 'y' : 'x',
       backgroundColor: colors,
       borderColor: colors,

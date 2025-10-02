@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { updateChat, updateMessage, updateMessageEntries } from '@buster/database/queries';
 import type { ModelMessage, ToolCallOptions } from 'ai';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CREATE_DASHBOARDS_TOOL_NAME } from '../../visualization-tools/dashboards/create-dashboards-tool/create-dashboards-tool';
@@ -10,12 +9,34 @@ import type { DoneToolContext, DoneToolState } from './done-tool';
 import { createDoneToolDelta } from './done-tool-delta';
 import { createDoneToolStart } from './done-tool-start';
 
+// Mock database queries
 vi.mock('@buster/database/queries', () => ({
   updateChat: vi.fn(),
   updateMessage: vi.fn(),
-  updateMessageEntries: vi.fn(),
+  updateMessageEntries: vi.fn().mockResolvedValue({
+    success: true,
+    sequenceNumber: 0,
+    skipped: false as const,
+  }),
+  waitForPendingUpdates: vi.fn().mockResolvedValue(undefined),
+  isMessageUpdateQueueClosed: vi.fn().mockReturnValue(false),
   getAssetLatestVersion: vi.fn().mockResolvedValue(1),
 }));
+
+// Import mocked functions after the mock definition
+import {
+  getAssetLatestVersion,
+  isMessageUpdateQueueClosed,
+  updateChat,
+  updateMessage,
+  updateMessageEntries,
+  waitForPendingUpdates,
+} from '@buster/database/queries';
+
+// Type assertion for mocked functions
+const mockedIsMessageUpdateQueueClosed = vi.mocked(isMessageUpdateQueueClosed);
+const mockedWaitForPendingUpdates = vi.mocked(waitForPendingUpdates);
+const mockedGetAssetLatestVersion = vi.mocked(getAssetLatestVersion);
 
 describe('done-tool-start', () => {
   const mockContext: DoneToolContext = {
@@ -30,8 +51,20 @@ describe('done-tool-start', () => {
     finalResponse: undefined,
   };
 
+  // Helper to create mock ToolCallOptions
+  const createMockToolCallOptions = (
+    overrides: Partial<ToolCallOptions> = {}
+  ): ToolCallOptions => ({
+    messages: [],
+    toolCallId: 'done-call',
+    ...overrides,
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedIsMessageUpdateQueueClosed.mockReturnValue(false);
+    mockedWaitForPendingUpdates.mockResolvedValue(undefined);
+    mockedGetAssetLatestVersion.mockResolvedValue(1);
   });
 
   describe('mostRecentFile selection', () => {
@@ -126,10 +159,12 @@ describe('done-tool-start', () => {
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
       // Start phase - initializes state
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - streams in the assets and final response
       const deltaInput = JSON.stringify({
@@ -145,8 +180,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
         mostRecentFileId: reportId,
@@ -232,10 +267,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the first metric as the asset to return
       const deltaInput = JSON.stringify({
@@ -251,8 +288,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Should select the first metric (first in extractedFiles)
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -343,10 +380,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the report and standalone metric as assets to return
       const deltaInput = JSON.stringify({
@@ -367,8 +406,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Report should be selected as mostRecentFile
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -443,10 +482,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the first metric
       const deltaInput = JSON.stringify({
@@ -462,8 +503,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Should select the first metric
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -510,10 +551,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the first dashboard
       const deltaInput = JSON.stringify({
@@ -529,8 +572,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Should select the first dashboard
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -596,10 +639,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the dashboard
       const deltaInput = JSON.stringify({
@@ -615,8 +660,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Should select the dashboard (first in extractedFiles)
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -628,10 +673,12 @@ describe('done-tool-start', () => {
 
     it('should handle empty file lists gracefully', async () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: [],
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: [],
+        })
+      );
 
       // Should not call updateChat when no files exist
       expect(updateChat).not.toHaveBeenCalled();
@@ -681,10 +728,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the report
       const deltaInput = JSON.stringify({
@@ -700,8 +749,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Report should still be selected as mostRecentFile
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -772,10 +821,12 @@ describe('done-tool-start', () => {
       const doneToolStart = createDoneToolStart(mockContext, mockDoneToolState);
       const doneToolDelta = createDoneToolDelta(mockContext, mockDoneToolState);
 
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Delta phase - stream in the dashboard (metrics are embedded)
       const deltaInput = JSON.stringify({
@@ -791,8 +842,8 @@ describe('done-tool-start', () => {
 
       await doneToolDelta({
         inputTextDelta: deltaInput,
-        toolCallId: 'done-call',
-      } as ToolCallOptions);
+        ...createMockToolCallOptions({ toolCallId: 'done-call' }),
+      });
 
       // Should select the dashboard since that's what we're returning
       expect(updateChat).toHaveBeenCalledWith('chat-123', {
@@ -836,10 +887,12 @@ describe('done-tool-start', () => {
       ];
 
       const doneToolStart = createDoneToolStart(contextWithEmptyChatId, mockDoneToolState);
-      await doneToolStart({
-        toolCallId: 'done-call',
-        messages: mockMessages,
-      } as ToolCallOptions);
+      await doneToolStart(
+        createMockToolCallOptions({
+          toolCallId: 'done-call',
+          messages: mockMessages,
+        })
+      );
 
       // Should not call updateChat when chatId is missing
       expect(updateChat).not.toHaveBeenCalled();

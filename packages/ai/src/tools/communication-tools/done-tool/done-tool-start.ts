@@ -25,6 +25,8 @@ export function createDoneToolStart(context: DoneToolContext, doneToolState: Don
     doneToolState.addedAssetIds = [];
     doneToolState.addedAssets = [];
     doneToolState.isFinalizing = false;
+    doneToolState.latestSequenceNumber = undefined;
+    doneToolState.finalSequenceNumber = undefined;
 
     // Selection logic moved to delta; skip extracting files here
     if (options.messages) {
@@ -67,7 +69,10 @@ export function createDoneToolStart(context: DoneToolContext, doneToolState: Don
 
     try {
       if (entries.responseMessages || entries.rawLlmMessages) {
-        await updateMessageEntries(entries);
+        const result = await updateMessageEntries(entries);
+        if (!result.skipped && result.sequenceNumber >= 0) {
+          doneToolState.latestSequenceNumber = result.sequenceNumber;
+        }
       }
     } catch (error) {
       console.error('[done-tool] Failed to update done tool raw LLM message:', error);

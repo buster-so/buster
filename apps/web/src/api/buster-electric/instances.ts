@@ -2,6 +2,7 @@ import {
   type BackoffOptions,
   type ChangeMessage,
   isChangeMessage,
+  type MaybePromise,
   type Message,
   type Row,
 } from '@electric-sql/client';
@@ -83,9 +84,9 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
 
     let hasSyncedInitial = false;
 
-    const handler = (messages: Message<T>[]) => {
+    const handler: Parameters<typeof stream.subscribe>[0] = (messages) => {
       for (const m of messages) {
-        if (m.headers.control === 'up-to-date') {
+        if (m.headers.control === 'up-to-date' || m.headers.control === 'snapshot-end') {
           hasSyncedInitial = true;
         } else if (
           hasSyncedInitial &&

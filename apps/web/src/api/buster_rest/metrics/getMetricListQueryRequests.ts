@@ -2,7 +2,7 @@ import { type QueryClient, type UseQueryOptions, useQuery } from '@tanstack/reac
 import { useMemo } from 'react';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { isQueryStale } from '@/lib/query';
-import type { RustApiError } from '../../errors';
+import type { ApiError } from '../../errors';
 import { useGetUserOrganizationId } from '../users/useGetUserInfo';
 import { hasOrganizationId } from '../users/userQueryHelpers';
 import { listMetrics } from './requests';
@@ -10,7 +10,7 @@ import { listMetrics } from './requests';
 export const useGetMetricsList = (
   params: Omit<Parameters<typeof listMetrics>[0], 'page_token' | 'page_size'>,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof listMetrics>>, RustApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof listMetrics>>, ApiError>,
     'queryKey' | 'queryFn' | 'initialData'
   >
 ) => {
