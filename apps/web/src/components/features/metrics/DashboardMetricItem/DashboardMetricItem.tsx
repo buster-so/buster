@@ -34,7 +34,7 @@ export const DashboardMetricItem: React.FC<DashboardMetricItemBaseProps> = React
       threshold: 0.25,
     });
     const { data: dataLength = 0 } = useGetMetricData(
-      { id: metricId, versionNumber: metricVersionNumber },
+      { id: metricId, versionNumber: metricVersionNumber, filterValues: undefined },
       { select: useCallback((data: BusterMetricData) => data.data?.length || 0, []) }
     );
     const animate = !isDragOverlay && dataLength < 125 && numberOfMetrics <= 30 && animateProp;

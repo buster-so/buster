@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { DataMetadataSchema, DataResultSchema } from './metadata.type';
-import { MetricSchema } from './metric.types';
+import { MetricSchema, MetricSchemaWithFilters } from './metric.types';
 import { MetricListItemSchema } from './metrics-list.types';
 
-export const GetMetricResponseSchema = MetricSchema;
+export const GetMetricResponseSchema = MetricSchemaWithFilters;
 export const ListMetricsResponseSchema = z.array(MetricListItemSchema);
 export const UpdateMetricResponseSchema = MetricSchema;
 export const DuplicateMetricResponseSchema = MetricSchema;
@@ -55,6 +55,14 @@ export const MetricDataQuerySchema = z.object({
   version_number: z.coerce.number().int().min(1).optional(),
   report_file_id: z.string().uuid().optional(),
   password: z.string().min(1).optional(),
+  filter_values: z.string().transform((val) => {
+    if (!val) return undefined;
+    try {
+      return JSON.parse(val) as Record<string, unknown>;
+    } catch {
+      return undefined;
+    }
+  }).optional(),
 });
 
 export type MetricDataQuery = z.infer<typeof MetricDataQuerySchema>;

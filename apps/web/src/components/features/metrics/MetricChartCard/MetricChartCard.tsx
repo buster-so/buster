@@ -1,8 +1,10 @@
 import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core';
 import isEmpty from 'lodash/isEmpty';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { BusterMetric, BusterMetricData } from '@/api/asset_interfaces/metric';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { MetricFilters } from '@/components/features/metrics/MetricFilters';
+import { useDashboardFilterValues } from '@/controllers/DashboardController/DashboardViewDashboardController/DashboardContentController/DashboardFilterContext';
 import { useUpdateMetricChart } from '@/context/Metrics/useUpdateMetricChart';
 import { useSelectedColorPalette } from '@/context/Themes/usePalettes';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -34,6 +36,7 @@ const stableMetricSelect = ({
   permission,
   version_number,
   versions,
+  filters,
 }: BusterMetric) => ({
   name,
   description,
@@ -42,6 +45,7 @@ const stableMetricSelect = ({
   chart_config,
   version_number,
   versions,
+  filters,
 });
 const stableMetricData: BusterMetricData['data'] = [];
 
@@ -65,6 +69,14 @@ export const MetricChartCard = React.memo(
       },
       ref
     ) => {
+      const [metricSpecificFilterValues, setMetricSpecificFilterValues] = useState<Record<string, unknown>>({});
+      const { dashboardFilterValues } = useDashboardFilterValues();
+
+      // Merge dashboard-level filters with metric-specific filters
+      const filterValues = useMemo(() => {
+        return { ...dashboardFilterValues, ...metricSpecificFilterValues };
+      }, [dashboardFilterValues, metricSpecificFilterValues]);
+
       const { data: metric, isFetched: isFetchedMetric } = useGetMetric(
         { id: metricId, versionNumber },
         { select: stableMetricSelect, enabled: true }
@@ -73,7 +85,7 @@ export const MetricChartCard = React.memo(
         data: metricData,
         isFetched: isFetchedMetricData,
         error: metricDataError,
-      } = useGetMetricData({ id: metricId, versionNumber, cacheDataId });
+      } = useGetMetricData({ id: metricId, versionNumber, cacheDataId, filterValues });
 
       //data config
       const loadingData = !isFetchedMetricData;
@@ -118,6 +130,7 @@ export const MetricChartCard = React.memo(
             metricVersionNumber={versionNumber}
           />
           <div className={'border-border border-b'} />
+          <MetricFilters filters={metric?.filters} onFilterValuesChange={setMetricSpecificFilterValues} />
           {renderChartContent && (
             <MetricViewChartContent
               chartConfig={memoizedChartConfig}

@@ -13,6 +13,7 @@ import {
   type DataMetadata,
   type GetMetricResponse,
   type Metric,
+  type MetricWithFilters,
   type MetricYml,
 } from '@buster/server-shared/metrics';
 import type { AssetPermissionRole, VerificationStatus } from '@buster/server-shared/share';
@@ -196,6 +197,7 @@ export async function buildMetricResponse(
   processedData: ProcessedMetricData,
   userId: string
 ): Promise<GetMetricResponse> {
+  console.log('buildMetricResponse called for metric:', processedData.resolvedName);
   const {
     metricFile,
     resolvedContent,
@@ -271,7 +273,14 @@ export async function buildMetricResponse(
     public_password: metricFile.publicPassword,
     workspace_sharing: metricFile.workspaceSharing,
     workspace_member_count: workspaceMemberCount,
+    filters: resolvedContent.filters,
   };
+
+  console.log(`buildMetricResponse for ${resolvedName}:`, {
+    hasFilters: !!resolvedContent.filters,
+    filterCount: resolvedContent.filters?.length || 0,
+    filters: resolvedContent.filters,
+  });
 
   return response;
 }
@@ -279,8 +288,9 @@ export async function buildMetricResponse(
 export async function getMetricsInAncestorAssetFromMetricIds(
   metricIds: string[],
   user: User
-): Promise<Record<string, Metric>> {
-  const metricsObj: Record<string, Metric> = {};
+): Promise<Record<string, MetricWithFilters>> {
+  console.log('getMetricsInAncestorAssetFromMetricIds called with', metricIds.length, 'metrics');
+  const metricsObj: Record<string, MetricWithFilters> = {};
 
   // Process metrics in chunks of 4 to manage concurrency
   const results = [];

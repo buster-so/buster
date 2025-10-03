@@ -153,10 +153,12 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
     id = '',
     versionNumber: versionNumberProp,
     cacheDataId,
+    filterValues,
   }: {
     id: string | undefined;
     versionNumber: number | 'LATEST' | undefined;
     cacheDataId?: string;
+    filterValues?: Record<string, unknown>;
   },
   params?: Omit<UseQueryOptions<BusterMetricData, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
@@ -177,12 +179,15 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
   const queryFn = async () => {
     const chosenVersionNumber: number | undefined =
       versionNumberProp === 'LATEST' ? undefined : versionNumberProp;
+    console.log('Fetching metric data with filter values:', filterValues);
     const result = await getMetricData({
       id,
       version_number: chosenVersionNumber || undefined,
       password,
       report_file_id: cacheDataId,
+      filter_values: filterValues,
     });
+    console.log('Received metric data:', result);
     const latestVersionNumber = getLatestMetricVersion(id);
     const isLatest =
       versionNumberProp === 'LATEST' ||
@@ -195,7 +200,7 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
   };
 
   return useQuery({
-    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST'),
+    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST', cacheDataId, filterValues),
     queryFn,
     select: params?.select,
     ...params,

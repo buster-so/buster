@@ -108,6 +108,10 @@ const MetricFilterSchema = z
     }
   });
 
+export const MetricSchemaWithFilters = MetricSchema.extend({
+  filters: z.array(MetricFilterSchema).optional(),
+});
+
 export const MetricYmlSchema = z.object({
   name: z.string(),
   description: z.string(),
@@ -122,5 +126,7 @@ export type MetricYml = z.infer<typeof MetricYmlSchema>;
 export type MetricFilter = z.infer<typeof MetricFilterSchema>;
 
 export type Metric = z.infer<typeof MetricSchema>;
+
+export type MetricWithFilters = z.infer<typeof MetricSchemaWithFilters>;
 
 export const DEFAULT_METRIC: Required<Metric> = getDefaults(MetricSchema);

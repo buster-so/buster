@@ -15,7 +15,7 @@ const LIST_TYPES = new Set<MetricFilter['type']>(['string_list', 'number_list'])
 
 const RANGE_TYPES = new Set<MetricFilter['type']>(['daterange', 'timestamp_range']);
 
-export function compileSqlWithDefaults(metric: MetricContent): string {
+export function compileSqlWithDefaults(metric: MetricContent, filterValues?: Record<string, unknown>): string {
   const filters = metric.filters ?? [];
 
   const filterMap = new Map<string, MetricFilter>();
@@ -49,20 +49,23 @@ export function compileSqlWithDefaults(metric: MetricContent): string {
     }
     usedFilters.add(key);
 
-    const shouldApply = shouldApplyDefault(filter, filter.default);
+    // Use user-provided value if available, otherwise use default
+    const value = filterValues && key in filterValues ? filterValues[key] : filter.default;
+
+    const shouldApply = shouldApplyDefault(filter, value);
     if (!shouldApply) {
       if (filter.required) {
         throw new Error(
-          `Filter '${filter.key}' is required but no default value was provided for validation.`
+          `Filter '${filter.key}' is required but no value was provided.`
         );
       }
-      // Remove token entirely when no default is supplied.
+      // Remove token entirely when no value is supplied.
       lastIndex = tokenEnd;
       continue;
     }
 
     const indent = detectIndentation(sql, tokenStart);
-    const fragment = renderFragment(filter, filter.default);
+    const fragment = renderFragment(filter, value);
     const formattedFragment = fragment.trim().length === 0 ? '' : applyIndent(fragment, indent);
     compiledSql += formattedFragment;
     lastIndex = tokenEnd;

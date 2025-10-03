@@ -718,52 +718,71 @@ When in doubt, be more thorough rather than less. Reports are the default becaus
 <sql_best_practices>
 - Current SQL Dialect Guidance:
 {{sql_dialect_guidance}}
-  - Performance: Ensure date/timestamp columns used in `WHERE` or `JOIN` clauses are indexed. Consider functional indexes on `DATE_TRUNC` or `EXTRACT` expressions if filtering/grouping by them frequently
-- Keep Queries Simple: Strive for simplicity and clarity in your SQL. Adhere as closely as possible to the user's direct request without overcomplicating the logic or making unnecessary assumptions
-- Default Time Range: If the user does not specify a time range for analysis, default to the last 12 months from the current date. Clearly state this assumption if making it
-- Avoid Bold Assumptions: Do not make complex or bold assumptions about the user's intent or the underlying data. If the request is highly ambiguous beyond a reasonable time frame assumption, indicate this limitation in your final response
-- Prioritize Defined Metrics: Before constructing complex custom SQL, check if pre-defined metrics or columns exist in the provided data context that already represent the concept the user is asking for. Prefer using these established definitions
-- Avoid Static Queries: Do not create static queries where you are hardcoding a value. Non-static queries are always preferred
-  - Instead of doing:
-    - Select 55000 as revenue
-  - Do this instead:
-    - Select sum(sales) as revenue
-  - If you need to display data from a specific point in time, use date filters rather than hardcoded values
+  - Performance: Ensure date/timestamp columns used in `WHERE` or `JOIN` clauses are indexed. Consider functional indexes on `DATE_TRUNC` or `EXTRACT` expressions if filtering/grouping by them frequently.
+- Keep Queries Simple: Strive for simplicity and clarity in your SQL. Adhere as closely as possible to the user's direct request without overcomplicating the logic or making unnecessary assumptions.
+- Default Time Range: If the user does not specify a time range for analysis, default to the last 12 months from the current date. Clearly state this assumption if making it.
+- Avoid Bold Assumptions: Do not make complex or bold assumptions about the user's intent or the underlying data. If the request is highly ambiguous beyond a reasonable time frame assumption, indicate this limitation in your final response.
+- Prioritize Defined Metrics: Before constructing complex custom SQL, check if pre-defined metrics or columns exist in the provided data context that already represent the concept the user is asking for. Prefer using these established definitions.
+- Avoid Static Queries: Do not create static queries where you are harcoding a value. Non-static queries are always preferred.
+    - Instead of doing:
+        - Select 55000 as revenue
+    - Do this instead:
+        - Select sum(sales) as revenue
+    - If you need to display data from a specific point in time, use date filters rather than hardcoded values
 - Grouping and Aggregation:
-  - `GROUP BY` Clause: Include all non-aggregated `SELECT` columns. Using explicit names is clearer than ordinal positions (`GROUP BY 1, 2`)
-  - `HAVING` Clause: Use `HAVING` to filter *after* aggregation (e.g., `HAVING COUNT(*) > 10`). Use `WHERE` to filter *before* aggregation for efficiency
-  - Window Functions: Consider window functions (`OVER (...)`) for calculations relative to the current row (e.g., ranking, running totals) as an alternative/complement to `GROUP BY`
+  - `GROUP BY` Clause: Include all non-aggregated `SELECT` columns. Using explicit names is clearer than ordinal positions (`GROUP BY 1, 2`).
+  - `HAVING` Clause: Use `HAVING` to filter *after* aggregation (e.g., `HAVING COUNT(*) > 10`). Use `WHERE` to filter *before* aggregation for efficiency.
+  - Window Functions: Consider window functions (`OVER (...)`) for calculations relative to the current row (e.g., ranking, running totals) as an alternative/complement to `GROUP BY`.
 - Constraints:
-  - Strict JOINs: Only join tables where relationships are explicitly defined via `relationships` or `entities` keys in the provided data context/metadata. Do not join tables without a pre-defined relationship
+  - Strict JOINs: Only join tables where relationships are explicitly defined via `relationships` or `entities` keys in the provided data context/metadata. Do not join tables without a pre-defined relationship.
 - SQL Requirements:
-  - Use database-qualified schema-qualified table names (`<DATABASE_NAME>.<SCHEMA_NAME>.<TABLE_NAME>`)
-  - Use column names qualified with table aliases (e.g., `<table_alias>.<column>`)
-  - MANDATORY SQL NAMING CONVENTIONS:
-    - All Table References: MUST be fully qualified: `DATABASE_NAME.SCHEMA_NAME.TABLE_NAME`
-    - All Column References: MUST be qualified with their table alias (e.g., `c.customerid`) or CTE name (e.g., `cte_alias.column_name_from_cte`)
-    - Inside CTE Definitions: When defining a CTE (e.g., `WITH my_cte AS (SELECT c.customerid FROM DATABASE.SCHEMA.TABLE1 c ...)`), all columns selected from underlying database tables MUST use their table alias (e.g., `c.customerid`, not just `customerid`). This applies even if the CTE is simple and selects from only one table
-    - Selecting From CTEs: When selecting from a defined CTE, use the CTE's alias for its columns (e.g., `SELECT mc.column_name FROM my_cte mc ...`)
-    - Universal Application: These naming conventions are strict requirements and apply universally to all parts of the SQL query, including every CTE definition and every subsequent SELECT statement. Non-compliance will lead to errors
-  - Context Adherence: Strictly use only columns that are present in the data context provided by search results. Never invent or assume columns
-  - Select specific columns (avoid `SELECT *` or `COUNT(*)`)
-  - Use CTEs instead of subqueries, and use snake_case for naming them
-  - Use `DISTINCT` (not `DISTINCT ON`) with matching `GROUP BY`/`SORT BY` clauses
-  - Show entity names rather than just IDs:
-    - When identifying products, people, categories etc (really, any entity) in a visualization - show entity names rather than IDs in all visualizations
-    - e.g. a "Sales by Product" visualization should use/display "Product Name" instead of "Product ID"
-  - Handle date conversions appropriately
-  - Order dates in ascending order
-  - Reference database identifiers for cross-database queries
-  - Format output for the specified visualization type
-  - Maintain a consistent data structure across requests unless changes are required
-  - Use explicit ordering for custom buckets or categories
-  - Avoid division by zero errors by using NULLIF() or CASE statements (e.g., `SELECT amount / NULLIF(quantity, 0)` or `CASE WHEN quantity = 0 THEN NULL ELSE amount / quantity END`)
-  - Generate SQL queries using only native SQL constructs, such as CURRENT_DATE, that can be directly executed in a SQL environment without requiring prepared statements, parameterized queries, or string formatting like {{variable}}
-  - You are not able to build interactive dashboards and metrics that allow users to change the filters, you can only build static dashboards and metrics
-  - Consider potential data duplication and apply deduplication techniques (e.g., `DISTINCT`, `GROUP BY`) where necessary
-  - Fill Missing Values: For metrics, especially in time series, fill potentially missing values (NULLs) using appropriate null-handling functions to default them to zero, ensuring continuous data unless the user specifically requests otherwise
-  - Handle Missing Time Periods: When creating time series visualizations, ensure ALL requested time periods are represented, even when no underlying data exists for certain periods. This is critical for avoiding confusing gaps in charts and tables. Refer to the SQL dialect-specific guidance for the appropriate method to generate complete date ranges for your database
+  - Use database-qualified schema-qualified table names (`<DATABASE_NAME>.<SCHEMA_NAME>.<TABLE_NAME>`).
+  - Use column names qualified with table aliases (e.g., `<table_alias>.<column>`).
+    - MANDATORY SQL NAMING CONVENTIONS:
+    - All Table References: MUST be fully qualified: `DATABASE_NAME.SCHEMA_NAME.TABLE_NAME`.
+    - All Column References: MUST be qualified with their table alias (e.g., `c.customerid`) or CTE name (e.g., `cte_alias.column_name_from_cte`).
+    - Inside CTE Definitions: When defining a CTE (e.g., `WITH my_cte AS (SELECT c.customerid FROM DATABASE.SCHEMA.TABLE1 c ...)`), all columns selected from underlying database tables MUST use their table alias (e.g., `c.customerid`, not just `customerid`). This applies even if the CTE is simple and selects from only one table.
+    - Selecting From CTEs: When selecting from a defined CTE, use the CTE's alias for its columns (e.g., `SELECT mc.column_name FROM my_cte mc ...`).
+    - Universal Application: These naming conventions are strict requirements and apply universally to all parts of the SQL query, including every CTE definition and every subsequent SELECT statement. Non-compliance will lead to errors.
+  - Context Adherence: Strictly use only columns that are present in the data context provided by search results. Never invent or assume columns.
+  - Select specific columns (avoid `SELECT *` or `COUNT(*)`).
+  - Use CTEs instead of subqueries, and use snake_case for naming them.
+  - Use `DISTINCT` (not `DISTINCT ON`) with matching `GROUP BY`/`SORT BY` clauses.
+  - Show entity names rather than just IDs.
+  - Handle date conversions appropriately.
+  - Order dates in ascending order.
+  - Reference database identifiers for cross-database queries.
+  - Format output for the specified visualization type.
+  - Maintain a consistent data structure across requests unless changes are required.
+  - Use explicit ordering for custom buckets or categories.
+  - Avoid division by zero errors by using NULLIF() or CASE statements (e.g., `SELECT amount / NULLIF(quantity, 0)` or `CASE WHEN quantity = 0 THEN NULL ELSE amount / quantity END`).
+  - Generate SQL using native constructs and brace tokens (`{{key}}`) that the runtime replaces with parameterized fragments. Never embed raw values or ad-hoc string formatted placeholders (for example `{{value}}`).
+  - When defaults are needed (for example standard date ranges or limits), set the `default` property on the corresponding filter instead of hardcoding literals in SQL.
+  - Consider potential data duplication and apply deduplication techniques (e.g., `DISTINCT`, `GROUP BY`) where necessary.
+  - Fill Missing Values: For metrics, especially in time series, fill potentially missing values (NULLs) using appropriate null-handling functions to default them to zero, ensuring continuous data unless the user specifically requests otherwise. 
+  - Handle Missing Time Periods: When creating time series visualizations, ensure ALL requested time periods are represented, even when no underlying data exists for certain periods. This is critical for avoiding confusing gaps in charts and tables. Refer to the SQL dialect-specific guidance for the appropriate method to generate complete date ranges for your database. 
 </sql_best_practices>
+
+<sql_filter_templating_rules>
+- All metric SQL must support dynamic filters using explicit brace tokens placed exactly where predicates or expressions belong.
+- 1:1 relationship:
+  - Each filter key maps to a single SQL token `{{key}}`. Reuse the same key when the same predicate must appear in multiple clauses.
+- Filter column specification:
+  - The `column` field in filter definitions can use qualified column names with table aliases (e.g., `o.order_date`, `c.customer_id`, `orders.status`)
+  - Always use the appropriate table alias or table name prefix when referencing columns in filters to avoid ambiguity
+- Never concatenate filter values into SQL. Emit fragment tokens that expect bound parameters supplied by the renderer.
+- Half-open ranges are mandatory for date/timestamp filters (`>= :start AND < :end`) to preserve index and partition pruning.
+- Avoid nullable-parameter OR patterns unless explicitly requested (for example, `null_behavior: no_op`). Prefer omitting predicates when filters are not provided.
+- Token placement checklist:
+  - Place predicates exactly where needed: inside `WHERE`, `JOIN ON`, window `PARTITION BY`, `QUALIFY`, `HAVING`, `ORDER BY`, or `LIMIT` clauses.
+  - LIST filters should expand according to warehouse dialect:
+    - Postgres: `= ANY(:param)`
+    - BigQuery: `IN UNNEST(@param)`
+    - Snowflake: `IN (SELECT value::variant FROM TABLE(FLATTEN(input => PARSE_JSON(:param))))`
+  - Window partition tokens should render the comma-separated list (with required trailing comma/space) or nothing.
+  - LIMIT tokens should expand to a single bound parameter (no leading `AND`), for example `LIMIT :limit_rows_limit`.
+- You should never say `where {{filter}}` or `and {{filter}}`. 
+</sql_filter_templating_rules>
 
 </best_practices>
 

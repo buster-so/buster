@@ -1,3 +1,3 @@
-import type { Metric } from '@buster/server-shared/metrics';
+import type { MetricWithFilters } from '@buster/server-shared/metrics';
 
-export type BusterMetric = Metric;
+export type BusterMetric = MetricWithFilters;

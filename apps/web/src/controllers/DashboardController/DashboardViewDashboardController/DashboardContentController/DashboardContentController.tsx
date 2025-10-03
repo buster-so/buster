@@ -3,11 +3,14 @@ import isEmpty from 'lodash/isEmpty';
 import React, { useMemo, useState } from 'react';
 import type { BusterDashboardResponse, BusterMetric } from '@/api/asset_interfaces';
 import type { useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
+import { DashboardFilters } from '@/components/features/dashboards/DashboardFilters';
 import { BusterResizeableGrid, type BusterResizeableGridRow } from '@/components/ui/grid';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { DashboardMetricItem } from '../../../../components/features/metrics/DashboardMetricItem';
 import { DashboardContentControllerProvider } from './DashboardContentControllerContext';
 import { DashboardEmptyState, DashboardNoContentReadOnly } from './DashboardEmptyState';
+import { DashboardFilterProvider } from './DashboardFilterContext';
+import { getCommonFilters } from './helpers/getCommonFilters';
 import { removeChildrenFromItems } from './helpers';
 
 const DEFAULT_EMPTY_ROWS: DashboardConfig['rows'] = [];
@@ -31,6 +34,16 @@ export const DashboardContentController: React.FC<{
     onUpdateDashboardConfig,
   }) => {
     const [draggingId, setDraggingId] = useState<string | null>(null);
+    const [dashboardFilterValues, setDashboardFilterValues] = useState<Record<string, unknown>>({});
+
+    const commonFilters = useMemo(() => {
+      const filters = getCommonFilters(metrics);
+      console.log('DashboardContentController - commonFilters:', filters);
+      console.log('DashboardContentController - readOnly:', readOnly);
+      console.log('DashboardContentController - Should show filters?', !readOnly && filters.length > 0);
+      return filters;
+    }, [metrics, readOnly]);
+
     const dashboardVersionNumber = dashboard?.version_number;
     const dashboardConfig = dashboard?.config || DEFAULT_EMPTY_CONFIG;
     const rows = dashboardConfig?.rows || DEFAULT_EMPTY_ROWS;
@@ -107,16 +120,24 @@ export const DashboardContentController: React.FC<{
     return (
       <div className="dashboard-content-controller overflow-visible">
         {hasMetrics && !!dashboardRows.length && !!dashboard ? (
-          <DashboardContentControllerProvider dashboard={dashboard}>
-            <BusterResizeableGrid
-              rows={dashboardRows}
-              readOnly={readOnly}
-              onRowLayoutChange={onRowLayoutChange}
-              onStartDrag={onStartDrag}
-              onEndDrag={onDragEnd}
-              overlayComponent={memoizedOverlayComponent}
-            />
-          </DashboardContentControllerProvider>
+          <DashboardFilterProvider>
+            <DashboardContentControllerProvider dashboard={dashboard}>
+              {!readOnly && commonFilters.length > 0 && (
+                <DashboardFilters
+                  commonFilters={commonFilters}
+                  onFilterValuesChange={setDashboardFilterValues}
+                />
+              )}
+              <BusterResizeableGrid
+                rows={dashboardRows}
+                readOnly={readOnly}
+                onRowLayoutChange={onRowLayoutChange}
+                onStartDrag={onStartDrag}
+                onEndDrag={onDragEnd}
+                overlayComponent={memoizedOverlayComponent}
+              />
+            </DashboardContentControllerProvider>
+          </DashboardFilterProvider>
         ) : !readOnly ? (
           <DashboardEmptyState onOpenAddContentModal={onOpenAddContentModal} />
         ) : (

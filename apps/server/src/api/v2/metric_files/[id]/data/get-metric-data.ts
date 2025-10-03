@@ -38,7 +38,8 @@ export async function getMetricDataHandler(
   limit = 5000,
   versionNumber?: number,
   reportFileId?: string,
-  password?: string
+  password?: string,
+  filterValues?: Record<string, unknown>
 ): Promise<MetricDataResponse> {
   // Retrieve metric definition from database with data source info
   const metric = await getMetricWithDataSource({ metricId, versionNumber });
@@ -120,8 +121,13 @@ export async function getMetricDataHandler(
   // Ensure limit is within bounds
   const queryLimit = Math.min(Math.max(limit, 1), 5000);
 
-  // Compile SQL with defaults to remove filter tokens
-  const compiledSql = compileSqlWithDefaults(metric.content);
+  console.log('Filter values received:', filterValues);
+  console.log('Metric filters:', metric.content.filters);
+
+  // Compile SQL with user-provided filter values or defaults
+  const compiledSql = compileSqlWithDefaults(metric.content, filterValues);
+
+  console.log('Compiled SQL:', compiledSql);
 
   // Extract SQL query from metric content (for backwards compatibility if no filters)
   const sql = compiledSql || extractSqlFromMetricContent(metric.content);
