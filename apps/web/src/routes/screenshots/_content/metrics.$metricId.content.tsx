@@ -21,9 +21,6 @@ export const Route = createFileRoute('/screenshots/_content/metrics/$metricId/co
     if (!metric || !metricData) {
       throw new Error('Metric not found');
     }
-    return {
-      metric,
-    };
   },
 
   component: () => {

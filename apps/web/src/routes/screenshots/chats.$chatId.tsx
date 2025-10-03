@@ -2,24 +2,22 @@ import { createServerFileRoute } from '@tanstack/react-start/server';
 import { z } from 'zod';
 import { browserLogin } from '@/api/server-functions/browser-login';
 import { createScreenshotResponse } from '@/api/server-functions/screenshot-helpers';
-import { getSupabaseServerClient } from '@/integrations/supabase/server';
 import { createHrefFromLink } from '@/lib/routes';
 
-export const GetMetricScreenshotParamsSchema = z.object({
-  metricId: z.string(),
+export const GetChatScreenshotParamsSchema = z.object({
+  chatId: z.string(),
 });
 
-export const GetMetricScreenshotQuerySchema = z.object({
-  version_number: z.coerce.number().min(1).optional(),
-  width: z.coerce.number().min(100).max(3840).default(800),
-  height: z.coerce.number().min(100).max(2160).default(450),
+export const GetChatScreenshotQuerySchema = z.object({
+  width: z.coerce.number().min(600).max(3840).default(600),
+  height: z.coerce.number().min(400).max(2160).default(338),
   type: z.enum(['png', 'jpeg']).default('png'),
 });
 
-export const ServerRoute = createServerFileRoute('/screenshots/metrics/$metricId/').methods({
+export const ServerRoute = createServerFileRoute('/screenshots/chats/$chatId').methods({
   GET: async ({ request, params }) => {
-    const { metricId } = GetMetricScreenshotParamsSchema.parse(params);
-    const { version_number, type, width, height } = GetMetricScreenshotQuerySchema.parse(
+    const { chatId } = GetChatScreenshotParamsSchema.parse(params);
+    const { width, height, type } = GetChatScreenshotQuerySchema.parse(
       Object.fromEntries(new URL(request.url).searchParams)
     );
 
@@ -28,23 +26,22 @@ export const ServerRoute = createServerFileRoute('/screenshots/metrics/$metricId
         width,
         height,
         fullPath: createHrefFromLink({
-          to: '/screenshots/metrics/$metricId/content',
-          params: { metricId },
-          search: { version_number, type, width, height },
+          to: '/screenshots/chats/$chatId/content',
+          params: { chatId },
+          search: { type, width, height },
         }),
         request,
         callback: async ({ page }) => {
           const screenshotBuffer = await page.screenshot({
             type,
           });
-
           return screenshotBuffer;
         },
       });
 
       return createScreenshotResponse({ screenshotBuffer });
     } catch (error) {
-      console.error('Error capturing metric screenshot', error);
+      console.error('Error capturing chat screenshot', error);
       return new Response(
         JSON.stringify({
           message: 'Failed to capture screenshot',

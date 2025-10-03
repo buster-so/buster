@@ -6,9 +6,7 @@ export const Route = createFileRoute('/screenshots/_content')({
   ssr: true,
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
-    const user = await getSupabaseSession();
     await ensureGetMyUserInfo(context.queryClient);
-    return { user };
   },
 });
 

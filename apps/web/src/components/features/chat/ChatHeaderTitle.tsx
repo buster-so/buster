@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type React from 'react';
 import { useUpdateChat } from '@/api/buster_rest/chats';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
+import { cn } from '@/lib/classMerge';
 
 const animation = {
   initial: { opacity: 0 },
@@ -16,7 +17,8 @@ export const ChatHeaderTitle: React.FC<{
   chatTitle: string;
   chatId: string;
   isStreamingMessage: boolean;
-}> = ({ chatTitle, chatId, isStreamingMessage }) => {
+  alignTitleToCenter: boolean;
+}> = ({ chatTitle, chatId, isStreamingMessage, alignTitleToCenter }) => {
   const { mutateAsync: updateChat } = useUpdateChat();
   const isStreamFinished = !isStreamingMessage;
 
@@ -32,7 +34,10 @@ export const ChatHeaderTitle: React.FC<{
         transition={{
           duration: isStreamFinished ? 0 : 0.2,
         }}
-        className="flex w-full items-center overflow-hidden"
+        className={cn(
+          'flex w-full items-center overflow-hidden',
+          alignTitleToCenter && 'mx-auto max-w-[600px] pl-4'
+        )}
       >
         <EditableTitle
           className="w-full"

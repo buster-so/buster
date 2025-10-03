@@ -3,30 +3,31 @@ import { env } from '@/env';
 import { getSupabaseServerClient } from '@/integrations/supabase/server';
 
 export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
-  accessToken,
   width,
   height,
   fullPath,
   request,
   callback,
 }: {
-  accessToken: string;
   width: number;
   height: number;
   fullPath: string;
   request: Request;
   callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
 }) => {
+  const bearerToken = request.headers.get('Authorization') || '';
+  const accessToken = bearerToken.replace('Bearer ', '');
   const supabase = getSupabaseServerClient();
-  const jwtPayload = JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64').toString());
-  const origin = new URL(request.url).origin;
 
   const {
     data: { user },
   } = await supabase.auth.getUser(accessToken);
 
+  const jwtPayload = JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64').toString());
+  const origin = new URL(request.url).origin;
+
   if (!user || user?.is_anonymous) {
-    throw new Error('User not found');
+    throw new Error('User not authenticated');
   }
 
   const session = {

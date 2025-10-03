@@ -6,11 +6,19 @@ import { ChatHeader } from './ChatHeader';
 export const CHAT_CONTAINER_ID = 'chat-container-content';
 
 export const ChatContainer = React.memo(
-  ({ chatId, isEmbed }: { chatId: string | undefined; isEmbed: boolean }) => {
+  ({
+    chatId,
+    isEmbed,
+    alignTitleToCenter,
+  }: {
+    chatId: string | undefined;
+    isEmbed: boolean;
+    alignTitleToCenter: boolean;
+  }) => {
     return (
       <AppPageLayout
         headerSizeVariant="default"
-        header={<ChatHeader isEmbed={isEmbed} />}
+        header={<ChatHeader isEmbed={isEmbed} alignTitleToCenter={alignTitleToCenter} />}
         headerBorderVariant="ghost"
         headerClassName="bg-page-background"
         mainClassName="bg-page-background"
