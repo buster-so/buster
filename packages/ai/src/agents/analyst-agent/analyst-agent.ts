@@ -25,10 +25,6 @@ import {
   RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
   createRespondWithoutAssetCreationTool,
 } from '../../tools/communication-tools/respond-without-asset-creation/respond-without-asset-creation-tool';
-import {
-  SUBMIT_THOUGHTS_TOOL_NAME,
-  createSubmitThoughtsTool,
-} from '../../tools/communication-tools/submit-thoughts-tool/submit-thoughts-tool';
 import { EXECUTE_SQL_TOOL_NAME } from '../../tools/database-tools/execute-sql/execute-sql';
 import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
 import { CREATE_DASHBOARDS_TOOL_NAME } from '../../tools/visualization-tools/dashboards/create-dashboards-tool/create-dashboards-tool';
@@ -45,7 +41,7 @@ import { getAnalystAgentSystemPrompt } from './get-analyst-agent-system-prompt';
 export const ANALYST_AGENT_NAME = 'analystAgent';
 
 const STOP_CONDITIONS = [
-  stepCountIs(25),
+  stepCountIs(50),
   hasToolCall(DONE_TOOL_NAME),
   hasToolCall(RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME),
   hasToolCall(MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME),

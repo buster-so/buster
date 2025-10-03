@@ -15,8 +15,8 @@ const dashboardGetList = (
 
 const dashboardGetDashboard = (dashboardId: string, version_number: number | 'LATEST') =>
   queryOptions<GetDashboardResponse>({
-    queryKey: ['dashboard', 'get', dashboardId, version_number || 'LATEST'] as const,
-    staleTime: 60 * 1000,
+    queryKey: ['dashboard', 'get', 'v2', dashboardId, version_number || 'LATEST'] as const, // Added 'v2' to bust cache
+    staleTime: 0, // Temporarily set to 0 during filter development
   });
 
 export const dashboardQueryKeys = {

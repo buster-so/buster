@@ -34,7 +34,7 @@ export const getDashboardById = async ({
   /** The version number of the dashboard */
   version_number?: number;
 }) => {
-  return await mainApi
+  return await mainApiV2
     .get<GetDashboardResponse>(`/dashboards/${id}`, {
       params: { password, version_number },
     })

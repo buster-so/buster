@@ -197,7 +197,6 @@ export async function buildMetricResponse(
   processedData: ProcessedMetricData,
   userId: string
 ): Promise<GetMetricResponse> {
-  console.log('buildMetricResponse called for metric:', processedData.resolvedName);
   const {
     metricFile,
     resolvedContent,
@@ -276,12 +275,6 @@ export async function buildMetricResponse(
     filters: resolvedContent.filters,
   };
 
-  console.log(`buildMetricResponse for ${resolvedName}:`, {
-    hasFilters: !!resolvedContent.filters,
-    filterCount: resolvedContent.filters?.length || 0,
-    filters: resolvedContent.filters,
-  });
-
   return response;
 }
 
@@ -289,7 +282,6 @@ export async function getMetricsInAncestorAssetFromMetricIds(
   metricIds: string[],
   user: User
 ): Promise<Record<string, MetricWithFilters>> {
-  console.log('getMetricsInAncestorAssetFromMetricIds called with', metricIds.length, 'metrics');
   const metricsObj: Record<string, MetricWithFilters> = {};
 
   // Process metrics in chunks of 4 to manage concurrency

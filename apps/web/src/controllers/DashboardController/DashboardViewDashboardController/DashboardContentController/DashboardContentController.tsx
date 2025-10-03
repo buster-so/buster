@@ -9,7 +9,7 @@ import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { DashboardMetricItem } from '../../../../components/features/metrics/DashboardMetricItem';
 import { DashboardContentControllerProvider } from './DashboardContentControllerContext';
 import { DashboardEmptyState, DashboardNoContentReadOnly } from './DashboardEmptyState';
-import { DashboardFilterProvider } from './DashboardFilterContext';
+import { DashboardFilterProvider, useDashboardFilterValues } from './DashboardFilterContext';
 import { getCommonFilters } from './helpers/getCommonFilters';
 import { removeChildrenFromItems } from './helpers';
 
@@ -17,7 +17,7 @@ const DEFAULT_EMPTY_ROWS: DashboardConfig['rows'] = [];
 const DEFAULT_EMPTY_METRICS: Record<string, BusterMetric> = {};
 const DEFAULT_EMPTY_CONFIG: DashboardConfig = {};
 
-export const DashboardContentController: React.FC<{
+const DashboardContentControllerInner: React.FC<{
   readOnly?: boolean;
   metrics: BusterDashboardResponse['metrics'] | undefined;
   dashboard: BusterDashboardResponse['dashboard'] | undefined;
@@ -34,13 +34,10 @@ export const DashboardContentController: React.FC<{
     onUpdateDashboardConfig,
   }) => {
     const [draggingId, setDraggingId] = useState<string | null>(null);
-    const [dashboardFilterValues, setDashboardFilterValues] = useState<Record<string, unknown>>({});
+    const { setDashboardFilterValues } = useDashboardFilterValues();
 
     const commonFilters = useMemo(() => {
       const filters = getCommonFilters(metrics);
-      console.log('DashboardContentController - commonFilters:', filters);
-      console.log('DashboardContentController - readOnly:', readOnly);
-      console.log('DashboardContentController - Should show filters?', !readOnly && filters.length > 0);
       return filters;
     }, [metrics, readOnly]);
 
@@ -120,24 +117,22 @@ export const DashboardContentController: React.FC<{
     return (
       <div className="dashboard-content-controller overflow-visible">
         {hasMetrics && !!dashboardRows.length && !!dashboard ? (
-          <DashboardFilterProvider>
-            <DashboardContentControllerProvider dashboard={dashboard}>
-              {!readOnly && commonFilters.length > 0 && (
-                <DashboardFilters
-                  commonFilters={commonFilters}
-                  onFilterValuesChange={setDashboardFilterValues}
-                />
-              )}
-              <BusterResizeableGrid
-                rows={dashboardRows}
-                readOnly={readOnly}
-                onRowLayoutChange={onRowLayoutChange}
-                onStartDrag={onStartDrag}
-                onEndDrag={onDragEnd}
-                overlayComponent={memoizedOverlayComponent}
+          <DashboardContentControllerProvider dashboard={dashboard}>
+            {!readOnly && commonFilters.length > 0 && (
+              <DashboardFilters
+                commonFilters={commonFilters}
+                onFilterValuesChange={setDashboardFilterValues}
               />
-            </DashboardContentControllerProvider>
-          </DashboardFilterProvider>
+            )}
+            <BusterResizeableGrid
+              rows={dashboardRows}
+              readOnly={readOnly}
+              onRowLayoutChange={onRowLayoutChange}
+              onStartDrag={onStartDrag}
+              onEndDrag={onDragEnd}
+              overlayComponent={memoizedOverlayComponent}
+            />
+          </DashboardContentControllerProvider>
         ) : !readOnly ? (
           <DashboardEmptyState onOpenAddContentModal={onOpenAddContentModal} />
         ) : (
@@ -147,4 +142,19 @@ export const DashboardContentController: React.FC<{
     );
   }
 );
-DashboardContentController.displayName = 'DashboardIndividualDashboard';
+DashboardContentControllerInner.displayName = 'DashboardContentControllerInner';
+
+export const DashboardContentController: React.FC<{
+  readOnly?: boolean;
+  metrics: BusterDashboardResponse['metrics'] | undefined;
+  dashboard: BusterDashboardResponse['dashboard'] | undefined;
+  onUpdateDashboardConfig: ReturnType<typeof useUpdateDashboardConfig>['mutateAsync'];
+  onOpenAddContentModal: () => void;
+  animate?: boolean;
+}> = (props) => {
+  return (
+    <DashboardFilterProvider>
+      <DashboardContentControllerInner {...props} />
+    </DashboardFilterProvider>
+  );
+};

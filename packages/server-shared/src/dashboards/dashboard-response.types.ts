@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { MetricSchema } from '../metrics';
+import { MetricSchemaWithFilters } from '../metrics';
 import { ShareConfigSchema, ShareRoleSchema } from '../share';
 import { DashboardSchema } from './dashboard.types';
 
 export const GetDashboardResponseSchema = z.object({
-  metrics: z.record(z.string(), MetricSchema),
+  metrics: z.record(z.string(), MetricSchemaWithFilters),
   dashboard: DashboardSchema,
   collections: z.array(
     z.object({

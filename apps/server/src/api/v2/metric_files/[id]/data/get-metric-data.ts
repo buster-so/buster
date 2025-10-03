@@ -121,13 +121,8 @@ export async function getMetricDataHandler(
   // Ensure limit is within bounds
   const queryLimit = Math.min(Math.max(limit, 1), 5000);
 
-  console.log('Filter values received:', filterValues);
-  console.log('Metric filters:', metric.content.filters);
-
   // Compile SQL with user-provided filter values or defaults
   const compiledSql = compileSqlWithDefaults(metric.content, filterValues);
-
-  console.log('Compiled SQL:', compiledSql);
 
   // Extract SQL query from metric content (for backwards compatibility if no filters)
   const sql = compiledSql || extractSqlFromMetricContent(metric.content);

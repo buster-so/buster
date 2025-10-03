@@ -179,7 +179,6 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
   const queryFn = async () => {
     const chosenVersionNumber: number | undefined =
       versionNumberProp === 'LATEST' ? undefined : versionNumberProp;
-    console.log('Fetching metric data with filter values:', filterValues);
     const result = await getMetricData({
       id,
       version_number: chosenVersionNumber || undefined,
@@ -187,7 +186,6 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
       report_file_id: cacheDataId,
       filter_values: filterValues,
     });
-    console.log('Received metric data:', result);
     const latestVersionNumber = getLatestMetricVersion(id);
     const isLatest =
       versionNumberProp === 'LATEST' ||
