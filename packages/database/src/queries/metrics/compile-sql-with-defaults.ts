@@ -50,7 +50,15 @@ export function compileSqlWithDefaults(metric: MetricContent, filterValues?: Rec
     usedFilters.add(key);
 
     // Use user-provided value if available, otherwise use default
-    const value = filterValues && key in filterValues ? filterValues[key] : filter.default;
+    const filterValueData = filterValues && key in filterValues ? filterValues[key] : filter.default;
+
+    // Check if filter value includes operator override
+    let value = filterValueData;
+    let operatorOverride: string | undefined;
+    if (filterValueData && typeof filterValueData === 'object' && !Array.isArray(filterValueData) && 'value' in filterValueData) {
+      value = (filterValueData as { value: unknown; op?: string }).value;
+      operatorOverride = 'op' in filterValueData ? String((filterValueData as { value: unknown; op?: string }).op) : undefined;
+    }
 
     const shouldApply = shouldApplyDefault(filter, value);
     if (!shouldApply) {
@@ -65,7 +73,7 @@ export function compileSqlWithDefaults(metric: MetricContent, filterValues?: Rec
     }
 
     const indent = detectIndentation(sql, tokenStart);
-    const fragment = renderFragment(filter, value);
+    const fragment = renderFragment(filter, value, operatorOverride);
     const formattedFragment = fragment.trim().length === 0 ? '' : applyIndent(fragment, indent);
     compiledSql += formattedFragment;
     lastIndex = tokenEnd;
@@ -106,7 +114,7 @@ function shouldApplyDefault(_filter: MetricFilter, value: unknown): boolean {
   return true;
 }
 
-function renderFragment(filter: MetricFilter, value: unknown): string {
+function renderFragment(filter: MetricFilter, value: unknown, operatorOverride?: string): string {
   const needsLeadingAnd = filter.needsLeadingAnd ?? MODES_REQUIRING_AND.has(filter.mode);
 
   switch (filter.mode) {
@@ -117,7 +125,7 @@ function renderFragment(filter: MetricFilter, value: unknown): string {
       if (!filter.column.trim()) {
         throw new Error(`Filter '${filter.key}' must define a column for mode '${filter.mode}'.`);
       }
-      const op = filter.op ?? '=';
+      const op = operatorOverride ?? filter.op ?? '=';
       const literal = toSqlLiteral(value, filter.type);
       const condition = `${filter.column} ${op} ${literal}`;
       return needsLeadingAnd ? `AND ${condition}` : condition;

@@ -9,38 +9,67 @@ interface DashboardFiltersProps {
   className?: string;
 }
 
+const COMPARISON_OPERATORS = ['=', '!=', '>', '>=', '<', '<=', 'like', 'ilike'] as const;
+
+// Modes that support comparison operators
+const MODES_SUPPORTING_OPERATORS = new Set(['predicate', 'join_predicate', 'qualify', 'having']);
+
+function canUseOperator(filter: MetricFilter): boolean {
+  return MODES_SUPPORTING_OPERATORS.has(filter.mode);
+}
+
 export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   commonFilters,
   onFilterValuesChange,
   className,
 }) => {
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
+  const [filterOperators, setFilterOperators] = useState<Record<string, string>>({});
 
   if (!commonFilters || commonFilters.length === 0) {
     return null;
   }
 
-  const handleFilterChange = (key: string, value: string) => {
-    const newFilterValues = { ...filterValues, [key]: value };
-    setFilterValues(newFilterValues);
+  const handleInputChange = (key: string, value: string) => {
+    setFilterValues({ ...filterValues, [key]: value });
+  };
 
+  const handleOperatorChange = (key: string, op: string) => {
+    setFilterOperators({ ...filterOperators, [key]: op });
+  };
+
+  const handleBlur = () => {
     // Convert values to appropriate types
     const typedValues: Record<string, unknown> = {};
-    Object.entries(newFilterValues).forEach(([filterKey, filterValue]) => {
+    Object.entries(filterValues).forEach(([filterKey, filterValue]) => {
       const filter = commonFilters.find((f) => f.key === filterKey);
       if (!filter || !filterValue) return;
 
+      let parsedValue: unknown;
+
       // Parse values based on filter type
       if (filter.type === 'number') {
-        typedValues[filterKey] = Number(filterValue);
+        parsedValue = Number(filterValue);
       } else if (filter.type === 'string_list' || filter.type === 'number_list') {
         const listValues = filterValue.split(',').map((v) => v.trim());
-        typedValues[filterKey] =
-          filter.type === 'number_list' ? listValues.map(Number) : listValues;
+        parsedValue = filter.type === 'number_list' ? listValues.map(Number) : listValues;
+      } else if (filter.type === 'daterange' || filter.type === 'timestamp_range') {
+        const rangeValues = filterValue.split(',').map((v) => v.trim().replace(/^["']|["']$/g, ''));
+        parsedValue = rangeValues;
       } else if (filter.type === 'boolean') {
-        typedValues[filterKey] = filterValue.toLowerCase() === 'true';
+        parsedValue = filterValue.toLowerCase() === 'true';
       } else {
-        typedValues[filterKey] = filterValue;
+        parsedValue = filterValue;
+      }
+
+      // Check if we should include operator override
+      const operator = filterOperators[filterKey];
+      const shouldIncludeOperator = operator && canUseOperator(filter);
+
+      if (shouldIncludeOperator) {
+        typedValues[filterKey] = { value: parsedValue, op: operator };
+      } else {
+        typedValues[filterKey] = parsedValue;
       }
     });
 
@@ -55,11 +84,26 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           <label htmlFor={`dashboard-${filter.key}`} className="text-muted-foreground text-sm font-medium">
             {filter.key}:
           </label>
+          {canUseOperator(filter) && (
+            <select
+              value={filterOperators[filter.key] || filter.op || '='}
+              onChange={(e) => handleOperatorChange(filter.key, e.target.value)}
+              onBlur={handleBlur}
+              className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+            >
+              {COMPARISON_OPERATORS.map((op) => (
+                <option key={op} value={op}>
+                  {op}
+                </option>
+              ))}
+            </select>
+          )}
           <Input
             id={`dashboard-${filter.key}`}
             type="text"
             value={filterValues[filter.key] || ''}
-            onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+            onChange={(e) => handleInputChange(filter.key, e.target.value)}
+            onBlur={handleBlur}
             placeholder={getPlaceholder(filter)}
             className="h-8 w-48"
           />
