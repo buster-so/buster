@@ -743,6 +743,7 @@ export const dashboardFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('dashboard_files_created_by_idx').using(
@@ -817,6 +818,7 @@ export const reportFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('report_files_created_by_idx').using(
@@ -889,6 +891,7 @@ export const chats = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('chats_created_at_idx').using(
@@ -1040,6 +1043,7 @@ export const metricFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('metric_files_created_by_idx').using(

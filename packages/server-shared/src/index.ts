@@ -37,3 +37,4 @@ export * from './shortcuts';
 export * from './healthcheck';
 export * from './sql';
 export * from './logs-writeback';
+export * from './library';

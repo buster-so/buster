@@ -53,3 +53,7 @@ export {
   GetAssetScreenshotBucketKeyInputSchema,
   type GetAssetScreenshotBucketKeyInput,
 } from './get-asset-screenshot-bucket-key';
+
+export { bulkUpdateLibraryField } from './bulk-update-asset-library-field';
+
+export { listPermissionedLibraryAssets } from './list-permissioned-library-assets';

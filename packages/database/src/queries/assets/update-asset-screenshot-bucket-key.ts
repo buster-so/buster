@@ -21,7 +21,7 @@ type ScreenshotTable =
   | typeof metricFiles
   | typeof reportFiles;
 
-const assetTableMap: Record<AssetType, ScreenshotTable> = {
+export const assetTableMap: Record<AssetType, ScreenshotTable> = {
   chat: chats,
   collection: collections,
   dashboard_file: dashboardFiles,
