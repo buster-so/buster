@@ -161,7 +161,7 @@ import { ServerRoute as AuthConfirmServerRouteImport } from './routes/auth.confi
 import { ServerRoute as AuthCallbackServerRouteImport } from './routes/auth.callback'
 import { ServerRoute as ScreenshotsReportsReportIdServerRouteImport } from './routes/screenshots/reports.$reportId'
 import { ServerRoute as ScreenshotsMetricsMetricIdIndexServerRouteImport } from './routes/screenshots/metrics.$metricId.index'
-import { ServerRoute as ScreenshotsDashboardDashboardIdIndexServerRouteImport } from './routes/screenshots/dashboard.$dashboardId.index'
+import { ServerRoute as ScreenshotsDashboardsDashboardIdIndexServerRouteImport } from './routes/screenshots/dashboards.$dashboardId.index'
 import { ServerRoute as ScreenshotsChatsChatIdIndexServerRouteImport } from './routes/screenshots/chats.$chatId.index'
 
 const ScreenshotsRouteImport = createFileRoute('/screenshots')()
@@ -1235,10 +1235,10 @@ const ScreenshotsMetricsMetricIdIndexServerRoute =
     path: '/screenshots/metrics/$metricId/',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ScreenshotsDashboardDashboardIdIndexServerRoute =
-  ScreenshotsDashboardDashboardIdIndexServerRouteImport.update({
-    id: '/screenshots/dashboard/$dashboardId/',
-    path: '/screenshots/dashboard/$dashboardId/',
+const ScreenshotsDashboardsDashboardIdIndexServerRoute =
+  ScreenshotsDashboardsDashboardIdIndexServerRouteImport.update({
+    id: '/screenshots/dashboards/$dashboardId/',
+    path: '/screenshots/dashboards/$dashboardId/',
     getParentRoute: () => rootServerRouteImport,
   } as any)
 const ScreenshotsChatsChatIdIndexServerRoute =
@@ -2104,7 +2104,7 @@ export interface FileServerRoutesByFullPath {
   '/auth/confirm': typeof AuthConfirmServerRoute
   '/screenshots/reports/$reportId': typeof ScreenshotsReportsReportIdServerRoute
   '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdIndexServerRoute
-  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdIndexServerRoute
+  '/screenshots/dashboards/$dashboardId': typeof ScreenshotsDashboardsDashboardIdIndexServerRoute
   '/screenshots/metrics/$metricId': typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 export interface FileServerRoutesByTo {
@@ -2112,7 +2112,7 @@ export interface FileServerRoutesByTo {
   '/auth/confirm': typeof AuthConfirmServerRoute
   '/screenshots/reports/$reportId': typeof ScreenshotsReportsReportIdServerRoute
   '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdIndexServerRoute
-  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdIndexServerRoute
+  '/screenshots/dashboards/$dashboardId': typeof ScreenshotsDashboardsDashboardIdIndexServerRoute
   '/screenshots/metrics/$metricId': typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 export interface FileServerRoutesById {
@@ -2121,7 +2121,7 @@ export interface FileServerRoutesById {
   '/auth/confirm': typeof AuthConfirmServerRoute
   '/screenshots/reports/$reportId': typeof ScreenshotsReportsReportIdServerRoute
   '/screenshots/chats/$chatId/': typeof ScreenshotsChatsChatIdIndexServerRoute
-  '/screenshots/dashboard/$dashboardId/': typeof ScreenshotsDashboardDashboardIdIndexServerRoute
+  '/screenshots/dashboards/$dashboardId/': typeof ScreenshotsDashboardsDashboardIdIndexServerRoute
   '/screenshots/metrics/$metricId/': typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 export interface FileServerRouteTypes {
@@ -2131,7 +2131,7 @@ export interface FileServerRouteTypes {
     | '/auth/confirm'
     | '/screenshots/reports/$reportId'
     | '/screenshots/chats/$chatId'
-    | '/screenshots/dashboard/$dashboardId'
+    | '/screenshots/dashboards/$dashboardId'
     | '/screenshots/metrics/$metricId'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
@@ -2139,7 +2139,7 @@ export interface FileServerRouteTypes {
     | '/auth/confirm'
     | '/screenshots/reports/$reportId'
     | '/screenshots/chats/$chatId'
-    | '/screenshots/dashboard/$dashboardId'
+    | '/screenshots/dashboards/$dashboardId'
     | '/screenshots/metrics/$metricId'
   id:
     | '__root__'
@@ -2147,7 +2147,7 @@ export interface FileServerRouteTypes {
     | '/auth/confirm'
     | '/screenshots/reports/$reportId'
     | '/screenshots/chats/$chatId/'
-    | '/screenshots/dashboard/$dashboardId/'
+    | '/screenshots/dashboards/$dashboardId/'
     | '/screenshots/metrics/$metricId/'
   fileServerRoutesById: FileServerRoutesById
 }
@@ -2156,7 +2156,7 @@ export interface RootServerRouteChildren {
   AuthConfirmServerRoute: typeof AuthConfirmServerRoute
   ScreenshotsReportsReportIdServerRoute: typeof ScreenshotsReportsReportIdServerRoute
   ScreenshotsChatsChatIdIndexServerRoute: typeof ScreenshotsChatsChatIdIndexServerRoute
-  ScreenshotsDashboardDashboardIdIndexServerRoute: typeof ScreenshotsDashboardDashboardIdIndexServerRoute
+  ScreenshotsDashboardsDashboardIdIndexServerRoute: typeof ScreenshotsDashboardsDashboardIdIndexServerRoute
   ScreenshotsMetricsMetricIdIndexServerRoute: typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 
@@ -3321,11 +3321,11 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ScreenshotsMetricsMetricIdIndexServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/screenshots/dashboard/$dashboardId/': {
-      id: '/screenshots/dashboard/$dashboardId/'
-      path: '/screenshots/dashboard/$dashboardId'
-      fullPath: '/screenshots/dashboard/$dashboardId'
-      preLoaderRoute: typeof ScreenshotsDashboardDashboardIdIndexServerRouteImport
+    '/screenshots/dashboards/$dashboardId/': {
+      id: '/screenshots/dashboards/$dashboardId/'
+      path: '/screenshots/dashboards/$dashboardId'
+      fullPath: '/screenshots/dashboards/$dashboardId'
+      preLoaderRoute: typeof ScreenshotsDashboardsDashboardIdIndexServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/screenshots/chats/$chatId/': {
@@ -4389,8 +4389,8 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ScreenshotsReportsReportIdServerRoute: ScreenshotsReportsReportIdServerRoute,
   ScreenshotsChatsChatIdIndexServerRoute:
     ScreenshotsChatsChatIdIndexServerRoute,
-  ScreenshotsDashboardDashboardIdIndexServerRoute:
-    ScreenshotsDashboardDashboardIdIndexServerRoute,
+  ScreenshotsDashboardsDashboardIdIndexServerRoute:
+    ScreenshotsDashboardsDashboardIdIndexServerRoute,
   ScreenshotsMetricsMetricIdIndexServerRoute:
     ScreenshotsMetricsMetricIdIndexServerRoute,
 }

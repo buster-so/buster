@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
-import { GetDashboardScreenshotQuerySchema } from '../dashboard.$dashboardId.index';
+import { ensureMetricData } from '@/api/buster_rest/metrics';
+import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParams';
+import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
+import { GetDashboardScreenshotQuerySchema } from '../dashboards.$dashboardId.index';
 
 export const Route = createFileRoute('/screenshots/_content/dashboards/$dashboardId/content')({
   component: RouteComponent,
@@ -17,10 +20,31 @@ export const Route = createFileRoute('/screenshots/_content/dashboards/$dashboar
       throw new Error('Dashboard not found');
     }
 
+    const allMetrics = Object.entries(dashboard?.metrics || {});
+
+    await Promise.all(
+      allMetrics.map(([metricId, metric]) => {
+        return ensureMetricData(context.queryClient, {
+          id: metricId,
+          version_number: metric.version_number,
+        });
+      })
+    );
+
     return { dashboard };
   },
 });
 
 function RouteComponent() {
-  return <div>Hello "/screenshots/_content/dashboards/$dashboardId/content"!</div>;
+  const { dashboardId, dashboardVersionNumber } = useGetDashboardParams();
+  return (
+    <div className="h-full w-full bg-page-background overflow-y-auto">
+      <DashboardViewDashboardController
+        dashboardId={dashboardId}
+        dashboardVersionNumber={dashboardVersionNumber}
+        readOnly
+        animate={false}
+      />
+    </div>
+  );
 }
