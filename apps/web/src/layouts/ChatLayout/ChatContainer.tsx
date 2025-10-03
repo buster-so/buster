@@ -9,16 +9,16 @@ export const ChatContainer = React.memo(
   ({
     chatId,
     isEmbed,
-    alignTitleToCenter,
+    isScreenshotMode,
   }: {
     chatId: string | undefined;
     isEmbed: boolean;
-    alignTitleToCenter: boolean;
+    isScreenshotMode: boolean;
   }) => {
     return (
       <AppPageLayout
         headerSizeVariant="default"
-        header={<ChatHeader isEmbed={isEmbed} alignTitleToCenter={alignTitleToCenter} />}
+        header={<ChatHeader isEmbed={isEmbed} isScreenshotMode={isScreenshotMode} />}
         headerBorderVariant="ghost"
         headerClassName="bg-page-background"
         mainClassName="bg-page-background"
@@ -26,7 +26,7 @@ export const ChatContainer = React.memo(
         id={CHAT_CONTAINER_ID}
         className="flex h-full w-full min-w-[295px] flex-col"
       >
-        <ChatContent chatId={chatId} isEmbed={isEmbed} />
+        <ChatContent chatId={chatId} isEmbed={isEmbed} doNotScrollToBottom={isScreenshotMode} />
       </AppPageLayout>
     );
   }

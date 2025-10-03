@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
-import { GetDashboardScreenshotQuerySchema } from '../dashboard.$dashboardId';
+import { GetDashboardScreenshotQuerySchema } from '../dashboard.$dashboardId.index';
 
 export const Route = createFileRoute('/screenshots/_content/dashboards/$dashboardId/content')({
   component: RouteComponent,

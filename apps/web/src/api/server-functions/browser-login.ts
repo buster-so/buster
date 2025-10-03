@@ -15,8 +15,16 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   request: Request;
   callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
 }) => {
-  const bearerToken = request.headers.get('Authorization') || '';
+  const bearerToken = request.headers.get('Authorization');
+  if (!bearerToken) {
+    throw new Error('Missing Authorization header');
+  }
+
   const accessToken = bearerToken.replace('Bearer ', '');
+  if (!accessToken || accessToken.split('.').length !== 3) {
+    throw new Error('Invalid access token format');
+  }
+
   const supabase = getSupabaseServerClient();
 
   const {

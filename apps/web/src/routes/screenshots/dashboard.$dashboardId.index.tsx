@@ -13,7 +13,7 @@ export const GetDashboardScreenshotQuerySchema = z.object({
   type: z.enum(['png', 'jpeg']).default('png'),
 });
 
-export const ServerRoute = createServerFileRoute('/screenshots/dashboard/$dashboardId').methods({
+export const ServerRoute = createServerFileRoute('/screenshots/dashboard/$dashboardId/').methods({
   GET: async ({ request, params }) => {
     const { dashboardId } = GetDashboardScreenshotParamsSchema.parse(params);
     const { version_number, width, height, type } = GetDashboardScreenshotQuerySchema.parse(

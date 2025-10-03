@@ -10,11 +10,11 @@ export const GetChatScreenshotParamsSchema = z.object({
 
 export const GetChatScreenshotQuerySchema = z.object({
   width: z.coerce.number().min(600).max(3840).default(600),
-  height: z.coerce.number().min(400).max(2160).default(338),
+  height: z.coerce.number().min(300).max(2160).default(338),
   type: z.enum(['png', 'jpeg']).default('png'),
 });
 
-export const ServerRoute = createServerFileRoute('/screenshots/chats/$chatId').methods({
+export const ServerRoute = createServerFileRoute('/screenshots/chats/$chatId/').methods({
   GET: async ({ request, params }) => {
     const { chatId } = GetChatScreenshotParamsSchema.parse(params);
     const { width, height, type } = GetChatScreenshotQuerySchema.parse(
@@ -32,9 +32,7 @@ export const ServerRoute = createServerFileRoute('/screenshots/chats/$chatId').m
         }),
         request,
         callback: async ({ page }) => {
-          const screenshotBuffer = await page.screenshot({
-            type,
-          });
+          const screenshotBuffer = await page.screenshot({ type });
           return screenshotBuffer;
         },
       });

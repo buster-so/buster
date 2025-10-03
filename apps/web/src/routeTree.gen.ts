@@ -160,9 +160,9 @@ import { Route as AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdCont
 import { ServerRoute as AuthConfirmServerRouteImport } from './routes/auth.confirm'
 import { ServerRoute as AuthCallbackServerRouteImport } from './routes/auth.callback'
 import { ServerRoute as ScreenshotsReportsReportIdServerRouteImport } from './routes/screenshots/reports.$reportId'
-import { ServerRoute as ScreenshotsDashboardDashboardIdServerRouteImport } from './routes/screenshots/dashboard.$dashboardId'
-import { ServerRoute as ScreenshotsChatsChatIdServerRouteImport } from './routes/screenshots/chats.$chatId'
 import { ServerRoute as ScreenshotsMetricsMetricIdIndexServerRouteImport } from './routes/screenshots/metrics.$metricId.index'
+import { ServerRoute as ScreenshotsDashboardDashboardIdIndexServerRouteImport } from './routes/screenshots/dashboard.$dashboardId.index'
+import { ServerRoute as ScreenshotsChatsChatIdIndexServerRouteImport } from './routes/screenshots/chats.$chatId.index'
 
 const ScreenshotsRouteImport = createFileRoute('/screenshots')()
 const EmbedChatChatIdReportsReportIdRouteImport = createFileRoute(
@@ -1229,22 +1229,22 @@ const ScreenshotsReportsReportIdServerRoute =
     path: '/screenshots/reports/$reportId',
     getParentRoute: () => rootServerRouteImport,
   } as any)
-const ScreenshotsDashboardDashboardIdServerRoute =
-  ScreenshotsDashboardDashboardIdServerRouteImport.update({
-    id: '/screenshots/dashboard/$dashboardId',
-    path: '/screenshots/dashboard/$dashboardId',
-    getParentRoute: () => rootServerRouteImport,
-  } as any)
-const ScreenshotsChatsChatIdServerRoute =
-  ScreenshotsChatsChatIdServerRouteImport.update({
-    id: '/screenshots/chats/$chatId',
-    path: '/screenshots/chats/$chatId',
-    getParentRoute: () => rootServerRouteImport,
-  } as any)
 const ScreenshotsMetricsMetricIdIndexServerRoute =
   ScreenshotsMetricsMetricIdIndexServerRouteImport.update({
     id: '/screenshots/metrics/$metricId/',
     path: '/screenshots/metrics/$metricId/',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ScreenshotsDashboardDashboardIdIndexServerRoute =
+  ScreenshotsDashboardDashboardIdIndexServerRouteImport.update({
+    id: '/screenshots/dashboard/$dashboardId/',
+    path: '/screenshots/dashboard/$dashboardId/',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ScreenshotsChatsChatIdIndexServerRoute =
+  ScreenshotsChatsChatIdIndexServerRouteImport.update({
+    id: '/screenshots/chats/$chatId/',
+    path: '/screenshots/chats/$chatId/',
     getParentRoute: () => rootServerRouteImport,
   } as any)
 
@@ -2102,26 +2102,26 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackServerRoute
   '/auth/confirm': typeof AuthConfirmServerRoute
-  '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdServerRoute
-  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdServerRoute
   '/screenshots/reports/$reportId': typeof ScreenshotsReportsReportIdServerRoute
+  '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdIndexServerRoute
+  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdIndexServerRoute
   '/screenshots/metrics/$metricId': typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 export interface FileServerRoutesByTo {
   '/auth/callback': typeof AuthCallbackServerRoute
   '/auth/confirm': typeof AuthConfirmServerRoute
-  '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdServerRoute
-  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdServerRoute
   '/screenshots/reports/$reportId': typeof ScreenshotsReportsReportIdServerRoute
+  '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdIndexServerRoute
+  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdIndexServerRoute
   '/screenshots/metrics/$metricId': typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/auth/callback': typeof AuthCallbackServerRoute
   '/auth/confirm': typeof AuthConfirmServerRoute
-  '/screenshots/chats/$chatId': typeof ScreenshotsChatsChatIdServerRoute
-  '/screenshots/dashboard/$dashboardId': typeof ScreenshotsDashboardDashboardIdServerRoute
   '/screenshots/reports/$reportId': typeof ScreenshotsReportsReportIdServerRoute
+  '/screenshots/chats/$chatId/': typeof ScreenshotsChatsChatIdIndexServerRoute
+  '/screenshots/dashboard/$dashboardId/': typeof ScreenshotsDashboardDashboardIdIndexServerRoute
   '/screenshots/metrics/$metricId/': typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 export interface FileServerRouteTypes {
@@ -2129,34 +2129,34 @@ export interface FileServerRouteTypes {
   fullPaths:
     | '/auth/callback'
     | '/auth/confirm'
+    | '/screenshots/reports/$reportId'
     | '/screenshots/chats/$chatId'
     | '/screenshots/dashboard/$dashboardId'
-    | '/screenshots/reports/$reportId'
     | '/screenshots/metrics/$metricId'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/auth/callback'
     | '/auth/confirm'
+    | '/screenshots/reports/$reportId'
     | '/screenshots/chats/$chatId'
     | '/screenshots/dashboard/$dashboardId'
-    | '/screenshots/reports/$reportId'
     | '/screenshots/metrics/$metricId'
   id:
     | '__root__'
     | '/auth/callback'
     | '/auth/confirm'
-    | '/screenshots/chats/$chatId'
-    | '/screenshots/dashboard/$dashboardId'
     | '/screenshots/reports/$reportId'
+    | '/screenshots/chats/$chatId/'
+    | '/screenshots/dashboard/$dashboardId/'
     | '/screenshots/metrics/$metricId/'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   AuthCallbackServerRoute: typeof AuthCallbackServerRoute
   AuthConfirmServerRoute: typeof AuthConfirmServerRoute
-  ScreenshotsChatsChatIdServerRoute: typeof ScreenshotsChatsChatIdServerRoute
-  ScreenshotsDashboardDashboardIdServerRoute: typeof ScreenshotsDashboardDashboardIdServerRoute
   ScreenshotsReportsReportIdServerRoute: typeof ScreenshotsReportsReportIdServerRoute
+  ScreenshotsChatsChatIdIndexServerRoute: typeof ScreenshotsChatsChatIdIndexServerRoute
+  ScreenshotsDashboardDashboardIdIndexServerRoute: typeof ScreenshotsDashboardDashboardIdIndexServerRoute
   ScreenshotsMetricsMetricIdIndexServerRoute: typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 
@@ -3314,25 +3314,25 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ScreenshotsReportsReportIdServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/screenshots/dashboard/$dashboardId': {
-      id: '/screenshots/dashboard/$dashboardId'
-      path: '/screenshots/dashboard/$dashboardId'
-      fullPath: '/screenshots/dashboard/$dashboardId'
-      preLoaderRoute: typeof ScreenshotsDashboardDashboardIdServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/screenshots/chats/$chatId': {
-      id: '/screenshots/chats/$chatId'
-      path: '/screenshots/chats/$chatId'
-      fullPath: '/screenshots/chats/$chatId'
-      preLoaderRoute: typeof ScreenshotsChatsChatIdServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
     '/screenshots/metrics/$metricId/': {
       id: '/screenshots/metrics/$metricId/'
       path: '/screenshots/metrics/$metricId'
       fullPath: '/screenshots/metrics/$metricId'
       preLoaderRoute: typeof ScreenshotsMetricsMetricIdIndexServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/screenshots/dashboard/$dashboardId/': {
+      id: '/screenshots/dashboard/$dashboardId/'
+      path: '/screenshots/dashboard/$dashboardId'
+      fullPath: '/screenshots/dashboard/$dashboardId'
+      preLoaderRoute: typeof ScreenshotsDashboardDashboardIdIndexServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/screenshots/chats/$chatId/': {
+      id: '/screenshots/chats/$chatId/'
+      path: '/screenshots/chats/$chatId'
+      fullPath: '/screenshots/chats/$chatId'
+      preLoaderRoute: typeof ScreenshotsChatsChatIdIndexServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
   }
@@ -4386,10 +4386,11 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   AuthCallbackServerRoute: AuthCallbackServerRoute,
   AuthConfirmServerRoute: AuthConfirmServerRoute,
-  ScreenshotsChatsChatIdServerRoute: ScreenshotsChatsChatIdServerRoute,
-  ScreenshotsDashboardDashboardIdServerRoute:
-    ScreenshotsDashboardDashboardIdServerRoute,
   ScreenshotsReportsReportIdServerRoute: ScreenshotsReportsReportIdServerRoute,
+  ScreenshotsChatsChatIdIndexServerRoute:
+    ScreenshotsChatsChatIdIndexServerRoute,
+  ScreenshotsDashboardDashboardIdIndexServerRoute:
+    ScreenshotsDashboardDashboardIdIndexServerRoute,
   ScreenshotsMetricsMetricIdIndexServerRoute:
     ScreenshotsMetricsMetricIdIndexServerRoute,
 }

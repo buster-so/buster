@@ -3,7 +3,7 @@ import { prefetchGetChat } from '@/api/buster_rest/chats';
 import * as chatLayoutServerContext from '@/context/BusterAssets/chat-server/chatLayoutServer';
 import { ChatLayout } from '@/layouts/ChatLayout';
 import { DEFAULT_CHAT_ONLY_LAYOUT } from '@/layouts/ChatLayout/config';
-import { GetChatScreenshotQuerySchema } from '../chats.$chatId';
+import { GetChatScreenshotQuerySchema } from '../chats.$chatId.index';
 
 export const Route = createFileRoute('/screenshots/_content/chats/$chatId/content')({
   ...chatLayoutServerContext,
@@ -11,6 +11,7 @@ export const Route = createFileRoute('/screenshots/_content/chats/$chatId/conten
   ssr: true,
   beforeLoad: async ({ context, params }) => {
     const chat = await prefetchGetChat({ id: params.chatId }, context.queryClient);
+
     if (!chat) {
       throw new Error('Chat not found');
     }
@@ -22,7 +23,7 @@ export const Route = createFileRoute('/screenshots/_content/chats/$chatId/conten
         autoSaveId={'chat-screenshot'}
         defaultLayout={DEFAULT_CHAT_ONLY_LAYOUT}
         selectedLayout={'chat-only'}
-        alignTitleToCenter
+        isScreenshotMode
       >
         {null}
       </ChatLayout>
