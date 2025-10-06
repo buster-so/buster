@@ -35,9 +35,7 @@ export const Route = createFileRoute('/screenshots/metrics/$metricId/')({
               search: { version_number, type, width, height },
             }),
             callback: async ({ page }) => {
-              return await page.screenshot({
-                type,
-              });
+              return await page.screenshot({ type });
             },
           });
 

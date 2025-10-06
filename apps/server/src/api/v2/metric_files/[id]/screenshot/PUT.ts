@@ -32,7 +32,7 @@ const app = new Hono().put('/', zValidator('param', AssetIdParamsSchema), async 
   }
 
   const screenshotBuffer = await getMetricScreenshotHandler({
-    params: { metricId: assetId },
+    params: { id: assetId },
     search: { version_number: 1, width: 800, height: 600, type: 'png' },
     context: c,
   });
