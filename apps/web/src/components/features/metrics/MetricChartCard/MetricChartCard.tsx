@@ -70,12 +70,15 @@ export const MetricChartCard = React.memo(
       ref
     ) => {
       const [metricSpecificFilterValues, setMetricSpecificFilterValues] = useState<Record<string, unknown>>({});
-      const { dashboardFilterValues } = useDashboardFilterValues();
+      const { dashboardFilterValues, showMetricFilters, isOnDashboard } = useDashboardFilterValues();
 
       // Merge dashboard-level filters with metric-specific filters
       const filterValues = useMemo(() => {
         return { ...dashboardFilterValues, ...metricSpecificFilterValues };
       }, [dashboardFilterValues, metricSpecificFilterValues]);
+
+      // Show metric filters if: standalone metric OR (on dashboard AND toggle is on)
+      const shouldShowMetricFilters = !isOnDashboard || showMetricFilters;
 
       const { data: metric, isFetched: isFetchedMetric } = useGetMetric(
         { id: metricId, versionNumber },
@@ -130,7 +133,9 @@ export const MetricChartCard = React.memo(
             metricVersionNumber={versionNumber}
           />
           <div className={'border-border border-b'} />
-          <MetricFilters filters={metric?.filters} onFilterValuesChange={setMetricSpecificFilterValues} />
+          {shouldShowMetricFilters && (
+            <MetricFilters filters={metric?.filters} onFilterValuesChange={setMetricSpecificFilterValues} />
+          )}
           {renderChartContent && (
             <MetricViewChartContent
               chartConfig={memoizedChartConfig}

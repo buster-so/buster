@@ -34,7 +34,7 @@ const DashboardContentControllerInner: React.FC<{
     onUpdateDashboardConfig,
   }) => {
     const [draggingId, setDraggingId] = useState<string | null>(null);
-    const { setDashboardFilterValues } = useDashboardFilterValues();
+    const { setDashboardFilterValues, showMetricFilters, setShowMetricFilters } = useDashboardFilterValues();
 
     const commonFilters = useMemo(() => {
       const filters = getCommonFilters(metrics);
@@ -118,10 +118,12 @@ const DashboardContentControllerInner: React.FC<{
       <div className="dashboard-content-controller overflow-visible">
         {hasMetrics && !!dashboardRows.length && !!dashboard ? (
           <DashboardContentControllerProvider dashboard={dashboard}>
-            {!readOnly && commonFilters.length > 0 && (
+            {!readOnly && (
               <DashboardFilters
                 commonFilters={commonFilters}
                 onFilterValuesChange={setDashboardFilterValues}
+                showMetricFilters={showMetricFilters}
+                onToggleMetricFilters={() => setShowMetricFilters(!showMetricFilters)}
               />
             )}
             <BusterResizeableGrid
