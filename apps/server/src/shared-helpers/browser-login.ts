@@ -1,22 +1,39 @@
+import type { User } from '@supabase/supabase-js';
 import type { Context } from 'hono';
 import type { Browser, Page } from 'playwright';
+
+type BrowserParamsBase<T> = {
+  width: number;
+  height: number;
+  fullPath: string;
+  callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
+};
+
+type BrowserParamsContext<T> = BrowserParamsBase<T> & {
+  context: Context;
+};
+
+type BrowserParamsDirectRequest<T> = BrowserParamsBase<T> & {
+  supabaseUser: User;
+  supabaseCookieKey: string;
+  accessToken: string;
+};
+
+type BrowserParams<T> = BrowserParamsContext<T> | BrowserParamsDirectRequest<T>;
 
 export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   width,
   height,
   fullPath,
   callback,
-  context,
-}: {
-  width: number;
-  height: number;
-  fullPath: string;
-  callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
-  context: Context;
-}) => {
-  const supabaseUser = context.get('supabaseUser');
-  const supabaseCookieKey = context.get('supabaseCookieKey');
-  const accessToken = context.get('accessToken');
+  ...rest
+}: BrowserParams<T>) => {
+  const isContext = 'context' in rest;
+  const supabaseUser = isContext ? rest.context.get('supabaseUser') : rest.supabaseUser;
+  const supabaseCookieKey = isContext
+    ? rest.context.get('supabaseCookieKey')
+    : rest.supabaseCookieKey;
+  const accessToken = isContext ? rest.context.get('accessToken') : rest.accessToken;
 
   if (!accessToken) {
     throw new Error('Missing Authorization header');
