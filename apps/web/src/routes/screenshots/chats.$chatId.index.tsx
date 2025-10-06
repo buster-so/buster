@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { browserLogin } from '@/api/server-functions/browser-login';
 import { createScreenshotResponse } from '@/api/server-functions/screenshot-helpers';
 import { createHrefFromLink } from '@/lib/routes';
 
@@ -24,6 +23,7 @@ export const Route = createFileRoute('/screenshots/chats/$chatId/')({
         );
 
         try {
+          const { browserLogin } = await import('@/api/server-functions/browser-login');
           const { result: screenshotBuffer } = await browserLogin({
             width,
             height,

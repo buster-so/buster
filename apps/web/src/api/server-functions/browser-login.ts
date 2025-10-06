@@ -1,4 +1,4 @@
-import { type Browser, chromium, type Page } from 'playwright';
+import type { Browser, Page } from 'playwright';
 import { env } from '@/env';
 import { getSupabaseServerClient } from '@/integrations/supabase/server';
 
@@ -47,6 +47,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     user: user,
   };
 
+  const { chromium } = await import('playwright');
   const browser = await chromium.launch();
 
   try {
