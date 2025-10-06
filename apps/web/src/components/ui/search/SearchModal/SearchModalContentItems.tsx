@@ -1,5 +1,6 @@
 import { Command } from 'cmdk';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import type {
@@ -65,14 +66,16 @@ const ItemsSelecter = <M, T extends string>({
 
 const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & CommonProps<M, T>) => {
   const { value, label, secondaryLabel, tertiaryLabel, icon, disabled, onSelectGlobal } = item;
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
     <Command.Item
       className={cn(
-        'min-h-9 px-4 flex items-center rounded',
+        'min-h-9 pl-4 pr-4 flex items-center rounded',
         secondaryLabel && 'min-h-13.5',
         'data-[selected=true]:bg-item-hover data-[selected=true]:text-foreground',
         !disabled ? 'cursor-pointer' : 'cursor-not-allowed',
-        'space-x-2'
+        'space-x-2 overflow-hidden @container'
       )}
       value={value}
       disabled={disabled}
@@ -90,8 +93,21 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
         </span>
       )}
 
-      <div className="flex flex-col space-y-1">
-        <Text>{label}</Text>
+      <div ref={containerRef} className="flex flex-col space-y-1 w-full overflow-hidden">
+        <div className="flex space-x-1.5 w-full justify-between items-center">
+          <Text truncate>{label}</Text>
+          <AnimatePresence initial={false}>
+            {tertiaryLabel && (
+              <Text
+                size="sm"
+                variant="secondary"
+                className="whitespace-nowrap @[600px]:block! hidden"
+              >
+                {tertiaryLabel}
+              </Text>
+            )}
+          </AnimatePresence>
+        </div>
         <AnimatePresence initial={false}>
           {secondaryLabel && (
             <motion.div

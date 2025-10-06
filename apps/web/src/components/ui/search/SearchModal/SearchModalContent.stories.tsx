@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { fn } from 'storybook/test';
 import HouseIcon from '@/components/ui/icons/NucleoIconOutlined/house';
+import { createDayjsDate } from '@/lib/date';
 import { SearchModalContent } from './SearchModalContent';
 import type { SearchItem, SearchItems } from './search-modal.types';
 
@@ -24,6 +25,7 @@ const mockSearchItems: SearchItem[] = [
     icon: <HouseIcon />,
     label: 'Search Result 1',
     secondaryLabel: 'This is a secondary label',
+    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
     value: 'result-1',
     keywords: ['search', 'result', 'example'],
     type: 'item',
@@ -32,6 +34,7 @@ const mockSearchItems: SearchItem[] = [
     icon: <HouseIcon />,
     label: 'Document',
     secondaryLabel: 'A document file',
+    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
     value: 'document-1',
     keywords: ['document', 'file', 'pdf'],
     type: 'item',
@@ -41,6 +44,7 @@ const mockSearchItems: SearchItem[] = [
     icon: <HouseIcon />,
     label: 'Dashboard',
     secondaryLabel: 'Analytics dashboard',
+    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
     value: 'dashboard-1',
     keywords: ['dashboard', 'analytics', 'charts'],
     type: 'item',
@@ -48,8 +52,9 @@ const mockSearchItems: SearchItem[] = [
   },
   ...Array.from({ length: 10 }).map<SearchItem>((_, index) => ({
     icon: <HouseIcon />,
-    label: `Dashboard ${index}`,
+    label: `Dashboard ${index} with a super long label that will be truncated`,
     secondaryLabel: `Analytics dashboard ${index}`,
+    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
     value: `testing-${index}`,
     keywords: ['dashboard', 'analytics', 'charts'],
     type: 'item' as const,
