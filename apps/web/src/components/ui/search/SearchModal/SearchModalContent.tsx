@@ -4,7 +4,8 @@ import { SearchEmptyState } from './SearchEmptyState';
 import { SearchFooter } from './SearchFooter';
 import { SearchInput } from './SearchInput';
 import { SearchModalContentItems } from './SearchModalContentItems';
-import type { SearchItem, SearchModalContentProps } from './search-modal.types';
+import type { SearchModalContentProps } from './search-modal.types';
+import { useViewSearchItem } from './useViewSearchItem';
 
 export const SearchModalContent = <M, T extends string>({
   searchItems,
@@ -20,6 +21,10 @@ export const SearchModalContent = <M, T extends string>({
   secondaryContent,
   openSecondaryContent,
 }: SearchModalContentProps<M, T>) => {
+  const { handleKeyDown, focusedValue, setFocusedValue } = useViewSearchItem({
+    searchItems,
+    onViewSearchItem,
+  });
   const [searchValue, setSearchValue] = useState<string>(defaulSearchValue);
 
   const onSearchChangePreflight = (searchValue: string) => {
@@ -30,7 +35,9 @@ export const SearchModalContent = <M, T extends string>({
   return (
     <Command
       className="min-w-[650px] min-h-[450px] max-h-[75vh] bg-background flex flex-col"
-      value={searchValue}
+      value={focusedValue}
+      onValueChange={setFocusedValue}
+      onKeyDown={handleKeyDown}
     >
       <SearchInput
         searchValue={searchValue}

@@ -69,6 +69,7 @@ const SearchItemComponent = <M, T extends string>({
       value={value}
       disabled={disabled}
       onSelect={() => {
+        console.log('onSelect', value);
         onSelect?.();
       }}
     >

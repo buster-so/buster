@@ -6,7 +6,7 @@ export type SearchItem<M = unknown, T extends string = string> = {
   value: T;
   keywords?: string[];
   meta?: M;
-  onSelect?: () => void;
+  onSelect?: () => void; //should only be used for side effects
   loading?: boolean;
   disabled?: boolean;
   type: 'item';
@@ -33,7 +33,7 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   filterContent?: React.ReactNode;
   searchItems: SearchItems<M, T>[];
   onSearchChange: (searchValue: string) => void;
-  onSelect: (item: SearchItem<M, T>) => void;
+  onSelect: (item: SearchItem<M, T>, modifier: 'select' | 'navigate') => void;
   onViewSearchItem: (item: SearchItem<M, T>) => void;
   emptyState?: React.ReactNode | string;
   placeholder?: string;

@@ -31,6 +31,7 @@ const mockSearchItems: SearchItem[] = [
     value: 'document-1',
     keywords: ['document', 'file', 'pdf'],
     type: 'item',
+    onSelect: fn(),
   },
   {
     icon: '📊',
@@ -39,6 +40,7 @@ const mockSearchItems: SearchItem[] = [
     value: 'dashboard-1',
     keywords: ['dashboard', 'analytics', 'charts'],
     type: 'item',
+    onSelect: fn(),
   },
   ...Array.from({ length: 10 }).map<SearchItem>((_, index) => ({
     icon: '📊',
@@ -47,6 +49,7 @@ const mockSearchItems: SearchItem[] = [
     value: `testing-${index}`,
     keywords: ['dashboard', 'analytics', 'charts'],
     type: 'item' as const,
+    onSelect: fn(),
   })),
 ];
 
