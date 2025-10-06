@@ -1,4 +1,4 @@
-import { Command } from 'cmdk';
+import { Command, useCommandState } from 'cmdk';
 import { cn } from '@/lib/utils';
 import type {
   SearchItem,
@@ -8,15 +8,24 @@ import type {
   SearchModalContentProps,
 } from './search-modal.types';
 
+type CommonProps<M, T extends string> = {
+  onSelectGlobal: (d: SearchItem<M, T>) => void;
+};
+
 export const SearchModalContentItems = <M, T extends string>({
   searchItems,
-  onSelect,
-  onViewSearchItem,
-}: Pick<SearchModalContentProps<M, T>, 'searchItems' | 'onSelect' | 'onViewSearchItem'>) => {
+  onSelectGlobal,
+}: Pick<SearchModalContentProps<M, T>, 'searchItems' | 'onViewSearchItem'> & CommonProps<M, T>) => {
+  const hasResults = useCommandState((x) => x.filtered.count) > 0;
+
   return (
-    <Command.List className="flex flex-col overflow-y-auto flex-1">
+    <Command.List className={cn('flex flex-col overflow-y-auto flex-1', !hasResults && 'hidden')}>
       {searchItems.map((item, index) => (
-        <ItemsSelecter key={keyExtractor(item, index)} item={item} />
+        <ItemsSelecter
+          key={keyExtractor(item, index)}
+          item={item}
+          onSelectGlobal={onSelectGlobal}
+        />
       ))}
     </Command.List>
   );
@@ -29,14 +38,20 @@ const keyExtractor = <M, T extends string>(item: SearchItems<M, T>, index: numbe
   return item.type + index;
 };
 
-const ItemsSelecter = <M, T extends string>({ item }: { item: SearchItems<M, T> }) => {
+const ItemsSelecter = <M, T extends string>({
+  item,
+  onSelectGlobal,
+}: {
+  item: SearchItems<M, T>;
+  onSelectGlobal: (d: SearchItem<M, T>) => void;
+}) => {
   const type = item.type;
   if (type === 'item') {
-    return <SearchItemComponent {...item} />;
+    return <SearchItemComponent {...item} onSelectGlobal={onSelectGlobal} />;
   }
 
   if (type === 'group') {
-    return <SearchItemGroupComponent item={item} />;
+    return <SearchItemGroupComponent item={item} onSelectGlobal={onSelectGlobal} />;
   }
 
   if (type === 'seperator') {
@@ -48,16 +63,8 @@ const ItemsSelecter = <M, T extends string>({ item }: { item: SearchItems<M, T> 
   return null;
 };
 
-const SearchItemComponent = <M, T extends string>({
-  value,
-  label,
-  secondaryLabel,
-  tertiaryLabel,
-  icon,
-  onSelect,
-  loading,
-  disabled,
-}: SearchItem<M, T>) => {
+const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & CommonProps<M, T>) => {
+  const { value, label, secondaryLabel, tertiaryLabel, icon, disabled, onSelectGlobal } = item;
   return (
     <Command.Item
       className={cn(
@@ -68,10 +75,7 @@ const SearchItemComponent = <M, T extends string>({
       )}
       value={value}
       disabled={disabled}
-      onSelect={() => {
-        console.log('onSelect', value);
-        onSelect?.();
-      }}
+      onSelect={() => onSelectGlobal(item)}
     >
       {label}
     </Command.Item>
@@ -80,18 +84,24 @@ const SearchItemComponent = <M, T extends string>({
 
 const SearchItemGroupComponent = <M, T extends string>({
   item,
+  onSelectGlobal,
 }: {
   item: SearchItemGroup<M, T>;
+  onSelectGlobal: (d: SearchItem<M, T>) => void;
 }) => {
   return (
     <Command.Group>
       {item.items.map((item, index) => (
-        <ItemsSelecter key={keyExtractor(item, index)} item={item} />
+        <ItemsSelecter
+          key={keyExtractor(item, index)}
+          item={item}
+          onSelectGlobal={onSelectGlobal}
+        />
       ))}
     </Command.Group>
   );
 };
 
-const SearchItemSeperatorComponent = ({ item }: { item: SearchItemSeperator }) => {
+const SearchItemSeperatorComponent = ({ item: _item }: { item: SearchItemSeperator }) => {
   return <Command.Separator className="border-t w-full" />;
 };

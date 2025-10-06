@@ -1,10 +1,11 @@
 import { Command } from 'cmdk';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { SearchEmptyState } from './SearchEmptyState';
 import { SearchFooter } from './SearchFooter';
 import { SearchInput } from './SearchInput';
 import { SearchModalContentItems } from './SearchModalContentItems';
-import type { SearchModalContentProps } from './search-modal.types';
+import type { SearchItem, SearchModalContentProps } from './search-modal.types';
 import { useViewSearchItem } from './useViewSearchItem';
 
 export const SearchModalContent = <M, T extends string>({
@@ -26,10 +27,31 @@ export const SearchModalContent = <M, T extends string>({
     onViewSearchItem,
   });
   const [searchValue, setSearchValue] = useState<string>(defaulSearchValue);
+  const isCommandKeyPressedRef = useRef(false);
 
   const onSearchChangePreflight = (searchValue: string) => {
     setSearchValue(searchValue);
     onSearchChange(searchValue);
+  };
+
+  const handleKeyDownGlobal = (e: React.KeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey) {
+      isCommandKeyPressedRef.current = true;
+    }
+    handleKeyDown(e);
+  };
+
+  const handleKeyUpGlobal = (e: React.KeyboardEvent) => {
+    if (!e.metaKey && !e.ctrlKey) {
+      isCommandKeyPressedRef.current = false;
+    }
+  };
+
+  const onSelectGlobal = (item: SearchItem<M, T>) => {
+    if (item?.onSelect) {
+      item.onSelect();
+    }
+    onSelect(item, isCommandKeyPressedRef.current ? 'navigate' : 'select');
   };
 
   return (
@@ -37,7 +59,8 @@ export const SearchModalContent = <M, T extends string>({
       className="min-w-[650px] min-h-[450px] max-h-[75vh] bg-background flex flex-col"
       value={focusedValue}
       onValueChange={setFocusedValue}
-      onKeyDown={handleKeyDown}
+      onKeyDown={handleKeyDownGlobal}
+      onKeyUp={handleKeyUpGlobal}
     >
       <SearchInput
         searchValue={searchValue}
@@ -48,7 +71,7 @@ export const SearchModalContent = <M, T extends string>({
       <div className="border-b" />
       <SearchModalContentItems
         searchItems={searchItems}
-        onSelect={onSelect}
+        onSelectGlobal={onSelectGlobal}
         onViewSearchItem={onViewSearchItem}
       />
       <SearchEmptyState emptyState={emptyState} />
