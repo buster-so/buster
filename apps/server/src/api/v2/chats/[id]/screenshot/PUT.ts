@@ -2,7 +2,7 @@ import { checkPermission } from '@buster/access-controls';
 import { getChatById } from '@buster/database/queries';
 import {
   AssetIdParamsSchema,
-  PutScreenshotRequestSchema,
+  PutMetricScreenshotRequestSchema,
   type PutScreenshotResponse,
 } from '@buster/server-shared/screenshots';
 import { zValidator } from '@hono/zod-validator';
@@ -12,7 +12,7 @@ import { uploadScreenshotHandler } from '../../../../../shared-helpers/upload-sc
 
 const app = new Hono().put(
   '/',
-  zValidator('json', PutScreenshotRequestSchema),
+  zValidator('json', PutMetricScreenshotRequestSchema),
   zValidator('param', AssetIdParamsSchema),
   async (c) => {
     const assetId = c.req.valid('param').id;

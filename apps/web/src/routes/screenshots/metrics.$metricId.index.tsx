@@ -28,30 +28,23 @@ export const Route = createFileRoute('/screenshots/metrics/$metricId/')({
           const { result: screenshotBuffer } = await browserLogin({
             width,
             height,
+            request,
             fullPath: createHrefFromLink({
               to: '/screenshots/metrics/$metricId/content',
               params: { metricId },
               search: { version_number, type, width, height },
             }),
-            request,
             callback: async ({ page }) => {
-              const screenshotBuffer = await page.screenshot({
+              return await page.screenshot({
                 type,
               });
-
-              return screenshotBuffer;
             },
           });
 
           return createScreenshotResponse({ screenshotBuffer });
         } catch (error) {
-          console.error('Error capturing metric screenshot', error);
-          return new Response(
-            JSON.stringify({
-              message: 'Failed to capture screenshot',
-            }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-          );
+          console.error('Error generating metric image', error);
+          throw Error('Failed to generate metric image');
         }
       },
     },

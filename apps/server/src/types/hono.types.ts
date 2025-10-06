@@ -7,6 +7,12 @@ import type { User } from '@supabase/supabase-js';
 declare module 'hono' {
   interface ContextVariableMap {
     /**
+     * The Supabase cookie key. This is used to set the cookie in the browser.
+     * It is the cookie that supabase uses to store the user's session.
+     * We use it on the server for playwright auth setting
+     */
+    readonly supabaseCookieKey: string;
+    /**
      * The authenticated Supabase user. This object is readonly to prevent accidental mutation.
      */
     readonly supabaseUser: User;
@@ -31,5 +37,9 @@ declare module 'hono' {
      * API key context for public API endpoints. Set by the createApiKeyAuthMiddleware.
      */
     readonly apiKey?: ApiKeyContext;
+    /**
+     * The access token for the user. Set by the requireAuth middleware.
+     */
+    readonly accessToken?: string;
   }
 }

@@ -7,7 +7,12 @@ import { getSupabaseClient } from './supabase';
 export const requireAuth = bearerAuth({
   verifyToken: async (token, c) => {
     try {
-      const { data, error } = await getSupabaseClient().auth.getUser(token); //usually takes about 3 - 7ms
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
+      const supabaseCookieKey = (supabase as unknown as { storageKey: string }).storageKey;
+
+      c.set('supabaseCookieKey', supabaseCookieKey);
+      c.set('accessToken', token);
 
       if (error) {
         // Log specific auth errors to help with debugging

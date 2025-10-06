@@ -4,12 +4,6 @@ export const AssetIdParamsSchema = z.object({
   id: z.string().uuid('Asset ID must be a valid UUID'),
 });
 
-export const PutScreenshotRequestSchema = z.object({
-  base64Image: z.string().min(1, 'Base64 image is required'),
-});
-
-export type PutScreenshotRequest = z.infer<typeof PutScreenshotRequestSchema>;
-
 export const PutScreenshotResponseSchema = z.object({
   success: z.boolean(),
   bucketKey: z.string().min(1, 'Bucket key is required'),

@@ -19,6 +19,8 @@ const requiredEnv = {
   SLACK_CLIENT_SECRET: process.env.SLACK_CLIENT_SECRET,
   SLACK_APP_SUPPORT_URL: process.env.SLACK_APP_SUPPORT_URL,
   SERVER_URL: process.env.SERVER_URL,
+  //WEB_URL
+  VITE_PUBLIC_URL: process.env.VITE_PUBLIC_URL,
 };
 
 // Validate environment variables

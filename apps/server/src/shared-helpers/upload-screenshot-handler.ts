@@ -3,13 +3,13 @@ import { updateAssetScreenshotBucketKey } from '@buster/database/queries';
 import type { AssetType } from '@buster/server-shared/assets';
 import { AssetTypeSchema } from '@buster/server-shared/assets';
 import {
-  PutScreenshotRequestSchema,
+  PutChatScreenshotRequestSchema,
   type PutScreenshotResponse,
   PutScreenshotResponseSchema,
 } from '@buster/server-shared/screenshots';
 import z from 'zod';
 
-export const UploadScreenshotParamsSchema = PutScreenshotRequestSchema.extend({
+export const UploadScreenshotParamsSchema = PutChatScreenshotRequestSchema.extend({
   assetType: AssetTypeSchema,
   assetId: z.string().uuid('Asset ID must be a valid UUID'),
   organizationId: z.string().uuid('Organization ID must be a valid UUID'),
