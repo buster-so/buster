@@ -16,7 +16,7 @@ import { silenceAssetErrors } from '@/api/response-helpers/silenece-asset-errors
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { updateChatToIChat } from '@/lib/chat';
-import type { RustApiError } from '../../errors';
+import type { ApiError } from '../../errors';
 import {
   useAddAssetToCollection,
   useRemoveAssetFromCollection,
@@ -122,7 +122,7 @@ const getChatQueryFn = (params: Parameters<typeof getChat>[0], queryClient: Quer
 
 export const useGetChat = <TData = IBusterChat>(
   params: Parameters<typeof getChat>[0],
-  options?: Omit<UseQueryOptions<IBusterChat, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<IBusterChat, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const queryClient = useQueryClient();
 
@@ -260,7 +260,7 @@ export const useGetChatMemoized = () => {
 
 export const useGetChatMessage = <TData = BusterChatMessage>(
   messageId: string,
-  options?: Omit<UseQueryOptions<BusterChatMessage, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<BusterChatMessage, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery({
     ...chatQueryKeys.chatsMessages(messageId),

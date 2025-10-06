@@ -1,10 +1,5 @@
-import {
-  type UpdateMessageEntriesParams,
-  getAssetLatestVersion,
-  updateChat,
-  updateMessage,
-  updateMessageEntries,
-} from '@buster/database/queries';
+import type { UpdateMessageEntriesParams } from '@buster/database/queries';
+import * as databaseQueries from '@buster/database/queries';
 import {
   type ResponseMessageFileType,
   ResponseMessageFileTypeSchema,
@@ -26,9 +21,26 @@ const FINAL_RESPONSE_KEY = 'finalResponse' as const satisfies keyof DoneToolInpu
 const ASSETS_TO_RETURN_KEY = 'assetsToReturn' as const satisfies keyof DoneToolInput;
 
 export function createDoneToolDelta(context: DoneToolContext, doneToolState: DoneToolState) {
+  const { getAssetLatestVersion, updateChat, updateMessage, updateMessageEntries } =
+    databaseQueries;
+
+  const isMessageUpdateQueueClosed = databaseQueries.isMessageUpdateQueueClosed ?? (() => false);
+
   return async function doneToolDelta(
     options: { inputTextDelta: string } & ToolCallOptions
   ): Promise<void> {
+    if (doneToolState.isFinalizing || isMessageUpdateQueueClosed(context.messageId)) {
+      return;
+    }
+
+    const recordSequence = (sequenceNumber: number, skipped?: boolean) => {
+      if (skipped || sequenceNumber < 0) {
+        return;
+      }
+
+      const current = doneToolState.latestSequenceNumber ?? -1;
+      doneToolState.latestSequenceNumber = Math.max(current, sequenceNumber);
+    };
     // Accumulate the delta to the args
     doneToolState.args = (doneToolState.args || '') + options.inputTextDelta;
 
@@ -52,32 +64,71 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
       assetId: string;
       assetName: string;
       assetType: ResponseMessageFileType;
+      versionNumber: number;
     };
 
-    function isAssetToReturn(value: unknown): value is AssetToReturn {
-      if (!value || typeof value !== 'object') return false;
-      const obj = value as Record<string, unknown>;
-      const idOk = typeof obj.assetId === 'string';
-      const nameOk = typeof obj.assetName === 'string';
-      const typeVal = obj.assetType;
-      const typeOk =
-        typeof typeVal === 'string' &&
-        ResponseMessageFileTypeSchema.options.includes(typeVal as ResponseMessageFileType);
-      return idOk && nameOk && typeOk;
-    }
-
-    let assetsToInsert: AssetToReturn[] = [];
-    if (Array.isArray(rawAssets)) {
-      assetsToInsert = rawAssets.filter(isAssetToReturn);
-    } else if (typeof rawAssets === 'string') {
-      try {
-        const parsed: unknown = JSON.parse(rawAssets);
-        if (Array.isArray(parsed)) {
-          assetsToInsert = parsed.filter(isAssetToReturn);
-        }
-      } catch {
-        // ignore malformed JSON until more delta arrives
+    const rawAssetItems: unknown[] = (() => {
+      if (Array.isArray(rawAssets)) {
+        return rawAssets;
       }
+      if (typeof rawAssets === 'string') {
+        try {
+          const parsed: unknown = JSON.parse(rawAssets);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch {
+          // ignore malformed JSON until more delta arrives
+        }
+      }
+      return [];
+    })();
+
+    const assetsToInsert: AssetToReturn[] = [];
+    for (const candidate of rawAssetItems) {
+      if (!candidate || typeof candidate !== 'object') {
+        continue;
+      }
+
+      const data = candidate as Record<string, unknown>;
+      const assetId = typeof data.assetId === 'string' ? data.assetId : undefined;
+      const assetName = typeof data.assetName === 'string' ? data.assetName : undefined;
+      const rawType = data.assetType;
+      const normalizedType =
+        typeof rawType === 'string' &&
+        ResponseMessageFileTypeSchema.options.includes(rawType as ResponseMessageFileType)
+          ? (rawType as ResponseMessageFileType)
+          : undefined;
+
+      if (!assetId || !assetName || !normalizedType) {
+        continue;
+      }
+
+      let versionNumber: number | undefined;
+      if (typeof data.versionNumber === 'number') {
+        versionNumber = data.versionNumber;
+      } else if (typeof (data as { version_number?: unknown }).version_number === 'number') {
+        versionNumber = (data as { version_number: number }).version_number;
+      }
+
+      if (versionNumber === undefined || Number.isNaN(versionNumber) || versionNumber <= 0) {
+        try {
+          versionNumber = await getAssetLatestVersion({
+            assetId,
+            assetType: normalizedType,
+          });
+        } catch (error) {
+          console.error('[done-tool] Failed to fetch asset version, defaulting to 1:', error);
+          versionNumber = 1;
+        }
+      }
+
+      assetsToInsert.push({
+        assetId,
+        assetName,
+        assetType: normalizedType,
+        versionNumber,
+      });
     }
 
     // Insert any newly completed asset items as response messages (dedupe via state)
@@ -95,7 +146,7 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
           type: 'file' as const,
           file_type: a.assetType,
           file_name: a.assetName,
-          version_number: 1,
+          version_number: a.versionNumber,
           filter_version_id: null,
           metadata: [
             {
@@ -113,7 +164,8 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
         };
 
         try {
-          await updateMessageEntries(entriesForAssets);
+          const result = await updateMessageEntries(entriesForAssets);
+          recordSequence(result.sequenceNumber, result.skipped);
           // Update state to prevent duplicates on next deltas
           doneToolState.addedAssetIds = [
             ...(doneToolState.addedAssetIds || []),
@@ -124,11 +176,19 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
         }
       }
 
-      // Store ALL assets (including reports) for chat update later
-      if (newAssets.length > 0) {
+      // Store assets for chat update later (excluding reasoning which is not an asset type)
+      const assetsForChatUpdate = newAssets.filter(
+        (a): a is typeof a & { assetType: Exclude<typeof a.assetType, 'reasoning'> } =>
+          a.assetType !== 'reasoning'
+      );
+      if (assetsForChatUpdate.length > 0) {
         doneToolState.addedAssets = [
           ...(doneToolState.addedAssets || []),
-          ...newAssets.map((a) => ({ assetId: a.assetId, assetType: a.assetType })),
+          ...assetsForChatUpdate.map((a) => ({
+            assetId: a.assetId,
+            assetType: a.assetType,
+            versionNumber: a.versionNumber,
+          })),
         ];
       }
     }
@@ -159,16 +219,10 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
               const firstAsset = doneToolState.addedAssets[0];
 
               if (firstAsset) {
-                // Get the actual version number from the database
-                const versionNumber = await getAssetLatestVersion({
-                  assetId: firstAsset.assetId,
-                  assetType: firstAsset.assetType,
-                });
-
                 await updateChat(context.chatId, {
                   mostRecentFileId: firstAsset.assetId,
                   mostRecentFileType: firstAsset.assetType,
-                  mostRecentVersionNumber: versionNumber,
+                  mostRecentVersionNumber: firstAsset.versionNumber,
                 });
               }
             } catch (error) {
@@ -207,7 +261,8 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
 
       try {
         if (entries.responseMessages || entries.rawLlmMessages) {
-          await updateMessageEntries(entries);
+          const result = await updateMessageEntries(entries);
+          recordSequence(result.sequenceNumber, result.skipped);
         }
       } catch (error) {
         console.error('[done-tool] Failed to update done tool raw LLM message:', error);

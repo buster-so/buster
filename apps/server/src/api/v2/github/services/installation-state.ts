@@ -11,7 +11,7 @@ interface InstallationState {
  * Generate a vault key for OAuth state
  */
 function generateStateVaultKey(state: string): string {
-  return `github_oauth_state_${state}`;
+  return `github_app_state_${state}`;
 }
 
 /**
@@ -24,7 +24,7 @@ export async function storeInstallationState(
 ): Promise<void> {
   const key = generateStateVaultKey(state);
   const expirationTime = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-  const description = `GitHub OAuth state expires at ${expirationTime}`;
+  const description = `GitHub App state expires at ${expirationTime}`;
 
   try {
     // Check if state already exists (shouldn't happen with random generation)
@@ -45,9 +45,9 @@ export async function storeInstallationState(
       });
     }
 
-    console.info(`Stored OAuth state for user ${data.userId}, org ${data.organizationId}`);
+    console.info(`Stored App state for user ${data.userId}, org ${data.organizationId}`);
   } catch (error) {
-    console.error('Failed to store OAuth state:', error);
+    console.error('Failed to store App state:', error);
     throw new Error('Failed to store installation state');
   }
 }
@@ -63,7 +63,7 @@ export async function retrieveInstallationState(state: string): Promise<Installa
     const secret = await getSecretByName(key);
 
     if (!secret) {
-      console.warn(`OAuth state not found: ${state}`);
+      console.warn(`State not found: ${state}`);
       return null;
     }
 
@@ -72,7 +72,7 @@ export async function retrieveInstallationState(state: string): Promise<Installa
     try {
       data = JSON.parse(secret.secret) as InstallationState;
     } catch (error) {
-      console.error('Failed to parse OAuth state data:', error);
+      console.error('Failed to parse App state data:', error);
       await deleteSecret(secret.id);
       return null;
     }
@@ -81,7 +81,7 @@ export async function retrieveInstallationState(state: string): Promise<Installa
     const tenMinutes = 10 * 60 * 1000;
 
     if (now.getTime() - createdAt.getTime() > tenMinutes) {
-      console.warn(`OAuth state expired: ${state}`);
+      console.warn(`App state expired: ${state}`);
       // Clean up expired state
       await deleteSecret(secret.id);
       return null;
@@ -90,16 +90,16 @@ export async function retrieveInstallationState(state: string): Promise<Installa
     // Delete state after retrieval (one-time use)
     await deleteSecret(secret.id);
 
-    console.info(`Retrieved OAuth state for user ${data.userId}, org ${data.organizationId}`);
+    console.info(`Retrieved App state for user ${data.userId}, org ${data.organizationId}`);
     return data;
   } catch (error) {
-    console.error('Failed to retrieve OAuth state:', error);
+    console.error('Failed to retrieve App state:', error);
     return null;
   }
 }
 
 /**
- * Clean up expired OAuth states
+ * Clean up expired App states
  * This should be called periodically to clean up old states
  */
 export async function cleanupExpiredStates(): Promise<void> {

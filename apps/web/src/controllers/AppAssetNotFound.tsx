@@ -1,17 +1,15 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type { ResponseMessageFileType } from '@buster/server-shared/chats';
 import { Link } from '@tanstack/react-router';
-import React from 'react';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Button } from '@/components/ui/buttons';
 import { Title } from '@/components/ui/typography';
 import { useMount } from '@/hooks/useMount';
-import { AppNoPageAccess } from './AppNoPageAccess';
 
 export const AppAssetNotFound: React.FC<{
   assetId: string;
   type: AssetType | ResponseMessageFileType;
-}> = React.memo(({ type, assetId }) => {
+}> = ({ type, assetId }) => {
   useMount(() => {
     console.info('AppAssetNotFound for asset:', assetId, 'and type:', type);
   });
@@ -32,6 +30,4 @@ export const AppAssetNotFound: React.FC<{
       </div>
     </div>
   );
-});
-
-AppNoPageAccess.displayName = 'AppNoPageAccess';
+};

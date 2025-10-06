@@ -11,6 +11,7 @@ import {
 import { chatQueryKeys } from '@/api/query_keys/chat';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useBlackboxMessage } from '@/context/BlackBox/useBlackboxMessage';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { updateChatToIChat } from '@/lib/chat';
 
@@ -105,8 +106,9 @@ export const useChatStreaming = ({
   });
 
   //HOOKS FOR TRACKING CHAT AND MESSAGE CHANGES
+  const isEmbed = useIsEmbed();
   useTrackAndUpdateChatChanges({ chatId, isStreamingMessage });
-  useTrackAndUpdateNewMessages({ chatId });
+  useTrackAndUpdateNewMessages({ chatId, isEmbed });
   useTrackAndUpdateMessageChanges({ chatId, messageId, isStreamingMessage }, (c) => {
     const {
       reasoning_messages,

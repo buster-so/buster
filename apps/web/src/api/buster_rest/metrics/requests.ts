@@ -15,14 +15,15 @@ import type {
   MetricDownloadParams,
   MetricDownloadQueryParams,
   MetricDownloadResponse,
-  ShareDeleteResponse,
-  ShareUpdateResponse,
+  ShareMetricUpdateResponse,
   UpdateMetricRequest,
   UpdateMetricResponse,
 } from '@buster/server-shared/metrics';
 import type {
   ShareDeleteRequest,
+  ShareDeleteResponse,
   SharePostRequest,
+  SharePostResponse,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
 import { mainApi, mainApiV2 } from '../instances';
@@ -80,11 +81,13 @@ export const bulkUpdateMetricVerificationStatus = async (
 // share metrics
 
 export const shareMetric = async ({ id, params }: { id: string; params: SharePostRequest }) => {
-  return mainApi.post<string>(`/metric_files/${id}/sharing`, params).then((res) => res.data);
+  return mainApiV2
+    .post<SharePostResponse>(`/metric_files/${id}/sharing`, params)
+    .then((res) => res.data);
 };
 
 export const unshareMetric = async ({ id, data }: { id: string; data: ShareDeleteRequest }) => {
-  return mainApi
+  return mainApiV2
     .delete<ShareDeleteResponse>(`/metric_files/${id}/sharing`, { data })
     .then((res) => res.data);
 };
@@ -96,8 +99,8 @@ export const updateMetricShare = async ({
   id: string;
   params: ShareUpdateRequest;
 }) => {
-  return mainApi
-    .put<ShareUpdateResponse>(`/metric_files/${id}/sharing`, params)
+  return mainApiV2
+    .put<ShareMetricUpdateResponse>(`/metric_files/${id}/sharing`, params)
     .then((res) => res.data);
 };
 

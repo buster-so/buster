@@ -54,3 +54,9 @@
     opacity: 1;
   }
 }
+
+.search-bold {
+  .keyword {
+    @apply font-semibold;
+  }
+}

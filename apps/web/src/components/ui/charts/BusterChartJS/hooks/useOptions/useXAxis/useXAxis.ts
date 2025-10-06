@@ -203,7 +203,6 @@ export const useXAxis = ({
       return formatLabel(value, firstXColumnLabelFormat);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I had a devil of a time trying to type this... This is a hack to get the type to work
     return DEFAULT_X_AXIS_TICK_CALLBACK.call(
       this,
       value,

@@ -765,6 +765,23 @@ If all true → proceed to submit prep for Asset Creation with `submitThoughts`.
         - if you are building a table of customers, the first column should be their name. 
         - If you are building a table comparing regions, have the first column be region.
         - If you are building a column comparing regions but each row is a customer, have the first column be customer name and the second be the region but have it ordered by region so customers of the same region are next to each other.
+- Using a category as "series grouping" vs. "color grouping" (categories/grouping rules for bar and line charts)
+    - Many attributes are categorical (labels, enums), but this does **not** mean they should create multiple series.
+    - Series grouping has a very specific meaning: *split into multiple parallel series that align across the X-axis*.
+    - Color grouping assigns colors within a single series and **does not** create parallel series.
+    - Misusing series grouping to “separate colors” causes empty slots or duplicated labels when categories don’t exist for every item/time — resulting in a janky chart with gaps.
+    - Decision Rule
+        - Ask: *Is this category defining the primary comparison structure, or just distinguishing items?*
+        - Primary structure split → use series grouping
+            - Example: *Values over time by group* → multiple lines (one per group).
+        - Distinguishing only → use color grouping
+            - Example: *Items on one axis, colored by group* → one bar/line per item, colored by group.
+        - No secondary distinction needed → use neither
+            - Example: *Top N items by value* → one bar per item, no color grouping.
+    - Checklist Before Using series grouping
+        1. Is the X-axis temporal and the intent is to compare multiple parallel trends? → series grouping.
+        2. Do you need grouped/stacked comparisons of the **same** measure across multiple categories? → series grouping.
+        3. Otherwise (entity list on X with a single measure on Y) → keep a single series; no category/color grouping needed.
 - Planning and Description Guidelines
     - For grouped/stacked bar charts, specify the grouping/stacking field (e.g., "grouped by `[field_name]`").
     - For bar charts with time units (e.g., days of the week, months, quarters, years) on the x-axis, sort the bars in chronological order rather than in ascending or descending order based on the y-axis measure.

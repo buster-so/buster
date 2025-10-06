@@ -10,7 +10,7 @@ import { organizationQueryKeys } from '@/api/query_keys/organization';
 import { userQueryKeys } from '@/api/query_keys/users';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { timeout } from '@/lib/timeout';
-import type { RustApiError } from '../../errors';
+import type { ApiError } from '../../errors';
 import { useCreateOrganization } from '../organizations/queryRequests';
 import {
   getMyUserInfo,
@@ -19,9 +19,10 @@ import {
   inviteUser,
   updateOrganizationUser,
 } from './requests';
+import { useGetUserBasicInfo } from './useGetUserInfo';
 
 export const useGetMyUserInfo = <TData = UserResponse>(
-  props?: Omit<UseQueryOptions<UserResponse | null, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  props?: Omit<UseQueryOptions<UserResponse | null, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery({
     ...userQueryKeys.userGetUserMyself,
@@ -33,6 +34,14 @@ export const useGetMyUserInfo = <TData = UserResponse>(
 
 export const prefetchGetMyUserInfo = async (queryClient: QueryClient) => {
   await queryClient.prefetchQuery({
+    ...userQueryKeys.userGetUserMyself,
+    queryFn: () => getMyUserInfo(),
+  });
+  return queryClient.getQueryData(userQueryKeys.userGetUserMyself.queryKey);
+};
+
+export const ensureGetMyUserInfo = async (queryClient: QueryClient) => {
+  await queryClient.ensureQueryData({
     ...userQueryKeys.userGetUserMyself,
     queryFn: () => getMyUserInfo(),
   });
@@ -120,11 +129,22 @@ export const useCreateUserOrganization = () => {
   });
 };
 
-export const useGetSuggestedPrompts = (params: Parameters<typeof getSuggestedPrompts>[0]) => {
-  const queryFn = () => getSuggestedPrompts(params);
+export const useGetSuggestedPrompts = () => {
+  const user = useGetUserBasicInfo();
+  const queryFn = () => getSuggestedPrompts({ userId: user?.id ?? '' });
   return useQuery({
-    ...userQueryKeys.userGetSuggestedPrompts(params.userId),
+    ...userQueryKeys.userGetSuggestedPrompts(user?.id ?? ''),
     queryFn,
+    enabled: !!user?.id,
+    initialData: {
+      suggestedPrompts: {
+        report: [],
+        dashboard: [],
+        visualization: [],
+        help: [],
+      },
+      updatedAt: '',
+    },
   });
 };
 

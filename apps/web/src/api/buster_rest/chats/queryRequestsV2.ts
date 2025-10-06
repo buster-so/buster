@@ -1,4 +1,3 @@
-import type { ChatCreateRequest } from '@buster/server-shared/chats';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 import { chatQueryKeys } from '@/api/query_keys/chat';
@@ -19,11 +18,7 @@ export const useStartNewChat = () => {
   };
 
   return useMutation({
-    mutationFn: async (props: ChatCreateRequest) => {
-      // I opted to not use honoInstance to take better advantage of turbo caching
-      //  const res = await honoInstance.api.v2.chats.$post({ json: props });
-      return await createNewChat(props);
-    },
+    mutationFn: createNewChat,
     onSuccess: (data) => {
       const { iChat, iChatMessages } = updateChatToIChat(data);
       saveAllChatMessages(iChatMessages);

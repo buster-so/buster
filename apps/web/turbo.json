@@ -63,7 +63,7 @@
     },
     "dev:fast": {
       "dependsOn": ["@buster/server-shared#build"],
-      "cache": false,
+      "cache": true,
       "persistent": true,
       "inputs": [
         "src/**/*",

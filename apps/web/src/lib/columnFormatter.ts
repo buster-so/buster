@@ -43,9 +43,11 @@ export const formatLabel = (
     textIsNotNullOrUndefined &&
     columnType === 'number' &&
     !useKeyFormatter &&
-    replaceMissingDataWith === 0
+    replaceMissingDataWith === 0 &&
+    typeof textProp !== 'object' //object is a date
       ? Number(textProp)
       : textProp;
+
   let formattedText = text;
 
   if (text === null || text === undefined) {

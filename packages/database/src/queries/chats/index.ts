@@ -4,6 +4,8 @@ export {
   updateChat,
   getChatWithDetails,
   createMessage,
+  updateChatSharing,
+  getChatById,
   CreateChatInputSchema,
   GetChatInputSchema,
   CreateMessageInputSchema,

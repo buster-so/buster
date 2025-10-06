@@ -48,7 +48,13 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
   } = check;
 
   // Check cache first (only for single role checks)
-  const cached = getCachedPermission(userId, assetId, assetType, requiredRole, userSuppliedPassword);
+  const cached = getCachedPermission(
+    userId,
+    assetId,
+    assetType,
+    requiredRole,
+    userSuppliedPassword
+  );
   if (cached !== undefined) {
     return cached;
   }
@@ -106,8 +112,6 @@ export async function checkPermission(check: AssetPermissionCheck): Promise<Asse
       }
     }
   }
-
-  console.info('publiclyAccessible', publiclyAccessible);
 
   if (publiclyAccessible) {
     const hasPublicAccessCheck = hasPublicAccess(

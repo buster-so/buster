@@ -1,6 +1,6 @@
 import type { AnyPluginConfig, Value } from 'platejs';
 import { Plate, type TPlateEditor } from 'platejs/react';
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { ScrollToBottomButton } from '@/components/features/buttons/ScrollToBottomButton';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useDebounceFn } from '@/hooks/useDebounce';
@@ -140,7 +140,6 @@ export const ReportEditor = React.memo(
         <Plate editor={editor} onValueChange={onValueChangeDebounced}>
           <EditorContainer
             variant={variant}
-            readOnly={readOnly}
             className={cn('editor-container relative', containerClassName)}
           >
             {preEditorChildren}
@@ -149,7 +148,7 @@ export const ReportEditor = React.memo(
                 style={style}
                 placeholder={placeholder}
                 className={cn('editor', className)}
-                readOnly={readOnly || isStreaming}
+                readOnly={readOnly} //do not have streaming here, it causes scrolling issue when toggling
                 autoFocus
               />
             </ThemeWrapper>

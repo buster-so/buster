@@ -34,7 +34,7 @@ export const ChatUserMessage: React.FC<{
     setIsTooltipOpen(false);
   }, []);
 
-  const handleCopy = useCallback(
+  const handleCopyParagraph = useCallback(
     (e?: React.ClipboardEvent) => {
       // Check if user has selected text
       const selection = window.getSelection();
@@ -49,6 +49,16 @@ export const ChatUserMessage: React.FC<{
       } else {
         navigator.clipboard.writeText(hasSelection ? selectedText : request || '');
       }
+      openSuccessMessage('Copied to clipboard');
+    },
+    [openSuccessMessage, request]
+  );
+
+  const handleCopyButton = useCallback(
+    (e?: React.ClipboardEvent) => {
+      e?.preventDefault();
+      e?.preventDefault();
+      navigator.clipboard.writeText(request || '');
       openSuccessMessage('Copied to clipboard');
     },
     [openSuccessMessage, request]
@@ -71,7 +81,7 @@ export const ChatUserMessage: React.FC<{
         />
       ) : (
         <>
-          <Paragraph className="break-words whitespace-pre-line" onCopy={handleCopy}>
+          <Paragraph className="break-words whitespace-pre-line" onCopy={handleCopyParagraph}>
             {request}
           </Paragraph>
 
@@ -79,7 +89,7 @@ export const ChatUserMessage: React.FC<{
             <RequestMessageTooltip
               isTooltipOpen={isTooltipOpen}
               setIsEditing={setIsEditing}
-              onCopy={handleCopy}
+              onCopy={handleCopyButton}
             />
           )}
         </>

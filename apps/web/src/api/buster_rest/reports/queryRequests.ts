@@ -11,13 +11,14 @@ import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { reportsQueryKeys } from '@/api/query_keys/reports';
 import { silenceAssetErrors } from '@/api/response-helpers/silenece-asset-errors';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
-import type { RustApiError } from '../../errors';
+import type { ApiError } from '../../errors';
 import {
   useAddAssetToCollection,
   useRemoveAssetFromCollection,
 } from '../collections/queryRequests';
 import { useGetUserFavorites } from '../users/favorites';
-import { getReportById, getReportsList, updateReport } from './requests';
+import { getReportAndInitializeMetrics } from './reportQueryHelpers';
+import { getReportsList, updateReport } from './requests';
 
 /**
  * Hook to get a list of reports
@@ -80,9 +81,13 @@ export const prefetchGetReport = async (
     await queryClient.prefetchQuery({
       ...reportsQueryKeys.reportsGetReport(reportId, version_number || 'LATEST'),
       queryFn: () =>
-        getReportById({
+        getReportAndInitializeMetrics({
           id: reportId,
           version_number: typeof version_number === 'number' ? version_number : undefined,
+          password: undefined,
+          queryClient,
+          shouldInitializeMetrics: true,
+          prefetchMetricsData: false,
         }),
       retry: silenceAssetErrors,
     });
@@ -103,20 +108,23 @@ export const usePrefetchGetReportClient = () => {
  */
 export const useGetReport = <T = GetReportResponse>(
   { id, versionNumber }: { id: string | undefined; versionNumber?: number },
-  options?: Omit<UseQueryOptions<GetReportResponse, RustApiError, T>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<GetReportResponse, ApiError, T>, 'queryKey' | 'queryFn'>
 ) => {
   const password = useProtectedAssetPassword(id || '');
-  const queryFn = () => {
-    return getReportById({
-      id: id ?? '',
-      version_number: typeof versionNumber === 'number' ? versionNumber : undefined,
-      password,
-    });
-  };
+  const queryClient = useQueryClient();
 
   return useQuery({
     ...reportsQueryKeys.reportsGetReport(id ?? '', versionNumber || 'LATEST'),
-    queryFn,
+    queryFn: () => {
+      return getReportAndInitializeMetrics({
+        id: id ?? '',
+        version_number: typeof versionNumber === 'number' ? versionNumber : undefined,
+        password,
+        queryClient,
+        shouldInitializeMetrics: true,
+        prefetchMetricsData: true,
+      });
+    },
     enabled: !!id,
     select: options?.select,
     ...options,
@@ -129,7 +137,7 @@ export const useUpdateReport = () => {
 
   return useMutation<
     UpdateReportResponse,
-    RustApiError,
+    ApiError,
     Parameters<typeof updateReport>[0],
     { previousReport?: GetReportResponse }
   >({

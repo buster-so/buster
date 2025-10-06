@@ -4,7 +4,7 @@ import { ChatHeaderTitle } from '@/components/features/chat/ChatHeaderTitle';
 import { useGetActiveChatTitle, useIsStreamingMessage } from '@/context/Chats';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 
-export const ChatHeader: React.FC = React.memo(() => {
+export const ChatHeader: React.FC<{ isEmbed: boolean }> = React.memo(({ isEmbed }) => {
   const chatId = useGetChatId();
   const chatTitle = useGetActiveChatTitle();
   const isStreamingMessage = useIsStreamingMessage();
@@ -16,7 +16,7 @@ export const ChatHeader: React.FC = React.memo(() => {
         chatId={chatId || ''}
         isStreamingMessage={isStreamingMessage}
       />
-      <ChatHeaderOptions />
+      {!isEmbed && <ChatHeaderOptions />}
     </>
   );
 });

@@ -13,11 +13,16 @@ export const GetChatsRequestSchemaV2 = PaginatedRequestSchema;
 export type GetChatsRequestV2 = z.infer<typeof GetChatsRequestSchemaV2>;
 
 // Request for getting a single chat
-export const GetChatRequestSchema = z.object({
+export const GetChatRequestParamsSchema = z.object({
   id: z.string(),
 });
 
-export type GetChatRequest = z.infer<typeof GetChatRequestSchema>;
+export const GetChatRequestQuerySchema = z.object({
+  password: z.string().optional(),
+});
+
+export type GetChatRequestQuery = z.infer<typeof GetChatRequestQuerySchema>;
+export type GetChatRequestParams = z.infer<typeof GetChatRequestParamsSchema>;
 
 // Request for deleting multiple chats
 export const DeleteChatsRequestSchema = z.array(z.string());

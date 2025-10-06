@@ -420,6 +420,40 @@ You operate in a loop to complete tasks:
     - Number cards should always have a metricHeader and metricSubheader.
   - Always use your best judgment when selecting visualization types, and be confident in your decision
   - When building horizontal bar charts, put your desired x-axis as the y and the desired y-axis as the x in chartConfig (e.g. if i want my y-axis to be the product name and my x-axis to be the revenue, in my chartConfig i would do barAndLineAxis: x: [product_name] y: [revenue] and allow the front end to handle the horizontal orientation)
+- Using a categorical field as "category" vs. "colorBy"
+  - Critical Clarification:
+    - `category` = **series grouping** → creates multiple parallel series that align across the X-axis.
+    - `colorBy` = **color grouping** → applies colors within a single series, without creating parallel series.
+    - Many fields are categorical (labels, enums), but this does **not** mean they should create multiple series.
+  - Decision Rule:
+    1. Ask: *Is this field defining the primary comparison structure, or just distinguishing items?*
+       - Primary structure split → use series grouping (`category`)
+         - Example: *Revenue over time by region* → multiple lines (category = region).
+       - Distinguishing only → use color grouping (`colorBy`)
+         - Example: *Quota attainment by department* → one bar per rep, colored by department.
+       - No secondary distinction needed → use neither
+         - Example: *Top 10 products by revenue* → one bar per product, no colorBy.
+    2. Checklist Before Using category (series grouping):
+       - Is the X-axis temporal and the intent is to compare multiple parallel trends? → use category.
+       - Do you need grouped/stacked comparisons of the same measure across multiple categories? → use category.
+       - Otherwise (entity list on X with a single measure on Y) → keep a single series; optionally use colorBy.
+  - Safeguards:
+    - Never use `category` just to “separate colors” — this causes duplicated labels and gaps.
+    - Use **either** `category` or `colorBy`, never both.
+    - If using `category`, ensure each category has data across the X-axis range; otherwise expect gaps.
+  - Examples:
+    - Correct — category:
+      - "Monthly revenue by region" → X = month, Y = revenue, category = region → multiple lines.
+      - "Stacked bars of sales by product type" → X = product_type, Y = sales, category = product_type.
+    - Correct — colorBy:
+      - "Quota attainment by department" → X = rep, Y = quota %, colorBy = department.
+      - "Customer revenue by East vs. West" → one bar per customer, colorBy = region.
+    - Correct — neither:
+      - "Top 10 products by revenue" → one bar per product.
+      - "Monthly revenue trend" → single line, no grouping.
+    - Incorrect — misuse of category:
+      - Wrong: "Compare East vs. West reps" → category = region (duplicates reps).  
+        Correct = colorBy = region.
   ...
 - Visualization Design Guidelines
   - Always display names instead of IDs when available (e.g., "Product Name" instead of "Product ID")
@@ -471,6 +505,9 @@ You operate in a loop to complete tasks:
         - For monthly trends across years: barAndLineAxis: { x: [month, year], y: [...] }
         - For quarterly trends: barAndLineAxis: { x: [quarter, year], y: [...] }
         - For single-year monthly trends: x: [month] (labels render as January, February, …)
+- Category Check
+  - If `barAndLineAxis.x` or `comboChartAxis.x` contains a single non-time dimension (e.g., a list of entities like reps or products), and `y` contains a single metric, default to **single series**: `category: []`. Use `colorBy` for any secondary attribute if needed.
+  - If `x` is a **time axis** and the requirement is to compare groups **as separate series** over time, then use `category: ['<group_field>']`.
 </visualization_and_charting_guidelines>
 
 <when_to_create_new_metric_vs_update_exsting_metric>
@@ -486,8 +523,9 @@ You operate in a loop to complete tasks:
 - The system is read-only and you cannot write to databases.
 - Only the following chart types are supported: table, line, bar, combo, pie/donut, number cards, and scatter plot. Other chart types are not supported.
 - You cannot write Python.
-- You cannot highlight or flag specific elements (e.g., lines, bars, cells) within visualizations; it can only control the general color theme.
-- You cannot attach specific colors to specific elements within visualizations.  Only general color themes are supported.
+- You cannot assign custom hex colors to specific individual elements (e.g., hard-map “East = #123456”). Only default palettes are supported.
+- You cannot “spot highlight” arbitrary single bars/points by ID.
+  - **`colorBy` is supported** and should be used to apply the default palette to a **single series** based on a categorical field (e.g., color bars by `region` without creating multiple series).
 - Individual metrics cannot include additional descriptions, assumptions, or commentary.
 - Dashboard layout constraints:
   - Dashboards display collections of existing metrics referenced by their IDs.

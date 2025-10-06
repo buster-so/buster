@@ -10,14 +10,17 @@
   "exports": {
     ".": {
       "types": "./dist/configs/index.d.ts",
+      "import": "./dist/configs/index.js",
       "default": "./dist/configs/index.js"
     },
     "./base": {
       "types": "./dist/configs/base.d.ts",
+      "import": "./dist/configs/base.js",
       "default": "./dist/configs/base.js"
     },
     "./ui": {
       "types": "./dist/configs/ui.d.ts",
+      "import": "./dist/configs/ui.js",
       "default": "./dist/configs/ui.js"
     }
   },

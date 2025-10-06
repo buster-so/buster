@@ -9,6 +9,7 @@ export const ssr = true;
 
 export const component = () => {
   const { metricId, metricVersionNumber } = useGetMetricParams();
+
   return (
     <AppAssetCheckLayout assetType={'metric_file'}>
       <MetricViewChartController

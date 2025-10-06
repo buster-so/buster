@@ -1,35 +1,41 @@
+import { checkPermission } from '@buster/access-controls';
 import {
   findUsersByEmails,
   getReportFileById,
-  getReportWorkspaceSharing,
   removeAssetPermission,
 } from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
-import type { ShareDeleteResponse } from '@buster/server-shared/reports';
+import type { ShareDeleteResponse } from '@buster/server-shared/share';
 import type { ShareDeleteRequest } from '@buster/server-shared/share';
 import { ShareDeleteRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { checkIfAssetIsEditable } from '../../../../../shared-helpers/asset-public-access';
 
 export async function deleteReportSharingHandler(
   reportId: string,
   emails: ShareDeleteRequest,
   user: User
 ): Promise<ShareDeleteResponse> {
-  await checkIfAssetIsEditable({
-    user,
-    assetId: reportId,
-    assetType: 'report_file',
-    workspaceSharing: getReportWorkspaceSharing,
-    requiredRole: 'full_access',
-  });
-
   // Get the report to verify it exists and get owner info
   const report = await getReportFileById({ reportId, userId: user.id });
   if (!report) {
     throw new HTTPException(404, { message: 'Report not found' });
+  }
+
+  const permissionCheck = await checkPermission({
+    userId: user.id,
+    assetId: reportId,
+    assetType: 'report_file',
+    requiredRole: 'full_access',
+    workspaceSharing: report.workspace_sharing,
+    organizationId: report.organization_id,
+  });
+
+  if (!permissionCheck.hasAccess) {
+    throw new HTTPException(403, {
+      message: 'You do not have permission to delete sharing for this report',
+    });
   }
 
   // Find users by emails

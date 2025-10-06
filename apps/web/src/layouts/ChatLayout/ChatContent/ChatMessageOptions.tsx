@@ -89,18 +89,20 @@ export const ChatMessageOptions: React.FC<{
           />
         </AppTooltip>
       )}
-      <AppTooltip title="Report message">
-        <Button
-          variant="ghost"
-          prefix={feedback === 'negative' ? <ThumbsDownFilled /> : <ThumbsDown />}
-          onClick={() =>
-            updateChatMessageFeedback({
-              message_id: messageId,
-              feedback: feedback === 'negative' ? null : 'negative',
-            })
-          }
-        />
-      </AppTooltip>
+      {canEditChat && (
+        <AppTooltip title="Report message">
+          <Button
+            variant="ghost"
+            prefix={feedback === 'negative' ? <ThumbsDownFilled /> : <ThumbsDown />}
+            onClick={() =>
+              updateChatMessageFeedback({
+                message_id: messageId,
+                feedback: feedback === 'negative' ? null : 'negative',
+              })
+            }
+          />
+        </AppTooltip>
+      )}
 
       {postProcessingMessage && (
         <AppTooltip title="View assumptions">

@@ -59,7 +59,6 @@ export const ThrowUnauthorizedErrorSchema = z.object({
 
 export type ThrowUnauthorizedErrorParams = z.infer<typeof ThrowUnauthorizedErrorSchema>;
 
-
 // Decides the appropriate error to throw based on the public access settings
 export function throwUnauthorizedError(params: ThrowUnauthorizedErrorParams): never {
   const { publiclyAccessible, publicExpiryDate, publicPassword, userSuppliedPassword } = params;

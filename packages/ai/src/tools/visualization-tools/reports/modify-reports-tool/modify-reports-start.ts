@@ -16,6 +16,7 @@ export function modifyReportsStart(context: ModifyReportsContext, state: ModifyR
     state.startTime = Date.now();
     state.responseMessageCreated = false;
     state.snapshotContent = undefined;
+    state.firstDelta = true;
 
     if (context.messageId) {
       try {

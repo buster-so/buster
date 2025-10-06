@@ -9,6 +9,7 @@ import type {
 import isEmpty from 'lodash/isEmpty';
 import React, { useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorCard } from '@/components/ui/error/ErrorCard';
 import { useUpdateMetricChart } from '@/context/Metrics/useUpdateMetricChart';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { chartTypeToAxis, zoneIdToAxis } from './config';
@@ -58,11 +59,7 @@ export const SelectAxis: React.FC<
 
   const memoizedErrorComponent = useMemo(() => {
     return (
-      <div className="bg-danger-background flex min-h-28 items-center justify-center rounded border border-red-500">
-        <span className="text-danger-foreground p-3 text-center">
-          There was an error loading the chart config. Please contact Buster support.
-        </span>
-      </div>
+      <ErrorCard message="There was an error loading the chart config. Please contact Buster support." />
     );
   }, []);
 

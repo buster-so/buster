@@ -1,6 +1,6 @@
 {
   "name": "@buster-app/cli",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Buster CLI - TypeScript version",
   "type": "module",
   "bin": {

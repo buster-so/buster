@@ -4,7 +4,7 @@ import type { deploy } from '@buster/server-shared';
 type UnifiedDeployRequest = deploy.UnifiedDeployRequest;
 type UnifiedDeployResponse = deploy.UnifiedDeployResponse;
 
-import { loadCredentials } from '../../../utils/credentials';
+import { getCredentials } from '../../../utils/credentials';
 import type { DeploymentFailure, DeploymentItem } from '../schemas';
 
 /**
@@ -85,15 +85,22 @@ export function createLiveDeployer(sdk: BusterSDK): DeployFunction {
  * This is the only function that performs I/O in this module
  */
 export async function createAuthenticatedDeployer(): Promise<DeployFunction> {
-  const credentials = await loadCredentials();
+  // Use getCredentials which checks env vars first, then saved credentials
+  const credentials = await getCredentials();
 
   if (!credentials?.apiKey) {
+    const isCIEnvironment = process.env.CI || !process.stdin.isTTY;
+    if (isCIEnvironment) {
+      throw new Error(
+        'Not authenticated. Please set BUSTER_API_KEY environment variable or use --api-key flag.'
+      );
+    }
     throw new Error('Not authenticated. Please run: buster auth');
   }
 
   const sdk = createBusterSDK({
     apiKey: credentials.apiKey,
-    apiUrl: credentials.apiUrl || 'https://api.buster.so',
+    apiUrl: credentials.apiUrl || 'https://api2.buster.so',
   });
 
   return createLiveDeployer(sdk);

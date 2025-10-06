@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import type { RustApiError } from '@/api/errors';
+import type { ApiError } from '@/api/errors';
 import {
   ERROR_RETRY_DELAY,
   GC_TIME,
@@ -7,7 +7,7 @@ import {
   USER_CANCELLED_ERROR,
 } from './query-client-config';
 
-type OpenErrorNotification = (error: Error | { message: string } | RustApiError) => void;
+type OpenErrorNotification = (error: Error | { message: string } | ApiError) => void;
 
 export function makeQueryClient(params?: {
   openErrorNotification?: OpenErrorNotification;

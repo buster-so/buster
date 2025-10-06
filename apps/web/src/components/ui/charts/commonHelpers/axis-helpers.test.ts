@@ -116,6 +116,7 @@ describe('doesChartHaveValidAxis', () => {
       y: ['value1', 'value2'],
       category: [],
       tooltip: null,
+      colorBy: null,
     } as ChartEncodes;
     expect(
       doesChartHaveValidAxis({

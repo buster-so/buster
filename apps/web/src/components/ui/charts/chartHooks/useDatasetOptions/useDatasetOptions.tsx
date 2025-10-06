@@ -1,4 +1,5 @@
 import type {
+  BarAndLineAxis,
   BarSortBy,
   ChartConfigProps,
   ChartEncodes,
@@ -20,6 +21,7 @@ import { sortLineBarData } from './datasetHelpers_BarLinePie';
 import { downsampleAndSortScatterData } from './datasetHelpers_Scatter';
 import type { DatasetOptionsWithTicks } from './interfaces';
 import { modifyDatasets } from './modifyDatasets';
+import { useColorMapping } from './useColorMapping';
 
 type DatasetHookResult = {
   datasetOptions: DatasetOptionsWithTicks;
@@ -44,9 +46,12 @@ type DatasetHookParams = {
   lineGroupType: BusterChartProps['lineGroupType'];
   trendlines: Trendline[] | undefined;
   columnMetadata: NonNullable<BusterChartProps['columnMetadata']>;
+  colors: string[];
 };
 
 const defaultYAxis2 = [] as string[];
+const stableColorByFields = [] as string[];
+const stableCategoryFields = [] as string[];
 
 export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult => {
   const {
@@ -60,15 +65,20 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     lineGroupType,
     pieSortBy,
     columnMetadata,
+    colors,
   } = params;
   const {
     x: xFields,
     y: yAxisFields,
     size: sizeField,
     tooltip: _tooltipFields = null,
-    category: categoryFields = [],
-  } = selectedAxis as ScatterAxis;
+    category: categoryFields = stableCategoryFields,
+    colorBy: colorByFields = stableColorByFields,
+  } = selectedAxis as ScatterAxis & BarAndLineAxis;
   const { y2: y2AxisFields = defaultYAxis2 } = selectedAxis as ComboChartAxis;
+
+  // Use the optimized color mapping hook
+  const { colorConfig } = useColorMapping(data, colorByFields, colors);
 
   const tooltipFields = useMemo(() => _tooltipFields || [], [_tooltipFields]);
 
@@ -145,7 +155,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
   }, [y2AxisFieldsString, isComboChart]);
 
   const tooltipKeys = useMemo(() => {
-    if (isEmpty(tooltipFields)) return [...measureFields];
+    if (isEmpty(tooltipFields)) return measureFields;
 
     return tooltipFields;
   }, [tooltipFieldsString, measureFields]);
@@ -170,7 +180,8 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
         tooltip: tooltipFields,
       },
       columnLabelFormats,
-      isScatter
+      isScatter,
+      colorConfig
     );
   }, [
     sortedAndLimitedData,
@@ -182,6 +193,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     tooltipFieldsString,
     measureFieldsReplaceDataWithKey,
     isScatter,
+    colorConfig,
   ]);
 
   const datasetOptions = useMemo(() => {

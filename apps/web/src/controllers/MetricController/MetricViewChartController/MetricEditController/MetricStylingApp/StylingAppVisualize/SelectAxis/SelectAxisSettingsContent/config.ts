@@ -18,6 +18,7 @@ export const zoneIdToAxisSettingContent: Record<
   y2Axis: Y2AxisSettingContent,
   tooltip: TooltipAxisSettingContent,
   sizeAxis: null,
+  colorBy: null,
   available: null,
   metric: null,
 };

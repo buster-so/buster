@@ -1,0 +1,2 @@
+CREATE INDEX "idx_perm_active_identity_asset" ON "asset_permissions" USING btree ("identity_type","identity_id","asset_type","asset_id") WHERE "asset_permissions"."deleted_at" is null;--> statement-breakpoint
+CREATE INDEX "idx_as2_active_by_org" ON "asset_search_v2" USING btree ("organization_id") WHERE "asset_search_v2"."deleted_at" is null;

@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority';
+import uniq from 'lodash/uniq';
 import React, { useMemo } from 'react';
 import { cn } from '@/lib/classMerge';
 import Target from '../OtherComponents/Target';
@@ -10,7 +11,7 @@ const itemVariants = cva(
     variants: {
       size: {
         sm: 'w-2 h-4',
-        default: 'w-4.5 h-4',
+        default: 'w-4 h-4',
       },
     },
   }
@@ -25,7 +26,7 @@ const dotVariants = cva('bg-border transition-colors duration-100', {
     type: {
       bar: 'w-4.5 h-4 rounded-sm',
       line: 'w-4.5 h-1 rounded-sm',
-      scatter: 'w-3 h-4 rounded-full',
+      scatter: 'w-4 h-4 rounded-full',
     },
   },
 
@@ -50,7 +51,7 @@ const dotVariants = cva('bg-border transition-colors duration-100', {
 
 export const LegendItemDot: React.FC<
   {
-    color: string | undefined;
+    color: string | string[] | undefined;
     inactive: boolean;
     type: BusterChartLegendItem['type'];
     onFocusItem?: (() => void) | undefined;
@@ -79,6 +80,8 @@ export const LegendItemDot: React.FC<
     return dotVariants({ size, type: 'bar' });
   }, [type, size]);
 
+  const buttonStyle = useButtonColor(color, inactive);
+
   return (
     <div className={cn(itemVariants({ size }))} data-testid="legend-dot-container">
       <button
@@ -88,7 +91,7 @@ export const LegendItemDot: React.FC<
         className={cn('cursor-pointer', dotStyle, {
           'group-hover:opacity-0': hasFocusItem,
         })}
-        style={{ backgroundColor: !inactive ? color : undefined }}
+        style={buttonStyle}
       />
       {hasFocusItem && (
         <button
@@ -114,3 +117,31 @@ export const LegendItemDot: React.FC<
   );
 });
 LegendItemDot.displayName = 'LegendItemDot';
+
+const useButtonColor = (color: string | string[] | undefined, inactive: boolean) => {
+  return useMemo(() => {
+    if (inactive) return {};
+
+    const isArrayColor = Array.isArray(color);
+
+    if (isArrayColor && color && color.length > 0) {
+      // Create a striped pattern with multiple colors
+
+      const colorArray = uniq(color as string[]).slice(0, 4);
+      const stripeWidth = 100 / colorArray.length;
+
+      const gradientStops = colorArray.flatMap((colorValue, index) => {
+        const start = index * stripeWidth;
+        const end = (index + 1) * stripeWidth;
+        return [`${colorValue} ${start}%`, `${colorValue} ${end}%`];
+      });
+
+      return {
+        background: `linear-gradient(-45deg, ${gradientStops.join(', ')})`,
+      };
+    } else {
+      // Single color
+      return { backgroundColor: typeof color === 'string' ? color : undefined };
+    }
+  }, [color, inactive]);
+};

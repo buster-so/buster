@@ -5,7 +5,7 @@ import {
   getAssetsAssociatedWithMetric,
   getMetricFileById,
   getOrganizationMemberCount,
-  getUsersWithMetricPermissions,
+  getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 import { type ChartConfigProps, DEFAULT_CHART_CONFIG } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';
@@ -26,7 +26,7 @@ vi.mock('@buster/access-controls', () => ({
 
 vi.mock('@buster/database/queries', () => ({
   getMetricFileById: vi.fn(),
-  getUsersWithMetricPermissions: vi.fn(),
+  getUsersWithAssetPermissions: vi.fn(),
   getOrganizationMemberCount: vi.fn(),
   getAssetsAssociatedWithMetric: vi.fn(),
 }));
@@ -45,7 +45,7 @@ vi.mock('js-yaml', () => ({
 describe('metric-helpers', () => {
   const mockCheckPermission = checkPermission as Mock;
   const mockGetMetricFileById = getMetricFileById as Mock;
-  const mockGetUsersWithMetricPermissions = getUsersWithMetricPermissions as Mock;
+  const mockGetUsersWithAssetPermissions = getUsersWithAssetPermissions as Mock;
   const mockGetOrganizationMemberCount = getOrganizationMemberCount as Mock;
   const mockGetAssetsAssociatedWithMetric = getAssetsAssociatedWithMetric as Mock;
   const mockGetPubliclyEnabledByUser = getPubliclyEnabledByUser as Mock;
@@ -100,6 +100,8 @@ describe('metric-helpers', () => {
     workspaceSharingEnabledAt: null,
     workspaceSharingEnabledBy: null,
     deletedAt: null,
+    screenshotBucketKey: null,
+    savedToLibrary: false,
     ...overrides,
   });
 
@@ -111,7 +113,7 @@ describe('metric-helpers', () => {
       hasAccess: true,
       effectiveRole: 'can_view',
     });
-    mockGetUsersWithMetricPermissions.mockResolvedValue([]);
+    mockGetUsersWithAssetPermissions.mockResolvedValue([]);
     mockGetOrganizationMemberCount.mockResolvedValue(5);
     mockGetAssetsAssociatedWithMetric.mockResolvedValue({
       dashboards: [],
@@ -630,9 +632,9 @@ describe('metric-helpers', () => {
     it('should include all associated data from concurrent queries', async () => {
       const processedData = createProcessedData();
 
-      mockGetUsersWithMetricPermissions.mockResolvedValue([
-        { userId: 'user-1', role: 'can_view' },
-        { userId: 'user-2', role: 'can_edit' },
+      mockGetUsersWithAssetPermissions.mockResolvedValue([
+        { role: 'can_view', email: 'user1@test.com', name: 'User 1', avatarUrl: null },
+        { role: 'can_edit', email: 'user2@test.com', name: 'User 2', avatarUrl: null },
       ]);
       mockGetOrganizationMemberCount.mockResolvedValue(10);
       mockGetAssetsAssociatedWithMetric.mockResolvedValue({

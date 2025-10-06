@@ -2,6 +2,7 @@ import type { AuthError, Session, SupabaseClient } from '@supabase/supabase-js';
 import { createServerFn } from '@tanstack/react-start';
 import type { SimplifiedSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
 import { getSupabaseServerClient } from '@/integrations/supabase/server';
+import { isServer } from '@/lib/window';
 import { isTokenExpired } from '../auth_helpers/expiration-helpers';
 
 export const extractSimplifiedSupabaseSession = async (

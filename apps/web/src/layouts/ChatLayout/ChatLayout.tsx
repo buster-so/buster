@@ -5,6 +5,7 @@ import {
   type AppSplitterRef,
   type LayoutSize,
 } from '@/components/ui/layouts/AppSplitter';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { useGetCurrentMessageId, useIsStreamingMessage } from '@/context/Chats';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 import type { LayoutMode } from '@/layouts/ChatLayout/config';
@@ -38,6 +39,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({
   const selectedAssetId = useSelectedAssetId();
   const currentMessageId = useGetCurrentMessageId() || '';
   const chatId = useGetChatId();
+  const isEmbed = useIsEmbed();
   const isStreamingMessage = useIsStreamingMessage();
 
   const leftPanelMinSize = selectedAssetId ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : '0px';
@@ -57,7 +59,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({
   return (
     <AppSplitter
       ref={appSplitterRef}
-      leftChildren={renderLeftPanel && <ChatContainer chatId={chatId} />}
+      leftChildren={renderLeftPanel && <ChatContainer chatId={chatId} isEmbed={isEmbed} />}
       rightChildren={renderRightPanel && children}
       autoSaveId={autoSaveId}
       defaultLayout={defaultLayout}

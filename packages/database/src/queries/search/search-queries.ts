@@ -1,12 +1,8 @@
-import { and, count, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
+import { and, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2, assetTypeEnum } from '../../schema';
-import {
-  type PaginatedResponse,
-  PaginationInputSchema,
-  createPaginatedResponse,
-} from '../../schema-types';
+import { assetSearchV2 } from '../../schema';
+import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
 import { createPermissionedAssetsSubquery } from './access-control-helpers';
 
 import { AssetTypeSchema } from '../../schema-types/asset';
@@ -46,7 +42,7 @@ export type SearchFilters = z.infer<typeof SearchFiltersSchema>;
 export type SearchTextInput = z.infer<typeof SearchTextInputSchema>;
 export type TextSearchResult = z.infer<typeof TextSearchResultSchema>;
 
-export type SearchTextResponse = PaginatedResponse<TextSearchResult>;
+export type SearchTextResponse = SearchPaginatedResponse<TextSearchResult>;
 
 /**
  * Search asset_search_v2 table using pgroonga index
@@ -57,11 +53,13 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
     const validated = SearchTextInputSchema.parse(input);
     const { searchString, organizationId, userId, page, page_size, filters } = validated;
     const offset = (page - 1) * page_size;
+    const paginationCheckCount = page_size + 1;
 
     const filterConditions = [];
+    let fullSearchString = searchString;
 
     if (searchString) {
-      const fullSearchString = `${searchString}*`;
+      fullSearchString = `${searchString}*`;
       filterConditions.push(
         sql`ARRAY[${assetSearchV2.title}, ${assetSearchV2.additionalText}] &@~ ${fullSearchString}`
       );
@@ -69,7 +67,6 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
 
     // Asset types filter (multiple asset types)
     if (filters?.assetTypes && filters.assetTypes.length > 0) {
-      console.info('filters.assetTypes', filters.assetTypes);
       filterConditions.push(inArray(assetSearchV2.assetType, filters.assetTypes));
     }
 
@@ -93,14 +90,28 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
     // Create the permissioned assets subquery for this user
     const permissionedAssetsSubquery = createPermissionedAssetsSubquery(userId, organizationId);
 
-    // Execute search query with pagination
+    const highlightedTitleSql = fullSearchString
+      ? sql<string>`pgroonga_highlight_html(${assetSearchV2.title}, pgroonga_query_extract_keywords(${fullSearchString}))`
+      : assetSearchV2.title;
+
+    const snippetLength = 160;
+    const additionalSnippetSql = fullSearchString
+      ? sql<string>`coalesce(
+           (pgroonga_snippet_html(${assetSearchV2.additionalText},
+                                  pgroonga_query_extract_keywords(${fullSearchString}),
+                                  ${snippetLength}))[1],
+           left(${assetSearchV2.additionalText}, ${snippetLength})
+         )`
+      : sql<string>`left(${assetSearchV2.additionalText}, ${snippetLength})`;
+
     const results = await db
       .select({
         assetId: assetSearchV2.assetId,
         assetType: assetSearchV2.assetType,
-        title: assetSearchV2.title,
-        additionalText: assetSearchV2.additionalText,
+        title: highlightedTitleSql,
+        additionalText: additionalSnippetSql,
         updatedAt: assetSearchV2.updatedAt,
+        screenshotBucketKey: assetSearchV2.screenshotBucketKey,
       })
       .from(assetSearchV2)
       .innerJoin(
@@ -112,27 +123,23 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
         sql`pgroonga_score("asset_search_v2".tableoid, "asset_search_v2".ctid) DESC`,
         assetSearchV2.updatedAt
       )
-      .limit(page_size)
+      .limit(paginationCheckCount)
       .offset(offset);
 
-    // Get total count for pagination - also needs to respect permissions
-    const [countResult] = await db
-      .select({
-        count: count(),
-      })
-      .from(assetSearchV2)
-      .innerJoin(
-        permissionedAssetsSubquery,
-        eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
-      )
-      .where(and(...allConditions));
+    const hasMore = results.length > page_size;
 
-    const paginatedResponse = createPaginatedResponse({
+    if (hasMore) {
+      results.pop();
+    }
+
+    const paginatedResponse = {
       data: results,
-      page,
-      page_size,
-      total: countResult?.count ?? 0,
-    });
+      pagination: {
+        page,
+        page_size,
+        has_more: hasMore,
+      },
+    };
 
     return paginatedResponse;
   } catch (error) {

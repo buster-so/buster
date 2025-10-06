@@ -6,19 +6,6 @@ export const GetReportsListResponseSchema = PaginatedResponseSchema(ReportListIt
 export const UpdateReportResponseSchema = ReportResponseSchema;
 export const ShareUpdateResponseSchema = ReportResponseSchema;
 
-// Sharing operation response schemas
-export const SharePostResponseSchema = z.object({
-  success: z.boolean(),
-  shared: z.array(z.string()),
-  notFound: z.array(z.string()),
-});
-
-export const ShareDeleteResponseSchema = z.object({
-  success: z.boolean(),
-  removed: z.array(z.string()),
-  notFound: z.array(z.string()),
-});
-
 // For GET sharing endpoint - matches AssetPermissionWithUser from database
 export const ShareGetResponseSchema = z.object({
   permissions: z.array(
@@ -51,6 +38,4 @@ export type GetReportsListResponse = z.infer<typeof GetReportsListResponseSchema
 export type UpdateReportResponse = z.infer<typeof UpdateReportResponseSchema>;
 export type GetReportResponse = z.infer<typeof ReportResponseSchema>;
 export type ShareUpdateResponse = z.infer<typeof ShareUpdateResponseSchema>;
-export type SharePostResponse = z.infer<typeof SharePostResponseSchema>;
-export type ShareDeleteResponse = z.infer<typeof ShareDeleteResponseSchema>;
 export type ShareGetResponse = z.infer<typeof ShareGetResponseSchema>;

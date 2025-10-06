@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useHealthcheck } from '@/api/buster_rest/healthcheck/queryRequests';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
 import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
-import type { RustApiError } from '@/api/errors';
+import type { ApiError } from '@/api/errors';
 import {
   Card,
   CardContent,
@@ -73,7 +73,7 @@ function LoadingState() {
   );
 }
 
-function ErrorState({ error }: { error: Error | RustApiError }) {
+function ErrorState({ error }: { error: Error | ApiError }) {
   return (
     <div className="min-h-screen  flex items-center justify-center">
       <Card className="max-w-md w-full mx-4">

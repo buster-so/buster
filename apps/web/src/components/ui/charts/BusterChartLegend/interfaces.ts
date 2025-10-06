@@ -13,7 +13,7 @@ export interface BusterChartLegendProps {
 }
 
 export interface BusterChartLegendItem {
-  color: string;
+  color: string | string[]; //will be string[] for colorBy
   inactive: boolean;
   type: ChartType;
   data: ChartDataset['data'];

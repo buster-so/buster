@@ -200,7 +200,8 @@ describe('super-execute-sql', () => {
     it('should truncate large string values', async () => {
       const executeHandler = createSuperExecuteSqlExecute(mockState, mockContext);
 
-      const longString = 'a'.repeat(200);
+      // Updated to test the new 5000 character limit
+      const longString = 'a'.repeat(5100);
       mockExecute.mockResolvedValue({
         success: true,
         rows: [{ description: longString }],
@@ -219,7 +220,7 @@ describe('super-execute-sql', () => {
         expect(firstRow).toBeDefined();
         if (!firstRow) throw new Error('Expected at least one result row');
         const description = firstRow.description as string;
-        expect(description).toContain('...[TRUNCATED]');
+        expect(description).toContain('...[TRUNCATED');
         expect(description.length).toBeLessThan(longString.length);
       }
     });
@@ -299,6 +300,49 @@ describe('super-execute-sql', () => {
         const metadata = firstRow.metadata as string;
         expect(typeof metadata).toBe('string');
         expect(metadata).toBe('{"key":"value","nested":{"data":"test"}}');
+      }
+    });
+
+    it('should apply smart truncation to large JSON objects', async () => {
+      const executeHandler = createSuperExecuteSqlExecute(mockState, mockContext);
+
+      // Reset the mock to resolve properly for this test
+      vi.mocked(getDataSource).mockResolvedValue(mockDataSource);
+
+      // Create a large object that exceeds 500 char budget
+      const largeObject = {
+        field1: 'a'.repeat(100),
+        field2: 'b'.repeat(100),
+        field3: 'c'.repeat(100),
+        field4: 'd'.repeat(100),
+        field5: 'e'.repeat(100),
+        field6: 'f'.repeat(100),
+      };
+
+      mockExecute.mockResolvedValue({
+        success: true,
+        rows: [{ data: largeObject }],
+      });
+
+      const result = await executeHandler({
+        statements: ['SELECT * FROM items'],
+      });
+
+      const first = result.results[0];
+      expect(first).toBeDefined();
+      if (!first) throw new Error('Expected a first result');
+      expect(first.status).toBe('success');
+      if (first.status === 'success') {
+        const firstRow = first.results[0];
+        expect(firstRow).toBeDefined();
+        if (!firstRow) throw new Error('Expected at least one result row');
+        const data = firstRow.data as string;
+        expect(typeof data).toBe('string');
+        // Should be stringified and contain truncation indicators
+        expect(data).toContain('...[100 chars total]');
+        // Should be around 500-700 chars (500 budget + overhead for structure and indicators)
+        expect(data.length).toBeGreaterThan(400);
+        expect(data.length).toBeLessThan(800);
       }
     });
   });

@@ -3,6 +3,7 @@ import type { DraggableAttributes } from '@dnd-kit/core';
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import React, { useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorCard } from '@/components/ui/error/ErrorCard';
 import { useUpdateMetricChart } from '@/context/Metrics/useUpdateMetricChart';
 import { CollapseDelete } from '../../Common/CollapseDelete';
 import { chartTypeToAxis, type SelectAxisContainerId, zoneIdToAxis } from './config';
@@ -89,15 +90,10 @@ const DropdownContent: React.FC<{ id: string; zoneId: SelectAxisContainerId }> =
   const barGroupType = useAxisContextBarGroupType();
   const lineGroupType = useAxisContextLineGroupType();
   const rowCount = useAxisContextRowCount();
-  const metricId = useAxisContextMetricId();
 
   const memoizedErrorComponent = useMemo(() => {
     return (
-      <div className="bg-danger-background flex min-h-24 items-center justify-center rounded-b border border-red-500">
-        <span className="text-danger-foreground p-3 text-center">
-          There was an error loading the chart config. Please contact Buster support.
-        </span>
-      </div>
+      <ErrorCard message="There was an error loading the chart config. Please contact Buster support." />
     );
   }, []);
 

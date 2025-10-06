@@ -178,6 +178,15 @@ const zoneErrorRecord: Record<
     }
     return null;
   },
+  [SelectAxisContainerId.ColorBy]: (targetZone) => {
+    if (targetZone.items.length >= 1) {
+      return {
+        error: true,
+        reason: 'Cannot add more than one color by column',
+      };
+    }
+    return null;
+  },
   [SelectAxisContainerId.Tooltip]: () => null,
 };
 

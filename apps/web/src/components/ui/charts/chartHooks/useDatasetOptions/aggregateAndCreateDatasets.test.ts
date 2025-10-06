@@ -2029,4 +2029,195 @@ describe('aggregateAndCreateDatasets', () => {
       }),
     ]);
   });
+
+  describe('createDatasetsByColorThenAggregate', () => {
+    it('should create separate datasets for each color value', () => {
+      const testData = [
+        { month: 'Jan', sales: 100, productType: 'Electronics' },
+        { month: 'Jan', sales: 80, productType: 'Clothing' },
+        { month: 'Feb', sales: 120, productType: 'Electronics' },
+        { month: 'Feb', sales: 90, productType: 'Clothing' },
+      ];
+
+      const colorConfig = {
+        field: 'productType',
+        mapping: new Map([
+          ['Electronics', '#ff0000'],
+          ['Clothing', '#00ff00'],
+        ]),
+      };
+
+      const result = aggregateAndCreateDatasets(
+        testData,
+        {
+          x: ['month'],
+          y: ['sales'],
+        },
+        {},
+        false,
+        colorConfig
+      );
+
+      // Should have 2 datasets (one for each color/productType)
+      expect(result.datasets).toHaveLength(2);
+
+      // Check first dataset (Electronics)
+      expect(result.datasets[0].colors).toBe('#ff0000');
+      expect(result.datasets[0].data).toEqual([100, 120]);
+      expect(result.datasets[0].label).toEqual([{ key: 'productType', value: 'Electronics' }]);
+
+      // Check second dataset (Clothing)
+      expect(result.datasets[1].colors).toBe('#00ff00');
+      expect(result.datasets[1].data).toEqual([80, 90]);
+      expect(result.datasets[1].label).toEqual([{ key: 'productType', value: 'Clothing' }]);
+
+      // Check ticks are consistent across all datasets
+      expect(result.ticks).toEqual([['Jan'], ['Feb']]);
+      expect(result.ticksKey).toEqual([{ key: 'month', value: '' }]);
+    });
+
+    it('should handle multiple y-axes with color configuration', () => {
+      const testData = [
+        { month: 'Jan', sales: 100, profit: 20, region: 'North' },
+        { month: 'Jan', sales: 80, profit: 15, region: 'South' },
+        { month: 'Feb', sales: 120, profit: 25, region: 'North' },
+        { month: 'Feb', sales: 90, profit: 18, region: 'South' },
+      ];
+
+      const colorConfig = {
+        field: 'region',
+        mapping: new Map([
+          ['North', '#0000ff'],
+          ['South', '#ff00ff'],
+        ]),
+      };
+
+      const result = aggregateAndCreateDatasets(
+        testData,
+        {
+          x: ['month'],
+          y: ['sales', 'profit'],
+        },
+        {},
+        false,
+        colorConfig
+      );
+
+      // Should have 4 datasets (2 metrics × 2 regions)
+      expect(result.datasets).toHaveLength(4);
+
+      // Find sales datasets
+      const salesDatasets = result.datasets.filter((d) => d.dataKey === 'sales');
+      const profitDatasets = result.datasets.filter((d) => d.dataKey === 'profit');
+
+      expect(salesDatasets).toHaveLength(2);
+      expect(profitDatasets).toHaveLength(2);
+
+      // Check labels include both metric and color field
+      const northSalesDataset = salesDatasets.find((d) => d.colors === '#0000ff');
+      expect(northSalesDataset?.label).toEqual([
+        { key: 'sales', value: '' },
+        { key: 'region', value: 'North' },
+      ]);
+
+      const southProfitDataset = profitDatasets.find((d) => d.colors === '#ff00ff');
+      expect(southProfitDataset?.label).toEqual([
+        { key: 'profit', value: '' },
+        { key: 'region', value: 'South' },
+      ]);
+    });
+
+    it('should handle categories combined with color configuration', () => {
+      const testData = [
+        { quarter: 'Q1', sales: 100, product: 'A', region: 'North' },
+        { quarter: 'Q1', sales: 80, product: 'B', region: 'North' },
+        { quarter: 'Q2', sales: 120, product: 'A', region: 'North' },
+        { quarter: 'Q1', sales: 90, product: 'A', region: 'South' },
+        { quarter: 'Q2', sales: 95, product: 'A', region: 'South' },
+      ];
+
+      const colorConfig = {
+        field: 'region',
+        mapping: new Map([
+          ['North', '#aabbcc'],
+          ['South', '#ddeeff'],
+        ]),
+      };
+
+      const result = aggregateAndCreateDatasets(
+        testData,
+        {
+          x: ['quarter'],
+          y: ['sales'],
+          category: ['product'],
+        },
+        {},
+        false,
+        colorConfig
+      );
+
+      // Should have 3 datasets (North: A, B; South: A)
+      expect(result.datasets).toHaveLength(3);
+
+      // Check that labels include product category AND color field
+      const northProductADataset = result.datasets.find(
+        (d) => d.colors === '#aabbcc' && d.label.some((l) => l.key === 'product' && l.value === 'A')
+      );
+
+      expect(northProductADataset).toBeDefined();
+      expect(northProductADataset?.label).toEqual([
+        { key: 'region', value: 'North' },
+        { key: 'product', value: 'A' },
+      ]);
+      expect(northProductADataset?.data).toEqual([100, 120]);
+
+      const southProductADataset = result.datasets.find(
+        (d) => d.colors === '#ddeeff' && d.label.some((l) => l.key === 'product' && l.value === 'A')
+      );
+
+      expect(southProductADataset).toBeDefined();
+      expect(southProductADataset?.data).toEqual([90, 95]);
+    });
+
+    it('should handle missing color values by filtering unmapped data', () => {
+      const testData = [
+        { month: 'Jan', sales: 100, category: 'A' },
+        { month: 'Jan', sales: 80, category: 'C' }, // C is not mapped to a color
+        { month: 'Feb', sales: 120, category: 'A' },
+        { month: 'Feb', sales: 90, category: 'C' }, // C is not mapped to a color
+      ];
+
+      const colorConfig = {
+        field: 'category',
+        mapping: new Map([
+          ['A', '#ff0000'],
+          ['B', '#00ff00'], // B doesn't exist in data but is mapped
+        ]),
+      };
+
+      const result = aggregateAndCreateDatasets(
+        testData,
+        {
+          x: ['month'],
+          y: ['sales'],
+        },
+        {},
+        false,
+        colorConfig
+      );
+
+      // Should have 1 dataset (only for A which has data and color mapping)
+      expect(result.datasets).toHaveLength(1);
+
+      // Dataset A should have real data
+      const datasetA = result.datasets.find((d) => d.colors === '#ff0000');
+      expect(datasetA?.data).toEqual([100, 120]);
+      expect(datasetA?.label).toEqual([{ key: 'category', value: 'A' }]);
+
+      // Category C data should be filtered out since it's not in the color mapping
+      // Check ticks are still correct for all x-axis values from original data
+      expect(result.ticks).toEqual([['Jan'], ['Feb']]);
+      expect(result.ticksKey).toEqual([{ key: 'month', value: '' }]);
+    });
+  });
 });

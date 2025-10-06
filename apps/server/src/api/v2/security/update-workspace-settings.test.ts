@@ -28,6 +28,14 @@ vi.mock('@buster/database/connection', () => ({
 
 vi.mock('@buster/database/schema', () => ({
   organizations: {},
+  chats: {},
+  collections: {},
+  dashboardFiles: {},
+  reportFiles: {},
+  metricFiles: {},
+  users: {},
+  datasets: {},
+  dataSources: {},
   eq: vi.fn(),
   and: vi.fn(),
   isNull: vi.fn(),

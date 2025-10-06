@@ -1,6 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { db } from '@buster/database/connection';
-import { updateMessageEntries, updateReportContent } from '@buster/database/queries';
+import {
+  isReportUpdateQueueClosed,
+  updateMessageEntries,
+  updateReportContent,
+  updateReportWithVersion,
+} from '@buster/database/queries';
 import { assetPermissions, reportFiles } from '@buster/database/schema';
 import type { ToolCallOptions } from 'ai';
 import {
@@ -48,6 +53,9 @@ function createInitialReportVersionHistory(content: string, createdAt: string): 
 
 export function createCreateReportsDelta(context: CreateReportsContext, state: CreateReportsState) {
   return async (options: { inputTextDelta: string } & ToolCallOptions) => {
+    if (state.file?.id && isReportUpdateQueueClosed(state.file.id)) {
+      return;
+    }
     // Handle string deltas (accumulate JSON text)
     state.argsText = (state.argsText || '') + options.inputTextDelta;
 
@@ -167,9 +175,19 @@ export function createCreateReportsDelta(context: CreateReportsContext, state: C
         // Update report content if we have content
         if (content && reportId) {
           try {
-            await updateReportContent({
-              reportId: reportId,
-              content: content,
+            const now = new Date().toISOString();
+            const versionHistory = {
+              '1': {
+                content,
+                updated_at: now,
+                version_number: 1,
+              },
+            };
+            await updateReportWithVersion({
+              reportId,
+              content,
+              name,
+              versionHistory,
             });
 
             // Keep the file status as 'loading' during streaming

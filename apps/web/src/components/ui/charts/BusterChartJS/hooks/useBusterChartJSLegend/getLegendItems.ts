@@ -47,15 +47,17 @@ export const getLegendItems = ({
 
   const datasets = data.datasets?.filter((dataset) => !dataset.hidden) || [];
 
-  return datasets.map<BusterChartLegendItem>((dataset, index) => ({
-    color: colors[index % colors.length] ?? '',
-    inactive: dataset.label ? (inactiveDatasets[dataset.label] ?? false) : false,
-    type: getType(isComboChart, globalType, dataset, columnSettings),
-    formattedName: dataset.label as string,
-    id: dataset.label || '',
-    data: dataset.data,
-    yAxisKey: dataset.yAxisKey,
-  }));
+  return datasets.map<BusterChartLegendItem>((dataset, index) => {
+    return {
+      color: getColor(dataset, colors, index),
+      inactive: dataset.label ? (inactiveDatasets[dataset.label] ?? false) : false,
+      type: getType(isComboChart, globalType, dataset, columnSettings),
+      formattedName: dataset.label as string,
+      id: dataset.label || '',
+      data: dataset.data,
+      yAxisKey: dataset.yAxisKey,
+    };
+  });
 };
 
 const getType = (
@@ -72,4 +74,16 @@ const getType = (
   if (columnVisualization === 'line') return 'line';
 
   return 'bar';
+};
+
+const getColor = (dataset: ChartDataset, colors: string[], index: number) => {
+  if (dataset.backgroundColor) {
+    if (Array.isArray(dataset.backgroundColor) && dataset.backgroundColor.length > 0) {
+      return dataset.backgroundColor;
+    } else if (typeof dataset.backgroundColor === 'string') {
+      return dataset.backgroundColor;
+    }
+  }
+
+  return colors[index % colors.length];
 };

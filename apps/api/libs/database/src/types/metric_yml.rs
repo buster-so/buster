@@ -74,6 +74,7 @@ fn lowercase_column_identifiers(value: &mut serde_yaml::Value) {
                         "size",
                         "tableColumnOrder",
                         "barSortBy", // Added barSortBy as it likely contains column names
+                        "colorBy", // Added colorBy as it contains column names
                     ]
                     .contains(&key_str.as_str())
                     {
@@ -608,6 +609,9 @@ pub struct BarAndLineAxis {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(alias = "tooltip")]
     pub tooltip: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(alias = "color_by")]
+    pub color_by: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -694,6 +698,9 @@ pub struct ComboChartAxis {
     pub category: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tooltip: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(alias = "color_by")]
+    pub color_by: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

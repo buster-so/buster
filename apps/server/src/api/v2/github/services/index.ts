@@ -23,10 +23,3 @@ export {
   retrieveInstallationToken,
   storeInstallationToken,
 } from './token-storage';
-
-// Webhook signature verification
-export {
-  extractGitHubWebhookSignature,
-  verifyGitHubWebhook,
-  verifyGitHubWebhookSignature,
-} from './verify-webhook-signature';

@@ -103,6 +103,14 @@
     "./search": {
       "types": "./dist/search/index.d.ts",
       "default": "./dist/search/index.js"
+    },
+    "./screenshots": {
+      "types": "./dist/screenshots/index.d.ts",
+      "default": "./dist/screenshots/index.js"
+    },
+    "./library": {
+      "types": "./dist/library/index.d.ts",
+      "default": "./dist/library/index.js"
     }
   },
   "module": "src/index.ts",

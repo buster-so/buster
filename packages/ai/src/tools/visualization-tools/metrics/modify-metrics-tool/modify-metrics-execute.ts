@@ -17,6 +17,7 @@ import { z } from 'zod';
 import { getDataSourceCredentials } from '../../../../utils/get-data-source';
 import { cleanupState } from '../../../shared/cleanup-state';
 import { createRawToolResultEntry } from '../../../shared/create-raw-llm-tool-result-entry';
+import { truncateQueryResults } from '../../../shared/smart-truncate';
 import { trackFileAssociations } from '../../file-tracking-helper';
 import { validateAndAdjustBarLineAxes } from '../helpers/bar-line-axis-validator';
 import { ensureTimeFrameQuoted } from '../helpers/time-frame-helper';
@@ -146,8 +147,11 @@ async function validateSql(
         retryDelays: [1000, 3000, 6000], // 1s, 3s, 6s
       });
 
-      // Truncate results to 25 records for display in validation
-      const displayResults = result.data.slice(0, 25);
+      // Apply smart truncation to results before display
+      const truncatedData = truncateQueryResults(result.data);
+
+      // Take first 25 records for display in validation
+      const displayResults = truncatedData.slice(0, 25);
 
       let message: string;
       if (result.data.length === 0) {

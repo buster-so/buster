@@ -61,7 +61,7 @@ export const useSeriesOptions = ({
       sizeKey,
       columnSettings,
     });
-  }, [datasetOptions, columnSettings, columnLabelFormats, xAxisKeys, sizeKey]);
+  }, [datasetOptions, columnSettings, columnLabelFormats, xAxisKeys, sizeKey, selectedChartType]);
 
   const sizeOptions: SeriesBuilderProps['sizeOptions'] = useMemo(() => {
     if (!sizeKey || sizeKey.length === 0) {
@@ -81,7 +81,7 @@ export const useSeriesOptions = ({
       minValue: Number(assosciatedColumn?.min_value),
       maxValue: Number(assosciatedColumn?.max_value),
     };
-  }, [sizeKey]);
+  }, [sizeKey, columnMetadata]);
 
   const datasets: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
     return dataBuilderRecord[selectedChartType]({
@@ -113,6 +113,7 @@ export const useSeriesOptions = ({
     barShowTotalAtTop,
     yAxisKeys,
     y2AxisKeys,
+    selectedChartType,
   ]);
 
   return {

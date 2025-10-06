@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { prefetchGetCollection } from '@/api/buster_rest/collections';
 import { CollectionIndividualController } from '@/controllers/CollectionIndividualController';
 
 export const Route = createFileRoute('/app/_app/_asset/collections/$collectionId/')({
@@ -6,12 +7,11 @@ export const Route = createFileRoute('/app/_app/_asset/collections/$collectionId
     assetType: 'collection',
   },
   loader: async ({ params, context }) => {
-    const title = await context.getAssetTitle({
-      assetId: params.collectionId,
-      assetType: 'collection',
+    const collection = await prefetchGetCollection(context.queryClient, {
+      id: params.collectionId,
     });
     return {
-      title,
+      title: collection?.name,
     };
   },
   head: ({ loaderData }) => ({

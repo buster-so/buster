@@ -14,8 +14,10 @@ const mockDbSelect = vi.fn();
 
 vi.mock('@buster/database/queries', () => ({
   updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
-  batchUpdateReport: vi.fn().mockResolvedValue({ success: true }),
+  updateReportWithVersion: vi.fn().mockResolvedValue(undefined),
   updateMetricsToReports: vi.fn().mockResolvedValue({ created: 0, updated: 0, deleted: 0 }),
+  waitForPendingReportUpdates: vi.fn().mockResolvedValue(undefined),
+  closeReportUpdateQueue: vi.fn(),
 }));
 vi.mock('@buster/database/schema', () => ({
   reportFiles: {},
@@ -422,8 +424,8 @@ Updated content with metrics.`;
         resolveLastUpdate = resolve;
       });
 
-      // Set up state with an in-progress lastUpdate
-      state.lastUpdate = lastUpdatePromise;
+      // Set up state with an in-progress lastProcessing
+      state.lastProcessing = lastUpdatePromise;
       state.snapshotContent = '# Original Report';
 
       mockDbLimit.mockResolvedValue([
@@ -447,26 +449,26 @@ Updated content with metrics.`;
 
       const execute = createModifyReportsExecute(context, state);
 
-      // Start the execute (it should wait for lastUpdate)
+      // Start the execute (it should wait for lastProcessing)
       const executePromise = execute(input);
 
       // Give it a moment to ensure it's waiting
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // batchUpdateReport should not have been called yet
-      const mockBatchUpdateReport = vi.mocked(
-        await import('@buster/database/queries').then((m) => m.batchUpdateReport)
+      // updateReportWithVersion should not have been called yet
+      const mockUpdateReportWithVersion = vi.mocked(
+        await import('@buster/database/queries').then((m) => m.updateReportWithVersion)
       );
-      expect(mockBatchUpdateReport).not.toHaveBeenCalled();
+      expect(mockUpdateReportWithVersion).not.toHaveBeenCalled();
 
-      // Now resolve the lastUpdate promise
+      // Now resolve the lastProcessing promise
       resolveLastUpdate!();
 
       // Wait for execute to complete
       const result = await executePromise;
 
-      // Now batchUpdateReport should have been called
-      expect(mockBatchUpdateReport).toHaveBeenCalled();
+      // Now updateReportWithVersion should have been called
+      expect(mockUpdateReportWithVersion).toHaveBeenCalled();
       expect(result.success).toBe(true);
       expect(result.file.content).toContain('# Final Version');
     });
@@ -475,8 +477,8 @@ Updated content with metrics.`;
       // Create a rejected promise to simulate a failed delta write
       const lastUpdatePromise = Promise.reject(new Error('Delta write failed'));
 
-      // Set up state with a rejected lastUpdate
-      state.lastUpdate = lastUpdatePromise;
+      // Set up state with a rejected lastProcessing
+      state.lastProcessing = lastUpdatePromise;
       state.snapshotContent = '# Original Report';
 
       mockDbLimit.mockResolvedValue([

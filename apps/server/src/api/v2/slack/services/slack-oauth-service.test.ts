@@ -26,6 +26,12 @@ vi.mock('@buster/database/schema', () => ({
   permissionGroups: {},
   users: {},
   slackIntegrations: {},
+  chats: {},
+  collections: {},
+  dashboardFiles: {},
+  reportFiles: {},
+  metricFiles: {},
+  dataSources: {},
 }));
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';

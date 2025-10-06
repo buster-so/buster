@@ -16,12 +16,7 @@ export {
   type GetDashboardByIdInput,
 } from './get-dashboard-by-id';
 
-export {
-  getUsersWithDashboardPermissions,
-  GetUsersWithDashboardPermissionsInputSchema,
-  type GetUsersWithDashboardPermissionsInput,
-  type GetUsersWithDashboardPermissionsResult,
-} from './get-users-with-dashboard-permissions-by-id';
+export { updateDashboard } from './update-dashboard';
 
 export {
   getCollectionsAssociatedWithDashboard,

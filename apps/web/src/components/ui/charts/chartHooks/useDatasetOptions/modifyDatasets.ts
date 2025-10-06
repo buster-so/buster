@@ -287,21 +287,52 @@ export function modifyDatasets({
 }: ModifyDatasetsParams): DatasetOptionsWithTicks {
   if (!datasets.datasets.length) return datasets;
 
-  // Create a deep clone of the entire datasets object
-  const result: DatasetOptionsWithTicks = cloneDeep(datasets);
+  // Only clone when we actually need to modify something
+  let needsModification: boolean = false;
+
+  // Check if we need to modify for pie charts
+  const isPie = selectedChartType === 'pie';
+  const needsPieThreshold = isPie && pieMinimumSlicePercentage != null;
+  const needsPieSort = isPie && pieSortBy;
+
+  // Check if we need to modify for percentage stack
+  const needsPercentageStack =
+    (selectedChartType === 'bar' && barGroupType === 'percentage-stack') ||
+    (selectedChartType === 'line' && lineGroupType === 'percentage-stack');
+
+  // Check if we need to modify for bar sorting
+  const needsBarSort =
+    selectedChartType === 'bar' && barSortBy && barSortBy.some((o) => o !== 'none');
+
+  needsModification = needsPieThreshold || !!needsPieSort || needsPercentageStack || !!needsBarSort;
+
+  // If no modifications needed, return original
+  if (!needsModification) {
+    return datasets;
+  }
+
+  // Create a shallow clone of the result structure, only clone deeply when needed
+  const result: DatasetOptionsWithTicks = {
+    datasets: datasets.datasets, // Start with reference, will replace if modified
+    ticksKey: datasets.ticksKey,
+    ticks: datasets.ticks,
+  };
 
   // Pie chart handling
-  if (selectedChartType === 'pie') {
-    let modifiedDatasets = cloneDeep(datasets.datasets);
+  if (isPie) {
+    let modifiedDatasets = datasets.datasets;
 
     // Apply minimum threshold if needed
-    if (pieMinimumSlicePercentage != null) {
+    if (needsPieThreshold) {
       modifiedDatasets = handlePieThreshold(modifiedDatasets, pieMinimumSlicePercentage);
     }
 
     // Apply sorting if needed
-    if (pieSortBy) {
-      const sortResult = sortPie(modifiedDatasets, pieSortBy, result.ticks);
+    if (needsPieSort) {
+      // Only clone ticks if we need to sort
+      const ticksToSort =
+        modifiedDatasets !== datasets.datasets ? result.ticks : cloneDeep(result.ticks);
+      const sortResult = sortPie(modifiedDatasets, pieSortBy, ticksToSort);
       modifiedDatasets = sortResult.datasets;
       result.ticks = sortResult.ticks;
     }
@@ -311,22 +342,18 @@ export function modifyDatasets({
   }
 
   // Percentage-stack for bar or line
-  if (
-    (selectedChartType === 'bar' && barGroupType === 'percentage-stack') ||
-    (selectedChartType === 'line' && lineGroupType === 'percentage-stack')
-  ) {
+  if (needsPercentageStack) {
     result.datasets = applyPercentageStack(datasets.datasets);
     return result;
   }
 
   // Bar sorting
-  if (selectedChartType === 'bar' && barSortBy && barSortBy.some((o) => o !== 'none')) {
+  if (needsBarSort) {
     const sortKey = barSortBy.find((o) => o !== 'none');
-    if (sortKey) {
-      const sortResult = sortBar(datasets.datasets, sortKey, result.ticks);
-      result.datasets = sortResult.datasets;
-      result.ticks = sortResult.ticks;
-    }
+    if (!sortKey) return result;
+    const sortResult = sortBar(datasets.datasets, sortKey, cloneDeep(result.ticks));
+    result.datasets = sortResult.datasets;
+    result.ticks = sortResult.ticks;
     return result;
   }
 

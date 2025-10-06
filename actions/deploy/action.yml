@@ -6,14 +6,6 @@ branding:
   color: 'green'
 
 inputs:
-  api-key:
-    description: 'Buster API key (defaults to BUSTER_API_KEY env var)'
-    required: false
-    default: ''
-  host:
-    description: 'Buster API host URL (defaults to BUSTER_HOST env var or https://api.buster.so)'
-    required: false
-    default: ''
   directory:
     description: 'Directory containing buster.yml and models to deploy'
     required: false
@@ -22,157 +14,35 @@ inputs:
     description: 'Target environment for deployment (e.g., production, staging)'
     required: false
     default: ''
-  force:
-    description: 'Force deployment without confirmation prompts'
-    required: false
-    default: 'true'
   verbose:
     description: 'Enable verbose output'
     required: false
     default: 'false'
 
-outputs:
-  deployment-id:
-    description: 'ID of the deployment'
-    value: ${{ steps.deploy.outputs.deployment-id }}
-  status:
-    description: 'Deployment status'
-    value: ${{ steps.deploy.outputs.status }}
-  models-deployed:
-    description: 'Number of models deployed'
-    value: ${{ steps.deploy.outputs.models-deployed }}
-
 runs:
   using: 'composite'
   steps:
-    - name: Validate Environment
-      id: validate
+    - name: Require Buster CLI
       shell: bash
       run: |
-        # Check for Buster CLI
-        if ! command -v buster &> /dev/null && ! command -v buster.exe &> /dev/null; then
-          echo "❌ Buster CLI not found. Please use buster-so/buster-actions/install first"
+        if ! command -v buster &>/dev/null && ! command -v buster.exe &>/dev/null; then
+          echo "❌ Buster CLI not found. Please install with buster-so/buster-actions/install first."
           exit 1
         fi
-        
-        # Set up API key
-        API_KEY="${{ inputs.api-key }}"
-        if [[ -z "$API_KEY" ]]; then
-          API_KEY="${BUSTER_API_KEY:-}"
-        fi
-        
-        if [[ -z "$API_KEY" ]]; then
-          echo "❌ No API key provided. Set BUSTER_API_KEY env var or pass api-key input"
-          exit 1
-        fi
-        
-        # Set up host
-        HOST="${{ inputs.host }}"
-        if [[ -z "$HOST" ]]; then
-          HOST="${BUSTER_HOST:-https://api.buster.so}"
-        fi
-        
-        echo "✅ Configuration validated"
-        echo "📍 Host: $HOST"
-        echo "🔑 API key: ****${API_KEY: -4}"
-        
-        # Export for next steps
-        echo "BUSTER_API_KEY=$API_KEY" >> $GITHUB_ENV
-        echo "BUSTER_HOST=$HOST" >> $GITHUB_ENV
-
-    - name: Check for buster.yml
-      shell: bash
-      working-directory: ${{ inputs.directory }}
-      run: |
-        if [[ ! -f "buster.yml" ]]; then
-          echo "❌ No buster.yml found in ${{ inputs.directory }}"
-          echo "💡 Run 'buster init' to create a project configuration"
-          exit 1
-        fi
-        
-        echo "✅ Found buster.yml"
-        echo "📋 Project configuration:"
-        head -n 20 buster.yml | sed 's/^/    /'
 
     - name: Deploy to Buster
-      id: deploy
       shell: bash
       working-directory: ${{ inputs.directory }}
       run: |
-        echo "🚀 Starting deployment to Buster..."
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        
-        # Build deploy command
-        DEPLOY_CMD="buster deploy"
-        
-        # Add optional flags
-        if [[ "${{ inputs.environment }}" != "" ]]; then
-          DEPLOY_CMD="$DEPLOY_CMD --environment ${{ inputs.environment }}"
-        fi
-        
-        if [[ "${{ inputs.force }}" == "true" ]]; then
-          DEPLOY_CMD="$DEPLOY_CMD --force"
-        fi
-        
-        if [[ "${{ inputs.verbose }}" == "true" ]]; then
-          DEPLOY_CMD="$DEPLOY_CMD --verbose"
-        fi
-        
-        echo "📟 Running: $DEPLOY_CMD"
-        echo ""
-        
-        # Execute deployment and capture output
-        set +e
-        OUTPUT_FILE="${RUNNER_TEMP}/deploy-output.txt"
-        $DEPLOY_CMD 2>&1 | tee "$OUTPUT_FILE"
-        DEPLOY_EXIT_CODE=$?
         set -e
-        
-        # Parse output for key information
-        if [[ $DEPLOY_EXIT_CODE -eq 0 ]]; then
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "✅ Deployment successful!"
-          
-          # Try to extract deployment info from output
-          DEPLOYMENT_ID=$(grep -oP 'Deployment ID: \K[a-zA-Z0-9-]+' "$OUTPUT_FILE" || echo "unknown")
-          MODELS_COUNT=$(grep -oP 'Models deployed: \K[0-9]+' "$OUTPUT_FILE" || echo "0")
-          
-          echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-          echo "status=success" >> $GITHUB_OUTPUT
-          echo "models-deployed=$MODELS_COUNT" >> $GITHUB_OUTPUT
-          
-          # Create summary
-          echo "## 🚀 Buster Deployment Successful" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment:** ${{ inputs.environment || 'default' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Directory:** ${{ inputs.directory }}" >> $GITHUB_STEP_SUMMARY
-          if [[ "$DEPLOYMENT_ID" != "unknown" ]]; then
-            echo "- **Deployment ID:** $DEPLOYMENT_ID" >> $GITHUB_STEP_SUMMARY
-          fi
-          if [[ "$MODELS_COUNT" != "0" ]]; then
-            echo "- **Models Deployed:** $MODELS_COUNT" >> $GITHUB_STEP_SUMMARY
-          fi
-        else
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "❌ Deployment failed with exit code: $DEPLOY_EXIT_CODE"
-          
-          echo "status=failed" >> $GITHUB_OUTPUT
-          
-          # Create error summary
-          echo "## ❌ Buster Deployment Failed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ❌ Failed" >> $GITHUB_STEP_SUMMARY
-          echo "- **Exit Code:** $DEPLOY_EXIT_CODE" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment:** ${{ inputs.environment || 'default' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Directory:** ${{ inputs.directory }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Error Output" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 20 "$OUTPUT_FILE" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          
-          exit $DEPLOY_EXIT_CODE
+        if [[ -z "$BUSTER_API_KEY" ]]; then
+          echo "❌ Missing BUSTER_API_KEY env var"
+          exit 1
         fi
+
+        CMD="buster deploy"
+        [[ -n "${{ inputs.environment }}" ]] && CMD="$CMD --environment ${{ inputs.environment }}"
+        [[ "${{ inputs.verbose }}" == "true" ]] && CMD="$CMD --verbose"
+
+        echo "Running: $CMD"
+        $CMD

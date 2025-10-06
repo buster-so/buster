@@ -4,7 +4,7 @@ import type {
   GetChatsListResponseV2,
   GetChatsRequestV2,
 } from '@buster/server-shared/chats';
-import mainApi, { mainApiV2 } from '../instances';
+import { mainApiV2 } from '../instances';
 
 export const getListChats = async (
   params?: GetChatsRequestV2

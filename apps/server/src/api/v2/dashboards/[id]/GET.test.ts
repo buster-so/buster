@@ -4,7 +4,7 @@ import {
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
-  getUsersWithDashboardPermissions,
+  getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 import { DEFAULT_CHART_CONFIG } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';
@@ -25,7 +25,7 @@ vi.mock('@buster/access-controls', () => ({
 
 vi.mock('@buster/database/queries', () => ({
   getDashboardById: vi.fn(),
-  getUsersWithDashboardPermissions: vi.fn(),
+  getUsersWithAssetPermissions: vi.fn(),
   getOrganizationMemberCount: vi.fn(),
   getCollectionsAssociatedWithDashboard: vi.fn(),
 }));
@@ -49,7 +49,7 @@ vi.mock('js-yaml', () => ({
 describe('getDashboardHandler', () => {
   const mockCheckPermission = checkPermission as Mock;
   const mockGetDashboardById = getDashboardById as Mock;
-  const mockGetUsersWithDashboardPermissions = getUsersWithDashboardPermissions as Mock;
+  const mockGetUsersWithAssetPermissions = getUsersWithAssetPermissions as Mock;
   const mockGetOrganizationMemberCount = getOrganizationMemberCount as Mock;
   const mockGetCollectionsAssociatedWithDashboard = getCollectionsAssociatedWithDashboard as Mock;
   const mockGetPubliclyEnabledByUser = getPubliclyEnabledByUser as Mock;
@@ -107,7 +107,7 @@ describe('getDashboardHandler', () => {
       hasAccess: true,
       effectiveRole: 'can_view',
     });
-    mockGetUsersWithDashboardPermissions.mockResolvedValue([]);
+    mockGetUsersWithAssetPermissions.mockResolvedValue([]);
     mockGetOrganizationMemberCount.mockResolvedValue(5);
     mockGetCollectionsAssociatedWithDashboard.mockResolvedValue([]);
     mockGetPubliclyEnabledByUser.mockResolvedValue(null);

@@ -102,6 +102,10 @@ async function generateTodosWithLLM(
           messages: todosMessages,
           temperature: 0,
           providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+          onError: (error) => {
+            console.info('LLM error while generating todos', error);
+            throw new Error('LLM error while generating todos');
+          },
         });
 
         // Process text deltas for optimistic updates
@@ -111,11 +115,8 @@ async function generateTodosWithLLM(
           }
         })();
 
-        // Wait for the final object
-        const result = await object;
-
         // Ensure all delta processing is complete before finalizing
-        await deltaProcessing;
+        const [_, result] = await Promise.all([deltaProcessing, object]);
 
         // Finalize the reasoning message
         await onStreamFinish(result);

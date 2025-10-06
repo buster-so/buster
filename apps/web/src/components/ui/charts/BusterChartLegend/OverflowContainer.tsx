@@ -71,14 +71,7 @@ const OverflowPopoverContent = React.memo(
     });
 
     return (
-      <div
-        ref={parentRef}
-        style={{
-          maxHeight: '100%',
-          width: '100%',
-          overflow: 'auto',
-        }}
-      >
+      <div ref={parentRef} className="max-h-[100%] w-full overflow-auto min-h-7">
         <div
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`,

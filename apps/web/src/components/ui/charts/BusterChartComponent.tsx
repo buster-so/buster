@@ -22,6 +22,7 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     columnLabelFormats,
     selectedChartType,
     selectedAxis,
+    colors,
   } = props;
 
   const {
@@ -44,6 +45,7 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     trendlines,
     pieSortBy,
     columnMetadata,
+    colors,
   });
 
   const chartProps: BusterChartComponentProps = {

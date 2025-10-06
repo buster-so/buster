@@ -40,6 +40,7 @@ export function MentionListSelector<T = string>(props: MentionInputTriggerItemEx
   }
 
   const _exhaustiveCheck: never = type;
+  console.warn('mention list selector type not found', _exhaustiveCheck);
 
   return null;
 }

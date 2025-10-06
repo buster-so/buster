@@ -59,7 +59,14 @@ export async function getMetricForExport(input: GetMetricForExportInput): Promis
 
   if (validated.versionNumber !== undefined && result.versionHistory) {
     const versionKey = validated.versionNumber.toString();
-    const versionHistory = result.versionHistory as Record<string, any>;
+    const versionHistory = result.versionHistory as Record<
+      string,
+      {
+        content: Record<string, unknown>;
+        updated_at: string;
+        version_number: number;
+      }
+    >;
     const versionData = versionHistory[versionKey];
 
     if (versionData?.content) {

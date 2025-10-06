@@ -1,7 +1,9 @@
 import {
-  batchUpdateReport,
+  closeReportUpdateQueue,
   updateMessageEntries,
   updateMetricsToReports,
+  updateReportWithVersion,
+  waitForPendingReportUpdates,
 } from '@buster/database/queries';
 import type { ChatMessageResponseMessage } from '@buster/server-shared/chats';
 import { wrapTraced } from 'braintrust';
@@ -81,6 +83,9 @@ export function createCreateReportsExecute(
 ) {
   return wrapTraced(
     async (input: CreateReportsInput): Promise<CreateReportsOutput> => {
+      if (state.file?.id) {
+        closeReportUpdateQueue(state.file.id);
+      }
       const startTime = Date.now();
 
       try {
@@ -146,12 +151,18 @@ export function createCreateReportsExecute(
             };
 
             // Update the report with complete content from input (source of truth)
-            await batchUpdateReport({
-              reportId,
-              content,
-              name,
-              versionHistory,
-            });
+            await updateReportWithVersion(
+              {
+                reportId,
+                content,
+                name,
+                versionHistory,
+              },
+              {
+                isFinal: true,
+              }
+            );
+            await waitForPendingReportUpdates(reportId);
 
             // Update cache with the newly created report content
             updateCachedSnapshot(reportId, content, versionHistory);

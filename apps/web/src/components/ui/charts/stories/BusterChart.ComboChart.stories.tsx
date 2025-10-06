@@ -75,6 +75,7 @@ export const DualAxisCombo: Story = {
       y2: ['averageOrderValue'],
       tooltip: ['revenue', 'averageOrderValue'],
       category: [],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -131,6 +132,7 @@ export const RevenueAndOrders: Story = {
       y2: ['orders'],
       tooltip: ['revenue', 'orders'],
       category: [],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -186,6 +188,7 @@ export const DualLineChart: Story = {
       y: ['revenue'],
       y2: ['averageOrderValue'],
       tooltip: ['revenue', 'averageOrderValue'],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -243,6 +246,7 @@ export const DualBarChart: Story = {
       y: ['revenue'],
       y2: ['orders'],
       tooltip: ['revenue', 'orders'],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -296,6 +300,7 @@ export const CompactView: Story = {
       y: ['revenue'],
       y2: ['averageOrderValue'],
       tooltip: ['revenue', 'averageOrderValue'],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -351,6 +356,7 @@ export const NoLegendNoGrid: Story = {
       y: ['revenue'],
       y2: ['averageOrderValue'],
       tooltip: ['revenue', 'averageOrderValue'],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -406,6 +412,7 @@ export const LargeDataset: Story = {
       y: ['revenue'],
       y2: ['averageOrderValue'],
       tooltip: ['revenue', 'averageOrderValue'],
+      colorBy: [],
     },
     columnSettings: {
       revenue: {
@@ -461,6 +468,7 @@ export const MultipleY2Axes: Story = {
       y: ['sales'],
       y2: ['stockLevel'], // 'returnRate', 'customerRating'
       tooltip: ['sales', 'customerRating', 'stockLevel', 'returnRate'],
+      colorBy: [],
     },
     columnSettings: {
       sales: {
@@ -581,6 +589,7 @@ export const ProblematicData: Story = {
       y: ['metric_discountimpact', 'orders_with_discount'],
       y2: [],
       tooltip: null,
+      colorBy: [],
     },
     columnMetadata: [
       {
@@ -1118,6 +1127,7 @@ export const ComboChartWithNegativeNumbers: Story = {
       y2: ['non_revenue'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnSettings: {},
     disableTooltip: false,
@@ -1272,6 +1282,131 @@ export const ComboChartWithNegativeNumbers: Story = {
   },
 };
 
+export const WithColorByNoY2: Story = {
+  args: {
+    selectedChartType: 'combo',
+    showLegend: true,
+    data: ['Basketball'].flatMap((sport, lineIndex) => {
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      return months.flatMap((month, index) => {
+        const types = ['Home', 'Away'];
+        return types.map((type, typeIndex) => {
+          const test = typeIndex === 1 ? -1.5 : typeIndex * 1.25;
+          return {
+            month,
+            sales: 420 + (+index + lineIndex * 12 + typeIndex * 7.5) * test,
+            points: 100 + (+index + lineIndex * 12 + typeIndex * 7.5),
+            category: sport,
+            type,
+          };
+        });
+      });
+    }),
+    columnLabelFormats: {
+      month: {
+        columnType: 'date',
+        style: 'string',
+        displayName: '',
+      } as ColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        displayName: 'Sales',
+      } as ColumnLabelFormat,
+      points: {
+        columnType: 'number',
+        style: 'number',
+        displayName: 'Points',
+      } as ColumnLabelFormat,
+    },
+    comboChartAxis: {
+      x: ['month'],
+      y: ['sales'],
+      y2: [],
+      category: [],
+      tooltip: null,
+      colorBy: ['type'],
+    },
+  },
+};
+
+export const WithColorByWithY2: Story = {
+  args: {
+    selectedChartType: 'combo',
+    showLegend: true,
+    data: ['Basketball'].flatMap((sport, lineIndex) => {
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      return months.flatMap((month, index) => {
+        const types = ['Home', 'Away'];
+        return types.map((type, typeIndex) => {
+          const test = typeIndex === 1 ? -1.5 : typeIndex * 1.25;
+          return {
+            month,
+            sales: 420 + (+index + lineIndex * 12 + typeIndex * 7.5) * test,
+            points: 100 + (+index + lineIndex * 12 + typeIndex * 7.5),
+            category: sport,
+            type,
+          };
+        });
+      });
+    }),
+    columnLabelFormats: {
+      month: {
+        columnType: 'date',
+        style: 'string',
+        displayName: '',
+      } as ColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        displayName: 'Sales',
+      } as ColumnLabelFormat,
+      points: {
+        columnType: 'number',
+        style: 'number',
+        displayName: 'Points',
+      } as ColumnLabelFormat,
+    },
+    comboChartAxis: {
+      x: ['month'],
+      y: ['sales'],
+
+      //  y2: [],
+      y2: ['points'],
+      //  category: ['type'],
+      category: [],
+      tooltip: null,
+      colorBy: ['type'],
+    },
+  },
+};
+
 export const ComboChartWithNegativeNumbers2: Story = {
   args: {
     selectedChartType: 'combo',
@@ -1284,6 +1419,7 @@ export const ComboChartWithNegativeNumbers2: Story = {
       y2: ['avg_territory_growth'],
       tooltip: null,
       category: [],
+      colorBy: [],
     },
     columnLabelFormats: {
       region: {
@@ -1520,6 +1656,7 @@ export const ComboChartWithNegativeNumbers3: Story = {
       y: [],
       tooltip: null,
       category: [],
+      colorBy: [],
     },
     columnSettings: {},
     comboChartAxis: {
@@ -1528,6 +1665,7 @@ export const ComboChartWithNegativeNumbers3: Story = {
       y2: ['percent_change'],
       tooltip: null,
       category: [],
+      colorBy: [],
     },
     disableTooltip: false,
     metricColumnId: '',

@@ -4,7 +4,7 @@ import {
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
-  getUsersWithDashboardPermissions,
+  getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 import {
   GetDashboardParamsSchema,
@@ -17,9 +17,9 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
+import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
 import { getPubliclyEnabledByUser } from '../../../../shared-helpers/get-publicly-enabled-by-user';
 import { getMetricsInAncestorAssetFromMetricIds } from '../../../../shared-helpers/metric-helpers';
-import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
 
 interface GetDashboardHandlerParams {
   dashboardId: string;
@@ -205,7 +205,7 @@ export async function getDashboardHandler(
   // Get the extra dashboard info concurrently
   const [individualPermissions, workspaceMemberCount, collections, publicEnabledBy] =
     await Promise.all([
-      getUsersWithDashboardPermissions({ dashboardId }),
+      getUsersWithAssetPermissions({ assetId: dashboardId, assetType: 'dashboard_file' }),
       getOrganizationMemberCount(dashboardFile.organizationId),
       getCollectionsAssociatedWithDashboard(dashboardId, user.id),
       getPubliclyEnabledByUser(dashboardFile.publiclyEnabledBy),

@@ -15,6 +15,7 @@ export const ZoneIdToTitle: Record<SelectAxisContainerId, string> = {
   [SelectAxisContainerId.Tooltip]: 'Tooltip',
   [SelectAxisContainerId.Available]: 'Available',
   [SelectAxisContainerId.Metric]: 'Metric',
+  [SelectAxisContainerId.ColorBy]: 'Color By',
 };
 
 const makeDropZone = (
@@ -62,6 +63,9 @@ const makeTooltipDropZone = (tooltipItems: string[] | null | undefined): DropZon
 const makeY2AxisDropZone = (y2Items: string[] | null | undefined): DropZone =>
   makeDropZone(SelectAxisContainerId.Y2Axis, y2Items ?? EMPTY_ARRAY);
 
+const makeColorByDropZone = (colorByItems: string[] | null | undefined): DropZone =>
+  makeDropZone(SelectAxisContainerId.ColorBy, colorByItems ?? EMPTY_ARRAY);
+
 export const chartTypeToDropZones: Record<
   ChartConfigProps['selectedChartType'],
   (
@@ -80,6 +84,7 @@ export const chartTypeToDropZones: Record<
       isHorizontalBar
         ? makeReverseXAxisDropZone(_selectedAxis.x)
         : makeYAxisDropZone(_selectedAxis.y),
+      makeColorByDropZone(_selectedAxis.colorBy),
       makeCategoryAxisDropZone(_selectedAxis.category),
       makeTooltipDropZone(_selectedAxis.tooltip),
     ];
@@ -89,6 +94,7 @@ export const chartTypeToDropZones: Record<
     return [
       makeXAxisDropZone(_selectedAxis.x),
       makeYAxisDropZone(_selectedAxis.y),
+      makeColorByDropZone(_selectedAxis.colorBy),
       makeCategoryAxisDropZone(_selectedAxis.category),
       makeTooltipDropZone(_selectedAxis.tooltip),
     ];

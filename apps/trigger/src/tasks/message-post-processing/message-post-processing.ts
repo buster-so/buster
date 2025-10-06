@@ -6,6 +6,7 @@ import { db, eq, getDb } from '@buster/database/connection';
 import {
   getBraintrustMetadata,
   getChatConversationHistory,
+  getLogsWriteBackConfig,
   getMessageContext,
   getOrganizationAnalystDoc,
   getOrganizationDataSource,
@@ -19,9 +20,10 @@ import type {
   ConfidenceScore,
   PostProcessingMessage,
 } from '@buster/server-shared/message';
-import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { logger, schemaTask, tasks } from '@trigger.dev/sdk/v3';
 import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { z } from 'zod/v4';
+import type { logsWriteBackTask } from '../logs-write-back';
 import {
   buildWorkflowInput,
   fetchPreviousPostProcessingMessages,
@@ -472,6 +474,41 @@ export const messagePostProcessingTask: ReturnType<
           stack: slackError instanceof Error ? slackError.stack : undefined,
         });
         // Don't throw - this is a non-critical error
+      }
+
+      // Step 8: Trigger logs write-back task if configured
+      try {
+        // Check if organization has logs write-back configured
+        const logsWriteBackConfig = await getLogsWriteBackConfig(messageContext.organizationId);
+
+        if (logsWriteBackConfig) {
+          logger.log('Triggering logs write-back task', {
+            messageId: payload.messageId,
+            organizationId: messageContext.organizationId,
+          });
+
+          // Fire-and-forget trigger to logs write-back task
+          tasks
+            .trigger<typeof logsWriteBackTask>('logs-write-back', {
+              messageId: payload.messageId,
+              organizationId: messageContext.organizationId,
+            })
+            .catch((error) => {
+              // Log error but don't fail the current task
+              logger.error('Failed to trigger logs write-back task', {
+                messageId: payload.messageId,
+                organizationId: messageContext.organizationId,
+                error: error instanceof Error ? error.message : 'Unknown error',
+              });
+            });
+        }
+      } catch (logsError) {
+        // Log error but don't fail the task for logs write-back issues
+        logger.error('Error checking logs write-back configuration', {
+          messageId: payload.messageId,
+          organizationId: messageContext.organizationId,
+          error: logsError instanceof Error ? logsError.message : 'Unknown error',
+        });
       }
 
       logger.log('Message post-processing completed successfully', {

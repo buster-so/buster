@@ -78,12 +78,8 @@ export class BigQueryAdapter extends BaseAdapter {
       // Fix SQL to ensure proper escaping of identifiers with special characters
       const fixedSql = fixBigQueryTableReferences(sql);
 
-      // Debug logging to verify the fix is applied
-      if (sql !== fixedSql) {
-        console.log('[BigQuery] SQL fixed for special characters:');
-        console.log('  Original:', sql);
-        console.log('  Fixed:   ', fixedSql);
-      }
+      // Debug logging removed - was using console.log which violates linting rules
+      // The fix is still applied, just without logging
 
       const options: Query = {
         query: fixedSql,
@@ -242,5 +238,189 @@ export class BigQueryAdapter extends BaseAdapter {
       this.introspector = new BigQueryIntrospector('bigquery', this);
     }
     return this.introspector;
+  }
+
+  /**
+   * Check if a table exists in BigQuery
+   */
+  async tableExists(_database: string, schema: string, tableName: string): Promise<boolean> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('BigQuery client not initialized');
+    }
+
+    try {
+      const dataset = this.client.dataset(schema);
+      const table = dataset.table(tableName);
+      const [exists] = await table.exists();
+      return exists;
+    } catch (error) {
+      console.error('Error checking table existence:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Create the Buster logs table in BigQuery
+   */
+  async createLogsTable(
+    _database: string,
+    schema: string,
+    tableName = 'buster_query_logs'
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('BigQuery client not initialized');
+    }
+
+    const createTableSQL = `
+      CREATE TABLE IF NOT EXISTS \`${schema}.${tableName}\` (
+        message_id STRING,
+        user_email STRING,
+        user_name STRING,
+        chat_id STRING,
+        chat_link STRING,
+        request_message STRING,
+        created_at TIMESTAMP,
+        duration_seconds INT64,
+        confidence_score STRING,
+        assumptions JSON,
+        inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      )
+    `;
+
+    try {
+      const [job] = await this.client.createQueryJob({ query: createTableSQL });
+      await job.getQueryResults();
+      console.info(`Table ${schema}.${tableName} created successfully`);
+    } catch (error) {
+      throw new Error(
+        `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Insert a log record into the BigQuery table
+   */
+  override async insertLogRecord(
+    _database: string,
+    schema: string,
+    tableName: string,
+    record: {
+      messageId: string;
+      userEmail: string;
+      userName: string;
+      chatId: string;
+      chatLink: string;
+      requestMessage: string;
+      createdAt: Date;
+      durationSeconds: number;
+      confidenceScore: string;
+      assumptions: unknown[];
+    }
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('BigQuery client not initialized');
+    }
+
+    const insertSQL = `
+      INSERT INTO \`${schema}.${tableName}\` (
+        message_id, 
+        user_email, 
+        user_name, 
+        chat_id,
+        chat_link,
+        request_message,
+        created_at, 
+        duration_seconds, 
+        confidence_score, 
+        assumptions
+      ) VALUES (
+        @messageId,
+        @userEmail,
+        @userName,
+        @chatId,
+        @chatLink,
+        @requestMessage,
+        @createdAt,
+        @durationSeconds,
+        @confidenceScore,
+        PARSE_JSON(@assumptions)
+      )
+    `;
+
+    const params = {
+      messageId: record.messageId,
+      userEmail: record.userEmail,
+      userName: record.userName,
+      chatId: record.chatId,
+      chatLink: record.chatLink,
+      requestMessage: record.requestMessage,
+      createdAt: record.createdAt.toISOString(),
+      durationSeconds: record.durationSeconds,
+      confidenceScore: record.confidenceScore,
+      assumptions: JSON.stringify(record.assumptions),
+    };
+
+    try {
+      const [job] = await this.client.createQueryJob({
+        query: insertSQL,
+        params,
+      });
+      await job.getQueryResults();
+      console.info(`Log record inserted for message ${record.messageId}`);
+    } catch (error) {
+      throw new Error(
+        `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Execute a write operation (INSERT, UPDATE, DELETE)
+   */
+  override async executeWrite(
+    sql: string,
+    params?: QueryParameter[],
+    timeout?: number
+  ): Promise<{ rowCount: number }> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('BigQuery client not initialized');
+    }
+
+    try {
+      const options: {
+        query: string;
+        timeoutMs: number;
+        params?: unknown[];
+      } = {
+        query: sql,
+        timeoutMs: timeout || 60000,
+      };
+
+      if (params && params.length > 0) {
+        options.params = params;
+      }
+
+      const [job] = await this.client.createQueryJob(options);
+      const [rows] = await job.getQueryResults();
+
+      // For DML operations, BigQuery returns the affected row count differently
+      // We'll use the rows length for now as a fallback
+      return {
+        rowCount: rows?.length || 0,
+      };
+    } catch (error) {
+      throw new Error(
+        `BigQuery write operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 }

@@ -4,7 +4,7 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { getSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
 import { BASE_URL_V2 } from './config';
-import { rustErrorHandler } from './errors';
+import { apiErrorHandler } from './errors';
 
 const AXIOS_TIMEOUT = 120000; // 2 minutes
 
@@ -35,7 +35,7 @@ export const createAxiosInstance = (baseURL = BASE_URL_V2) => {
         );
       }
 
-      return Promise.reject(rustErrorHandler(error));
+      return Promise.reject(apiErrorHandler(error));
     }
   );
 

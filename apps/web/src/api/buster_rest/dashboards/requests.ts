@@ -1,7 +1,9 @@
 import type { DashboardConfig, GetDashboardResponse } from '@buster/server-shared/dashboards';
 import type {
   ShareDeleteRequest,
+  ShareDeleteResponse,
   SharePostRequest,
+  SharePostResponse,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
 import type { BusterDashboardListItem } from '@/api/asset_interfaces/dashboard';
@@ -76,11 +78,15 @@ export const dashboardsDeleteDashboard = async (data: { ids: string[] }) => {
 // share dashboards
 
 export const shareDashboard = async ({ id, params }: { id: string; params: SharePostRequest }) => {
-  return mainApi.post<string>(`/dashboards/${id}/sharing`, params).then((res) => res.data);
+  return mainApiV2
+    .post<SharePostResponse>(`/dashboards/${id}/sharing`, params)
+    .then((res) => res.data);
 };
 
 export const unshareDashboard = async ({ id, data }: { id: string; data: ShareDeleteRequest }) => {
-  return mainApi.delete<string>(`/dashboards/${id}/sharing`, { data }).then((res) => res.data);
+  return mainApiV2
+    .delete<ShareDeleteResponse>(`/dashboards/${id}/sharing`, { data })
+    .then((res) => res.data);
 };
 
 export const updateDashboardShare = async ({
@@ -90,7 +96,7 @@ export const updateDashboardShare = async ({
   id: string;
   params: ShareUpdateRequest;
 }) => {
-  return mainApi
+  return mainApiV2
     .put<GetDashboardResponse>(`/dashboards/${id}/sharing`, params)
     .then((res) => res.data);
 };

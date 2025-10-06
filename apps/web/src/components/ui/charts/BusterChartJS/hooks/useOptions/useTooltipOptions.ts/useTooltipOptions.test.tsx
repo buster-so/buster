@@ -33,6 +33,7 @@ describe('useTooltipOptions', () => {
       y: ['test'],
       category: ['category'],
       tooltip: null,
+      colorBy: null,
     } as ChartEncodes,
     hasMismatchedTooltipsAndMeasures: false,
     disableTooltip: false,

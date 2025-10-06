@@ -1,5 +1,5 @@
 import type { ChartConfigProps } from '@buster/server-shared/metrics';
-import type { Chart, ChartTypeRegistry, TooltipItem } from 'chart.js';
+import type { Chart, ChartTypeRegistry, CommonElementOptions, TooltipItem } from 'chart.js';
 import { formatLabel } from '@/lib/columnFormatter';
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import { getPercentage } from './helpers';
@@ -10,10 +10,15 @@ export const barAndLineTooltipHelper = (
   columnLabelFormats: NonNullable<ChartConfigProps['columnLabelFormats']>,
   keyToUsePercentage: string[],
   hasMultipleShownDatasets: boolean,
-  percentageMode: undefined | 'stacked'
+  percentageMode: undefined | 'stacked',
+  skipNull: boolean
 ): ITooltipItem[] => {
   if (percentageMode) {
     dataPoints.reverse(); //we do this because the data points are in reverse order and it looks better
+  }
+
+  if (skipNull) {
+    dataPoints = dataPoints.filter((dataPoint) => dataPoint.raw !== null);
   }
 
   const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {
@@ -21,17 +26,28 @@ export const barAndLineTooltipHelper = (
     const dataPointDataIndex = dataPoint.dataIndex;
     const tooltipData = tooltipDataset.tooltipData;
     const selectedToolTipData = tooltipData[dataPointDataIndex];
+    const colorItem = tooltipDataset?.backgroundColor;
+    const isColorItemArray = Array.isArray(colorItem);
 
     if (!selectedToolTipData) return [];
 
+    const getTooltipColor = (item: { key: string }) => {
+      if (!tooltipDataset || tooltipDataset.yAxisKey !== item.key) {
+        return undefined;
+      }
+
+      if (isColorItemArray) {
+        const foundColor = colorItem[dataPointDataIndex];
+        if (foundColor) return foundColor;
+      }
+
+      return typeof colorItem === 'function'
+        ? tooltipDataset?.borderColor
+        : tooltipDataset?.backgroundColor;
+    };
+
     return selectedToolTipData.map<ITooltipItem>((item) => {
-      const colorItem = tooltipDataset?.backgroundColor as string;
-      const color =
-        tooltipDataset && tooltipDataset.yAxisKey === item.key //we want to use the default gray color if the y axis key is the same as the item key (which means it is plotted)
-          ? typeof colorItem === 'function'
-            ? (tooltipDataset?.borderColor as string)
-            : (tooltipDataset?.backgroundColor as string)
-          : undefined;
+      const color = getTooltipColor(item);
       const usePercentage =
         !!percentageMode || keyToUsePercentage.includes(tooltipDataset.label as string);
 

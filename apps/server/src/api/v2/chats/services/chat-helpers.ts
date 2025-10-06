@@ -1,4 +1,8 @@
-import { canUserAccessChatCached } from '@buster/access-controls';
+import {
+  type AssetPermissionRole,
+  canUserAccessChatCached,
+  checkPermission,
+} from '@buster/access-controls';
 import type { ModelMessage } from '@buster/ai';
 import { db } from '@buster/database/connection';
 import {
@@ -7,7 +11,9 @@ import {
   createMessage,
   generateAssetMessages,
   getChatWithDetails,
-  getMessagesForChat,
+  getMessagesForChatWithUserDetails,
+  getOrganizationMemberCount,
+  getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 import type { Chat, Message } from '@buster/database/queries';
 import { chats, messages } from '@buster/database/schema';
@@ -24,6 +30,8 @@ import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { PostProcessingMessageSchema } from '@buster/server-shared/message';
 import { and, eq, gte, isNull } from 'drizzle-orm';
 import type { z } from 'zod';
+import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
+import { getPubliclyEnabledByUser } from '../../../../shared-helpers/get-publicly-enabled-by-user';
 
 /**
  * Validates a nullable JSONB field against a Zod schema
@@ -106,63 +114,71 @@ const buildReasoningMessages = (reasoningMessages: unknown): ChatMessage['reason
  * Build a ChatWithMessages object from database entities
  * Optimized for performance with pre-allocated objects and minimal iterations
  */
-export function buildChatWithMessages(
+export async function buildChatWithMessages(
   chat: Chat,
-  messages: Message[],
+  messages: { message: Message; user: User }[],
   user: User | null,
+  permission: AssetPermissionRole,
   isFavorited = false
-): ChatWithMessages {
+): Promise<ChatWithMessages> {
+  const createdByName = user?.name || user?.email || 'Unknown User';
+
   // Pre-allocate collections with known size
   const messageCount = messages.length;
   const messageMap: Record<string, ChatMessage> = {};
   const messageIds: string[] = new Array(messageCount);
-
-  // Cache user info to avoid repeated property access
-  const userName = user?.name || user?.email || 'Unknown User';
-  const userAvatar = user?.avatarUrl || undefined;
 
   // Single iteration with optimized object creation
   for (let i = 0; i < messageCount; i++) {
     const msg = messages[i];
     if (!msg) continue; // Skip if somehow undefined
 
-    const responseMessages = buildResponseMessages(msg.responseMessages);
-    const reasoningMessages = buildReasoningMessages(msg.reasoning);
+    const responseMessages = buildResponseMessages(msg.message.responseMessages);
+    const reasoningMessages = buildReasoningMessages(msg.message.reasoning);
 
     // Pre-compute arrays to avoid Object.keys() calls
     const responseMessageIds = Object.keys(responseMessages);
     const reasoningMessageIds = Object.keys(reasoningMessages);
 
-    const requestMessage = msg.requestMessage
+    const requestMessage = msg.message.requestMessage
       ? {
-          request: msg.requestMessage,
-          sender_id: msg.createdBy,
-          sender_name: userName,
-          sender_avatar: userAvatar,
+          request: msg.message.requestMessage,
+          sender_id: msg.message.createdBy,
+          sender_name: msg.user.name || msg.user.email || 'Unknown User',
+          sender_avatar: msg.user.avatarUrl,
         }
       : null;
 
     const chatMessage: ChatMessage = {
-      id: msg.id,
-      created_at: msg.createdAt,
-      updated_at: msg.updatedAt,
+      id: msg.message.id,
+      created_at: msg.message.createdAt,
+      updated_at: msg.message.updatedAt,
       request_message: requestMessage,
       response_messages: responseMessages,
       response_message_ids: responseMessageIds,
       reasoning_message_ids: reasoningMessageIds,
       reasoning_messages: reasoningMessages,
-      final_reasoning_message: msg.finalReasoningMessage || null,
-      feedback: msg.feedback ? (msg.feedback as 'negative') : null,
-      is_completed: msg.isCompleted || false,
+      final_reasoning_message: msg.message.finalReasoningMessage || null,
+      feedback: msg.message.feedback ? (msg.message.feedback as 'negative') : null,
+      is_completed: msg.message.isCompleted || false,
       post_processing_message: validateNullableJsonb(
-        msg.postProcessingMessage,
+        msg.message.postProcessingMessage,
         PostProcessingMessageSchema
       ),
     };
 
-    messageIds[i] = msg.id;
-    messageMap[msg.id] = chatMessage;
+    messageIds[i] = msg.message.id;
+    messageMap[msg.message.id] = chatMessage;
   }
+
+  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount] = await Promise.all([
+    getPubliclyEnabledByUser(chat.publiclyEnabledBy),
+    getUsersWithAssetPermissions({
+      assetId: chat.id,
+      assetType: 'chat',
+    }),
+    getOrganizationMemberCount(chat.organizationId),
+  ]);
 
   // Ensure message_ids array has no duplicates
   const uniqueMessageIds = [...new Set(messageIds)];
@@ -181,17 +197,16 @@ export function buildChatWithMessages(
     updated_at: chat.updatedAt,
     created_by: chat.createdBy,
     created_by_id: chat.createdBy,
-    created_by_name: userName,
+    created_by_name: createdByName,
     created_by_avatar: user?.avatarUrl || null,
-    // Sharing fields - TODO: implement proper sharing logic
-    individual_permissions: [],
+    individual_permissions: individualPermissions,
     publicly_accessible: chat.publiclyAccessible || false,
     public_expiry_date: chat.publicExpiryDate || null,
-    public_enabled_by: chat.publiclyEnabledBy || null,
-    public_password: null, // Don't expose password
-    permission: 'owner', // TODO: Implement proper permission checking
-    workspace_sharing: 'full_access',
-    workspace_member_count: 0,
+    public_enabled_by: publiclyEnabledBy,
+    public_password: chat.publicPassword || null,
+    permission,
+    workspace_sharing: chat.workspaceSharing || 'none',
+    workspace_member_count: workspaceMemberCount,
   };
 }
 
@@ -221,16 +236,22 @@ export async function handleExistingChat(
     throw new ChatError(ChatErrorCode.CHAT_NOT_FOUND, 'Chat not found', 404);
   }
 
-  const hasPermission = await canUserAccessChatCached({
+  const { effectiveRole, hasAccess } = await checkPermission({
     userId: user.id,
-    chatId,
+    assetId: chatId,
+    assetType: 'chat',
+    requiredRole: 'can_view',
+    organizationId: chatDetails.chat.organizationId,
+    workspaceSharing: chatDetails.chat.workspaceSharing,
+    publiclyAccessible: chatDetails.chat.publiclyAccessible,
+    publicExpiryDate: chatDetails.chat.publicExpiryDate || undefined,
   });
-  if (!hasPermission) {
-    throw new ChatError(
-      ChatErrorCode.PERMISSION_DENIED,
-      'You do not have permission to access this chat',
-      403
-    );
+
+  if (!hasAccess || !effectiveRole) {
+    throwUnauthorizedError({
+      publiclyAccessible: chatDetails.chat.publiclyAccessible,
+      publicExpiryDate: chatDetails.chat.publicExpiryDate || undefined,
+    });
   }
 
   // Handle redo logic if redoFromMessageId is provided
@@ -266,17 +287,20 @@ export async function handleExistingChat(
           metadata,
         })
       : Promise.resolve(null),
-    getMessagesForChat(chatId),
+    getMessagesForChatWithUserDetails(chatId),
   ]);
 
   // Combine messages - prepend new message to maintain descending order (newest first)
-  const allMessages = newMessage ? [newMessage, ...existingMessages] : existingMessages;
+  const allMessages = newMessage
+    ? [{ message: newMessage, user }, ...existingMessages]
+    : existingMessages;
 
   // Build chat with messages
-  const chatWithMessages: ChatWithMessages = buildChatWithMessages(
+  const chatWithMessages: ChatWithMessages = await buildChatWithMessages(
     chatDetails.chat,
     allMessages,
     chatDetails.user,
+    effectiveRole,
     chatDetails.isFavorited
   );
 
@@ -378,10 +402,11 @@ export async function handleNewChat({
   });
 
   // Build chat with messages
-  const chatWithMessages = buildChatWithMessages(
+  const chatWithMessages = await buildChatWithMessages(
     result.chat,
-    result.message ? [result.message] : [],
+    result.message ? [{ message: result.message, user }] : [],
     user,
+    'owner',
     false
   );
 

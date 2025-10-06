@@ -70,12 +70,15 @@ export function getGitHubAppCredentials(): {
  * Create a configured GitHub App instance
  */
 export function createGitHubApp(): App {
-  const { appId, privateKey } = getGitHubAppCredentials();
+  const { appId, privateKey, webhookSecret } = getGitHubAppCredentials();
 
   try {
     return new App({
       appId,
       privateKey,
+      webhooks: {
+        secret: webhookSecret,
+      },
     });
   } catch (error) {
     throw createGitHubError(

@@ -2,8 +2,8 @@ import type { LanguageModelV2ToolCall } from '@ai-sdk/provider';
 import { type ModelMessage, NoSuchToolError, generateText, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { ANALYST_AGENT_NAME, DOCS_AGENT_NAME, THINK_AND_PREP_AGENT_NAME } from '../../../agents';
-import { Sonnet4 } from '../../../llm';
-import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
+import { GPT5Mini, Sonnet4 } from '../../../llm';
+import { DEFAULT_ANTHROPIC_OPTIONS, DEFAULT_OPENAI_OPTIONS } from '../../../llm/providers/gateway';
 import type { RepairContext } from '../types';
 
 export function canHandleNoSuchTool(error: Error): boolean {
@@ -58,11 +58,11 @@ export async function repairWrongToolName(
 
       try {
         const result = streamText({
-          model: Sonnet4,
-          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+          model: GPT5Mini,
+          providerOptions: DEFAULT_OPENAI_OPTIONS,
           messages: healingMessages,
           tools: context.tools,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 10000,
           temperature: 0,
         });
 

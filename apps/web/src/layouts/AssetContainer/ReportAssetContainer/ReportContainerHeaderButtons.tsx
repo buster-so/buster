@@ -6,6 +6,7 @@ import { CreateChatButton } from '@/components/features/AssetLayout/CreateChatBu
 import { ShareReportButton } from '@/components/features/buttons/ShareReportButton';
 import { ClosePageButton } from '@/components/features/chat/ClosePageButton';
 import { ReportThreeDotMenu } from '@/components/features/reports/ReportThreeDotMenu';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { useIsChatMode, useIsFileMode } from '@/context/Chats/useMode';
 import { useIsReportReadOnly } from '@/context/Reports/useIsReportReadOnly';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
@@ -23,6 +24,7 @@ export const ReportContainerHeaderButtons: React.FC<ReportContainerHeaderButtons
 }) => {
   const isChatMode = useIsChatMode();
   const isFileMode = useIsFileMode();
+  const isEmbed = useIsEmbed();
   const { isViewingOldVersion } = useIsReportReadOnly({
     reportId: reportId || '',
   });
@@ -38,16 +40,18 @@ export const ReportContainerHeaderButtons: React.FC<ReportContainerHeaderButtons
     <FileButtonContainer>
       {isEffectiveOwner && <ShareReportButton reportId={reportId} />}
 
-      <ReportThreeDotMenu
-        reportId={reportId}
-        reportVersionNumber={reportVersionNumber}
-        isViewingOldVersion={isViewingOldVersion}
-      />
+      {!isEmbed && (
+        <ReportThreeDotMenu
+          reportId={reportId}
+          reportVersionNumber={reportVersionNumber}
+          isViewingOldVersion={isViewingOldVersion}
+        />
+      )}
 
       <HideButtonContainer show={isFileMode && isEditor}>
         <CreateChatButton assetId={reportId} assetType="report_file" />
       </HideButtonContainer>
-      {isChatMode && <ClosePageButton />}
+      {isChatMode && <ClosePageButton isEmbed={isEmbed} />}
     </FileButtonContainer>
   );
 };

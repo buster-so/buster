@@ -31,27 +31,120 @@ type VersionHistoryEntry = {
 
 type VersionHistory = Record<string, VersionHistoryEntry>;
 
-// Simple in-memory queue for each reportId
-const updateQueues = new Map<
-  string,
-  Promise<{
-    id: string;
-    name: string;
-    content: string;
-    versionHistory: VersionHistory | null;
-  }>
->();
+type Deferred<T> = {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: unknown) => void;
+};
+
+function createDeferred<T>(): Deferred<T> {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  promise.catch(() => undefined);
+
+  return { promise, resolve, reject };
+}
+
+type ReportUpdateQueueState = {
+  tailPromise: Promise<void>;
+  nextSequence: number;
+  pending: Map<number, Deferred<void>>;
+  lastCompletedSequence: number;
+  finalSequence?: number;
+  closed: boolean;
+};
+
+const updateQueues = new Map<string, ReportUpdateQueueState>();
+
+function getOrCreateQueueState(reportId: string, isFinal?: boolean): ReportUpdateQueueState {
+  const existing = updateQueues.get(reportId);
+  if (existing) {
+    return existing;
+  }
+
+  const initialState: ReportUpdateQueueState = {
+    tailPromise: Promise.resolve(),
+    nextSequence: 0,
+    pending: new Map(),
+    lastCompletedSequence: -1,
+    // If it is final, the queue should be closed
+    closed: isFinal ?? false,
+  };
+
+  updateQueues.set(reportId, initialState);
+  return initialState;
+}
+
+export function isReportUpdateQueueClosed(reportId: string): boolean {
+  const queue = updateQueues.get(reportId);
+  return queue?.closed ?? false;
+}
+
+export function reopenReportUpdateQueue(reportId: string): void {
+  const queue = updateQueues.get(reportId);
+  if (queue) {
+    queue.closed = false;
+  }
+}
+
+type WaitForPendingReportUpdateOptions = {
+  upToSequence?: number;
+};
+
+/**
+ * Wait for all pending updates for a given reportId to complete.
+ * This ensures all queued updates are flushed to the database before proceeding.
+ */
+export async function waitForPendingReportUpdates(
+  reportId: string,
+  options?: WaitForPendingReportUpdateOptions
+): Promise<void> {
+  const queue = updateQueues.get(reportId);
+  if (!queue) {
+    return;
+  }
+
+  const targetSequence = options?.upToSequence ?? queue.finalSequence;
+
+  if (targetSequence === undefined) {
+    await queue.tailPromise;
+    return;
+  }
+
+  const maxKnownSequence = queue.nextSequence - 1;
+  const effectiveTarget = Math.min(targetSequence, maxKnownSequence);
+
+  if (effectiveTarget <= queue.lastCompletedSequence) {
+    return;
+  }
+
+  const waits: Promise<unknown>[] = [];
+
+  for (let sequence = queue.lastCompletedSequence + 1; sequence <= effectiveTarget; sequence += 1) {
+    const deferred = queue.pending.get(sequence);
+    if (deferred) {
+      waits.push(deferred.promise.catch(() => undefined));
+    }
+  }
+
+  if (waits.length > 0) {
+    await Promise.all(waits);
+  } else {
+    await queue.tailPromise;
+  }
+}
 
 /**
  * Internal function that performs the actual update logic.
  * This is separated so it can be queued.
  */
-async function performUpdate(params: BatchUpdateReportInput): Promise<{
-  id: string;
-  name: string;
-  content: string;
-  versionHistory: VersionHistory | null;
-}> {
+async function performUpdate(params: BatchUpdateReportInput): Promise<void> {
   const { reportId, content, name, versionHistory } = BatchUpdateReportInputSchema.parse(params);
 
   try {
@@ -73,25 +166,12 @@ async function performUpdate(params: BatchUpdateReportInput): Promise<{
       updateData.versionHistory = versionHistory;
     }
 
-    const result = await db
+    await db
       .update(reportFiles)
       .set(updateData)
-      .where(and(eq(reportFiles.id, reportId), isNull(reportFiles.deletedAt)))
-      .returning({
-        id: reportFiles.id,
-        name: reportFiles.name,
-        content: reportFiles.content,
-        versionHistory: reportFiles.versionHistory,
-      });
-
-    const updatedReport = result[0];
-    if (!updatedReport) {
-      throw new Error('Report not found or already deleted');
-    }
-
-    return updatedReport;
+      .where(and(eq(reportFiles.id, reportId), isNull(reportFiles.deletedAt)));
   } catch (error) {
-    console.error('Error batch updating report:', {
+    console.error('Error updating report with version:', {
       reportId,
       error: error instanceof Error ? error.message : error,
     });
@@ -100,51 +180,83 @@ async function performUpdate(params: BatchUpdateReportInput): Promise<{
       throw error;
     }
 
-    throw new Error('Failed to batch update report');
+    throw new Error('Failed to update report with version');
+  }
+}
+
+export function closeReportUpdateQueue(reportId: string): void {
+  const queue = updateQueues.get(reportId);
+  if (queue) {
+    queue.closed = true;
   }
 }
 
 /**
- * Updates a report with new content, optionally name, and version history in a single operation
- * This is more efficient than multiple individual updates
- *
+ * Updates a report's content, name, and version history in a single operation.
  * Updates are queued per reportId to ensure they execute in order.
  */
-export const batchUpdateReport = async (
-  params: BatchUpdateReportInput
-): Promise<{
-  id: string;
-  name: string;
-  content: string;
-  versionHistory: VersionHistory | null;
-}> => {
-  const { reportId } = params;
+type UpdateReportWithVersionOptions = {
+  isFinal?: boolean;
+};
 
-  // Get the current promise for this reportId, or use a resolved promise as the starting point
-  const currentQueue =
-    updateQueues.get(reportId) ??
-    Promise.resolve({
-      id: '',
-      name: '',
-      content: '',
-      versionHistory: null,
+type UpdateReportWithVersionResult = {
+  sequenceNumber: number;
+  skipped?: boolean;
+};
+
+export const updateReportWithVersion = async (
+  params: BatchUpdateReportInput,
+  options?: UpdateReportWithVersionOptions
+): Promise<UpdateReportWithVersionResult> => {
+  const { reportId } = params;
+  const isFinal = options?.isFinal ?? false;
+  const queue = getOrCreateQueueState(reportId, isFinal);
+
+  if (!isFinal && queue.closed) {
+    const lastKnownSequence = queue.finalSequence ?? queue.nextSequence - 1;
+    return {
+      sequenceNumber: lastKnownSequence >= 0 ? lastKnownSequence : -1,
+      skipped: true,
+    };
+  }
+
+  const sequenceNumber = queue.nextSequence;
+  queue.nextSequence += 1;
+
+  const deferred = createDeferred<void>();
+  queue.pending.set(sequenceNumber, deferred);
+
+  const runUpdate = () => performUpdate(params);
+
+  const runPromise = queue.tailPromise.then(runUpdate, runUpdate);
+
+  queue.tailPromise = runPromise.then(
+    () => undefined,
+    () => undefined
+  );
+
+  const finalize = () => {
+    queue.pending.delete(sequenceNumber);
+    queue.lastCompletedSequence = Math.max(queue.lastCompletedSequence, sequenceNumber);
+    if (isFinal) {
+      queue.finalSequence = sequenceNumber;
+    }
+  };
+
+  const resultPromise = runPromise
+    .then(() => {
+      deferred.resolve();
+      finalize();
+      return {
+        sequenceNumber,
+        skipped: false as const,
+      };
+    })
+    .catch((error) => {
+      deferred.reject(error);
+      finalize();
+      throw error;
     });
 
-  // Chain the new update to run after the current queue completes
-  const newQueue = currentQueue
-    .then(() => performUpdate(params))
-    .catch(() => performUpdate(params)); // Still try to run even if previous failed
-
-  // Update the queue for this reportId
-  updateQueues.set(reportId, newQueue);
-
-  // Clean up the queue entry once this update completes
-  newQueue.finally(() => {
-    // Only remove if this is still the current queue
-    if (updateQueues.get(reportId) === newQueue) {
-      updateQueues.delete(reportId);
-    }
-  });
-
-  return newQueue;
+  return resultPromise;
 };

@@ -5,6 +5,7 @@ import { CreateChatButton } from '@/components/features/AssetLayout/CreateChatBu
 import { ShareDashboardButton } from '@/components/features/buttons/ShareDashboardButton';
 import { ClosePageButton } from '@/components/features/chat/ClosePageButton';
 import { DashboardThreeDotMenu } from '@/components/features/dashboard/DashboardThreeDotMenu';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { useIsChatMode, useIsFileMode } from '@/context/Chats/useMode';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
@@ -17,6 +18,7 @@ export const DashboardContainerHeaderButtons: React.FC<{
 }> = React.memo(({ dashboardId, dashboardVersionNumber }) => {
   const isChatMode = useIsChatMode();
   const isFileMode = useIsFileMode();
+  const isEmbed = useIsEmbed();
   const { isViewingOldVersion } = useIsDashboardReadOnly({
     dashboardId: dashboardId || '',
   });
@@ -36,15 +38,17 @@ export const DashboardContainerHeaderButtons: React.FC<{
           dashboardVersionNumber={dashboardVersionNumber}
         />
       )}
-      <DashboardThreeDotMenu
-        dashboardId={dashboardId}
-        isViewingOldVersion={isViewingOldVersion}
-        dashboardVersionNumber={dashboardVersionNumber}
-      />
+      {!isEmbed && (
+        <DashboardThreeDotMenu
+          dashboardId={dashboardId}
+          isViewingOldVersion={isViewingOldVersion}
+          dashboardVersionNumber={dashboardVersionNumber}
+        />
+      )}
       <HideButtonContainer show={isFileMode && isEditor}>
         <CreateChatButton assetId={dashboardId} assetType="dashboard_file" />
       </HideButtonContainer>
-      {isChatMode && <ClosePageButton />}
+      {isChatMode && <ClosePageButton isEmbed={isEmbed} />}
     </FileButtonContainer>
   );
 });

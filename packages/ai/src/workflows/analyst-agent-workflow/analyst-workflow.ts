@@ -83,7 +83,47 @@ export async function runAnalystWorkflow(
   // Add all messages from create-todos step (tool call, result, and user message)
   messages.push(...todos.messages);
 
-  const thinkAndPrepAgentStepResults = await runThinkAndPrepAgentStep({
+  // const thinkAndPrepAgentStepResults = await runThinkAndPrepAgentStep({
+  //   options: {
+  //     messageId: input.messageId,
+  //     chatId: input.chatId,
+  //     organizationId: input.organizationId,
+  //     dataSourceId: input.dataSourceId,
+  //     dataSourceSyntax: input.dataSourceSyntax,
+  //     userId: input.userId,
+  //     sql_dialect_guidance: input.dataSourceSyntax,
+  //     datasets: input.datasets,
+  //     workflowStartTime,
+  //     analysisMode,
+  //     analystInstructions,
+  //     organizationDocs,
+  //     userPersonalizationMessageContent,
+  //   },
+  //   streamOptions: {
+  //     messages,
+  //   },
+  // });
+
+  // console.info('[runAnalystWorkflow] DEBUG: Think-and-prep results', {
+  //   workflowId,
+  //   messageId: input.messageId,
+  //   earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
+  //   messageCount: thinkAndPrepAgentStepResults.messages.length,
+  // });
+
+  // messages.push(...thinkAndPrepAgentStepResults.messages);
+
+  // // Check if think-and-prep agent terminated early (clarifying question or direct response)
+  let analystAgentStepResults = { messages: [] as ModelMessage[] };
+
+  // if (!thinkAndPrepAgentStepResults.earlyTermination) {
+  //   console.info('[runAnalystWorkflow] Running analyst agent step (early termination = false)', {
+  //     workflowId,
+  //     messageId: input.messageId,
+  //     earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
+  //   });
+
+  analystAgentStepResults = await runAnalystAgentStep({
     options: {
       messageId: input.messageId,
       chatId: input.chatId,
@@ -91,7 +131,6 @@ export async function runAnalystWorkflow(
       dataSourceId: input.dataSourceId,
       dataSourceSyntax: input.dataSourceSyntax,
       userId: input.userId,
-      sql_dialect_guidance: input.dataSourceSyntax,
       datasets: input.datasets,
       workflowStartTime,
       analysisMode,
@@ -104,53 +143,14 @@ export async function runAnalystWorkflow(
     },
   });
 
-  console.info('[runAnalystWorkflow] DEBUG: Think-and-prep results', {
-    workflowId,
-    messageId: input.messageId,
-    earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
-    messageCount: thinkAndPrepAgentStepResults.messages.length,
-  });
-
-  messages.push(...thinkAndPrepAgentStepResults.messages);
-
-  // Check if think-and-prep agent terminated early (clarifying question or direct response)
-  let analystAgentStepResults = { messages: [] as ModelMessage[] };
-
-  if (!thinkAndPrepAgentStepResults.earlyTermination) {
-    console.info('[runAnalystWorkflow] Running analyst agent step (early termination = false)', {
-      workflowId,
-      messageId: input.messageId,
-      earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
-    });
-
-    analystAgentStepResults = await runAnalystAgentStep({
-      options: {
-        messageId: input.messageId,
-        chatId: input.chatId,
-        organizationId: input.organizationId,
-        dataSourceId: input.dataSourceId,
-        dataSourceSyntax: input.dataSourceSyntax,
-        userId: input.userId,
-        datasets: input.datasets,
-        workflowStartTime,
-        analysisMode,
-        analystInstructions,
-        organizationDocs,
-        userPersonalizationMessageContent,
-      },
-      streamOptions: {
-        messages,
-      },
-    });
-
-    messages.push(...analystAgentStepResults.messages);
-  } else {
-    console.info('[runAnalystWorkflow] DEBUG: SKIPPING analyst agent due to early termination', {
-      workflowId,
-      messageId: input.messageId,
-      earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
-    });
-  }
+  messages.push(...analystAgentStepResults.messages);
+  // } else {
+  //   console.info('[runAnalystWorkflow] DEBUG: SKIPPING analyst agent due to early termination', {
+  //     workflowId,
+  //     messageId: input.messageId,
+  //     earlyTermination: thinkAndPrepAgentStepResults.earlyTermination,
+  //   });
+  // }
 
   // Extract all tool calls from messages
   const allToolCalls = extractToolCallsFromMessages(messages);

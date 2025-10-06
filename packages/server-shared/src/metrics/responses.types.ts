@@ -9,8 +9,7 @@ export const UpdateMetricResponseSchema = MetricSchema;
 export const DuplicateMetricResponseSchema = MetricSchema;
 export const DeleteMetricResponseSchema = z.array(z.string());
 export const ShareMetricResponseSchema = MetricSchema;
-export const ShareDeleteResponseSchema = MetricSchema;
-export const ShareUpdateResponseSchema = MetricSchema;
+export const ShareMetricUpdateResponseSchema = MetricSchema;
 
 export const BulkUpdateMetricVerificationStatusResponseSchema = z.object({
   failed_updates: z.array(MetricSchema),
@@ -36,8 +35,7 @@ export type BulkUpdateMetricVerificationStatusResponse = z.infer<
   typeof BulkUpdateMetricVerificationStatusResponseSchema
 >;
 export type ShareMetricResponse = z.infer<typeof ShareMetricResponseSchema>;
-export type ShareDeleteResponse = z.infer<typeof ShareDeleteResponseSchema>;
-export type ShareUpdateResponse = z.infer<typeof ShareUpdateResponseSchema>;
+export type ShareMetricUpdateResponse = z.infer<typeof ShareMetricUpdateResponseSchema>;
 export type MetricDataResponse = z.infer<typeof MetricDataResponseSchema>;
 
 /**

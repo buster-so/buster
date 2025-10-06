@@ -8,7 +8,7 @@ export const MetricDownloadParamsSchema = z.object({
 });
 export const MetricDownloadQueryParamsSchema = z.object({
   report_file_id: z.string().uuid('Report file ID must be a valid UUID').optional(),
-  metric_version_number: z.number().optional(),
+  metric_version_number: z.coerce.number().optional(),
 });
 
 export type MetricDownloadParams = z.infer<typeof MetricDownloadParamsSchema>;

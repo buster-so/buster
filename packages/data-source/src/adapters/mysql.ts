@@ -176,4 +176,181 @@ export class MySQLAdapter extends BaseAdapter {
     }
     return this.introspector;
   }
+
+  /**
+   * Check if a table exists in MySQL
+   */
+  async tableExists(database: string, _schema: string, tableName: string): Promise<boolean> {
+    this.ensureConnected();
+
+    if (!this.connection) {
+      throw new Error('MySQL connection not initialized');
+    }
+
+    try {
+      const sql = `
+        SELECT COUNT(*) as count
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = ?
+      `;
+
+      const [rows] = await this.connection.execute(sql, [database, tableName]);
+      const firstRow = (rows as Array<{ count?: number }>)[0] as { count?: number } | undefined;
+      return !!firstRow && (firstRow.count ?? 0) > 0;
+    } catch (error) {
+      console.error('Error checking table existence:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Create the Buster logs table in MySQL
+   */
+  async createLogsTable(
+    database: string,
+    _schema: string,
+    tableName = 'buster_query_logs'
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.connection) {
+      throw new Error('MySQL connection not initialized');
+    }
+
+    const createTableSQL = `
+      CREATE TABLE IF NOT EXISTS \`${database}\`.\`${tableName}\` (
+        message_id VARCHAR(255),
+        user_email VARCHAR(500),
+        user_name VARCHAR(500),
+        chat_id VARCHAR(255),
+        chat_link VARCHAR(500),
+        request_message TEXT,
+        created_at DATETIME,
+        duration_seconds INT,
+        confidence_score VARCHAR(50),
+        assumptions JSON,
+        inserted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    try {
+      await this.connection.execute(createTableSQL);
+      console.info(`Table ${database}.${tableName} created successfully`);
+    } catch (error) {
+      throw new Error(
+        `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Insert a log record into the MySQL table
+   */
+  override async insertLogRecord(
+    database: string,
+    _schema: string,
+    tableName: string,
+    record: {
+      messageId: string;
+      userEmail: string;
+      userName: string;
+      chatId: string;
+      chatLink: string;
+      requestMessage: string;
+      createdAt: Date;
+      durationSeconds: number;
+      confidenceScore: string;
+      assumptions: unknown[];
+    }
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.connection) {
+      throw new Error('MySQL connection not initialized');
+    }
+
+    const insertSQL = `
+      INSERT INTO \`${database}\`.\`${tableName}\` (
+        message_id, 
+        user_email, 
+        user_name, 
+        chat_id,
+        chat_link,
+        request_message,
+        created_at, 
+        duration_seconds, 
+        confidence_score, 
+        assumptions
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const params = [
+      record.messageId,
+      record.userEmail,
+      record.userName,
+      record.chatId,
+      record.chatLink,
+      record.requestMessage,
+      record.createdAt,
+      record.durationSeconds,
+      record.confidenceScore,
+      JSON.stringify(record.assumptions),
+    ];
+
+    try {
+      await this.connection.execute(insertSQL, params);
+      console.info(`Log record inserted for message ${record.messageId}`);
+    } catch (error) {
+      throw new Error(
+        `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Execute a write operation (INSERT, UPDATE, DELETE)
+   */
+  override async executeWrite(
+    sql: string,
+    params?: QueryParameter[],
+    timeout?: number
+  ): Promise<{ rowCount: number }> {
+    this.ensureConnected();
+
+    if (!this.connection) {
+      throw new Error('MySQL connection not initialized');
+    }
+
+    try {
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
+
+      const queryPromise = this.connection.execute(sql, params);
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Query execution timeout after ${timeoutMs}ms`));
+        }, timeoutMs);
+      });
+
+      const [result] = await Promise.race([queryPromise, timeoutPromise]);
+
+      // For write operations, MySQL returns a ResultSetHeader
+      if (result && typeof result === 'object' && 'affectedRows' in result) {
+        const resultSet = result as mysql.ResultSetHeader;
+        return {
+          rowCount: resultSet.affectedRows || 0,
+        };
+      }
+
+      return {
+        rowCount: 0,
+      };
+    } catch (error) {
+      throw new Error(
+        `MySQL write operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
 }

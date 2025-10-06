@@ -12,6 +12,7 @@ import '../../../types/hono.types'; //I added this to fix intermitent type error
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import GET from './GET';
+import chatById from './[id]';
 import { cancelChatHandler } from './cancel-chat';
 import { createChatHandler } from './handler';
 
@@ -19,6 +20,7 @@ const app = new Hono()
   // Apply authentication middleware
   .use('*', requireAuth)
   .route('/', GET)
+  .route('/:id', chatById)
   // POST /chats - Create a new chat
   .post('/', zValidator('json', ChatCreateRequestSchema), async (c) => {
     const request = c.req.valid('json');

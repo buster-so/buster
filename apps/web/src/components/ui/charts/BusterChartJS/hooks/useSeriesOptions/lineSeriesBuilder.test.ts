@@ -330,6 +330,7 @@ describe('lineSeriesBuilder', () => {
       const labels = lineSeriesBuilder_labels(props);
 
       expect(labels).toHaveLength(3);
+      console.log('labels', labels[0]);
       expect(labels[0]).toBe('formatted-2023-01-01 formatted-A');
       expect(labels[1]).toBe('formatted-2023-01-02 formatted-B');
       expect(labels[2]).toBe('formatted-2023-01-03 formatted-A');

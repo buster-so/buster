@@ -18,6 +18,7 @@ vi.mock('braintrust', () => ({
 
 vi.mock('../../../llm', () => ({
   Sonnet4: 'mock-model',
+  GPT5Mini: 'mock-model',
 }));
 
 describe('structured-output-strategy', () => {
@@ -86,13 +87,16 @@ describe('structured-output-strategy', () => {
       });
 
       const tool = context.tools.testTool as any;
-      expect(mockGenerateObject).toHaveBeenCalledWith({
-        model: 'mock-model',
-        schema: tool?.inputSchema,
-        prompt: expect.stringContaining('Fix these tool arguments'),
-        mode: 'json',
-        providerOptions: expect.any(Object),
-      });
+      expect(mockGenerateObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'mock-model',
+          schema: tool?.inputSchema,
+          prompt: expect.stringContaining('Fix these tool arguments'),
+          mode: 'json',
+          maxOutputTokens: 10000,
+          providerOptions: expect.objectContaining({}),
+        })
+      );
     });
 
     it('should return null if tool not found', async () => {

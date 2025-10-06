@@ -6,6 +6,8 @@ import { useAutoRedirectStreaming } from './useAutoRedirectStreaming';
 // Mock all the dependencies
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: vi.fn(),
+  useLocation: vi.fn(),
+  useRouter: vi.fn(),
 }));
 
 vi.mock('@/api/buster_rest/chats', () => ({
@@ -27,6 +29,10 @@ vi.mock('@/context/Chats/useGetChatMessage', () => ({
   useGetChatMessageLastReasoningMessageId: vi.fn(),
 }));
 
+vi.mock('@/context/Routes/useRouteBuilder', () => ({
+  useBuildLocation: vi.fn(),
+}));
+
 vi.mock('@/hooks/useWindowFocus', () => ({
   useWindowFocus: vi.fn(),
 }));
@@ -36,7 +42,7 @@ vi.mock('@/lib/assets/assetParamsToRoute', () => ({
 }));
 
 // Import the mocked functions to use in tests
-import { useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useIsVersionChanged } from '@/context/AppVersion/useAppVersion';
 import { useHasLoadedChat } from '@/context/Chats/useGetChat';
@@ -46,6 +52,7 @@ import {
   useGetChatMessageIsFinishedReasoning,
   useGetChatMessageLastReasoningMessageId,
 } from '@/context/Chats/useGetChatMessage';
+import { useBuildLocation } from '@/context/Routes/useRouteBuilder';
 import { assetParamsToRoute } from '@/lib/assets/assetParamsToRoute';
 
 describe('useAutoRedirectStreaming', () => {
@@ -69,6 +76,7 @@ describe('useAutoRedirectStreaming', () => {
   };
 
   let mockNavigateFn: ReturnType<typeof vi.fn>;
+  let mockBuildLocationFn: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -76,6 +84,16 @@ describe('useAutoRedirectStreaming', () => {
     // Setup navigation mock
     mockNavigateFn = vi.fn();
     vi.mocked(useNavigate).mockReturnValue(mockNavigateFn);
+
+    // Setup location mocks
+    vi.mocked(useLocation).mockReturnValue({
+      pathname: '/current/path',
+    } as any);
+
+    mockBuildLocationFn = vi.fn().mockReturnValue({
+      pathname: '/different/path', // Different from current location to trigger navigation
+    });
+    vi.mocked(useBuildLocation).mockReturnValue(mockBuildLocationFn);
 
     // Set default mock implementations
     vi.mocked(useHasLoadedChat).mockReturnValue(true);

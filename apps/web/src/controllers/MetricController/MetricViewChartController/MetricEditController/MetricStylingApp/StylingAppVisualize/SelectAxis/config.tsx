@@ -1,4 +1,4 @@
-import type { ChartType, ColumnLabelFormat } from '@buster/server-shared/metrics';
+import type { ChartEncodes, ChartType, ColumnLabelFormat } from '@buster/server-shared/metrics';
 import type React from 'react';
 import Calendar from '@/components/ui/icons/NucleoIconOutlined/calendar';
 import CurrencyDollar from '@/components/ui/icons/NucleoIconOutlined/currency-dollar';
@@ -50,18 +50,28 @@ export enum SelectAxisContainerId {
   Tooltip = 'tooltip',
   Y2Axis = 'y2Axis',
   Metric = 'metric',
+  ColorBy = 'colorBy',
 }
 
-export const zoneIdToAxis: Record<SelectAxisContainerId, string> = {
-  [SelectAxisContainerId.Available]: '',
-  [SelectAxisContainerId.XAxis]: 'x',
-  [SelectAxisContainerId.YAxis]: 'y',
-  [SelectAxisContainerId.CategoryAxis]: 'category',
-  [SelectAxisContainerId.SizeAxis]: 'size',
-  [SelectAxisContainerId.Tooltip]: 'tooltip',
-  [SelectAxisContainerId.Y2Axis]: 'y2',
-  [SelectAxisContainerId.Metric]: 'metric',
-};
+// Extract all possible keys from any schema in the ChartEncodes union
+export type AllChartEncodesAxisKeys = ChartEncodes extends infer U
+  ? U extends Record<string, unknown>
+    ? keyof U
+    : never
+  : never;
+
+export const zoneIdToAxis: Record<SelectAxisContainerId, AllChartEncodesAxisKeys | 'metric' | ''> =
+  {
+    [SelectAxisContainerId.Available]: '',
+    [SelectAxisContainerId.XAxis]: 'x',
+    [SelectAxisContainerId.YAxis]: 'y',
+    [SelectAxisContainerId.CategoryAxis]: 'category',
+    [SelectAxisContainerId.SizeAxis]: 'size',
+    [SelectAxisContainerId.Tooltip]: 'tooltip',
+    [SelectAxisContainerId.Y2Axis]: 'y2',
+    [SelectAxisContainerId.Metric]: 'metric',
+    [SelectAxisContainerId.ColorBy]: 'colorBy',
+  };
 
 export const chartTypeToAxis: Record<
   ChartType,

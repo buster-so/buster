@@ -35,6 +35,7 @@ export const createTickDates = (
     if (isAQuarter !== -1) {
       return createQuarterTickDates(ticks, xColumnLabelFormats, isAQuarter);
     }
+
     const dateTicks = ticks.flatMap((item) => {
       return item.map<Date>((item) => {
         return createDayjsDate(item as string).toDate(); //do not join because it will turn into a string
@@ -44,6 +45,7 @@ export const createTickDates = (
   }
 
   const isDoubleXAxis = xAxisKeys.length === 2;
+  console.log('isDoubleXAxis', isDoubleXAxis);
   if (isDoubleXAxis) {
     const oneIsAQuarter = xColumnLabelFormats.findIndex(
       (format) => format.convertNumberTo === 'quarter' && format.columnType === 'number'
@@ -51,6 +53,8 @@ export const createTickDates = (
     const oneIsANumber = xColumnLabelFormats.findIndex(
       (format) => format.columnType === 'number' && format.style === 'number'
     );
+    console.log('oneIsAQuarter', oneIsAQuarter);
+    console.log('oneIsANumber', oneIsANumber);
     if (oneIsAQuarter !== -1 && oneIsANumber !== -1) {
       return createQuarterTickDates(ticks, xColumnLabelFormats, oneIsAQuarter);
     }

@@ -21,9 +21,10 @@ export const inputVariants = cva(
 );
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix'>,
     VariantProps<typeof inputVariants> {
   onPressEnter?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  prefix?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -35,6 +36,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       type = 'text',
       onPressEnter,
       onKeyDown,
+      prefix,
       ...props
     },
     ref
@@ -45,6 +47,23 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       }
       onKeyDown?.(e);
     };
+
+    if (prefix) {
+      return (
+        <div className={cn('relative flex items-center', className)}>
+          <span className="pointer-events-none absolute left-2.5 flex items-center text-foreground">
+            {prefix}
+          </span>
+          <input
+            type={type}
+            className={cn(inputVariants({ size, variant }), 'pl-6.5')}
+            ref={ref}
+            onKeyDown={handleKeyDown}
+            {...props}
+          />
+        </div>
+      );
+    }
 
     return (
       <input

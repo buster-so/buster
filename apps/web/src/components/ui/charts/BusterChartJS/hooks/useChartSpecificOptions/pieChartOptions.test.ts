@@ -35,6 +35,7 @@ describe('pieOptionsHandler', () => {
         x: ['category'],
         category: [],
         tooltip: null,
+        colorBy: null,
       } as ChartSpecificOptionsProps['selectedAxis'],
       columnLabelFormats: {},
       barShowTotalAtTop: false,
@@ -63,6 +64,7 @@ describe('piePluginsHandler', () => {
         x: ['category'],
         category: [],
         tooltip: null,
+        colorBy: null,
       } as ChartSpecificOptionsProps['selectedAxis'],
       columnLabelFormats: {
         value: { columnType: 'number', style: 'number' } as any,
@@ -98,6 +100,7 @@ describe('piePluginsHandler', () => {
         x: ['category'],
         category: [],
         tooltip: null,
+        colorBy: null,
       } as ChartSpecificOptionsProps['selectedAxis'],
       columnLabelFormats: {
         value: { columnType: 'number', style: 'number' } as ColumnLabelFormat,

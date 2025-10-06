@@ -7,6 +7,7 @@ import {
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import type { TElement } from 'platejs';
+import { usePluginOption } from 'platejs/react';
 import type * as React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { cn } from '@/lib/utils';
@@ -49,11 +50,12 @@ export function CaptionTextarea(props: React.ComponentProps<typeof CaptionTextar
 
 export const CaptionButton = (props: React.ComponentProps<typeof Button>) => {
   const captionButtonState = useCaptionButtonState();
-
-  const hasCaption = (captionButtonState.element?.caption as TElement[])?.length > 0;
+  const visibleId = usePluginOption(CaptionPlugin, 'visibleId');
+  const element = captionButtonState.element;
+  const isOpen = visibleId === element.id;
+  const hasCaption = (captionButtonState.element?.caption as TElement[]) !== undefined || isOpen;
   const text = hasCaption ? NodeTypeLabels.removeCaption.label : NodeTypeLabels.addCaption.label;
   const editor = captionButtonState.editor;
-  const element = captionButtonState.element;
 
   const addCaption = () => {
     const path = editor.api.findPath(element);

@@ -1,7 +1,7 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import { and, desc, eq, isNull, ne } from 'drizzle-orm';
 import { db } from '../../connection';
-import { messages } from '../../schema';
+import { messages, users } from '../../schema';
 
 export type Message = InferSelectModel<typeof messages>;
 
@@ -36,6 +36,20 @@ export async function getMessagesForChat(chatId: string) {
   return await db
     .select()
     .from(messages)
+    .where(and(eq(messages.chatId, chatId), isNull(messages.deletedAt)))
+    .orderBy(desc(messages.createdAt));
+}
+
+/**
+ * Get all messages for a specific chat with user details
+ * @param chatId - The ID of the chat
+ * @returns Array of messages for the chat with user details
+ */
+export async function getMessagesForChatWithUserDetails(chatId: string) {
+  return await db
+    .select({ message: messages, user: users })
+    .from(messages)
+    .innerJoin(users, eq(messages.createdBy, users.id))
     .where(and(eq(messages.chatId, chatId), isNull(messages.deletedAt)))
     .orderBy(desc(messages.createdAt));
 }

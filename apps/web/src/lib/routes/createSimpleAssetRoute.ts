@@ -59,8 +59,16 @@ export const createChatAssetRoute = (asset: {
   id: string | undefined;
   chatId: string;
   versionNumber?: number;
+  isEmbed: boolean;
 }) => {
   if (asset.asset_type === 'chat' || !asset.asset_type || !asset.id) {
+    if (asset.isEmbed) {
+      return defineLink({
+        to: '/embed/chat/$chatId',
+        params: { chatId: asset.chatId },
+      });
+    }
+
     return defineLink({
       to: '/app/chats/$chatId',
       params: { chatId: asset.chatId },
@@ -68,6 +76,13 @@ export const createChatAssetRoute = (asset: {
   }
 
   if (asset.asset_type === 'metric_file') {
+    if (asset.isEmbed) {
+      return defineLink({
+        to: '/embed/chat/$chatId/metrics/$metricId',
+        params: { metricId: asset.id || '', chatId: asset.chatId },
+        search: { metric_version_number: asset.versionNumber },
+      });
+    }
     return defineLink({
       to: '/app/chats/$chatId/metrics/$metricId',
       params: { metricId: asset.id || '', chatId: asset.chatId },
@@ -76,6 +91,13 @@ export const createChatAssetRoute = (asset: {
   }
 
   if (asset.asset_type === 'dashboard_file') {
+    if (asset.isEmbed) {
+      return defineLink({
+        to: '/embed/chat/$chatId/dashboards/$dashboardId',
+        params: { dashboardId: asset.id || '', chatId: asset.chatId },
+        search: { dashboard_version_number: asset.versionNumber },
+      });
+    }
     return defineLink({
       to: '/app/chats/$chatId/dashboards/$dashboardId',
       params: { dashboardId: asset.id || '', chatId: asset.chatId },
@@ -84,6 +106,13 @@ export const createChatAssetRoute = (asset: {
   }
 
   if (asset.asset_type === 'report_file') {
+    if (asset.isEmbed) {
+      return defineLink({
+        to: '/embed/chat/$chatId/reports/$reportId',
+        params: { reportId: asset.id || '', chatId: asset.chatId },
+        search: { report_version_number: asset.versionNumber },
+      });
+    }
     return defineLink({
       to: '/app/chats/$chatId/reports/$reportId',
       params: { reportId: asset.id || '', chatId: asset.chatId },
@@ -92,6 +121,12 @@ export const createChatAssetRoute = (asset: {
   }
 
   if (asset.asset_type === 'reasoning') {
+    if (asset.isEmbed) {
+      return defineLink({
+        to: '/embed/chat/$chatId/reasoning/$messageId',
+        params: { messageId: asset.id || '', chatId: asset.chatId },
+      });
+    }
     return defineLink({
       to: '/app/chats/$chatId/reasoning/$messageId',
       params: { chatId: asset.chatId, messageId: asset.id || '' },
@@ -99,6 +134,12 @@ export const createChatAssetRoute = (asset: {
   }
 
   if (asset.asset_type === 'collection') {
+    if (asset.isEmbed) {
+      console.warn('collection is actually not supported for embeds...', asset.id);
+      return defineLink({
+        to: '/auth/login',
+      });
+    }
     return defineLink({
       to: '/app/collections/$collectionId',
       params: { collectionId: asset.id || '' },

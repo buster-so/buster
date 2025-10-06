@@ -250,4 +250,198 @@ export class SQLServerAdapter extends BaseAdapter {
     }
     return this.introspector;
   }
+
+  /**
+   * Check if a table exists in SQL Server
+   */
+  async tableExists(database: string, schema: string, tableName: string): Promise<boolean> {
+    this.ensureConnected();
+
+    if (!this.pool) {
+      throw new Error('SQL Server pool not initialized');
+    }
+
+    try {
+      const request = this.pool.request();
+      const result = await request
+        .input('database', sql.VarChar, database)
+        .input('schema', sql.VarChar, schema)
+        .input('tableName', sql.VarChar, tableName)
+        .query(`
+          SELECT COUNT(*) as count
+          FROM INFORMATION_SCHEMA.TABLES
+          WHERE TABLE_CATALOG = @database
+          AND TABLE_SCHEMA = @schema
+          AND TABLE_NAME = @tableName
+        `);
+
+      const firstRow = result.recordset[0] as { count?: number } | undefined;
+      return !!firstRow && (firstRow.count ?? 0) > 0;
+    } catch (error) {
+      console.error('Error checking table existence:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Create the Buster logs table in SQL Server
+   */
+  async createLogsTable(
+    _database: string,
+    schema: string,
+    tableName = 'buster_query_logs'
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.pool) {
+      throw new Error('SQL Server pool not initialized');
+    }
+
+    const createTableSQL = `
+      IF NOT EXISTS (
+        SELECT * FROM sys.tables t
+        JOIN sys.schemas s ON t.schema_id = s.schema_id
+        WHERE s.name = '${schema}' AND t.name = '${tableName}'
+      )
+      CREATE TABLE [${schema}].[${tableName}] (
+        message_id NVARCHAR(255),
+        user_email NVARCHAR(500),
+        user_name NVARCHAR(500),
+        chat_id NVARCHAR(255),
+        chat_link NVARCHAR(500),
+        request_message NVARCHAR(MAX),
+        created_at DATETIMEOFFSET,
+        duration_seconds INT,
+        confidence_score NVARCHAR(50),
+        assumptions NVARCHAR(MAX),
+        inserted_at DATETIMEOFFSET DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    try {
+      const request = this.pool.request();
+      await request.query(createTableSQL);
+      console.info(`Table ${schema}.${tableName} created successfully`);
+    } catch (error) {
+      throw new Error(
+        `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Insert a log record into the SQL Server table
+   */
+  override async insertLogRecord(
+    _database: string,
+    schema: string,
+    tableName: string,
+    record: {
+      messageId: string;
+      userEmail: string;
+      userName: string;
+      chatId: string;
+      chatLink: string;
+      requestMessage: string;
+      createdAt: Date;
+      durationSeconds: number;
+      confidenceScore: string;
+      assumptions: unknown[];
+    }
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.pool) {
+      throw new Error('SQL Server pool not initialized');
+    }
+
+    const insertSQL = `
+      INSERT INTO [${schema}].[${tableName}] (
+        message_id, 
+        user_email, 
+        user_name, 
+        chat_id,
+        chat_link,
+        request_message,
+        created_at, 
+        duration_seconds, 
+        confidence_score, 
+        assumptions
+      ) VALUES (
+        @messageId,
+        @userEmail,
+        @userName,
+        @chatId,
+        @chatLink,
+        @requestMessage,
+        @createdAt,
+        @durationSeconds,
+        @confidenceScore,
+        @assumptions
+      )
+    `;
+
+    try {
+      const request = this.pool.request();
+      await request
+        .input('messageId', sql.NVarChar, record.messageId)
+        .input('userEmail', sql.NVarChar, record.userEmail)
+        .input('userName', sql.NVarChar, record.userName)
+        .input('chatId', sql.NVarChar, record.chatId)
+        .input('chatLink', sql.NVarChar, record.chatLink)
+        .input('requestMessage', sql.NVarChar, record.requestMessage)
+        .input('createdAt', sql.DateTimeOffset, record.createdAt)
+        .input('durationSeconds', sql.Int, record.durationSeconds)
+        .input('confidenceScore', sql.NVarChar, record.confidenceScore)
+        .input('assumptions', sql.NVarChar, JSON.stringify(record.assumptions))
+        .query(insertSQL);
+
+      console.info(`Log record inserted for message ${record.messageId}`);
+    } catch (error) {
+      throw new Error(
+        `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Execute a write operation (INSERT, UPDATE, DELETE)
+   */
+  override async executeWrite(
+    sql: string,
+    params?: QueryParameter[],
+    timeout?: number
+  ): Promise<{ rowCount: number }> {
+    this.ensureConnected();
+
+    if (!this.pool) {
+      throw new Error('SQL Server pool not initialized');
+    }
+
+    try {
+      const request = this.pool.request();
+
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
+      // SQL Server uses requestTimeout property on the request config
+      (request as unknown as Record<string, unknown>).timeout = timeoutMs;
+
+      // Add parameters if provided
+      if (params && params.length > 0) {
+        params.forEach((param, index) => {
+          request.input(`param${index}`, param);
+        });
+      }
+
+      const result = await request.query(sql);
+
+      return {
+        rowCount: result.rowsAffected[0] ?? 0,
+      };
+    } catch (error) {
+      throw new Error(
+        `SQL Server write operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
 }

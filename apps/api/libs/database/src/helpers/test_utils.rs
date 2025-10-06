@@ -246,6 +246,7 @@ fn create_default_chart_config() -> ChartConfig {
             y: vec!["y".to_string()],
             category: None,
             tooltip: None,
+            color_by: None,
         },
         bar_layout: None,
         bar_sort_by: None,

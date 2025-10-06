@@ -3,14 +3,15 @@ import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { initializeChat } from './chat-service';
 
-import { canUserAccessChatCached } from '@buster/access-controls';
+import { checkPermission } from '@buster/access-controls';
 // Import mocked functions
 import {
   createChat,
   createMessage,
-  generateAssetMessages,
   getChatWithDetails,
-  getMessagesForChat,
+  getMessagesForChatWithUserDetails,
+  getOrganizationMemberCount,
+  getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 
 const mockUser = {
@@ -90,18 +91,34 @@ vi.mock('@buster/database/queries', () => ({
   getChatWithDetails: vi.fn(),
   createMessage: vi.fn(),
   generateAssetMessages: vi.fn(),
-  getMessagesForChat: vi.fn(),
+  getMessagesForChatWithUserDetails: vi.fn(),
   createAssetPermission: vi.fn(),
+  getUsersWithAssetPermissions: vi.fn(),
+  getOrganizationMemberCount: vi.fn(),
 }));
 
 // Mock access-controls
 vi.mock('@buster/access-controls', () => ({
-  canUserAccessChatCached: vi.fn(),
+  checkPermission: vi.fn(),
 }));
 
 describe('chat-service', () => {
+  const mockCheckPermission = checkPermission as any;
+  const mockGetOrganizationMemberCount = getOrganizationMemberCount as any;
+  const mockGetUsersWithAssetPermissions = getUsersWithAssetPermissions as any;
+  const mockGetMessagesForChatWithUserDetails = getMessagesForChatWithUserDetails as any;
+
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Setup default mock returns
+    mockCheckPermission.mockResolvedValue({
+      hasAccess: true,
+      effectiveRole: 'can_view',
+    });
+    mockGetOrganizationMemberCount.mockResolvedValue(5);
+    mockGetUsersWithAssetPermissions.mockResolvedValue([]);
+    mockGetMessagesForChatWithUserDetails.mockResolvedValue([]);
   });
 
   describe('initializeChat', () => {
@@ -117,13 +134,11 @@ describe('chat-service', () => {
     });
 
     it('should add message to existing chat when chat_id is provided', async () => {
-      vi.mocked(canUserAccessChatCached).mockResolvedValue(true);
       vi.mocked(getChatWithDetails).mockResolvedValue({
         chat: mockChat,
         user: { id: 'user-123', name: 'Test User', avatarUrl: null } as any,
         isFavorited: false,
       });
-      vi.mocked(getMessagesForChat).mockResolvedValue([mockMessage]);
       vi.mocked(createMessage).mockResolvedValue({
         ...mockMessage,
         id: 'msg-456',
@@ -136,9 +151,15 @@ describe('chat-service', () => {
         'org-123'
       );
 
-      expect(canUserAccessChatCached).toHaveBeenCalledWith({
+      expect(mockCheckPermission).toHaveBeenCalledWith({
         userId: mockUser.id,
-        chatId: 'chat-123',
+        assetId: 'chat-123',
+        assetType: 'chat',
+        requiredRole: 'can_view',
+        organizationId: '550e8400-e29b-41d4-a716-446655440000',
+        publiclyAccessible: false,
+        publicExpiryDate: undefined,
+        workspaceSharing: undefined,
       });
       expect(createMessage).toHaveBeenCalledWith({
         chatId: 'chat-123',
@@ -150,7 +171,10 @@ describe('chat-service', () => {
     });
 
     it('should throw PERMISSION_DENIED error when user lacks permission', async () => {
-      vi.mocked(canUserAccessChatCached).mockResolvedValue(false);
+      mockCheckPermission.mockResolvedValue({
+        hasAccess: false,
+        effectiveRole: null,
+      });
       vi.mocked(getChatWithDetails).mockResolvedValue({
         chat: mockChat,
         user: { id: 'user-123', name: 'Test User', avatarUrl: null } as any,
@@ -159,14 +183,7 @@ describe('chat-service', () => {
 
       await expect(
         initializeChat({ chat_id: 'chat-123', prompt: 'Hello' }, mockUser, 'org-123')
-      ).rejects.toThrow(ChatError);
-
-      await expect(
-        initializeChat({ chat_id: 'chat-123', prompt: 'Hello' }, mockUser, 'org-123')
-      ).rejects.toMatchObject({
-        code: ChatErrorCode.PERMISSION_DENIED,
-        statusCode: 403,
-      });
+      ).rejects.toThrow('You do not have permission to access this asset');
     });
 
     it('should throw CHAT_NOT_FOUND error when chat does not exist', async () => {

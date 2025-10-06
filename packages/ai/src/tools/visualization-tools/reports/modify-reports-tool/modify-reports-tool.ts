@@ -95,6 +95,7 @@ const ModifyReportsStateSchema = z.object({
     )
     .optional(),
   isComplete: z.boolean().optional().describe('Whether the tool execution is complete'),
+  firstDelta: z.boolean().optional().describe('Whether this is the first delta'),
 });
 
 // Export types
@@ -105,7 +106,8 @@ export type ModifyReportsEditState = z.infer<typeof ModifyReportsEditStateSchema
 
 // Extend the inferred type to include Promise fields (not supported by Zod directly)
 export type ModifyReportsState = z.infer<typeof ModifyReportsStateSchema> & {
-  lastUpdate?: Promise<void>; // Track the last write promise for sequential chaining
+  lastUpdate?: Promise<void>; // Track the last write promise for sequential chaining (deprecated, use lastProcessing)
+  lastProcessing?: Promise<void>; // Track the entire processing chain for proper sequencing
 };
 
 // Factory function that accepts agent context and maps to tool context
@@ -122,6 +124,7 @@ export function createModifyReportsTool(context: ModifyReportsContext) {
     responseMessageCreated: false,
     snapshotContent: undefined,
     reportModifiedInMessage: false,
+    firstDelta: true,
   };
 
   // Create all functions with the context and state passed

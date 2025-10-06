@@ -68,6 +68,7 @@ const createMockChartConfig = (id: string): ChartConfigProps => {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     pieChartAxis: {
       x: ['product'],

@@ -2,7 +2,44 @@ import { createGateway } from '@ai-sdk/gateway';
 import { wrapLanguageModel } from 'ai';
 import { BraintrustMiddleware } from 'braintrust';
 
-export const DEFAULT_ANTHROPIC_OPTIONS = {
+// Provider-specific option types
+export type GatewayProviderOrder = string[];
+
+export type AnthropicOptions = {
+  cacheControl?: { type: 'ephemeral' };
+};
+
+export type BedrockOptions = {
+  cachePoint?: { type: 'default' };
+  additionalModelRequestFields?: {
+    anthropic_beta?: string[];
+  };
+};
+
+export type OpenAIOptions = {
+  // parallelToolCalls?: boolean;
+  reasoningEffort?: 'low' | 'medium' | 'high' | 'minimal';
+  verbosity?: 'low' | 'medium' | 'high';
+};
+
+// Main provider options types
+export type AnthropicProviderOptions = {
+  gateway: {
+    order: GatewayProviderOrder;
+  };
+  anthropic: AnthropicOptions;
+  bedrock: BedrockOptions;
+};
+
+export type OpenAIProviderOptions = {
+  gateway: {
+    order: GatewayProviderOrder;
+  };
+  openai: OpenAIOptions;
+};
+
+// Default options with proper typing
+export const DEFAULT_ANTHROPIC_OPTIONS: AnthropicProviderOptions = {
   gateway: {
     order: ['bedrock', 'anthropic', 'vertex'],
   },
@@ -10,14 +47,14 @@ export const DEFAULT_ANTHROPIC_OPTIONS = {
     cacheControl: { type: 'ephemeral' },
   },
   bedrock: {
-    cacheControl: { type: 'ephemeral' },
+    cachePoint: { type: 'default' },
     additionalModelRequestFields: {
       anthropic_beta: ['fine-grained-tool-streaming-2025-05-14'],
     },
   },
 };
 
-export const DEFAULT_OPENAI_OPTIONS = {
+export const DEFAULT_OPENAI_OPTIONS: OpenAIProviderOptions = {
   gateway: {
     order: ['openai'],
   },

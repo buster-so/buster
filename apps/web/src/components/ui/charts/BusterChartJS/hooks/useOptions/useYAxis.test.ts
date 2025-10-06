@@ -15,6 +15,7 @@ describe('useYAxis', () => {
       x: ['date'],
       category: [],
       tooltip: null,
+      colorBy: null,
     } as ChartEncodes,
     selectedChartType: 'bar',
     columnMetadata: undefined,

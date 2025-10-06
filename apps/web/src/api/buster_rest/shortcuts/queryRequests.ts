@@ -7,7 +7,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { shortcutsQueryKeys } from '@/api/query_keys/shortcuts';
-import type { RustApiError } from '../../errors';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import type { ApiError } from '../../errors';
 import {
   createShortcut,
   deleteShortcut,
@@ -17,13 +18,14 @@ import {
 } from './requests';
 
 export const useListShortcuts = <TData = ListShortcutsResponse>(
-  props?: Omit<UseQueryOptions<ListShortcutsResponse, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  props?: Omit<UseQueryOptions<ListShortcutsResponse, ApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery({
     ...shortcutsQueryKeys.shortcutsGetList,
     queryFn: listShortcuts,
     select: props?.select,
     ...props,
+    initialData: { shortcuts: [] },
   });
 };
 
@@ -40,6 +42,7 @@ export const useGetShortcut = (params: Parameters<typeof getShortcut>[0]) => {
   return useQuery({
     ...shortcutsQueryKeys.shortcutsGet(params.id),
     queryFn,
+    enabled: !!params.id,
   });
 };
 
@@ -71,6 +74,10 @@ export const useCreateShortcut = () => {
         shortcutsQueryKeys.shortcutsGet(newShortcut.id).queryKey,
         newShortcut
       );
+
+      queryClient.invalidateQueries({
+        queryKey: shortcutsQueryKeys.shortcutsGetList.queryKey,
+      });
     },
   });
 };
@@ -167,12 +174,12 @@ export const useUpdateShortcut = () => {
   });
 };
 
-export const useDeleteShortcut = () => {
+export const useDeleteShortcut = (useConfirmModal = true) => {
   const queryClient = useQueryClient();
+  const { openConfirmModal } = useBusterNotifications();
 
-  return useMutation({
-    mutationFn: deleteShortcut,
-    onMutate: async (params) => {
+  const mutationFn = async (params: Parameters<typeof deleteShortcut>[0]) => {
+    const method = async () => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
         queryKey: shortcutsQueryKeys.shortcutsGet(params.id).queryKey,
@@ -203,27 +210,25 @@ export const useDeleteShortcut = () => {
         queryKey: shortcutsQueryKeys.shortcutsGet(params.id).queryKey,
       });
 
-      // Return a context object with the snapshotted values
-      return { previousShortcut, previousShortcuts };
-    },
+      await deleteShortcut(params);
+    };
+
+    if (useConfirmModal) {
+      return openConfirmModal({
+        title: 'Delete shortcut',
+        content: 'Are you sure you want to delete this shortcut?',
+        onOk: method,
+      });
+    }
+    return method();
+  };
+
+  return useMutation({
+    mutationFn: mutationFn,
     onSuccess: () => {
-      // The optimistic update was correct, no need to do anything
-      // The shortcut is already removed from cache
-    },
-    onError: (_error, params, context) => {
-      // Revert the optimistic updates if the mutation fails
-      if (context?.previousShortcut) {
-        queryClient.setQueryData(
-          shortcutsQueryKeys.shortcutsGet(params.id).queryKey,
-          context.previousShortcut
-        );
-      }
-      if (context?.previousShortcuts) {
-        queryClient.setQueryData(
-          shortcutsQueryKeys.shortcutsGetList.queryKey,
-          context.previousShortcuts
-        );
-      }
+      queryClient.invalidateQueries({
+        queryKey: shortcutsQueryKeys.shortcutsGetList.queryKey,
+      });
     },
   });
 };

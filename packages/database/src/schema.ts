@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { isNull, sql } from 'drizzle-orm';
 import {
   bigint,
   boolean,
@@ -47,7 +47,6 @@ import {
   VerificationSchema,
   WorkspaceSharingSchema,
 } from './schema-types';
-import { DEFAULT_USER_SUGGESTED_PROMPTS } from './schema-types/user';
 
 export const assetPermissionRoleEnum = pgEnum(
   'asset_permission_role_enum',
@@ -233,6 +232,7 @@ export const collections = pgTable(
       withTimezone: true,
       mode: 'string',
     }),
+    screenshotBucketKey: text('screenshot_bucket_key'),
   },
   (table) => [
     foreignKey({
@@ -555,7 +555,29 @@ export const users = pgTable(
     avatarUrl: text('avatar_url'),
     suggestedPrompts: jsonb('suggested_prompts')
       .$type<UserSuggestedPromptsType>()
-      .default(DEFAULT_USER_SUGGESTED_PROMPTS)
+      .default(sql`'{
+        "suggestedPrompts": {
+          "report": [
+            "provide a trend analysis of quarterly profits",
+            "evaluate product performance across regions"
+          ],
+          "dashboard": [
+            "create a sales performance dashboard",
+            "design a revenue forecast dashboard"
+          ],
+          "visualization": [
+            "create a metric for monthly sales",
+            "show top vendors by purchase volume"
+          ],
+          "help": [
+            "what types of analyses can you perform?",
+            "what questions can I ask buster?",
+            "what data models are available for queries?",
+            "can you explain your forecasting capabilities?"
+          ]
+        },
+        "updatedAt": "2024-01-01T00:00:00.000Z"
+      }'::jsonb`)
       .notNull(),
     personalizationEnabled: boolean('personalization_enabled').default(false).notNull(),
     personalizationConfig: jsonb('personalization_config')
@@ -664,6 +686,10 @@ export const messagesToFiles = pgTable(
       'btree',
       table.messageId.asc().nullsLast().op('uuid_ops')
     ),
+    // Performance indexes for active messages to files
+    index('idx_mtf_active_by_file')
+      .on(table.messageId)
+      .where(isNull(table.deletedAt)),
     foreignKey({
       columns: [table.messageId],
       foreignColumns: [messages.id],
@@ -716,6 +742,8 @@ export const dashboardFiles = pgTable(
       withTimezone: true,
       mode: 'string',
     }),
+    screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('dashboard_files_created_by_idx').using(
@@ -789,6 +817,8 @@ export const reportFiles = pgTable(
       withTimezone: true,
       mode: 'string',
     }),
+    screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('report_files_created_by_idx').using(
@@ -847,6 +877,7 @@ export const chats = pgTable(
       withTimezone: true,
       mode: 'string',
     }),
+    publicPassword: text('public_password'),
     mostRecentFileId: uuid('most_recent_file_id'),
     mostRecentFileType: assetTypeEnum('most_recent_file_type'),
     mostRecentVersionNumber: integer('most_recent_version_number'),
@@ -859,6 +890,8 @@ export const chats = pgTable(
       withTimezone: true,
       mode: 'string',
     }),
+    screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('chats_created_at_idx').using(
@@ -1009,6 +1042,8 @@ export const metricFiles = pgTable(
       withTimezone: true,
       mode: 'string',
     }),
+    screenshotBucketKey: text('screenshot_bucket_key'),
+    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('metric_files_created_by_idx').using(
@@ -1379,6 +1414,10 @@ export const collectionsToAssets = pgTable(
       columns: [table.collectionId, table.assetId, table.assetType],
       name: 'collections_to_assets_pkey',
     }),
+    // Performance index for active collections lookup by asset
+    index('idx_cta_active_by_asset')
+      .on(table.assetId, table.assetType, table.collectionId)
+      .where(isNull(table.deletedAt)),
   ]
 );
 
@@ -1449,6 +1488,13 @@ export const assetPermissions = pgTable(
       columns: [table.identityId, table.identityType, table.assetId, table.assetType],
       name: 'asset_permissions_pkey',
     }),
+    // Performance index for active permissions lookup by asset and identity
+    index('idx_perm_active_asset_identity')
+      .on(table.assetId, table.assetType, table.identityId, table.identityType)
+      .where(isNull(table.deletedAt)),
+    index('idx_perm_active_identity_asset')
+      .on(table.identityType, table.identityId, table.assetType, table.assetId)
+      .where(isNull(table.deletedAt)),
   ]
 );
 
@@ -1505,6 +1551,10 @@ export const usersToOrganizations = pgTable(
       columns: [table.userId, table.organizationId],
       name: 'users_to_organizations_pkey',
     }),
+    // Performance index for active user organization lookup
+    index('idx_uto_active_by_user')
+      .on(table.userId, table.organizationId)
+      .where(isNull(table.deletedAt)),
   ]
 );
 
@@ -1859,6 +1909,7 @@ export const assetSearchV2 = pgTable(
       .defaultNow()
       .notNull(),
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+    screenshotBucketKey: text('screenshot_bucket_key'),
   },
   (table) => [
     foreignKey({
@@ -1872,5 +1923,58 @@ export const assetSearchV2 = pgTable(
       table.additionalText.asc().nullsLast().op('pgroonga_text_full_text_search_ops_v2')
     ),
     unique('asset_search_v2_asset_type_asset_id_unique').on(table.assetId, table.assetType),
+    index('idx_as2_active_by_asset')
+      .on(table.assetId, table.assetType)
+      .where(isNull(table.deletedAt)),
+    index('idx_as2_active_by_org').on(table.organizationId).where(isNull(table.deletedAt)),
+  ]
+);
+
+// Logs writeback configuration for external data sources
+export const logsWriteBackConfigs = pgTable(
+  'logs_write_back_configs',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    dataSourceId: uuid('data_source_id').notNull(),
+    database: varchar('database', { length: 255 }).notNull(),
+    schema: varchar('schema', { length: 255 }).notNull(),
+    tableName: varchar('table_name', { length: 255 }).default('buster_query_logs').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'logs_write_back_configs_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.dataSourceId],
+      foreignColumns: [dataSources.id],
+      name: 'logs_write_back_configs_data_source_id_fkey',
+    }).onDelete('cascade'),
+    // Ensure only one active config per organization
+    uniqueIndex('logs_write_back_configs_org_unique')
+      .on(table.organizationId)
+      .where(sql`${table.deletedAt} IS NULL`),
+    // Indexes for efficient lookups
+    index('idx_logs_write_back_configs_org_id').using(
+      'btree',
+      table.organizationId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_logs_write_back_configs_data_source_id').using(
+      'btree',
+      table.dataSourceId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_logs_write_back_configs_deleted_at').using(
+      'btree',
+      table.deletedAt.asc().nullsLast()
+    ),
   ]
 );

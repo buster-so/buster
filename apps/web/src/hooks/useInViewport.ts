@@ -1,11 +1,12 @@
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { type RefObject, useEffect, useRef, useState } from 'react';
 
 interface UseInViewportOptions {
   /** The percentage of the element that needs to be visible (0 to 1) */
   threshold?: number;
   /** Margin around the root element (viewport) */
   rootMargin?: string;
+  root?: Element;
 }
 
 /**
@@ -36,6 +37,7 @@ export const useInViewport = (
       {
         threshold: options.threshold ?? 0,
         rootMargin: options.rootMargin ?? '0px',
+        root: options.root,
       }
     );
 
@@ -49,7 +51,7 @@ export const useInViewport = (
         observer.unobserve(currentRef);
       }
     };
-  }, [ref, options.threshold, options.rootMargin]);
+  }, [ref, options.threshold, options.rootMargin, options.root]);
 
   return [inViewport] as const;
 };

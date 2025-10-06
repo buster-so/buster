@@ -2,7 +2,7 @@ import type {
   DeleteChatsRequest,
   DuplicateChatRequest,
   DuplicateChatResponse,
-  GetChatRequest,
+  GetChatRequestParams,
   GetChatResponse,
   GetLogsListRequest,
   GetLogsListResponse,
@@ -14,7 +14,9 @@ import type {
 } from '@buster/server-shared/chats';
 import type {
   ShareDeleteRequest,
+  ShareDeleteResponse,
   SharePostRequest,
+  SharePostResponse,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
 import { mainApi, mainApiV2 } from '../instances';
@@ -30,8 +32,8 @@ export const getListLogs = async (params?: GetLogsListRequest): Promise<GetLogsL
     .then((res) => res.data);
 };
 
-export const getChat = async ({ id }: GetChatRequest): Promise<GetChatResponse> => {
-  return mainApi.get<GetChatResponse>(`${CHATS_BASE}/${id}`).then((res) => res.data);
+export const getChat = async ({ id }: GetChatRequestParams): Promise<GetChatResponse> => {
+  return mainApiV2.get<GetChatResponse>(`${CHATS_BASE}/${id}`).then((res) => res.data);
 };
 
 export const deleteChat = async (data: DeleteChatsRequest): Promise<void> => {
@@ -61,11 +63,15 @@ export const duplicateChat = async ({
 };
 
 export const shareChat = async ({ id, params }: { id: string; params: SharePostRequest }) => {
-  return mainApi.post<string>(`${CHATS_BASE}/${id}/sharing`, params).then((res) => res.data);
+  return mainApiV2
+    .post<SharePostResponse>(`${CHATS_BASE}/${id}/sharing`, params)
+    .then((res) => res.data);
 };
 
 export const unshareChat = async ({ id, data }: { id: string; data: ShareDeleteRequest }) => {
-  return mainApi.delete<boolean>(`${CHATS_BASE}/${id}/sharing`, { data }).then((res) => res.data);
+  return mainApiV2
+    .delete<ShareDeleteResponse>(`${CHATS_BASE}/${id}/sharing`, { data })
+    .then((res) => res.data);
 };
 
 export const updateChatShare = async ({
@@ -75,7 +81,7 @@ export const updateChatShare = async ({
   id: string;
   params: ShareUpdateRequest;
 }) => {
-  return mainApi
+  return mainApiV2
     .put<ShareChatResponse>(`${CHATS_BASE}/${id}/sharing`, params)
     .then((res) => res.data);
 };

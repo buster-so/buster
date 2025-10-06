@@ -26,6 +26,12 @@ const itemMatchesQuery = (item: MentionTriggerItem, query: string): boolean => {
     return results.length > 0;
   }
 
+  if (typeof item.pillLabel === 'string') {
+    const pillLabelFuse = new Fuse([item.pillLabel], fuseConfig);
+    const results = pillLabelFuse.search(query);
+    return results.length > 0;
+  }
+
   // No match if label is not a string and no labelMatches provided
   return false;
 };

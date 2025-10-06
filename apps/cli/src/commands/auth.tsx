@@ -45,6 +45,9 @@ export function Auth({ apiKey, host, local, cloud, clear, noSave, show }: AuthPr
   const [error, setError] = useState<string | null>(null);
   const [existingCreds, setExistingCreds] = useState<Credentials | null>(null);
 
+  // Check if we're in a TTY environment
+  const isTTY = process.stdin.isTTY;
+
   // Initialize based on flags
   useEffect(() => {
     if (show) {
@@ -95,6 +98,13 @@ export function Auth({ apiKey, host, local, cloud, clear, noSave, show }: AuthPr
           setHostValue(initialHost || host || DEFAULT_HOST);
           setApiKeyValue(apiKey);
           setStep('validate');
+        } else if (!isTTY) {
+          // Non-TTY environment - require API key from flags or env
+          console.error('❌ Non-interactive environment detected.');
+          console.error(
+            '   Please provide API key via --api-key flag or BUSTER_API_KEY environment variable.'
+          );
+          exit();
         } else if (initialHost || host) {
           // If we only have host, set it and prompt for API key
           setHostValue(initialHost || host || '');
@@ -107,10 +117,7 @@ export function Auth({ apiKey, host, local, cloud, clear, noSave, show }: AuthPr
     }
   }, [show, clear, apiKey, host, local, cloud, exit]);
 
-  // Handle keyboard input
-  // Check if we're in a TTY environment to avoid errors
-  const isTTY = process.stdin.isTTY;
-
+  // Handle keyboard input only if in TTY mode
   useInput((input, key) => {
     // Skip input handling if not in TTY or not in input steps
     if (!isTTY || (step !== 'host' && step !== 'apikey')) return;

@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card/CardBase';
 
 // Displays a full-screen, visually polished 404 not found state
 // inspired by GlobalErrorCard with consistent styling and components.
-export const NotFoundCard: NotFoundRouteComponent = () => {
+export const NotFoundCard = () => {
   return (
     <section
       className="flex flex-col items-center z-[999] absolute inset-0 top-0 left-0 right-0 bottom-0 justify-center h-full w-full p-8 bg-background"

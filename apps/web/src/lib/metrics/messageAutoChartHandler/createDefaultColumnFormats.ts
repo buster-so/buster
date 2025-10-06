@@ -5,6 +5,7 @@ import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   type SimplifiedColumnType,
 } from '@buster/server-shared/metrics';
+import isEmpty from 'lodash/isEmpty';
 import { create } from 'mutative';
 import { isDateColumnType, isNumericColumnType, simplifyColumnType } from '@/lib/messages';
 
@@ -12,7 +13,7 @@ export const createDefaultColumnLabelFormats = (
   columnLabelFormats: Record<string, ColumnLabelFormat> | undefined,
   columnsMetaData: ColumnMetaData[] | undefined
 ): ChartConfigProps['columnLabelFormats'] => {
-  if (!columnsMetaData) return {};
+  if (isEmpty(columnsMetaData) || !columnsMetaData) return columnLabelFormats || {};
 
   return columnsMetaData.reduce(
     (acc, column) => {

@@ -234,4 +234,99 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
     return this.introspector;
   }
+
+  /**
+   * Insert a log record into the PostgreSQL table
+   */
+  override async insertLogRecord(
+    _database: string,
+    schema: string,
+    tableName: string,
+    record: {
+      messageId: string;
+      userEmail: string;
+      userName: string;
+      chatId: string;
+      chatLink: string;
+      requestMessage: string;
+      createdAt: Date;
+      durationSeconds: number;
+      confidenceScore: string;
+      assumptions: unknown[];
+    }
+  ): Promise<void> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('PostgreSQL client not initialized');
+    }
+
+    const insertSQL = `
+      INSERT INTO "${schema}"."${tableName}" (
+        message_id, 
+        user_email, 
+        user_name, 
+        chat_id,
+        chat_link,
+        request_message,
+        created_at, 
+        duration_seconds, 
+        confidence_score, 
+        assumptions
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `;
+
+    const params = [
+      record.messageId,
+      record.userEmail,
+      record.userName,
+      record.chatId,
+      record.chatLink,
+      record.requestMessage,
+      record.createdAt,
+      record.durationSeconds,
+      record.confidenceScore,
+      JSON.stringify(record.assumptions),
+    ];
+
+    try {
+      await this.client.query(insertSQL, params);
+      console.info(`Log record inserted for message ${record.messageId}`);
+    } catch (error) {
+      throw new Error(
+        `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Execute a write operation (INSERT, UPDATE, DELETE)
+   */
+  override async executeWrite(
+    sql: string,
+    params?: QueryParameter[],
+    timeout?: number
+  ): Promise<{ rowCount: number }> {
+    this.ensureConnected();
+
+    if (!this.client) {
+      throw new Error('PostgreSQL client not initialized');
+    }
+
+    try {
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
+      await this.client.query(`SET statement_timeout = ${timeoutMs}`);
+
+      const result = await this.client.query(sql, params);
+
+      return {
+        rowCount: result.rowCount ?? 0,
+      };
+    } catch (error) {
+      throw new Error(
+        `PostgreSQL write operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
 }

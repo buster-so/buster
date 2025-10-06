@@ -1,3 +1,4 @@
+import { checkPermission } from '@buster/access-controls';
 import {
   checkAssetPermission,
   getReportFileById,
@@ -19,10 +20,13 @@ export async function getReportSharingHandler(
   }
 
   // Check if user has permission to view the report
-  const permissionCheck = await checkAssetPermission({
+  const permissionCheck = await checkPermission({
+    userId: user.id,
     assetId: reportId,
     assetType: 'report_file',
-    userId: user.id,
+    requiredRole: 'can_view',
+    workspaceSharing: report.workspace_sharing,
+    organizationId: report.organization_id,
   });
 
   if (!permissionCheck.hasAccess) {

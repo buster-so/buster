@@ -13,8 +13,16 @@ export const MetricViewChart: React.FC<{
   readOnly?: boolean;
   className?: string;
   cardClassName?: string;
+  animate?: boolean;
 }> = React.memo(
-  ({ metricId, versionNumber, readOnly = false, className = '', cardClassName = '' }) => {
+  ({
+    metricId,
+    versionNumber,
+    readOnly = false,
+    className = '',
+    cardClassName = '',
+    animate = true,
+  }) => {
     const { data: hasMoreRecords } = useGetMetricData(
       { id: metricId, versionNumber },
       { select: stableMetricDataSelect }
@@ -28,6 +36,7 @@ export const MetricViewChart: React.FC<{
             versionNumber={versionNumber}
             readOnly={readOnly}
             className={cardClassName}
+            animate={animate}
           />
           {hasMoreRecords && (
             <MetricDataTruncatedWarning metricId={metricId} metricVersionNumber={versionNumber} />

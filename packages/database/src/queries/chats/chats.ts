@@ -223,3 +223,56 @@ export async function updateChat(
     throw new Error(`Failed to update chat fields for chat ${chatId}`);
   }
 }
+
+/**
+ * Updates a chat's sharing settings
+ */
+export async function updateChatSharing(
+  chatId: string,
+  userId: string,
+  options: {
+    publicly_accessible?: boolean;
+    public_expiry_date?: string | null;
+    workspace_sharing?: 'none' | 'can_view' | 'can_edit' | 'full_access';
+  }
+): Promise<{ success: boolean }> {
+  const updateFields: UpdateableChatFields = {
+    updatedBy: userId,
+  };
+
+  if (options.publicly_accessible !== undefined) {
+    updateFields.publiclyAccessible = options.publicly_accessible;
+    updateFields.publiclyEnabledBy = options.publicly_accessible ? userId : null;
+  }
+
+  if (options.public_expiry_date !== undefined) {
+    updateFields.publicExpiryDate = options.public_expiry_date;
+  }
+
+  if (options.workspace_sharing !== undefined) {
+    updateFields.workspaceSharing = options.workspace_sharing;
+
+    if (options.workspace_sharing !== 'none') {
+      updateFields.workspaceSharingEnabledBy = userId;
+      updateFields.workspaceSharingEnabledAt = new Date().toISOString();
+    } else {
+      updateFields.workspaceSharingEnabledBy = null;
+      updateFields.workspaceSharingEnabledAt = null;
+    }
+  }
+
+  return await updateChat(chatId, updateFields);
+}
+
+/**
+ * Get a chat by ID (simple version for sharing handlers)
+ */
+export async function getChatById(chatId: string): Promise<Chat | null> {
+  const [chat] = await db
+    .select()
+    .from(chats)
+    .where(and(eq(chats.id, chatId), isNull(chats.deletedAt)))
+    .limit(1);
+
+  return chat || null;
+}

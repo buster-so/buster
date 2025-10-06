@@ -156,7 +156,7 @@ describe('Storage Factory', () => {
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
         accountId: 'test-account',
-        bucket: 'metric-exports',
+        bucket: 'development',
         accessKeyId: 'test-key',
         secretAccessKey: 'test-secret',
       });
@@ -198,7 +198,7 @@ describe('Storage Factory', () => {
       process.env.R2_ACCOUNT_ID = 'default-account';
       process.env.R2_ACCESS_KEY_ID = 'default-key';
       process.env.R2_SECRET_ACCESS_KEY = 'default-secret';
-      // Intentionally not setting R2_BUCKET so it uses the default 'metric-exports'
+      // Intentionally not setting R2_BUCKET so it uses the default 'development'
     });
 
     afterEach(() => {
@@ -296,7 +296,7 @@ describe('Storage Factory', () => {
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
         accountId: 'default-account',
-        bucket: 'metric-exports',
+        bucket: 'development',
         accessKeyId: 'default-key',
         secretAccessKey: 'default-secret',
       });
@@ -314,7 +314,7 @@ describe('Storage Factory', () => {
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
         accountId: 'default-account',
-        bucket: 'metric-exports',
+        bucket: 'development',
         accessKeyId: 'default-key',
         secretAccessKey: 'default-secret',
       });
@@ -329,7 +329,7 @@ describe('Storage Factory', () => {
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
         accountId: 'default-account',
-        bucket: 'metric-exports',
+        bucket: 'development',
         accessKeyId: 'default-key',
         secretAccessKey: 'default-secret',
       });
@@ -349,7 +349,7 @@ describe('Storage Factory', () => {
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
         accountId: 'default-account',
-        bucket: 'metric-exports',
+        bucket: 'development',
         accessKeyId: 'default-key',
         secretAccessKey: 'default-secret',
       });
@@ -374,7 +374,7 @@ describe('Storage Factory', () => {
       expect(createR2Provider).toHaveBeenCalledWith({
         provider: 'r2',
         accountId: 'default-account',
-        bucket: 'metric-exports',
+        bucket: 'development',
         accessKeyId: 'default-key',
         secretAccessKey: 'default-secret',
       });

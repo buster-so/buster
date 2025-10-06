@@ -2,58 +2,13 @@ import { checkQueryIsReadOnly } from '@buster/access-controls';
 import { type DataSource, withRateLimit } from '@buster/data-source';
 import { wrapTraced } from 'braintrust';
 import { getDataSource } from '../../../utils/get-data-source';
+import { truncateQueryResults } from '../../shared/smart-truncate';
 import type {
   SuperExecuteSqlContext,
   SuperExecuteSqlInput,
   SuperExecuteSqlOutput,
   SuperExecuteSqlState,
 } from './super-execute-sql';
-
-/**
- * Processes a single column value for truncation
- */
-function processColumnValue(value: unknown, maxLength: number): unknown {
-  if (value === null || value === undefined) {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    return value.length > maxLength ? `${value.slice(0, maxLength)}...[TRUNCATED]` : value;
-  }
-
-  if (typeof value === 'object') {
-    // Always stringify objects/arrays to prevent parser issues
-    const stringValue = JSON.stringify(value);
-    return stringValue.length > maxLength
-      ? `${stringValue.slice(0, maxLength)}...[TRUNCATED]`
-      : stringValue;
-  }
-
-  // For numbers, booleans, etc.
-  const stringValue = String(value);
-  return stringValue.length > maxLength
-    ? `${stringValue.slice(0, maxLength)}...[TRUNCATED]`
-    : value; // Keep original value and type if not too long
-}
-
-/**
- * Truncates query results to prevent overwhelming responses with large JSON objects, arrays, or text
- * Always converts objects/arrays to strings to ensure parser safety
- */
-function truncateQueryResults(
-  rows: Record<string, unknown>[],
-  maxLength = 100
-): Record<string, unknown>[] {
-  return rows.map((row) => {
-    const truncatedRow: Record<string, unknown> = {};
-
-    for (const [key, value] of Object.entries(row)) {
-      truncatedRow[key] = processColumnValue(value, maxLength);
-    }
-
-    return truncatedRow;
-  });
-}
 
 async function executeSingleStatement(
   sqlStatement: string,

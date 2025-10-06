@@ -25,6 +25,19 @@ export interface PaginatedResponse<T> {
   pagination: PaginationMetadata;
 }
 
+export const SearchPaginationSchema = z.object({
+  page: z.number(),
+  page_size: z.number(),
+  has_more: z.boolean(),
+});
+
+export type SearchPaginationMetadata = z.infer<typeof SearchPaginationSchema>;
+
+export interface SearchPaginatedResponse<T> {
+  data: T[];
+  pagination: SearchPaginationMetadata;
+}
+
 // Type helper for creating paginated API responses
 export type WithPagination<T> = {
   [K in keyof T]: T[K];

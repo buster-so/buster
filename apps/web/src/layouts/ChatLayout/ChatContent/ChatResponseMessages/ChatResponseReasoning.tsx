@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/typography';
 import { ShimmerText } from '@/components/ui/typography/ShimmerText';
 import { useGetBlackBoxMessage } from '@/context/BlackBox/blackbox-store';
 import { BLACK_BOX_INITIAL_THOUGHT } from '@/context/BlackBox/useBlackboxMessage';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { useSelectedAssetType } from '@/context/BusterAssets/useSelectedAssetType';
 import { useGetCurrentMessageId } from '@/context/Chats';
 
@@ -31,6 +32,7 @@ export const ChatResponseReasoning: React.FC<{
   const { data: lastMessageTitle } = useGetChatMessage(messageId, {
     select: stableLastMessageTitleSelector,
   });
+  const isEmbed = useIsEmbed();
   const selectedFileType = useSelectedAssetType();
   const isReasonginFileSelected = selectedFileType === 'reasoning' && urlMessageId === messageId;
   const showShimmerText = isReasonginFileSelected
@@ -49,7 +51,11 @@ export const ChatResponseReasoning: React.FC<{
   return (
     <Link
       to={
-        isReasonginFileSelected ? '/app/chats/$chatId' : '/app/chats/$chatId/reasoning/$messageId'
+        isEmbed
+          ? '/embed/chat/$chatId/reasoning/$messageId'
+          : isReasonginFileSelected
+            ? '/app/chats/$chatId'
+            : '/app/chats/$chatId/reasoning/$messageId'
       }
       params={{
         chatId,

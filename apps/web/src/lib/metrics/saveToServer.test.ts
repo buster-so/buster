@@ -1,10 +1,6 @@
-import type { ChartType } from '@buster/server-shared/metrics';
 import { describe, expect, it } from 'vitest';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
-import {
-  getChangedTopLevelMessageValues,
-  getChangesFromDefaultChartConfig,
-} from './saveToServerHelpers';
+import { getChangedTopLevelMessageValues } from './saveToServerHelpers';
 
 // Mock minimal metric objects for testing
 const createMockMetric = (overrides?: Partial<BusterMetric>): BusterMetric =>
@@ -145,76 +141,5 @@ describe('getChangedTopLevelMessageValues', () => {
     const result = getChangedTopLevelMessageValues(newMetric, oldMetric);
 
     expect(result).toEqual({ name: 'Updated Metric Name is a good name' });
-  });
-});
-
-// Tests for getChangesFromDefaultChartConfig
-describe('getChangesFromDefaultChartConfig', () => {
-  it('should return empty object when chart_config is undefined', () => {
-    const metric = createMockMetric({ chart_config: undefined });
-
-    const result = getChangesFromDefaultChartConfig(metric);
-
-    expect(result).toEqual({});
-  });
-
-  it('should detect changes from default chart config', () => {
-    // Create a metric with partial chart config that will be merged with defaults
-    const metric = createMockMetric();
-    // Assert on a non-typed partial chart_config to avoid TypeScript errors
-    // @ts-expect-error - We're testing runtime behavior, TypeScript doesn't need to validate this test data
-    metric.chart_config = {
-      selectedChartType: 'bar',
-      showLegend: true,
-      xAxisShowAxisLabel: false,
-      colors: ['#FF0000', '#00FF00', '#0000FF'], // Custom colors
-    };
-
-    const result = getChangesFromDefaultChartConfig(metric);
-
-    expect(result).toEqual({
-      selectedChartType: 'bar',
-      showLegend: true,
-      xAxisShowAxisLabel: false,
-      colors: ['#FF0000', '#00FF00', '#0000FF'],
-    });
-  });
-
-  it('should detect and filter changes in column label formats', () => {
-    const metric = createMockMetric();
-
-    // Create the chart config manually to avoid type issues
-    const chartConfig = {} as any;
-    chartConfig.columnLabelFormats = {
-      revenue: {
-        style: 'currency',
-        currency: 'EUR',
-        compactNumbers: true,
-        makeLabelHumanReadable: true,
-      },
-      date: {
-        columnType: 'date',
-        isUTC: true,
-      },
-    };
-
-    metric.chart_config = chartConfig;
-
-    const result = getChangesFromDefaultChartConfig(metric);
-
-    // Should only include the properties that differ from defaults
-    expect(result).toEqual({
-      columnLabelFormats: {
-        revenue: {
-          style: 'currency',
-          currency: 'EUR',
-          compactNumbers: true,
-        },
-        date: {
-          columnType: 'date',
-          isUTC: true,
-        },
-      },
-    });
   });
 });

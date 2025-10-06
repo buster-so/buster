@@ -6,9 +6,7 @@ import { ReportEditorSkeleton } from './ReportEditorSkeleton';
 
 const DynamicReportEditorBase = lazy(() =>
   import('@/components/ui/report/ReportEditor').then((mod) => {
-    return {
-      default: mod.ReportEditor,
-    };
+    return { default: mod.ReportEditor };
   })
 );
 

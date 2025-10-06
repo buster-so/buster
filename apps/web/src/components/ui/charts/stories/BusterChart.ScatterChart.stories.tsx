@@ -37,6 +37,7 @@ export const Default: Story = {
       y: ['y'],
       tooltip: null,
       size: [],
+
       category: [],
     },
     columnLabelFormats: {
@@ -78,6 +79,7 @@ export const WithCategory: Story = {
       y: ['y'],
       size: [],
       tooltip: null,
+
       category: ['category'],
     },
   },
@@ -150,6 +152,7 @@ export const LargeDatasetWithCategory: Story = {
       y: ['y'],
       size: [],
       tooltip: null,
+
       category: ['category'],
     },
   },
@@ -259,6 +262,7 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
       y: ['revenue'],
       tooltip: null,
       size: [],
+
       category: [],
     },
     className: 'w-[800px] h-[400px]',

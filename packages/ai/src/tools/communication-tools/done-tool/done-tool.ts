@@ -15,6 +15,11 @@ export const DoneToolInputSchema = z.object({
         assetId: z.string().uuid(),
         assetName: z.string(),
         assetType: AssetTypeSchema,
+        versionNumber: z
+          .number()
+          .int()
+          .positive()
+          .describe('The version number of the asset to return'),
       })
     )
     .describe(
@@ -60,17 +65,24 @@ const DoneToolStateSchema = z.object({
     .array(
       z.object({
         assetId: z.string(),
-        assetType: z.enum([
-          'metric_file',
-          'dashboard_file',
-          'report_file',
-          'analyst_chat',
-          'collection',
-        ]),
+        assetType: AssetTypeSchema,
+        versionNumber: z.number(),
       })
     )
     .optional()
-    .describe('Assets that have been added with their types for chat update'),
+    .describe('Assets that have been added with their types and version numbers for chat update'),
+  isFinalizing: z
+    .boolean()
+    .optional()
+    .describe('Indicates the execute phase has started so further deltas should be ignored'),
+  latestSequenceNumber: z
+    .number()
+    .optional()
+    .describe('Highest message update sequence number observed during streaming'),
+  finalSequenceNumber: z
+    .number()
+    .optional()
+    .describe('Sequence number for the final execute message update'),
 });
 
 export type DoneToolInput = z.infer<typeof DoneToolInputSchema>;
@@ -85,12 +97,14 @@ export function createDoneTool(context: DoneToolContext) {
     finalResponse: undefined,
     addedAssetIds: [],
     addedAssets: [],
+    isFinalizing: false,
+    latestSequenceNumber: undefined,
+    finalSequenceNumber: undefined,
   };
 
   const execute = createDoneToolExecute(context, state);
   const onInputStart = createDoneToolStart(context, state);
   const onInputDelta = createDoneToolDelta(context, state);
-  const onInputAvailable = createDoneToolFinish(context, state);
 
   return tool({
     description:
@@ -100,7 +114,6 @@ export function createDoneTool(context: DoneToolContext) {
     execute,
     onInputStart,
     onInputDelta,
-    onInputAvailable,
   });
 }
 

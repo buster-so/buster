@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import type { BusterChatMessage, BusterChatResponseMessage_file } from '@/api/asset_interfaces';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { useIsEmbed } from '@/context/BusterAssets/useIsEmbed';
 import { createChatAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import type { ILinkProps } from '@/types/routes';
 import type { ChatResponseMessageProps } from '../ChatResponseMessageSelector';
@@ -21,12 +22,14 @@ export const ChatResponseMessage_File: React.FC<ChatResponseMessageProps> = Reac
     const { file_type } = responseMessage;
 
     const { isSelectedFile } = useGetIsSelectedFile({ responseMessage });
+    const isEmbed = useIsEmbed();
 
     const linkParams = createChatAssetRoute({
       asset_type: file_type,
       id: responseMessage.id,
       chatId,
       versionNumber: responseMessage.version_number,
+      isEmbed,
     }) as unknown as ILinkProps;
 
     const SelectedComponent = useMemo(() => {

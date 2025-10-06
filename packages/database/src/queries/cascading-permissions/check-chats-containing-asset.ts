@@ -9,11 +9,12 @@ export interface ChatWithSharing {
   workspaceSharing: WorkspaceSharing | null;
   publiclyAccessible: boolean;
   publicExpiryDate: string | null;
+  publicPassword: string | null;
 }
 
 export async function checkChatsContainingAsset(
   assetId: string,
-  _assetType: 'metric_file' | 'dashboard_file'
+  _assetType: 'metric_file' | 'dashboard_file' | 'report_file'
 ): Promise<ChatWithSharing[]> {
   const result = await db
     .selectDistinct({
@@ -22,6 +23,7 @@ export async function checkChatsContainingAsset(
       workspaceSharing: chats.workspaceSharing,
       publiclyAccessible: chats.publiclyAccessible,
       publicExpiryDate: chats.publicExpiryDate,
+      publicPassword: chats.publicPassword,
     })
     .from(messagesToFiles)
     .innerJoin(messages, eq(messages.id, messagesToFiles.messageId))

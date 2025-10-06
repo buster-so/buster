@@ -2,10 +2,9 @@ import { ClientOnly } from '@tanstack/react-router';
 import type React from 'react';
 import { useMemo } from 'react';
 import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
+import { BusterChatInput } from '@/components/features/input/BusterChatInput';
 import { Title } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
-import { isServer } from '@/lib/window';
-import { NewChatInput } from './NewChatInput';
 import { NewChatWarning } from './NewChatWarning';
 import { useNewChatWarning } from './useNewChatWarning';
 
@@ -42,7 +41,7 @@ export const HomePageController: React.FC<{
               </Title>
             </div>
 
-            <NewChatInput initialValue={initialValue} autoSubmit={autoSubmit} />
+            <BusterChatInput initialValue={initialValue} autoSubmit={autoSubmit} />
           </div>
         </ClientOnly>
       )}

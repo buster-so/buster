@@ -29,7 +29,7 @@ export function getDefaultProvider(): StorageProvider {
   const accountId = process.env.R2_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const bucket = process.env.R2_BUCKET || 'metric-exports';
+  const bucket = process.env.R2_BUCKET ?? 'development';
 
   if (!accountId || !accessKeyId || !secretAccessKey) {
     throw new Error('Default R2 storage credentials not configured');

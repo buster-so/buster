@@ -1,5 +1,13 @@
 import type { SuggestionProps } from '@tiptap/suggestion';
-import React, { useEffect, useImperativeHandle, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { cn } from '@/lib/utils';
 import type {
   MentionInputTriggerItem,
   MentionOnSelectParams,
@@ -19,12 +27,21 @@ export interface MentionListImperativeHandle {
 export type MentionListProps<T = string> = SuggestionProps<
   MentionInputTriggerItem<T>,
   MentionTriggerItem<T> & { trigger: string }
-> & { trigger: string; emptyState?: React.ReactNode };
+> & { trigger: string; emptyState?: React.ReactNode; className?: string };
 
 function MentionListInner<T = string>(
-  { trigger, emptyState, items, command }: MentionListProps<T>,
+  {
+    trigger,
+    emptyState,
+    items,
+    command,
+    className,
+    query: _query,
+    editor: _editor,
+  }: MentionListProps<T>,
   ref: React.ForwardedRef<MentionListImperativeHandle>
 ) {
+  const listRef = useRef<HTMLDivElement>(null);
   const [selectedItem, setSelectedItem] = useState<T | undefined>(undefined);
 
   const selectItem = (value: T) => {
@@ -97,24 +114,57 @@ function MentionListInner<T = string>(
   }));
 
   return (
-    <div className="flex flex-col p-1 bg-background rounded border w-full min-w-[200px]">
-      {items.length ? (
-        items.map((item, index: number) => (
-          <MentionListSelector<T>
-            key={index}
-            {...item}
-            selectedItem={selectedItem}
-            setSelectedItem={setSelectedItem}
-            onSelectItem={selectItem}
-          />
-        ))
-      ) : (
-        <div className="text-gray-light">{emptyState || 'No results'}</div>
-      )}
-    </div>
+    <MentionListProvider listRef={listRef}>
+      <div
+        ref={listRef}
+        data-testid="mention-list"
+        className={cn(
+          'flex flex-col p-1 bg-background rounded border w-full min-w-[200px] max-w-[280px] overflow-x-auto',
+          'max-h-[300px] overflow-y-auto',
+          className
+        )}
+      >
+        {items.length ? (
+          items.map((item, index: number) => (
+            <MentionListSelector<T>
+              key={index}
+              {...item}
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+              onSelectItem={selectItem}
+            />
+          ))
+        ) : (
+          <div className="text-gray-light min-h-8 flex items-center justify-center">
+            {emptyState || 'No results'}
+          </div>
+        )}
+      </div>
+    </MentionListProvider>
   );
 }
 
 export const MentionList = React.forwardRef(MentionListInner) as <T = string>(
   props: MentionListProps<T> & { ref?: React.ForwardedRef<MentionListImperativeHandle> }
 ) => ReturnType<typeof MentionListInner> & { displayName?: string };
+
+const MentionListContext = createContext<{
+  listRef: React.RefObject<HTMLDivElement | null> | null;
+}>({
+  listRef: null,
+});
+
+const MentionListProvider = ({
+  children,
+  listRef,
+}: {
+  children: React.ReactNode;
+  listRef: React.RefObject<HTMLDivElement | null>;
+}) => {
+  return <MentionListContext.Provider value={{ listRef }}>{children}</MentionListContext.Provider>;
+};
+
+export const useMentionListRef = () => {
+  const { listRef } = useContext(MentionListContext);
+  return listRef;
+};

@@ -63,6 +63,7 @@ export const Default: Story = {
       y: ['sales', 'units', 'returns'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       sales: {
@@ -70,7 +71,7 @@ export const Default: Story = {
         columnType: 'number',
         style: 'currency',
         currency: 'USD',
-        displayName: 'SALES',
+        displayName: 'Sales',
       } as ColumnLabelFormat,
       units: {
         ...DEFAULT_COLUMN_LABEL_FORMAT,
@@ -109,6 +110,7 @@ export const MultipleYAxis: Story = {
       y: ['sales', 'units'],
       category: [],
       tooltip: null,
+      colorBy: [],
     } satisfies BarAndLineAxis,
     columnLabelFormats: {
       category: {
@@ -199,6 +201,7 @@ export const WithCategory: Story = {
       y: ['sales'],
       category: ['product'],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       region: {
@@ -244,6 +247,7 @@ export const WithCategoryAndMultipleYAxis: Story = {
       y: ['sales', 'units'],
       category: ['product'],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       region: {
@@ -292,6 +296,7 @@ export const DateXAxis: Story = {
       y: ['sales', 'units'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       date: {
@@ -330,6 +335,7 @@ export const HorizontalBar: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       category: {
@@ -373,6 +379,7 @@ export const WithDataLabels: Story = {
       y: ['sales', 'units'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnSettings: {
       sales: {
@@ -426,6 +433,7 @@ export const WithDataLabelsAndStackTotal: Story = {
       y: ['units', 'sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     barGroupType: 'stack',
     barShowTotalAtTop: true,
@@ -528,6 +536,7 @@ export const LargeDataset: Story = {
       y: ['sales', 'units', 'returns'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       category: {
@@ -568,6 +577,7 @@ export const LargeDatasetWithDualYAxis: Story = {
       y2: ['units'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       category: {
@@ -608,6 +618,7 @@ export const WithSorting: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     barSortBy: ['asc'],
   },
@@ -625,6 +636,7 @@ export const WithDatesInXAxis: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       date: {
@@ -653,6 +665,7 @@ export const WithDatesInXAxisAndSorting: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     barSortBy: ['asc'],
     columnLabelFormats: {
@@ -683,6 +696,7 @@ export const HorizontalBarWithGoalLine: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       category: {
@@ -749,6 +763,7 @@ export const GroupedBar: Story = {
       y: ['sales'],
       category: ['product'],
       tooltip: null,
+      colorBy: [],
     },
     barGroupType: 'group',
     columnLabelFormats: {
@@ -810,6 +825,7 @@ export const PercentageStackedBar: Story = {
       y: ['sales'],
       category: ['product'],
       tooltip: null,
+      colorBy: [],
     },
     barGroupType: 'percentage-stack',
     columnSettings: {
@@ -871,6 +887,7 @@ export const ExtraLargeDataset: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       category: {
@@ -913,6 +930,7 @@ export const ExtraLargeDatasetWithCategory: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnLabelFormats: {
       category: {
@@ -959,6 +977,7 @@ export const ManyUnPlottedTooltipItems: Story = {
       y: ['sales'],
       category: [],
       tooltip: ['sales', 'customerRating', 'stockLevel', 'returnRate'],
+      colorBy: [],
     },
     columnSettings: {
       sales: {
@@ -1078,6 +1097,7 @@ export const WithMultipleXAxis: Story = {
       y: ['sales'],
       category: [],
       tooltip: null,
+      colorBy: [],
     } satisfies BarAndLineAxis,
   },
 };
@@ -1171,79 +1191,6 @@ export const WithTrendlines: Story = {
   },
 };
 
-//IT got the x and y axis mixed up... which is fair...
-export const ProblematicBarChart: Story = {
-  args: {
-    selectedChartType: 'bar',
-    barLayout: 'horizontal',
-    barAndLineAxis: {
-      x: ['metric_clv_all_time'],
-      y: ['customer_name'],
-      category: [],
-      tooltip: null,
-    },
-    columnLabelFormats: {
-      customer_name: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        columnType: 'text',
-        style: 'string',
-        numberSeparatorStyle: null,
-        replaceMissingDataWith: null,
-      },
-      metric_clv_all_time: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        columnType: 'number',
-        style: 'currency',
-        numberSeparatorStyle: ',',
-        replaceMissingDataWith: 0,
-        currency: 'USD',
-      },
-    },
-    data: [
-      {
-        customer_name: 'Customer A',
-        metric_clv_all_time: 800000.0,
-      },
-      {
-        customer_name: 'Customer B',
-        metric_clv_all_time: 780000.0,
-      },
-      {
-        customer_name: 'Customer C',
-        metric_clv_all_time: 760000.0,
-      },
-      {
-        customer_name: 'Customer D',
-        metric_clv_all_time: 740000.0,
-      },
-      {
-        customer_name: 'Customer E',
-        metric_clv_all_time: 720000.0,
-      },
-      {
-        customer_name: 'Customer F',
-        metric_clv_all_time: 700000.0,
-      },
-      {
-        customer_name: 'Customer G',
-        metric_clv_all_time: 680000.0,
-      },
-      {
-        customer_name: 'Customer H',
-        metric_clv_all_time: 660000.0,
-      },
-      {
-        customer_name: 'Customer I',
-        metric_clv_all_time: 640000.0,
-      },
-      {
-        customer_name: 'Customer J',
-        metric_clv_all_time: 620000.0,
-      },
-    ],
-  },
-};
-
 export const WithYearInXAxis: Story = {
   args: {
     ...Default.args,
@@ -1270,6 +1217,83 @@ export const WithYearInXAxis: Story = {
   },
 };
 
+export const WithColorByXAxis: Story = {
+  args: {
+    ...Default.args,
+    showLegend: true,
+    data: [
+      {
+        sales: 1000,
+        type: 'Type 1',
+        level: 'Level 1',
+      },
+      {
+        sales: 2000,
+        type: 'Type 2',
+        level: 'Level 2',
+      },
+      {
+        sales: 1200,
+        type: 'Type 3',
+        level: 'Level 1',
+      },
+    ],
+    barAndLineAxis: {
+      x: ['type'],
+      y: ['sales'],
+      category: [],
+      tooltip: null,
+      colorBy: ['level'],
+    },
+  },
+};
+
+export const WithColorBy: Story = {
+  args: {
+    ...Default.args,
+    showLegend: true,
+    data: [
+      {
+        sales: 1000,
+        type: 'Type 1',
+        level: 'Level 1',
+      },
+      {
+        sales: 2000,
+        type: 'Type 2',
+        level: 'Level 2',
+      },
+      {
+        sales: 1200,
+        type: 'Type 3',
+        level: 'Level 1',
+      },
+      {
+        sales: 1500,
+        type: 'Type 4',
+        level: 'Level 1',
+      },
+      {
+        sales: 1500,
+        type: 'Type 5',
+        level: 'Level 3',
+      },
+      {
+        sales: 900,
+        type: 'Type 6',
+        level: 'Level 4',
+      },
+    ],
+    barAndLineAxis: {
+      x: ['type'],
+      y: ['sales'],
+      category: [],
+      tooltip: null,
+      colorBy: ['level'],
+    },
+  },
+};
+
 export const BarChartWithProblemData: Story = {
   args: {
     barLayout: 'vertical',
@@ -1279,6 +1303,7 @@ export const BarChartWithProblemData: Story = {
       y: ['percentage_within_motivation'],
       category: ['category_name'],
       tooltip: null,
+      colorBy: [],
     },
     columnSettings: {
       category_name: {
@@ -1509,6 +1534,7 @@ export const BarChartWithSortedDayOfWeek: Story = {
       y: ['message_count'],
       category: [],
       tooltip: null,
+      colorBy: [],
     },
     columnSettings: {
       day_of_week: {
@@ -1627,6 +1653,557 @@ export const BarChartWithSortedDayOfWeek: Story = {
       {
         day_of_week: 6,
         message_count: 5,
+      },
+    ],
+  },
+};
+
+export const BarWithProblemQuarters: Story = {
+  args: {
+    colors: [
+      '#B399FD',
+      '#FC8497',
+      '#FBBC30',
+      '#279EFF',
+      '#E83562',
+      '#41F8FF',
+      '#F3864F',
+      '#C82184',
+      '#31FCB4',
+      '#E83562',
+    ],
+    barLayout: 'vertical',
+    barSortBy: [],
+    goalLines: [],
+    gridLines: true,
+    pieSortBy: 'value',
+    showLegend: null,
+    trendlines: [],
+    scatterAxis: {
+      x: [],
+      y: [],
+      size: [],
+      tooltip: null,
+      category: [],
+    },
+    barGroupType: 'stack',
+    metricHeader: null,
+    pieChartAxis: {
+      x: [],
+      y: [],
+      tooltip: null,
+    },
+    lineGroupType: null,
+    pieDonutWidth: 40,
+    xAxisDataZoom: false,
+    barAndLineAxis: {
+      x: ['quarter'],
+      y: ['product_count'],
+      colorBy: [],
+      tooltip: null,
+      category: ['metric_seasoncategory'],
+    },
+    columnSettings: {},
+    comboChartAxis: {
+      x: [],
+      y: [],
+      y2: [],
+      colorBy: [],
+      tooltip: null,
+      category: [],
+    },
+    disableTooltip: false,
+    metricColumnId: '',
+    scatterDotSize: [3, 15],
+    xAxisAxisTitle: null,
+    yAxisAxisTitle: null,
+    yAxisScaleType: 'linear',
+    metricSubHeader: null,
+    y2AxisAxisTitle: null,
+    y2AxisScaleType: 'linear',
+    metricValueLabel: null,
+    pieLabelPosition: 'none',
+    tableColumnOrder: null,
+    barShowTotalAtTop: false,
+    categoryAxisTitle: null,
+    pieDisplayLabelAs: 'number',
+    pieShowInnerLabel: true,
+    selectedChartType: 'bar',
+    tableColumnWidths: null,
+    xAxisTimeInterval: null,
+    columnLabelFormats: {
+      quarter: {
+        isUTC: false,
+        style: 'date',
+        prefix: '',
+        suffix: '',
+        currency: 'USD',
+        columnType: 'number',
+        dateFormat: 'auto',
+        multiplier: 1,
+        displayName: '',
+        compactNumbers: false,
+        convertNumberTo: 'quarter',
+        useRelativeTime: false,
+        numberSeparatorStyle: null,
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        makeLabelHumanReadable: true,
+        replaceMissingDataWith: 0,
+      },
+      product_count: {
+        isUTC: false,
+        style: 'number',
+        prefix: '',
+        suffix: '',
+        currency: 'USD',
+        columnType: 'number',
+        dateFormat: 'auto',
+        multiplier: 1,
+        displayName: 'Product Count',
+        compactNumbers: false,
+        convertNumberTo: null,
+        useRelativeTime: false,
+        numberSeparatorStyle: ',',
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+        makeLabelHumanReadable: true,
+        replaceMissingDataWith: 0,
+      },
+      metric_seasoncategory: {
+        isUTC: false,
+        style: 'string',
+        prefix: '',
+        suffix: '',
+        currency: 'USD',
+        columnType: 'text',
+        dateFormat: 'auto',
+        multiplier: 1,
+        displayName: 'Season Category',
+        compactNumbers: false,
+        convertNumberTo: null,
+        useRelativeTime: false,
+        numberSeparatorStyle: null,
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        makeLabelHumanReadable: true,
+        replaceMissingDataWith: null,
+      },
+    },
+    pieInnerLabelTitle: null,
+    showLegendHeadline: false,
+    xAxisLabelRotation: 'auto',
+    xAxisShowAxisLabel: true,
+    xAxisShowAxisTitle: true,
+    yAxisShowAxisLabel: true,
+    yAxisShowAxisTitle: true,
+    y2AxisShowAxisLabel: true,
+    y2AxisShowAxisTitle: true,
+    metricValueAggregate: 'sum',
+    tableColumnFontColor: null,
+    tableHeaderFontColor: null,
+    yAxisStartAxisAtZero: null,
+    y2AxisStartAxisAtZero: true,
+    pieInnerLabelAggregate: 'sum',
+    pieMinimumSlicePercentage: 0,
+    tableHeaderBackgroundColor: null,
+    data: [
+      {
+        quarter: 1,
+        metric_seasoncategory: 'High Season',
+        product_count: 55,
+      },
+      {
+        quarter: 1,
+        metric_seasoncategory: 'Low Season',
+        product_count: 18,
+      },
+      {
+        quarter: 1,
+        metric_seasoncategory: 'Regular Season',
+        product_count: 174,
+      },
+      {
+        quarter: 2,
+        metric_seasoncategory: 'High Season',
+        product_count: 27,
+      },
+      {
+        quarter: 2,
+        metric_seasoncategory: 'Low Season',
+        product_count: 60,
+      },
+      {
+        quarter: 2,
+        metric_seasoncategory: 'Regular Season',
+        product_count: 156,
+      },
+      {
+        quarter: 3,
+        metric_seasoncategory: 'High Season',
+        product_count: 2,
+      },
+      {
+        quarter: 3,
+        metric_seasoncategory: 'Low Season',
+        product_count: 181,
+      },
+      {
+        quarter: 3,
+        metric_seasoncategory: 'Regular Season',
+        product_count: 82,
+      },
+      {
+        quarter: 4,
+        metric_seasoncategory: 'High Season',
+        product_count: 136,
+      },
+      {
+        quarter: 4,
+        metric_seasoncategory: 'Low Season',
+        product_count: 22,
+      },
+      {
+        quarter: 4,
+        metric_seasoncategory: 'Regular Season',
+        product_count: 108,
+      },
+    ],
+    columnMetadata: [
+      {
+        name: 'quarter',
+        min_value: 1,
+        max_value: 4,
+        unique_values: 4,
+        simple_type: 'number',
+        type: 'numeric',
+      },
+      {
+        name: 'metric_seasoncategory',
+        min_value: 'High Season',
+        max_value: 'Regular Season',
+        unique_values: 3,
+        simple_type: 'text',
+        type: 'text',
+      },
+      {
+        name: 'product_count',
+        min_value: 2,
+        max_value: 181,
+        unique_values: 12,
+        simple_type: 'number',
+        type: 'int8',
+      },
+    ],
+  },
+};
+
+export const BarChatWithProblemDates: Story = {
+  decorators: [
+    (Story) => {
+      return (
+        <div style={{ width: '650px', height: '100%' }}>
+          <Story />
+        </div>
+      );
+    },
+  ],
+  args: {
+    className: 'w-[650px] h-[400px]',
+    colors: [
+      '#B399FD',
+      '#FC8497',
+      '#FBBC30',
+      '#279EFF',
+      '#E83562',
+      '#41F8FF',
+      '#F3864F',
+      '#C82184',
+      '#31FCB4',
+      '#E83562',
+    ],
+    barLayout: 'vertical',
+    barSortBy: [],
+    goalLines: [],
+    gridLines: true,
+    pieSortBy: 'value',
+    showLegend: null,
+    trendlines: [],
+    scatterAxis: {
+      x: [],
+      y: [],
+      size: [],
+      tooltip: null,
+      category: [],
+    },
+    barGroupType: 'group',
+    metricHeader: null,
+    pieChartAxis: {
+      x: [],
+      y: [],
+      tooltip: null,
+    },
+    lineGroupType: null,
+    pieDonutWidth: 40,
+    xAxisDataZoom: false,
+    barAndLineAxis: {
+      x: ['time_stamp'],
+      y: ['watch_time'],
+      colorBy: [],
+      tooltip: null,
+      category: [],
+    },
+    columnSettings: {},
+    comboChartAxis: {
+      x: [],
+      y: [],
+      y2: [],
+      colorBy: [],
+      tooltip: null,
+      category: [],
+    },
+    disableTooltip: false,
+    metricColumnId: '',
+    scatterDotSize: [3, 15],
+    xAxisAxisTitle: null,
+    yAxisAxisTitle: null,
+    yAxisScaleType: 'linear',
+    metricSubHeader: null,
+    y2AxisAxisTitle: null,
+    y2AxisScaleType: 'linear',
+    metricValueLabel: null,
+    pieLabelPosition: 'none',
+    tableColumnOrder: null,
+    barShowTotalAtTop: false,
+    categoryAxisTitle: null,
+    pieDisplayLabelAs: 'number',
+    pieShowInnerLabel: true,
+    selectedChartType: 'bar',
+    tableColumnWidths: null,
+    xAxisTimeInterval: null,
+    columnLabelFormats: {
+      watch_time: {
+        isUTC: false,
+        style: 'number',
+        prefix: '',
+        suffix: '',
+        currency: 'USD',
+        columnType: 'number',
+        dateFormat: 'auto',
+        multiplier: 1,
+        displayName: 'New Hours Added',
+        compactNumbers: false,
+        convertNumberTo: null,
+        useRelativeTime: false,
+        numberSeparatorStyle: ',',
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 1,
+        makeLabelHumanReadable: true,
+        replaceMissingDataWith: 0,
+      },
+      time_stamp: {
+        isUTC: true,
+        style: 'date',
+        prefix: '',
+        suffix: '',
+        currency: 'USD',
+        columnType: 'date',
+        dateFormat: 'MMM YYYY',
+        multiplier: 1,
+        displayName: 'Month',
+        compactNumbers: false,
+        convertNumberTo: null,
+        useRelativeTime: false,
+        numberSeparatorStyle: null,
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        makeLabelHumanReadable: true,
+        replaceMissingDataWith: null,
+      },
+    },
+    pieInnerLabelTitle: null,
+    showLegendHeadline: false,
+    xAxisLabelRotation: 'auto',
+    xAxisShowAxisLabel: true,
+    xAxisShowAxisTitle: true,
+    yAxisShowAxisLabel: true,
+    yAxisShowAxisTitle: true,
+    y2AxisShowAxisLabel: true,
+    y2AxisShowAxisTitle: true,
+    metricValueAggregate: 'sum',
+    tableColumnFontColor: null,
+    tableHeaderFontColor: null,
+    yAxisStartAxisAtZero: null,
+    y2AxisStartAxisAtZero: true,
+    pieInnerLabelAggregate: 'sum',
+    pieMinimumSlicePercentage: 0,
+    tableHeaderBackgroundColor: null,
+    data: [
+      {
+        time_stamp: '2022-06-01T00:00:00.000Z',
+        watch_time: 30.706111,
+      },
+      {
+        time_stamp: '2022-07-01T00:00:00.000Z',
+        watch_time: 4.4875,
+      },
+      {
+        time_stamp: '2022-09-01T00:00:00.000Z',
+        watch_time: 5.646944,
+      },
+      {
+        time_stamp: '2022-10-01T00:00:00.000Z',
+        watch_time: 7.295,
+      },
+      {
+        time_stamp: '2022-11-01T00:00:00.000Z',
+        watch_time: 22.980556,
+      },
+      {
+        time_stamp: '2022-12-01T00:00:00.000Z',
+        watch_time: 3.955833,
+      },
+      {
+        time_stamp: '2023-01-01T00:00:00.000Z',
+        watch_time: 3.107778,
+      },
+      {
+        time_stamp: '2023-02-01T00:00:00.000Z',
+        watch_time: 6.12,
+      },
+      {
+        time_stamp: '2023-03-01T00:00:00.000Z',
+        watch_time: 5.703611,
+      },
+      {
+        time_stamp: '2023-04-01T00:00:00.000Z',
+        watch_time: 6.83,
+      },
+      {
+        time_stamp: '2023-05-01T00:00:00.000Z',
+        watch_time: 9.665278,
+      },
+      {
+        time_stamp: '2023-06-01T00:00:00.000Z',
+        watch_time: 6.590278,
+      },
+      {
+        time_stamp: '2023-07-01T00:00:00.000Z',
+        watch_time: 6.13,
+      },
+      {
+        time_stamp: '2023-08-01T00:00:00.000Z',
+        watch_time: 5.546667,
+      },
+      {
+        time_stamp: '2023-09-01T00:00:00.000Z',
+        watch_time: 5.541667,
+      },
+      {
+        time_stamp: '2023-10-01T00:00:00.000Z',
+        watch_time: 7.720278,
+      },
+      {
+        time_stamp: '2023-11-01T00:00:00.000Z',
+        watch_time: 7.246111,
+      },
+      {
+        time_stamp: '2023-12-01T00:00:00.000Z',
+        watch_time: 6.724167,
+      },
+      {
+        time_stamp: '2024-01-01T00:00:00.000Z',
+        watch_time: 0.734722,
+      },
+      {
+        time_stamp: '2024-02-01T00:00:00.000Z',
+        watch_time: 3.892222,
+      },
+      {
+        time_stamp: '2024-03-01T00:00:00.000Z',
+        watch_time: 5.255,
+      },
+      {
+        time_stamp: '2024-04-01T00:00:00.000Z',
+        watch_time: 4.281389,
+      },
+      {
+        time_stamp: '2024-05-01T00:00:00.000Z',
+        watch_time: 1.8425,
+      },
+      {
+        time_stamp: '2024-06-01T00:00:00.000Z',
+        watch_time: 9.715278,
+      },
+      {
+        time_stamp: '2024-07-01T00:00:00.000Z',
+        watch_time: 4.211111,
+      },
+      {
+        time_stamp: '2024-08-01T00:00:00.000Z',
+        watch_time: 9.561111,
+      },
+      {
+        time_stamp: '2024-09-01T00:00:00.000Z',
+        watch_time: 6.538611,
+      },
+      {
+        time_stamp: '2024-10-01T00:00:00.000Z',
+        watch_time: 4.194444,
+      },
+      {
+        time_stamp: '2024-11-01T00:00:00.000Z',
+        watch_time: 2.588056,
+      },
+      {
+        time_stamp: '2024-12-01T00:00:00.000Z',
+        watch_time: 8.929167,
+      },
+      {
+        time_stamp: '2025-01-01T00:00:00.000Z',
+        watch_time: 3.890833,
+      },
+      {
+        time_stamp: '2025-02-01T00:00:00.000Z',
+        watch_time: 7.061389,
+      },
+      {
+        time_stamp: '2025-03-01T00:00:00.000Z',
+        watch_time: 8.763611,
+      },
+      {
+        time_stamp: '2025-06-01T00:00:00.000Z',
+        watch_time: 0.795556,
+      },
+      {
+        time_stamp: '2025-08-01T00:00:00.000Z',
+        watch_time: 2.926667,
+      },
+      {
+        time_stamp: '2025-09-01T00:00:00.000Z',
+        watch_time: 1.993889,
+      },
+      {
+        time_stamp: '2025-10-01T00:00:00.000Z',
+        watch_time: 1.566667,
+      },
+    ],
+    columnMetadata: [
+      {
+        name: 'time_stamp',
+        min_value: '2022-06-01T00:00:00.000Z',
+        max_value: '2025-10-01T00:00:00.000Z',
+        unique_values: 37,
+        simple_type: 'date',
+        type: 'timestamptz',
+      },
+      {
+        name: 'watch_time',
+        min_value: 0.734722,
+        max_value: 30.706111,
+        unique_values: 37,
+        simple_type: 'number',
+        type: 'numeric',
       },
     ],
   },

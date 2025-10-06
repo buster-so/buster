@@ -7,7 +7,12 @@ import type {
   UpdateReportRequest,
   UpdateReportResponse,
 } from '@buster/server-shared/reports';
-import type { SharePostRequest, ShareUpdateRequest } from '@buster/server-shared/share';
+import type {
+  ShareDeleteResponse,
+  SharePostRequest,
+  SharePostResponse,
+  ShareUpdateRequest,
+} from '@buster/server-shared/share';
 import { mainApiV2 } from '../instances';
 
 /**
@@ -42,7 +47,7 @@ export const updateReport = async ({
  */
 export const shareReport = async ({ id, params }: { id: string; params: SharePostRequest }) => {
   return mainApiV2
-    .post<GetReportResponse>(`/reports/${id}/sharing`, params)
+    .post<SharePostResponse>(`/reports/${id}/sharing`, params)
     .then((res) => res.data);
 };
 
@@ -51,7 +56,7 @@ export const shareReport = async ({ id, params }: { id: string; params: SharePos
  */
 export const unshareReport = async ({ id, data }: { id: string; data: string[] }) => {
   return mainApiV2
-    .delete<GetReportResponse>(`/reports/${id}/sharing`, { data })
+    .delete<ShareDeleteResponse>(`/reports/${id}/sharing`, { data })
     .then((res) => res.data);
 };
 

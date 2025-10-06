@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { z } from 'zod';
 import { prefetchListShortcuts } from '@/api/buster_rest/shortcuts/queryRequests';
 import {
@@ -6,17 +6,7 @@ import {
   prefetchGetSuggestedPrompts,
 } from '@/api/buster_rest/users/queryRequests';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
-import { HomePageController, HomePageHeader } from '@/controllers/HomePage';
-
-const searchParamsSchema = z.object({
-  q: z.string().optional(),
-  submit: z
-    .preprocess((val) => {
-      if (typeof val === 'string') val === 'true';
-      return val;
-    }, z.boolean())
-    .optional(),
-});
+import { HomePageHeader } from '@/controllers/HomePage';
 
 export const Route = createFileRoute('/app/_app/home')({
   ssr: false,
@@ -30,7 +20,6 @@ export const Route = createFileRoute('/app/_app/home')({
       ],
     };
   },
-  validateSearch: searchParamsSchema,
   loader: async ({ context }) => {
     const { queryClient } = context;
     const user = await prefetchGetMyUserInfo(queryClient);
@@ -45,11 +34,9 @@ export const Route = createFileRoute('/app/_app/home')({
 });
 
 function RouteComponent() {
-  const { q, submit } = Route.useSearch();
-
   return (
-    <AppPageLayout headerSizeVariant="list" header={<HomePageHeader />}>
-      <HomePageController initialValue={q} autoSubmit={submit} />
+    <AppPageLayout headerSizeVariant="list" header={<HomePageHeader />} scrollable>
+      <Outlet />
     </AppPageLayout>
   );
 }

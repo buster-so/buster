@@ -1,9 +1,8 @@
+import { checkPermission } from '@buster/access-controls';
 import {
   bulkCreateAssetPermissions,
-  checkAssetPermission,
   findUsersByEmails,
   getReportFileById,
-  getReportWorkspaceSharing,
   getUserOrganizationId,
   updateReport,
 } from '@buster/database/queries';
@@ -13,7 +12,6 @@ import { type ShareUpdateRequest, ShareUpdateRequestSchema } from '@buster/serve
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { checkIfAssetIsEditable } from '../../../../../shared-helpers/asset-public-access';
 import { getReportHandler } from '../GET';
 
 export async function updateReportShareHandler(
@@ -21,27 +19,25 @@ export async function updateReportShareHandler(
   request: ShareUpdateRequest,
   user: User & { organizationId: string }
 ) {
-  // Check if user has permission to edit asset permissions
-  const permissionCheck = await checkAssetPermission({
-    assetId: reportId,
-    assetType: 'report_file',
-    userId: user.id,
-  });
-
-  // Check if user has at least full_access permission
-  if (
-    !permissionCheck.hasAccess ||
-    (permissionCheck.role !== 'full_access' && permissionCheck.role !== 'owner')
-  ) {
-    throw new HTTPException(403, {
-      message: 'User does not have permission to edit asset permissions',
-    });
-  }
-
   // Check if report exists
   const report = await getReportFileById({ reportId, userId: user.id });
   if (!report) {
     throw new HTTPException(404, { message: 'Report not found' });
+  }
+
+  const permissionCheck = await checkPermission({
+    userId: user.id,
+    assetId: reportId,
+    assetType: 'report_file',
+    requiredRole: 'full_access',
+    workspaceSharing: report.workspace_sharing,
+    organizationId: report.organization_id,
+  });
+
+  if (!permissionCheck.hasAccess) {
+    throw new HTTPException(403, {
+      message: 'You do not have permission to update sharing for this report',
+    });
   }
 
   const { publicly_accessible, public_expiry_date, public_password, workspace_sharing, users } =
@@ -130,15 +126,6 @@ const app = new Hono().put('/', zValidator('json', ShareUpdateRequestSchema), as
   if (!userOrg) {
     throw new HTTPException(403, { message: 'User is not associated with an organization' });
   }
-
-  await checkIfAssetIsEditable({
-    user,
-    assetId: reportId,
-    assetType: 'report_file',
-    workspaceSharing: getReportWorkspaceSharing,
-    organizationId: userOrg.organizationId,
-    requiredRole: 'full_access',
-  });
 
   const updatedReport: ShareUpdateResponse = await updateReportShareHandler(reportId, request, {
     ...user,

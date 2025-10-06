@@ -98,6 +98,9 @@ export type {
 export { checkQueryIsReadOnly } from './utils/sql-validation';
 export type { QueryTypeCheckResult } from './utils/sql-validation';
 
+// Credentials validation utilities
+export { isValidCredentials, toCredentials } from './utils/validate-credentials';
+
 // R2 cache utilities for metric data
 export {
   checkCacheExists,

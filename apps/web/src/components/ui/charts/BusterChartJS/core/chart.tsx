@@ -11,6 +11,8 @@ import { forwardRef, useEffect, useRef } from 'react';
 import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
 import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
 
+const stablePlugins: ChartProps['plugins'] = [];
+
 function ChartComponent<
   TType extends ChartType = ChartType,
   TData = DefaultDataPoint<TType>,
@@ -24,7 +26,7 @@ function ChartComponent<
     type,
     data,
     options,
-    plugins = [],
+    plugins = stablePlugins,
     fallbackContent,
     updateMode,
     ...canvasProps

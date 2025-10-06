@@ -17,6 +17,16 @@ export function createModifyReportsFinish(
   return async (options: { input: ModifyReportsInput } & ToolCallOptions) => {
     const input = options.input;
 
+    // Wait for all queued delta processing to complete before setting isComplete
+    if (state.lastProcessing) {
+      try {
+        await state.lastProcessing;
+        console.info('[modify-reports-finish] All delta processing completed');
+      } catch (error) {
+        console.error('[modify-reports-finish] Error waiting for delta processing:', error);
+      }
+    }
+
     // Set isComplete to prevent further delta processing (same as sequential thinking)
     state.isComplete = true;
 

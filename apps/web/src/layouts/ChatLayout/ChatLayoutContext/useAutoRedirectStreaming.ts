@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
@@ -10,6 +10,7 @@ import {
   useGetChatMessageIsFinishedReasoning,
   useGetChatMessageLastReasoningMessageId,
 } from '@/context/Chats/useGetChatMessage';
+import { useBuildLocation } from '@/context/Routes/useRouteBuilder';
 import { useWindowFocus } from '@/hooks/useWindowFocus';
 import { assetParamsToRoute } from '@/lib/assets/assetParamsToRoute';
 
@@ -21,6 +22,8 @@ export const useAutoRedirectStreaming = ({
   chatId: string | undefined;
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const buildLocation = useBuildLocation();
   const getChatMessageMemoized = useGetChatMessageMemoized();
   const versionChanged = useIsVersionChanged();
   const isStreamFinished = useGetChatMessageCompleted({ messageId: lastMessageId });
@@ -67,8 +70,11 @@ export const useAutoRedirectStreaming = ({
           chatId,
           versionNumber: firstFile.version_number,
         });
-
-        navigate({ ...linkProps, replace: true, reloadDocument: versionChanged });
+        const builtLocation = buildLocation(linkProps);
+        const isOnSamePage = builtLocation.pathname === location.pathname;
+        if (!isOnSamePage) {
+          navigate({ ...linkProps, replace: true, reloadDocument: versionChanged });
+        }
       }
 
       previousIsCompletedStream.current = true;

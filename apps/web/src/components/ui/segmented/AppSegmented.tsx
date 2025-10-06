@@ -11,7 +11,6 @@ import * as React from 'react';
 import { useEffect, useLayoutEffect, useState, useTransition } from 'react';
 import { useIsBlockerEnabled } from '@/context/Routes/blocker-store';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useMount } from '@/hooks/useMount';
 import { useSize } from '@/hooks/useSize';
 import { cn } from '@/lib/classMerge';
 import type { ILinkProps } from '@/types/routes';
@@ -42,7 +41,7 @@ export interface AppSegmentedProps<
   value?: T;
   onChange?: (value: SegmentedItem<T, TRouter, TOptions, TFrom>) => void;
   className?: string;
-  size?: 'default' | 'large';
+  size?: 'default' | 'large' | 'medium';
   block?: boolean;
   type?: 'button' | 'track';
   disabled?: boolean;
@@ -73,12 +72,12 @@ const segmentedVariants = cva('relative inline-flex items-center rounded', {
 });
 
 const triggerVariants = cva(
-  'relative z-10 flex items-center h-6 justify-center gap-x-1.5 gap-y-1 rounded transition-colors ',
+  'relative z-10 flex items-center justify-center gap-x-1.5 gap-y-1 rounded transition-colors ',
   {
     variants: {
       size: {
-        default: 'px-2 flex-row',
-        medium: 'px-3 flex-row',
+        default: 'flex-row min-w-6',
+        medium: 'min-w-7 flex-row',
         large: 'px-3 flex-col',
       },
       block: {
@@ -285,7 +284,11 @@ function SegmentedTriggerComponent<
 
   const linkContent = (
     <>
-      {icon && <span className={cn('flex items-center text-sm')}>{icon}</span>}
+      {icon && (
+        <span className={cn('flex items-center text-sm', size === 'medium' && 'text-lg')}>
+          {icon}
+        </span>
+      )}
       {label && <span className={cn('text-sm')}>{label}</span>}
     </>
   );
@@ -301,6 +304,24 @@ function SegmentedTriggerComponent<
   ) : (
     <div {...commonProps}>{linkContent}</div>
   );
+
+  // Determine padding based on size, icon, and label presence
+  const getPaddingClass = () => {
+    if (size === 'default') {
+      // If there's an icon but no label, use p-0
+      if (icon && !label) {
+        return 'p-0';
+      }
+      // If there's a label, use p-2
+      if (label) {
+        return 'p-2';
+      }
+      // Default fallback for edge cases
+      return 'p-2';
+    }
+    // For other sizes, no additional padding (they have their own px-3)
+    return '';
+  };
 
   return (
     <Tooltip title={tooltip || ''} sideOffset={10} delayDuration={150}>
@@ -318,7 +339,8 @@ function SegmentedTriggerComponent<
             block,
             disabled,
             selected: selectedValue === value,
-          })
+          }),
+          getPaddingClass()
         )}
       >
         {linkDiv}
