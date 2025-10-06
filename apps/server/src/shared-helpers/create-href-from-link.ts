@@ -3,7 +3,10 @@ import { z } from 'zod';
 const CreateHrefFromLinkParamsSchema = z.object({
   to: z.string().describe('Route path with param placeholders like /path/$paramName'),
   params: z.record(z.string()).describe('Object mapping param names to values'),
-  search: z.record(z.union([z.string(), z.number(), z.boolean(), z.undefined()])).optional().describe('Query parameters'),
+  search: z
+    .record(z.union([z.string(), z.number(), z.boolean(), z.undefined()]))
+    .optional()
+    .describe('Query parameters'),
 });
 
 type CreateHrefFromLinkParams = z.infer<typeof CreateHrefFromLinkParamsSchema>;
