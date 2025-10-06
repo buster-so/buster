@@ -38,6 +38,9 @@ const config = defineConfig(({ command, mode }) => {
       'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId),
       'import.meta.env.VITE_BUILD_AT': JSON.stringify(buildAt),
     },
+    optimizeDeps: {
+      exclude: ['playwright', 'playwright-core', 'chromium-bidi'],
+    },
     plugins: [
       // this is the plugin that enables path aliases
       viteTsConfigPaths({ projects: ['./tsconfig.json'] }),

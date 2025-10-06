@@ -1,23 +1,18 @@
-import type { AssetType } from '@buster/server-shared/assets';
 import {
   type StaticDataRouteOption,
   useMatches,
   useParams,
   useSearch,
 } from '@tanstack/react-router';
-import findLast from 'lodash/findLast';
 
 export const useSelectedAssetType = (): NonNullable<StaticDataRouteOption['assetType']> => {
   const lastMatch = useMatches({
-    select: (matches) => {
-      return findLast(matches, (match) => match.staticData?.assetType);
-    },
+    select: (matches) => matches.reverse().find((match) => match.staticData?.assetType),
   });
 
   if (typeof lastMatch === 'number') {
     return 'chat';
   }
-  // @ts-expect-error - lastMatch is not undefined
   const data = lastMatch?.staticData?.assetType as StaticDataRouteOption['assetType'];
   const { messageId } = useParams({
     strict: false,

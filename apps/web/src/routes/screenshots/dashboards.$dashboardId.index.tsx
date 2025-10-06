@@ -1,7 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createServerFileRoute } from '@tanstack/react-start/server';
 import { z } from 'zod';
-import { browserLogin } from '@/api/server-functions/browser-login';
 import { createScreenshotResponse } from '@/api/server-functions/screenshot-helpers';
 import { createHrefFromLink } from '@/lib/routes';
 
@@ -16,38 +14,79 @@ export const GetDashboardScreenshotQuerySchema = z.object({
   type: z.enum(['png', 'jpeg']).default('png'),
 });
 
-export const ServerRoute = createServerFileRoute('/screenshots/dashboards/$dashboardId/').methods({
-  GET: async ({ request, params }) => {
-    const { dashboardId } = GetDashboardScreenshotParamsSchema.parse(params);
-    const { version_number, width, height, type } = GetDashboardScreenshotQuerySchema.parse(
-      Object.fromEntries(new URL(request.url).searchParams)
-    );
+export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/')({
+  server: {
+    handlers: {
+      GET: async ({ request, params }) => {
+        const { dashboardId } = GetDashboardScreenshotParamsSchema.parse(params);
+        const { version_number, width, height, type } = GetDashboardScreenshotQuerySchema.parse(
+          Object.fromEntries(new URL(request.url).searchParams)
+        );
 
-    try {
-      const { result: screenshotBuffer } = await browserLogin({
-        width,
-        height,
-        fullPath: createHrefFromLink({
-          to: '/screenshots/dashboards/$dashboardId/content',
-          params: { dashboardId },
-          search: { version_number, type, width, height },
-        }),
-        request,
-        callback: async ({ page }) => {
-          const screenshotBuffer = await page.screenshot({ type });
-          return screenshotBuffer;
-        },
-      });
+        try {
+          const { browserLogin } = await import('@/api/server-functions/browser-login');
+          const { result: screenshotBuffer } = await browserLogin({
+            width,
+            height,
+            fullPath: createHrefFromLink({
+              to: '/screenshots/dashboards/$dashboardId/content',
+              params: { dashboardId },
+              search: { version_number, type, width, height },
+            }),
+            request,
+            callback: async ({ page }) => {
+              const screenshotBuffer = await page.screenshot({ type });
+              return screenshotBuffer;
+            },
+          });
 
-      return createScreenshotResponse({ screenshotBuffer });
-    } catch (error) {
-      console.error('Error capturing dashboard screenshot', error);
-      return new Response(
-        JSON.stringify({
-          message: 'Failed to capture screenshot',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+          return createScreenshotResponse({ screenshotBuffer });
+        } catch (error) {
+          console.error('Error capturing dashboard screenshot', error);
+          return new Response(
+            JSON.stringify({
+              message: 'Failed to capture screenshot',
+            }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+      },
+    },
   },
 });
+
+// export const ServerRoute = createServerFileRoute('/screenshots/dashboards/$dashboardId/').methods({
+//   GET: async ({ request, params }) => {
+//     const { dashboardId } = GetDashboardScreenshotParamsSchema.parse(params);
+//     const { version_number, width, height, type } = GetDashboardScreenshotQuerySchema.parse(
+//       Object.fromEntries(new URL(request.url).searchParams)
+//     );
+
+//     try {
+//       const { result: screenshotBuffer } = await browserLogin({
+//         width,
+//         height,
+//         fullPath: createHrefFromLink({
+//           to: '/screenshots/dashboards/$dashboardId/content',
+//           params: { dashboardId },
+//           search: { version_number, type, width, height },
+//         }),
+//         request,
+//         callback: async ({ page }) => {
+//           const screenshotBuffer = await page.screenshot({ type });
+//           return screenshotBuffer;
+//         },
+//       });
+
+//       return createScreenshotResponse({ screenshotBuffer });
+//     } catch (error) {
+//       console.error('Error capturing dashboard screenshot', error);
+//       return new Response(
+//         JSON.stringify({
+//           message: 'Failed to capture screenshot',
+//         }),
+//         { status: 500, headers: { 'Content-Type': 'application/json' } }
+//       );
+//     }
+//   },
+// });

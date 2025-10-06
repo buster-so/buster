@@ -1,6 +1,5 @@
-import { createServerFileRoute } from '@tanstack/react-start/server';
+import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { browserLogin } from '@/api/server-functions/browser-login';
 import { createScreenshotResponse } from '@/api/server-functions/screenshot-helpers';
 import { createHrefFromLink } from '@/lib/routes';
 
@@ -14,38 +13,43 @@ export const GetChatScreenshotQuerySchema = z.object({
   type: z.enum(['png', 'jpeg']).default('png'),
 });
 
-export const ServerRoute = createServerFileRoute('/screenshots/chats/$chatId/').methods({
-  GET: async ({ request, params }) => {
-    const { chatId } = GetChatScreenshotParamsSchema.parse(params);
-    const { width, height, type } = GetChatScreenshotQuerySchema.parse(
-      Object.fromEntries(new URL(request.url).searchParams)
-    );
+export const Route = createFileRoute('/screenshots/chats/$chatId/')({
+  server: {
+    handlers: {
+      GET: async ({ request, params }) => {
+        const { chatId } = GetChatScreenshotParamsSchema.parse(params);
+        const { width, height, type } = GetChatScreenshotQuerySchema.parse(
+          Object.fromEntries(new URL(request.url).searchParams)
+        );
 
-    try {
-      const { result: screenshotBuffer } = await browserLogin({
-        width,
-        height,
-        fullPath: createHrefFromLink({
-          to: '/screenshots/chats/$chatId/content',
-          params: { chatId },
-          search: { type, width, height },
-        }),
-        request,
-        callback: async ({ page }) => {
-          const screenshotBuffer = await page.screenshot({ type });
-          return screenshotBuffer;
-        },
-      });
+        try {
+          const { browserLogin } = await import('@/api/server-functions/browser-login');
+          const { result: screenshotBuffer } = await browserLogin({
+            width,
+            height,
+            fullPath: createHrefFromLink({
+              to: '/screenshots/chats/$chatId/content',
+              params: { chatId },
+              search: { type, width, height },
+            }),
+            request,
+            callback: async ({ page }) => {
+              const screenshotBuffer = await page.screenshot({ type });
+              return screenshotBuffer;
+            },
+          });
 
-      return createScreenshotResponse({ screenshotBuffer });
-    } catch (error) {
-      console.error('Error capturing chat screenshot', error);
-      return new Response(
-        JSON.stringify({
-          message: 'Failed to capture screenshot',
-        }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+          return createScreenshotResponse({ screenshotBuffer });
+        } catch (error) {
+          console.error('Error capturing chat screenshot', error);
+          return new Response(
+            JSON.stringify({
+              message: 'Failed to capture screenshot',
+            }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+      },
+    },
   },
 });

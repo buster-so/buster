@@ -1,4 +1,4 @@
-import { createServerFileRoute } from '@tanstack/react-start/server';
+import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
 export const GetReportScreenshotParamsSchema = z.object({
@@ -12,11 +12,17 @@ export const GetReportScreenshotQuerySchema = z.object({
   type: z.enum(['png', 'jpeg']).default('png'),
 });
 
-export const ServerRoute = createServerFileRoute('/screenshots/reports/$reportId').methods({
-  GET: async ({ request, params }) => {
-    const { reportId } = GetReportScreenshotParamsSchema.parse(params);
-    const { version_number, width, height, type } = GetReportScreenshotQuerySchema.parse(
-      Object.fromEntries(new URL(request.url).searchParams)
-    );
+export const Route = createFileRoute('/screenshots/reports/$reportId')({
+  server: {
+    handlers: {
+      GET: async ({ request, params }) => {
+        const { reportId } = GetReportScreenshotParamsSchema.parse(params);
+        const { version_number, width, height, type } = GetReportScreenshotQuerySchema.parse(
+          Object.fromEntries(new URL(request.url).searchParams)
+        );
+
+        return new Response('Hello, World!');
+      },
+    },
   },
 });

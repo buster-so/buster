@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { env } from '@/env';
-import { ServerRoute as AuthCallbackRoute } from '../../routes/auth.callback';
+import { Route as AuthCallbackRoute } from '../../routes/auth.callback';
 import { getSupabaseServerClient } from './server';
 
 const isValidRedirectUrl = (url: string): boolean => {
@@ -44,7 +44,7 @@ const handleOAuthSignIn = async (
 };
 
 export const signInWithEmailAndPassword = createServerFn({ method: 'POST' })
-  .validator(
+  .inputValidator(
     z.object({
       email: z.string(),
       password: z.string(),
@@ -117,25 +117,25 @@ export const signInWithAnonymousUser = createServerFn({ method: 'POST' }).handle
 const oAuthRedirectValidator = z.object({ redirectTo: z.string().nullable().optional() });
 
 export const signInWithGoogle = createServerFn({ method: 'POST' })
-  .validator(oAuthRedirectValidator)
+  .inputValidator(oAuthRedirectValidator)
   .handler(async ({ data: { redirectTo } }) => {
     return handleOAuthSignIn('google', redirectTo);
   });
 
 export const signInWithGithub = createServerFn({ method: 'POST' })
-  .validator(oAuthRedirectValidator)
+  .inputValidator(oAuthRedirectValidator)
   .handler(async ({ data: { redirectTo } }) => {
     return handleOAuthSignIn('github', redirectTo);
   });
 
 export const signInWithAzure = createServerFn({ method: 'POST' })
-  .validator(oAuthRedirectValidator)
+  .inputValidator(oAuthRedirectValidator)
   .handler(async ({ data: { redirectTo } }) => {
     return handleOAuthSignIn('azure', redirectTo, { scopes: 'email' });
   });
 
 export const signUpWithEmailAndPassword = createServerFn({ method: 'POST' })
-  .validator(
+  .inputValidator(
     z.object({
       email: z.string(),
       password: z.string(),
