@@ -43,7 +43,7 @@ export const ColumnLabelFormatSchema = z.object({
   // OPTIONAL: default is 0. This will only apply if the format is set to 'number'. This will replace missing data with the specified value.
   replaceMissingDataWith: z.optional(z.union([z.literal(0), z.null(), z.string()])).default(0),
   useRelativeTime: z.optional(z.boolean()).default(false),
-  isUTC: z.optional(z.boolean()).default(false),
+  isUTC: z.optional(z.boolean()).default(true),
   makeLabelHumanReadable: z.optional(z.boolean()).default(true),
   // DO NOT SHARE WITH LLM
   compactNumbers: z.optional(z.boolean()).default(false),

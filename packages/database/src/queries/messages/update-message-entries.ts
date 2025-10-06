@@ -70,17 +70,6 @@ function getOrCreateQueueState(messageId: string): MessageUpdateQueueState {
   return initialState;
 }
 
-function cleanupQueueIfIdle(messageId: string, state: MessageUpdateQueueState): void {
-  if (
-    state.closed &&
-    state.finalSequence !== undefined &&
-    state.lastCompletedSequence >= state.finalSequence &&
-    state.pending.size === 0
-  ) {
-    updateQueues.delete(messageId);
-  }
-}
-
 export function isMessageUpdateQueueClosed(messageId: string): boolean {
   const queue = updateQueues.get(messageId);
   return queue?.closed ?? false;
@@ -107,7 +96,6 @@ export async function waitForPendingUpdates(
 
   if (targetSequence === undefined) {
     await queue.tailPromise;
-    cleanupQueueIfIdle(messageId, queue);
     return;
   }
 
@@ -115,7 +103,6 @@ export async function waitForPendingUpdates(
   const effectiveTarget = Math.min(targetSequence, maxKnownSequence);
 
   if (effectiveTarget <= queue.lastCompletedSequence) {
-    cleanupQueueIfIdle(messageId, queue);
     return;
   }
 
@@ -133,8 +120,13 @@ export async function waitForPendingUpdates(
   } else {
     await queue.tailPromise;
   }
+}
 
-  cleanupQueueIfIdle(messageId, queue);
+export function closeMessageUpdateQueue(messageId: string): void {
+  const queue = updateQueues.get(messageId);
+  if (queue) {
+    queue.closed = true;
+  }
 }
 
 /**
@@ -235,20 +227,15 @@ export async function updateMessageEntries(
   const { messageId } = params;
 
   const queue = getOrCreateQueueState(messageId);
+  const isFinal = options?.isFinal ?? false;
 
-  if (queue.closed) {
+  if (!isFinal && queue.closed) {
     const lastKnownSequence = queue.finalSequence ?? queue.nextSequence - 1;
     return {
       success: false,
       sequenceNumber: lastKnownSequence >= 0 ? lastKnownSequence : -1,
       skipped: true,
     };
-  }
-
-  const isFinal = options?.isFinal ?? false;
-
-  if (isFinal) {
-    queue.closed = true;
   }
 
   const sequenceNumber = queue.nextSequence;
@@ -272,7 +259,6 @@ export async function updateMessageEntries(
     if (isFinal) {
       queue.finalSequence = sequenceNumber;
     }
-    cleanupQueueIfIdle(messageId, queue);
     return success;
   };
 

@@ -62,7 +62,7 @@ type ReportUpdateQueueState = {
 
 const updateQueues = new Map<string, ReportUpdateQueueState>();
 
-function getOrCreateQueueState(reportId: string): ReportUpdateQueueState {
+function getOrCreateQueueState(reportId: string, isFinal?: boolean): ReportUpdateQueueState {
   const existing = updateQueues.get(reportId);
   if (existing) {
     return existing;
@@ -73,27 +73,24 @@ function getOrCreateQueueState(reportId: string): ReportUpdateQueueState {
     nextSequence: 0,
     pending: new Map(),
     lastCompletedSequence: -1,
-    closed: false,
+    // If it is final, the queue should be closed
+    closed: isFinal ?? false,
   };
 
   updateQueues.set(reportId, initialState);
   return initialState;
 }
 
-function cleanupQueueIfIdle(reportId: string, state: ReportUpdateQueueState): void {
-  if (
-    state.closed &&
-    state.finalSequence !== undefined &&
-    state.lastCompletedSequence >= state.finalSequence &&
-    state.pending.size === 0
-  ) {
-    updateQueues.delete(reportId);
-  }
-}
-
 export function isReportUpdateQueueClosed(reportId: string): boolean {
   const queue = updateQueues.get(reportId);
   return queue?.closed ?? false;
+}
+
+export function reopenReportUpdateQueue(reportId: string): void {
+  const queue = updateQueues.get(reportId);
+  if (queue) {
+    queue.closed = false;
+  }
 }
 
 type WaitForPendingReportUpdateOptions = {
@@ -117,7 +114,6 @@ export async function waitForPendingReportUpdates(
 
   if (targetSequence === undefined) {
     await queue.tailPromise;
-    cleanupQueueIfIdle(reportId, queue);
     return;
   }
 
@@ -125,7 +121,6 @@ export async function waitForPendingReportUpdates(
   const effectiveTarget = Math.min(targetSequence, maxKnownSequence);
 
   if (effectiveTarget <= queue.lastCompletedSequence) {
-    cleanupQueueIfIdle(reportId, queue);
     return;
   }
 
@@ -143,8 +138,6 @@ export async function waitForPendingReportUpdates(
   } else {
     await queue.tailPromise;
   }
-
-  cleanupQueueIfIdle(reportId, queue);
 }
 
 /**
@@ -191,6 +184,13 @@ async function performUpdate(params: BatchUpdateReportInput): Promise<void> {
   }
 }
 
+export function closeReportUpdateQueue(reportId: string): void {
+  const queue = updateQueues.get(reportId);
+  if (queue) {
+    queue.closed = true;
+  }
+}
+
 /**
  * Updates a report's content, name, and version history in a single operation.
  * Updates are queued per reportId to ensure they execute in order.
@@ -209,20 +209,15 @@ export const updateReportWithVersion = async (
   options?: UpdateReportWithVersionOptions
 ): Promise<UpdateReportWithVersionResult> => {
   const { reportId } = params;
-  const queue = getOrCreateQueueState(reportId);
+  const isFinal = options?.isFinal ?? false;
+  const queue = getOrCreateQueueState(reportId, isFinal);
 
-  if (queue.closed) {
+  if (!isFinal && queue.closed) {
     const lastKnownSequence = queue.finalSequence ?? queue.nextSequence - 1;
     return {
       sequenceNumber: lastKnownSequence >= 0 ? lastKnownSequence : -1,
       skipped: true,
     };
-  }
-
-  const isFinal = options?.isFinal ?? false;
-
-  if (isFinal) {
-    queue.closed = true;
   }
 
   const sequenceNumber = queue.nextSequence;
@@ -246,7 +241,6 @@ export const updateReportWithVersion = async (
     if (isFinal) {
       queue.finalSequence = sequenceNumber;
     }
-    cleanupQueueIfIdle(reportId, queue);
   };
 
   const resultPromise = runPromise

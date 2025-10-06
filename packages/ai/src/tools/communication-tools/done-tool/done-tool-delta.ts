@@ -29,11 +29,7 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
   return async function doneToolDelta(
     options: { inputTextDelta: string } & ToolCallOptions
   ): Promise<void> {
-    if (doneToolState.isFinalizing) {
-      return;
-    }
-
-    if (isMessageUpdateQueueClosed(context.messageId)) {
+    if (doneToolState.isFinalizing || isMessageUpdateQueueClosed(context.messageId)) {
       return;
     }
 

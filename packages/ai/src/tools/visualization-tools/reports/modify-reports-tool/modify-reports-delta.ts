@@ -1,5 +1,7 @@
 import { db } from '@buster/database/connection';
 import {
+  isReportUpdateQueueClosed,
+  reopenReportUpdateQueue,
   updateMessageEntries,
   updateReportWithVersion,
   waitForPendingReportUpdates,
@@ -41,6 +43,10 @@ const TOOL_KEYS = {
 
 export function createModifyReportsDelta(context: ModifyReportsContext, state: ModifyReportsState) {
   return async (options: { inputTextDelta: string } & ToolCallOptions) => {
+    if (state.reportId && isReportUpdateQueueClosed(state.reportId)) {
+      return;
+    }
+
     // Handle string deltas (accumulate JSON text)
     state.argsText = (state.argsText || '') + options.inputTextDelta;
 
@@ -56,6 +62,10 @@ export function createModifyReportsDelta(context: ModifyReportsContext, state: M
         TOOL_KEYS.edits,
         []
       );
+      if (id && state.firstDelta) {
+        state.firstDelta = false;
+        reopenReportUpdateQueue(id);
+      }
 
       // Validate that we have a complete UUID before processing
       // UUID format: 8-4-4-4-12 characters (36 total with hyphens)

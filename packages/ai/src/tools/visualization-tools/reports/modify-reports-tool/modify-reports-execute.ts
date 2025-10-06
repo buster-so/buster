@@ -1,5 +1,6 @@
 import { db } from '@buster/database/connection';
 import {
+  closeReportUpdateQueue,
   updateMessageEntries,
   updateMetricsToReports,
   waitForPendingReportUpdates,
@@ -199,12 +200,17 @@ async function processEditOperations(
       }
     }
 
-    await updateReportWithVersion({
-      reportId,
-      content: currentContent,
-      name: reportName,
-      versionHistory: newVersionHistory,
-    });
+    await updateReportWithVersion(
+      {
+        reportId,
+        content: currentContent,
+        name: reportName,
+        versionHistory: newVersionHistory,
+      },
+      {
+        isFinal: true,
+      }
+    );
 
     // Wait for the database update to fully complete in the queue
     await waitForPendingReportUpdates(reportId);
@@ -410,6 +416,9 @@ export function createModifyReportsExecute(
 ) {
   return wrapTraced(
     async (input: ModifyReportsInput): Promise<ModifyReportsOutput> => {
+      if (input.id) {
+        closeReportUpdateQueue(input.id);
+      }
       const startTime = Date.now();
 
       try {

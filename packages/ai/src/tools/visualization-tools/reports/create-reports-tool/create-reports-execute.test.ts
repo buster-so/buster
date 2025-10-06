@@ -11,6 +11,8 @@ vi.mock('@buster/database/queries', () => ({
   updateMessageEntries: vi.fn().mockResolvedValue({ success: true }),
   updateReportWithVersion: vi.fn().mockResolvedValue(undefined),
   updateMetricsToReports: vi.fn().mockResolvedValue({ created: 0, updated: 0, deleted: 0 }),
+  closeReportUpdateQueue: vi.fn(),
+  waitForPendingReportUpdates: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('./helpers/create-reports-tool-transform-helper', () => ({

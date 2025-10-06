@@ -21,6 +21,7 @@ vi.mock('@buster/database/queries', () => ({
   waitForPendingUpdates: vi.fn().mockResolvedValue(undefined),
   isMessageUpdateQueueClosed: vi.fn().mockReturnValue(false),
   getAssetLatestVersion: vi.fn().mockResolvedValue(1),
+  closeMessageUpdateQueue: vi.fn(),
 }));
 
 // Import mocked functions after the mock definition

@@ -25,10 +25,6 @@ import {
   RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME,
   createRespondWithoutAssetCreationTool,
 } from '../../tools/communication-tools/respond-without-asset-creation/respond-without-asset-creation-tool';
-import {
-  SUBMIT_THOUGHTS_TOOL_NAME,
-  createSubmitThoughtsTool,
-} from '../../tools/communication-tools/submit-thoughts-tool/submit-thoughts-tool';
 import { EXECUTE_SQL_TOOL_NAME } from '../../tools/database-tools/execute-sql/execute-sql';
 import { SEQUENTIAL_THINKING_TOOL_NAME } from '../../tools/planning-thinking-tools/sequential-thinking-tool/sequential-thinking-tool';
 import { CREATE_DASHBOARDS_TOOL_NAME } from '../../tools/visualization-tools/dashboards/create-dashboards-tool/create-dashboards-tool';
@@ -45,7 +41,7 @@ import { getAnalystAgentSystemPrompt } from './get-analyst-agent-system-prompt';
 export const ANALYST_AGENT_NAME = 'analystAgent';
 
 const STOP_CONDITIONS = [
-  stepCountIs(25),
+  stepCountIs(50),
   hasToolCall(DONE_TOOL_NAME),
   hasToolCall(RESPOND_WITHOUT_ASSET_CREATION_TOOL_NAME),
   hasToolCall(MESSAGE_USER_CLARIFYING_QUESTION_TOOL_NAME),
@@ -127,10 +123,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
 
   const docsSystemMessage = docsContent
     ? ({
-        role: 'system',
-        content: `<data_catalog_docs>\n${docsContent}\n</data_catalog_docs>`,
-        providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
-      } as ModelMessage)
+      role: 'system',
+      content: `<data_catalog_docs>\n${docsContent}\n</data_catalog_docs>`,
+      providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+    } as ModelMessage)
     : null;
 
   async function stream({ messages }: AnalystStreamOptions) {
@@ -187,19 +183,19 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     // Create analyst instructions system message with proper escaping
     const analystInstructionsMessage = analystInstructions
       ? ({
-          role: 'system',
-          content: `<organization_instructions>\n${analystInstructions}\n</organization_instructions>`,
-          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
-        } as ModelMessage)
+        role: 'system',
+        content: `<organization_instructions>\n${analystInstructions}\n</organization_instructions>`,
+        providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+      } as ModelMessage)
       : null;
 
     // Create user personalization system message
     const userPersonalizationSystemMessage = userPersonalizationMessageContent
       ? ({
-          role: 'system',
-          content: userPersonalizationMessageContent,
-          providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
-        } as ModelMessage)
+        role: 'system',
+        content: userPersonalizationMessageContent,
+        providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
+      } as ModelMessage)
       : null;
 
     return wrapTraced(

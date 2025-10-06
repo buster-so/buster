@@ -79,6 +79,7 @@ async function processDone(
 // Factory function that creates the execute function with proper context typing
 const updateMessage = databaseQueries.updateMessage;
 const updateMessageEntries = databaseQueries.updateMessageEntries;
+const closeMessageUpdateQueue = databaseQueries.closeMessageUpdateQueue;
 const waitForPendingUpdates =
   databaseQueries.waitForPendingUpdates ?? (async (_messageId: string) => {});
 
@@ -90,9 +91,8 @@ export function createDoneToolExecute(context: DoneToolContext, state: DoneToolS
       }
 
       state.isFinalizing = true;
-      // CRITICAL: Wait for ALL pending updates from delta/finish to complete FIRST
-      // This ensures execute's update is always the last one in the queue
-      if (typeof state.latestSequenceNumber === 'number') {
+      closeMessageUpdateQueue(context.messageId);
+      if (state.latestSequenceNumber) {
         await waitForPendingUpdates(context.messageId, {
           upToSequence: state.latestSequenceNumber,
         });
@@ -116,13 +116,7 @@ export function createDoneToolExecute(context: DoneToolContext, state: DoneToolS
         state.finalSequenceNumber = sequenceNumber;
       }
 
-      if (typeof state.finalSequenceNumber === 'number') {
-        await waitForPendingUpdates(context.messageId, {
-          upToSequence: state.finalSequenceNumber,
-        });
-      } else {
-        await waitForPendingUpdates(context.messageId);
-      }
+      await waitForPendingUpdates(context.messageId);
 
       cleanupState(state);
       return output;

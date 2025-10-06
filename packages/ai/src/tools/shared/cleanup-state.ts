@@ -5,7 +5,7 @@
 export function cleanupState(state: Record<string, unknown>): void {
   // Clear all properties except toolCallId (might be needed for logging)
   Object.keys(state).forEach((key) => {
-    if (key !== 'toolCallId') {
+    if (key !== 'toolCallId' && key !== 'isFinalizing') {
       state[key] = undefined;
     }
   });

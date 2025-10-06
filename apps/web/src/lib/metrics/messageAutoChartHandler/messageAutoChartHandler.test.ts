@@ -106,7 +106,7 @@ describe('createDefaultChartConfig', () => {
           convertNumberTo: null,
           dateFormat: 'auto',
           useRelativeTime: false,
-          isUTC: false,
+          isUTC: true,
           multiplier: 1,
           prefix: '',
           suffix: '',

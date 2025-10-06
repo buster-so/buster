@@ -17,6 +17,7 @@ vi.mock('@buster/database/queries', () => ({
   updateReportWithVersion: vi.fn().mockResolvedValue(undefined),
   updateMetricsToReports: vi.fn().mockResolvedValue({ created: 0, updated: 0, deleted: 0 }),
   waitForPendingReportUpdates: vi.fn().mockResolvedValue(undefined),
+  closeReportUpdateQueue: vi.fn(),
 }));
 vi.mock('@buster/database/schema', () => ({
   reportFiles: {},

@@ -95,6 +95,7 @@ const ModifyReportsStateSchema = z.object({
     )
     .optional(),
   isComplete: z.boolean().optional().describe('Whether the tool execution is complete'),
+  firstDelta: z.boolean().optional().describe('Whether this is the first delta'),
 });
 
 // Export types
@@ -123,6 +124,7 @@ export function createModifyReportsTool(context: ModifyReportsContext) {
     responseMessageCreated: false,
     snapshotContent: undefined,
     reportModifiedInMessage: false,
+    firstDelta: true,
   };
 
   // Create all functions with the context and state passed
