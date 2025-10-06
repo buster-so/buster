@@ -7,6 +7,7 @@ import {
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { createImageResponse } from '../../../../../shared-helpers/create-image-response';
 import { getChatScreenshotHandler } from './getChatScreenshotHandler';
 
 const app = new Hono().get(
@@ -45,17 +46,13 @@ const app = new Hono().get(
         context: c,
       });
 
-      return new Response(screenshotBuffer, {
-        headers: {
-          'Content-Type': `image/${search.type}`,
-          'Content-Length': screenshotBuffer.length.toString(),
-        },
-      });
+      return createImageResponse(screenshotBuffer, search.type);
     } catch (error) {
       console.error('Failed to generate chat screenshot URL', {
         chatId,
         error,
       });
+      throw new Error('Failed to generate chat screenshot URL');
     }
   }
 );

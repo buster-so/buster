@@ -7,6 +7,7 @@ import {
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { createImageResponse } from '../../../../../shared-helpers/create-image-response';
 import { standardErrorHandler } from '../../../../../utils/response';
 import { getMetricScreenshotHandler } from './getMetricScreenshotHandler';
 
@@ -47,12 +48,7 @@ const app = new Hono()
           context: c,
         });
 
-        return new Response(screenshotBuffer, {
-          headers: {
-            'Content-Type': `image/${type}`,
-            'Content-Length': screenshotBuffer.length.toString(),
-          },
-        });
+        return createImageResponse(screenshotBuffer, type);
       } catch (error) {
         console.error('Failed to generate metric image', {
           metricId,
