@@ -234,15 +234,15 @@ jobs:
       #     echo "✅ Docker images pre-pulled successfully"
 
       - name: Start services in background
-        run: pnpm turbo start
-          # echo "🚀 Starting all services in background..."
-          # pnpm turbo start 2>&1 | tee turbo.log &
-          # echo $! > turbo.pid
-          # echo "Started turbo with PID $(cat turbo.pid)"
-          # echo "Showing initial startup logs..."
-          # sleep 5
-          # echo "=== Latest logs ==="
-          # tail -20 turbo.log || echo "No logs yet"
+        run: |
+          echo "🚀 Starting all services in background..."
+          pnpm turbo start 2>&1 | tee turbo.log &
+          echo $! > turbo.pid
+          echo "Started turbo with PID $(cat turbo.pid)"
+          echo "Showing initial startup logs..."
+          sleep 5
+          echo "=== Latest logs ==="
+          tail -20 turbo.log || echo "No logs yet"
         env:
           TURBO_CACHE_DIR: .turbo
           SKIP_ENV_CHECK: true
