@@ -1,5 +1,5 @@
 import { GetMetricScreenshotQuerySchema } from '@buster/server-shared/screenshots';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ensureMetricData, prefetchGetMetric } from '@/api/buster_rest/metrics';
 import { useGetMetricParams } from '@/context/Metrics/useGetMetricParams';
 import { MetricViewChartController } from '@/controllers/MetricController/MetricViewChartController';
@@ -19,7 +19,9 @@ export const Route = createFileRoute('/screenshots/metrics/$metricId/content')({
       }),
     ]);
     if (!metric || !metricData) {
-      throw new Error('Metric not found');
+      throw redirect({
+        to: '/app/home',
+      });
     }
   },
 

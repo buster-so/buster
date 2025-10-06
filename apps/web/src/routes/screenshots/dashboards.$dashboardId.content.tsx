@@ -1,5 +1,5 @@
 import { GetDashboardScreenshotQuerySchema } from '@buster/server-shared/screenshots';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
 import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParams';
@@ -17,7 +17,9 @@ export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/conte
     });
 
     if (!dashboard) {
-      throw new Error('Dashboard not found');
+      throw redirect({
+        to: '/app/home',
+      });
     }
 
     const numberOfMetrics = 8;

@@ -1,5 +1,5 @@
 import { GetReportScreenshotQuerySchema } from '@buster/server-shared/screenshots';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
 import { prefetchGetReport } from '@/api/buster_rest/reports';
 import { ReportPageController } from '@/controllers/ReportPageControllers';
@@ -16,7 +16,9 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
     );
 
     if (!report) {
-      throw new Error('Report not found');
+      throw redirect({
+        to: '/app/home',
+      });
     }
 
     const allMetrics = Object.entries(report?.metrics || {});
