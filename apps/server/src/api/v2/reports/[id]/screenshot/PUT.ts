@@ -1,7 +1,7 @@
 import { checkPermission } from '@buster/access-controls';
 import { getReportFileById } from '@buster/database/queries';
 import {
-  AssetIdParamsSchema,
+  PutReportScreenshotParamsSchema,
   PutReportScreenshotRequestSchema,
   type PutScreenshotResponse,
 } from '@buster/server-shared/screenshots';
@@ -13,10 +13,10 @@ import { uploadScreenshotHandler } from '../../../../../shared-helpers/upload-sc
 const app = new Hono().put(
   '/',
   zValidator('json', PutReportScreenshotRequestSchema),
-  zValidator('param', AssetIdParamsSchema),
+  zValidator('param', PutReportScreenshotParamsSchema),
   async (c) => {
     const assetId = c.req.valid('param').id;
-    const { base64Image } = c.req.valid('json');
+    const { image } = c.req.valid('json');
     const user = c.get('busterUser');
 
     const report = await getReportFileById({ reportId: assetId, userId: user.id });
@@ -43,7 +43,7 @@ const app = new Hono().put(
     const result: PutScreenshotResponse = await uploadScreenshotHandler({
       assetType: 'report_file',
       assetId,
-      base64Image,
+      image,
       organizationId: report.organization_id,
     });
 

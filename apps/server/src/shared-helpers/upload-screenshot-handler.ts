@@ -55,6 +55,36 @@ function parseBase64Image(base64Image: string): {
   };
 }
 
+async function parseImageFile(file: File): Promise<{
+  buffer: Buffer;
+  contentType: string;
+  extension: string;
+}> {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  if (buffer.length === 0) {
+    throw new Error('Provided image file is empty');
+  }
+
+  return {
+    buffer,
+    contentType: file.type,
+    extension: getExtensionFromContentType(file.type),
+  };
+}
+
+async function parseImageInput(image: string | File): Promise<{
+  buffer: Buffer;
+  contentType: string;
+  extension: string;
+}> {
+  if (typeof image === 'string') {
+    return parseBase64Image(image);
+  }
+  return parseImageFile(image);
+}
+
 function buildScreenshotKey(
   assetType: AssetType,
   assetId: string,
@@ -67,10 +97,9 @@ function buildScreenshotKey(
 export async function uploadScreenshotHandler(
   params: UploadScreenshotParams
 ): Promise<PutScreenshotResponse> {
-  const { assetType, assetId, base64Image, organizationId } =
-    UploadScreenshotParamsSchema.parse(params);
+  const { assetType, assetId, image, organizationId } = UploadScreenshotParamsSchema.parse(params);
 
-  const { buffer, contentType, extension } = parseBase64Image(base64Image);
+  const { buffer, contentType, extension } = await parseImageInput(image);
 
   const targetKey = buildScreenshotKey(assetType, assetId, extension, organizationId);
 

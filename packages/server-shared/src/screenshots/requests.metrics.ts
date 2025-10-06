@@ -18,7 +18,17 @@ export type GetMetricScreenshotParams = z.infer<typeof GetMetricScreenshotParams
 export type GetMetricScreenshotQuery = z.infer<typeof GetMetricScreenshotQuerySchema>;
 
 export const PutMetricScreenshotRequestSchema = z.object({
-  base64Image: z.string(),
+  image: z
+    .union([
+      z.string().startsWith('data:image/').describe('Base64-encoded image with data URI prefix'),
+      z.instanceof(File).refine((file) => file.type.startsWith('image/'), {
+        message: 'File must be an image',
+      }),
+    ])
+    .describe('Image as base64 data URI or File object'),
+});
+export const PutMetricScreenshotParamsSchema = z.object({
+  id: z.string().uuid('Asset ID must be a valid UUID'),
 });
 
 export type PutMetricScreenshotRequest = z.infer<typeof PutMetricScreenshotRequestSchema>;

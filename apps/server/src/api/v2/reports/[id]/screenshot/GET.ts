@@ -1,12 +1,15 @@
 import { checkPermission } from '@buster/access-controls';
 import { getAssetScreenshotBucketKey, getReportFileById } from '@buster/database/queries';
 import { getAssetScreenshotSignedUrl } from '@buster/search';
-import { AssetIdParamsSchema, type GetScreenshotResponse } from '@buster/server-shared/screenshots';
+import {
+  GetReportScreenshotParamsSchema,
+  type GetScreenshotResponse,
+} from '@buster/server-shared/screenshots';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-const app = new Hono().get('/', zValidator('param', AssetIdParamsSchema), async (c) => {
+const app = new Hono().get('/', zValidator('param', GetReportScreenshotParamsSchema), async (c) => {
   const reportId = c.req.valid('param').id;
   const user = c.get('busterUser');
 

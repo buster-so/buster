@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import { BaseScreenshotSearchSchema } from './requests.base';
+import { PutMetricScreenshotRequestSchema } from './requests.metrics';
 
-export const PutChatScreenshotRequestSchema = z.object({
-  base64Image: z.string(),
+export const PutChatScreenshotRequestSchema = PutMetricScreenshotRequestSchema;
+export const PutChatScreenshotParamsSchema = z.object({
+  id: z.string().uuid('Asset ID must be a valid UUID'),
 });
 
 export type PutChatScreenshotRequest = z.infer<typeof PutChatScreenshotRequestSchema>;

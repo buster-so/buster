@@ -1,8 +1,8 @@
 import { checkPermission } from '@buster/access-controls';
 import { getChatById } from '@buster/database/queries';
 import {
-  AssetIdParamsSchema,
-  PutMetricScreenshotRequestSchema,
+  PutChatScreenshotParamsSchema,
+  PutChatScreenshotRequestSchema,
   type PutScreenshotResponse,
 } from '@buster/server-shared/screenshots';
 import { zValidator } from '@hono/zod-validator';
@@ -12,11 +12,12 @@ import { uploadScreenshotHandler } from '../../../../../shared-helpers/upload-sc
 
 const app = new Hono().put(
   '/',
-  zValidator('json', PutMetricScreenshotRequestSchema),
-  zValidator('param', AssetIdParamsSchema),
+  zValidator('json', PutChatScreenshotRequestSchema),
+  zValidator('param', PutChatScreenshotParamsSchema),
   async (c) => {
+    console.log('PUT chat screenshot');
     const assetId = c.req.valid('param').id;
-    const { base64Image } = c.req.valid('json');
+    const { image } = c.req.valid('json');
     const user = c.get('busterUser');
 
     const chat = await getChatById(assetId);
@@ -42,7 +43,7 @@ const app = new Hono().put(
     const result: PutScreenshotResponse = await uploadScreenshotHandler({
       assetType: 'chat',
       assetId,
-      base64Image,
+      image,
       organizationId: chat.organizationId,
     });
 

@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-export const AssetIdParamsSchema = z.object({
-  id: z.string().uuid('Asset ID must be a valid UUID'),
-});
-
 export const PutScreenshotResponseSchema = z.object({
   success: z.boolean(),
   bucketKey: z.string().min(1, 'Bucket key is required'),
