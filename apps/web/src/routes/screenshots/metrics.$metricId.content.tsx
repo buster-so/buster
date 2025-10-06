@@ -1,10 +1,10 @@
+import { GetMetricScreenshotQuerySchema } from '@buster/server-shared/screenshots';
 import { createFileRoute } from '@tanstack/react-router';
 import { ensureMetricData, prefetchGetMetric } from '@/api/buster_rest/metrics';
 import { useGetMetricParams } from '@/context/Metrics/useGetMetricParams';
 import { MetricViewChartController } from '@/controllers/MetricController/MetricViewChartController';
-import { GetMetricScreenshotQuerySchema } from '../metrics.$metricId.index';
 
-export const Route = createFileRoute('/screenshots/_content/metrics/$metricId/content')({
+export const Route = createFileRoute('/screenshots/metrics/$metricId/content')({
   validateSearch: GetMetricScreenshotQuerySchema,
   ssr: true,
   beforeLoad: async ({ context, params, search }) => {

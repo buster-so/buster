@@ -1,11 +1,11 @@
+import { GetDashboardScreenshotQuerySchema } from '@buster/server-shared/screenshots';
 import { createFileRoute } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
 import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParams';
 import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
-import { GetDashboardScreenshotQuerySchema } from '../dashboards.$dashboardId.index';
 
-export const Route = createFileRoute('/screenshots/_content/dashboards/$dashboardId/content')({
+export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/content')({
   component: RouteComponent,
   ssr: true,
   validateSearch: GetDashboardScreenshotQuerySchema,

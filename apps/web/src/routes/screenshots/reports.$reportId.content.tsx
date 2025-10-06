@@ -1,8 +1,8 @@
+import { GetReportScreenshotQuerySchema } from '@buster/server-shared/screenshots';
 import { createFileRoute } from '@tanstack/react-router';
 import { prefetchGetReport } from '@/api/buster_rest/reports';
-import { GetReportScreenshotQuerySchema } from '../reports.$reportId';
 
-export const Route = createFileRoute('/screenshots/_content/reports/$reportId/content')({
+export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
   component: RouteComponent,
   validateSearch: GetReportScreenshotQuerySchema,
   ssr: true,
