@@ -1,6 +1,8 @@
 import { GetReportScreenshotQuerySchema } from '@buster/server-shared/screenshots';
 import { createFileRoute } from '@tanstack/react-router';
+import { ensureMetricData } from '@/api/buster_rest/metrics';
 import { prefetchGetReport } from '@/api/buster_rest/reports';
+import { ReportPageController } from '@/controllers/ReportPageControllers';
 
 export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
   component: RouteComponent,
@@ -17,10 +19,22 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
       throw new Error('Report not found');
     }
 
+    const allMetrics = Object.entries(report?.metrics || {});
+
+    await Promise.all(
+      allMetrics.map(([metricId, metric]) => {
+        return ensureMetricData(context.queryClient, {
+          id: metricId,
+          version_number: metric.version_number,
+        });
+      })
+    );
+
     return { report };
   },
 });
 
 function RouteComponent() {
-  return <div>Hello "/screenshots/_content/reports/$reportId/conent"!</div>;
+  const { reportId } = Route.useParams();
+  return <ReportPageController reportId={reportId} readOnly mode="export" />;
 }

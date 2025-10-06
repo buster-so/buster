@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BaseScreenshotSearchSchema } from './requests.base';
 
 export const PutDashboardScreenshotRequestSchema = z.object({
   base64Image: z.string(),
@@ -12,11 +13,13 @@ export const GetDashboardScreenshotParamsSchema = z.object({
 
 export type GetDashboardScreenshotParams = z.infer<typeof GetDashboardScreenshotParamsSchema>;
 
-export const GetDashboardScreenshotQuerySchema = z.object({
-  width: z.coerce.number().min(100).max(3840).default(800),
-  height: z.coerce.number().min(100).max(4160).default(450),
-  type: z.enum(['png', 'jpeg']).default('png'),
-  version_number: z.coerce.number().optional(),
-});
+export const GetDashboardScreenshotQuerySchema = z
+  .object({
+    width: z.coerce.number().min(100).max(3840).default(800),
+    height: z.coerce.number().min(100).max(4160).default(450),
+    type: z.enum(['png', 'jpeg']).default('png'),
+    version_number: z.coerce.number().optional(),
+  })
+  .merge(BaseScreenshotSearchSchema);
 
 export type GetDashboardScreenshotQuery = z.infer<typeof GetDashboardScreenshotQuerySchema>;

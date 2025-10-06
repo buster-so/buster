@@ -20,10 +20,23 @@ export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/conte
       throw new Error('Dashboard not found');
     }
 
+    const numberOfMetrics = 8;
     const allMetrics = Object.entries(dashboard?.metrics || {});
+    const firstXMetrics = allMetrics.slice(0, numberOfMetrics);
+    const restMetrics = allMetrics.slice(numberOfMetrics);
 
+    Promise.all(
+      restMetrics.map(([metricId, metric]) => {
+        return ensureMetricData(context.queryClient, {
+          id: metricId,
+          version_number: metric.version_number,
+        });
+      })
+    );
+
+    //Only really need to wait for the first X metrics to be loaded
     await Promise.all(
-      allMetrics.map(([metricId, metric]) => {
+      firstXMetrics.map(([metricId, metric]) => {
         return ensureMetricData(context.queryClient, {
           id: metricId,
           version_number: metric.version_number,
@@ -38,13 +51,11 @@ export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/conte
 function RouteComponent() {
   const { dashboardId, dashboardVersionNumber } = useGetDashboardParams();
   return (
-    <div className="h-full w-full bg-page-background overflow-y-auto">
-      <DashboardViewDashboardController
-        dashboardId={dashboardId}
-        dashboardVersionNumber={dashboardVersionNumber}
-        readOnly
-        animate={false}
-      />
-    </div>
+    <DashboardViewDashboardController
+      dashboardId={dashboardId}
+      dashboardVersionNumber={dashboardVersionNumber}
+      readOnly
+      animate={false}
+    />
   );
 }
