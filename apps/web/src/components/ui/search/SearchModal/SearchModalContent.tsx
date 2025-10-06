@@ -1,10 +1,11 @@
 import { Command } from 'cmdk';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { SearchEmptyState } from './SearchEmptyState';
 import { SearchFooter } from './SearchFooter';
 import { SearchInput } from './SearchInput';
 import { SearchModalContentItems } from './SearchModalContentItems';
+import { SearchModalItemsContainer } from './SearchModalItemsContainer';
 import type { SearchItem, SearchModalContentProps } from './search-modal.types';
 import { useViewSearchItem } from './useViewSearchItem';
 
@@ -56,7 +57,7 @@ export const SearchModalContent = <M, T extends string>({
 
   return (
     <Command
-      className="min-w-[650px] min-h-[450px] max-h-[75vh] bg-background flex flex-col"
+      className="min-w-[750px] w-[750px] min-h-[450px] max-h-[75vh] bg-background flex flex-col"
       value={focusedValue}
       onValueChange={setFocusedValue}
       onKeyDown={handleKeyDownGlobal}
@@ -69,8 +70,10 @@ export const SearchModalContent = <M, T extends string>({
         placeholder={placeholder}
       />
       <div className="border-b" />
-      <SearchModalContentItems
+      <SearchModalItemsContainer
         searchItems={searchItems}
+        secondaryContent={secondaryContent}
+        openSecondaryContent={openSecondaryContent}
         onSelectGlobal={onSelectGlobal}
         onViewSearchItem={onViewSearchItem}
       />

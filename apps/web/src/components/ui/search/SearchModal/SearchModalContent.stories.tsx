@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { fn } from 'storybook/test';
 import { SearchModalContent } from './SearchModalContent';
 import type { SearchItem } from './search-modal.types';
@@ -64,5 +65,26 @@ export const Default: Story = {
     placeholder: 'Search for something',
     filterContent: <div>Filter</div>,
     filterDropdownContent: <div>Filter Dropdown</div>,
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(false);
+    const [secondaryContent, setSecondaryContent] = useState<React.ReactNode>(null);
+
+    const onViewSearchItem = (item: SearchItem) => {
+      setSecondaryContent(<div>Secondary Content {item.label}</div>);
+      setOpen(true);
+    };
+
+    return (
+      <SearchModalContent
+        {...args}
+        onViewSearchItem={onViewSearchItem}
+        onSearchChange={() => {
+          setOpen(false);
+        }}
+        openSecondaryContent={open}
+        secondaryContent={secondaryContent}
+      />
+    );
   },
 };

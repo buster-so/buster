@@ -16,10 +16,8 @@ export const SearchModalContentItems = <M, T extends string>({
   searchItems,
   onSelectGlobal,
 }: Pick<SearchModalContentProps<M, T>, 'searchItems' | 'onViewSearchItem'> & CommonProps<M, T>) => {
-  const hasResults = useCommandState((x) => x.filtered.count) > 0;
-
   return (
-    <Command.List className={cn('flex flex-col overflow-y-auto flex-1', !hasResults && 'hidden')}>
+    <Command.List className={cn('flex flex-col overflow-y-auto flex-1')}>
       {searchItems.map((item, index) => (
         <ItemsSelecter
           key={keyExtractor(item, index)}
