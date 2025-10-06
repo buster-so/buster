@@ -4,13 +4,10 @@ import {
   useParams,
   useSearch,
 } from '@tanstack/react-router';
-import findLast from 'lodash/findLast';
 
 export const useSelectedAssetType = (): NonNullable<StaticDataRouteOption['assetType']> => {
   const lastMatch = useMatches({
-    select: (matches) => {
-      return findLast(matches, (match) => match.staticData?.assetType);
-    },
+    select: (matches) => matches.reverse().find((match) => match.staticData?.assetType),
   });
 
   if (typeof lastMatch === 'number') {
