@@ -15,7 +15,6 @@ const app = new Hono().put(
   zValidator('json', PutChatScreenshotRequestSchema),
   zValidator('param', PutChatScreenshotParamsSchema),
   async (c) => {
-    console.log('PUT chat screenshot');
     const assetId = c.req.valid('param').id;
     const { image } = c.req.valid('json');
     const user = c.get('busterUser');
