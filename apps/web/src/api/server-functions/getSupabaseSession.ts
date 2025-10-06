@@ -1,8 +1,7 @@
-import type { AuthError, Session, SupabaseClient } from '@supabase/supabase-js';
+import type { AuthError, SupabaseClient } from '@supabase/supabase-js';
 import { createServerFn } from '@tanstack/react-start';
 import type { SimplifiedSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
 import { getSupabaseServerClient } from '@/integrations/supabase/server';
-import { isServer } from '@/lib/window';
 import { isTokenExpired } from '../auth_helpers/expiration-helpers';
 
 export const extractSimplifiedSupabaseSession = async (
@@ -30,7 +29,14 @@ export const getSupabaseSessionServerFn = createServerFn({ method: 'GET' }).hand
     const { data, error } = await extractSimplifiedSupabaseSession(supabase);
     return {
       data,
-      error,
+      error: error
+        ? {
+            code: error.code,
+            status: error.status,
+            name: error.name,
+            message: error.message,
+          }
+        : null,
     };
   } catch (error) {
     // Final catch-all for any unhandled errors
@@ -63,6 +69,13 @@ export const getSupabaseUserServerFn = createServerFn({ method: 'GET' }).handler
     data: {
       user: pickedUser,
     },
-    error: userError,
+    error: userError
+      ? {
+          code: userError.code,
+          status: userError.status,
+          name: userError.name,
+          message: userError.message,
+        }
+      : null,
   };
 });

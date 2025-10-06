@@ -1,5 +1,11 @@
 import { type CookieOptions, createServerClient } from '@supabase/ssr';
-import { parseCookies, setCookie } from '@tanstack/react-start/server';
+import {
+  getCookie,
+  getCookies,
+  getRequest,
+  getResponseHeaders,
+  setCookie,
+} from '@tanstack/react-start/server';
 import { env } from '@/env';
 
 export const COOKIE_OPTIONS: CookieOptions = {
@@ -30,7 +36,8 @@ const safeSetCookie = (name: string, value: string, options: CookieOptions) => {
 
 const safeParseCookies = () => {
   try {
-    return parseCookies();
+    const cookies = getCookies();
+    return cookies;
   } catch (error) {
     if (error instanceof Error && error.message.includes('ERR_HTTP_HEADERS_SENT')) {
       // Return empty object if we can't parse cookies

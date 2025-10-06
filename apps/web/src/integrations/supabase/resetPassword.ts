@@ -6,7 +6,7 @@ import { getSupabaseUser } from './getSupabaseUserClient';
 import { getSupabaseServerClient } from './server';
 
 export const resetPasswordEmailSend = createServerFn({ method: 'POST' })
-  .validator(z.object({ email: z.string().email() }))
+  .inputValidator(z.object({ email: z.string().email() }))
   .handler(async ({ data: { email } }) => {
     const supabase = await getSupabaseServerClient();
 
@@ -25,7 +25,7 @@ export const resetPasswordEmailSend = createServerFn({ method: 'POST' })
   });
 
 export const resetPassword = createServerFn({ method: 'POST' })
-  .validator(z.object({ password: z.string() }))
+  .inputValidator(z.object({ password: z.string() }))
   .handler(async ({ data: { password } }) => {
     const supabase = await getSupabaseServerClient();
 

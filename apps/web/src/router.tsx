@@ -9,8 +9,6 @@ import { NotFoundCard } from '@/components/features/global/NotFoundCard';
 import { FileIndeterminateLoader } from '@/components/features/loaders/FileIndeterminateLoader';
 import * as TanstackQuery from './integrations/tanstack-query/query-client';
 import { routeTree } from './routeTree.gen';
-// Import global middleware to register it
-import './global-middleware';
 
 export interface AppRouterContext {
   queryClient: QueryClient;

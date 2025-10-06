@@ -1,4 +1,3 @@
-import type { AssetType } from '@buster/server-shared/assets';
 import {
   type StaticDataRouteOption,
   useMatches,
@@ -17,7 +16,6 @@ export const useSelectedAssetType = (): NonNullable<StaticDataRouteOption['asset
   if (typeof lastMatch === 'number') {
     return 'chat';
   }
-  // @ts-expect-error - lastMatch is not undefined
   const data = lastMatch?.staticData?.assetType as StaticDataRouteOption['assetType'];
   const { messageId } = useParams({
     strict: false,
