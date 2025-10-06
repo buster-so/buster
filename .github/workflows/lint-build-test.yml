@@ -234,7 +234,7 @@ jobs:
       #     echo "✅ Docker images pre-pulled successfully"
 
       - name: Start services in background
-        run: turbo start
+        run: pnpm turbo start
           # echo "🚀 Starting all services in background..."
           # pnpm turbo start 2>&1 | tee turbo.log &
           # echo $! > turbo.pid
