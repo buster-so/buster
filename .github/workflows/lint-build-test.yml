@@ -333,8 +333,8 @@ jobs:
           # Check all required services
           echo "Checking required services..."
           check_port 3000 "Frontend (Web)"
-          check_port 3001 "Backend APIV1"
-          check_port 3002 "Api V2"
+          check_port 3001/health "Backend APIV1"
+          check_port 3002/healthcheck "Api V2"
 
           echo "🎉 All services are ready!"
           echo "⏳ Waiting 2 minutes for services to fully stabilize..."
