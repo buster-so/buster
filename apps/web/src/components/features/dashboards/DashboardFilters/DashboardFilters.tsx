@@ -1,6 +1,7 @@
 import type { MetricFilter } from '@buster/server-shared/metrics';
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/inputs/Input';
+import { Popover } from '@/components/ui/popover/Popover';
 import { cn } from '@/lib/utils';
 
 interface DashboardFiltersProps {
@@ -32,6 +33,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [filterOperators, setFilterOperators] = useState<Record<string, string>>({});
   const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
+  const [multiSelectValues, setMultiSelectValues] = useState<Record<string, string[]>>({});
 
   const hasCommonFilters = commonFilters && commonFilters.length > 0;
 
@@ -49,8 +51,27 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       setFilterValues(newFilterValues);
 
       // Immediately process the enum selection
-      processFilterValues(newFilterValues, filterOperators);
+      processFilterValues(newFilterValues, filterOperators, multiSelectValues);
     }
+  };
+
+  const handleMultiSelectToggle = (key: string, value: string) => {
+    if (value === CUSTOM_VALUE_KEY) {
+      setCustomMode({ ...customMode, [key]: true });
+      setMultiSelectValues({ ...multiSelectValues, [key]: [] });
+      return;
+    }
+
+    const currentValues = multiSelectValues[key] || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+
+    const newMultiSelectValues = { ...multiSelectValues, [key]: newValues };
+    setMultiSelectValues(newMultiSelectValues);
+
+    // Immediately process the multi-select
+    processFilterValues(filterValues, filterOperators, newMultiSelectValues);
   };
 
   const handleOperatorChange = (key: string, op: string) => {
@@ -59,13 +80,28 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
 
   const processFilterValues = (
     currentFilterValues: Record<string, string>,
-    currentFilterOperators: Record<string, string>
+    currentFilterOperators: Record<string, string>,
+    currentMultiSelectValues: Record<string, string[]>
   ) => {
     // Convert values to appropriate types
     const typedValues: Record<string, unknown> = {};
+
+    // Process multi-select values first (for in_list mode)
+    Object.entries(currentMultiSelectValues).forEach(([filterKey, selectedValues]) => {
+      const filter = commonFilters.find((f) => f.key === filterKey);
+      if (!filter || !selectedValues || selectedValues.length === 0) return;
+
+      // Multi-select is always an array
+      typedValues[filterKey] = selectedValues;
+    });
+
+    // Process regular filter values
     Object.entries(currentFilterValues).forEach(([filterKey, filterValue]) => {
       const filter = commonFilters.find((f) => f.key === filterKey);
       if (!filter || !filterValue) return;
+
+      // Skip if already processed as multi-select
+      if (filterKey in typedValues) return;
 
       let parsedValue: unknown;
 
@@ -99,7 +135,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   };
 
   const handleBlur = () => {
-    processFilterValues(filterValues, filterOperators);
+    processFilterValues(filterValues, filterOperators, multiSelectValues);
   };
 
   return (
@@ -110,6 +146,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           {commonFilters.map((filter) => {
             const hasEnum = filter.validate?.enum && filter.validate.enum.length > 0;
             const isCustomMode = customMode[filter.key];
+            const isInListMode = filter.mode === 'in_list';
 
             return (
               <div key={filter.key} className="flex items-center gap-2">
@@ -130,31 +167,129 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                     ))}
                   </select>
                 )}
-                {hasEnum && !isCustomMode ? (
-                  <select
-                    id={`dashboard-${filter.key}`}
-                    value={filterValues[filter.key] || ''}
-                    onChange={(e) => handleEnumChange(filter.key, e.target.value)}
-                    className="h-8 w-48 rounded-md border border-input bg-background px-2 text-sm"
+                {hasEnum && !isCustomMode && isInListMode ? (
+                  <Popover
+                    content={
+                      <div className="flex max-h-64 w-48 flex-col gap-1 overflow-y-auto p-2">
+                        {filter.validate!.enum!.map((enumValue) => {
+                          const isSelected = (multiSelectValues[filter.key] || []).includes(String(enumValue));
+                          return (
+                            <label
+                              key={String(enumValue)}
+                              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-accent"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleMultiSelectToggle(filter.key, String(enumValue))}
+                                className="h-4 w-4 rounded border-gray-300"
+                              />
+                              <span className="text-sm">{String(enumValue)}</span>
+                            </label>
+                          );
+                        })}
+                        <div className="border-t border-border mt-1 pt-1">
+                          <button
+                            onClick={() => handleMultiSelectToggle(filter.key, CUSTOM_VALUE_KEY)}
+                            className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
+                          >
+                            Custom...
+                          </button>
+                        </div>
+                      </div>
+                    }
+                    align="start"
                   >
-                    <option value="">Select value...</option>
-                    {filter.validate!.enum!.map((enumValue) => (
-                      <option key={String(enumValue)} value={String(enumValue)}>
-                        {String(enumValue)}
-                      </option>
-                    ))}
-                    <option value={CUSTOM_VALUE_KEY}>Custom...</option>
-                  </select>
+                    <button
+                      type="button"
+                      className="flex h-8 w-48 items-center justify-between rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
+                    >
+                      <span className="truncate">
+                        {(multiSelectValues[filter.key] || []).length > 0
+                          ? `${(multiSelectValues[filter.key] || []).length} selected`
+                          : 'Select values...'}
+                      </span>
+                      <span className="ml-2">▼</span>
+                    </button>
+                  </Popover>
+                ) : hasEnum && !isCustomMode ? (
+                  <Popover
+                    content={
+                      <div className="flex max-h-64 w-48 flex-col gap-1 overflow-y-auto p-2">
+                        <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-accent">
+                          <input
+                            type="radio"
+                            name={`dashboard-filter-${filter.key}`}
+                            checked={!filterValues[filter.key]}
+                            onChange={() => handleEnumChange(filter.key, '')}
+                            className="h-4 w-4"
+                          />
+                          <span className="text-sm text-muted-foreground">None</span>
+                        </label>
+                        {filter.validate!.enum!.map((enumValue) => {
+                          const isSelected = filterValues[filter.key] === String(enumValue);
+                          return (
+                            <label
+                              key={String(enumValue)}
+                              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-accent"
+                            >
+                              <input
+                                type="radio"
+                                name={`dashboard-filter-${filter.key}`}
+                                checked={isSelected}
+                                onChange={() => handleEnumChange(filter.key, String(enumValue))}
+                                className="h-4 w-4"
+                              />
+                              <span className="text-sm">{String(enumValue)}</span>
+                            </label>
+                          );
+                        })}
+                        <div className="border-t border-border mt-1 pt-1">
+                          <button
+                            onClick={() => handleEnumChange(filter.key, CUSTOM_VALUE_KEY)}
+                            className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
+                          >
+                            Custom...
+                          </button>
+                        </div>
+                      </div>
+                    }
+                    align="start"
+                  >
+                    <button
+                      type="button"
+                      className="flex h-8 w-48 items-center justify-between rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
+                    >
+                      <span className="truncate">
+                        {filterValues[filter.key] || 'Select value...'}
+                      </span>
+                      <span className="ml-2">▼</span>
+                    </button>
+                  </Popover>
                 ) : (
-                  <Input
-                    id={`dashboard-${filter.key}`}
-                    type="text"
-                    value={filterValues[filter.key] || ''}
-                    onChange={(e) => handleInputChange(filter.key, e.target.value)}
-                    onBlur={handleBlur}
-                    placeholder={getPlaceholder(filter)}
-                    className="h-8 w-48"
-                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id={`dashboard-${filter.key}`}
+                      type="text"
+                      value={filterValues[filter.key] || ''}
+                      onChange={(e) => handleInputChange(filter.key, e.target.value)}
+                      onBlur={handleBlur}
+                      placeholder={getPlaceholder(filter)}
+                      className="h-8 w-48"
+                    />
+                    {hasEnum && isCustomMode && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomMode({ ...customMode, [filter.key]: false });
+                          setFilterValues({ ...filterValues, [filter.key]: '' });
+                        }}
+                        className="text-xs text-muted-foreground hover:text-foreground underline"
+                      >
+                        Back to options
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             );
