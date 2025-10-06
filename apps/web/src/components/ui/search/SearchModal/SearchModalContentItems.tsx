@@ -1,4 +1,6 @@
-import { Command, useCommandState } from 'cmdk';
+import { Command } from 'cmdk';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import type {
   SearchItem,
@@ -69,13 +71,41 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
         'min-h-9 px-4 flex items-center',
         secondaryLabel && 'min-h-13.5',
         'data-[selected=true]:bg-item-hover data-[selected=true]:text-foreground',
-        !disabled ? 'cursor-pointer' : 'cursor-not-allowed'
+        !disabled ? 'cursor-pointer' : 'cursor-not-allowed',
+        'space-x-2'
       )}
       value={value}
       disabled={disabled}
       onSelect={() => onSelectGlobal(item)}
     >
-      {label}
+      {icon && (
+        <span
+          className={cn(
+            'text-icon-color text-center group-hover:text-foreground size-4 text-icon-size',
+            secondaryLabel && 'self-start mt-2.5'
+          )}
+        >
+          {icon}
+        </span>
+      )}
+
+      <div className="flex flex-col space-y-1">
+        <Text>{label}</Text>
+        <AnimatePresence initial={false}>
+          {secondaryLabel && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0 } }}
+              transition={{ duration: 0.2 }}
+            >
+              <Text size="sm" variant="secondary">
+                {secondaryLabel}
+              </Text>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </Command.Item>
   );
 };
