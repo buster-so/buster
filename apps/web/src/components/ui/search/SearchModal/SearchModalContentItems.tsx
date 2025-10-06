@@ -19,7 +19,7 @@ export const SearchModalContentItems = <M, T extends string>({
   onSelectGlobal,
 }: Pick<SearchModalContentProps<M, T>, 'searchItems' | 'onViewSearchItem'> & CommonProps<M, T>) => {
   return (
-    <Command.List className={cn('flex flex-col overflow-y-auto flex-1')}>
+    <Command.List className={cn('flex flex-col overflow-y-auto flex-1 px-3 pt-1.5 pb-1.5')}>
       {searchItems.map((item, index) => (
         <ItemsSelecter
           key={keyExtractor(item, index)}
@@ -68,7 +68,7 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
   return (
     <Command.Item
       className={cn(
-        'min-h-9 px-4 flex items-center',
+        'min-h-9 px-4 flex items-center rounded',
         secondaryLabel && 'min-h-13.5',
         'data-[selected=true]:bg-item-hover data-[selected=true]:text-foreground',
         !disabled ? 'cursor-pointer' : 'cursor-not-allowed',
@@ -81,7 +81,8 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
       {icon && (
         <span
           className={cn(
-            'text-icon-color text-center group-hover:text-foreground size-4 text-icon-size',
+            'text-center group-hover:text-foreground size-4 text-icon-size text-icon-color',
+            'data-[selected=true]:text-foreground',
             secondaryLabel && 'self-start mt-2.5'
           )}
         >

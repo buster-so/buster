@@ -77,7 +77,6 @@ export const Default: Story = {
     const onViewSearchItem = (item: SearchItem) => {
       setSecondaryContent(<div>Secondary Content {item.label}</div>);
       setOpen(true);
-      //   setAddInSecondaryLabel(true);
     };
 
     const searchItems: SearchItems[] = mockSearchItems.map((item) => ({
@@ -96,7 +95,6 @@ export const Default: Story = {
         onViewSearchItem={onViewSearchItem}
         onSearchChange={() => {
           setOpen(false);
-          // setAddInSecondaryLabel(false);
         }}
         openSecondaryContent={open}
         secondaryContent={secondaryContent}
