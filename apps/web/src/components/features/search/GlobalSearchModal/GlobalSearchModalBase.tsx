@@ -16,6 +16,7 @@ import type {
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { timeFromNow } from '@/lib/date';
 import { assetTypeToIcon } from '../../icons/assetIcons';
+import type { FiltersParams, OnSetFiltersParams } from './GlobalSearchModal';
 import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
 import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
 import { useGlobalSearchStore } from './global-search-store';
@@ -25,7 +26,8 @@ export type GlobalSearchModalBaseProps<M = unknown, T extends string = string> =
   'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'openSecondaryContent'
 > & {
   items: SearchTextResponse['data'];
-  selectedAssets: AssetType[] | null;
+  filtersParams: FiltersParams;
+  onSetFilters: OnSetFiltersParams;
 };
 
 export const GlobalSearchModalBase = ({
@@ -35,7 +37,8 @@ export const GlobalSearchModalBase = ({
   loading,
   openSecondaryContent,
   scrollContainerRef,
-  selectedAssets,
+  filtersParams,
+  onSetFilters,
 }: GlobalSearchModalBaseProps) => {
   const { isOpen, onClose } = useGlobalSearchStore();
   const navigate = useNavigate();
@@ -127,8 +130,8 @@ export const GlobalSearchModalBase = ({
         return viewedItem ? <GlobalSearchSecondaryContent selectedItem={viewedItem} /> : null;
       }, [viewedItem])}
       filterContent={useMemo(
-        () => <GlobalSearchModalFilters selectedAssets={selectedAssets} />,
-        [selectedAssets]
+        () => <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />,
+        [filtersParams, onSetFilters]
       )}
       placeholder="Search..."
       loading={loading}

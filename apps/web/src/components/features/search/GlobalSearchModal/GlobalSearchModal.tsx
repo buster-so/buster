@@ -2,6 +2,7 @@ import type { AssetType } from '@buster/server-shared/assets';
 import React, { useMemo, useState } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { GlobalSearchModalBase } from './GlobalSearchModalBase';
 import { useGlobalSearchStore } from './global-search-store';
 
@@ -14,6 +15,20 @@ export const GlobalSearchModal = () => {
 
   const hasQuery = searchQuery.length > 0;
   const openSecondaryContent = hasQuery;
+
+  const onSetFilters: OnSetFiltersParams = useMemo(
+    () => ({
+      setSelectedAssets,
+    }),
+    [setSelectedAssets]
+  );
+
+  const filtersParams: FiltersParams = useMemo(
+    () => ({
+      selectedAssets,
+    }),
+    [selectedAssets]
+  );
 
   const assetTypes: AssetType[] | undefined = useMemo(() => {
     if (selectedAssets) {
@@ -28,6 +43,7 @@ export const GlobalSearchModal = () => {
   const { allResults, isLoading, scrollContainerRef } = useSearchInfinite({
     page_size: 20,
     assetTypes,
+
     searchQuery: debouncedSearchQuery,
     includeAssetAncestors: true,
     includeScreenshots: true,
@@ -45,7 +61,16 @@ export const GlobalSearchModal = () => {
       loading={isLoading}
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent}
-      selectedAssets={selectedAssets}
+      onSetFilters={onSetFilters}
+      filtersParams={filtersParams}
     />
   );
+};
+
+export type OnSetFiltersParams = {
+  setSelectedAssets: React.Dispatch<React.SetStateAction<AssetType[] | null>>;
+};
+
+export type FiltersParams = {
+  selectedAssets: AssetType[] | null;
 };
