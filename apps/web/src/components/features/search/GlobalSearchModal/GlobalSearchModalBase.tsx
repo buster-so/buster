@@ -13,6 +13,8 @@ import type {
 } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { useWhyDidYouUpdate } from '@/hooks/useWhyDidYouUpdate';
+import { formatDate, timeFromNow } from '@/lib/date';
+import { ASSET_ICONS, assetTypeToIcon } from '../../icons/assetIcons';
 import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
 import { useGlobalSearchStore } from './global-search-store';
 
@@ -36,12 +38,19 @@ export const GlobalSearchModalBase = ({
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
   const searchItems: SearchItems[] = useMemo(() => {
-    if (openSecondaryContent) {
-      const allItems: SearchItem[] = items.map((item) => ({
+    const makeItem = (item: SearchTextData, makeTertiary?: boolean): SearchItem => {
+      const Icon = assetTypeToIcon(item.assetType);
+      return {
         label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
+        icon: <Icon />,
         value: item.assetId,
         type: 'item',
-      }));
+        tertiaryLabel: makeTertiary ? timeFromNow(item.updatedAt) : undefined,
+      };
+    };
+
+    if (openSecondaryContent) {
+      const allItems: SearchItem[] = items.map((item) => makeItem(item));
 
       return [
         {
@@ -82,11 +91,7 @@ export const GlobalSearchModalBase = ({
         ([key, value]) => ({
           type: 'group',
           label: translations[key as keyof typeof translations],
-          items: value.map((item) => ({
-            label: item.title,
-            value: item.assetId,
-            type: 'item',
-          })),
+          items: value.map((item) => makeItem(item, true)),
           display: value.length > 0,
         })
       ),

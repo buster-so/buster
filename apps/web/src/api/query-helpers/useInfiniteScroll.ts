@@ -106,10 +106,14 @@ export function useInfiniteScroll<TData, TError = ApiError>(
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container) return;
+
+    if (!container) {
+      return;
+    }
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
+      console.log(scrollHeight);
       // Trigger when user is within scrollThreshold pixels of the bottom
       if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
         if (hasNextPage && !isFetchingNextPage) {
@@ -120,7 +124,14 @@ export function useInfiniteScroll<TData, TError = ApiError>(
 
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, scrollThreshold]);
+  }, [
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    scrollThreshold,
+    queryResult.isFetched,
+    options.enabled,
+  ]);
 
   return {
     ...queryResult,
