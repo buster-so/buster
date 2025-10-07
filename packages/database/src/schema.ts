@@ -1902,6 +1902,7 @@ export const assetSearchV2 = pgTable(
     organizationId: uuid('organization_id').notNull(),
     title: text('title').notNull(),
     additionalText: text('additional_text'),
+    createdBy: uuid('created_by').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -1916,6 +1917,11 @@ export const assetSearchV2 = pgTable(
       columns: [table.organizationId],
       foreignColumns: [organizations.id],
       name: 'asset_search_v2_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [users.id],
+      name: 'asset_search_v2_created_by_fkey',
     }).onDelete('cascade'),
     index('pgroonga_search_title_description_index').using(
       'pgroonga',
