@@ -42,15 +42,13 @@ const mockSearchTextData: SearchTextData = {
     reports: [],
     collections: [],
   },
-  createdBy: {
-    id: 'abc123',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatarUrl: faker.image.url({
-      width: 200,
-      height: 200,
-    }),
-  },
+
+  createdBy: '123e4567-e89b-12d3-a456-426614174000',
+  createdByName: 'John Doe',
+  createdByAvatarUrl: faker.image.url({
+    width: 200,
+    height: 200,
+  }),
 };
 
 export const Default: Story = {

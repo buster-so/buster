@@ -24,8 +24,17 @@ export type GlobalSearchSecondaryContentProps = {
 export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContentProps> = ({
   selectedItem,
 }) => {
-  const { assetId, assetType, title, ancestors, updatedAt, screenshotUrl, createdBy } =
-    selectedItem;
+  const {
+    assetId,
+    assetType,
+    title,
+    ancestors,
+    updatedAt,
+    screenshotUrl,
+    createdBy,
+    createdByAvatarUrl,
+    createdByName,
+  } = selectedItem;
 
   return (
     <div className="px-3 pt-3 pb-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3 flex-1 h-full">
@@ -35,7 +44,12 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
         <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
       )}
 
-      <MetaContent updatedAt={updatedAt} createdBy={createdBy} />
+      <MetaContent
+        updatedAt={updatedAt}
+        createdBy={createdBy}
+        createdByAvatarUrl={createdByAvatarUrl}
+        createdByName={createdByName}
+      />
 
       <hr className="border-t" />
 
@@ -174,7 +188,12 @@ const MetricScreenshotContainer = ({
   );
 };
 
-const MetaContent = ({ updatedAt, createdBy }: Pick<SearchTextData, 'updatedAt' | 'createdBy'>) => {
+const MetaContent = ({
+  updatedAt,
+  createdBy,
+  createdByAvatarUrl,
+  createdByName,
+}: Pick<SearchTextData, 'updatedAt' | 'createdBy' | 'createdByAvatarUrl' | 'createdByName'>) => {
   const PillContainer = ({ children }: { children: React.ReactNode }) => {
     return (
       <div
@@ -193,13 +212,13 @@ const MetaContent = ({ updatedAt, createdBy }: Pick<SearchTextData, 'updatedAt' 
       {createdBy && (
         <PillContainer>
           <img
-            src={createdBy.avatarUrl ?? ''}
+            src={createdByAvatarUrl ?? ''}
             alt="Avatar"
             className="w-3 h-3 rounded-full border object-contain bg-gray-light/50"
             style={{ objectFit: 'contain' }}
           />
 
-          {createdBy?.name}
+          {createdByName}
         </PillContainer>
       )}
       <PillContainer>
