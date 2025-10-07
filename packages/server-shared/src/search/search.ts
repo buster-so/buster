@@ -51,7 +51,6 @@ export const SearchTextRequestSchema = z
 export const SearchTextDataSchema = TextSearchResultSchema.extend({
   ancestors: AssetAncestorsSchema.optional(),
   screenshotUrl: z.string().optional(),
-  createdBy: UserInfoResponseSchema.optional(),
 });
 
 export type { AssetAncestors } from '@buster/database/schema-types';

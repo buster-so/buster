@@ -8,4 +8,7 @@ export const TextSearchResultSchema = z.object({
   additionalText: z.string().nullable(),
   updatedAt: z.string().datetime(),
   screenshotBucketKey: z.string().nullable(),
+  createdBy: z.string().uuid(),
+  createdByName: z.string(),
+  createdByAvatarUrl: z.string().nullable(),
 });
