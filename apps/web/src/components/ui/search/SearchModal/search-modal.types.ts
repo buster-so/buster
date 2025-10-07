@@ -43,8 +43,10 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   emptyState?: React.ReactNode | string;
   placeholder?: string;
   loading?: boolean;
+  showTopLoading?: boolean;
   secondaryContent?: React.ReactNode | null;
   openSecondaryContent?: boolean; //if undefined it will close and open with the secondary content
+  onScrollToBottom?: () => void;
 } & Pick<React.ComponentProps<typeof Command>, 'filter' | 'shouldFilter'>;
 
 export type SearchModalProps = SearchModalContentProps & {

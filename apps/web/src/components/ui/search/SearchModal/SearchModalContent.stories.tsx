@@ -60,6 +60,7 @@ export const Default: Story = {
     onChangeValue: fn(),
     onSelect: fn(),
     onViewSearchItem: fn(),
+    onScrollToBottom: fn(),
     emptyState: 'No results found',
     placeholder: 'Search for something',
     filterContent: <div>Filter</div>,

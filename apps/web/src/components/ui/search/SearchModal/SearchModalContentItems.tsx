@@ -18,16 +18,45 @@ type CommonProps<M, T extends string> = {
   onSelectGlobal: (d: SearchItem<M, T>) => void;
 };
 
+const SCROLL_THRESHOLD = 55;
+
 export const SearchModalContentItems = <M, T extends string>({
   searchItems,
+  loading,
   onSelectGlobal,
-}: Pick<SearchModalContentProps<M, T>, 'searchItems' | 'onViewSearchItem'> & CommonProps<M, T>) => {
+  onScrollToBottom,
+}: Pick<
+  SearchModalContentProps<M, T>,
+  'loading' | 'onScrollToBottom' | 'searchItems' | 'onViewSearchItem'
+> &
+  CommonProps<M, T>) => {
+  const hasFiredRef = useRef(false);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const scrollHeight = target.scrollHeight;
+    const scrollTop = target.scrollTop;
+    const clientHeight = target.clientHeight;
+
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+    if (distanceFromBottom <= SCROLL_THRESHOLD) {
+      if (!hasFiredRef.current) {
+        hasFiredRef.current = true;
+        onScrollToBottom?.();
+      }
+    } else {
+      hasFiredRef.current = false;
+    }
+  };
+
   return (
     <Command.List
       className={cn(
         'flex flex-col overflow-y-auto flex-1 px-3 pt-1.5 pb-1.5',
         '[&_[hidden]+[data-separator-after-hidden]]:hidden'
       )}
+      onScroll={onScrollToBottom ? handleScroll : undefined}
     >
       {searchItems.map((item, index) => (
         <ItemsSelecter
@@ -36,6 +65,14 @@ export const SearchModalContentItems = <M, T extends string>({
           onSelectGlobal={onSelectGlobal}
         />
       ))}
+
+      {loading && (
+        <div className="flex items-center justify-center my-1.5">
+          <Text size={'sm'} variant={'secondary'}>
+            Loading...
+          </Text>
+        </div>
+      )}
     </Command.List>
   );
 };

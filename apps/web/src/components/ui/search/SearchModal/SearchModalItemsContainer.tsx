@@ -1,8 +1,6 @@
 import { useCommandState } from 'cmdk';
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
 import { cn } from '@/lib/utils';
-import { SearchLoading } from './SearchLoading';
 import { SearchModalContentItems } from './SearchModalContentItems';
 import type { SearchItem, SearchItems, SearchModalContentProps } from './search-modal.types';
 
@@ -14,12 +12,16 @@ export const SearchModalItemsContainer = <M, T extends string>({
   onViewSearchItem,
   secondaryContent,
   openSecondaryContent,
+  loading,
+  onScrollToBottom,
 }: {
   searchItems: SearchItems<M, T>[];
+  loading: SearchModalContentProps<M, T>['loading'];
   onSelectGlobal: (d: SearchItem<M, T>) => void;
   onViewSearchItem: (item: SearchItem<M, T>) => void;
   secondaryContent: SearchModalContentProps<M, T>['secondaryContent'];
   openSecondaryContent: SearchModalContentProps<M, T>['openSecondaryContent'];
+  onScrollToBottom: SearchModalContentProps<M, T>['onScrollToBottom'];
 }) => {
   const hasResults = useCommandState((x) => x.filtered.count) > 0;
 
@@ -33,8 +35,10 @@ export const SearchModalItemsContainer = <M, T extends string>({
       >
         <SearchModalContentItems
           searchItems={searchItems}
+          loading={loading}
           onSelectGlobal={onSelectGlobal}
           onViewSearchItem={onViewSearchItem}
+          onScrollToBottom={onScrollToBottom}
         />
       </motion.div>
       <AnimatePresence>
