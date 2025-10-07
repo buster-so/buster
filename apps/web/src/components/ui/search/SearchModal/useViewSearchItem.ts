@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import type { SearchItem, SearchItems } from './search-modal.types';
 
 export const useViewSearchItem = <M, T extends string>({
@@ -10,35 +11,45 @@ export const useViewSearchItem = <M, T extends string>({
 }) => {
   const [focusedValue, setFocusedValue] = useState<string>('');
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && onViewSearchItem) {
-      // Wait for next tick to get updated focusedValue
-      setTimeout(() => {
-        if (!focusedValue) return;
+  const findAndViewSearchItem = useMemoizedFn(() => {
+    if (!onViewSearchItem) return;
 
-        const findItem = (items: typeof searchItems): SearchItem<M, T> | null => {
-          for (const item of items) {
-            if (item.type === 'item' && item.value === focusedValue) {
-              return item;
-            }
-            if (item.type === 'group') {
-              const found = findItem(item.items);
-              if (found) return found;
-            }
+    // Wait for next tick to get updated focusedValue
+    setTimeout(() => {
+      if (!focusedValue) return;
+
+      const findItem = (items: typeof searchItems): SearchItem<M, T> | null => {
+        for (const item of items) {
+          if (item.type === 'item' && item.value === focusedValue) {
+            return item;
           }
-          return null;
-        };
-
-        const item = findItem(searchItems);
-        if (item) {
-          onViewSearchItem(item);
+          if (item.type === 'group') {
+            const found = findItem(item.items);
+            if (found) return found;
+          }
         }
-      }, 0);
-    }
-  };
+        return null;
+      };
+
+      const item = findItem(searchItems);
+      if (item) {
+        onViewSearchItem(item);
+      }
+    }, 0);
+  });
+
+  // const handleKeyDown = (e: React.KeyboardEvent) => {
+  //   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+  //     findAndViewSearchItem();
+  //   }
+  // };
+
+  useEffect(() => {
+    findAndViewSearchItem();
+  }, [focusedValue]);
 
   return {
-    handleKeyDown,
+    // handleKeyDown,
     focusedValue,
     setFocusedValue,
   };

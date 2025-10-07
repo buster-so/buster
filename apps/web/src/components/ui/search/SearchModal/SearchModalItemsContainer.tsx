@@ -9,7 +9,6 @@ const duration = 0.15;
 export const SearchModalItemsContainer = <M, T extends string>({
   searchItems,
   onSelectGlobal,
-  onViewSearchItem,
   secondaryContent,
   openSecondaryContent,
   loading,
@@ -18,7 +17,6 @@ export const SearchModalItemsContainer = <M, T extends string>({
   searchItems: SearchItems<M, T>[];
   loading: SearchModalContentProps<M, T>['loading'];
   onSelectGlobal: (d: SearchItem<M, T>) => void;
-  onViewSearchItem: (item: SearchItem<M, T>) => void;
   secondaryContent: SearchModalContentProps<M, T>['secondaryContent'];
   openSecondaryContent: SearchModalContentProps<M, T>['openSecondaryContent'];
   scrollContainerRef: SearchModalContentProps<M, T>['scrollContainerRef'];
@@ -37,7 +35,6 @@ export const SearchModalItemsContainer = <M, T extends string>({
           searchItems={searchItems}
           loading={loading}
           onSelectGlobal={onSelectGlobal}
-          onViewSearchItem={onViewSearchItem}
           scrollContainerRef={scrollContainerRef}
         />
       </motion.div>

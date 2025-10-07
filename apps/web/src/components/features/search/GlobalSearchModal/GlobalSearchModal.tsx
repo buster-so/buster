@@ -8,7 +8,7 @@ export const GlobalSearchModal = () => {
   const [selectedAssets, setSelectedAssets] = useState<AssetType[] | null>(null);
 
   const hasQuery = searchQuery.length > 0;
-  const openSecondaryContent = true;
+  const openSecondaryContent = hasQuery;
 
   const assetTypes: AssetType[] | undefined = useMemo(() => {
     if (selectedAssets) {

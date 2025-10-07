@@ -18,17 +18,12 @@ type CommonProps<M, T extends string> = {
   onSelectGlobal: (d: SearchItem<M, T>) => void;
 };
 
-const SCROLL_THRESHOLD = 55;
-
 export const SearchModalContentItems = <M, T extends string>({
   searchItems,
   loading,
   onSelectGlobal,
   scrollContainerRef,
-}: Pick<
-  SearchModalContentProps<M, T>,
-  'scrollContainerRef' | 'loading' | 'searchItems' | 'onViewSearchItem'
-> &
+}: Pick<SearchModalContentProps<M, T>, 'scrollContainerRef' | 'loading' | 'searchItems'> &
   CommonProps<M, T>) => {
   const hasFiredRef = useRef(false);
 

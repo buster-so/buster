@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing */
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
@@ -37,7 +38,7 @@ export const GlobalSearchModalBase = ({
   const searchItems: SearchItems[] = useMemo(() => {
     if (openSecondaryContent) {
       return items.map((item) => ({
-        label: item.title,
+        label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
         value: item.assetId,
         type: 'item',
       }));
@@ -91,6 +92,7 @@ export const GlobalSearchModalBase = ({
 
   return (
     <SearchModal
+      className="search-bold"
       open={isOpen}
       onClose={onClose}
       value={value}
@@ -105,6 +107,7 @@ export const GlobalSearchModalBase = ({
       showTopLoading={false}
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent && !!viewedItem}
+      shouldFilter={false}
     />
   );
 };

@@ -55,4 +55,5 @@ export type SearchModalProps<M = unknown, T extends string = string> = SearchMod
 > & {
   open: boolean;
   onClose: () => void;
+  className?: string;
 };

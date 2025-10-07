@@ -28,7 +28,7 @@ export const SearchModalContent = <M, T extends string>({
   filter,
   scrollContainerRef,
 }: SearchModalContentProps<M, T>) => {
-  const { handleKeyDown, focusedValue, setFocusedValue } = useViewSearchItem({
+  const { focusedValue, setFocusedValue } = useViewSearchItem({
     searchItems,
     onViewSearchItem,
   });
@@ -38,7 +38,7 @@ export const SearchModalContent = <M, T extends string>({
     if (e.metaKey || e.ctrlKey) {
       isCommandKeyPressedRef.current = true;
     }
-    handleKeyDown(e);
+    // handleKeyDown(e);
   };
 
   const handleKeyUpGlobal = (e: React.KeyboardEvent) => {
@@ -79,7 +79,6 @@ export const SearchModalContent = <M, T extends string>({
         openSecondaryContent={openSecondaryContent}
         loading={loading}
         onSelectGlobal={onSelectGlobal}
-        onViewSearchItem={onViewSearchItem}
         scrollContainerRef={scrollContainerRef}
       />
 
