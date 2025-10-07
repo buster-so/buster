@@ -1,15 +1,22 @@
 import { randomBytes } from 'node:crypto';
-import { type User, getUserOrganizationId } from '@buster/database/queries';
+import { getUserOrganizationId } from '@buster/database/queries';
+import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { storeInstallationState } from '../services/installation-state';
+import { requireAuth } from '../../../../../middleware/auth';
+import { storeInstallationState } from '../../services/installation-state';
 
-/**
- * Initiates the GitHub App installation flow
- * Redirects the user to GitHub to install the app with a state parameter
- */
-export async function authInitHandler(user: User): Promise<{ redirectUrl: string }> {
+const app = new Hono().get('/', requireAuth, async (c) => {
+  const user = c.get('busterUser');
+  console.info('Github app/install received');
+  const response = await appInstallHandler(user.id);
+  return c.json(response);
+});
+
+export default app;
+
+export async function appInstallHandler(userId: string): Promise<{ redirectUrl: string }> {
   // Get user's organization
-  const userOrg = await getUserOrganizationId(user.id);
+  const userOrg = await getUserOrganizationId(userId);
   if (!userOrg) {
     throw new HTTPException(400, {
       message: 'User is not associated with an organization',
@@ -21,7 +28,7 @@ export async function authInitHandler(user: User): Promise<{ redirectUrl: string
 
   // Store the state with user/org context (expires in 10 minutes)
   await storeInstallationState(state, {
-    userId: user.id,
+    userId: userId,
     organizationId: userOrg.organizationId,
     createdAt: new Date().toISOString(),
   });
@@ -46,7 +53,7 @@ export async function authInitHandler(user: User): Promise<{ redirectUrl: string
   // We pass the state as a parameter that GitHub will preserve
   const redirectUrl = `https://github.com/apps/${appName}/installations/new?state=${state}`;
 
-  console.info(`Initiating GitHub installation for user ${user.id}, org ${userOrg.organizationId}`);
+  console.info(`Initiating GitHub installation for user ${userId}, org ${userOrg.organizationId}`);
 
   return { redirectUrl };
 }

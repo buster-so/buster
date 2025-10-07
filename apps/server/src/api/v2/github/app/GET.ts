@@ -3,7 +3,8 @@ import {
   getActiveGithubIntegration,
   getUserOrganizationId,
 } from '@buster/database/queries';
-import { HTTPException } from 'hono/http-exception';
+import { Hono } from 'hono';
+import { requireAuth } from '../../../../middleware/auth';
 
 interface GetIntegrationResponse {
   connected: boolean;
@@ -12,6 +13,14 @@ interface GetIntegrationResponse {
   createdAt?: string;
   status?: string;
 }
+
+const app = new Hono().get('/', requireAuth, async (c) => {
+  const user = c.get('busterUser');
+  const response = await getIntegrationHandler(user);
+  return c.json(response);
+});
+
+export default app;
 
 /**
  * Get the current GitHub integration status for the user's organization

@@ -9,9 +9,7 @@ import type { githubIntegrations } from '@buster/database/schema';
 import {
   GitHubErrorCode,
   type InstallationCallbackRequest,
-  createGitHubApp,
   deleteInstallationToken,
-  storeInstallationToken,
 } from '@buster/github';
 import type { InferSelectModel } from 'drizzle-orm';
 
@@ -98,15 +96,7 @@ async function handleInstallationCreated(params: {
       );
     }
 
-    // Generate and store new token
-    const tokenVaultKey = await generateAndStoreToken(installation.id.toString());
-
-    // Update the integration with the new vault key
-    const fullyUpdated = await updateGithubIntegration(existing.id, {
-      tokenVaultKey,
-    });
-
-    return fullyUpdated || updated;
+    return updated;
   }
 
   // Create new integration
@@ -116,7 +106,7 @@ async function handleInstallationCreated(params: {
     githubOrgName: installation.account.login,
     organizationId,
     userId,
-    status: 'pending', // Will be updated to 'active' after token generation
+    status: 'active',
   });
 
   if (!integration) {
@@ -126,25 +116,9 @@ async function handleInstallationCreated(params: {
     );
   }
 
-  // Generate and store installation token
-  const tokenVaultKey = await generateAndStoreToken(installation.id.toString());
-
-  // Update integration with token vault key and active status
-  const updatedIntegration = await updateGithubIntegration(integration.id, {
-    tokenVaultKey,
-    status: 'active',
-  });
-
-  if (!updatedIntegration) {
-    throw createGitHubError(
-      GitHubErrorCode.DATABASE_ERROR,
-      `Failed to update integration for installation ${installation.id}`
-    );
-  }
-
   console.info(`Created GitHub integration for installation ${installation.id}`);
 
-  return updatedIntegration;
+  return integration;
 }
 
 /**
@@ -222,13 +196,9 @@ async function handleInstallationUnsuspended(installationId: string): Promise<Gi
     );
   }
 
-  // Generate new token
-  const tokenVaultKey = await generateAndStoreToken(installationId);
-
   // Update status to active
   const unsuspended = await updateGithubIntegration(integration.id, {
     status: 'active',
-    tokenVaultKey,
   });
 
   if (!unsuspended) {
@@ -246,35 +216,36 @@ async function handleInstallationUnsuspended(installationId: string): Promise<Gi
 /**
  * Generate and store an installation token
  */
-async function generateAndStoreToken(installationId: string): Promise<string> {
-  try {
-    const app = createGitHubApp();
+// Commenting out for now since I don't believe we should store tokens. If we want to then we can add it back easily.
+// async function generateAndStoreToken(installationId: string): Promise<string> {
+//   try {
+//     const app = createGitHubApp();
 
-    // Generate installation access token
-    const { data } = await app.octokit.rest.apps.createInstallationAccessToken({
-      installation_id: Number.parseInt(installationId, 10),
-    });
+//     // Generate installation access token
+//     const { data } = await app.octokit.rest.apps.createInstallationAccessToken({
+//       installation_id: Number.parseInt(installationId, 10),
+//     });
 
-    // Store token in vault
-    const vaultKey = await storeInstallationToken(
-      installationId,
-      data.token,
-      data.expires_at,
-      data.permissions,
-      data.repository_selection
-    );
+//     // Store token in vault
+//     const vaultKey = await storeInstallationToken(
+//       installationId,
+//       data.token,
+//       data.expires_at,
+//       data.permissions,
+//       data.repository_selection
+//     );
 
-    console.info(`Generated and stored token for installation ${installationId}`);
+//     console.info(`Generated and stored token for installation ${installationId}`);
 
-    return vaultKey;
-  } catch (error) {
-    console.error(`Failed to generate token for installation ${installationId}:`, error);
-    throw createGitHubError(
-      GitHubErrorCode.TOKEN_GENERATION_FAILED,
-      `Failed to generate token: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
-  }
-}
+//     return vaultKey;
+//   } catch (error) {
+//     console.error(`Failed to generate token for installation ${installationId}:`, error);
+//     throw createGitHubError(
+//       GitHubErrorCode.TOKEN_GENERATION_FAILED,
+//       `Failed to generate token: ${error instanceof Error ? error.message : 'Unknown error'}`
+//     );
+//   }
+// }
 
 /**
  * Create a GitHub operation error

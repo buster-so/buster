@@ -1,6 +1,37 @@
 import { getUserOrganizationId } from '@buster/database/queries';
-import { handleInstallationCallback } from '../services/handle-installation-callback';
-import { retrieveInstallationState } from '../services/installation-state';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
+import { z } from 'zod';
+import { handleInstallationCallback } from '../../../services/handle-installation-callback';
+import { retrieveInstallationState } from '../../../services/installation-state';
+
+// Define request schemas
+const GithubInstallationCallbackSchema = z.object({
+  state: z.string().optional(),
+  installation_id: z.string().optional(),
+  setup_action: z.enum(['install', 'update']).optional(),
+  error: z.string().optional(), // GitHub sends this when user cancels
+  error_description: z.string().optional(),
+});
+
+const app = new Hono().get(
+  '/',
+  zValidator('query', GithubInstallationCallbackSchema),
+  async (c) => {
+    const query = c.req.valid('query');
+    console.info('GitHub auth callback received', { query });
+    const result = await githubInstallationCallbackHandler({
+      state: query.state,
+      installation_id: query.installation_id,
+      setup_action: query.setup_action,
+      error: query.error,
+      error_description: query.error_description,
+    });
+    return c.redirect(result.redirectUrl);
+  }
+);
+
+export default app;
 
 interface CompleteInstallationRequest {
   state?: string | undefined;
@@ -19,7 +50,7 @@ interface AuthCallbackResult {
  * This is called after the user installs the app on GitHub
  * Returns a redirect URL to send the user to the appropriate page
  */
-export async function authCallbackHandler(
+export async function githubInstallationCallbackHandler(
   request: CompleteInstallationRequest
 ): Promise<AuthCallbackResult> {
   // Get base URL from environment
@@ -76,7 +107,6 @@ export async function authCallbackHandler(
   }
 
   // Create the installation callback payload
-  // The webhook will arrive shortly with full details, but we can create the record now
   const callbackPayload = {
     action: 'created' as const,
     installation: {

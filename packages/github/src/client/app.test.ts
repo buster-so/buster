@@ -122,6 +122,9 @@ describe('github-app', () => {
       expect(App).toHaveBeenCalledWith({
         appId: 123456,
         privateKey: '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----',
+        webhooks: {
+          secret: 'webhook-secret',
+        },
       });
       expect(app).toBe(mockApp);
     });
