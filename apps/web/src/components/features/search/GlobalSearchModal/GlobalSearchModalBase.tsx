@@ -12,9 +12,8 @@ import type {
   SearchModalProps,
 } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { useWhyDidYouUpdate } from '@/hooks/useWhyDidYouUpdate';
-import { formatDate, timeFromNow } from '@/lib/date';
-import { ASSET_ICONS, assetTypeToIcon } from '../../icons/assetIcons';
+import { timeFromNow } from '@/lib/date';
+import { assetTypeToIcon } from '../../icons/assetIcons';
 import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
 import { useGlobalSearchStore } from './global-search-store';
 
@@ -50,7 +49,7 @@ export const GlobalSearchModalBase = ({
     };
 
     if (openSecondaryContent) {
-      const allItems: SearchItem[] = items.map((item) => makeItem(item));
+      const allItems: SearchItem[] = items.map((item) => makeItem(item, true));
 
       return [
         {
