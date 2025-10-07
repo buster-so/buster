@@ -21,6 +21,7 @@ export const useSearch = <T = SearchTextResponse>(
 export const useSearchInfinite = (
   {
     enabled,
+    mounted,
     ...params
   }: Pick<
     Parameters<typeof search>[0],

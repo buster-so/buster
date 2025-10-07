@@ -1,10 +1,8 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import type { P } from 'vitest/dist/chunks/environment.d.cL3nLXbE.js';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { GlobalSearchModalBase } from './GlobalSearchModalBase';
 import { useGlobalSearchStore } from './global-search-store';
 
@@ -18,7 +16,6 @@ export const GlobalSearchModal = () => {
   const { isOpen } = useGlobalSearchStore();
 
   const debouncedSearchQuery = useDebounce(searchQuery, { wait: 100 });
-
   const hasQuery = searchQuery.length > 0;
   const openSecondaryContent = hasQuery;
 
@@ -51,7 +48,8 @@ export const GlobalSearchModal = () => {
   const { allResults, isLoading, scrollContainerRef } = useSearchInfinite({
     page_size: 20,
     assetTypes,
-
+    startDate: selectedDateRange?.from?.toISOString(),
+    endDate: selectedDateRange?.to?.toISOString(),
     searchQuery: debouncedSearchQuery,
     includeAssetAncestors: true,
     includeScreenshots: true,

@@ -5,16 +5,7 @@ import ChevronUpIcon from '@/components/ui/icons/NucleoIconOutlined/chevron-up';
 import { cn } from '@/lib/utils';
 import { Button } from '../buttons';
 import { Calendar } from '../calendar';
-import { Label } from '../label';
 import { PopoverBase, PopoverContent, PopoverTrigger } from '../popover/PopoverBase';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../select/SelectBase';
-import { Switch } from '../switch';
 import { DateInput } from './DateInput';
 
 export interface DateRangePickerProps {
@@ -58,8 +49,8 @@ const getDateAdjustedForTimezone = (dateInput: Date | string): Date => {
 };
 
 interface DateRange {
-  from: Date;
-  to: Date | undefined;
+  from: Date | null;
+  to: Date | undefined | null;
 }
 
 interface Preset {
@@ -123,7 +114,8 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
   const areRangesEqual = (a?: DateRange, b?: DateRange): boolean => {
     if (!a || !b) return a === b; // If either is undefined, return true if both are undefined
     return (
-      a.from.getTime() === b.from.getTime() && (!a.to || !b.to || a.to.getTime() === b.to.getTime())
+      a.from?.getTime() === b.from?.getTime() &&
+      (!a.to || !b.to || a.to.getTime() === b.to.getTime())
     );
   };
 
@@ -148,7 +140,7 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
         <Button variant="outlined" suffix={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}>
           <div className="text-right">
             <div className="py-1">
-              <div>{`${formatDate(range.from, locale)}${
+              <div>{`${range?.from ? formatDate(range.from, locale) : ''} ${
                 range.to != null ? ` - ${formatDate(range.to, locale)}` : ''
               }`}</div>
             </div>
@@ -282,9 +274,9 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
     for (const preset of PRESETS) {
       const presetRange = getPresetRange(preset.name);
 
-      const normalizedRangeFrom = new Date(range.from);
+      const normalizedRangeFrom = new Date(range.from ?? 0);
       normalizedRangeFrom.setHours(0, 0, 0, 0);
-      const normalizedPresetFrom = new Date(presetRange.from.setHours(0, 0, 0, 0));
+      const normalizedPresetFrom = new Date(presetRange.from?.setHours(0, 0, 0, 0) ?? 0);
 
       const normalizedRangeTo = new Date(range.to ?? 0);
       normalizedRangeTo.setHours(0, 0, 0, 0);
@@ -329,13 +321,13 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
 
   return (
     <>
-      <div className="flex pt-2 items-center justify-space-around">
+      <div className="flex pt-2 items-center justify-between px-1 overflow-hidden">
         <div className="flex">
           <div className="flex flex-col">
             <div className="flex flex-col justify-center items-center gap-2">
               <div className="flex gap-2">
                 <DateInput
-                  value={range.from}
+                  value={range.from ?? undefined}
                   onChange={(date) => {
                     const toDate = range.to == null || date > range.to ? date : range.to;
                     setRange((prevRange) => ({
@@ -347,9 +339,9 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
                 />
                 <div className="py-1">-</div>
                 <DateInput
-                  value={range.to}
+                  value={range.to ?? undefined}
                   onChange={(date) => {
-                    const fromDate = date < range.from ? date : range.from;
+                    const fromDate = range.from == null || date < range.from ? date : range.from;
                     setRange((prevRange) => ({
                       ...prevRange,
                       from: fromDate,
@@ -368,7 +360,7 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
                     setRange({ from: value.from, to: value?.to });
                   }
                 }}
-                selected={range}
+                selected={{ from: range.from ?? undefined, to: range.to ?? undefined }}
                 numberOfMonths={2}
                 defaultMonth={new Date(new Date().setMonth(new Date().getMonth()))}
                 disabled={(date) => {
@@ -389,7 +381,7 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1 pr-0 pl-3 pb-3">
+        <div className="flex flex-col items-end gap-1">
           {PRESETS.map((preset) => (
             <PresetButton
               key={preset.name}
@@ -400,22 +392,36 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
           ))}
         </div>
       </div>
-      <div className="flex justify-end gap-2 py-2 pr-4 border-t">
+      <div className="flex justify-between gap-2 py-2 px-4 border-t">
         <Button
-          onClick={() => {
-            onCancel?.();
-          }}
           variant="ghost"
-        >
-          Cancel
-        </Button>
-        <Button
           onClick={() => {
-            onUpdate?.({ range });
+            setRange({
+              from: null,
+              to: null,
+            });
+            onUpdate?.({ range: { from: null, to: null } });
           }}
         >
-          Update
+          Reset
         </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => {
+              onCancel?.();
+            }}
+            variant="ghost"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              onUpdate?.({ range });
+            }}
+          >
+            Update
+          </Button>
+        </div>
       </div>
     </>
   );

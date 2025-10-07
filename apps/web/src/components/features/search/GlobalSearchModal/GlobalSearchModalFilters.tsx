@@ -84,10 +84,15 @@ export const GlobalSearchModalFilters = React.memo(
                   cancelable: true,
                 })
               );
-              setSelectedDateRange({
-                from: range.from,
-                to: range.to || new Date(),
-              });
+
+              if (range.from == null && range.to == null) {
+                setSelectedDateRange(null);
+              } else {
+                setSelectedDateRange({
+                  from: range.from ?? new Date(),
+                  to: range.to ?? new Date(),
+                });
+              }
             }}
           />,
         ],

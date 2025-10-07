@@ -16,14 +16,6 @@ const meta: Meta<typeof DateRangePicker> = {
       control: 'date',
       description: 'Initial value for end date',
     },
-    initialCompareFrom: {
-      control: 'date',
-      description: 'Initial value for start date for compare',
-    },
-    initialCompareTo: {
-      control: 'date',
-      description: 'Initial value for end date for compare',
-    },
     onUpdate: {
       action: 'range updated',
       description: 'Click handler for applying the updates from DateRangePicker',
@@ -74,28 +66,6 @@ export const Last30Days: Story = {
   render: (args) => <InteractiveDateRangePicker {...args} />,
   args: {
     initialDateFrom: new Date(new Date().setDate(new Date().getDate() - 29)),
-    initialDateTo: new Date(),
-    align: 'end',
-    locale: 'en-US',
-  },
-};
-
-export const WithComparison: Story = {
-  render: (args) => <InteractiveDateRangePicker {...args} />,
-  args: {
-    initialDateFrom: new Date(new Date().setDate(new Date().getDate() - 6)),
-    initialDateTo: new Date(),
-    initialCompareFrom: new Date(new Date().setDate(new Date().getDate() - 13)),
-    initialCompareTo: new Date(new Date().setDate(new Date().getDate() - 7)),
-    align: 'end',
-    locale: 'en-US',
-  },
-};
-
-export const WithoutCompare: Story = {
-  render: (args) => <InteractiveDateRangePicker {...args} />,
-  args: {
-    initialDateFrom: new Date(new Date().setDate(new Date().getDate() - 6)),
     initialDateTo: new Date(),
     align: 'end',
     locale: 'en-US',
