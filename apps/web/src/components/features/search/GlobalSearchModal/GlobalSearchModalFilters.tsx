@@ -12,7 +12,12 @@ import { ASSET_ICONS } from '../../icons/assetIcons';
 import type { FiltersParams, OnSetFiltersParams } from './GlobalSearchModal';
 
 export const GlobalSearchModalFilters = React.memo(
-  ({ selectedAssets, setSelectedAssets }: FiltersParams & OnSetFiltersParams) => {
+  ({
+    selectedAssets,
+    selectedDateRange,
+    setSelectedDateRange,
+    setSelectedAssets,
+  }: FiltersParams & OnSetFiltersParams) => {
     const AssetTypeDropdownItems: IDropdownItem = useMemo(() => {
       return {
         label: 'Asset type',
@@ -63,20 +68,26 @@ export const GlobalSearchModalFilters = React.memo(
         label: 'Date range',
         value: 'date-range',
         icon: <Calendar />,
-        className: 'max-h-[400px]',
+        className: 'max-h-[400px] w-[620px]',
         closeOnSelect: true,
         items: [
           <DateRangePickerContent
             key="date-range"
             disableDateAfter={getNow().add(12, 'hours').toDate()}
-            onUpdate={(values) => {
-              console.log(values);
-              const node = document.querySelector(
-                '[data-state="open"][role="menu"]'
-              ) as HTMLElement;
-              //click on the body to close the dropdown
-              console.log(node);
-              node?.click();
+            initialDateFrom={selectedDateRange?.from}
+            initialDateTo={selectedDateRange?.to}
+            onUpdate={({ range }) => {
+              document.dispatchEvent(
+                new KeyboardEvent('keydown', {
+                  key: 'Escape',
+                  bubbles: true,
+                  cancelable: true,
+                })
+              );
+              setSelectedDateRange({
+                from: range.from,
+                to: range.to || new Date(),
+              });
             }}
           />,
         ],

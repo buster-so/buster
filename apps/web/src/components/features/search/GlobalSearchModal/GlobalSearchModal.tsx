@@ -1,6 +1,7 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type React from 'react';
 import { useMemo, useState } from 'react';
+import type { P } from 'vitest/dist/chunks/environment.d.cL3nLXbE.js';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -10,6 +11,10 @@ import { useGlobalSearchStore } from './global-search-store';
 export const GlobalSearchModal = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedAssets, setSelectedAssets] = useState<AssetType[] | null>(null);
+  const [selectedDateRange, setSelectedDateRange] = useState<{
+    from: Date;
+    to: Date;
+  } | null>(null);
   const { isOpen } = useGlobalSearchStore();
 
   const debouncedSearchQuery = useDebounce(searchQuery, { wait: 100 });
@@ -20,13 +25,15 @@ export const GlobalSearchModal = () => {
   const onSetFilters: OnSetFiltersParams = useMemo(
     () => ({
       setSelectedAssets,
+      setSelectedDateRange,
     }),
-    [setSelectedAssets]
+    [setSelectedAssets, setSelectedDateRange]
   );
 
   const filtersParams: FiltersParams = useMemo(
     () => ({
       selectedAssets,
+      selectedDateRange,
     }),
     [selectedAssets]
   );
@@ -70,8 +77,18 @@ export const GlobalSearchModal = () => {
 
 export type OnSetFiltersParams = {
   setSelectedAssets: React.Dispatch<React.SetStateAction<AssetType[] | null>>;
+  setSelectedDateRange: React.Dispatch<
+    React.SetStateAction<{
+      from: Date;
+      to: Date;
+    } | null>
+  >;
 };
 
 export type FiltersParams = {
   selectedAssets: AssetType[] | null;
+  selectedDateRange: {
+    from: Date;
+    to: Date;
+  } | null;
 };

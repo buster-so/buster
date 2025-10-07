@@ -329,7 +329,7 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
 
   return (
     <>
-      <div className="flex pt-2">
+      <div className="flex pt-2 items-center justify-space-around">
         <div className="flex">
           <div className="flex flex-col">
             <div className="flex flex-col justify-center items-center gap-2">
@@ -389,7 +389,7 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1 pr-2 pl-3 pb-3">
+        <div className="flex flex-col items-end gap-1 pr-0 pl-3 pb-3">
           {PRESETS.map((preset) => (
             <PresetButton
               key={preset.name}
