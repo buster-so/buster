@@ -2,7 +2,7 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData } from '@buster/server-shared/search';
 import { Link, type LinkProps, useRouter } from '@tanstack/react-router';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useLayoutEffect, useState } from 'react';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
@@ -14,6 +14,7 @@ import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import { ASSET_ICONS } from '../../icons/assetIcons';
+import { MetricChartCard } from '../../metrics/MetricChartCard';
 
 export type GlobalSearchSecondaryContentProps = {
   selectedItem: SearchTextData;
@@ -28,17 +29,12 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
   return (
     <div className="p-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3">
       {assetType === 'metric_file' ? (
-        <MetricScreenshotContainer assetId={assetId} />
+        <MetricScreenshotContainer assetId={assetId} screenshotUrl={screenshotUrl} />
       ) : (
         <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
       )}
 
-      <MetaContent
-        assetType={assetType}
-        title={title}
-        updatedAt={updatedAt}
-        createdBy={createdBy}
-      />
+      <MetaContent updatedAt={updatedAt} createdBy={createdBy} />
 
       <hr className="border-t" />
 
@@ -131,27 +127,47 @@ const ScreenshotImage = ({
   );
 };
 
-const MetricScreenshotContainer = ({ assetId }: { assetId: SearchTextData['assetId'] }) => {
-  const { data: metric, isFetched: isFetchedMetric } = useGetMetric({
+const MetricScreenshotContainer = ({
+  assetId,
+  screenshotUrl,
+}: {
+  assetId: SearchTextData['assetId'];
+  screenshotUrl: SearchTextData['screenshotUrl'];
+}) => {
+  const { isFetched: isFetchedMetric, isError: isErrorMetric } = useGetMetric({
     id: assetId,
     versionNumber: 'LATEST',
   });
-  const { data: metricData, isFetched: isFetchedMetricData } = useGetMetricData({
+  const { isFetched: isFetchedMetricData, isError: isErrorMetricData } = useGetMetricData({
     id: assetId,
     versionNumber: 'LATEST',
   });
 
-  const isLoadingContent = !isFetchedMetric || !isFetchedMetricData;
+  const isLoadingContent =
+    (!isFetchedMetric || !isFetchedMetricData) && !isErrorMetric && !isErrorMetricData;
 
-  return <div></div>;
+  return (
+    <div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isLoadingContent ? 'loading' : 'content'}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          {isLoadingContent ? (
+            <ScreenshotImage screenshotUrl={screenshotUrl} assetType={'metric_file'} />
+          ) : (
+            <MetricChartCard metricId={assetId} versionNumber={undefined} />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
 };
 
-const MetaContent = ({
-  assetType,
-  title,
-  updatedAt,
-  createdBy,
-}: Pick<SearchTextData, 'assetType' | 'title' | 'updatedAt' | 'createdBy'>) => {
+const MetaContent = ({ updatedAt, createdBy }: Pick<SearchTextData, 'updatedAt' | 'createdBy'>) => {
   const PillContainer = ({ children }: { children: React.ReactNode }) => {
     return (
       <div
