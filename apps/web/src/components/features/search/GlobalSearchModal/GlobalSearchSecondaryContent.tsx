@@ -282,6 +282,9 @@ const Ancestors = React.memo(
         <LinkWrapper>
           <React.Fragment>
             <div
+              style={{
+                lineHeight: 0,
+              }}
               className={cn(
                 'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
                 !isMain && router && 'cursor-pointer',

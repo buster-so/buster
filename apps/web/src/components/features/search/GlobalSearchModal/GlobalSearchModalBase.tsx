@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing */
+
+import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
@@ -14,6 +16,7 @@ import type {
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { timeFromNow } from '@/lib/date';
 import { assetTypeToIcon } from '../../icons/assetIcons';
+import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
 import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
 import { useGlobalSearchStore } from './global-search-store';
 
@@ -22,6 +25,7 @@ export type GlobalSearchModalBaseProps<M = unknown, T extends string = string> =
   'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'openSecondaryContent'
 > & {
   items: SearchTextResponse['data'];
+  selectedAssets: AssetType[] | null;
 };
 
 export const GlobalSearchModalBase = ({
@@ -31,20 +35,28 @@ export const GlobalSearchModalBase = ({
   loading,
   openSecondaryContent,
   scrollContainerRef,
+  selectedAssets,
 }: GlobalSearchModalBaseProps) => {
   const { isOpen, onClose } = useGlobalSearchStore();
   const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
   const searchItems: SearchItems[] = useMemo(() => {
-    const makeItem = (item: SearchTextData, makeTertiary?: boolean): SearchItem => {
+    const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
       const Icon = assetTypeToIcon(item.assetType);
       return {
         label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
         icon: <Icon />,
         value: item.assetId,
         type: 'item',
-        tertiaryLabel: makeTertiary ? timeFromNow(item.updatedAt) : undefined,
+        tertiaryLabel: timeFromNow(item.updatedAt),
+        secondaryLabel:
+          makeSecondary && item.additionalText ? (
+            <span
+              className="line-clamp-1"
+              dangerouslySetInnerHTML={{ __html: item.additionalText }}
+            />
+          ) : undefined,
       };
     };
 
@@ -90,7 +102,7 @@ export const GlobalSearchModalBase = ({
         ([key, value]) => ({
           type: 'group',
           label: translations[key as keyof typeof translations],
-          items: value.map((item) => makeItem(item, true)),
+          items: value.map((item) => makeItem(item, false)),
           display: value.length > 0,
         })
       ),
@@ -114,6 +126,10 @@ export const GlobalSearchModalBase = ({
       secondaryContent={useMemo(() => {
         return viewedItem ? <GlobalSearchSecondaryContent selectedItem={viewedItem} /> : null;
       }, [viewedItem])}
+      filterContent={useMemo(
+        () => <GlobalSearchModalFilters selectedAssets={selectedAssets} />,
+        [selectedAssets]
+      )}
       placeholder="Search..."
       loading={loading}
       showTopLoading={false}

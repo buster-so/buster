@@ -26,13 +26,13 @@ export const GlobalSearchModal = () => {
   }, [selectedAssets, hasQuery]);
 
   const { allResults, isLoading, scrollContainerRef } = useSearchInfinite({
-    page_size: 15,
+    page_size: 20,
     assetTypes,
     searchQuery: debouncedSearchQuery,
     includeAssetAncestors: true,
     includeScreenshots: true,
     scrollConfig: {
-      scrollThreshold: 60,
+      scrollThreshold: 10,
     },
     mounted: isOpen,
   });
@@ -45,6 +45,7 @@ export const GlobalSearchModal = () => {
       loading={isLoading}
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent}
+      selectedAssets={selectedAssets}
     />
   );
 };
