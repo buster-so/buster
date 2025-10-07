@@ -1,5 +1,6 @@
 import type { AssetType } from '@buster/server-shared/assets';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';

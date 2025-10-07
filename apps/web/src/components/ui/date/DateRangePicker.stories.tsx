@@ -37,10 +37,6 @@ const meta: Meta<typeof DateRangePicker> = {
       control: 'text',
       description: 'Option for locale',
     },
-    showCompare: {
-      control: 'boolean',
-      description: 'Option for showing compare feature',
-    },
   },
 };
 
@@ -61,7 +57,6 @@ export const Default: Story = {
   args: {
     align: 'end',
     locale: 'en-US',
-    showCompare: true,
   },
 };
 
@@ -72,7 +67,6 @@ export const Last7Days: Story = {
     initialDateTo: new Date(),
     align: 'end',
     locale: 'en-US',
-    showCompare: true,
   },
 };
 
@@ -83,7 +77,6 @@ export const Last30Days: Story = {
     initialDateTo: new Date(),
     align: 'end',
     locale: 'en-US',
-    showCompare: true,
   },
 };
 
@@ -96,7 +89,6 @@ export const WithComparison: Story = {
     initialCompareTo: new Date(new Date().setDate(new Date().getDate() - 7)),
     align: 'end',
     locale: 'en-US',
-    showCompare: true,
   },
 };
 
@@ -107,7 +99,6 @@ export const WithoutCompare: Story = {
     initialDateTo: new Date(),
     align: 'end',
     locale: 'en-US',
-    showCompare: false,
   },
 };
 
@@ -118,7 +109,6 @@ export const CustomLocale: Story = {
     initialDateTo: new Date(),
     align: 'end',
     locale: 'de-DE',
-    showCompare: true,
   },
 };
 
@@ -129,7 +119,6 @@ export const AlignStart: Story = {
     initialDateTo: new Date(),
     align: 'start',
     locale: 'en-US',
-    showCompare: true,
   },
 };
 
@@ -140,6 +129,5 @@ export const CurrentMonth: Story = {
     initialDateTo: new Date(),
     align: 'end',
     locale: 'en-US',
-    showCompare: true,
   },
 };

@@ -1,12 +1,13 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons';
-import { DateRangePicker } from '@/components/ui/date/DateRangePicker';
+import { DateRangePickerContent } from '@/components/ui/date/DateRangePicker';
 import { Dropdown, type DropdownProps, type IDropdownItem } from '@/components/ui/dropdown';
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import Calendar from '@/components/ui/icons/NucleoIconOutlined/calendar';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import { Tooltip } from '@/components/ui/tooltip';
+import { getNow } from '@/lib/date';
 import { ASSET_ICONS } from '../../icons/assetIcons';
 import type { FiltersParams, OnSetFiltersParams } from './GlobalSearchModal';
 
@@ -62,10 +63,22 @@ export const GlobalSearchModalFilters = React.memo(
         label: 'Date range',
         value: 'date-range',
         icon: <Calendar />,
+        className: 'max-h-[400px]',
+        closeOnSelect: true,
         items: [
-          <div key="date-range">
-            <DateRangePicker />
-          </div>,
+          <DateRangePickerContent
+            key="date-range"
+            disableDateAfter={getNow().add(12, 'hours').toDate()}
+            onUpdate={(values) => {
+              console.log(values);
+              const node = document.querySelector(
+                '[data-state="open"][role="menu"]'
+              ) as HTMLElement;
+              //click on the body to close the dropdown
+              console.log(node);
+              node?.click();
+            }}
+          />,
         ],
       };
     }, []);
