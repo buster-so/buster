@@ -239,6 +239,7 @@ export async function generateNewInstallationToken(
       installation_id: Number.parseInt(installationId, 10),
     });
 
+    console.info('token:', data.token);
     // Store the new token in vault
     const vaultKey = await storeInstallationToken(
       installationId,
@@ -307,3 +308,5 @@ function createGitHubError(code: GitHubErrorCode, message: string): Error {
   error.code = code;
   return error;
 }
+
+//blahblahbalbha test commit
