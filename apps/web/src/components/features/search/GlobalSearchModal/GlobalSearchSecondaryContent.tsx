@@ -1,7 +1,7 @@
 import type { SearchTextData } from '@buster/server-shared/search';
 import { motion } from 'framer-motion';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
 import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.png';
 import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
@@ -33,6 +33,23 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
   );
 };
 
+function getFallback(assetType: SearchTextData['assetType']) {
+  switch (assetType) {
+    case 'chat':
+      return SkeletonSearchChat;
+    case 'metric_file':
+      return SkeletonSearchMetric;
+    case 'dashboard_file':
+      return SkeletonSearchDashboard;
+    case 'report_file':
+      return SkeletonSearchReport;
+    case 'collection':
+      return SkeletonSearchMetric;
+    default:
+      return SkeletonSearchMetric;
+  }
+}
+
 const ScreenshotImage = ({
   screenshotUrl,
   assetType,
@@ -41,24 +58,30 @@ const ScreenshotImage = ({
   assetType: SearchTextData['assetType'];
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCached, setIsCached] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  let fallbackImageUrl = '';
-  if (assetType === 'chat') {
-    fallbackImageUrl = SkeletonSearchChat;
-  } else if (assetType === 'metric_file') {
-    fallbackImageUrl = SkeletonSearchMetric;
-  } else if (assetType === 'dashboard_file') {
-    fallbackImageUrl = SkeletonSearchDashboard;
-  } else if (assetType === 'report_file') {
-    fallbackImageUrl = SkeletonSearchReport;
-  } else if (assetType === 'collection') {
-    fallbackImageUrl = SkeletonSearchMetric;
-  } else {
-    const _exhaustiveCheck: never = assetType;
-  }
-
+  const fallbackImageUrl = getFallback(assetType);
   const imageUrl = hasError || !screenshotUrl ? fallbackImageUrl : screenshotUrl;
+
+  useLayoutEffect(() => {
+    if (!imageUrl) return;
+
+    const img = new Image();
+    img.src = imageUrl;
+
+    if (img.complete && img.naturalHeight !== 0) {
+      // Already cached
+      setIsCached(true);
+      setIsLoaded(true);
+    } else {
+      img.onload = () => setIsLoaded(true);
+      img.onerror = () => {
+        setHasError(true);
+        setIsLoaded(true);
+      };
+    }
+  }, [imageUrl]);
 
   return (
     <div
@@ -78,17 +101,17 @@ const ScreenshotImage = ({
         <CircleSpinnerLoader size={18} />
       </motion.div>
       <motion.img
+        key={imageUrl}
         src={imageUrl}
         alt="Screenshot"
         className="w-full h-full object-cover object-top"
-        initial={{ opacity: 0, filter: 'blur(4px)' }}
-        animate={{ opacity: isLoaded ? 1 : 0, filter: isLoaded ? 'blur(0px)' : 'blur(4px)' }}
+        initial={
+          isCached ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
+        }
+        animate={
+          isLoaded ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
+        }
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        onLoad={() => setIsLoaded(true)}
-        onError={() => {
-          setHasError(true);
-          setIsLoaded(true);
-        }}
       />
     </div>
   );
