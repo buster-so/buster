@@ -1,7 +1,7 @@
 import { and, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2 } from '../../schema';
+import { assetSearchV2, users } from '../../schema';
 import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
 import { createPermissionedAssetsSubquery } from './access-control-helpers';
 
@@ -112,14 +112,19 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
         additionalText: additionalSnippetSql,
         updatedAt: assetSearchV2.updatedAt,
         screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+        createdBy: assetSearchV2.createdBy,
+        createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+        createdByAvatarUrl: users.avatarUrl,
       })
       .from(assetSearchV2)
+      .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
       .innerJoin(
         permissionedAssetsSubquery,
         eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
       )
       .where(and(...allConditions))
       .orderBy(
+        sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
         sql`pgroonga_score("asset_search_v2".tableoid, "asset_search_v2".ctid) DESC`,
         assetSearchV2.updatedAt
       )
