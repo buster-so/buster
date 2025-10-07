@@ -1,9 +1,9 @@
 import type { SearchTextData } from '@buster/server-shared/search';
 import type React from 'react';
-import SkeletonSearchChat from '@/assets/png/skeleton-search-chat.png';
-import SkeletonSearchDashboard from '@/assets/png/skeleton-search-dashboard.png';
-import SkeletonSearchMetric from '@/assets/png/skeleton-search-metric.png';
-import SkeletonSearchReport from '@/assets/png/skeleton-search-report.png';
+import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
+import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashbaord.png';
+import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
+import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
 
 export type GlobalSearchSecondaryContentProps = {
   selectedItem: SearchTextData;
@@ -53,11 +53,17 @@ const ScreenshotImage = ({
       const _exhaustiveCheck: never = assetType;
     }
   }
+
   return (
-    <img
-      src={screenshotUrl || SkeletonSearchMetric}
-      alt="Screenshot"
-      className="w-full h-full object-cover"
-    />
+    <div
+      className="bg-gray-100 rounded border overflow-hidden w-full h-full"
+      style={{
+        height: '240px',
+        maxHeight: '240px',
+        minHeight: '240px',
+      }}
+    >
+      <img src={imageUrl || ''} alt="Screenshot" className="w-full h-full object-cover" />
+    </div>
   );
 };

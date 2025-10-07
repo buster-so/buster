@@ -23,8 +23,8 @@ const mockSearchTextData: SearchTextData = {
   updatedAt: new Date().toISOString(),
   screenshotBucketKey: 'screenshots/mock-screenshot.png',
   screenshotUrl: faker.image.url({
-    width: 1024,
-    height: 1024,
+    width: 430,
+    height: 240,
   }),
   ancestors: {
     chats: [
