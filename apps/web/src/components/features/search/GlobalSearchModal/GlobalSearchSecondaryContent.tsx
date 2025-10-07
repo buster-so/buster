@@ -211,12 +211,14 @@ const MetaContent = ({
     <div className="flex flex-wrap gap-1">
       {createdBy && (
         <PillContainer>
-          <img
-            src={createdByAvatarUrl ?? ''}
-            alt="Avatar"
-            className="w-3 h-3 rounded-full border object-contain bg-gray-light/50"
-            style={{ objectFit: 'contain' }}
-          />
+          {createdByAvatarUrl && (
+            <img
+              src={createdByAvatarUrl ?? ''}
+              alt="Avatar"
+              className="w-3 h-3 rounded-full border object-contain bg-gray-light/50"
+              style={{ objectFit: 'contain' }}
+            />
+          )}
 
           {createdByName}
         </PillContainer>

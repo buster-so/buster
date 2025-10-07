@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { assetSearchV2, users } from '../../schema';
@@ -126,7 +126,7 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
       .orderBy(
         sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
         sql`pgroonga_score("asset_search_v2".tableoid, "asset_search_v2".ctid) DESC`,
-        assetSearchV2.updatedAt
+        desc(assetSearchV2.updatedAt)
       )
       .limit(paginationCheckCount)
       .offset(offset);
