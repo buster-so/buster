@@ -25,6 +25,7 @@ export const GlobalSearchModalBase = ({
       onChangeValue={onChangeValue}
       onSelect={onSelect}
       onViewSearchItem={onViewSearchItem}
+      placeholder="Search..."
     />
   );
 };
