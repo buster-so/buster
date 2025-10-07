@@ -1,7 +1,9 @@
+/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
+import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData } from '@buster/server-shared/search';
+import { Link, type LinkProps, useRouter } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import type React from 'react';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
 import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.png';
 import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
@@ -9,6 +11,9 @@ import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
 import { Avatar } from '@/components/ui/avatar';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { formatDate } from '@/lib/date';
+import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
+import { cn } from '@/lib/utils';
+import { ASSET_ICONS } from '../../icons/assetIcons';
 
 export type GlobalSearchSecondaryContentProps = {
   selectedItem: SearchTextData;
@@ -39,6 +44,8 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
       />
 
       <hr className="border-t" />
+
+      <Ancestors ancestors={ancestors} title={title} type={assetType} assetId={assetId} />
     </div>
   );
 };
@@ -135,19 +142,23 @@ const MetaContent = ({
 }: Pick<SearchTextData, 'assetType' | 'title' | 'updatedAt' | 'createdBy'>) => {
   const PillContainer = ({ children }: { children: React.ReactNode }) => {
     return (
-      <div className="flex items-center leading-none gap-1 text-secondary border rounded h-6 px-1">
+      <div className="flex items-center leading-none gap-1 text-secondary border rounded h-6 px-1 text-xs">
         {children}
       </div>
     );
   };
 
-  console.log(createdBy);
-
   return (
     <div className="flex flex-wrap gap-1">
       {createdBy && (
         <PillContainer>
-          <Avatar image={createdBy.avatarUrl} size={12} />
+          <img
+            src={createdBy.avatarUrl ?? ''}
+            alt="Avatar"
+            className="w-3 h-3 rounded-full border object-contain bg-gray-light/50"
+            style={{ objectFit: 'contain' }}
+          />
+
           {createdBy?.name}
         </PillContainer>
       )}
@@ -157,6 +168,127 @@ const MetaContent = ({
           format: 'lll',
         })}
       </PillContainer>
+    </div>
+  );
+};
+
+const Translation: Record<AssetType, string> = {
+  chat: 'Chat',
+  dashboard_file: 'Dashboard',
+  report_file: 'Report',
+  collection: 'Collection',
+  metric_file: 'Metric',
+};
+
+const Ancestors = ({
+  ancestors,
+  title,
+  type,
+  assetId,
+}: {
+  ancestors: SearchTextData['ancestors'];
+  title: string;
+  type: AssetType;
+  assetId: string;
+}) => {
+  if (!ancestors) return null;
+
+  const { chats, collections, dashboards, reports } = ancestors;
+
+  type AncestorObject = {
+    type: AssetType;
+    title: string;
+    id: string;
+    secondaryText: string;
+    isMain?: boolean;
+  };
+
+  const AncestorContainer = ({ isMain, type, title, secondaryText }: AncestorObject) => {
+    let Icon = <ASSET_ICONS.metrics />;
+    const router = useRouter();
+
+    if (type === 'chat') {
+      Icon = <ASSET_ICONS.chats />;
+    } else if (type === 'dashboard_file') {
+      Icon = <ASSET_ICONS.dashboards />;
+    } else if (type === 'report_file') {
+      Icon = <ASSET_ICONS.reports />;
+    } else if (type === 'collection') {
+      Icon = <ASSET_ICONS.collections />;
+    } else if (type === 'metric_file') {
+      Icon = <ASSET_ICONS.metrics />;
+    } else {
+      const _exhaustiveCheck: never = type;
+    }
+
+    const LinkWrapper = ({ children }: { children: React.ReactNode | React.ReactNode[] }) => {
+      if (isMain || !router) {
+        return <>{children}</>;
+      }
+      const link = createSimpleAssetRoute({
+        asset_type: type,
+        id: assetId,
+      }) as LinkProps;
+
+      return <Link {...link}>{children}</Link>;
+    };
+
+    return (
+      <LinkWrapper>
+        <React.Fragment>
+          <div
+            className={cn(
+              'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
+              !isMain && router && 'cursor-pointer',
+              'text-xs h-3.5'
+            )}
+          >
+            <span>{Icon}</span>
+            {title}
+            <span>{'•'}</span>
+            {secondaryText}
+          </div>
+        </React.Fragment>
+      </LinkWrapper>
+    );
+  };
+
+  const allAncestors: AncestorObject[] = [
+    {
+      type,
+      title,
+      id: assetId,
+      secondaryText: Translation[type],
+      isMain: true,
+    },
+    ...reports.map((r) => ({ ...r, type: 'report_file' as const, secondaryText: 'Parent Report' })),
+    ...dashboards.map((d) => ({
+      ...d,
+      type: 'dashboard_file' as const,
+      secondaryText: 'Parent Dashboard',
+    })),
+    ...collections.map((c) => ({
+      ...c,
+      type: 'collection' as const,
+      secondaryText: 'Parent Collection',
+    })),
+    ...chats.map((c) => ({ ...c, type: 'chat' as const, secondaryText: 'Parent Chat' })),
+  ];
+
+  const lastItemIndex = allAncestors.length - 1;
+
+  return (
+    <div className="flex flex-col gap-y-[1px]">
+      {allAncestors.map((ancestor, index) => (
+        <React.Fragment key={ancestor.id}>
+          <AncestorContainer {...ancestor} />
+          {index < lastItemIndex && (
+            <div className="flex items-start justify-start ml-[5px]">
+              <div className="border-l min-h-2" />
+            </div>
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
 };
