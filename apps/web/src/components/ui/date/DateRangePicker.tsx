@@ -116,23 +116,6 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
 
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
 
-  const [isSmallScreen, setIsSmallScreen] = useState(
-    typeof window !== 'undefined' ? window.innerWidth < 960 : false
-  );
-
-  useEffect(() => {
-    const handleResize = (): void => {
-      setIsSmallScreen(window.innerWidth < 960);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Clean up event listener on unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   const getPresetRange = (presetName: string): DateRange => {
     const preset = PRESETS.find(({ name }) => name === presetName);
     if (!preset) throw new Error(`Unknown date range preset: ${presetName}`);
@@ -405,25 +388,6 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
                 )}
               </div>
 
-              {isSmallScreen && (
-                <Select
-                  defaultValue={selectedPreset}
-                  onValueChange={(value) => {
-                    setPreset(value);
-                  }}
-                >
-                  <SelectTrigger className="w-[180px] mx-auto mb-2">
-                    <SelectValue placeholder="Select..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRESETS.map((preset) => (
-                      <SelectItem key={preset.name} value={preset.name}>
-                        {preset.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
               <div>
                 <Calendar
                   mode="range"
@@ -433,26 +397,23 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
                     }
                   }}
                   selected={range}
-                  numberOfMonths={isSmallScreen ? 1 : 2}
-                  defaultMonth={
-                    new Date(new Date().setMonth(new Date().getMonth() - (isSmallScreen ? 0 : 1)))
-                  }
+                  numberOfMonths={2}
+                  defaultMonth={new Date(new Date().setMonth(new Date().getMonth()))}
                 />
               </div>
             </div>
           </div>
-          {!isSmallScreen && (
-            <div className="flex flex-col items-end gap-1 pr-2 pl-3 pb-3">
-              {PRESETS.map((preset) => (
-                <PresetButton
-                  key={preset.name}
-                  preset={preset.name}
-                  label={preset.label}
-                  isSelected={selectedPreset === preset.name}
-                />
-              ))}
-            </div>
-          )}
+
+          <div className="flex flex-col items-end gap-1 pr-2 pl-3 pb-3">
+            {PRESETS.map((preset) => (
+              <PresetButton
+                key={preset.name}
+                preset={preset.name}
+                label={preset.label}
+                isSelected={selectedPreset === preset.name}
+              />
+            ))}
+          </div>
         </div>
         <div className="flex justify-end gap-2 py-2 pr-4 border-t">
           <Button
