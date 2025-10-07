@@ -1,18 +1,23 @@
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
+import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { Plus } from '@/components/ui/icons';
+import { createChatRecord } from '@/components/ui/list/createChatRecord';
 import { SearchModal } from '@/components/ui/search/SearchModal';
 import type {
   SearchItem,
+  SearchItemGroup,
   SearchItems,
   SearchModalProps,
 } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { useWhyDidYouUpdate } from '@/hooks/useWhyDidYouUpdate';
 import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
 import { useGlobalSearchStore } from './global-search-store';
 
 export type GlobalSearchModalBaseProps<M = unknown, T extends string = string> = Pick<
   NonNullable<SearchModalProps<M, T>>,
-  'value' | 'onChangeValue' | 'onSelect' | 'loading' | 'scrollContainerRef' | 'openSecondaryContent'
+  'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'openSecondaryContent'
 > & {
   items: SearchTextResponse['data'];
 };
@@ -21,23 +26,63 @@ export const GlobalSearchModalBase = ({
   value,
   items,
   onChangeValue,
-  onSelect,
   loading,
   openSecondaryContent,
   scrollContainerRef,
 }: GlobalSearchModalBaseProps) => {
   const { isOpen, onClose } = useGlobalSearchStore();
+  const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
-  const searchItems: SearchItems[] = useMemo(
-    () =>
-      items.map((item) => ({
+  const searchItems: SearchItems[] = useMemo(() => {
+    if (openSecondaryContent) {
+      return items.map((item) => ({
         label: item.title,
         value: item.assetId,
         type: 'item',
-      })),
-    [items]
-  );
+      }));
+    }
+
+    const todayAndYesterday = createChatRecord(items, 'updatedAt');
+    const translations: Record<keyof typeof todayAndYesterday, string> = {
+      TODAY: 'Today',
+      YESTERDAY: 'Yesterday',
+      LAST_WEEK: 'Last Week',
+      ALL_OTHERS: 'All Others',
+    };
+
+    return [
+      {
+        type: 'group',
+        label: 'Actions',
+        items: [
+          {
+            label: 'Create new chat',
+            value: 'create-new-chat',
+            type: 'item',
+            icon: <Plus />,
+            onSelect: async () => {
+              await navigate({ to: '/app/home' });
+              onClose();
+            },
+          },
+        ],
+        display: true,
+      },
+      ...Object.entries(todayAndYesterday).map<SearchItemGroup & { display: boolean }>(
+        ([key, value]) => ({
+          type: 'group',
+          label: translations[key as keyof typeof translations],
+          items: value.map((item) => ({
+            label: item.title,
+            value: item.assetId,
+            type: 'item',
+          })),
+          display: value.length > 0,
+        })
+      ),
+    ].filter((x) => x.display !== false) as SearchItems[];
+  }, [items, openSecondaryContent]);
 
   const onViewSearchItem = useMemoizedFn((item: SearchItem) => {
     const foundItem = items.find((x) => x.assetId === item.value);
@@ -51,7 +96,6 @@ export const GlobalSearchModalBase = ({
       value={value}
       searchItems={searchItems}
       onChangeValue={onChangeValue}
-      onSelect={onSelect}
       onViewSearchItem={onViewSearchItem}
       secondaryContent={useMemo(() => {
         return viewedItem ? <GlobalSearchSecondaryContent selectedItem={viewedItem} /> : null;
@@ -60,7 +104,7 @@ export const GlobalSearchModalBase = ({
       loading={loading}
       showTopLoading={false}
       scrollContainerRef={scrollContainerRef}
-      openSecondaryContent={openSecondaryContent}
+      openSecondaryContent={openSecondaryContent && !!viewedItem}
     />
   );
 };

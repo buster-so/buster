@@ -20,7 +20,10 @@ export const useSearch = <T = SearchTextResponse>(
 };
 
 export const useSearchInfinite = (
-  params: Pick<
+  {
+    searchQuery,
+    ...params
+  }: Pick<
     Parameters<typeof search>[0],
     | 'page_size'
     | 'assetTypes'
@@ -30,18 +33,18 @@ export const useSearchInfinite = (
     | 'startDate'
   > & {
     scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
+    searchQuery: string;
   } = {
     page_size: 5,
     assetTypes: ['chat'],
+    searchQuery: '',
   }
 ) => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
   const queryResult = useInfiniteScroll<SearchTextData>({
     queryKey: ['search', 'results', 'infinite', params] as const,
     staleTime: 1000 * 30, // 30 seconds
     queryFn: ({ pageParam = 1 }) => search({ query: searchQuery, page: pageParam, ...params }),
   });
 
-  return { ...queryResult, setSearchQuery, searchQuery };
+  return { ...queryResult, searchQuery };
 };

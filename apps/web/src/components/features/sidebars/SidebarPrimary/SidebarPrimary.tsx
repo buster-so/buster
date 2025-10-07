@@ -12,7 +12,7 @@ import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons';
-import { Flag, Gear, House4, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
+import { Flag, House4, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
 import {
   COLLAPSED_HIDDEN,
@@ -44,6 +44,7 @@ import {
 import { cn } from '@/lib/classMerge';
 import { InvitePeopleModal } from '../../modals/InvitePeopleModal';
 import { SupportModal } from '../../modals/SupportModal';
+import { GlobalSearchModal, toggleGlobalSearch } from '../../search/GlobalSearchModal';
 import { SidebarUserFooter } from '../SidebarUserFooter';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
 
@@ -196,7 +197,6 @@ export const SidebarPrimary = React.memo(() => {
   const isUserRegistered = useIsUserRegistered();
 
   const favoritesDropdownItems = useFavoriteSidebarPanel();
-  //  const selectedAssetType = useGetSelectedAssetTypeLoose();
 
   const tryGroupMemoized = useMemo(
     () => tryGroup(!restrictNewUserInvitations),
@@ -236,6 +236,12 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
     navigate({ to: '/app/home' });
   });
 
+  useHotkeys('S', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleGlobalSearch(true);
+  });
+
   return (
     <div className={cn(COLLAPSED_JUSTIFY_CENTER, 'flex min-h-7 items-center')}>
       <Link to={'/app/home'}>
@@ -244,11 +250,16 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
       </Link>
       {!hideActions && (
         <div className={cn(COLLAPSED_HIDDEN, 'items-center gap-2')}>
-          <Tooltip title="Settings">
-            <Link to={'/app/settings/profile'}>
-              <Button prefix={<Gear />} variant="ghost" />
-            </Link>
+          <Tooltip title="Search" shortcuts={['S']}>
+            <Button
+              size="tall"
+              variant="ghost"
+              rounding={'large'}
+              prefix={<Magnifier />}
+              onClick={() => toggleGlobalSearch(true)}
+            />
           </Tooltip>
+
           <Tooltip title="Start a chat" shortcuts={['C']}>
             <Link to={'/app/home'}>
               <Button size="tall" rounding={'large'} prefix={<PencilSquareIcon />} />
@@ -271,6 +282,7 @@ const GlobalModals = () => {
     <>
       <InvitePeopleModal open={openInviteModal} onClose={closeInviteModal} />
       <SupportModal formType={formType} onClose={closeContactSupportModal} />
+      <GlobalSearchModal />
     </>
   );
 };

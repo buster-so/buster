@@ -48,10 +48,8 @@ export const SearchModalContent = <M, T extends string>({
   };
 
   const onSelectGlobal = (item: SearchItem<M, T>) => {
-    if (item?.onSelect) {
-      item.onSelect();
-    }
-    onSelect(item, isCommandKeyPressedRef.current ? 'navigate' : 'select');
+    item.onSelect?.();
+    onSelect?.(item, isCommandKeyPressedRef.current ? 'navigate' : 'select');
   };
 
   return (

@@ -1,23 +1,34 @@
-import React, { useState } from 'react';
+import type { AssetType } from '@buster/server-shared/assets';
+import React, { useMemo, useState } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
-import type { SearchItem } from '@/components/ui/search/SearchModal/search-modal.types';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { GlobalSearchModalBase } from './GlobalSearchModalBase';
 
 export const GlobalSearchModal = () => {
-  const { searchQuery, setSearchQuery, allResults, isLoading, scrollContainerRef } =
-    useSearchInfinite({
-      page_size: 15,
-      scrollConfig: {
-        scrollThreshold: 60,
-      },
-    });
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedAssets, setSelectedAssets] = useState<AssetType[] | null>(null);
 
   const hasQuery = searchQuery.length > 0;
+  const openSecondaryContent = true;
 
-  const onSelect = useMemoizedFn((v: SearchItem) => {
-    console.log('v', v);
-    //   setSearchQuery(v.value);
+  const assetTypes: AssetType[] | undefined = useMemo(() => {
+    if (selectedAssets) {
+      return selectedAssets;
+    }
+    if (!hasQuery) {
+      return ['chat'];
+    }
+    return;
+  }, [selectedAssets, hasQuery]);
+
+  const { allResults, isLoading, scrollContainerRef } = useSearchInfinite({
+    page_size: 15,
+    assetTypes,
+    searchQuery,
+    includeAssetAncestors: true,
+    includeScreenshots: true,
+    scrollConfig: {
+      scrollThreshold: 60,
+    },
   });
 
   return (
@@ -25,10 +36,9 @@ export const GlobalSearchModal = () => {
       value={searchQuery}
       items={allResults}
       onChangeValue={setSearchQuery}
-      onSelect={onSelect}
       loading={isLoading}
       scrollContainerRef={scrollContainerRef}
-      openSecondaryContent={hasQuery}
+      openSecondaryContent={openSecondaryContent}
     />
   );
 };

@@ -111,10 +111,11 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
       {icon && (
         <span
           className={cn(
-            'text-center group-hover:text-foreground size-4 text-icon-size text-icon-color',
+            'text-center group-hover:text-foreground size-4 text-icon-color',
             'data-[selected=true]:text-foreground',
             secondaryLabel && 'self-start mt-2.5'
           )}
+          style={{ fontSize: 16 }}
         >
           {icon}
         </span>
