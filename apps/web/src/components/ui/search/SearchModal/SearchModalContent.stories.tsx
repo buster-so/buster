@@ -71,6 +71,7 @@ export const Default: Story = {
     const [open, setOpen] = useState(false);
     const [secondaryContent, setSecondaryContent] = useState<React.ReactNode>(null);
     const [loading, setLoading] = useState(false);
+    const [filterDropdownContent, setFilterDropdownContent] = useState<React.ReactNode>(null);
 
     const onViewSearchItem = (item: SearchItem) => {
       setSecondaryContent(<div>Secondary Content {item.label}</div>);
@@ -86,6 +87,9 @@ export const Default: Story = {
     useHotkeys('l', () => {
       setLoading((x) => !x);
     });
+    useHotkeys('f', () => {
+      setFilterDropdownContent((x) => !x);
+    });
 
     return (
       <SearchModalContent
@@ -100,6 +104,9 @@ export const Default: Story = {
         openSecondaryContent={open}
         secondaryContent={secondaryContent}
         loading={loading}
+        filterDropdownContent={
+          filterDropdownContent ? <div>Filter Dropdown Content</div> : undefined
+        }
       />
     );
   },

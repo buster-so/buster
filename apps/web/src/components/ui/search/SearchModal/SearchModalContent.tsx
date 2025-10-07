@@ -1,5 +1,6 @@
 import { Command } from 'cmdk';
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import { SearchEmptyState } from './SearchEmptyState';
 import { SearchFooter } from './SearchFooter';
 import { SearchInput } from './SearchInput';
@@ -65,6 +66,7 @@ export const SearchModalContent = <M, T extends string>({
         searchValue={searchValue}
         onChangeValue={onChangeValue}
         filterContent={filterContent}
+        filterDropdownContent={filterDropdownContent}
         placeholder={placeholder}
         isModalOpen={isModalOpen}
       />
