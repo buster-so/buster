@@ -30,11 +30,11 @@ export type SearchItems<M = unknown, T extends string = string> =
   | SearchItemSeperator;
 
 export type SearchModalContentProps<M = unknown, T extends string = string> = {
-  defaulSearchValue?: string;
+  value: string;
   filterDropdownContent?: React.ReactNode;
   filterContent?: React.ReactNode;
   searchItems: SearchItems<M, T>[];
-  onSearchChange: (searchValue: string) => void;
+  onChangeValue: (searchValue: string) => void;
   onSelect: (item: SearchItem<M, T>, modifier: 'select' | 'navigate') => void;
   onViewSearchItem: (item: SearchItem<M, T>) => void;
   emptyState?: React.ReactNode | string;

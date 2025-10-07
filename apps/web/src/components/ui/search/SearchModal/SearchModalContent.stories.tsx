@@ -97,16 +97,16 @@ const createMockSearchItems = (includeSecondary: boolean): SearchItems[] => [
 export const Default: Story = {
   args: {
     searchItems: createMockSearchItems(false),
-    onSearchChange: fn(),
+    onChangeValue: fn(),
     onSelect: fn(),
     onViewSearchItem: fn(),
-    defaulSearchValue: 'it',
     emptyState: 'No results found',
     placeholder: 'Search for something',
     filterContent: <div>Filter</div>,
     filterDropdownContent: <div>Filter Dropdown</div>,
   },
   render: (args) => {
+    const [searchValue, setSearchValue] = useState('');
     const [addInSecondaryLabel, setAddInSecondaryLabel] = useState(false);
     const [open, setOpen] = useState(false);
     const [secondaryContent, setSecondaryContent] = useState<React.ReactNode>(null);
@@ -128,8 +128,10 @@ export const Default: Story = {
         {...args}
         searchItems={searchItems}
         onViewSearchItem={onViewSearchItem}
-        onSearchChange={() => {
+        value={searchValue}
+        onChangeValue={(v) => {
           setOpen(false);
+          setSearchValue(v);
         }}
         openSecondaryContent={open}
         secondaryContent={secondaryContent}

@@ -1,4 +1,7 @@
-import { Command } from 'cmdk';
+/** biome-ignore-all lint/a11y/useFocusableInteractive: no ally stuff. I don't give a piss about nothin but the tide. */
+/** biome-ignore-all lint/a11y/useAriaPropsForRole: blitz bama blitz */
+/** biome-ignore-all lint/a11y/useSemanticElements: don't care about a11y for this one **/
+import { Command, useCommandState } from 'cmdk';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRef } from 'react';
 import { Text } from '@/components/ui/typography';
@@ -20,7 +23,12 @@ export const SearchModalContentItems = <M, T extends string>({
   onSelectGlobal,
 }: Pick<SearchModalContentProps<M, T>, 'searchItems' | 'onViewSearchItem'> & CommonProps<M, T>) => {
   return (
-    <Command.List className={cn('flex flex-col overflow-y-auto flex-1 px-3 pt-1.5 pb-1.5')}>
+    <Command.List
+      className={cn(
+        'flex flex-col overflow-y-auto flex-1 px-3 pt-1.5 pb-1.5',
+        '[&_[hidden]+[data-separator-after-hidden]]:hidden'
+      )}
+    >
       {searchItems.map((item, index) => (
         <ItemsSelecter
           key={keyExtractor(item, index)}
@@ -156,5 +164,20 @@ const SearchItemGroupComponent = <M, T extends string>({
 };
 
 const SearchItemSeperatorComponent = ({ item: _item }: { item: SearchItemSeperator }) => {
-  return <Command.Separator className="border-t w-full" />;
+  const hasResults = useCommandState((x) => x.filtered.count) > 0;
+
+  return (
+    <div
+      role="separator"
+      className={cn(
+        'bg-border my-1.5 h-[0.5px]',
+        'first:hidden',
+        'last:hidden',
+        'has-[+[role="separator"]]:hidden',
+        'has-[+[hidden]]:hidden',
+        !hasResults && 'hidden'
+      )}
+      data-separator-after-hidden="true"
+    />
+  );
 };

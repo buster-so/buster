@@ -11,15 +11,15 @@ import { useViewSearchItem } from './useViewSearchItem';
 
 export const SearchModalContent = <M, T extends string>({
   searchItems,
-  onSearchChange,
+  onChangeValue,
   onSelect,
   onViewSearchItem,
   emptyState,
-  defaulSearchValue = '',
   filterContent,
   placeholder,
   filterDropdownContent,
   loading,
+  value: searchValue,
   secondaryContent,
   openSecondaryContent,
 }: SearchModalContentProps<M, T>) => {
@@ -27,12 +27,10 @@ export const SearchModalContent = <M, T extends string>({
     searchItems,
     onViewSearchItem,
   });
-  const [searchValue, setSearchValue] = useState<string>(defaulSearchValue);
   const isCommandKeyPressedRef = useRef(false);
 
   const onSearchChangePreflight = (searchValue: string) => {
-    setSearchValue(searchValue);
-    onSearchChange(searchValue);
+    onChangeValue(searchValue);
   };
 
   const handleKeyDownGlobal = (e: React.KeyboardEvent) => {
@@ -62,6 +60,7 @@ export const SearchModalContent = <M, T extends string>({
       onValueChange={setFocusedValue}
       onKeyDown={handleKeyDownGlobal}
       onKeyUp={handleKeyUpGlobal}
+      shouldFilter={true}
     >
       <SearchInput
         searchValue={searchValue}
