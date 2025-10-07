@@ -2,7 +2,7 @@ import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/s
 import { keepPreviousData, type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { ApiError } from '@/api/errors';
-import { getSearchResultInfinite, searchQueryKeys } from '@/api/query_keys/search';
+import { searchQueryKeys } from '@/api/query_keys/search';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { search } from './requests';
 
@@ -20,7 +20,17 @@ export const useSearch = <T = SearchTextResponse>(
 };
 
 export const useSearchInfinite = (
-  params: Pick<Parameters<typeof search>[0], 'page_size' | 'assetTypes'> = {
+  params: Pick<
+    Parameters<typeof search>[0],
+    | 'page_size'
+    | 'assetTypes'
+    | 'includeAssetAncestors'
+    | 'includeScreenshots'
+    | 'endDate'
+    | 'startDate'
+  > & {
+    scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
+  } = {
     page_size: 5,
     assetTypes: ['chat'],
   }

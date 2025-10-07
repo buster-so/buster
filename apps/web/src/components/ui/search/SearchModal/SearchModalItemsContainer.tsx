@@ -13,7 +13,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
   secondaryContent,
   openSecondaryContent,
   loading,
-  onScrollToBottom,
+  scrollContainerRef,
 }: {
   searchItems: SearchItems<M, T>[];
   loading: SearchModalContentProps<M, T>['loading'];
@@ -21,14 +21,14 @@ export const SearchModalItemsContainer = <M, T extends string>({
   onViewSearchItem: (item: SearchItem<M, T>) => void;
   secondaryContent: SearchModalContentProps<M, T>['secondaryContent'];
   openSecondaryContent: SearchModalContentProps<M, T>['openSecondaryContent'];
-  onScrollToBottom: SearchModalContentProps<M, T>['onScrollToBottom'];
+  scrollContainerRef: SearchModalContentProps<M, T>['scrollContainerRef'];
 }) => {
   const hasResults = useCommandState((x) => x.filtered.count) > 0;
 
   return (
     <div className={cn('flex w-full overflow-hidden flex-1 relative', !hasResults && 'hidden')}>
       <motion.div
-        className="overflow-y-auto flex flex-col shrink-0"
+        className="overflow-hidden flex flex-col shrink-0"
         initial={false}
         animate={{ width: openSecondaryContent ? 320 : '100%' }}
         transition={{ duration, ease: 'easeInOut' }}
@@ -38,7 +38,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
           loading={loading}
           onSelectGlobal={onSelectGlobal}
           onViewSearchItem={onViewSearchItem}
-          onScrollToBottom={onScrollToBottom}
+          scrollContainerRef={scrollContainerRef}
         />
       </motion.div>
       <AnimatePresence>

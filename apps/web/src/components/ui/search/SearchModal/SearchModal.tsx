@@ -1,9 +1,13 @@
-import type React from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../../modal/ModalBase';
 import { SearchModalContent } from './SearchModalContent';
 import type { SearchModalProps } from './search-modal.types';
 
-export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose, ...props }) => {
+const SearchModalBase = <M = unknown, T extends string = string>({
+  open,
+  onClose,
+  ...props
+}: SearchModalProps<M, T>) => {
   return (
     <Dialog open={open} onOpenChange={(x) => x}>
       <DialogTitle hidden>{'Search Modal'}</DialogTitle>
@@ -14,3 +18,5 @@ export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose, ...prop
     </Dialog>
   );
 };
+
+export const SearchModal = React.memo(SearchModalBase);

@@ -24,31 +24,13 @@ export const SearchModalContentItems = <M, T extends string>({
   searchItems,
   loading,
   onSelectGlobal,
-  onScrollToBottom,
+  scrollContainerRef,
 }: Pick<
   SearchModalContentProps<M, T>,
-  'loading' | 'onScrollToBottom' | 'searchItems' | 'onViewSearchItem'
+  'scrollContainerRef' | 'loading' | 'searchItems' | 'onViewSearchItem'
 > &
   CommonProps<M, T>) => {
   const hasFiredRef = useRef(false);
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const scrollHeight = target.scrollHeight;
-    const scrollTop = target.scrollTop;
-    const clientHeight = target.clientHeight;
-
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-
-    if (distanceFromBottom <= SCROLL_THRESHOLD) {
-      if (!hasFiredRef.current) {
-        hasFiredRef.current = true;
-        onScrollToBottom?.();
-      }
-    } else {
-      hasFiredRef.current = false;
-    }
-  };
 
   return (
     <Command.List
@@ -56,7 +38,7 @@ export const SearchModalContentItems = <M, T extends string>({
         'flex flex-col overflow-y-auto flex-1 px-3 pt-1.5 pb-1.5',
         '[&_[hidden]+[data-separator-after-hidden]]:hidden'
       )}
-      onScroll={onScrollToBottom ? handleScroll : undefined}
+      ref={scrollContainerRef}
     >
       {searchItems.map((item, index) => (
         <ItemsSelecter

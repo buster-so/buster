@@ -26,7 +26,7 @@ export const SearchModalContent = <M, T extends string>({
   shouldFilter = true,
   showTopLoading = false,
   filter,
-  onScrollToBottom,
+  scrollContainerRef,
 }: SearchModalContentProps<M, T>) => {
   const { handleKeyDown, focusedValue, setFocusedValue } = useViewSearchItem({
     searchItems,
@@ -82,7 +82,7 @@ export const SearchModalContent = <M, T extends string>({
         loading={loading}
         onSelectGlobal={onSelectGlobal}
         onViewSearchItem={onViewSearchItem}
-        onScrollToBottom={onScrollToBottom}
+        scrollContainerRef={scrollContainerRef}
       />
 
       <SearchEmptyState emptyState={emptyState} />

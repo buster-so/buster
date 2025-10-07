@@ -46,10 +46,13 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   showTopLoading?: boolean;
   secondaryContent?: React.ReactNode | null;
   openSecondaryContent?: boolean; //if undefined it will close and open with the secondary content
-  onScrollToBottom?: () => void;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 } & Pick<React.ComponentProps<typeof Command>, 'filter' | 'shouldFilter'>;
 
-export type SearchModalProps = SearchModalContentProps & {
+export type SearchModalProps<M = unknown, T extends string = string> = SearchModalContentProps<
+  M,
+  T
+> & {
   open: boolean;
   onClose: () => void;
 };
