@@ -16,6 +16,8 @@ export type SearchItemGroup<M = unknown, T extends string = string> = {
   label: string | React.ReactNode;
   items: SearchItem<M, T>[];
   type: 'group';
+  className?: string;
+  value?: string; //this is used to identify the group in case the heading changes
 };
 
 export type SearchItemSeperator = {

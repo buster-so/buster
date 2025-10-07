@@ -1,6 +1,6 @@
 import { Command } from 'cmdk';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
 import type {
@@ -134,9 +134,17 @@ const SearchItemGroupComponent = <M, T extends string>({
   item: SearchItemGroup<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
 }) => {
+  const { className, items, label } = item;
   return (
-    <Command.Group>
-      {item.items.map((item, index) => (
+    <Command.Group
+      data-testid="search-item-group"
+      className={cn(
+        'text-text-tertiary overflow-hidden [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-2.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-base',
+        className
+      )}
+      heading={label}
+    >
+      {items.map((item, index) => (
         <ItemsSelecter
           key={keyExtractor(item, index)}
           item={item}

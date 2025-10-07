@@ -20,51 +20,83 @@ const meta: Meta<typeof SearchModalContent> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockSearchItems: SearchItem[] = [
+const createMockSearchItems = (includeSecondary: boolean): SearchItems[] => [
   {
-    icon: <HouseIcon />,
-    label: 'Search Result 1',
-    secondaryLabel: 'This is a secondary label',
-    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-    value: 'result-1',
-    keywords: ['search', 'result', 'example'],
-    type: 'item',
+    type: 'group',
+    label: 'Group',
+    items: [
+      ...Array.from({ length: 2 }).map<SearchItem>((_, index) => ({
+        type: 'item',
+        icon: <HouseIcon />,
+        label: `Dashboard ${index} with a super long label that will be truncated`,
+        secondaryLabel: includeSecondary ? `Analytics dashboard ${index}` : undefined,
+        tertiaryLabel: createDayjsDate(new Date()).format('LL'),
+        value: `testing-${index}`,
+      })),
+    ],
   },
   {
-    icon: <HouseIcon />,
-    label: 'Document',
-    secondaryLabel: 'A document file',
-    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-    value: 'document-1',
-    keywords: ['document', 'file', 'pdf'],
-    type: 'item',
-    onSelect: fn(),
+    type: 'seperator',
   },
   {
-    icon: <HouseIcon />,
-    label: 'Dashboard',
-    secondaryLabel: 'Analytics dashboard',
-    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-    value: 'dashboard-1',
-    keywords: ['dashboard', 'analytics', 'charts'],
-    type: 'item',
-    onSelect: fn(),
+    type: 'group',
+    label: 'Group 2',
+    items: [
+      ...Array.from({ length: 12 }).map<SearchItem>((_, index) => ({
+        type: 'item',
+        icon: <HouseIcon />,
+        label: `Search item ${index} with a super long label that will be truncated`,
+        secondaryLabel: includeSecondary ? `Search item ${index}` : undefined,
+        tertiaryLabel: createDayjsDate(new Date()).format('LL'),
+        value: `testing-search-item-${index}`,
+      })),
+    ],
   },
-  ...Array.from({ length: 10 }).map<SearchItem>((_, index) => ({
-    icon: <HouseIcon />,
-    label: `Dashboard ${index} with a super long label that will be truncated`,
-    secondaryLabel: `Analytics dashboard ${index}`,
-    tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-    value: `testing-${index}`,
-    keywords: ['dashboard', 'analytics', 'charts'],
-    type: 'item' as const,
-    onSelect: fn(),
-  })),
+
+  // {
+  //   icon: <HouseIcon />,
+  //   label: 'Search Result 1',
+  //   secondaryLabel: 'This is a secondary label',
+  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
+  //   value: 'result-1',
+  //   keywords: ['search', 'result', 'example'],
+  //   type: 'item',
+  // },
+  // {
+  //   icon: <HouseIcon />,
+  //   label: 'Document',
+  //   secondaryLabel: 'A document file',
+  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
+  //   value: 'document-1',
+  //   keywords: ['document', 'file', 'pdf'],
+  //   type: 'item',
+  //   onSelect: fn(),
+  // },
+  // {
+  //   icon: <HouseIcon />,
+  //   label: 'Dashboard',
+  //   secondaryLabel: 'Analytics dashboard',
+  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
+  //   value: 'dashboard-1',
+  //   keywords: ['dashboard', 'analytics', 'charts'],
+  //   type: 'item',
+  //   onSelect: fn(),
+  // },
+  // ...Array.from({ length: 10 }).map<SearchItem>((_, index) => ({
+  //   icon: <HouseIcon />,
+  //   label: `Dashboard ${index} with a super long label that will be truncated`,
+  //   secondaryLabel: `Analytics dashboard ${index}`,
+  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
+  //   value: `testing-${index}`,
+  //   keywords: ['dashboard', 'analytics', 'charts'],
+  //   type: 'item' as const,
+  //   onSelect: fn(),
+  // })),
 ];
 
 export const Default: Story = {
   args: {
-    searchItems: mockSearchItems,
+    searchItems: createMockSearchItems(false),
     onSearchChange: fn(),
     onSelect: fn(),
     onViewSearchItem: fn(),
@@ -82,12 +114,10 @@ export const Default: Story = {
     const onViewSearchItem = (item: SearchItem) => {
       setSecondaryContent(<div>Secondary Content {item.label}</div>);
       setOpen(true);
+      setAddInSecondaryLabel(true);
     };
 
-    const searchItems: SearchItems[] = mockSearchItems.map((item) => ({
-      ...item,
-      secondaryLabel: !addInSecondaryLabel ? null : item.secondaryLabel,
-    }));
+    const searchItems = createMockSearchItems(addInSecondaryLabel);
 
     useHotkeys('x', () => {
       setAddInSecondaryLabel((x) => !x);
