@@ -57,4 +57,11 @@ export const Default: Story = {
   args: {
     selectedItem: mockSearchTextData,
   },
+  decorators: [
+    (Story) => (
+      <div className="w-[420px] h-[420px] border-red-500 border">
+        <Story />
+      </div>
+    ),
+  ],
 };
