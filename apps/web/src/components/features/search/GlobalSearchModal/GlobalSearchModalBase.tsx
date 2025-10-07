@@ -37,11 +37,19 @@ export const GlobalSearchModalBase = ({
 
   const searchItems: SearchItems[] = useMemo(() => {
     if (openSecondaryContent) {
-      return items.map((item) => ({
+      const allItems: SearchItem[] = items.map((item) => ({
         label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
         value: item.assetId,
         type: 'item',
       }));
+
+      return [
+        {
+          type: 'group',
+          label: 'Best matches',
+          items: allItems,
+        },
+      ];
     }
 
     const todayAndYesterday = createChatRecord(items, 'updatedAt');

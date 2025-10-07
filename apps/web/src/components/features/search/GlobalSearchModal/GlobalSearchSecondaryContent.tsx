@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/complexity/noUselessFragments:it is okay */
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing mom */
 import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData } from '@buster/server-shared/search';
 import { Link, type LinkProps, useRouter } from '@tanstack/react-router';
@@ -27,7 +28,7 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
     selectedItem;
 
   return (
-    <div className="p-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3">
+    <div className="px-3 pt-3 pb-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3 flex-1 h-full">
       {assetType === 'metric_file' ? (
         <MetricScreenshotContainer assetId={assetId} screenshotUrl={screenshotUrl} />
       ) : (
@@ -147,23 +148,29 @@ const MetricScreenshotContainer = ({
     (!isFetchedMetric || !isFetchedMetricData) && !isErrorMetric && !isErrorMetricData;
 
   return (
-    <div>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={isLoadingContent ? 'loading' : 'content'}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          {isLoadingContent ? (
-            <ScreenshotImage screenshotUrl={screenshotUrl} assetType={'metric_file'} />
-          ) : (
-            <MetricChartCard metricId={assetId} versionNumber={undefined} />
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        className="h-[280px]"
+        key={isLoadingContent ? 'loading' : 'content'}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+      >
+        {isLoadingContent ? (
+          <ScreenshotImage screenshotUrl={screenshotUrl} assetType={'metric_file'} />
+        ) : (
+          <MetricChartCard
+            metricId={assetId}
+            versionNumber={undefined}
+            animate={false}
+            readOnly
+            useHeaderLink={false}
+            disableTooltip={true}
+          />
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
@@ -264,7 +271,11 @@ const Ancestors = React.memo(
           id: assetId,
         }) as LinkProps;
 
-        return <Link {...link}>{children}</Link>;
+        return (
+          <Link {...link} preload={false}>
+            {children}
+          </Link>
+        );
       };
 
       return (
@@ -278,7 +289,7 @@ const Ancestors = React.memo(
               )}
             >
               <span>{Icon}</span>
-              {title}
+              <span dangerouslySetInnerHTML={{ __html: title }} />
               <span>{'•'}</span>
               {secondaryText}
             </div>
@@ -316,7 +327,7 @@ const Ancestors = React.memo(
     const lastItemIndex = allAncestors.length - 1;
 
     return (
-      <div className="flex flex-col gap-y-[1px]">
+      <div className="flex flex-col gap-y-[1px] flex-1 overflow-y-auto">
         {allAncestors.map((ancestor, index) => (
           <React.Fragment key={ancestor.id}>
             <AncestorContainer {...ancestor} />

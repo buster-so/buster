@@ -10,7 +10,6 @@ const SearchModalBase = <M = unknown, T extends string = string>({
   className,
   ...props
 }: SearchModalProps<M, T>) => {
-  console.log(className);
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogTitle hidden>{'Search Modal'}</DialogTitle>
