@@ -6,7 +6,9 @@ import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
 import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.png';
 import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
 import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
+import { Avatar } from '@/components/ui/avatar';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
+import { formatDate } from '@/lib/date';
 
 export type GlobalSearchSecondaryContentProps = {
   selectedItem: SearchTextData;
@@ -27,8 +29,16 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
   } = selectedItem;
 
   return (
-    <div className="p-3 min-w-[420px] min-h-[420px]">
+    <div className="p-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3">
       <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
+      <MetaContent
+        assetType={assetType}
+        title={title}
+        updatedAt={updatedAt}
+        createdBy={createdBy}
+      />
+
+      <hr className="border-t" />
     </div>
   );
 };
@@ -113,6 +123,40 @@ const ScreenshotImage = ({
         }
         transition={{ duration: 0.2, ease: 'easeOut' }}
       />
+    </div>
+  );
+};
+
+const MetaContent = ({
+  assetType,
+  title,
+  updatedAt,
+  createdBy,
+}: Pick<SearchTextData, 'assetType' | 'title' | 'updatedAt' | 'createdBy'>) => {
+  const PillContainer = ({ children }: { children: React.ReactNode }) => {
+    return (
+      <div className="flex items-center leading-none gap-1 text-secondary border rounded h-6 px-1">
+        {children}
+      </div>
+    );
+  };
+
+  console.log(createdBy);
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {createdBy && (
+        <PillContainer>
+          <Avatar image={createdBy.avatarUrl} size={12} />
+          {createdBy?.name}
+        </PillContainer>
+      )}
+      <PillContainer>
+        {formatDate({
+          date: updatedAt,
+          format: 'lll',
+        })}
+      </PillContainer>
     </div>
   );
 };
