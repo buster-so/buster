@@ -2,6 +2,7 @@ import { useCommandState } from 'cmdk';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { SearchLoading } from './SearchLoading';
 import { SearchModalContentItems } from './SearchModalContentItems';
 import type { SearchItem, SearchItems, SearchModalContentProps } from './search-modal.types';
 
@@ -23,7 +24,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
   const hasResults = useCommandState((x) => x.filtered.count) > 0;
 
   return (
-    <div className={cn('flex w-full overflow-hidden flex-1', !hasResults && 'hidden')}>
+    <div className={cn('flex w-full overflow-hidden flex-1 relative', !hasResults && 'hidden')}>
       <motion.div
         className="overflow-y-auto flex flex-col shrink-0"
         initial={false}

@@ -1,3 +1,5 @@
+import type { Command } from 'cmdk';
+
 export type SearchItem<M = unknown, T extends string = string> = {
   icon?: React.ReactNode;
   label: string | React.ReactNode;
@@ -30,6 +32,7 @@ export type SearchItems<M = unknown, T extends string = string> =
   | SearchItemSeperator;
 
 export type SearchModalContentProps<M = unknown, T extends string = string> = {
+  isModalOpen: boolean;
   value: string;
   filterDropdownContent?: React.ReactNode;
   filterContent?: React.ReactNode;
@@ -42,7 +45,7 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   loading?: boolean;
   secondaryContent?: React.ReactNode | null;
   openSecondaryContent?: boolean; //if undefined it will close and open with the secondary content
-};
+} & Pick<React.ComponentProps<typeof Command>, 'filter' | 'shouldFilter'>;
 
 export type SearchModalProps = SearchModalContentProps & {
   open: boolean;

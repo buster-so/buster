@@ -1,10 +1,10 @@
-import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { fn } from 'storybook/test';
 import HouseIcon from '@/components/ui/icons/NucleoIconOutlined/house';
 import { createDayjsDate } from '@/lib/date';
+import { SearchModal } from './SearchModal';
 import { SearchModalContent } from './SearchModalContent';
 import type { SearchItem, SearchItems } from './search-modal.types';
 
@@ -52,46 +52,6 @@ const createMockSearchItems = (includeSecondary: boolean): SearchItems[] => [
       })),
     ],
   },
-
-  // {
-  //   icon: <HouseIcon />,
-  //   label: 'Search Result 1',
-  //   secondaryLabel: 'This is a secondary label',
-  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-  //   value: 'result-1',
-  //   keywords: ['search', 'result', 'example'],
-  //   type: 'item',
-  // },
-  // {
-  //   icon: <HouseIcon />,
-  //   label: 'Document',
-  //   secondaryLabel: 'A document file',
-  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-  //   value: 'document-1',
-  //   keywords: ['document', 'file', 'pdf'],
-  //   type: 'item',
-  //   onSelect: fn(),
-  // },
-  // {
-  //   icon: <HouseIcon />,
-  //   label: 'Dashboard',
-  //   secondaryLabel: 'Analytics dashboard',
-  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-  //   value: 'dashboard-1',
-  //   keywords: ['dashboard', 'analytics', 'charts'],
-  //   type: 'item',
-  //   onSelect: fn(),
-  // },
-  // ...Array.from({ length: 10 }).map<SearchItem>((_, index) => ({
-  //   icon: <HouseIcon />,
-  //   label: `Dashboard ${index} with a super long label that will be truncated`,
-  //   secondaryLabel: `Analytics dashboard ${index}`,
-  //   tertiaryLabel: createDayjsDate(new Date()).format('LL'),
-  //   value: `testing-${index}`,
-  //   keywords: ['dashboard', 'analytics', 'charts'],
-  //   type: 'item' as const,
-  //   onSelect: fn(),
-  // })),
 ];
 
 export const Default: Story = {
@@ -110,6 +70,7 @@ export const Default: Story = {
     const [addInSecondaryLabel, setAddInSecondaryLabel] = useState(false);
     const [open, setOpen] = useState(false);
     const [secondaryContent, setSecondaryContent] = useState<React.ReactNode>(null);
+    const [loading, setLoading] = useState(false);
 
     const onViewSearchItem = (item: SearchItem) => {
       setSecondaryContent(<div>Secondary Content {item.label}</div>);
@@ -121,6 +82,9 @@ export const Default: Story = {
 
     useHotkeys('x', () => {
       setAddInSecondaryLabel((x) => !x);
+    });
+    useHotkeys('l', () => {
+      setLoading((x) => !x);
     });
 
     return (
@@ -135,6 +99,64 @@ export const Default: Story = {
         }}
         openSecondaryContent={open}
         secondaryContent={secondaryContent}
+        loading={loading}
+      />
+    );
+  },
+};
+
+export const SearchModalStory: Story = {
+  render: (args) => {
+    const [open, setOpen] = useState(false);
+    const [openSecondaryContent, setOpenSecondaryContent] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [addInSecondaryLabel, setAddInSecondaryLabel] = useState(false);
+    const [secondaryContent, setSecondaryContent] = useState<React.ReactNode>(null);
+    const [loading, setLoading] = useState(false);
+
+    const onViewSearchItem = (item: SearchItem) => {
+      setSecondaryContent(<div>Secondary Content {item.label}</div>);
+      setOpen(true);
+      setOpenSecondaryContent(true);
+      setAddInSecondaryLabel(true);
+    };
+
+    const searchItems = createMockSearchItems(addInSecondaryLabel);
+
+    useHotkeys('x', () => {
+      setAddInSecondaryLabel((x) => !x);
+    });
+    useHotkeys('l', () => {
+      setLoading((x) => !x);
+    });
+
+    useHotkeys(
+      'o',
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(true);
+      },
+      {
+        preventDefault: true,
+      }
+    );
+
+    return (
+      <SearchModal
+        {...args}
+        searchItems={searchItems}
+        onViewSearchItem={onViewSearchItem}
+        value={searchValue}
+        onChangeValue={(v) => {
+          setOpenSecondaryContent(false);
+          setSearchValue(v);
+        }}
+        openSecondaryContent={openSecondaryContent}
+        secondaryContent={secondaryContent}
+        loading={loading}
+        open={open}
+        onClose={() => setOpen(false)}
       />
     );
   },
