@@ -33,6 +33,10 @@ export interface DateRangePickerProps {
   side?: 'left' | 'right' | 'top' | 'bottom';
   /** Option for locale */
   locale?: string;
+  /** Disable dates before this date */
+  disableDateBefore?: Date | string;
+  /** Disable dates after this date */
+  disableDateAfter?: Date | string;
 }
 
 const formatDate = (date: Date, locale: string = 'en-us'): string => {
@@ -90,6 +94,8 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
   side = 'bottom',
   align = 'start',
   locale = 'en-US',
+  disableDateBefore,
+  disableDateAfter,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -399,6 +405,19 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
                   selected={range}
                   numberOfMonths={2}
                   defaultMonth={new Date(new Date().setMonth(new Date().getMonth()))}
+                  disabled={(date) => {
+                    if (disableDateBefore) {
+                      const beforeDate = getDateAdjustedForTimezone(disableDateBefore);
+                      beforeDate.setHours(0, 0, 0, 0);
+                      if (date < beforeDate) return true;
+                    }
+                    if (disableDateAfter) {
+                      const afterDate = getDateAdjustedForTimezone(disableDateAfter);
+                      afterDate.setHours(23, 59, 59, 999);
+                      if (date > afterDate) return true;
+                    }
+                    return false;
+                  }}
                 />
               </div>
             </div>
