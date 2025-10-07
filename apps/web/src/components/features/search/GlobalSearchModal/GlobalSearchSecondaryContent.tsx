@@ -1,14 +1,14 @@
-/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
+/** biome-ignore-all lint/complexity/noUselessFragments:it is okay */
 import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData } from '@buster/server-shared/search';
 import { Link, type LinkProps, useRouter } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
+import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
 import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.png';
 import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
 import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
-import { Avatar } from '@/components/ui/avatar';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
@@ -22,20 +22,17 @@ export type GlobalSearchSecondaryContentProps = {
 export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContentProps> = ({
   selectedItem,
 }) => {
-  const {
-    assetId,
-    assetType,
-    title,
-    ancestors,
-    updatedAt,
-    screenshotBucketKey,
-    screenshotUrl,
-    createdBy,
-  } = selectedItem;
+  const { assetId, assetType, title, ancestors, updatedAt, screenshotUrl, createdBy } =
+    selectedItem;
 
   return (
     <div className="p-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3">
-      <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
+      {assetType === 'metric_file' ? (
+        <MetricScreenshotContainer assetId={assetId} />
+      ) : (
+        <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
+      )}
+
       <MetaContent
         assetType={assetType}
         title={title}
@@ -128,10 +125,25 @@ const ScreenshotImage = ({
         animate={
           isLoaded ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
         }
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        transition={{ duration: 0.165, ease: 'easeOut' }}
       />
     </div>
   );
+};
+
+const MetricScreenshotContainer = ({ assetId }: { assetId: SearchTextData['assetId'] }) => {
+  const { data: metric, isFetched: isFetchedMetric } = useGetMetric({
+    id: assetId,
+    versionNumber: 'LATEST',
+  });
+  const { data: metricData, isFetched: isFetchedMetricData } = useGetMetricData({
+    id: assetId,
+    versionNumber: 'LATEST',
+  });
+
+  const isLoadingContent = !isFetchedMetric || !isFetchedMetricData;
+
+  return <div></div>;
 };
 
 const MetaContent = ({
@@ -142,7 +154,12 @@ const MetaContent = ({
 }: Pick<SearchTextData, 'assetType' | 'title' | 'updatedAt' | 'createdBy'>) => {
   const PillContainer = ({ children }: { children: React.ReactNode }) => {
     return (
-      <div className="flex items-center leading-none gap-1 text-secondary border rounded h-6 px-1 text-xs">
+      <div
+        className="flex bg-background items-center gap-1 text-secondary border rounded h-4.5 px-1 text-xs"
+        style={{
+          lineHeight: 0,
+        }}
+      >
         {children}
       </div>
     );
@@ -180,115 +197,123 @@ const Translation: Record<AssetType, string> = {
   metric_file: 'Metric',
 };
 
-const Ancestors = ({
-  ancestors,
-  title,
-  type,
-  assetId,
-}: {
-  ancestors: SearchTextData['ancestors'];
-  title: string;
-  type: AssetType;
-  assetId: string;
-}) => {
-  if (!ancestors) return null;
-
-  const { chats, collections, dashboards, reports } = ancestors;
-
-  type AncestorObject = {
-    type: AssetType;
+const Ancestors = React.memo(
+  ({
+    ancestors,
+    title,
+    type,
+    assetId,
+  }: {
+    ancestors: SearchTextData['ancestors'];
     title: string;
-    id: string;
-    secondaryText: string;
-    isMain?: boolean;
-  };
+    type: AssetType;
+    assetId: string;
+  }) => {
+    if (!ancestors) return null;
 
-  const AncestorContainer = ({ isMain, type, title, secondaryText }: AncestorObject) => {
-    let Icon = <ASSET_ICONS.metrics />;
-    const router = useRouter();
+    const { chats, collections, dashboards, reports } = ancestors;
 
-    if (type === 'chat') {
-      Icon = <ASSET_ICONS.chats />;
-    } else if (type === 'dashboard_file') {
-      Icon = <ASSET_ICONS.dashboards />;
-    } else if (type === 'report_file') {
-      Icon = <ASSET_ICONS.reports />;
-    } else if (type === 'collection') {
-      Icon = <ASSET_ICONS.collections />;
-    } else if (type === 'metric_file') {
-      Icon = <ASSET_ICONS.metrics />;
-    } else {
-      const _exhaustiveCheck: never = type;
-    }
-
-    const LinkWrapper = ({ children }: { children: React.ReactNode | React.ReactNode[] }) => {
-      if (isMain || !router) {
-        return <>{children}</>;
-      }
-      const link = createSimpleAssetRoute({
-        asset_type: type,
-        id: assetId,
-      }) as LinkProps;
-
-      return <Link {...link}>{children}</Link>;
+    type AncestorObject = {
+      type: AssetType;
+      title: string;
+      id: string;
+      secondaryText: string;
+      isMain?: boolean;
     };
 
-    return (
-      <LinkWrapper>
-        <React.Fragment>
-          <div
-            className={cn(
-              'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
-              !isMain && router && 'cursor-pointer',
-              'text-xs h-3.5'
-            )}
-          >
-            <span>{Icon}</span>
-            {title}
-            <span>{'•'}</span>
-            {secondaryText}
-          </div>
-        </React.Fragment>
-      </LinkWrapper>
-    );
-  };
+    const AncestorContainer = ({ isMain, type, title, secondaryText }: AncestorObject) => {
+      let Icon = <ASSET_ICONS.metrics />;
+      const router = useRouter();
 
-  const allAncestors: AncestorObject[] = [
-    {
-      type,
-      title,
-      id: assetId,
-      secondaryText: Translation[type],
-      isMain: true,
-    },
-    ...reports.map((r) => ({ ...r, type: 'report_file' as const, secondaryText: 'Parent Report' })),
-    ...dashboards.map((d) => ({
-      ...d,
-      type: 'dashboard_file' as const,
-      secondaryText: 'Parent Dashboard',
-    })),
-    ...collections.map((c) => ({
-      ...c,
-      type: 'collection' as const,
-      secondaryText: 'Parent Collection',
-    })),
-    ...chats.map((c) => ({ ...c, type: 'chat' as const, secondaryText: 'Parent Chat' })),
-  ];
+      if (type === 'chat') {
+        Icon = <ASSET_ICONS.chats />;
+      } else if (type === 'dashboard_file') {
+        Icon = <ASSET_ICONS.dashboards />;
+      } else if (type === 'report_file') {
+        Icon = <ASSET_ICONS.reports />;
+      } else if (type === 'collection') {
+        Icon = <ASSET_ICONS.collections />;
+      } else if (type === 'metric_file') {
+        Icon = <ASSET_ICONS.metrics />;
+      } else {
+        const _exhaustiveCheck: never = type;
+      }
 
-  const lastItemIndex = allAncestors.length - 1;
+      const LinkWrapper = ({ children }: { children: React.ReactNode | React.ReactNode[] }) => {
+        if (isMain || !router) {
+          return <>{children}</>;
+        }
+        const link = createSimpleAssetRoute({
+          asset_type: type,
+          id: assetId,
+        }) as LinkProps;
 
-  return (
-    <div className="flex flex-col gap-y-[1px]">
-      {allAncestors.map((ancestor, index) => (
-        <React.Fragment key={ancestor.id}>
-          <AncestorContainer {...ancestor} />
-          {index < lastItemIndex && (
-            <div className="flex items-start justify-start ml-[5px]">
-              <div className="border-l min-h-2" />
+        return <Link {...link}>{children}</Link>;
+      };
+
+      return (
+        <LinkWrapper>
+          <React.Fragment>
+            <div
+              className={cn(
+                'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
+                !isMain && router && 'cursor-pointer',
+                'text-xs h-3.5'
+              )}
+            >
+              <span>{Icon}</span>
+              {title}
+              <span>{'•'}</span>
+              {secondaryText}
             </div>
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
+          </React.Fragment>
+        </LinkWrapper>
+      );
+    };
+
+    const allAncestors: AncestorObject[] = [
+      {
+        type,
+        title,
+        id: assetId,
+        secondaryText: Translation[type],
+        isMain: true,
+      },
+      ...reports.map((r) => ({
+        ...r,
+        type: 'report_file' as const,
+        secondaryText: 'Parent Report',
+      })),
+      ...dashboards.map((d) => ({
+        ...d,
+        type: 'dashboard_file' as const,
+        secondaryText: 'Parent Dashboard',
+      })),
+      ...chats.map((c) => ({ ...c, type: 'chat' as const, secondaryText: 'Parent Chat' })),
+      ...collections.map((c) => ({
+        ...c,
+        type: 'collection' as const,
+        secondaryText: 'Parent Collection',
+      })),
+    ];
+
+    const lastItemIndex = allAncestors.length - 1;
+
+    return (
+      <div className="flex flex-col gap-y-[1px]">
+        {allAncestors.map((ancestor, index) => (
+          <React.Fragment key={ancestor.id}>
+            <AncestorContainer {...ancestor} />
+            {index < lastItemIndex && (
+              <div className="flex items-start justify-start ml-[5px]">
+                <div className="border-l min-h-2" />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
+);
+
+Ancestors.displayName = 'Ancestors';
