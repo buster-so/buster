@@ -10,7 +10,7 @@ import type { SearchItem, SearchModalContentProps } from './search-modal.types';
 import { useViewSearchItem } from './useViewSearchItem';
 
 export const SearchModalContent = <M, T extends string>({
-  isModalOpen,
+  open,
   searchItems,
   onChangeValue,
   onSelect,
@@ -68,7 +68,7 @@ export const SearchModalContent = <M, T extends string>({
         filterContent={filterContent}
         filterDropdownContent={filterDropdownContent}
         placeholder={placeholder}
-        isModalOpen={isModalOpen}
+        open={open}
       />
 
       <SearchLoading loading={loading} />

@@ -8,20 +8,13 @@ import type { SearchModalContentProps } from './search-modal.types';
 export const SearchInput: React.FC<
   Pick<
     SearchModalContentProps,
-    'placeholder' | 'filterContent' | 'isModalOpen' | 'onChangeValue' | 'filterDropdownContent'
+    'placeholder' | 'filterContent' | 'open' | 'onChangeValue' | 'filterDropdownContent'
   > & {
     searchValue: string;
   }
 > = React.memo(
-  ({
-    searchValue,
-    filterDropdownContent,
-    onChangeValue,
-    placeholder,
-    filterContent,
-    isModalOpen,
-  }) => {
-    const debouncedAutoFocus = useDebounce(isModalOpen, { wait: 100 });
+  ({ searchValue, filterDropdownContent, onChangeValue, placeholder, filterContent, open }) => {
+    const debouncedAutoFocus = useDebounce(open, { wait: 100 });
 
     return (
       <div className="flex flex-col gap-y-0">

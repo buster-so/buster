@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../../modal/ModalBase';
 import { SearchModalContent } from './SearchModalContent';
 import type { SearchModalProps } from './search-modal.types';
@@ -9,7 +9,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ open, onClose, ...prop
       <DialogTitle hidden>{'Search Modal'}</DialogTitle>
       <DialogDescription hidden>{'This modal is used to search for items'}</DialogDescription>
       <DialogContent showClose={false} className="overflow-hidden max-w-fit max-h-fit">
-        <SearchModalContent {...props} isModalOpen={open} />
+        <SearchModalContent {...props} open={open} />
       </DialogContent>
     </Dialog>
   );

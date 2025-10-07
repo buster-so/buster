@@ -32,7 +32,7 @@ export type SearchItems<M = unknown, T extends string = string> =
   | SearchItemSeperator;
 
 export type SearchModalContentProps<M = unknown, T extends string = string> = {
-  isModalOpen: boolean;
+  open: boolean; //is modal open
   value: string;
   filterDropdownContent?: React.ReactNode;
   filterContent?: React.ReactNode;
