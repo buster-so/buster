@@ -11,6 +11,7 @@ import {
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import Calendar from '@/components/ui/icons/NucleoIconOutlined/calendar';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
+import { SEARCH_INPUT_ID } from '@/components/ui/search/SearchModal/SearchInput';
 import { Tooltip } from '@/components/ui/tooltip';
 import { getNow } from '@/lib/date';
 import { ASSET_ICONS } from '../../icons/assetIcons';
@@ -60,12 +61,6 @@ export const GlobalSearchModalFilters = React.memo(
           ...item,
           selected: selectedAssets?.includes(item.value as AssetType),
           onClick: () => {
-            console.log(
-              'onClick',
-              item.value,
-              selectedAssets,
-              selectedAssets?.includes(item.value as AssetType)
-            );
             if (selectedAssets?.includes(item.value as AssetType)) {
               setSelectedAssets(selectedAssets.filter((v) => v !== item.value));
             } else {
@@ -127,9 +122,21 @@ export const GlobalSearchModalFilters = React.memo(
       <Dropdown
         menuHeader={<div className="px-2.5 py-1.5 text-text-tertiary">Filters...</div>}
         items={items}
+        onOpenChange={(v) => {
+          if (!v) {
+            requestAnimationFrame(() => {
+              const element = document.getElementById(SEARCH_INPUT_ID)?.querySelector('input');
+              if (element) element.focus();
+            });
+          }
+        }}
       >
         <Tooltip title="Filters">
-          <Button variant={'ghost'} prefix={<BarsFilter />} />
+          <Button
+            variant={'ghost'}
+            prefix={<BarsFilter />}
+            className="focus-visible:ring-1 focus-visible:ring-border"
+          />
         </Tooltip>
       </Dropdown>
     );
