@@ -28,6 +28,7 @@ import { getSupabaseCookieKey, getSupabaseUser } from '../../utils/supabase';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 import type { TakeDashboardScreenshotTrigger } from '../screenshots/schemas';
 import { screenshots_task_keys } from '../screenshots/task-keys';
+import { analyst_agent_task_keys } from './task-keys';
 
 /**
  * Resource usage tracker for the entire task execution
@@ -245,12 +246,12 @@ function logPerformanceMetrics(
 //@ts-ignore
 export const analystAgentTask: ReturnType<
   typeof schemaTask<
-    'analyst-agent-task',
+    typeof analyst_agent_task_keys.analyst_agent_task,
     typeof AnalystAgentTaskInputSchema,
     AnalystAgentTaskOutput
   >
 > = schemaTask({
-  id: 'analyst-agent-task',
+  id: analyst_agent_task_keys.analyst_agent_task,
   machine: 'small-2x',
   schema: AnalystAgentTaskInputSchema,
   queue: analystQueue,
@@ -517,14 +518,18 @@ export const analystAgentTask: ReturnType<
 
       const supabaseUser = await getSupabaseUser(payload.access_token);
       if (supabaseUser) {
-        await tasks.trigger(screenshots_task_keys.take_dashboard_screenshot, {
-          dashboardId: payload.message_id,
-          isOnSaveEvent: false,
-          organizationId: messageContext.organizationId,
-          supabaseCookieKey: getSupabaseCookieKey(),
-          accessToken: payload.access_token,
-          supabaseUser,
-        } satisfies TakeDashboardScreenshotTrigger);
+        await tasks.trigger(
+          screenshots_task_keys.take_dashboard_screenshot,
+          {
+            dashboardId: payload.message_id,
+            isOnSaveEvent: false,
+            organizationId: messageContext.organizationId,
+            supabaseCookieKey: getSupabaseCookieKey(),
+            accessToken: payload.access_token,
+            supabaseUser,
+          } satisfies TakeDashboardScreenshotTrigger,
+          { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
+        );
       }
 
       // Log final performance metrics

@@ -1,3 +1,4 @@
+import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
 import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import type { ChatWithMessages } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -128,7 +129,7 @@ describe('createChatHandler', () => {
       '550e8400-e29b-41d4-a716-446655440000'
     );
     expect(tasks.trigger).toHaveBeenCalledWith(
-      'analyst-agent-task',
+      analyst_agent_task_keys.analyst_agent_task,
       {
         message_id: 'msg-123',
       },
@@ -297,7 +298,7 @@ describe('createChatHandler', () => {
       emptyChat
     );
     expect(tasks.trigger).toHaveBeenCalledWith(
-      'analyst-agent-task',
+      analyst_agent_task_keys.analyst_agent_task,
       {
         message_id: 'user-msg-123', // Should use the last message ID (user's prompt)
       },
@@ -386,7 +387,7 @@ describe('createChatHandler', () => {
 
     // Verify analyst task is triggered with user message ID
     expect(tasks.trigger).toHaveBeenCalledWith(
-      'analyst-agent-task',
+      analyst_agent_task_keys.analyst_agent_task,
       { message_id: 'user-msg-123' },
       { concurrencyKey: 'chat-123' }
     );

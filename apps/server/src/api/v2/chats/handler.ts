@@ -1,3 +1,5 @@
+import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
+import type { AnalystAgentTaskInput } from '@buster-app/trigger/task-schemas';
 import { getUserOrganizationId, updateUserLastUsedShortcuts } from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
 import {
@@ -7,6 +9,7 @@ import {
   type ChatWithMessages,
 } from '@buster/server-shared/chats';
 import { tasks } from '@trigger.dev/sdk';
+import type { Context } from 'hono';
 import { handleAssetChat, handleAssetChatWithPrompt } from './services/chat-helpers';
 import { initializeChat } from './services/chat-service';
 
@@ -25,7 +28,8 @@ import { initializeChat } from './services/chat-service';
  */
 export async function createChatHandler(
   request: ChatCreateHandlerRequest,
-  user: User
+  user: User,
+  context: Context
 ): Promise<ChatWithMessages> {
   const startTime = Date.now();
 
@@ -140,8 +144,11 @@ export async function createChatHandler(
       try {
         // Just queue the background job - should be <100ms
         const taskHandle = await tasks.trigger(
-          'analyst-agent-task',
-          { message_id: actualMessageId },
+          analyst_agent_task_keys.analyst_agent_task,
+          {
+            message_id: actualMessageId,
+            access_token: context.get('accessToken'),
+          } satisfies AnalystAgentTaskInput,
           {
             concurrencyKey: chatId, // Ensure sequential processing per chat
           }

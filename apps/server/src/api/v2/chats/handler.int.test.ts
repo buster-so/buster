@@ -1,3 +1,4 @@
+import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
 import { asc, db, eq } from '@buster/database/connection';
 import { chats, messages, usersToOrganizations } from '@buster/database/schema';
 import {
@@ -117,7 +118,7 @@ describe('Chat Handler Integration Tests', () => {
           asset_type: request.asset_type,
         };
 
-        const response = await createChatHandler(handlerRequest, user);
+        const response = await createChatHandler(handlerRequest, user, c);
         const validatedResponse = ChatWithMessagesSchema.parse(response);
 
         return c.json(validatedResponse);
@@ -413,7 +414,7 @@ describe('Chat Handler Integration Tests', () => {
     const chat = (await response.json()) as ChatWithMessages;
 
     // Verify trigger was called with correct message_id
-    expect(triggerSpy).toHaveBeenCalledWith('analyst-agent-task', {
+    expect(triggerSpy).toHaveBeenCalledWith(analyst_agent_task_keys.analyst_agent_task, {
       message_id: chat.message_ids[0],
     });
 
