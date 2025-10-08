@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { useDatasetListDatasetGroups } from '@/api/buster_rest/datasets';
 import {

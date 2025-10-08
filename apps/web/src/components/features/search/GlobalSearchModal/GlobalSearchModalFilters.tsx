@@ -131,7 +131,7 @@ export const GlobalSearchModalFilters = React.memo(
           }
         }}
       >
-        <Tooltip title="Filters">
+        <Tooltip title="Filters" sideOffset={10} side="top">
           <Button
             variant={'ghost'}
             prefix={<BarsFilter />}

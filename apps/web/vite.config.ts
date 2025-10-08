@@ -37,23 +37,23 @@ const config = defineConfig(({ command, mode }) => {
     plugins: [
       // this is the plugin that enables path aliases
       tsConfigPaths({ projects: ['./tsconfig.json'] }),
-      tailwindcss(),
-      tanstackStart(),
-      nitroV2Plugin({
-        preset: isLocalBuild && !isVercelBuild ? 'bun' : 'node-server',
-      }),
-      viteReact(),
       useChecker
         ? checker({
             typescript: isTypecheck,
             biome: isProduction,
           })
         : undefined,
+      tailwindcss(),
+      tanstackStart(),
+      nitroV2Plugin({
+        preset: isLocalBuild && !isVercelBuild ? 'bun' : 'node-server',
+      }),
+      viteReact(),
     ],
     worker: { format: 'es' },
     build: {
       chunkSizeWarningLimit: 1500,
-      reportCompressedSize: true, // Disable gzip size reporting to speed up build
+      reportCompressedSize: false, // Disable gzip size reporting to speed up build
       rollupOptions: {
         // Exclude test and stories files from build
         external: (id) => {

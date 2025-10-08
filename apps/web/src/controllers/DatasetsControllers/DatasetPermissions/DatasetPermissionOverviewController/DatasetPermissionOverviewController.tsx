@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { useGetDatasetPermissionsOverview } from '@/api/buster_rest/datasets';
 import {
