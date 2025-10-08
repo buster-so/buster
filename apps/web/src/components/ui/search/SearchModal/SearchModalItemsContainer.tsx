@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { SearchModalContentItems } from './SearchModalContentItems';
 import type { SearchItem, SearchItems, SearchModalContentProps } from './search-modal.types';
 
-const duration = 0.15;
+const duration = 0.12;
 
 export const SearchModalItemsContainer = <M, T extends string>({
   searchItems,

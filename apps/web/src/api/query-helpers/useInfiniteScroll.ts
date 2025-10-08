@@ -6,8 +6,9 @@ import type {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { ApiError } from '@/api/errors';
+import { useDebounce } from '@/hooks/useDebounce';
 
 /**
  * Configuration for infinite scroll behavior
@@ -41,6 +42,7 @@ type UseInfiniteScrollOptions<TData, TError = ApiError> = Omit<
    * Infinite scroll configuration
    */
   scrollConfig?: InfiniteScrollConfig;
+  mounted?: boolean;
 };
 
 /**
@@ -82,11 +84,12 @@ type UseInfiniteScrollResult<TData, TError = ApiError> = UseInfiniteQueryResult<
 export function useInfiniteScroll<TData, TError = ApiError>(
   options: UseInfiniteScrollOptions<TData, TError>
 ): UseInfiniteScrollResult<TData, TError> {
-  const { scrollConfig, ...queryOptions } = options;
+  const { scrollConfig, mounted, ...queryOptions } = options;
   const scrollThreshold =
     scrollConfig?.scrollThreshold ?? InfiniteScrollConfigSchema.scrollThreshold;
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const debouncedMounted = useDebounce(mounted, { wait: 2000 });
 
   const queryResult = useInfiniteQuery({
     ...queryOptions,
@@ -102,7 +105,10 @@ export function useInfiniteScroll<TData, TError = ApiError>(
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = queryResult;
 
   // Combine all pages into a single array of results
-  const allResults = queryResult.data?.pages.flatMap((page) => page.data) ?? [];
+  const allResults = useMemo(
+    () => queryResult.data?.pages.flatMap((page) => page.data) ?? [],
+    [queryResult.data]
+  );
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -123,14 +129,7 @@ export function useInfiniteScroll<TData, TError = ApiError>(
 
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-    scrollThreshold,
-    queryResult.isFetched,
-    options.enabled,
-  ]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, scrollThreshold, debouncedMounted]);
 
   return {
     ...queryResult,

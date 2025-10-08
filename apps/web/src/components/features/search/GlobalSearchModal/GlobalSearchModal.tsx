@@ -54,7 +54,7 @@ export const GlobalSearchModal = () => {
     includeAssetAncestors: true,
     includeScreenshots: true,
     scrollConfig: {
-      scrollThreshold: 10,
+      scrollThreshold: 55,
     },
     mounted: isOpen,
   });

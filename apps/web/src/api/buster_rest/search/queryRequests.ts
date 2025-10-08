@@ -18,38 +18,33 @@ export const useSearch = <T = SearchTextResponse>(
   });
 };
 
-export const useSearchInfinite = (
-  {
-    enabled,
-    mounted,
-    ...params
-  }: Pick<
-    Parameters<typeof search>[0],
-    | 'page_size'
-    | 'assetTypes'
-    | 'includeAssetAncestors'
-    | 'includeScreenshots'
-    | 'endDate'
-    | 'startDate'
-  > & {
-    scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
-    searchQuery: string;
-    enabled?: boolean;
-    mounted?: boolean;
-  } = {
-    page_size: 5,
-    assetTypes: ['chat'],
-    searchQuery: '',
-    enabled: true,
-    mounted: true,
-  }
-) => {
+export const useSearchInfinite = ({
+  enabled,
+  mounted,
+  scrollConfig,
+  ...params
+}: Pick<
+  Parameters<typeof search>[0],
+  | 'page_size'
+  | 'assetTypes'
+  | 'includeAssetAncestors'
+  | 'includeScreenshots'
+  | 'endDate'
+  | 'startDate'
+> & {
+  scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
+  searchQuery: string;
+  enabled?: boolean;
+  mounted?: boolean;
+}) => {
   const { searchQuery } = params;
   return useInfiniteScroll<SearchTextData>({
     queryKey: ['search', 'results', 'infinite', params] as const,
-    staleTime: 1000 * 30, // 30 seconds
+    staleTime: 1000 * 45, // 45 seconds
     queryFn: ({ pageParam = 1 }) => search({ query: searchQuery, page: pageParam, ...params }),
     placeholderData: keepPreviousData,
-    enabled: true,
+    enabled,
+    scrollConfig,
+    mounted,
   });
 };

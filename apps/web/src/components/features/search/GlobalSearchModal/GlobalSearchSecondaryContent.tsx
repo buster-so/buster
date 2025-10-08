@@ -59,28 +59,31 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
 };
 
 function getFallback(assetType: SearchTextData['assetType']) {
-  switch (assetType) {
-    case 'chat':
-      return SkeletonSearchChat;
-    case 'metric_file':
-      return SkeletonSearchMetric;
-    case 'dashboard_file':
-      return SkeletonSearchDashboard;
-    case 'report_file':
-      return SkeletonSearchReport;
-    case 'collection':
-      return SkeletonSearchMetric;
-    default:
-      return SkeletonSearchMetric;
+  if (assetType === 'metric_file') {
+    return SkeletonSearchMetric;
+  } else if (assetType === 'chat') {
+    return SkeletonSearchChat;
+  } else if (assetType === 'dashboard_file') {
+    return SkeletonSearchDashboard;
+  } else if (assetType === 'report_file') {
+    return SkeletonSearchReport;
+  } else if (assetType === 'collection') {
+    return SkeletonSearchMetric;
+  } else {
+    const _exhaustiveCheck: never = assetType;
+    console.warn('Exhaustive check', _exhaustiveCheck);
+    return SkeletonSearchMetric;
   }
 }
 
 const ScreenshotImage = ({
   screenshotUrl,
   assetType,
+  className,
 }: {
   screenshotUrl: string | null | undefined;
   assetType: SearchTextData['assetType'];
+  className?: string;
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isCached, setIsCached] = useState(false);
@@ -129,7 +132,7 @@ const ScreenshotImage = ({
         key={imageUrl}
         src={imageUrl}
         alt="Screenshot"
-        className="w-full h-full object-cover object-top"
+        className={cn('w-full h-full object-cover object-top', className)}
         initial={
           isCached ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
         }
@@ -172,7 +175,11 @@ const MetricScreenshotContainer = ({
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
         {isLoadingContent ? (
-          <ScreenshotImage screenshotUrl={screenshotUrl} assetType={'metric_file'} />
+          <ScreenshotImage
+            screenshotUrl={screenshotUrl}
+            assetType={'metric_file'}
+            className="animate-pulse"
+          />
         ) : (
           <MetricChartCard
             metricId={assetId}
