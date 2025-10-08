@@ -55,6 +55,7 @@ export const MetricDataQuerySchema = z.object({
   version_number: z.coerce.number().int().min(1).optional(),
   report_file_id: z.string().uuid().optional(),
   password: z.string().min(1).optional(),
+  is_screenshot: z.boolean().default(false).optional(),
 });
 
 export type MetricDataQuery = z.infer<typeof MetricDataQuerySchema>;

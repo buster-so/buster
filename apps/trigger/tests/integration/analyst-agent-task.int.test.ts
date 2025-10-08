@@ -36,7 +36,7 @@ describe('Analyst Agent Task Integration Tests', () => {
   const TEST_MESSAGE_CONTENT = 'who is our top customer';
 
   async function triggerAndPollAnalystAgent(
-    payload: { message_id: string },
+    payload: { message_id: string; access_token: string | null },
     pollIntervalMs = 2000,
     timeoutMs = 30 * 60 * 1000 // align with 30 min test timeout
   ) {
@@ -110,7 +110,8 @@ describe('Analyst Agent Task Integration Tests', () => {
       console.log('Triggering analyst agent task...');
 
       const tracedTaskTrigger = wrapTraced(
-        async () => await triggerAndPollAnalystAgent({ message_id: messageId }, 5000),
+        async () =>
+          await triggerAndPollAnalystAgent({ message_id: messageId, access_token: '' }, 5000),
         {
           name: 'Trigger Analyst Agent Task',
         }
@@ -183,7 +184,10 @@ describe('Analyst Agent Task Integration Tests', () => {
     try {
       console.log('Testing error handling with invalid message ID...');
 
-      const result = await triggerAndPollAnalystAgent({ message_id: invalidMessageId }, 2000);
+      const result = await triggerAndPollAnalystAgent(
+        { message_id: invalidMessageId, access_token: '' },
+        2000
+      );
 
       // Task should complete but with error result
       expect(result).toBeDefined();
@@ -213,7 +217,7 @@ describe('Analyst Agent Task Integration Tests', () => {
       await expect(
         triggerAndPollAnalystAgent(
           // Intentionally invalid input to test validation
-          { message_id: 'not-a-uuid' } as { message_id: string },
+          { message_id: 'not-a-uuid', access_token: '' },
           1000
         )
       ).rejects.toThrow();

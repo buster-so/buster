@@ -1,6 +1,7 @@
 import type { User } from '@supabase/supabase-js';
 import type { Browser, Page } from 'playwright';
 import { z } from 'zod';
+import { getSupabaseCookieKey, getSupabaseUser } from '../../supabase/server';
 import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
 
 type BrowserParamsBase<T> = {
@@ -11,8 +12,6 @@ type BrowserParamsBase<T> = {
 };
 
 export const BrowserParamsContextSchema = z.object({
-  supabaseUser: z.any() as z.ZodType<User>,
-  supabaseCookieKey: z.string(),
   accessToken: z.string(),
   organizationId: z.string(),
 });
@@ -27,8 +26,6 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   height = DEFAULT_SCREENSHOT_CONFIG.height,
   fullPath,
   callback,
-  supabaseUser,
-  supabaseCookieKey,
   accessToken,
 }: BrowserParams<T>) => {
   if (!accessToken) {
@@ -41,7 +38,13 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
 
   const jwtPayload = JSON.parse(Buffer.from(accessToken.split('.')[1] || '', 'base64').toString());
 
-  if (!supabaseUser || supabaseUser?.is_anonymous) {
+  const [supabaseUser, chromium] = await Promise.all([
+    getSupabaseUser(accessToken),
+    import('playwright').then(({ chromium }) => chromium),
+  ]);
+  const supabaseCookieKey = getSupabaseCookieKey();
+
+  if (!supabaseUser || supabaseUser?.is_anonymous || !supabaseCookieKey) {
     throw new Error('User not authenticated');
   }
 
@@ -54,7 +57,6 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     user: supabaseUser,
   };
 
-  const { chromium } = await import('playwright');
   const browser = await chromium.launch();
 
   try {

@@ -38,9 +38,3 @@ export const getSupabaseUser = async (jwtToken: string): Promise<User | null> =>
   const supabaseUser = await supabase.auth.getUser(jwtToken);
   return supabaseUser.data.user;
 };
-
-// export const getSupabaseAccessToken = async (userId: string) => {
-//   const supabase = getSupabaseClient();
-
-//   //
-// };

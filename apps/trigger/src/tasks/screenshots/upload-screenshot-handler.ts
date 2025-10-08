@@ -7,6 +7,7 @@ import {
   type PutScreenshotResponse,
   PutScreenshotResponseSchema,
 } from '@buster/server-shared/screenshots';
+import { logger } from '@trigger.dev/sdk';
 import z from 'zod';
 
 export const UploadScreenshotParamsSchema = PutChatScreenshotRequestSchema.extend({
@@ -149,26 +150,39 @@ function buildScreenshotKey(
 export async function uploadScreenshotHandler(
   params: UploadScreenshotParams
 ): Promise<PutScreenshotResponse> {
+  logger.info('Uploading screenshot', { params });
+
   const { assetType, assetId, image, organizationId } = UploadScreenshotParamsSchema.parse(params);
 
+  logger.info('Parsing image input', { image });
+
   const { buffer, contentType, extension } = await parseImageInput(image);
+
+  logger.info('Building screenshot key', { assetType, assetId, extension, organizationId });
 
   const targetKey = buildScreenshotKey(assetType, assetId, extension, organizationId);
 
   const provider = await getProviderForOrganization(organizationId);
+
+  logger.info('Uploading screenshot', { targetKey });
+
   const result = await provider.upload(targetKey, buffer, {
     contentType,
   });
+
+  logger.info('Screenshot uploaded', { result });
 
   if (!result.success) {
     throw new Error(result.error ?? 'Failed to upload screenshot');
   }
 
-  await updateAssetScreenshotBucketKey({
+  const resultOfUpload = await updateAssetScreenshotBucketKey({
     assetId,
     assetType,
     screenshotBucketKey: result.key,
   });
+
+  logger.info('Screenshot uploaded', { resultOfUpload });
 
   return PutScreenshotResponseSchema.parse({
     success: true,

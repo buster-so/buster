@@ -31,9 +31,13 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
       isOnSaveEvent,
     });
 
+    logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
+
     if (!shouldTakeNewScreenshot) {
       return;
     }
+
+    logger.info('Getting metric screenshot');
 
     const screenshotBuffer = await getMetricScreenshot(args);
 
@@ -65,5 +69,7 @@ const shouldTakenNewScreenshot = async ({
     dayjs().subtract(6, 'hours')
   );
 
-  return !isScreenshotExpired;
+  logger.info('Is screenshot expired', { isScreenshotExpired });
+
+  return isScreenshotExpired;
 };

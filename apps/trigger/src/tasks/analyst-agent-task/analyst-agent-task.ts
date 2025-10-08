@@ -526,9 +526,7 @@ export const analystAgentTask: ReturnType<
               dashboardId: payload.message_id,
               isOnSaveEvent: false,
               organizationId: messageContext.organizationId,
-              supabaseCookieKey: getSupabaseCookieKey(),
               accessToken: payload.access_token,
-              supabaseUser,
             } satisfies TakeDashboardScreenshotTrigger,
             { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
           );

@@ -252,8 +252,6 @@ export async function getDashboardHandler(
       dashboardId,
       isOnSaveEvent: false,
       organizationId: dashboardFile.organizationId,
-      supabaseCookieKey: c.get('supabaseCookieKey'),
-      supabaseUser: c.get('supabaseUser'),
       accessToken: c.get('accessToken'),
     } satisfies TakeDashboardScreenshotTrigger,
     { concurrencyKey: `take-dashboard-screenshot-${dashboardId}-${versionNumber}` }

@@ -95,8 +95,6 @@ const app = new Hono()
         {
           reportId,
           organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-          supabaseCookieKey: c.get('supabaseCookieKey'),
-          supabaseUser: c.get('supabaseUser'),
           accessToken: c.get('accessToken'),
         } satisfies TakeReportScreenshotTrigger,
         { concurrencyKey: `take-report-screenshot-${reportId}-${versionNumber}` }
