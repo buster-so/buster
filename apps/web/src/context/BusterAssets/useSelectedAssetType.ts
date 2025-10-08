@@ -46,6 +46,10 @@ export const useSelectedAssetId = () => {
     return metricId;
   }
 
+  if (messageId) {
+    return messageId;
+  }
+
   if (dashboardId) {
     return dashboardId;
   }
@@ -60,10 +64,6 @@ export const useSelectedAssetId = () => {
 
   if (collectionId) {
     return collectionId;
-  }
-
-  if (messageId) {
-    return messageId;
   }
 
   return null;

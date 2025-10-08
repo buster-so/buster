@@ -181,5 +181,6 @@ export const MOCK_CHAT = (chatIndex = 0): BusterChat => {
     workspace_sharing: 'full_access',
     workspace_member_count: 0,
     individual_permissions: [],
+    screenshot_taken_at: null,
   };
 };
