@@ -74,11 +74,63 @@ async function parseImageFile(file: File): Promise<{
   };
 }
 
-async function parseImageInput(image: string | File): Promise<{
+function detectImageTypeFromBuffer(buffer: Buffer): { contentType: string; extension: string } {
+  // Check PNG signature (89 50 4E 47)
+  if (
+    buffer.length >= 4 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47
+  ) {
+    return { contentType: 'image/png', extension: '.png' };
+  }
+
+  // Check JPEG signature (FF D8 FF)
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return { contentType: 'image/jpeg', extension: '.jpg' };
+  }
+
+  // Check WebP signature (RIFF ... WEBP)
+  if (
+    buffer.length >= 12 &&
+    buffer[0] === 0x52 &&
+    buffer[1] === 0x49 &&
+    buffer[2] === 0x46 &&
+    buffer[3] === 0x46 &&
+    buffer[8] === 0x57 &&
+    buffer[9] === 0x45 &&
+    buffer[10] === 0x42 &&
+    buffer[11] === 0x50
+  ) {
+    return { contentType: 'image/webp', extension: '.webp' };
+  }
+
+  // Default to PNG if unknown
+  return { contentType: 'image/png', extension: '.png' };
+}
+
+function parseBuffer(buffer: Buffer): {
+  buffer: Buffer;
+  contentType: string;
+  extension: string;
+} {
+  const { contentType, extension } = detectImageTypeFromBuffer(buffer);
+  return {
+    buffer,
+    contentType,
+    extension,
+  };
+}
+
+async function parseImageInput(image: string | File | Buffer): Promise<{
   buffer: Buffer;
   contentType: string;
   extension: string;
 }> {
+  if (Buffer.isBuffer(image)) {
+    return parseBuffer(image);
+  }
   if (typeof image === 'string') {
     return parseBase64Image(image);
   }
