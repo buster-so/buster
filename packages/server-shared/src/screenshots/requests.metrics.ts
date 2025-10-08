@@ -24,7 +24,9 @@ export const PutMetricScreenshotRequestSchema = z.object({
       z.instanceof(File).refine((file) => file.type.startsWith('image/'), {
         message: 'File must be an image',
       }),
-      z.instanceof(Buffer).describe('Buffer containing raw image data'),
+      z
+        .any()
+        .describe('Buffer containing raw image data'), // Buffer is not available in the browser
     ])
     .describe('Image as base64 data URI, File object, or Buffer'),
 });
@@ -32,4 +34,6 @@ export const PutMetricScreenshotParamsSchema = z.object({
   id: z.string().uuid('Asset ID must be a valid UUID'),
 });
 
-export type PutMetricScreenshotRequest = z.infer<typeof PutMetricScreenshotRequestSchema>;
+export type PutMetricScreenshotRequest = {
+  image: string | File | Buffer;
+};

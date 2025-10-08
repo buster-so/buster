@@ -1,4 +1,7 @@
-import { hasMetricScreenshotBeenTakenWithin } from '@buster/database/queries';
+import {
+  getUserOrganizationId,
+  hasMetricScreenshotBeenTakenWithin,
+} from '@buster/database/queries';
 import type { BrowserParamsContextOrDirectRequest } from '@shared-helpers/browser-login';
 import { DEFAULT_SCREENSHOT_CONFIG } from '@shared-helpers/screenshot-config';
 import { uploadScreenshotHandler } from '@shared-helpers/upload-screenshot-handler';
@@ -27,16 +30,38 @@ type SaveMetricScreenshotHandlerArgs = {
   isOnSaveEvent: boolean;
 } & BrowserParamsContextOrDirectRequest;
 
+const activelyCapturingScreenshot = new Set<string>();
+
 export const saveMetricScreenshotHandler = async (args: SaveMetricScreenshotHandlerArgs) => {
   try {
     const { isOnSaveEvent, metricId } = args;
+
+    if (activelyCapturingScreenshot.has(metricId)) {
+      return;
+    }
+
+    console.log('activelyCapturingScreenshot', activelyCapturingScreenshot);
 
     const shouldTakeNewScreenshot = await shouldTakenNewScreenshot({
       metricId,
       isOnSaveEvent,
     });
+
     if (!shouldTakeNewScreenshot) {
       return;
+    }
+
+    activelyCapturingScreenshot.add(metricId);
+    const organizationId =
+      'context' in args
+        ? args.context.get('userOrganizationInfo')?.organizationId ||
+          (await getUserOrganizationId(args.context.get('busterUser')?.id))?.organizationId
+        : args.organizationId;
+
+    if (!organizationId) {
+      return {
+        success: false,
+      };
     }
 
     const screenshotBuffer = await getMetricScreenshotHandler({
@@ -44,10 +69,8 @@ export const saveMetricScreenshotHandler = async (args: SaveMetricScreenshotHand
       width: DEFAULT_SCREENSHOT_CONFIG.width,
       height: DEFAULT_SCREENSHOT_CONFIG.height,
     });
-    const organizationId =
-      'context' in args
-        ? args.context.get('userOrganizationInfo').organizationId
-        : args.organizationId;
+
+    console.log('screenshotBuffer', screenshotBuffer.length);
 
     const result = await uploadScreenshotHandler({
       assetType: 'metric_file',
@@ -62,5 +85,7 @@ export const saveMetricScreenshotHandler = async (args: SaveMetricScreenshotHand
     return {
       success: false,
     };
+  } finally {
+    activelyCapturingScreenshot.delete(args.metricId);
   }
 };

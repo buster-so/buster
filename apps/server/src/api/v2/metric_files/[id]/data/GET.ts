@@ -28,7 +28,7 @@ const app = new Hono()
       saveMetricScreenshotHandler({
         metricId: id,
         version_number,
-        isOnSaveEvent: true,
+        isOnSaveEvent: false,
         context: c,
       });
 

@@ -33,7 +33,7 @@ export const requireAuth = bearerAuth({
       c.set('supabaseUser', data.user);
 
       // Get the corresponding user from your database
-      const busterUser = await getUser({ id: data.user.id });
+      const [busterUser] = await Promise.all([getUser({ id: data.user.id })]);
 
       if (!busterUser) {
         console.warn('Supabase user found but no corresponding database user:', {
