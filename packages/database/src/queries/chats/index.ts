@@ -27,3 +27,5 @@ export {
   type ListChatsRequest,
   type ListChatsResponse,
 } from './list-chats';
+
+export { hasChatScreenshotBeenTakenWithin } from './chat-screenshots';

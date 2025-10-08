@@ -22,3 +22,5 @@ export {
   getCollectionsAssociatedWithDashboard,
   type AssociatedCollection,
 } from './get-collections-associated-with-dashboard';
+
+export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';

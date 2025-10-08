@@ -9,3 +9,4 @@ export * from './replace-report-content';
 export * from './append-report-content';
 export * from './update-report-content';
 export * from './batch-update-report';
+export * from './report-screenshots';

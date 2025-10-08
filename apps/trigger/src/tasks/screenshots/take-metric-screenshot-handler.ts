@@ -2,7 +2,6 @@ import { hasMetricScreenshotBeenTakenWithin } from '@buster/database/queries';
 import { getMetricScreenshot } from '@buster/server-shared/screenshots';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
-import { z } from 'zod';
 import { TakeMetricScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
