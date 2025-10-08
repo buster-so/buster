@@ -5,6 +5,7 @@ import { createRetrieveMetadataExecute } from './retrieve-metadata-execute';
 export const RETRIEVE_METADATA_TOOL_NAME = 'retrieveMetadata';
 
 export const RetrieveMetadataInputSchema = z.object({
+  dataSourceId: z.string().min(1).describe('Data source identifier'),
   database: z.string().min(1).describe('Database name where the dataset resides'),
   schema: z.string().min(1).describe('Schema name where the dataset resides'),
   name: z.string().min(1).describe('Dataset/table name'),

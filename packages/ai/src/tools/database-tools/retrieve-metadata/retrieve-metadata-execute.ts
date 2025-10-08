@@ -10,6 +10,7 @@ import {
  * Retrieve dataset metadata via API endpoint
  */
 async function executeApiRequest(
+  dataSourceId: string,
   database: string,
   schema: string,
   name: string,
@@ -22,6 +23,7 @@ async function executeApiRequest(
   try {
     // Build query string
     const params = new URLSearchParams({
+      dataSourceId,
       database,
       schema,
       name,
@@ -66,10 +68,10 @@ async function executeApiRequest(
 export function createRetrieveMetadataExecute(context: RetrieveMetadataContext) {
   return wrapTraced(
     async (input: RetrieveMetadataInput): Promise<RetrieveMetadataOutput> => {
-      const { database, schema, name } = input;
+      const { dataSourceId, database, schema, name } = input;
 
       // Execute API request
-      const result = await executeApiRequest(database, schema, name, context);
+      const result = await executeApiRequest(dataSourceId, database, schema, name, context);
 
       if (result.success && result.data) {
         return result.data;
