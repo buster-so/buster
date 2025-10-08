@@ -61,6 +61,10 @@ const config = defineConfig(({ command, mode }) => {
           if (/\.(test|stories)\.(js|ts|jsx|tsx)$/.test(id)) {
             return true;
           }
+          // Exclude playwright-core (Node.js-only package)
+          if (id.includes('playwright-core')) {
+            return true;
+          }
           // Don't externalize React and React DOM - let them be bundled
           return false;
         },
