@@ -52,7 +52,7 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
-    "dayjs": "^1.11.18",
+    "dayjs": "catalog:",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",

@@ -51,10 +51,9 @@
     "@types/js-yaml": "catalog:",
     "ai": "catalog:",
     "braintrust": "catalog:",
-    "dayjs": "^1.11.18",
+    "dayjs": "catalog:",
     "drizzle-orm": "catalog:",
     "js-yaml": "catalog:",
-    "playwright": "^1.55.1",
     "vitest": "catalog:",
     "zod": "catalog:"
   },
