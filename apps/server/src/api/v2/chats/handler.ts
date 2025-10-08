@@ -141,9 +141,7 @@ export async function createChatHandler(
         // Just queue the background job - should be <100ms
         const taskHandle = await tasks.trigger(
           'analyst-agent-task',
-          {
-            message_id: actualMessageId,
-          },
+          { message_id: actualMessageId },
           {
             concurrencyKey: chatId, // Ensure sequential processing per chat
           }

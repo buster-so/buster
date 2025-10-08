@@ -50,7 +50,7 @@ const app = new Hono()
           type,
           supabaseCookieKey: c.get('supabaseCookieKey'),
           supabaseUser: c.get('supabaseUser'),
-          accessToken: c.get('accessToken') || '',
+          accessToken: c.get('accessToken'),
           organizationId: metric.organizationId,
         });
 

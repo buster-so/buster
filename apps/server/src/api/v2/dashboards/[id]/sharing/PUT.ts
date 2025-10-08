@@ -10,14 +10,15 @@ import type { User } from '@buster/database/queries';
 import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
 import { type ShareUpdateRequest, ShareUpdateRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { getDashboardHandler } from '../GET';
 
 export async function updateDashboardShareHandler(
   dashboardId: string,
   request: ShareUpdateRequest,
-  user: User & { organizationId: string }
+  user: User & { organizationId: string },
+  c: Context
 ) {
   // Check if dashboard exists
   const dashboard = await getDashboardById({ dashboardId });
@@ -104,7 +105,11 @@ export async function updateDashboardShareHandler(
     workspace_sharing,
   });
 
-  const updatedDashboard: GetDashboardResponse = await getDashboardHandler({ dashboardId }, user);
+  const updatedDashboard: GetDashboardResponse = await getDashboardHandler(
+    { dashboardId },
+    user,
+    c
+  );
 
   return updatedDashboard;
 }
@@ -130,7 +135,8 @@ const app = new Hono().put('/', zValidator('json', ShareUpdateRequestSchema), as
     {
       ...user,
       organizationId: userOrg.organizationId,
-    }
+    },
+    c
   );
 
   return c.json(updatedDashboard);

@@ -1,5 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
-import { getDashboardById, getUserOrganizationId } from '@buster/database/queries';
+import { getDashboardById } from '@buster/database/queries';
 import {
   GetDashboardScreenshotParamsSchema,
   GetDashboardScreenshotQuerySchema,
@@ -48,7 +48,7 @@ const app = new Hono()
           dashboardId,
           supabaseCookieKey: c.get('supabaseCookieKey'),
           supabaseUser: c.get('supabaseUser'),
-          accessToken: c.get('accessToken') || '',
+          accessToken: c.get('accessToken'),
           organizationId: dashboard.organizationId,
         });
 

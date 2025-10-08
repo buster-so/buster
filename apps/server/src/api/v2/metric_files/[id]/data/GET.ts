@@ -27,20 +27,20 @@ const app = new Hono()
         password
       );
 
+      const organizationId =
+        (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '';
+
       await tasks.trigger(
         screenshots_task_keys.take_metric_screenshot,
         {
           metricId: id,
-          isOnSaveEvent: true,
+          isOnSaveEvent: false,
           supabaseCookieKey: c.get('supabaseCookieKey'),
           supabaseUser: c.get('supabaseUser'),
-          accessToken: c.get('accessToken') || '',
-          organizationId:
-            (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '',
+          accessToken: c.get('accessToken'),
+          organizationId,
         } satisfies TakeMetricScreenshotTrigger,
-        {
-          idempotencyKey: `take-metric-screenshot-${id}`,
-        }
+        { concurrencyKey: `take-metric-screenshot-${id}-${version_number}` }
       );
 
       return c.json(response);

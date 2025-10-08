@@ -1,3 +1,5 @@
+import { screenshots_task_keys } from '@buster-app/trigger/task-keys';
+import type { TakeDashboardScreenshotTrigger } from '@buster-app/trigger/task-schemas';
 import { checkPermission } from '@buster/access-controls';
 import {
   type User,
@@ -14,7 +16,8 @@ import {
 import type { DashboardYml } from '@buster/server-shared/dashboards';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
+import { tasks } from '@trigger.dev/sdk';
+import { type Context, Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
@@ -46,7 +49,8 @@ const app = new Hono().get(
         versionNumber: version_number,
         password,
       },
-      user
+      user,
+      c
     );
 
     return c.json(response);
@@ -61,7 +65,8 @@ export default app;
  */
 export async function getDashboardHandler(
   params: GetDashboardHandlerParams,
-  user: User
+  user: User,
+  c: Context
 ): Promise<GetDashboardResponse> {
   const { dashboardId, versionNumber, password } = params;
 
@@ -241,6 +246,18 @@ export async function getDashboardHandler(
     workspace_member_count: workspaceMemberCount,
   };
 
+  await tasks.trigger(
+    screenshots_task_keys.take_dashboard_screenshot,
+    {
+      dashboardId,
+      isOnSaveEvent: false,
+      organizationId: dashboardFile.organizationId,
+      supabaseCookieKey: c.get('supabaseCookieKey'),
+      supabaseUser: c.get('supabaseUser'),
+      accessToken: c.get('accessToken'),
+    } satisfies TakeDashboardScreenshotTrigger,
+    { concurrencyKey: `take-dashboard-screenshot-${dashboardId}-${versionNumber}` }
+  );
   return response;
 }
 

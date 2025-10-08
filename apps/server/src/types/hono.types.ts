@@ -41,6 +41,6 @@ declare module 'hono' {
     /**
      * The access token for the user. Set by the requireAuth middleware.
      */
-    readonly accessToken?: string;
+    readonly accessToken: string;
   }
 }
