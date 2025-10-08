@@ -8,12 +8,14 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
   component: RouteComponent,
   validateSearch: GetReportScreenshotQuerySchema,
   ssr: true,
-  beforeLoad: async ({ context, params, search }) => {
-    const report = await prefetchGetReport(
-      context.queryClient,
-      params.reportId,
-      search.version_number
-    );
+  beforeLoad: ({ search }) => {
+    return {
+      version_number: search.version_number,
+    };
+  },
+  loader: async ({ context, params }) => {
+    const { version_number } = context;
+    const report = await prefetchGetReport(context.queryClient, params.reportId, version_number);
 
     if (!report) {
       throw redirect({
@@ -23,7 +25,7 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
 
     const allMetrics = Object.entries(report?.metrics || {});
 
-    await Promise.all(
+    const res = await Promise.all(
       allMetrics.map(([metricId, metric]) => {
         return ensureMetricData(context.queryClient, {
           id: metricId,
@@ -31,6 +33,10 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
         });
       })
     );
+
+    res.forEach((metric) => {
+      console.log('metric', metric.data?.length);
+    });
 
     return { report };
   },

@@ -247,7 +247,7 @@ export async function getDashboardHandler(
     workspace_member_count: workspaceMemberCount,
   };
 
-  const tag = `take-dashboard-screenshot-${dashboardId}-${versionNumber}`;
+  const tag = `take-dashboard-screenshot-${dashboardId}`;
   if (
     await shouldTakeScreenshot({
       tag,

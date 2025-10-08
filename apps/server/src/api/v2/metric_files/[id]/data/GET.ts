@@ -29,7 +29,7 @@ const app = new Hono()
         password
       );
 
-      const tag = `take-metric-screenshot-${id}-${version_number}`;
+      const tag = `take-metric-screenshot-${id}`;
       if (
         await shouldTakeScreenshot({
           tag,

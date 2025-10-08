@@ -5,6 +5,9 @@ import type { Context } from 'hono';
 // This helper ensures that we do not run multiple trigger jobs for the same screenshot task concurrently.
 // It checks if a job for the given tag and key is already running or queued before starting a new one.
 
+const currentlyCheckingTags = new Set<string>();
+const CACHE_TAG_EXPIRATION_TIME = 1000 * 15; // 15 seconds
+
 export const shouldTakeScreenshot = async ({
   tag,
   key,
@@ -16,18 +19,29 @@ export const shouldTakeScreenshot = async ({
 }): Promise<boolean> => {
   const hasReferrer = !!context.req.header('referer');
 
-  if (!hasReferrer) {
+  if (!hasReferrer || currentlyCheckingTags.has(tag)) {
     return false;
   }
 
-  const lastTask = await runs
-    .list({
-      status: ['EXECUTING', 'QUEUED'],
-      taskIdentifier: key,
-      tag,
-      limit: 1,
-    })
-    .then((res) => res.data[0]);
+  currentlyCheckingTags.add(tag);
 
-  return !lastTask;
+  try {
+    const lastTask = await runs
+      .list({
+        status: ['EXECUTING', 'QUEUED'],
+        taskIdentifier: key,
+        tag,
+        limit: 1,
+      })
+      .then((res) => res.data[0]);
+
+    return !lastTask;
+  } catch (error) {
+    console.error('Error checking if screenshot should be taken', { error });
+    throw error;
+  } finally {
+    setTimeout(() => {
+      currentlyCheckingTags.delete(tag);
+    }, CACHE_TAG_EXPIRATION_TIME);
+  }
 };

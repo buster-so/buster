@@ -91,7 +91,7 @@ const app = new Hono()
         password
       );
 
-      const tag = `take-report-screenshot-${reportId}-${versionNumber}`;
+      const tag = `take-report-screenshot-${reportId}`;
 
       if (
         await shouldTakeScreenshot({
