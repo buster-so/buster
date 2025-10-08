@@ -16,6 +16,7 @@ export const useIsAssetFileChanged = () => {
     dashboardId: assetId,
     enabled: assetType === 'dashboard_file',
   });
+  console.log('reportParams', assetId, assetType);
   const reportParams = useIsReportFileChanged({
     reportId: assetId,
     enabled: assetType === 'report_file',

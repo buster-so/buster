@@ -6,52 +6,65 @@ import {
 } from '@tanstack/react-router';
 
 export const useSelectedAssetType = (): NonNullable<StaticDataRouteOption['assetType']> => {
-  const lastMatch = useMatches({
-    select: (matches) => matches.reverse().find((match) => match.staticData?.assetType),
-  });
-
-  if (typeof lastMatch === 'number') {
-    return 'chat';
-  }
-  const data = lastMatch?.staticData?.assetType as StaticDataRouteOption['assetType'];
-  const { messageId } = useParams({
+  const { dashboardId, metricId, reportId, chatId, collectionId, messageId } = useParams({
     strict: false,
   });
-  if (messageId || !data) {
+
+  if (metricId) {
+    return 'metric_file';
+  }
+
+  if (messageId) {
     return 'reasoning';
   }
-  return data;
+
+  if (dashboardId) {
+    return 'dashboard_file';
+  }
+
+  if (reportId) {
+    return 'report_file';
+  }
+
+  if (chatId) {
+    return 'chat';
+  }
+
+  if (collectionId) {
+    return 'collection';
+  }
+
+  return 'metric_file';
 };
 
 export const useSelectedAssetId = () => {
-  const assetType = useSelectedAssetType();
-  const params = useParams({ strict: false });
+  const { dashboardId, metricId, reportId, chatId, collectionId, messageId } = useParams({
+    strict: false,
+  });
 
-  if (assetType === 'dashboard_file') {
-    return params?.dashboardId;
+  if (metricId) {
+    return metricId;
   }
 
-  if (assetType === 'report_file') {
-    return params?.reportId;
+  if (dashboardId) {
+    return dashboardId;
   }
 
-  if (assetType === 'collection') {
-    return params?.collectionId;
+  if (reportId) {
+    return reportId;
   }
 
-  if (assetType === 'metric_file') {
-    return params?.metricId;
+  if (chatId) {
+    return chatId;
   }
 
-  if (assetType === 'chat') {
-    return params?.chatId;
+  if (collectionId) {
+    return collectionId;
   }
 
-  if (assetType === 'reasoning') {
-    return params?.messageId;
+  if (messageId) {
+    return messageId;
   }
-
-  const _exhaustiveCheck: never = assetType;
 
   return null;
 };
