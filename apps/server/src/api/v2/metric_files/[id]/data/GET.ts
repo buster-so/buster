@@ -3,9 +3,10 @@ import type { TakeMetricScreenshotTrigger } from '@buster-app/trigger/task-schem
 import { getUserOrganizationId } from '@buster/database/queries';
 import { MetricDataParamsSchema, MetricDataQuerySchema } from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
+import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
 import { runs, tasks } from '@trigger.dev/sdk';
+import dayjs from 'dayjs';
 import { Hono } from 'hono';
-import { id } from 'zod/v4/locales';
 import { standardErrorHandler } from '../../../../../utils/response';
 import { getMetricDataHandler } from './get-metric-data';
 
@@ -16,8 +17,7 @@ const app = new Hono()
     zValidator('query', MetricDataQuerySchema),
     async (c) => {
       const { id } = c.req.valid('param');
-      const { limit, version_number, report_file_id, password, is_screenshot } =
-        c.req.valid('query');
+      const { limit, version_number, report_file_id, password } = c.req.valid('query');
       const user = c.get('busterUser');
 
       const response = await getMetricDataHandler(
@@ -30,16 +30,13 @@ const app = new Hono()
       );
 
       const tag = `take-metric-screenshot-${id}-${version_number}`;
-      const lastTask = await runs
-        .list({
-          status: ['EXECUTING', 'QUEUED'],
-          taskIdentifier: screenshots_task_keys.take_metric_screenshot,
+      if (
+        await shouldTakeScreenshot({
           tag,
-          limit: 1,
+          key: screenshots_task_keys.take_metric_screenshot,
+          context: c,
         })
-        .then((res) => res.data[0]);
-
-      if (!lastTask && !is_screenshot) {
+      ) {
         const organizationId =
           (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '';
         await tasks.trigger(
