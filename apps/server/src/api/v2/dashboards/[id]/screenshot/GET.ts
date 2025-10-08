@@ -46,8 +46,6 @@ const app = new Hono()
         const screenshotBuffer = await getDashboardScreenshot({
           ...search,
           dashboardId,
-          supabaseCookieKey: c.get('supabaseCookieKey'),
-          supabaseUser: c.get('supabaseUser'),
           accessToken: c.get('accessToken'),
           organizationId: dashboard.organizationId,
         });

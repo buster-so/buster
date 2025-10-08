@@ -12,8 +12,8 @@ export {
   type TakeReportScreenshotTrigger,
 } from './tasks/screenshots/schemas';
 export {
-  TakeChartScreenshotTriggerSchema,
-  type TakeChartScreenshotTrigger,
+  TakeChatScreenshotTriggerSchema,
+  type TakeChatScreenshotTrigger,
 } from './tasks/screenshots/schemas';
 
 //ANALYST AGENT

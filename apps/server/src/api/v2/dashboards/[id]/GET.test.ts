@@ -101,8 +101,14 @@ describe('getDashboardHandler', () => {
   // Mock Hono context
   const mockContext = {
     env: {},
-    get: vi.fn(),
+    get: vi.fn((key: string) => {
+      if (key === 'accessToken') return 'mock-access-token';
+      return undefined;
+    }),
     set: vi.fn(),
+    req: {
+      header: vi.fn(() => undefined),
+    },
   } as any;
 
   beforeEach(() => {

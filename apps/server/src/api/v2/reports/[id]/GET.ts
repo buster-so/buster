@@ -13,6 +13,7 @@ import {
   type GetReportResponse,
 } from '@buster/server-shared/reports';
 import { zValidator } from '@hono/zod-validator';
+import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
 import { tasks } from '@trigger.dev/sdk';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -90,15 +91,25 @@ const app = new Hono()
         password
       );
 
-      await tasks.trigger(
-        screenshots_task_keys.take_report_screenshot,
-        {
-          reportId,
-          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-          accessToken: c.get('accessToken'),
-        } satisfies TakeReportScreenshotTrigger,
-        { concurrencyKey: `take-report-screenshot-${reportId}-${versionNumber}` }
-      );
+      const tag = `take-report-screenshot-${reportId}-${versionNumber}`;
+
+      if (
+        await shouldTakeScreenshot({
+          tag,
+          key: screenshots_task_keys.take_report_screenshot,
+          context: c,
+        })
+      ) {
+        tasks.trigger(
+          screenshots_task_keys.take_report_screenshot,
+          {
+            reportId,
+            organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+            accessToken: c.get('accessToken'),
+          } satisfies TakeReportScreenshotTrigger,
+          { concurrencyKey: `take-report-screenshot-${reportId}-${versionNumber}` }
+        );
+      }
 
       return c.json(response);
     }

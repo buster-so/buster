@@ -26,8 +26,8 @@ export const TakeReportScreenshotTriggerSchema = GetReportScreenshotHandlerArgsS
 
 export type TakeReportScreenshotTrigger = z.infer<typeof TakeReportScreenshotTriggerSchema>;
 
-export const TakeChartScreenshotTriggerSchema = GetChatScreenshotHandlerArgsSchema.extend({
-  chartId: z.string(),
+export const TakeChatScreenshotTriggerSchema = GetChatScreenshotHandlerArgsSchema.extend({
+  chatId: z.string(),
 });
 
-export type TakeChartScreenshotTrigger = z.infer<typeof TakeChartScreenshotTriggerSchema>;
+export type TakeChatScreenshotTrigger = z.infer<typeof TakeChatScreenshotTriggerSchema>;

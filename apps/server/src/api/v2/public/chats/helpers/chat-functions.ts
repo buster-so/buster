@@ -1,6 +1,7 @@
 import type { User } from '@buster/database/queries';
 import { PublicChatError, PublicChatErrorCode } from '@buster/server-shared';
 import type { ChatCreateHandlerRequest, ChatWithMessages } from '@buster/server-shared/chats';
+import type { Context } from 'hono';
 import { createChatHandler } from '../../../chats/handler';
 import { URL_CONFIG } from '../constants';
 
@@ -14,7 +15,7 @@ import { URL_CONFIG } from '../constants';
 export async function initializeChat(
   prompt: string,
   user: User,
-  _organizationId: string
+  context: Context
 ): Promise<ChatWithMessages> {
   try {
     // Create the chat request
@@ -23,7 +24,7 @@ export async function initializeChat(
     };
 
     // Use the existing chat handler
-    const chat = await createChatHandler(chatRequest, user);
+    const chat = await createChatHandler(chatRequest, user, context);
 
     return chat;
   } catch (error) {

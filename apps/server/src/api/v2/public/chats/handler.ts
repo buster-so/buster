@@ -23,7 +23,7 @@ export async function publicChatHandler(
     const user = await resolveAndValidateUser(request.email, apiKey.organizationId);
 
     // Step 2: Initialize the chat with the prompt
-    const chat = await initializeChat(request.prompt, user, apiKey.organizationId);
+    const chat = await initializeChat(request.prompt, user, c);
 
     // Step 3: Extract the message ID from the chat
     const messageId = extractMessageId(chat);

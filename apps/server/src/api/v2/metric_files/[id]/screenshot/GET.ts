@@ -48,8 +48,6 @@ const app = new Hono()
           height,
           version_number,
           type,
-          supabaseCookieKey: c.get('supabaseCookieKey'),
-          supabaseUser: c.get('supabaseUser'),
           accessToken: c.get('accessToken'),
           organizationId: metric.organizationId,
         });

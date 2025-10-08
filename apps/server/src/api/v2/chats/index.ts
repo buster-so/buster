@@ -26,7 +26,7 @@ const app = new Hono()
     const request = c.req.valid('json');
     const user = c.get('busterUser');
 
-    const response: ChatWithMessages = await createChatHandler(request, user);
+    const response: ChatWithMessages = await createChatHandler(request, user, c);
 
     const validatedResponse = ChatWithMessagesSchema.safeParse(response);
 

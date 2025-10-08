@@ -16,6 +16,7 @@ import {
 import type { DashboardYml } from '@buster/server-shared/dashboards';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
+import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
 import { tasks } from '@trigger.dev/sdk';
 import { type Context, Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -246,16 +247,26 @@ export async function getDashboardHandler(
     workspace_member_count: workspaceMemberCount,
   };
 
-  await tasks.trigger(
-    screenshots_task_keys.take_dashboard_screenshot,
-    {
-      dashboardId,
-      isOnSaveEvent: false,
-      organizationId: dashboardFile.organizationId,
-      accessToken: c.get('accessToken'),
-    } satisfies TakeDashboardScreenshotTrigger,
-    { concurrencyKey: `take-dashboard-screenshot-${dashboardId}-${versionNumber}` }
-  );
+  const tag = `take-dashboard-screenshot-${dashboardId}-${versionNumber}`;
+  if (
+    await shouldTakeScreenshot({
+      tag,
+      key: screenshots_task_keys.take_dashboard_screenshot,
+      context: c,
+    })
+  ) {
+    tasks.trigger(
+      screenshots_task_keys.take_dashboard_screenshot,
+      {
+        dashboardId,
+        isOnSaveEvent: false,
+        organizationId: dashboardFile.organizationId,
+        accessToken: c.get('accessToken'),
+      } satisfies TakeDashboardScreenshotTrigger,
+      { tags: [tag] }
+    );
+  }
+
   return response;
 }
 

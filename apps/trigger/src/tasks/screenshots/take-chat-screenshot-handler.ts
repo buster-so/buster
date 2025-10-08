@@ -1,18 +1,18 @@
 import { getChatScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
-import { TakeChartScreenshotTriggerSchema } from './schemas';
+import { TakeChatScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
 
 export const takeChartScreenshotHandlerTask: ReturnType<
   typeof schemaTask<
     typeof screenshots_task_keys.take_chart_screenshot,
-    typeof TakeChartScreenshotTriggerSchema,
+    typeof TakeChatScreenshotTriggerSchema,
     { success: boolean } | undefined
   >
 > = schemaTask({
   id: screenshots_task_keys.take_chart_screenshot,
-  schema: TakeChartScreenshotTriggerSchema,
+  schema: TakeChatScreenshotTriggerSchema,
   run: async (args) => {
     logger.info('Getting chart screenshot', { args });
 

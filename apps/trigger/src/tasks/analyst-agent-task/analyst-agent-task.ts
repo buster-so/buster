@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { logger, schemaTask, tasks } from '@trigger.dev/sdk';
 import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { analystQueue } from '../../queues/analyst-queue';
+import type { TakeChatScreenshotTrigger } from '../../tasks/screenshots/schemas';
 import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './types';
 
 // Task 2 & 4: Database helpers (IMPLEMENTED)
@@ -521,13 +522,12 @@ export const analystAgentTask: ReturnType<
         const supabaseUser = await getSupabaseUser(payload.access_token);
         if (supabaseUser) {
           await tasks.trigger(
-            screenshots_task_keys.take_dashboard_screenshot,
+            screenshots_task_keys.take_chart_screenshot,
             {
-              dashboardId: payload.message_id,
-              isOnSaveEvent: false,
+              chatId: messageContext.chatId,
               organizationId: messageContext.organizationId,
               accessToken: payload.access_token,
-            } satisfies TakeDashboardScreenshotTrigger,
+            } satisfies TakeChatScreenshotTrigger,
             { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
           );
         }

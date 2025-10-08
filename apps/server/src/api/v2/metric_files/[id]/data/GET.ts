@@ -39,7 +39,7 @@ const app = new Hono()
       ) {
         const organizationId =
           (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '';
-        await tasks.trigger(
+        tasks.trigger(
           screenshots_task_keys.take_metric_screenshot,
           {
             metricId: id,
