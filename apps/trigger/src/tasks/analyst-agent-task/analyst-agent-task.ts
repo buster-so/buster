@@ -516,20 +516,23 @@ export const analystAgentTask: ReturnType<
         totalWorkflowTimeMs: totalWorkflowTime,
       });
 
-      const supabaseUser = await getSupabaseUser(payload.access_token);
-      if (supabaseUser) {
-        await tasks.trigger(
-          screenshots_task_keys.take_dashboard_screenshot,
-          {
-            dashboardId: payload.message_id,
-            isOnSaveEvent: false,
-            organizationId: messageContext.organizationId,
-            supabaseCookieKey: getSupabaseCookieKey(),
-            accessToken: payload.access_token,
-            supabaseUser,
-          } satisfies TakeDashboardScreenshotTrigger,
-          { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
-        );
+      //unfortuatenly slack messages don't have an access token...
+      if (payload.access_token) {
+        const supabaseUser = await getSupabaseUser(payload.access_token);
+        if (supabaseUser) {
+          await tasks.trigger(
+            screenshots_task_keys.take_dashboard_screenshot,
+            {
+              dashboardId: payload.message_id,
+              isOnSaveEvent: false,
+              organizationId: messageContext.organizationId,
+              supabaseCookieKey: getSupabaseCookieKey(),
+              accessToken: payload.access_token,
+              supabaseUser,
+            } satisfies TakeDashboardScreenshotTrigger,
+            { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
+          );
+        }
       }
 
       // Log final performance metrics
