@@ -28,8 +28,8 @@ export const getReportAndInitializeMetrics = async ({
     const latestVersion = last(data.versions)?.version_number || 1;
     const isLatestVersion = data.version_number === latestVersion;
 
-    if (isLatestVersion) {
-      // set the original report?
+    if (isLatestVersion && version_number !== 'LATEST') {
+      queryClient.setQueryData(reportsQueryKeys.reportsGetReport(data.id, 'LATEST').queryKey, data);
     }
 
     if (data.version_number) {
