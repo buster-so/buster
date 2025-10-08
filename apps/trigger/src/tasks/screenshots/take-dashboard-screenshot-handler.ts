@@ -1,5 +1,5 @@
 import { hasDashboardScreenshotBeenTakenWithin } from '@buster/database/queries';
-import { getDashboardScreenshot } from '@buster/server-shared/screenshots';
+import { getDashboardScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
 import { TakeDashboardScreenshotTriggerSchema } from './schemas';

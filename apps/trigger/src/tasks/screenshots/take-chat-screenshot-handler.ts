@@ -1,6 +1,5 @@
-import { getChatScreenshot } from '@buster/server-shared/screenshots';
+import { getChatScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
-import dayjs from 'dayjs';
 import { TakeChartScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';

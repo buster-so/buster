@@ -3,7 +3,7 @@ import {
   GetDashboardScreenshotHandlerArgsSchema,
   GetMetricScreenshotHandlerArgsSchema,
   GetReportScreenshotHandlerArgsSchema,
-} from '@buster/server-shared/screenshots';
+} from '@buster/server-shared/screenshots/methods';
 import { z } from 'zod';
 
 export const TakeMetricScreenshotTriggerSchema = GetMetricScreenshotHandlerArgsSchema.extend({

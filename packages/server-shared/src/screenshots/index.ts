@@ -4,4 +4,3 @@ export * from './requests.dashboards';
 export * from './requests.reports';
 export * from './requests.chats';
 export * from './requests.base';
-export * from './methods';

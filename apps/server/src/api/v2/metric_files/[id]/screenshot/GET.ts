@@ -4,7 +4,7 @@ import {
   GetMetricScreenshotParamsSchema,
   GetMetricScreenshotQuerySchema,
 } from '@buster/server-shared/screenshots';
-import { getMetricScreenshot } from '@buster/server-shared/screenshots';
+import { getMetricScreenshot } from '@buster/server-shared/screenshots/methods';
 import { zValidator } from '@hono/zod-validator';
 import { createImageResponse } from '@shared-helpers/create-image-response';
 import { Hono } from 'hono';

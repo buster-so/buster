@@ -108,6 +108,10 @@
       "types": "./dist/screenshots/index.d.ts",
       "default": "./dist/screenshots/index.js"
     },
+    "./screenshots/methods": {
+      "types": "./dist/screenshots/methods/index.d.ts",
+      "default": "./dist/screenshots/methods/index.js"
+    },
     "./library": {
       "types": "./dist/library/index.d.ts",
       "default": "./dist/library/index.js"

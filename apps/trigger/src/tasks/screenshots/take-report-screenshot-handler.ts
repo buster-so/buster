@@ -1,5 +1,5 @@
 import { hasReportScreenshotBeenTakenWithin } from '@buster/database/queries';
-import { getReportScreenshot } from '@buster/server-shared/screenshots';
+import { getReportScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
 import { TakeReportScreenshotTriggerSchema } from './schemas';

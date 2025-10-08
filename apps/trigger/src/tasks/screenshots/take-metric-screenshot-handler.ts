@@ -1,5 +1,5 @@
 import { hasMetricScreenshotBeenTakenWithin } from '@buster/database/queries';
-import { getMetricScreenshot } from '@buster/server-shared/screenshots';
+import { getMetricScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
 import { TakeMetricScreenshotTriggerSchema } from './schemas';
