@@ -41,3 +41,5 @@ export {
   type AssociatedAsset,
   type AssetsAssociatedWithMetric,
 } from './get-permissioned-asset-associations';
+
+export { hasMetricScreenshotBeenTakenWithin } from './metric-screenshots';

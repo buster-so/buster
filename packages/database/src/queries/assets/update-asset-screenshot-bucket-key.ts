@@ -54,6 +54,7 @@ export const updateAssetScreenshotBucketKey = async (
     .update(table)
     .set({
       screenshotBucketKey,
+      screenshotTakenAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
     .where(and(eq(table.id, assetId), isNull(table.deletedAt)));

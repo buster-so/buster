@@ -233,6 +233,7 @@ export const collections = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
   },
   (table) => [
     foreignKey({
@@ -743,6 +744,7 @@ export const dashboardFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -818,6 +820,7 @@ export const reportFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -891,6 +894,7 @@ export const chats = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -1043,6 +1047,7 @@ export const metricFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [

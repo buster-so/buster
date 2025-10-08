@@ -19,7 +19,9 @@ type BrowserParamsDirectRequest<T> = BrowserParamsBase<T> & {
   accessToken: string;
 };
 
-type BrowserParams<T> = BrowserParamsContext<T> | BrowserParamsDirectRequest<T>;
+export type BrowserParams<T = Buffer<ArrayBufferLike>> =
+  | BrowserParamsContext<T>
+  | BrowserParamsDirectRequest<T>;
 
 export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   width,

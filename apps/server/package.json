@@ -41,6 +41,7 @@
     "@supabase/supabase-js": "catalog:",
     "@trigger.dev/sdk": "4.0.2",
     "ai": "catalog:",
+    "dayjs": "^1.11.18",
     "drizzle-orm": "catalog:",
     "hono": "catalog:",
     "hono-pino": "^0.10.2",
