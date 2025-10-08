@@ -2,25 +2,23 @@ import type {
   GetMetricScreenshotParams,
   GetMetricScreenshotQuery,
 } from '@buster/server-shared/screenshots';
-import type { Context } from 'hono';
-import type { BrowserParams } from '../../../../../shared-helpers/browser-login';
-import { createHrefFromLink } from '../../../../../shared-helpers/create-href-from-link';
+import type { BrowserParamsContextOrDirectRequest } from '@shared-helpers/browser-login';
+import { createHrefFromLink } from '@shared-helpers/create-href-from-link';
 
-export const getMetricScreenshotHandler = async ({
-  params,
-  search,
-  ...rest
-}: {
+type GetMetricScreenshotHandlerArgs = {
   params: GetMetricScreenshotParams;
   search: GetMetricScreenshotQuery;
-} & BrowserParams) => {
+} & BrowserParamsContextOrDirectRequest;
+
+export const getMetricScreenshotHandler = async (args: GetMetricScreenshotHandlerArgs) => {
+  const { params, search } = args;
   const { width, height, type, version_number } = search;
   const { id: metricId } = params;
 
   const { browserLogin } = await import('../../../../../shared-helpers/browser-login');
 
   const { result: screenshotBuffer } = await browserLogin({
-    ...rest,
+    ...args,
     width,
     height,
     fullPath: createHrefFromLink({

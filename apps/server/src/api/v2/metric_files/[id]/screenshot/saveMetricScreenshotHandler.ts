@@ -3,15 +3,19 @@ import type {
   GetMetricScreenshotParams,
   GetMetricScreenshotQuery,
 } from '@buster/server-shared/screenshots';
+import type { BrowserParamsContextOrDirectRequest } from '@shared-helpers/browser-login';
+import { uploadScreenshotHandler } from '@shared-helpers/upload-screenshot-handler';
 import dayjs from 'dayjs';
-import type { Context } from 'hono';
-import type { BrowserParams } from '../../../../../shared-helpers/browser-login';
 import { getMetricScreenshotHandler } from './getMetricScreenshotHandler';
 
 const shouldTakenNewScreenshot = async ({
   metricId,
   isOnSaveEvent,
 }: { metricId: string; isOnSaveEvent: boolean }) => {
+  if (isOnSaveEvent) {
+    return true;
+  }
+
   const isScreenshotExpired = await hasMetricScreenshotBeenTakenWithin(
     metricId,
     dayjs().subtract(6, 'hours')
@@ -20,30 +24,36 @@ const shouldTakenNewScreenshot = async ({
   return !isScreenshotExpired;
 };
 
-export const saveMetricScreenshotHandler = async ({
-  params,
-  search,
-  ...rest
-}: {
+type SaveMetricScreenshotHandlerArgs = {
   params: GetMetricScreenshotParams;
   search: GetMetricScreenshotQuery;
-} & BrowserParams<Buffer<ArrayBufferLike>>) => {
+  isOnSaveEvent: boolean;
+} & BrowserParamsContextOrDirectRequest;
+
+export const saveMetricScreenshotHandler = async (args: SaveMetricScreenshotHandlerArgs) => {
+  const { params, isOnSaveEvent } = args;
+
   const shouldTakeNewScreenshot = await shouldTakenNewScreenshot({
     metricId: params.id,
-    isOnSaveEvent: true,
+    isOnSaveEvent,
   });
   if (!shouldTakeNewScreenshot) {
     return;
   }
 
-  const browserParams = rest as BrowserParams<Buffer<ArrayBufferLike>>;
+  const screenshotBuffer = await getMetricScreenshotHandler(args);
+  const organizationId =
+    'context' in args
+      ? args.context.get('userOrganizationInfo').organizationId
+      : args.organizationId;
 
-  const screenshotBuffer = await getMetricScreenshotHandler({
-    params,
-    search,
-    ...browserParams,
+  const result = await uploadScreenshotHandler({
+    assetType: 'metric_file',
+    assetId: params.id,
+    image: screenshotBuffer,
+    organizationId,
   });
-  console.log('screenshotBuffer', screenshotBuffer);
+  console.log('result', result);
 
   //TODO: save the screenshot to the database
 };

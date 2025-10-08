@@ -9,19 +9,21 @@ type BrowserParamsBase<T> = {
   callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
 };
 
-type BrowserParamsContext<T> = BrowserParamsBase<T> & {
+type BrowserParamsContext = {
   context: Context;
 };
 
-type BrowserParamsDirectRequest<T> = BrowserParamsBase<T> & {
+type BrowserParamsDirectRequest = {
   supabaseUser: User;
   supabaseCookieKey: string;
   accessToken: string;
+  organizationId: string;
 };
 
-export type BrowserParams<T = Buffer<ArrayBufferLike>> =
-  | BrowserParamsContext<T>
-  | BrowserParamsDirectRequest<T>;
+export type BrowserParamsContextOrDirectRequest = BrowserParamsContext | BrowserParamsDirectRequest;
+
+export type BrowserParams<T = Buffer<ArrayBufferLike>> = BrowserParamsContextOrDirectRequest &
+  BrowserParamsBase<T>;
 
 export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   width,
