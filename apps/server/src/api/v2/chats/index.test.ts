@@ -83,6 +83,7 @@ describe('POST /chats', () => {
     workspace_sharing: 'full_access',
     workspace_member_count: 0,
     individual_permissions: [],
+    screenshot_taken_at: null,
   };
 
   beforeEach(() => {

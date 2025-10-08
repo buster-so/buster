@@ -64,12 +64,12 @@ const shouldTakenNewScreenshot = async ({
     return true;
   }
 
-  const isScreenshotExpired = await hasMetricScreenshotBeenTakenWithin(
+  const hasRecentScreenshot = await hasMetricScreenshotBeenTakenWithin(
     metricId,
     dayjs().subtract(6, 'hours')
   );
 
-  logger.info('Is screenshot expired', { isScreenshotExpired });
+  logger.info('Has recent screenshot', { hasRecentScreenshot });
 
-  return isScreenshotExpired;
+  return !hasRecentScreenshot;
 };
