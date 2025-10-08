@@ -25,6 +25,7 @@ function getOrSetApp() {
  * Verifies signature and parses payload
  */
 export function githubWebhookMiddleware(): MiddlewareHandler {
+  console.info('webhook middleware was called');
   return async (c: Context, next) => {
     try {
       const githubApp = getOrSetApp();
@@ -42,7 +43,9 @@ export function githubWebhookMiddleware(): MiddlewareHandler {
       }
 
       await next();
+      console.info('await next');
 
+      console.info('await githubApp.webhooks.verifyAndReceive');
       await githubApp.webhooks.verifyAndReceive({
         id,
         name,
