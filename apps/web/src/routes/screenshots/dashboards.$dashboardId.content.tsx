@@ -9,11 +9,17 @@ export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/conte
   component: RouteComponent,
   ssr: true,
   validateSearch: GetDashboardScreenshotQuerySchema,
-  beforeLoad: async ({ context, params, search }) => {
+  beforeLoad: ({ search }) => {
+    return {
+      version_number: search.version_number,
+    };
+  },
+  loader: async ({ context, params }) => {
+    const { version_number } = context;
     const dashboard = await prefetchGetDashboard({
       queryClient: context.queryClient,
       id: params.dashboardId,
-      version_number: search.version_number,
+      version_number: version_number,
     });
 
     if (!dashboard) {

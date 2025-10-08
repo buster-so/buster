@@ -7,15 +7,21 @@ import { MetricViewChartController } from '@/controllers/MetricController/Metric
 export const Route = createFileRoute('/screenshots/metrics/$metricId/content')({
   validateSearch: GetMetricScreenshotQuerySchema,
   ssr: true,
-  beforeLoad: async ({ context, params, search }) => {
+  beforeLoad: ({ search }) => {
+    return {
+      version_number: search.version_number,
+    };
+  },
+  loader: async ({ context, params }) => {
+    const { version_number } = context;
     const [metric, metricData] = await Promise.all([
       prefetchGetMetric(context.queryClient, {
         id: params.metricId,
-        version_number: search.version_number,
+        version_number: version_number,
       }),
       ensureMetricData(context.queryClient, {
         id: params.metricId,
-        version_number: search.version_number,
+        version_number: version_number,
       }),
     ]);
     if (!metric || !metricData) {

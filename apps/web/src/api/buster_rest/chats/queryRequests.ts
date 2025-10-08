@@ -153,6 +153,16 @@ export const prefetchGetChat = async (
   return existingData || queryClient.getQueryData(query.queryKey);
 };
 
+export const ensureChatData = async (
+  queryClient: QueryClient,
+  params: Parameters<typeof getChat>[0]
+) => {
+  return await queryClient.ensureQueryData({
+    ...chatQueryKeys.chatsGetChat(params.id),
+    queryFn: () => getChatQueryFn(params, queryClient),
+  });
+};
+
 export const useUpdateChat = (params?: { updateToServer?: boolean }) => {
   const queryClient = useQueryClient();
   const { updateToServer = true } = params || {};
