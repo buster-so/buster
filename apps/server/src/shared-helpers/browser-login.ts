@@ -1,10 +1,11 @@
 import type { User } from '@supabase/supabase-js';
 import type { Context } from 'hono';
 import type { Browser, Page } from 'playwright';
+import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
 
 type BrowserParamsBase<T> = {
-  width: number;
-  height: number;
+  width: number | undefined;
+  height: number | undefined;
   fullPath: string;
   callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
 };
@@ -26,8 +27,8 @@ export type BrowserParams<T = Buffer<ArrayBufferLike>> = BrowserParamsContextOrD
   BrowserParamsBase<T>;
 
 export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
-  width,
-  height,
+  width = DEFAULT_SCREENSHOT_CONFIG.width,
+  height = DEFAULT_SCREENSHOT_CONFIG.height,
   fullPath,
   callback,
   ...rest

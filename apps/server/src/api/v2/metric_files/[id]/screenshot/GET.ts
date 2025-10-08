@@ -43,8 +43,10 @@ const app = new Hono()
 
       try {
         const screenshotBuffer = await getMetricScreenshotHandler({
-          params: { id: metricId },
-          search: { version_number, width, height, type },
+          metricId,
+          width,
+          height,
+          version_number,
           context: c,
         });
 

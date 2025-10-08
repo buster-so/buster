@@ -1,30 +1,29 @@
-import type {
-  GetMetricScreenshotParams,
-  GetMetricScreenshotQuery,
-} from '@buster/server-shared/screenshots';
 import type { BrowserParamsContextOrDirectRequest } from '@shared-helpers/browser-login';
 import { createHrefFromLink } from '@shared-helpers/create-href-from-link';
+import { DEFAULT_SCREENSHOT_CONFIG } from '@shared-helpers/screenshot-config';
 
 type GetMetricScreenshotHandlerArgs = {
-  params: GetMetricScreenshotParams;
-  search: GetMetricScreenshotQuery;
+  metricId: string;
+  width: number;
+  height: number;
+  version_number: number | undefined;
+  type?: 'png' | 'jpeg';
 } & BrowserParamsContextOrDirectRequest;
 
 export const getMetricScreenshotHandler = async (args: GetMetricScreenshotHandlerArgs) => {
-  const { params, search } = args;
-  const { width, height, type, version_number } = search;
-  const { id: metricId } = params;
-
   const { browserLogin } = await import('../../../../../shared-helpers/browser-login');
+  const { width, height, type = DEFAULT_SCREENSHOT_CONFIG.type } = args;
 
   const { result: screenshotBuffer } = await browserLogin({
     ...args,
-    width,
-    height,
     fullPath: createHrefFromLink({
       to: '/screenshots/metrics/$metricId/content' as const,
-      params: { metricId },
-      search: { version_number, type, width, height },
+      params: { metricId: args.metricId },
+      search: {
+        version_number: args.version_number,
+        width,
+        height,
+      },
     }),
     callback: async ({ page }) => {
       return await page.screenshot({ type });

@@ -2,6 +2,7 @@ import { MetricDataParamsSchema, MetricDataQuerySchema } from '@buster/server-sh
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { standardErrorHandler } from '../../../../../utils/response';
+import { saveMetricScreenshotHandler } from '../screenshot/saveMetricScreenshotHandler';
 import { getMetricDataHandler } from './get-metric-data';
 
 const app = new Hono()
@@ -23,6 +24,13 @@ const app = new Hono()
         report_file_id,
         password
       );
+
+      saveMetricScreenshotHandler({
+        metricId: id,
+        version_number,
+        isOnSaveEvent: true,
+        context: c,
+      });
 
       return c.json(response);
     }
