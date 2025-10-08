@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { type User, createClient } from '@supabase/supabase-js';
 
 const createSupabaseClient = () => {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -25,4 +25,16 @@ export const getSupabaseClient = () => {
     globalSupabase = createSupabaseClient();
   }
   return globalSupabase;
+};
+
+export const getSupabaseCookieKey = (): string => {
+  const supabase = getSupabaseClient();
+  const supabaseCookieKey = (supabase as unknown as { storageKey: string }).storageKey;
+  return supabaseCookieKey;
+};
+
+export const getSupabaseUser = async (jwtToken: string): Promise<User | null> => {
+  const supabase = getSupabaseClient();
+  const supabaseUser = await supabase.auth.getUser(jwtToken);
+  return supabaseUser.data.user;
 };

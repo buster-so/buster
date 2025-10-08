@@ -6,6 +6,7 @@ export const UUIDSchema = z.string().uuid('Must be a valid UUID');
 // Simple input schema - just message_id
 export const AnalystAgentTaskInputSchema = z.object({
   message_id: UUIDSchema,
+  access_token: z.string(),
 });
 
 // Task execution result (for Trigger.dev monitoring)

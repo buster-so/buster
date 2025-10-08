@@ -24,7 +24,10 @@ import { type PermissionedDataset, getPermissionedDatasets } from '@buster/acces
 import { type AnalystWorkflowInput, runAnalystWorkflow } from '@buster/ai';
 
 import type { ModelMessage } from 'ai';
+import { getSupabaseCookieKey, getSupabaseUser } from '../../utils/supabase';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
+import type { TakeDashboardScreenshotTrigger } from '../screenshots/schemas';
+import { screenshots_task_keys } from '../screenshots/task-keys';
 
 /**
  * Resource usage tracker for the entire task execution
@@ -511,6 +514,18 @@ export const analystAgentTask: ReturnType<
         messageId: payload.message_id,
         totalWorkflowTimeMs: totalWorkflowTime,
       });
+
+      const supabaseUser = await getSupabaseUser(payload.access_token);
+      if (supabaseUser) {
+        await tasks.trigger(screenshots_task_keys.take_dashboard_screenshot, {
+          dashboardId: payload.message_id,
+          isOnSaveEvent: false,
+          organizationId: messageContext.organizationId,
+          supabaseCookieKey: getSupabaseCookieKey(),
+          accessToken: payload.access_token,
+          supabaseUser,
+        } satisfies TakeDashboardScreenshotTrigger);
+      }
 
       // Log final performance metrics
       logPerformanceMetrics(

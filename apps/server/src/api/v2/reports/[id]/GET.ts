@@ -1,5 +1,5 @@
 import { screenshots_task_keys } from '@buster-app/trigger/task-keys';
-import { TakeReportScreenshotTrigger } from '@buster-app/trigger/task-schemas';
+import type { TakeReportScreenshotTrigger } from '@buster-app/trigger/task-schemas';
 import { checkPermission } from '@buster/access-controls';
 import {
   type User,
