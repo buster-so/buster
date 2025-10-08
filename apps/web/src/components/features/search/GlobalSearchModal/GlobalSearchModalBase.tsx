@@ -15,6 +15,7 @@ import type {
 } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { timeFromNow } from '@/lib/date';
+import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { assetTypeToIcon } from '../../icons/assetIcons';
 import type { FiltersParams, OnSetFiltersParams } from './GlobalSearchModal';
 import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
@@ -60,6 +61,14 @@ export const GlobalSearchModalBase = ({
               dangerouslySetInnerHTML={{ __html: item.additionalText }}
             />
           ) : undefined,
+        onSelect: async () => {
+          const link = createSimpleAssetRoute({
+            asset_type: item.assetType,
+            id: item.assetId,
+          }) as Parameters<typeof navigate>[0];
+          await navigate(link);
+          onClose();
+        },
       };
     };
 
@@ -126,6 +135,12 @@ export const GlobalSearchModalBase = ({
       searchItems={searchItems}
       onChangeValue={onChangeValue}
       onViewSearchItem={onViewSearchItem}
+      placeholder="Search..."
+      loading={loading}
+      showTopLoading={false}
+      scrollContainerRef={scrollContainerRef}
+      openSecondaryContent={openSecondaryContent && !!viewedItem}
+      shouldFilter={false}
       secondaryContent={useMemo(() => {
         return viewedItem ? <GlobalSearchSecondaryContent selectedItem={viewedItem} /> : null;
       }, [viewedItem])}
@@ -133,12 +148,6 @@ export const GlobalSearchModalBase = ({
         () => <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />,
         [filtersParams, onSetFilters]
       )}
-      placeholder="Search..."
-      loading={loading}
-      showTopLoading={false}
-      scrollContainerRef={scrollContainerRef}
-      openSecondaryContent={openSecondaryContent && !!viewedItem}
-      shouldFilter={false}
     />
   );
 };

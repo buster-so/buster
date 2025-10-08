@@ -315,7 +315,7 @@ const Ancestors = React.memo(
               }}
               className={cn(
                 'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
-                !isMain && router && 'cursor-pointer',
+                !isMain && router && 'cursor-pointer hover:text-foreground hover:underline',
                 'text-xs h-3.5'
               )}
             >
