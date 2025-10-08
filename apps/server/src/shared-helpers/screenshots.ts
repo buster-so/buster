@@ -2,6 +2,9 @@ import type { screenshots_task_keys } from '@buster-app/trigger/task-keys';
 import { runs } from '@trigger.dev/sdk';
 import type { Context } from 'hono';
 
+// This helper ensures that we do not run multiple trigger jobs for the same screenshot task concurrently.
+// It checks if a job for the given tag and key is already running or queued before starting a new one.
+
 export const shouldTakeScreenshot = async ({
   tag,
   key,

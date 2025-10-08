@@ -28,6 +28,7 @@ export type TakeReportScreenshotTrigger = z.infer<typeof TakeReportScreenshotTri
 
 export const TakeChatScreenshotTriggerSchema = GetChatScreenshotHandlerArgsSchema.extend({
   chatId: z.string(),
+  isNewChatMessage: z.boolean(),
 });
 
 export type TakeChatScreenshotTrigger = z.infer<typeof TakeChatScreenshotTriggerSchema>;

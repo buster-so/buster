@@ -30,6 +30,7 @@ export const ChatWithMessagesSchema = z.object({
   created_by_id: z.string(),
   created_by_name: z.string(),
   created_by_avatar: z.string().nullable(),
+  screenshot_taken_at: z.string().nullable(),
   ...ShareConfigSchema.shape,
 });
 

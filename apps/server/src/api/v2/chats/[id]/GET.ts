@@ -1,12 +1,20 @@
+import { screenshots_task_keys } from '@buster-app/trigger/task-keys';
+import type { TakeChatScreenshotTrigger } from '@buster-app/trigger/task-schemas';
 import { checkPermission } from '@buster/access-controls';
 import type { User } from '@buster/database/queries';
-import { getChatWithDetails, getMessagesForChatWithUserDetails } from '@buster/database/queries';
+import {
+  getChatWithDetails,
+  getMessagesForChatWithUserDetails,
+  getUserOrganizationId,
+} from '@buster/database/queries';
 import {
   GetChatRequestParamsSchema,
   GetChatRequestQuerySchema,
   type GetChatResponse,
 } from '@buster/server-shared/chats';
 import { zValidator } from '@hono/zod-validator';
+import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
+import { tasks } from '@trigger.dev/sdk';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
@@ -39,6 +47,27 @@ const app = new Hono().get(
     }
 
     const response: GetChatResponse = await getChatHandler(getChatHandlerParams);
+
+    const tag = `take-chat-screenshot-${id}`;
+    if (
+      !response.screenshot_taken_at &&
+      (await shouldTakeScreenshot({
+        tag,
+        key: screenshots_task_keys.take_chat_screenshot,
+        context: c,
+      }))
+    ) {
+      tasks.trigger(
+        screenshots_task_keys.take_chat_screenshot,
+        {
+          chatId: id,
+          isNewChatMessage: false,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+        } satisfies TakeChatScreenshotTrigger,
+        { tags: [tag] }
+      );
+    }
 
     return c.json(response);
   }

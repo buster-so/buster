@@ -107,7 +107,7 @@ const app = new Hono()
             organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
             accessToken: c.get('accessToken'),
           } satisfies TakeReportScreenshotTrigger,
-          { concurrencyKey: `take-report-screenshot-${reportId}-${versionNumber}` }
+          { tags: [tag] }
         );
       }
 

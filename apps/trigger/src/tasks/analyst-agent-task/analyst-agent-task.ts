@@ -522,11 +522,12 @@ export const analystAgentTask: ReturnType<
         const supabaseUser = await getSupabaseUser(payload.access_token);
         if (supabaseUser) {
           await tasks.trigger(
-            screenshots_task_keys.take_chart_screenshot,
+            screenshots_task_keys.take_chat_screenshot,
             {
               chatId: messageContext.chatId,
               organizationId: messageContext.organizationId,
               accessToken: payload.access_token,
+              isNewChatMessage: true,
             } satisfies TakeChatScreenshotTrigger,
             { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
           );

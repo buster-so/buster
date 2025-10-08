@@ -1,22 +1,33 @@
+import { hasChatScreenshotBeenTakenWithin } from '@buster/database/queries';
 import { getChatScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
-import { TakeChatScreenshotTriggerSchema } from './schemas';
+import dayjs from 'dayjs';
+import { type TakeChatScreenshotTrigger, TakeChatScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
 
 export const takeChartScreenshotHandlerTask: ReturnType<
   typeof schemaTask<
-    typeof screenshots_task_keys.take_chart_screenshot,
+    typeof screenshots_task_keys.take_chat_screenshot,
     typeof TakeChatScreenshotTriggerSchema,
     { success: boolean } | undefined
   >
 > = schemaTask({
-  id: screenshots_task_keys.take_chart_screenshot,
+  id: screenshots_task_keys.take_chat_screenshot,
   schema: TakeChatScreenshotTriggerSchema,
   run: async (args) => {
     logger.info('Getting chart screenshot', { args });
 
-    const { chatId, organizationId } = args;
+    const { chatId, isNewChatMessage, organizationId } = args;
+
+    const shouldTakeNewScreenshot = await shouldTakeChatScreenshot({
+      chatId,
+      isNewChatMessage,
+    });
+
+    if (!shouldTakeNewScreenshot) {
+      return;
+    }
 
     const screenshotBuffer = await getChatScreenshot(args);
 
@@ -34,3 +45,18 @@ export const takeChartScreenshotHandlerTask: ReturnType<
     return result;
   },
 });
+
+const shouldTakeChatScreenshot = async (
+  args: Pick<TakeChatScreenshotTrigger, 'chatId' | 'isNewChatMessage'>
+) => {
+  if (args.isNewChatMessage) {
+    return true;
+  }
+
+  const isScreenshotExpired = await hasChatScreenshotBeenTakenWithin(
+    args.chatId,
+    dayjs().subtract(4, 'weeks')
+  );
+
+  return !isScreenshotExpired;
+};
