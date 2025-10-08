@@ -22,7 +22,6 @@ export * from './metrics';
 export * from './organization';
 export * from './public-chat';
 export * from './s3-integrations';
-export * from './screenshots';
 export * from './search';
 export * from './security';
 // Export share module (has some naming conflicts with chats and metrics)

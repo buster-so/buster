@@ -1,8 +1,6 @@
-import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
-
 export const createImageResponse = (
   imageBuffer: Buffer,
-  type: 'png' | 'jpeg' = DEFAULT_SCREENSHOT_CONFIG.type
+  type: 'png' | 'jpeg' = 'png'
 ): Response => {
   return new Response(imageBuffer, {
     headers: {

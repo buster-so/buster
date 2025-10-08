@@ -35,6 +35,7 @@
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
+    "@buster-app/trigger": "workspace:*",
     "@electric-sql/client": "catalog:",
     "@hono/zod-validator": "^0.7.3",
     "@octokit/webhooks": "^14.1.3",

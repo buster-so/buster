@@ -14,7 +14,7 @@ catalog:
   '@aws-sdk/s3-request-presigner': ^3.888.0
   '@electric-sql/client': ^1.0.12
   '@electric-sql/react': ^1.0.12
-  '@supabase/supabase-js': ^2.57.4
+  '@supabase/supabase-js': 2.57.4
   '@trigger.dev/build': ^4.0.2
   '@trigger.dev/sdk': ^4.0.2
   '@types/js-yaml': 4.0.9

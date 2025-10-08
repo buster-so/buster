@@ -4,11 +4,11 @@ import {
   GetChatScreenshotParamsSchema,
   GetChatScreenshotQuerySchema,
 } from '@buster/server-shared/screenshots';
+import { getChatScreenshot } from '@buster/server-shared/screenshots';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { createImageResponse } from '../../../../../shared-helpers/create-image-response';
-import { getChatScreenshotHandler } from './getChatScreenshotHandler';
 
 const app = new Hono().get(
   '/',
@@ -40,10 +40,15 @@ const app = new Hono().get(
     }
 
     try {
-      const screenshotBuffer = await getChatScreenshotHandler({
-        params: { id: chatId },
-        search,
-        context: c,
+      const screenshotBuffer = await getChatScreenshot({
+        chatId,
+        width: search.width,
+        height: search.height,
+        type: search.type,
+        supabaseCookieKey: c.get('supabaseCookieKey'),
+        supabaseUser: c.get('supabaseUser'),
+        accessToken: c.get('accessToken') || '',
+        organizationId: chat.organizationId,
       });
 
       return createImageResponse(screenshotBuffer, search.type);

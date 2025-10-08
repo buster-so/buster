@@ -1,15 +1,15 @@
 import { checkPermission } from '@buster/access-controls';
-import { getDashboardById } from '@buster/database/queries';
+import { getDashboardById, getUserOrganizationId } from '@buster/database/queries';
 import {
   GetDashboardScreenshotParamsSchema,
   GetDashboardScreenshotQuerySchema,
 } from '@buster/server-shared/screenshots';
+import { getDashboardScreenshot } from '@buster/server-shared/screenshots';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { createImageResponse } from '../../../../../shared-helpers/create-image-response';
 import { standardErrorHandler } from '../../../../../utils/response';
-import { getDashboardScreenshotHandler } from './getDashboardScreenshotHandler';
 
 const app = new Hono()
   .get(
@@ -43,10 +43,13 @@ const app = new Hono()
       }
 
       try {
-        const screenshotBuffer = await getDashboardScreenshotHandler({
-          params: { id: dashboardId },
-          search,
-          context: c,
+        const screenshotBuffer = await getDashboardScreenshot({
+          ...search,
+          dashboardId,
+          supabaseCookieKey: c.get('supabaseCookieKey'),
+          supabaseUser: c.get('supabaseUser'),
+          accessToken: c.get('accessToken') || '',
+          organizationId: dashboard.organizationId,
         });
 
         return createImageResponse(screenshotBuffer, search.type);

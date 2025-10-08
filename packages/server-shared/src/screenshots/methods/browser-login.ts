@@ -1,29 +1,25 @@
 import type { User } from '@supabase/supabase-js';
-import type { Context } from 'hono';
 import type { Browser, Page } from 'playwright';
+import { z } from 'zod';
 import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
 
 type BrowserParamsBase<T> = {
-  width: number | undefined;
-  height: number | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
   fullPath: string;
   callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
 };
 
-type BrowserParamsContext = {
-  context: Context;
-};
+export const BrowserParamsContextSchema = z.object({
+  supabaseUser: z.any() as z.ZodType<User>,
+  supabaseCookieKey: z.string(),
+  accessToken: z.string(),
+  organizationId: z.string(),
+});
 
-type BrowserParamsDirectRequest = {
-  supabaseUser: User;
-  supabaseCookieKey: string;
-  accessToken: string;
-  organizationId: string;
-};
+export type BrowserParamsContext = z.infer<typeof BrowserParamsContextSchema>;
 
-export type BrowserParamsContextOrDirectRequest = BrowserParamsContext | BrowserParamsDirectRequest;
-
-export type BrowserParams<T = Buffer<ArrayBufferLike>> = BrowserParamsContextOrDirectRequest &
+export type BrowserParams<T = Buffer<ArrayBufferLike>> = BrowserParamsContext &
   BrowserParamsBase<T>;
 
 export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
@@ -31,15 +27,10 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   height = DEFAULT_SCREENSHOT_CONFIG.height,
   fullPath,
   callback,
-  ...rest
+  supabaseUser,
+  supabaseCookieKey,
+  accessToken,
 }: BrowserParams<T>) => {
-  const isContext = 'context' in rest;
-  const supabaseUser = isContext ? rest.context.get('supabaseUser') : rest.supabaseUser;
-  const supabaseCookieKey = isContext
-    ? rest.context.get('supabaseCookieKey')
-    : rest.supabaseCookieKey;
-  const accessToken = isContext ? rest.context.get('accessToken') : rest.accessToken;
-
   if (!accessToken) {
     throw new Error('Missing Authorization header');
   }

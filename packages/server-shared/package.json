@@ -130,6 +130,8 @@
     "@buster/database": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
+    "@supabase/supabase-js": "catalog:",
+    "playwright": "^1.55.1",
     "zod": "catalog:"
   },
   "devDependencies": {

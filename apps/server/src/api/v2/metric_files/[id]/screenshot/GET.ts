@@ -4,12 +4,12 @@ import {
   GetMetricScreenshotParamsSchema,
   GetMetricScreenshotQuerySchema,
 } from '@buster/server-shared/screenshots';
+import { getMetricScreenshot } from '@buster/server-shared/screenshots';
 import { zValidator } from '@hono/zod-validator';
+import { createImageResponse } from '@shared-helpers/create-image-response';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { createImageResponse } from '../../../../../shared-helpers/create-image-response';
 import { standardErrorHandler } from '../../../../../utils/response';
-import { getMetricScreenshotHandler } from './getMetricScreenshotHandler';
 
 const app = new Hono()
   .get(
@@ -42,12 +42,16 @@ const app = new Hono()
       }
 
       try {
-        const screenshotBuffer = await getMetricScreenshotHandler({
+        const screenshotBuffer = await getMetricScreenshot({
           metricId,
           width,
           height,
           version_number,
-          context: c,
+          type,
+          supabaseCookieKey: c.get('supabaseCookieKey'),
+          supabaseUser: c.get('supabaseUser'),
+          accessToken: c.get('accessToken') || '',
+          organizationId: metric.organizationId,
         });
 
         return createImageResponse(screenshotBuffer, type);
