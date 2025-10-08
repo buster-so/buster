@@ -32,11 +32,11 @@ export const GlobalSearchModal = () => {
       selectedAssets,
       selectedDateRange,
     }),
-    [selectedAssets]
+    [selectedAssets, selectedDateRange]
   );
 
   const assetTypes: AssetType[] | undefined = useMemo(() => {
-    if (selectedAssets) {
+    if (selectedAssets?.length) {
       return selectedAssets;
     }
     if (!hasQuery) {

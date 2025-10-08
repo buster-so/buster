@@ -185,6 +185,8 @@ export interface DateRangePickerContentProps {
   onUpdate?: (values: { range: DateRange }) => void;
   /** Callback when Cancel button is clicked */
   onCancel?: () => void;
+  cancelButtonText?: string;
+  showResetButton?: boolean;
 }
 
 export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
@@ -194,6 +196,8 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
   disableDateAfter,
   onUpdate,
   onCancel,
+  cancelButtonText = 'Cancel',
+  showResetButton = false,
 }) => {
   const [range, setRange] = useState<DateRange>({
     from: getDateAdjustedForTimezone(initialDateFrom),
@@ -395,6 +399,7 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
       <div className="flex justify-between gap-2 py-2 px-4 border-t">
         <Button
           variant="ghost"
+          className={cn(!showResetButton && 'invisible')}
           onClick={() => {
             setRange({
               from: null,
@@ -412,7 +417,7 @@ export const DateRangePickerContent: FC<DateRangePickerContentProps> = ({
             }}
             variant="ghost"
           >
-            Cancel
+            {cancelButtonText}
           </Button>
           <Button
             onClick={() => {

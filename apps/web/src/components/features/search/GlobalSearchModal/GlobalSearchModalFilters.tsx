@@ -2,7 +2,12 @@ import type { AssetType } from '@buster/server-shared/assets';
 import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { DateRangePickerContent } from '@/components/ui/date/DateRangePicker';
-import { Dropdown, type DropdownProps, type IDropdownItem } from '@/components/ui/dropdown';
+import {
+  createDropdownItem,
+  Dropdown,
+  type DropdownProps,
+  type IDropdownItem,
+} from '@/components/ui/dropdown';
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import Calendar from '@/components/ui/icons/NucleoIconOutlined/calendar';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
@@ -30,41 +35,59 @@ export const GlobalSearchModalFilters = React.memo(
             value: 'metric_file' satisfies AssetType,
             selected: selectedAssets?.includes('metric_file'),
             icon: <ASSET_ICONS.metrics />,
-            onClick: () => setSelectedAssets([...(selectedAssets || []), 'metric_file']),
           },
           {
             label: 'Chats',
             value: 'chat' satisfies AssetType,
             icon: <ASSET_ICONS.chats />,
-            onClick: () => setSelectedAssets([...(selectedAssets || []), 'chat']),
           },
           {
             label: 'Reports',
             value: 'report_file' satisfies AssetType,
             icon: <ASSET_ICONS.reports />,
-            onClick: () => setSelectedAssets([...(selectedAssets || []), 'report_file']),
           },
           {
             label: 'Dashboards',
             value: 'dashboard_file',
             icon: <ASSET_ICONS.dashboards />,
-            onClick: () => setSelectedAssets([...(selectedAssets || []), 'dashboard_file']),
           },
           {
             label: 'Collections',
             value: 'collection' satisfies AssetType,
             icon: <ASSET_ICONS.collections />,
-            onClick: () => setSelectedAssets([...(selectedAssets || []), 'collection']),
           },
         ].map((item) => ({
           ...item,
           selected: selectedAssets?.includes(item.value as AssetType),
+          onClick: () => {
+            console.log(
+              'onClick',
+              item.value,
+              selectedAssets,
+              selectedAssets?.includes(item.value as AssetType)
+            );
+            if (selectedAssets?.includes(item.value as AssetType)) {
+              setSelectedAssets(selectedAssets.filter((v) => v !== item.value));
+            } else {
+              setSelectedAssets([...(selectedAssets || []), item.value as AssetType]);
+            }
+          },
         })) as IDropdownItem<AssetType>['items'],
       };
     }, [selectedAssets, setSelectedAssets]);
 
     const DatesDropdownItems: IDropdownItem = useMemo(() => {
-      return {
+      const closeContent = () => {
+        document.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: 'Escape',
+            bubbles: true,
+            cancelable: true,
+          })
+        );
+      };
+
+      return createDropdownItem({
         label: 'Date range',
         value: 'date-range',
         icon: <Calendar />,
@@ -76,15 +99,9 @@ export const GlobalSearchModalFilters = React.memo(
             disableDateAfter={getNow().add(12, 'hours').toDate()}
             initialDateFrom={selectedDateRange?.from}
             initialDateTo={selectedDateRange?.to}
+            cancelButtonText="Clear"
+            showResetButton={false}
             onUpdate={({ range }) => {
-              document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'Escape',
-                  bubbles: true,
-                  cancelable: true,
-                })
-              );
-
               if (range.from == null && range.to == null) {
                 setSelectedDateRange(null);
               } else {
@@ -93,11 +110,16 @@ export const GlobalSearchModalFilters = React.memo(
                   to: range.to ?? new Date(),
                 });
               }
+              closeContent();
+            }}
+            onCancel={() => {
+              setSelectedDateRange(null);
+              closeContent();
             }}
           />,
         ],
-      };
-    }, []);
+      });
+    }, [selectedDateRange, setSelectedDateRange]);
 
     const items: DropdownProps['items'] = [AssetTypeDropdownItems, DatesDropdownItems];
 

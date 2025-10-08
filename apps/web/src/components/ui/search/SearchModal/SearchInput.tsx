@@ -20,11 +20,12 @@ export const SearchInput: React.FC<
       <div className="flex flex-col gap-y-0">
         <div className="flex min-h-12 items-center space-x-3 justify-between px-5">
           <Command.Input
-            className={cn('text-md placeholder:text-gray-light')}
+            className={cn('text-md placeholder:text-gray-light w-full h-full')}
             value={searchValue}
             placeholder={placeholder}
             onValueChange={onChangeValue}
             autoFocus={debouncedAutoFocus}
+            tabIndex={0}
           />
           {filterContent}
         </div>
