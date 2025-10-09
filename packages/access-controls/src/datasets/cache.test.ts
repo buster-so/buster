@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { PermissionedDataset } from '../types/dataset-permissions';
 import {
   clearAllCaches,
-  getCacheStats,
   getCachedDatasetAccess,
   getCachedPermissionedDatasets,
+  getCacheStats,
   invalidateDataset,
   invalidateOnPermissionChange,
   invalidateUser,
