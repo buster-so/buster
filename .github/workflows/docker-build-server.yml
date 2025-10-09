@@ -79,11 +79,14 @@ jobs:
           cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
           cp -r packages /tmp/prod-deps/
           cp apps/server/package.json /tmp/prod-deps/apps/server/
-          
-          # Install production dependencies only
+
+          # Install production dependencies with platform-specific optional deps
           cd /tmp/prod-deps
           pnpm install --frozen-lockfile --prod
-          
+
+          # Force install Sharp for linux-x64 platform
+          pnpm add sharp --filter=@buster-app/server --prod --config.platform=linux --config.arch=x64
+
           # Copy back to workspace
           cd -
           mkdir -p docker-context
