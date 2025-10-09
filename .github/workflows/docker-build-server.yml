@@ -80,32 +80,9 @@ jobs:
           cp -r packages /tmp/prod-deps/
           cp -r apps /tmp/prod-deps/
 
-          # Install production dependencies with platform-specific optional deps
+          # Install production dependencies
           cd /tmp/prod-deps
-
-          # Install with platform-specific flags for Sharp linux-x64 binaries
-          # Configure pnpm supportedArchitectures for linux-x64 with glibc
-          echo "supportedArchitectures[os][]=linux" > .npmrc
-          echo "supportedArchitectures[cpu][]=x64" >> .npmrc
-          echo "supportedArchitectures[libc][]=glibc" >> .npmrc
-          echo "enable-pre-post-scripts=true" >> .npmrc
-
-          echo "📦 Installing production dependencies with linux-x64 Sharp binaries..."
-          cat .npmrc
-          pnpm install --frozen-lockfile --prod --ignore-scripts=false
-
-          # Verify Sharp was installed correctly for linux-x64
-          echo "🔍 Verifying Sharp installation..."
-          if [ -d "packages/server-shared/node_modules/sharp" ]; then
-            echo "✅ Sharp package found"
-            ls -la packages/server-shared/node_modules/sharp/
-            echo "Checking for Sharp binaries..."
-            find packages/server-shared/node_modules/sharp -name "*.node" -o -name "sharp-*" | head -10
-          else
-            echo "❌ WARNING: Sharp package NOT found!"
-            echo "Searching for Sharp in workspace..."
-            find . -path "*/node_modules/sharp" -type d | head -5
-          fi
+          pnpm install --frozen-lockfile --prod
 
           # Copy back to workspace
           cd -
@@ -113,6 +90,39 @@ jobs:
           cp -r /tmp/prod-deps/node_modules docker-context/
           cp -r apps/server/dist docker-context/
           cp apps/server/package.json docker-context/
+
+      - name: Install Sharp for linux-x64
+        run: |
+          echo "📦 Installing Sharp with linux-x64 binaries..."
+          cd docker-context
+
+          # Configure pnpm supportedArchitectures for linux-x64 with glibc
+          echo "supportedArchitectures[os][]=linux" > .npmrc
+          echo "supportedArchitectures[cpu][]=x64" >> .npmrc
+          echo "supportedArchitectures[libc][]=glibc" >> .npmrc
+          echo "enable-pre-post-scripts=true" >> .npmrc
+
+          echo "Configuration:"
+          cat .npmrc
+
+          # Reinstall Sharp with correct architecture
+          pnpm add sharp@^0.34.4 --ignore-scripts=false
+
+          # Verify Sharp was installed correctly for linux-x64
+          echo ""
+          echo "🔍 Verifying Sharp installation..."
+          if [ -d "node_modules/sharp" ]; then
+            echo "✅ Sharp package found"
+            echo "Sharp binaries:"
+            find node_modules/sharp -name "*.node" -o -name "sharp-*" | head -10
+          else
+            echo "❌ ERROR: Sharp package NOT found!"
+            exit 1
+          fi
+
+          # Clean up .npmrc
+          rm .npmrc
+          cd -
       
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
