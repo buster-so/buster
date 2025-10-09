@@ -90,7 +90,7 @@ const app = new Hono()
         password
       );
 
-      await triggerScreenshotIfNeeded<TakeReportScreenshotTrigger>({
+      triggerScreenshotIfNeeded<TakeReportScreenshotTrigger>({
         tag: `take-report-screenshot-${reportId}`,
         key: screenshots_task_keys.take_report_screenshot,
         context: c,

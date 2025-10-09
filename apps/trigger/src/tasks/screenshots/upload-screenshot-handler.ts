@@ -182,7 +182,7 @@ export async function uploadScreenshotHandler(
     screenshotBucketKey: result.key,
   });
 
-  logger.info('Screenshot uploaded', { resultOfUpload });
+  logger.info('Result of upload', { resultOfUpload });
 
   return PutScreenshotResponseSchema.parse({
     success: true,

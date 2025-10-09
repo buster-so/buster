@@ -30,15 +30,16 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
         return ensureMetricData(context.queryClient, {
           id: metricId,
           version_number: metric.version_number,
+          report_file_id: report.id,
         });
       })
     );
 
-    res.forEach((metric) => {
-      console.log('metric', metric.data?.length);
-    });
+    const allMetricsLoaded = res.every((metric) => !!metric.metricId);
 
-    return { report };
+    if (!allMetricsLoaded) {
+      throw new Error('Not all metrics loaded');
+    }
   },
 });
 

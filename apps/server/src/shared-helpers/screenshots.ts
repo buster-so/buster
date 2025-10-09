@@ -71,6 +71,6 @@ export async function triggerScreenshotIfNeeded<TTrigger>({
       context,
     }))
   ) {
-    tasks.trigger(key, payload, { tags: [tag], idempotencyKey: tag });
+    tasks.trigger(key, payload, { tags: [tag] });
   }
 }

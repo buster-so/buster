@@ -42,6 +42,7 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
     const screenshotBuffer = await getMetricScreenshot(args);
 
     logger.info('Metric screenshot taken', { screenshotBufferLength: screenshotBuffer.length });
+    logger.log('This is the screenshot buffer', { screenshotBuffer });
 
     const result = await uploadScreenshotHandler({
       assetType: 'metric_file',

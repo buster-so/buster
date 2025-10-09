@@ -49,7 +49,7 @@ const config = defineConfig(({ command, mode }) => {
       tailwindcss(),
       tanstackStart(),
       nitroV2Plugin({
-        preset: isLocalBuild && !isVercelBuild ? 'bun' : 'node-server',
+        preset: isLocalBuild || !isVercelBuild ? 'bun' : 'node-server',
       }),
       viteReact(),
     ],
