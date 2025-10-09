@@ -45,22 +45,6 @@ export const LazyErrorBoundary: React.FC<React.PropsWithChildren> = ({ children 
   );
 };
 
-const TestThrow = () => {
-  const [showThrow, setShowThrow] = useState(false);
-
-  useMount(() => {
-    setTimeout(() => {
-      setShowThrow(true);
-    }, 1000);
-  });
-
-  if (showThrow) {
-    throw new Error('Test error');
-  }
-
-  return 'loading';
-};
-
 const ComponentErrorCard: React.FC<{
   title?: string;
   message?: string;

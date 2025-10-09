@@ -13,7 +13,7 @@
     "build:production": "cross-env NODE_OPTIONS=--max-old-space-size=8192 pnpm run prebuild && vite build --mode production -- --typecheck",
     "build:local": "pnpm prebuild && cross-env NODE_OPTIONS=--max-old-space-size=12288 vite build -- --typecheck --local",
     "build-storybook": "storybook build",
-    "build:visualize": "npx vite-bundle-visualizer",
+    "build:visualize": "cross-env NODE_OPTIONS=--max-old-space-size=8192 npx vite-bundle-visualizer",
     "dev": "vite dev --port 3000",
     "dev:fast": "pnpm run build:local && pnpm run start:local",
     "generate-routes": "tsr generate",
