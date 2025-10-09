@@ -83,11 +83,8 @@ jobs:
           # Install production dependencies with platform-specific optional deps
           cd /tmp/prod-deps
 
-          # Set environment to force Sharp to install linux-x64 binaries
-          export npm_config_platform=linux
-          export npm_config_arch=x64
-
-          pnpm install --frozen-lockfile --prod
+          # Install with platform-specific flags for Sharp linux-x64 binaries
+          pnpm install --frozen-lockfile --prod --config.platform=linux --config.arch=x64 --config.libc=glibc
 
           # Copy back to workspace
           cd -
