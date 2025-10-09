@@ -80,9 +80,9 @@ jobs:
           cp -r packages /tmp/prod-deps/
           cp apps/server/package.json /tmp/prod-deps/apps/server/
           
-          # Install production dependencies only, skip optional dependencies
+          # Install production dependencies only
           cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod --no-optional
+          pnpm install --frozen-lockfile --prod
           
           # Copy back to workspace
           cd -
