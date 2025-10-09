@@ -228,12 +228,26 @@ jobs:
 
           # Install production dependencies with correct architecture (using .npmrc from workspace)
           cd /tmp/prod-deps
+
+          # Note: Sharp's build script is ignored by pnpm security, but that's OK
+          # because Sharp v0.34+ uses optionalDependencies (@img/sharp-*) instead of build scripts
           pnpm install --prod
 
           # Explicitly install Sharp platform binaries for production
+          # These contain the actual native .node binaries
           echo ""
           echo "📦 Ensuring Sharp platform binaries are installed for production..."
-          pnpm install @img/sharp-linux-x64 @img/sharp-libvips-linux-x64 --save-optional --no-frozen-lockfile
+          pnpm add @img/sharp-linux-x64 @img/sharp-libvips-linux-x64 --save-optional
+
+          # Verify Sharp and platform packages were installed
+          echo ""
+          echo "🔍 Verifying Sharp installation in /tmp/prod-deps..."
+          if [ -d "node_modules/sharp" ]; then
+            echo "✅ Sharp found"
+            ls -la node_modules/@img/sharp* 2>/dev/null || echo "⚠️  No @img/sharp packages yet"
+          else
+            echo "❌ Sharp not found!"
+          fi
 
           # Copy back to workspace
           cd -
