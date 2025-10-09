@@ -1,10 +1,13 @@
 import pkg from 'node-sql-parser';
+
 const { Parser } = pkg;
+
 import type { BaseFrom, ColumnRefItem, Join, Select } from 'node-sql-parser';
 import * as yaml from 'yaml';
+
+export type { QueryTypeCheckResult } from '@buster/data-source';
 // Import checkQueryIsReadOnly from data-source package
 export { checkQueryIsReadOnly } from '@buster/data-source';
-export type { QueryTypeCheckResult } from '@buster/data-source';
 
 export interface ParsedTable {
   database?: string;
@@ -155,7 +158,7 @@ export function extractPhysicalTables(sql: string, dataSourceSyntax?: string): P
  */
 export function parseTableReference(tableRef: string): ParsedTable {
   // Remove any quotes and trim
-  let cleanRef = tableRef.replace(/["'`\[\]]/g, '').trim();
+  let cleanRef = tableRef.replace(/["'`[\]]/g, '').trim();
 
   // Handle node-sql-parser format: "type::database::table" or "type::table"
   if (cleanRef.includes('::')) {

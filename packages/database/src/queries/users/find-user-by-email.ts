@@ -1,5 +1,5 @@
-import { eq, inArray } from 'drizzle-orm';
 import type { InferSelectModel } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '../../connection';
 import { users } from '../../schema';
 

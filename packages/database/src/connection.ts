@@ -9,8 +9,8 @@ const __dirname = path.dirname(__filename);
 // Load environment variables from root .env file
 config({ path: path.resolve(__dirname, '../../../.env') });
 
-import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 // Global pool instance
@@ -52,7 +52,7 @@ export function initializePool<T extends Record<string, postgres.PostgresType>>(
   const connectionString = validateEnvironment();
 
   const poolSize = process.env.DATABASE_POOL_SIZE
-    ? Number.parseInt(process.env.DATABASE_POOL_SIZE)
+    ? Number.parseInt(process.env.DATABASE_POOL_SIZE, 10)
     : 100;
 
   if (globalPool && globalDb) {

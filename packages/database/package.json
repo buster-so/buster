@@ -53,10 +53,11 @@
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
     "dayjs": "catalog:",
-    "drizzle-kit": "^0.31.4",
+    "@biomejs/biome": "2.2.5",
+    "drizzle-kit": "^0.31.5",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",
-    "lru-cache": "^11.2.1",
+    "lru-cache": "^11.2.2",
     "postgres": "^3.4.7",
     "zod": "catalog:"
   }

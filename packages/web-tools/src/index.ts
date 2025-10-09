@@ -1,20 +1,17 @@
 // Main exports for the web-tools package
 export { researchCompany } from './deep-research/company-research';
-export { FirecrawlService } from './services/firecrawl';
-export { pollJobStatus } from './utils/polling';
-
 // Types
 export type {
   CompanyResearch,
-  CompanyResearchOptions,
   CompanyResearchError,
+  CompanyResearchOptions,
 } from './deep-research/types';
-
 export type {
   FirecrawlConfig,
   WebSearchOptions,
-  WebSearchResult,
   WebSearchResponse,
+  WebSearchResult,
 } from './services/firecrawl';
-
+export { FirecrawlService } from './services/firecrawl';
 export type { PollingOptions } from './utils/polling';
+export { pollJobStatus } from './utils/polling';

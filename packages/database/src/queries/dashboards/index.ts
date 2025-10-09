@@ -1,26 +1,22 @@
 export {
-  getChatDashboardFiles,
-  type DashboardFileContext,
   type DashboardFile,
+  type DashboardFileContext,
+  getChatDashboardFiles,
 } from './dashboards';
-
 export {
-  getDashboardTitle,
-  GetDashboardTitleInputSchema,
-  type GetDashboardTitleInput,
-} from './get-dashboard-title';
-
-export {
-  getDashboardById,
-  GetDashboardByIdInputSchema,
-  type GetDashboardByIdInput,
-} from './get-dashboard-by-id';
-
-export { updateDashboard } from './update-dashboard';
-
-export {
-  getCollectionsAssociatedWithDashboard,
   type AssociatedCollection,
+  getCollectionsAssociatedWithDashboard,
 } from './get-collections-associated-with-dashboard';
 
 export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';
+export {
+  type GetDashboardByIdInput,
+  GetDashboardByIdInputSchema,
+  getDashboardById,
+} from './get-dashboard-by-id';
+export {
+  type GetDashboardTitleInput,
+  GetDashboardTitleInputSchema,
+  getDashboardTitle,
+} from './get-dashboard-title';
+export { updateDashboard } from './update-dashboard';

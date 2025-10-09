@@ -1,6 +1,6 @@
 import { loadEnv } from 'vite';
-import { defineConfig } from 'vitest/config';
 import type { Plugin, ViteUserConfig } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 
 export const baseConfig = defineConfig(async () => {
   const { default: tsconfigPaths } = await import('vite-tsconfig-paths');

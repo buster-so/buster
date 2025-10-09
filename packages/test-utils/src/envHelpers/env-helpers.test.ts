@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  type TestEnvironment,
   cleanupTestEnvironment,
   setupTestEnvironment,
+  type TestEnvironment,
   withTestEnv,
 } from './env-helpers';
 
@@ -140,7 +140,7 @@ describe('env-helpers.ts - Unit Tests', () => {
       }
 
       if (originalCustomVar === undefined) {
-        delete process.env.CUSTOM_VAR;
+        process.env.CUSTOM_VAR = undefined;
       }
     });
 

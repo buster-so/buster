@@ -1,45 +1,41 @@
 export {
-  getMetricTitle,
-  GetMetricTitleInputSchema,
-  type GetMetricTitleInput,
-} from './get-metric-title';
-
-export {
-  getMetricForExport,
-  GetMetricForExportInputSchema,
-  type GetMetricForExportInput,
-  type MetricForExport,
-} from './get-metric-for-export';
-
-export {
-  getMetricWithDataSource,
-  extractSqlFromMetricContent,
-  getLatestMetricVersion,
-  // Schemas (Zod-first)
-  GetMetricWithDataSourceInputSchema,
-  MetricContentSchema,
-  VersionHistoryEntrySchema,
-  MetricWithDataSourceSchema,
-  // Types (derived from schemas)
-  type GetMetricWithDataSourceInput,
-  type MetricWithDataSource,
-  type MetricContent,
-  type VersionHistoryEntry,
-} from './get-metric-with-data-source';
-
-export {
   getMetricFileById,
   type MetricFile,
 } from './get-metric-by-id';
 
-export { updateMetric } from './update-metric';
-
 export {
-  getDashboardsAssociatedWithMetric,
-  getCollectionsAssociatedWithMetric,
-  getAssetsAssociatedWithMetric,
-  type AssociatedAsset,
+  type GetMetricForExportInput,
+  GetMetricForExportInputSchema,
+  getMetricForExport,
+  type MetricForExport,
+} from './get-metric-for-export';
+export {
+  type GetMetricTitleInput,
+  GetMetricTitleInputSchema,
+  getMetricTitle,
+} from './get-metric-title';
+export {
+  extractSqlFromMetricContent,
+  // Types (derived from schemas)
+  type GetMetricWithDataSourceInput,
+  // Schemas (Zod-first)
+  GetMetricWithDataSourceInputSchema,
+  getLatestMetricVersion,
+  getMetricWithDataSource,
+  type MetricContent,
+  MetricContentSchema,
+  type MetricWithDataSource,
+  MetricWithDataSourceSchema,
+  type VersionHistoryEntry,
+  VersionHistoryEntrySchema,
+} from './get-metric-with-data-source';
+export {
   type AssetsAssociatedWithMetric,
+  type AssociatedAsset,
+  getAssetsAssociatedWithMetric,
+  getCollectionsAssociatedWithMetric,
+  getDashboardsAssociatedWithMetric,
 } from './get-permissioned-asset-associations';
 
 export { hasMetricScreenshotBeenTakenWithin } from './metric-screenshots';
+export { updateMetric } from './update-metric';

@@ -1,8 +1,8 @@
 // Export all metadata-related functionality
 export {
-  getBraintrustMetadata,
-  BraintrustMetadataInputSchema,
-  BraintrustMetadataOutputSchema,
   type BraintrustMetadataInput,
+  BraintrustMetadataInputSchema,
   type BraintrustMetadataOutput,
+  BraintrustMetadataOutputSchema,
+  getBraintrustMetadata,
 } from './braintrustMetadata';
