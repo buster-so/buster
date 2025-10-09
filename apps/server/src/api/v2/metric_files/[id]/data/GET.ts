@@ -3,8 +3,7 @@ import type { TakeMetricScreenshotTrigger } from '@buster-app/trigger/task-schem
 import { getUserOrganizationId } from '@buster/database/queries';
 import { MetricDataParamsSchema, MetricDataQuerySchema } from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
-import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
-import { runs, tasks } from '@trigger.dev/sdk';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import dayjs from 'dayjs';
 import { Hono } from 'hono';
 import { standardErrorHandler } from '../../../../../utils/response';
@@ -29,27 +28,18 @@ const app = new Hono()
         password
       );
 
-      const tag = `take-metric-screenshot-${id}`;
-      if (
-        await shouldTakeScreenshot({
-          tag,
-          key: screenshots_task_keys.take_metric_screenshot,
-          context: c,
-        })
-      ) {
-        const organizationId =
-          (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '';
-        tasks.trigger(
-          screenshots_task_keys.take_metric_screenshot,
-          {
-            metricId: id,
-            isOnSaveEvent: false,
-            accessToken: c.get('accessToken'),
-            organizationId,
-          } satisfies TakeMetricScreenshotTrigger,
-          { tags: [tag], idempotencyKey: tag }
-        );
-      }
+      await triggerScreenshotIfNeeded<TakeMetricScreenshotTrigger>({
+        tag: `take-metric-screenshot-${id}`,
+        key: screenshots_task_keys.take_metric_screenshot,
+        context: c,
+        payload: {
+          metricId: id,
+          isOnSaveEvent: false,
+          accessToken: c.get('accessToken'),
+          organizationId:
+            (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '',
+        },
+      });
 
       return c.json(response);
     }

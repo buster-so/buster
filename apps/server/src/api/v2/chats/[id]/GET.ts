@@ -13,8 +13,7 @@ import {
   type GetChatResponse,
 } from '@buster/server-shared/chats';
 import { zValidator } from '@hono/zod-validator';
-import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
-import { tasks } from '@trigger.dev/sdk';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
@@ -48,26 +47,18 @@ const app = new Hono().get(
 
     const response: GetChatResponse = await getChatHandler(getChatHandlerParams);
 
-    const tag = `take-chat-screenshot-${id}`;
-    if (
-      !response.screenshot_taken_at &&
-      (await shouldTakeScreenshot({
-        tag,
-        key: screenshots_task_keys.take_chat_screenshot,
-        context: c,
-      }))
-    ) {
-      tasks.trigger(
-        screenshots_task_keys.take_chat_screenshot,
-        {
-          chatId: id,
-          isNewChatMessage: false,
-          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-          accessToken: c.get('accessToken'),
-        } satisfies TakeChatScreenshotTrigger,
-        { tags: [tag], idempotencyKey: tag }
-      );
-    }
+    await triggerScreenshotIfNeeded<TakeChatScreenshotTrigger>({
+      tag: `take-chat-screenshot-${id}`,
+      key: screenshots_task_keys.take_chat_screenshot,
+      context: c,
+      payload: {
+        chatId: id,
+        isNewChatMessage: false,
+        organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+        accessToken: c.get('accessToken'),
+      },
+      shouldTrigger: !response.screenshot_taken_at,
+    });
 
     return c.json(response);
   }

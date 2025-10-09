@@ -17,8 +17,7 @@ import {
 import type { DashboardYml } from '@buster/server-shared/dashboards';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
-import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
-import { tasks } from '@trigger.dev/sdk';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import { type Context, Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
@@ -54,25 +53,17 @@ const app = new Hono().get(
       user
     );
 
-    const tag = `take-dashboard-screenshot-${id}`;
-    if (
-      await shouldTakeScreenshot({
-        tag,
-        key: screenshots_task_keys.take_dashboard_screenshot,
-        context: c,
-      })
-    ) {
-      tasks.trigger(
-        screenshots_task_keys.take_dashboard_screenshot,
-        {
-          dashboardId: id,
-          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-          accessToken: c.get('accessToken'),
-          isOnSaveEvent: false,
-        } satisfies TakeDashboardScreenshotTrigger,
-        { tags: [tag], idempotencyKey: tag }
-      );
-    }
+    await triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+      tag: `take-dashboard-screenshot-${id}`,
+      key: screenshots_task_keys.take_dashboard_screenshot,
+      context: c,
+      payload: {
+        dashboardId: id,
+        organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+        accessToken: c.get('accessToken'),
+        isOnSaveEvent: false,
+      },
+    });
 
     return c.json(response);
   }

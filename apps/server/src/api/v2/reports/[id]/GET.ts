@@ -13,8 +13,7 @@ import {
   type GetReportResponse,
 } from '@buster/server-shared/reports';
 import { zValidator } from '@hono/zod-validator';
-import { shouldTakeScreenshot } from '@shared-helpers/screenshots';
-import { tasks } from '@trigger.dev/sdk';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
@@ -91,25 +90,16 @@ const app = new Hono()
         password
       );
 
-      const tag = `take-report-screenshot-${reportId}`;
-
-      if (
-        await shouldTakeScreenshot({
-          tag,
-          key: screenshots_task_keys.take_report_screenshot,
-          context: c,
-        })
-      ) {
-        tasks.trigger(
-          screenshots_task_keys.take_report_screenshot,
-          {
-            reportId,
-            organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-            accessToken: c.get('accessToken'),
-          } satisfies TakeReportScreenshotTrigger,
-          { tags: [tag], idempotencyKey: tag }
-        );
-      }
+      await triggerScreenshotIfNeeded<TakeReportScreenshotTrigger>({
+        tag: `take-report-screenshot-${reportId}`,
+        key: screenshots_task_keys.take_report_screenshot,
+        context: c,
+        payload: {
+          reportId,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+        },
+      });
 
       return c.json(response);
     }

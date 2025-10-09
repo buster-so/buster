@@ -176,11 +176,7 @@ describe('getDashboardHandler', () => {
 
   describe('successful requests', () => {
     it('should return dashboard data for valid dashboard ID', async () => {
-      const result = await getDashboardHandler(
-        { dashboardId: 'dashboard-123' },
-        mockUser,
-        mockContext
-      );
+      const result = await getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser);
 
       expect(result.dashboard.id).toBe('dashboard-123');
       expect(result.dashboard.name).toBe('Test Dashboard');
@@ -223,8 +219,7 @@ describe('getDashboardHandler', () => {
 
       const result = await getDashboardHandler(
         { dashboardId: 'dashboard-123', versionNumber: 1 },
-        mockUser,
-        mockContext
+        mockUser
       );
 
       expect((result.dashboard.config as any).name).toBe('Version 1');
@@ -245,8 +240,7 @@ describe('getDashboardHandler', () => {
 
       const result = await getDashboardHandler(
         { dashboardId: 'dashboard-123', password: 'secret123' },
-        mockUser,
-        mockContext
+        mockUser
       );
 
       expect(result.permission).toBe('can_view');
@@ -258,7 +252,7 @@ describe('getDashboardHandler', () => {
       mockGetDashboardById.mockResolvedValue(null);
 
       await expect(
-        getDashboardHandler({ dashboardId: 'nonexistent-dashboard' }, mockUser, mockContext)
+        getDashboardHandler({ dashboardId: 'nonexistent-dashboard' }, mockUser)
       ).rejects.toThrow(new HTTPException(404, { message: 'Dashboard not found' }));
     });
 
@@ -273,9 +267,7 @@ describe('getDashboardHandler', () => {
         effectiveRole: undefined,
       });
 
-      await expect(
-        getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser, mockContext)
-      ).rejects.toThrow(
+      await expect(getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser)).rejects.toThrow(
         new HTTPException(403, { message: "You don't have permission to view this dashboard" })
       );
     });
@@ -295,9 +287,7 @@ describe('getDashboardHandler', () => {
         effectiveRole: undefined,
       });
 
-      await expect(
-        getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser, mockContext)
-      ).rejects.toThrow(
+      await expect(getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser)).rejects.toThrow(
         new HTTPException(403, { message: 'Public access to this dashboard has expired' })
       );
     });
@@ -314,9 +304,9 @@ describe('getDashboardHandler', () => {
         effectiveRole: undefined,
       });
 
-      await expect(
-        getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser, mockContext)
-      ).rejects.toThrow(new HTTPException(418, { message: 'Password required for public access' }));
+      await expect(getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser)).rejects.toThrow(
+        new HTTPException(418, { message: 'Password required for public access' })
+      );
     });
 
     it('should throw 403 when incorrect password is provided', async () => {
@@ -332,11 +322,7 @@ describe('getDashboardHandler', () => {
       });
 
       await expect(
-        getDashboardHandler(
-          { dashboardId: 'dashboard-123', password: 'wrong-password' },
-          mockUser,
-          mockContext
-        )
+        getDashboardHandler({ dashboardId: 'dashboard-123', password: 'wrong-password' }, mockUser)
       ).rejects.toThrow(
         new HTTPException(403, { message: 'Incorrect password for public access' })
       );
@@ -344,11 +330,7 @@ describe('getDashboardHandler', () => {
 
     it('should throw 404 when requested version does not exist', async () => {
       await expect(
-        getDashboardHandler(
-          { dashboardId: 'dashboard-123', versionNumber: 99 },
-          mockUser,
-          mockContext
-        )
+        getDashboardHandler({ dashboardId: 'dashboard-123', versionNumber: 99 }, mockUser)
       ).rejects.toThrow(new HTTPException(404, { message: 'Version 99 not found' }));
     });
 
@@ -366,11 +348,7 @@ describe('getDashboardHandler', () => {
       mockGetDashboardById.mockResolvedValue(versionedDashboard);
 
       await expect(
-        getDashboardHandler(
-          { dashboardId: 'dashboard-123', versionNumber: 1 },
-          mockUser,
-          mockContext
-        )
+        getDashboardHandler({ dashboardId: 'dashboard-123', versionNumber: 1 }, mockUser)
       ).rejects.toThrow(new HTTPException(404, { message: 'Version 1 not found' }));
     });
   });
@@ -399,11 +377,7 @@ describe('getDashboardHandler', () => {
       };
       mockGetDashboardById.mockResolvedValue(versionedDashboard);
 
-      const result = await getDashboardHandler(
-        { dashboardId: 'dashboard-123' },
-        mockUser,
-        mockContext
-      );
+      const result = await getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser);
 
       expect(result.versions).toEqual([
         { version_number: 1, updated_at: '2023-01-01T00:00:00Z' },
@@ -430,11 +404,7 @@ describe('getDashboardHandler', () => {
       };
       mockGetDashboardById.mockResolvedValue(versionedDashboard);
 
-      const result = await getDashboardHandler(
-        { dashboardId: 'dashboard-123' },
-        mockUser,
-        mockContext
-      );
+      const result = await getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser);
 
       expect(result.dashboard.version_number).toBe(2);
       expect(result.dashboard.config).toEqual(mockDashboardContent); // From current content
@@ -448,11 +418,7 @@ describe('getDashboardHandler', () => {
         effectiveRole: 'can_edit',
       });
 
-      const result = await getDashboardHandler(
-        { dashboardId: 'dashboard-123' },
-        mockUser,
-        mockContext
-      );
+      const result = await getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser);
 
       expect(result.permission).toBe('can_edit');
     });
@@ -468,11 +434,7 @@ describe('getDashboardHandler', () => {
         effectiveRole: undefined,
       });
 
-      const result = await getDashboardHandler(
-        { dashboardId: 'dashboard-123' },
-        mockUser,
-        mockContext
-      );
+      const result = await getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser);
 
       expect(result.permission).toBe('can_view');
     });
@@ -480,11 +442,7 @@ describe('getDashboardHandler', () => {
 
   describe('response structure', () => {
     it('should return properly formatted dashboard data', async () => {
-      const result = await getDashboardHandler(
-        { dashboardId: 'dashboard-123' },
-        mockUser,
-        mockContext
-      );
+      const result = await getDashboardHandler({ dashboardId: 'dashboard-123' }, mockUser);
 
       expect(result).toMatchObject({
         dashboard: {

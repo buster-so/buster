@@ -17,8 +17,7 @@ import { getDashboardHandler } from '../GET';
 export async function updateDashboardShareHandler(
   dashboardId: string,
   request: ShareUpdateRequest,
-  user: User & { organizationId: string },
-  c: Context
+  user: User & { organizationId: string }
 ) {
   // Check if dashboard exists
   const dashboard = await getDashboardById({ dashboardId });
@@ -105,11 +104,7 @@ export async function updateDashboardShareHandler(
     workspace_sharing,
   });
 
-  const updatedDashboard: GetDashboardResponse = await getDashboardHandler(
-    { dashboardId },
-    user,
-    c
-  );
+  const updatedDashboard: GetDashboardResponse = await getDashboardHandler({ dashboardId }, user);
 
   return updatedDashboard;
 }
@@ -135,8 +130,7 @@ const app = new Hono().put('/', zValidator('json', ShareUpdateRequestSchema), as
     {
       ...user,
       organizationId: userOrg.organizationId,
-    },
-    c
+    }
   );
 
   return c.json(updatedDashboard);
