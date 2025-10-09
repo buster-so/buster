@@ -1,28 +1,6 @@
+import { DashboardConfigSchema } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { VerificationStatusSchema } from '../share';
-
-// Dashboard Config Schema
-export const DashboardConfigSchema = z.object({
-  rows: z
-    .array(
-      z.object({
-        columnSizes: z
-          .array(z.number().min(1).max(12))
-          .refine((arr) => arr.reduce((sum, n) => sum + n, 0) === 12, {
-            message: 'columnSizes must add up to 12',
-          })
-          .optional(), // columns sizes 1 - 12. MUST add up to 12
-        rowHeight: z.number().optional(), // pixel based!
-        id: z.union([z.string(), z.number()]),
-        items: z.array(
-          z.object({
-            id: z.string(),
-          })
-        ),
-      })
-    )
-    .optional(),
-});
 
 // Dashboard Schema
 export const DashboardSchema = z.object({
@@ -41,14 +19,7 @@ export const DashboardSchema = z.object({
   file_name: z.string(),
 });
 
-export const DashboardYmlSchema = z
-  .object({
-    name: z.string(),
-    description: z.string(),
-  })
-  .merge(DashboardConfigSchema);
-
+export type { DashboardConfig, DashboardYml } from '@buster/database/schema-types';
 // Export inferred types
-export type DashboardConfig = z.infer<typeof DashboardConfigSchema>;
+export { DashboardConfigSchema, DashboardYmlSchema } from '@buster/database/schema-types';
 export type Dashboard = z.infer<typeof DashboardSchema>;
-export type DashboardYml = z.infer<typeof DashboardYmlSchema>;
