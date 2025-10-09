@@ -1,4 +1,4 @@
-import { type MockedFunction, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 import {
   GetOrganizationAnalystDocParamsSchema,
   getOrganizationAnalystDoc,

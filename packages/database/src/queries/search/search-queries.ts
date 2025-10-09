@@ -3,10 +3,9 @@ import { z } from 'zod';
 import { db } from '../../connection';
 import { assetSearchV2 } from '../../schema';
 import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
-import { createPermissionedAssetsSubquery } from './access-control-helpers';
-
 import { AssetTypeSchema } from '../../schema-types/asset';
 import type { TextSearchResultSchema } from '../../schema-types/search';
+import { createPermissionedAssetsSubquery } from './access-control-helpers';
 
 /**
  * Date range filter schema

@@ -192,7 +192,7 @@ function convertToolResultPart(part: unknown): unknown | unknown[] | null {
 
   // Only convert if we have 'result' field but not 'output' (v4 format)
   if ('result' in p && !('output' in p)) {
-    const { result, experimental_content, isError, ...rest } = p;
+    const { result, isError, ...rest } = p;
 
     // Validate toolCallId exists and matches Anthropic's pattern
     const toolCallId = rest.toolCallId;
