@@ -7,9 +7,9 @@ import {
   processDeploymentResponse,
 } from './deployment/results';
 import {
-  type DeployFunction,
   createAuthenticatedDeployer,
   createDryRunDeployer,
+  type DeployFunction,
 } from './deployment/strategies';
 import {
   createModelFileMap,

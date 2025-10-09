@@ -20,7 +20,7 @@ interface ReadMessageProps {
  */
 export function ReadMessage({ message }: ReadMessageProps) {
   const isExpanded = useExpansion();
-  const { args, result } = message;
+  const { result } = message;
 
   if (!result) {
     return null;
@@ -29,9 +29,9 @@ export function ReadMessage({ message }: ReadMessageProps) {
   // Handle error case
   if (result.status === 'error') {
     return (
-      <Box flexDirection='column' marginBottom={1}>
-        <ToolBadge tool='READ' filePath={result.file_path} />
-        <StatusLine message={`Error: ${result.error_message}`} status='error' />
+      <Box flexDirection="column" marginBottom={1}>
+        <ToolBadge tool="READ" filePath={result.file_path} />
+        <StatusLine message={`Error: ${result.error_message}`} status="error" />
       </Box>
     );
   }
@@ -47,9 +47,9 @@ export function ReadMessage({ message }: ReadMessageProps) {
   );
 
   return (
-    <Box flexDirection='column' marginBottom={1}>
+    <Box flexDirection="column" marginBottom={1}>
       {/* READ badge with relative file path */}
-      <ToolBadge tool='READ' filePath={result.file_path} />
+      <ToolBadge tool="READ" filePath={result.file_path} />
 
       {/* File content lines - always show with indentation */}
       {contentLines.length > 0 && (
@@ -68,7 +68,7 @@ export function ReadMessage({ message }: ReadMessageProps) {
       {/* Status line with indentation */}
       <StatusLine
         message={`Read ${contentLines.length} lines${result.truncated ? ' (truncated at 1000 lines)' : ''}`}
-        status='success'
+        status="success"
       />
     </Box>
   );

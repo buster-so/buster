@@ -26,13 +26,13 @@ export function TaskMessage({ message }: TaskMessageProps) {
   // Handle error case
   if (result.status === 'error') {
     return (
-      <Box flexDirection='column' marginBottom={1}>
-        <Box flexDirection='row'>
-          <Text bold color='white' backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
+      <Box flexDirection="column" marginBottom={1}>
+        <Box flexDirection="row">
+          <Text bold color="white" backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
             TASK
           </Text>
         </Box>
-        <StatusLine message={`Error: ${result.error_message}`} status='error' />
+        <StatusLine message={`Error: ${result.error_message}`} status="error" />
       </Box>
     );
   }
@@ -46,10 +46,10 @@ export function TaskMessage({ message }: TaskMessageProps) {
     args.instructions.length > 80 ? `${args.instructions.substring(0, 80)}...` : args.instructions;
 
   return (
-    <Box flexDirection='column' marginBottom={1}>
+    <Box flexDirection="column" marginBottom={1}>
       {/* TASK badge with instructions preview */}
-      <Box flexDirection='row'>
-        <Text bold color='white' backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
+      <Box flexDirection="row">
+        <Text bold color="white" backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
           TASK
         </Text>
         <Text color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}> ({instructionsPreview})</Text>
@@ -58,7 +58,7 @@ export function TaskMessage({ message }: TaskMessageProps) {
       {/* Show nested messages when expanded */}
       {isExpanded && hasMessages && (
         <IndentedContent>
-          <Box flexDirection='column'>
+          <Box flexDirection="column">
             <Text color={UI_CONSTANTS.COLORS.TEXT_DIM} dimColor>
               ── Task Messages ──
             </Text>
@@ -100,7 +100,7 @@ export function TaskMessage({ message }: TaskMessageProps) {
           result.summary ||
           `Completed with ${toolCallCount} tool call${toolCallCount !== 1 ? 's' : ''}`
         }
-        status='success'
+        status="success"
       />
     </Box>
   );

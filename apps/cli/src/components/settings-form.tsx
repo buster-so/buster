@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from 'ink';
 import { useEffect, useState } from 'react';
-import { type Settings, loadSettings, saveSettings } from '../utils/settings';
+import { loadSettings, type Settings, saveSettings } from '../utils/settings';
 
 interface SettingsFormProps {
   onClose: () => void;
@@ -128,9 +128,9 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
   }, [settings, hasChanges]);
 
   return (
-    <Box flexDirection='column' borderStyle='single' borderColor='#6b7280' padding={1}>
+    <Box flexDirection="column" borderStyle="single" borderColor="#6b7280" padding={1}>
       <Box marginBottom={1}>
-        <Text bold color='#a78bfa'>
+        <Text bold color="#a78bfa">
           ⚙️ Settings
         </Text>
         {hasChanges && (
@@ -141,13 +141,13 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
         )}
       </Box>
 
-      <Box flexDirection='column' gap={1}>
+      <Box flexDirection="column" gap={1}>
         {SETTING_OPTIONS.map((option, index) => {
           const isSelected = index === selectedIndex;
           const value = settings[option.key];
 
           return (
-            <Box key={option.key} flexDirection='column'>
+            <Box key={option.key} flexDirection="column">
               <Box>
                 <Text color={isSelected ? '#e9d5ff' : '#9ca3af'}>
                   {isSelected ? '› ' : '  '}
@@ -159,7 +159,7 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
                       {value ? '✓ Enabled' : '✗ Disabled'}
                     </Text>
                   ) : (
-                    <Text color='#60a5fa'>
+                    <Text color="#60a5fa">
                       {isEditing && isSelected ? '◀ ' : ''}
                       {String(value)}
                       {isEditing && isSelected ? ' ▶' : ''}
@@ -179,7 +179,7 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
         })}
       </Box>
 
-      <Box marginTop={1} borderTop borderColor='#6b7280' paddingTop={1}>
+      <Box marginTop={1} borderTop borderColor="#6b7280" paddingTop={1}>
         <Text dimColor>
           <Text bold>SPACE/ENTER</Text> toggle • <Text bold>S</Text> save • <Text bold>Q</Text> quit
           • <Text bold>ESC</Text> cancel

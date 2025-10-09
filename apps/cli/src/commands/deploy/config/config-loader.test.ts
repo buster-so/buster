@@ -239,7 +239,11 @@ describe('config-loader', () => {
     };
 
     it('should resolve configuration with project name', () => {
-      const resolved = resolveConfiguration(defaultConfig, { dryRun: false, verbose: false, debug: false }, 'test-project');
+      const resolved = resolveConfiguration(
+        defaultConfig,
+        { dryRun: false, verbose: false, debug: false },
+        'test-project'
+      );
 
       expect(resolved.data_source_name).toBe('postgres');
       expect(resolved.database).toBe('test_db');
@@ -249,7 +253,11 @@ describe('config-loader', () => {
     });
 
     it('should use first project when no name specified', () => {
-      const resolved = resolveConfiguration(defaultConfig, { dryRun: false, verbose: false, debug: false });
+      const resolved = resolveConfiguration(defaultConfig, {
+        dryRun: false,
+        verbose: false,
+        debug: false,
+      });
 
       expect(resolved.data_source_name).toBe('postgres');
     });
@@ -266,16 +274,24 @@ describe('config-loader', () => {
         ],
       };
 
-      const resolved = resolveConfiguration(config, { dryRun: false, verbose: false, debug: false });
+      const resolved = resolveConfiguration(config, {
+        dryRun: false,
+        verbose: false,
+        debug: false,
+      });
 
       expect(resolved.include).toEqual(['**/*.yml', '**/*.yaml']);
       expect(resolved.exclude).toEqual([]);
     });
 
     it('should throw error for non-existent project name', () => {
-      expect(() => resolveConfiguration(defaultConfig, { dryRun: false, verbose: false, debug: false }, 'non-existent')).toThrow(
-        "Project 'non-existent' not found in buster.yml"
-      );
+      expect(() =>
+        resolveConfiguration(
+          defaultConfig,
+          { dryRun: false, verbose: false, debug: false },
+          'non-existent'
+        )
+      ).toThrow("Project 'non-existent' not found in buster.yml");
     });
 
     it('should throw error when no projects defined', () => {
@@ -283,9 +299,9 @@ describe('config-loader', () => {
         projects: [],
       };
 
-      expect(() => resolveConfiguration(config, { dryRun: false, verbose: false, debug: false })).toThrow(
-        'No projects defined in buster.yml'
-      );
+      expect(() =>
+        resolveConfiguration(config, { dryRun: false, verbose: false, debug: false })
+      ).toThrow('No projects defined in buster.yml');
     });
   });
 });

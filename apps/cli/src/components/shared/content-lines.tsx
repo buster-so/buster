@@ -17,6 +17,7 @@ export function ContentLines({
   return (
     <>
       {lines.map((line, idx) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: Lines position stable during rendering? Dallin can confirm?
         <Text key={idx} color={color}>
           {line}
         </Text>

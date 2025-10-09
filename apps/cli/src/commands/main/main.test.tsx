@@ -8,7 +8,7 @@ vi.mock('bun', () => ({
       public pattern: string,
       public options: any
     ) {}
-    async *scan() {
+    async scan() {
       // Return empty for tests
       return [];
     }

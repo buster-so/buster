@@ -19,7 +19,7 @@ export function FileAutocompleteDisplay({
   }
 
   return (
-    <Box flexDirection='column'>
+    <Box flexDirection="column">
       {displayItems.map((item, index) => {
         const isSelected = index === selectedIndex;
         const { relativePath } = item;

@@ -2,8 +2,8 @@ import { program as commander } from 'commander';
 import { render } from 'ink';
 import { Main } from '../commands/main/main';
 import { getCurrentVersion } from '../commands/update/update-handler';
-import { setupPreActionHook } from './hooks';
 import { runHeadless } from '../services/headless-handler';
+import { setupPreActionHook } from './hooks';
 
 interface RootOptions {
   cwd?: string;

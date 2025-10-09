@@ -9,16 +9,17 @@ import {
   DeployColumnSchema,
   type DeployModel,
   DeployModelSchema,
-  type DeployRequest,
-  DeployRequestSchema,
-  type DeployResponse,
-  DeployResponseSchema,
   type DeploymentFailure,
   DeploymentFailureSchema,
   type DeploymentItem,
   DeploymentItemSchema,
+  type DeployRequest,
+  DeployRequestSchema,
+  type DeployResponse,
+  DeployResponseSchema,
   type Dimension,
   DimensionSchema,
+  deploy,
   type Filter,
   FilterSchema,
   type Measure,
@@ -29,13 +30,11 @@ import {
   ProjectContextSchema,
   type Relationship,
   RelationshipSchema,
-  deploy,
 } from '@buster/server-shared';
 import { z } from 'zod';
 
 // Get DocDeployResultSchema from deploy namespace
 const DocDeployResultSchema = deploy.DocDeployResultSchema;
-type DocDeployResult = deploy.DocDeployResult;
 
 // Re-export all the shared schemas from server-shared
 export {

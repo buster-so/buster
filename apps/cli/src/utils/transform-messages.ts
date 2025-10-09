@@ -17,8 +17,6 @@ const TOOL_NAMES = {
   IDLE: 'idleTool',
 } as const;
 
-type ToolName = (typeof TOOL_NAMES)[keyof typeof TOOL_NAMES];
-
 /**
  * Type guards for tool arguments and results
  */
@@ -399,7 +397,7 @@ function transformToolInvocation(invocation: ToolInvocation): AgentMessage | nul
         result,
       };
 
-    case TOOL_NAMES.TASK:
+    case TOOL_NAMES.TASK: {
       if (!isTaskArgs(args)) {
         console.warn('Invalid task args:', args);
         return null;
@@ -427,6 +425,7 @@ function transformToolInvocation(invocation: ToolInvocation): AgentMessage | nul
             }
           : resultWithoutMessages,
       };
+    }
 
     case TOOL_NAMES.IDLE:
       if (!isIdleArgs(args)) {

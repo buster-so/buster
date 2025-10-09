@@ -93,7 +93,7 @@ class FileSearcher {
             return `**/${pattern}`;
           });
           patterns.push(...adjustedPatterns);
-        } catch (error) {
+        } catch (_error) {
           // Silently ignore
         }
       }

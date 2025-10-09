@@ -15,7 +15,12 @@ export interface RunHeadlessParams {
  * Returns the chatId for resuming the conversation later
  */
 export async function runHeadless(params: RunHeadlessParams): Promise<string> {
-  const { prompt, chatId: providedChatId, workingDirectory = process.cwd(), isInResearchMode } = params;
+  const {
+    prompt,
+    chatId: providedChatId,
+    workingDirectory = process.cwd(),
+    isInResearchMode,
+  } = params;
 
   // Use provided chatId or generate new one
   const chatId = providedChatId || randomUUID();
