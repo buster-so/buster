@@ -125,7 +125,7 @@ export const ReportPageController: React.FC<{
             }
           />
         ) : (
-          <ReportEditorSkeleton />
+          <ReportEditorSkeleton className={commonClassName} />
         )}
       </div>
     );

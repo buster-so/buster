@@ -54,7 +54,13 @@ export function ReportEditorSkeleton({
   showToolbar = false,
 }: ReportEditorSkeletonProps) {
   return (
-    <div className={cn('mx-auto mt-8 w-full space-y-6', className)}>
+    <div
+      className={cn(
+        'mx-auto mt-8 w-full space-y-6',
+        'sm:px-[max(64px,calc(50%-350px))] px-[max(24px,calc(50%-350px))]',
+        className
+      )}
+    >
       {/* Toolbar skeleton */}
       {showToolbar && (
         <div className="border-border flex h-11 w-full animate-pulse items-center justify-between border-b bg-transparent px-3">
