@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   clearAllCaches,
-  getCacheStats,
   getCachedCascadingPermission,
   getCachedPermission,
+  getCacheStats,
   invalidateAsset,
   invalidateOnPermissionChange,
   invalidateUser,

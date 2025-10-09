@@ -1,89 +1,80 @@
 // Export all types
-export * from './types';
-
-// Export asset permissions (excluding cache functions to avoid conflicts)
-export {
-  // From permissions.ts
-  hasAssetPermission,
-  createPermission,
-  createPermissionByEmail,
-  removePermission,
-  removePermissionByEmail,
-  listPermissions,
-  // From checks.ts
-  checkPermission,
-  computeEffectivePermission,
-  type AssetPermissionCheck,
-  type AssetPermissionResult,
-  // From cascading-permissions.ts
-  checkCascadingPermissions,
-  checkMetricDashboardAccess,
-  checkMetricChatAccess,
-  checkMetricCollectionAccess,
-  checkMetricReportAccess,
-  checkDashboardChatAccess,
-  checkDashboardCollectionAccess,
-} from './assets';
-
-// Export dataset permissions
-export * from './datasets';
-
-// Export user utilities
-export * from './users';
-
-// Export SQL permissions
-export * from './sql-permissions';
-
-// Export cache functions separately
-export {
-  clearAllCaches,
-  invalidateUser,
-  invalidateOnPermissionChange,
-  getCacheStats as getAssetCacheStats,
-} from './assets/cache';
-
-// Export legacy access control functionality (for backward compatibility)
-export {
-  AccessControlsError,
-  type Permission,
-  type Role,
-  type AccessControlOptions,
-} from './types';
 
 // Export legacy access control functions
 export {
   checkPermission as legacyCheckPermission,
-  hasRole,
-  validateAccess,
   getPermissionedDatasets as legacyGetPermissionedDatasets,
-  hasDatasetAccess as legacyHasDatasetAccess,
   hasAllDatasetsAccess as legacyHasAllDatasetsAccess,
+  hasDatasetAccess as legacyHasDatasetAccess,
+  hasRole,
   type PermissionedDataset as LegacyPermissionedDataset,
+  validateAccess,
 } from './access-controls';
 
+// Export asset permissions (excluding cache functions to avoid conflicts)
+export {
+  type AssetPermissionCheck,
+  type AssetPermissionResult,
+  // From cascading-permissions.ts
+  checkCascadingPermissions,
+  checkDashboardChatAccess,
+  checkDashboardCollectionAccess,
+  checkMetricChatAccess,
+  checkMetricCollectionAccess,
+  checkMetricDashboardAccess,
+  checkMetricReportAccess,
+  // From checks.ts
+  checkPermission,
+  computeEffectivePermission,
+  createPermission,
+  createPermissionByEmail,
+  // From permissions.ts
+  hasAssetPermission,
+  listPermissions,
+  removePermission,
+  removePermissionByEmail,
+} from './assets';
+// Export cache functions separately
+export {
+  clearAllCaches,
+  getCacheStats as getAssetCacheStats,
+  invalidateOnPermissionChange,
+  invalidateUser,
+} from './assets/cache';
 export { canUserAccessChat } from './chats';
-
 // Export cached version and cache management functions
 export {
   canUserAccessChatCached,
-  getCacheStats,
-  resetCacheStats,
   clearCache,
+  getCacheStats,
   invalidateAccess,
-  invalidateUserAccess,
   invalidateChatAccess,
+  invalidateUserAccess,
+  resetCacheStats,
 } from './chats-cached';
-
-// Export utility functions
-export { formatPermissionName, buildAccessQuery } from './utils';
-
+// Export dataset permissions
+export * from './datasets';
+// Export SQL permissions
+export * from './sql-permissions';
+export * from './types';
+// Export legacy access control functionality (for backward compatibility)
+export {
+  type AccessControlOptions,
+  AccessControlsError,
+  type Permission,
+  type Role,
+} from './types';
 // Export user organization functions
 export {
-  checkUserInOrganization,
-  getUserOrganizations,
   checkEmailDomainForOrganization,
-  getOrganizationWithDefaults,
+  checkUserInOrganization,
   createUserInOrganization,
-  type UserOrganizationInfo,
+  getOrganizationWithDefaults,
+  getUserOrganizations,
   type OrganizationWithDefaults,
+  type UserOrganizationInfo,
 } from './user-organizations';
+// Export user utilities
+export * from './users';
+// Export utility functions
+export { buildAccessQuery, formatPermissionName } from './utils';

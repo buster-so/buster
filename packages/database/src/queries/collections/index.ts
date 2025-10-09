@@ -1,5 +1,5 @@
 export {
-  getCollectionTitle,
-  GetCollectionTitleInputSchema,
   type GetCollectionTitleInput,
+  GetCollectionTitleInputSchema,
+  getCollectionTitle,
 } from './get-collection-title';

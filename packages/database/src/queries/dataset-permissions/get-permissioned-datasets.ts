@@ -95,7 +95,9 @@ export async function getPermissionedDatasets(
         isNull(datasetPermissions.deletedAt)
       )
     );
-  directUserDatasets.forEach((d) => accessibleDatasetIds.add(d.datasetId));
+  directUserDatasets.forEach((d) => {
+    accessibleDatasetIds.add(d.datasetId);
+  });
 
   // Path 2: User → permission group → dataset
   const userGroupDatasets = await db
@@ -118,7 +120,9 @@ export async function getPermissionedDatasets(
       )
     )
     .where(isNull(datasetsToPermissionGroups.deletedAt));
-  userGroupDatasets.forEach((d) => accessibleDatasetIds.add(d.datasetId));
+  userGroupDatasets.forEach((d) => {
+    accessibleDatasetIds.add(d.datasetId);
+  });
 
   // Get user's teams
   const userTeams = await db
@@ -139,7 +143,9 @@ export async function getPermissionedDatasets(
           isNull(datasetPermissions.deletedAt)
         )
       );
-    teamDirectDatasets.forEach((d) => accessibleDatasetIds.add(d.datasetId));
+    teamDirectDatasets.forEach((d) => {
+      accessibleDatasetIds.add(d.datasetId);
+    });
 
     // Path 4: User → team → permission group → dataset
     const teamGroupDatasets = await db
@@ -162,7 +168,9 @@ export async function getPermissionedDatasets(
         )
       )
       .where(isNull(datasetsToPermissionGroups.deletedAt));
-    teamGroupDatasets.forEach((d) => accessibleDatasetIds.add(d.datasetId));
+    teamGroupDatasets.forEach((d) => {
+      accessibleDatasetIds.add(d.datasetId);
+    });
   }
 
   // Path 5: User → org → default permission group → dataset
@@ -184,7 +192,9 @@ export async function getPermissionedDatasets(
       )
       .where(isNull(datasetsToPermissionGroups.deletedAt));
 
-    defaultGroupDatasets.forEach((d) => accessibleDatasetIds.add(d.datasetId));
+    defaultGroupDatasets.forEach((d) => {
+      accessibleDatasetIds.add(d.datasetId);
+    });
   }
 
   if (accessibleDatasetIds.size === 0) {

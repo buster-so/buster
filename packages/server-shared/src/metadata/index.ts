@@ -18,7 +18,7 @@ export interface GetMetadataResponse {
 
 // Re-export trigger task types for use in server
 export type {
+  ColumnProfile,
   GetTableStatisticsInput,
   GetTableStatisticsOutput,
-  ColumnProfile,
 } from './trigger-task-types';
