@@ -24,7 +24,7 @@ export const Route = createFileRoute('/screenshots')({
   head: ({ loaderData }) => ({
     styles: [
       {
-        children: `body { background: ${loaderData?.backgroundColor || '#ffffff'}; min-width: auto; }`,
+        children: `body { background: ${loaderData?.backgroundColor || '#ffffff'}; min-width: auto; --page-background: ${loaderData?.backgroundColor || '#ffffff'}; }`,
       },
     ],
   }),
