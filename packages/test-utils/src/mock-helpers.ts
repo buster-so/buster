@@ -40,7 +40,7 @@ export function createMockDate(fixedDate: string | Date) {
   const mockDate = new Date(fixedDate);
   const originalDate = Date;
 
-  // @ts-ignore
+  // @ts-expect-error
   global.Date = vi.fn(() => mockDate);
   global.Date.now = vi.fn(() => mockDate.getTime());
 
