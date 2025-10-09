@@ -32,12 +32,6 @@ export const GlobalSearchModalFilters = React.memo(
         selectType: 'multiple',
         items: [
           {
-            label: 'Charts',
-            value: 'metric_file' satisfies AssetType,
-            selected: selectedAssets?.includes('metric_file'),
-            icon: <ASSET_ICONS.metrics />,
-          },
-          {
             label: 'Chats',
             value: 'chat' satisfies AssetType,
             icon: <ASSET_ICONS.chats />,
@@ -56,6 +50,12 @@ export const GlobalSearchModalFilters = React.memo(
             label: 'Collections',
             value: 'collection' satisfies AssetType,
             icon: <ASSET_ICONS.collections />,
+          },
+          {
+            label: 'Charts',
+            value: 'metric_file' satisfies AssetType,
+            selected: selectedAssets?.includes('metric_file'),
+            icon: <ASSET_ICONS.metrics />,
           },
         ].map((item) => ({
           ...item,
