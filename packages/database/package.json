@@ -51,11 +51,12 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster-app/supabase": "workspace:*",
+    "@biomejs/biome": "2.2.5",
     "ai": "catalog:",
-    "drizzle-kit": "^0.31.4",
+    "drizzle-kit": "^0.31.5",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",
-    "lru-cache": "^11.2.1",
+    "lru-cache": "^11.2.2",
     "postgres": "^3.4.7",
     "zod": "catalog:"
   }

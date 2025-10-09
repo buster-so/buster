@@ -8,10 +8,10 @@ import {
 import { z } from 'zod';
 
 export {
-  PaginationSchema,
-  SearchPaginationSchema,
   type PaginationMetadata,
+  PaginationSchema,
   type SearchPaginationMetadata,
+  SearchPaginationSchema,
 } from '@buster/database/schema-types';
 
 export type Pagination = PaginationMetadata;
