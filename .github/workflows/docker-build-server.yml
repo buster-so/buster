@@ -237,7 +237,7 @@ jobs:
           # These contain the actual native .node binaries
           echo ""
           echo "📦 Ensuring Sharp platform binaries are installed for production..."
-          pnpm add @img/sharp-linux-x64 @img/sharp-libvips-linux-x64 --save-optional
+          pnpm add -w @img/sharp-linux-x64 @img/sharp-libvips-linux-x64 --save-optional
 
           # Verify Sharp and platform packages were installed
           echo ""
