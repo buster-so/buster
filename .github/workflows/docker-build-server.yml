@@ -106,14 +106,15 @@ jobs:
           echo "Current .npmrc configuration:"
           cat ../../.npmrc
 
-          if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
+          if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -L "node_modules/@img/sharp-linux-x64" ]; then
             echo "✅ Sharp linux-x64 platform package found:"
-            find node_modules -path "*/@img/sharp-linux-x64*" -type d
+            ls -la node_modules/@img/sharp-linux-x64 2>/dev/null || true
 
-            # List .node binaries
+            # List .node binaries - follow symlinks with -L
             echo ""
             echo "Native binaries (.node files):"
-            find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f || echo "⚠️  No .node files found yet"
+            find -L node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null || echo "⚠️  No .node files found"
+            find -L node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null || echo "⚠️  No libvips .node files found"
           else
             echo "⚠️  Sharp linux-x64 platform package NOT found! Attempting to reinstall..."
             echo "Available Sharp platform packages:"
@@ -163,16 +164,19 @@ jobs:
             echo "All Sharp-related packages in node_modules:"
             find node_modules -name "*sharp*" -type d | head -20
 
-            if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
+            if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -L "node_modules/@img/sharp-linux-x64" ]; then
               echo ""
-              echo "✅ Sharp linux-x64 successfully installed on retry:"
-              find node_modules -path "*/@img/sharp-linux-x64*" -type d
-              find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f
+              echo "✅ Sharp linux-x64 successfully installed on retry!"
+              ls -la node_modules/@img/sharp*
+              echo ""
+              echo "Native binaries:"
+              find -L node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null
+              find -L node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null
             else
               echo ""
               echo "❌ ERROR: Still unable to install Sharp linux-x64 after retry!"
-              echo "Available Sharp platform packages:"
-              find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
+              echo "Available @img packages:"
+              ls -la node_modules/@img/ 2>/dev/null || echo "None found"
               exit 1
             fi
           fi
