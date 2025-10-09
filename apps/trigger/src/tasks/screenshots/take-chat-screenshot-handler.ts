@@ -6,7 +6,7 @@ import { type TakeChatScreenshotTrigger, TakeChatScreenshotTriggerSchema } from 
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
 
-export const takeChartScreenshotHandlerTask: ReturnType<
+export const takeChatScreenshotHandlerTask: ReturnType<
   typeof schemaTask<
     typeof screenshots_task_keys.take_chat_screenshot,
     typeof TakeChatScreenshotTriggerSchema,

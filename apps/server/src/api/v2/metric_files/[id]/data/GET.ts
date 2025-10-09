@@ -47,7 +47,7 @@ const app = new Hono()
             accessToken: c.get('accessToken'),
             organizationId,
           } satisfies TakeMetricScreenshotTrigger,
-          { tags: [tag] }
+          { tags: [tag], idempotencyKey: tag }
         );
       }
 

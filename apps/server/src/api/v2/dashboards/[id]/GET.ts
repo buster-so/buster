@@ -51,8 +51,7 @@ const app = new Hono().get(
         versionNumber: version_number,
         password,
       },
-      user,
-      c
+      user
     );
 
     const tag = `take-dashboard-screenshot-${id}`;
@@ -63,7 +62,6 @@ const app = new Hono().get(
         context: c,
       })
     ) {
-      console.log('Taking dashboard screenshot');
       tasks.trigger(
         screenshots_task_keys.take_dashboard_screenshot,
         {
@@ -72,7 +70,7 @@ const app = new Hono().get(
           accessToken: c.get('accessToken'),
           isOnSaveEvent: false,
         } satisfies TakeDashboardScreenshotTrigger,
-        { tags: [tag] }
+        { tags: [tag], idempotencyKey: tag }
       );
     }
 
@@ -88,8 +86,7 @@ export default app;
  */
 export async function getDashboardHandler(
   params: GetDashboardHandlerParams,
-  user: User,
-  c: Context
+  user: User
 ): Promise<GetDashboardResponse> {
   const { dashboardId, versionNumber, password } = params;
 
@@ -268,26 +265,6 @@ export async function getDashboardHandler(
     workspace_sharing: dashboardFile.workspaceSharing,
     workspace_member_count: workspaceMemberCount,
   };
-
-  const tag = `take-dashboard-screenshot-${dashboardId}`;
-  if (
-    await shouldTakeScreenshot({
-      tag,
-      key: screenshots_task_keys.take_dashboard_screenshot,
-      context: c,
-    })
-  ) {
-    tasks.trigger(
-      screenshots_task_keys.take_dashboard_screenshot,
-      {
-        dashboardId,
-        isOnSaveEvent: false,
-        organizationId: dashboardFile.organizationId,
-        accessToken: c.get('accessToken'),
-      } satisfies TakeDashboardScreenshotTrigger,
-      { tags: [tag] }
-    );
-  }
 
   return response;
 }

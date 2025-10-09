@@ -65,7 +65,7 @@ const app = new Hono().get(
           organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
           accessToken: c.get('accessToken'),
         } satisfies TakeChatScreenshotTrigger,
-        { tags: [tag] }
+        { tags: [tag], idempotencyKey: tag }
       );
     }
 
