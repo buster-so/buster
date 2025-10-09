@@ -3,5 +3,12 @@
   "extends": ["../../biome2.json"],
   "files": {
     "includes": ["src/**/*", "scripts/**/*"]
+  },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": "off"
+      }
+    }
   }
 }

@@ -40,7 +40,6 @@ function getRelativeTime(dateString: string): string {
 }
 
 export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: HistoryBrowserProps) {
-  const { exit } = useApp();
   const [conversations, setConversations] = useState<ConversationListItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -59,7 +58,7 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
             let title = 'Untitled conversation';
             if (fullConvo?.modelMessages) {
               const firstUserMsg = fullConvo.modelMessages.find(
-                (msg: any) => msg.message.kind === 'user'
+                (msg) => msg.message.kind === 'user'
               );
               if (firstUserMsg && firstUserMsg.message.kind === 'user') {
                 // Truncate to first line and max 60 chars

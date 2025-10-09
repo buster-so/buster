@@ -155,7 +155,7 @@ export async function runAnalyticsEngineerAgent(params: RunAnalyticsEngineerAgen
         accumulatorState,
         part.toolCallId,
         part.toolName,
-        part.output
+        part.output as string | Record<string, unknown>
       );
       onMessageUpdate?.(accumulatorState.messages);
     }

@@ -47,13 +47,6 @@ function encodePathForDirectory(path: string): string {
 }
 
 /**
- * Decodes a directory name back to the original path
- */
-function decodePathFromDirectory(encoded: string): string {
-  return Buffer.from(encoded, 'base64url').toString('utf-8');
-}
-
-/**
  * Gets the history directory for a specific working directory
  */
 function getHistoryDir(workingDirectory: string): string {
@@ -112,7 +105,7 @@ export async function loadConversation(
     const data = await readFile(filePath, 'utf-8');
     const parsed = JSON.parse(data);
     return ConversationSchema.parse(parsed);
-  } catch (error) {
+  } catch (_error) {
     // File doesn't exist or is invalid
     return null;
   }
@@ -124,6 +117,7 @@ export async function loadConversation(
 export async function saveModelMessages(
   chatId: string,
   workingDirectory: string,
+  // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
   modelMessages: any[]
 ): Promise<void> {
   let conversation = await loadConversation(chatId, workingDirectory);
@@ -134,6 +128,7 @@ export async function saveModelMessages(
   }
 
   // Replace the model messages with the new array
+  // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
   conversation.modelMessages = modelMessages as any[];
   conversation.updatedAt = new Date().toISOString();
 
@@ -174,7 +169,7 @@ export async function listConversations(
     return conversations
       .filter((c): c is NonNullable<typeof c> => c !== null)
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  } catch (error) {
+  } catch (_error) {
     // Directory doesn't exist or can't be read
     return [];
   }
@@ -228,7 +223,7 @@ export async function loadTodos(
     const data = await readFile(filePath, 'utf-8');
     const parsed = JSON.parse(data);
     return TodoListSchema.parse(parsed);
-  } catch (error) {
+  } catch (_error) {
     // File doesn't exist or is invalid
     return null;
   }

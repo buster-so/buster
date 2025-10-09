@@ -21,6 +21,7 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
   const { args, result } = message;
 
   // Get command description and output based on tool type
+  // biome-ignore lint/correctness/noUnusedVariables: false positive
   let description = '';
   let output = '';
   let exitCode: number | undefined;
@@ -38,7 +39,7 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
       description = `Search for "${args.pattern}"${args.glob ? ` in ${args.glob}` : ''}`;
     }
     if (result && 'matches' in result) {
-      output = result.matches.map((m: any) => `${m.path}:${m.lineNum}: ${m.lineText}`).join('\n');
+      output = result.matches.map((m) => `${m.path}:${m.lineNum}: ${m.lineText}`).join('\n');
       success = result.totalMatches > 0;
     }
   } else if (message.kind === 'ls') {

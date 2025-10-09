@@ -28,7 +28,7 @@ type AppMode = 'Planning' | 'Auto-accept' | 'None';
 export function Main() {
   const { exit } = useApp();
   const [input, setInput] = useState('');
-  const [history, setHistory] = useState<ChatHistoryEntry[]>([]);
+  const [_history, setHistory] = useState<ChatHistoryEntry[]>([]);
   const [messages, setMessages] = useState<CliAgentMessage[]>([]);
   const historyCounter = useRef(0);
   const messageCounter = useRef(0);
@@ -45,6 +45,7 @@ export function Main() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream
+  // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
   const handleMessageUpdate = useCallback((modelMessages: any[]) => {
     const transformedMessages = transformModelMessagesToUI(modelMessages);
 
@@ -125,6 +126,7 @@ export function Main() {
         role: 'user',
         content: trimmed,
       };
+      // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
       const updatedModelMessages = [...existingModelMessages, userMessage] as any;
 
       // Update UI state immediately

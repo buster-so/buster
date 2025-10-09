@@ -42,6 +42,7 @@ export function WriteMessage({ message }: WriteMessageProps) {
 
         return (
           <Box
+            // biome-ignore lint/suspicious/noArrayIndexKey: Messages are stable and won't be reordered? Dallin can confirm?
             key={fileIdx}
             flexDirection="column"
             marginBottom={fileIdx < args.files.length - 1 ? 1 : 0}

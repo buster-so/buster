@@ -65,7 +65,7 @@ function parseDiff(diff: string): { lines: ParsedDiffLine[]; additions: number; 
  */
 export function EditMessage({ message }: EditMessageProps) {
   const isExpanded = useExpansion();
-  const { args, result } = message;
+  const { result } = message;
 
   if (!result) {
     return null;
@@ -128,6 +128,7 @@ export function EditMessage({ message }: EditMessageProps) {
 
             return (
               <Text
+                // biome-ignore lint/suspicious/noArrayIndexKey: Messages are stable and won't be reordered? Dallin can confirm?
                 key={idx}
                 color={UI_CONSTANTS.COLORS.TEXT_PRIMARY}
                 {...(backgroundColor && { backgroundColor })}

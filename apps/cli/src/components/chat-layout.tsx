@@ -127,7 +127,7 @@ export function ChatInput({
 
   // Slash command state
   const [slashQuery, setSlashQuery] = useState<string | null>(null);
-  const [slashStart, setSlashStart] = useState<number>(-1);
+  const [_slashStart, setSlashStart] = useState<number>(-1);
   const [commandResults, setCommandResults] = useState<SlashCommand[]>([]);
   const [showCommandAutocomplete, setShowCommandAutocomplete] = useState(false);
   const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);

@@ -20,7 +20,7 @@ interface ReadMessageProps {
  */
 export function ReadMessage({ message }: ReadMessageProps) {
   const isExpanded = useExpansion();
-  const { args, result } = message;
+  const { result } = message;
 
   if (!result) {
     return null;

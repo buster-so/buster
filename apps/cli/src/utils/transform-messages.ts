@@ -17,8 +17,6 @@ const TOOL_NAMES = {
   IDLE: 'idleTool',
 } as const;
 
-type ToolName = (typeof TOOL_NAMES)[keyof typeof TOOL_NAMES];
-
 /**
  * Type guards for tool arguments and results
  */
