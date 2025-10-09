@@ -64,7 +64,7 @@ export const dashboardsUpdateDashboard = async (params: {
   /** restore the dashboard to a specific version */
   restore_to_version?: number;
 }) => {
-  return await mainApi
+  return await mainApiV2
     .put<GetDashboardResponse>(`/dashboards/${params.id}`, params)
     .then((res) => res.data);
 };

@@ -18,4 +18,5 @@ export {
   GetDashboardTitleInputSchema,
   getDashboardTitle,
 } from './get-dashboard-title';
+export { manageMetricAssociations } from './manage-metric-associations';
 export { updateDashboard } from './update-dashboard';
