@@ -64,9 +64,19 @@ jobs:
           echo "✅ Sharp package found"
           pnpm list sharp --depth=0
 
+          # Show Sharp version and info
+          echo ""
+          echo "📋 Sharp package details:"
+          if [ -f "node_modules/sharp/package.json" ]; then
+            echo "Version: $(cat node_modules/sharp/package.json | grep '"version"' | head -1)"
+            echo "Install script: $(cat node_modules/sharp/package.json | grep '"install"' | head -1)"
+          fi
+
           # Verify linux-x64 native binary exists
           echo ""
           echo "🔍 Checking for linux-x64-glibc native binaries..."
+          echo "Current .npmrc configuration:"
+          cat ../../.npmrc
 
           if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
             echo "✅ Sharp linux-x64 platform package found:"
@@ -81,13 +91,23 @@ jobs:
             echo "Available Sharp platform packages:"
             find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
 
-            # Remove existing Sharp installation
-            rm -rf node_modules/sharp node_modules/.pnpm/*sharp*
+            # Show what architecture pnpm thinks we're on
+            echo ""
+            echo "Current environment:"
+            echo "uname -m: $(uname -m)"
+            echo "NODE_ARCH: ${NODE_ARCH:-not set}"
 
-            # Reinstall Sharp with explicit architecture
+            # Remove existing Sharp and related packages
+            echo ""
+            echo "Removing existing Sharp installation..."
+            rm -rf node_modules/sharp
+            find node_modules/.pnpm -name "*sharp*" -type d -exec rm -rf {} + 2>/dev/null || true
+
+            # Reinstall Sharp in THIS package only
             echo ""
             echo "📦 Reinstalling Sharp with linux-x64-glibc binaries..."
-            pnpm install sharp --force
+            echo "Running: pnpm install --no-frozen-lockfile"
+            pnpm install --no-frozen-lockfile
 
             # Verify again
             echo ""
@@ -95,10 +115,14 @@ jobs:
             if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
               echo "✅ Sharp linux-x64 successfully installed on retry:"
               find node_modules -path "*/@img/sharp-linux-x64*" -type d
+              find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f
             else
               echo "❌ ERROR: Still unable to install Sharp linux-x64 after retry!"
               echo "Available Sharp platform packages:"
               find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
+              echo ""
+              echo "Sharp install location and contents:"
+              ls -la node_modules/sharp/ 2>/dev/null || echo "Sharp directory not found"
               exit 1
             fi
           fi
