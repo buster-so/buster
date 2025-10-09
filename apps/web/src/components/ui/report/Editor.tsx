@@ -28,8 +28,8 @@ const editorVariants = cva(
       },
       variant: {
         comment: cn('rounded-none border-none bg-transparent text-sm'),
-        default: 'px-16 pt-4 pb-72 text-base sm:px-[max(64px,calc(50%-350px))]',
-        fullWidth: 'px-16 pt-4 pb-72 text-base sm:px-24',
+        default: 'px-16 pt-4 pb-72 text-base',
+        fullWidth: 'pt-4 pb-72 text-base px-24',
         none: '',
       },
     },

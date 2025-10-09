@@ -1,4 +1,3 @@
-import type { User } from '@supabase/supabase-js';
 import type { Browser, Page } from 'playwright';
 import { z } from 'zod';
 import { getSupabaseCookieKey, getSupabaseUser } from '../../supabase/server';
@@ -14,6 +13,15 @@ type BrowserParamsBase<T> = {
 export const BrowserParamsContextSchema = z.object({
   accessToken: z.string(),
   organizationId: z.string(),
+  width: z.number().min(100).max(3840).default(DEFAULT_SCREENSHOT_CONFIG.width).optional(),
+  height: z.number().min(100).max(7000).default(DEFAULT_SCREENSHOT_CONFIG.height).optional(),
+  type: z.enum(['png', 'jpeg']).default(DEFAULT_SCREENSHOT_CONFIG.type).optional(),
+  deviceScaleFactor: z
+    .number()
+    .min(1)
+    .max(4)
+    .default(DEFAULT_SCREENSHOT_CONFIG.deviceScaleFactor)
+    .optional(),
 });
 
 export type BrowserParamsContext = z.infer<typeof BrowserParamsContextSchema>;
@@ -62,6 +70,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   try {
     const context = await browser.newContext({
       viewport: { width, height },
+      deviceScaleFactor: DEFAULT_SCREENSHOT_CONFIG.deviceScaleFactor, // High-DPI rendering for better quality screenshots
     });
 
     // Format cookie value as Supabase expects: base64-<encoded_session>
@@ -92,7 +101,6 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     });
 
     await page.goto(fullPath, { waitUntil: 'networkidle' });
-    console.info('Page loaded', { fullPath, height, width });
 
     const result = await callback({ page, browser });
 

@@ -6,10 +6,7 @@ import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
 export const GetMetricScreenshotHandlerArgsSchema = z
   .object({
     metricId: z.string().uuid('Metric ID must be a valid UUID'),
-    width: z.number().default(DEFAULT_SCREENSHOT_CONFIG.width).optional(),
-    height: z.number().default(DEFAULT_SCREENSHOT_CONFIG.height).optional(),
     version_number: z.number().optional(),
-    type: z.enum(['png', 'jpeg']).default(DEFAULT_SCREENSHOT_CONFIG.type).optional(),
   })
   .extend(BrowserParamsContextSchema.shape);
 

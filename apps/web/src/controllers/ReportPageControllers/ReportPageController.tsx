@@ -16,7 +16,7 @@ import { useGetCurrentMessageId, useIsStreamingMessage } from '../../context/Cha
 import { GeneratingContent } from './GeneratingContent';
 import { ReportPageHeader } from './ReportPageHeader';
 
-const commonClassName = 'sm:px-[max(64px,calc(50%-350px))]';
+const commonClassName = 'sm:px-[max(64px,calc(50%-350px))] px-[max(24px,calc(50%-350px))]';
 
 export const ReportPageController: React.FC<{
   reportId: string;

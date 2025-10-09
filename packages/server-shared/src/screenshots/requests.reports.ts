@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { DEFAULT_SCREENSHOT_CONFIG } from './methods/screenshot-config';
 import { BaseScreenshotSearchSchema } from './requests.base';
 import { PutMetricScreenshotRequestSchema } from './requests.metrics';
 
@@ -18,9 +17,6 @@ export type GetReportScreenshotParams = z.infer<typeof GetReportScreenshotParams
 
 export const GetReportScreenshotQuerySchema = z
   .object({
-    width: z.coerce.number().min(100).max(3840).default(DEFAULT_SCREENSHOT_CONFIG.width),
-    height: z.coerce.number().min(100).max(2160).default(DEFAULT_SCREENSHOT_CONFIG.height),
-    type: z.enum(['png', 'jpeg']).default('png'),
     version_number: z.coerce.number().optional(),
   })
   .merge(BaseScreenshotSearchSchema);
