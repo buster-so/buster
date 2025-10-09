@@ -16,7 +16,6 @@ const app = new Hono().get(
   zValidator('query', GetChatScreenshotQuerySchema),
   async (c) => {
     const chatId = c.req.valid('param').id;
-    const search = c.req.valid('query');
     const user = c.get('busterUser');
 
     const chat = await getChatById(chatId);
@@ -40,16 +39,15 @@ const app = new Hono().get(
     }
 
     try {
+      const type = 'png' as const;
       const screenshotBuffer = await getChatScreenshot({
         chatId,
-        width: search.width,
-        height: search.height,
-        type: search.type,
         accessToken: c.get('accessToken'),
         organizationId: chat.organizationId,
+        type,
       });
 
-      return createImageResponse(screenshotBuffer, search.type);
+      return createImageResponse(screenshotBuffer, type);
     } catch (error) {
       console.error('Failed to generate chat screenshot URL', {
         chatId,

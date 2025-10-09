@@ -18,7 +18,7 @@ const app = new Hono()
     zValidator('query', GetMetricScreenshotQuerySchema),
     async (c) => {
       const metricId = c.req.valid('param').id;
-      const { version_number, width, height, type } = c.req.valid('query');
+      const { version_number } = c.req.valid('query');
       const user = c.get('busterUser');
 
       const metric = await getMetricFileById(metricId);
@@ -42,14 +42,13 @@ const app = new Hono()
       }
 
       try {
+        const type = 'png' as const;
         const screenshotBuffer = await getMetricScreenshot({
           metricId,
-          width,
-          height,
           version_number,
-          type,
           accessToken: c.get('accessToken'),
           organizationId: metric.organizationId,
+          type,
         });
 
         return createImageResponse(screenshotBuffer, type);

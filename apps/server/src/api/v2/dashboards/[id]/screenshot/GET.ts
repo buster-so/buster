@@ -43,14 +43,16 @@ const app = new Hono()
       }
 
       try {
+        const type = 'png' as const;
         const screenshotBuffer = await getDashboardScreenshot({
           ...search,
           dashboardId,
           accessToken: c.get('accessToken'),
           organizationId: dashboard.organizationId,
+          type,
         });
 
-        return createImageResponse(screenshotBuffer, search.type);
+        return createImageResponse(screenshotBuffer, type);
       } catch (error) {
         console.error('Failed to generate chat screenshot URL', {
           dashboardId,
