@@ -6,7 +6,6 @@ import {
   extractSqlFromMetricContent,
   getDataSourceCredentials,
   getMetricWithDataSource,
-  getUserOrganizationId,
 } from '@buster/database/queries';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';

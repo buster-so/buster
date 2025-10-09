@@ -1,9 +1,12 @@
+import { screenshots_task_keys } from '@buster-app/trigger/task-keys';
+import type { TakeDashboardScreenshotTrigger } from '@buster-app/trigger/task-schemas';
 import { checkPermission } from '@buster/access-controls';
 import {
   type User,
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
+  getUserOrganizationId,
   getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 import {
@@ -14,7 +17,8 @@ import {
 import type { DashboardYml } from '@buster/server-shared/dashboards';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
+import { type Context, Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
@@ -48,6 +52,18 @@ const app = new Hono().get(
       },
       user
     );
+
+    await triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+      tag: `take-dashboard-screenshot-${id}`,
+      key: screenshots_task_keys.take_dashboard_screenshot,
+      context: c,
+      payload: {
+        dashboardId: id,
+        organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+        accessToken: c.get('accessToken'),
+        isOnSaveEvent: false,
+      },
+    });
 
     return c.json(response);
   }

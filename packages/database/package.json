@@ -47,12 +47,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@buster-app/supabase": "workspace:*",
     "@buster/env-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@buster-app/supabase": "workspace:*",
-    "@biomejs/biome": "2.2.5",
     "ai": "catalog:",
+    "dayjs": "catalog:",
+    "@biomejs/biome": "2.2.5",
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",

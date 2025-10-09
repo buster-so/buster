@@ -5,12 +5,13 @@ import type {
   DeleteMetricResponse,
   DuplicateMetricRequest,
   DuplicateMetricResponse,
-  GetMetricDataRequest,
   GetMetricListRequest,
   GetMetricParams,
   GetMetricQuery,
   GetMetricResponse,
   ListMetricsResponse,
+  MetricDataParams,
+  MetricDataQuery,
   MetricDataResponse,
   MetricDownloadParams,
   MetricDownloadQueryParams,
@@ -40,7 +41,7 @@ export const getMetric = async ({
 export const getMetricData = async ({
   id,
   ...params
-}: GetMetricDataRequest & GetMetricParams): Promise<MetricDataResponse> => {
+}: MetricDataParams & MetricDataQuery): Promise<MetricDataResponse> => {
   return mainApiV2
     .get<MetricDataResponse>(`/metric_files/${id}/data`, { params })
     .then((res) => res.data);

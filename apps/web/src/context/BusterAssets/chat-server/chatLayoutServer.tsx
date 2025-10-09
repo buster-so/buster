@@ -2,15 +2,21 @@ import type { AssetType } from '@buster/server-shared/assets';
 import type { QueryClient } from '@tanstack/react-query';
 import { Outlet, useRouteContext } from '@tanstack/react-router';
 import omit from 'lodash/omit';
+import { lazy, Suspense } from 'react';
 import { prefetchGetChat } from '@/api/buster_rest/chats';
 import { getAppLayout } from '@/api/server-functions/getAppLayout';
-import { ErrorCard } from '@/components/features/global/GlobalErrorCard';
 import {
   chooseInitialLayout,
   getDefaultLayout,
   getDefaultLayoutMode,
 } from '@/context/Chats/selected-mode-helpers';
 import { ChatLayout } from '@/layouts/ChatLayout/ChatLayout';
+
+const ErrorCard = lazy(() =>
+  import('@/components/features/global/GlobalErrorCard').then((module) => ({
+    default: module.ErrorCard,
+  }))
+);
 
 export const beforeLoad = async ({
   params,
@@ -81,10 +87,12 @@ export const component = () => {
 
   if (!initialLayout || !selectedLayout || !autoSaveId || !defaultLayout) {
     return (
-      <ErrorCard
-        header="Hmmm... Something went wrong."
-        message="An error occurred while loading the chat."
-      />
+      <Suspense fallback={<div />}>
+        <ErrorCard
+          header="Hmmm... Something went wrong."
+          message="An error occurred while loading the chat."
+        />
+      </Suspense>
     );
   }
 

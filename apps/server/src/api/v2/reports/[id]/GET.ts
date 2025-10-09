@@ -1,11 +1,19 @@
+import { screenshots_task_keys } from '@buster-app/trigger/task-keys';
+import type { TakeReportScreenshotTrigger } from '@buster-app/trigger/task-schemas';
 import { checkPermission } from '@buster/access-controls';
-import { type User, getMetricIdsInReport, getReportFileById } from '@buster/database/queries';
+import {
+  type User,
+  getMetricIdsInReport,
+  getReportFileById,
+  getUserOrganizationId,
+} from '@buster/database/queries';
 import {
   GetReportParamsSchema,
   GetReportQuerySchema,
   type GetReportResponse,
 } from '@buster/server-shared/reports';
 import { zValidator } from '@hono/zod-validator';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
@@ -81,6 +89,18 @@ const app = new Hono()
         versionNumber,
         password
       );
+
+      triggerScreenshotIfNeeded<TakeReportScreenshotTrigger>({
+        tag: `take-report-screenshot-${reportId}`,
+        key: screenshots_task_keys.take_report_screenshot,
+        context: c,
+        payload: {
+          reportId,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+        },
+      });
+
       return c.json(response);
     }
   )

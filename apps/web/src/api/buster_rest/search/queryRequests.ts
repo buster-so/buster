@@ -1,8 +1,7 @@
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { keepPreviousData, type UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import type { ApiError } from '@/api/errors';
-import { getSearchResultInfinite, searchQueryKeys } from '@/api/query_keys/search';
+import { searchQueryKeys } from '@/api/query_keys/search';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { search } from './requests';
 
@@ -19,19 +18,33 @@ export const useSearch = <T = SearchTextResponse>(
   });
 };
 
-export const useSearchInfinite = (
-  params: Pick<Parameters<typeof search>[0], 'page_size' | 'assetTypes'> = {
-    page_size: 5,
-    assetTypes: ['chat'],
-  }
-) => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const queryResult = useInfiniteScroll<SearchTextData>({
+export const useSearchInfinite = ({
+  enabled,
+  mounted,
+  scrollConfig,
+  ...params
+}: Pick<
+  Parameters<typeof search>[0],
+  | 'page_size'
+  | 'assetTypes'
+  | 'includeAssetAncestors'
+  | 'includeScreenshots'
+  | 'endDate'
+  | 'startDate'
+> & {
+  scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
+  searchQuery: string;
+  enabled?: boolean;
+  mounted?: boolean;
+}) => {
+  const { searchQuery } = params;
+  return useInfiniteScroll<SearchTextData>({
     queryKey: ['search', 'results', 'infinite', params] as const,
-    staleTime: 1000 * 30, // 30 seconds
+    staleTime: 1000 * 45, // 45 seconds
     queryFn: ({ pageParam = 1 }) => search({ query: searchQuery, page: pageParam, ...params }),
+    placeholderData: keepPreviousData,
+    enabled,
+    scrollConfig,
+    mounted,
   });
-
-  return { ...queryResult, setSearchQuery, searchQuery };
 };

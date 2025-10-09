@@ -189,13 +189,16 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
       !versionNumberProp ||
       latestVersionNumber === chosenVersionNumber;
     if (isLatest) {
-      queryClient.setQueryData(metricsQueryKeys.metricsGetData(id, 'LATEST').queryKey, result);
+      queryClient.setQueryData(
+        metricsQueryKeys.metricsGetData(id, 'LATEST', cacheDataId).queryKey,
+        result
+      );
     }
     return result;
   };
 
   return useQuery({
-    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST'),
+    ...metricsQueryKeys.metricsGetData(id || '', versionNumberProp || 'LATEST', cacheDataId),
     queryFn,
     select: params?.select,
     ...params,
@@ -213,16 +216,48 @@ export const useGetMetricData = <TData = BusterMetricDataExtended>(
   });
 };
 
+const prefetchGetMetricDataQueryFn = async ({
+  id,
+  version_number,
+  report_file_id,
+  queryClient,
+}: {
+  id: string;
+  version_number: number | undefined;
+  report_file_id?: string;
+  queryClient: QueryClient;
+}) => {
+  const res = await getMetricData({ id, version_number, report_file_id });
+  const latestVersion = queryClient.getQueryData(
+    metricsQueryKeys.metricsGetMetric(id, 'LATEST').queryKey
+  );
+  const isLatest = latestVersion?.version_number === version_number || !version_number;
+  if (isLatest) {
+    queryClient.setQueryData(
+      metricsQueryKeys.metricsGetData(id, 'LATEST', report_file_id).queryKey,
+      res
+    );
+  }
+  return res;
+};
+
 export const prefetchGetMetricDataClient = async (
-  { id, version_number }: { id: string; version_number: number },
+  {
+    id,
+    version_number,
+    report_file_id,
+  }: { id: string; version_number: number | undefined; report_file_id?: string },
   queryClient: QueryClient
 ) => {
-  const options = metricsQueryKeys.metricsGetData(id, version_number);
+  const chosenVersionNumber = version_number || 'LATEST';
+  const options = metricsQueryKeys.metricsGetData(id, chosenVersionNumber, report_file_id);
   const existingData = queryClient.getQueryData(options.queryKey);
   if (!existingData && id) {
     await queryClient.prefetchQuery({
       ...options,
-      queryFn: () => getMetricData({ id, version_number }),
+      queryFn: () => {
+        return prefetchGetMetricDataQueryFn({ id, version_number, report_file_id, queryClient });
+      },
     });
   }
 };
@@ -235,7 +270,14 @@ export const ensureMetricData = async (
   const options = metricsQueryKeys.metricsGetData(id, version_number || 'LATEST', report_file_id);
   return await queryClient.ensureQueryData({
     ...options,
-    queryFn: () => getMetricData({ id, version_number, report_file_id }),
+    queryFn: async () => {
+      return await prefetchGetMetricDataQueryFn({
+        id,
+        version_number,
+        report_file_id,
+        queryClient,
+      });
+    },
   });
 };
 

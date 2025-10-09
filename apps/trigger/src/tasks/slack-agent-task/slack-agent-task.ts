@@ -11,6 +11,7 @@ import {
 } from '@buster/slack';
 import { type TaskOutput, logger, runs, schemaTask, wait } from '@trigger.dev/sdk';
 import { z } from 'zod';
+import type { AnalystAgentTaskInput } from '../analyst-agent-task';
 import { analystAgentTask } from '../analyst-agent-task/analyst-agent-task';
 import {
   createMessage,
@@ -338,7 +339,8 @@ export const slackAgentTask: ReturnType<
       const analystHandle = await analystAgentTask.trigger(
         {
           message_id: message.id,
-        },
+          access_token: null,
+        } satisfies AnalystAgentTaskInput,
         {
           concurrencyKey: payload.chatId, // Ensure sequential processing per chat
         }

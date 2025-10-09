@@ -1,10 +1,11 @@
 import { execSync } from 'node:child_process';
 import tailwindcss from '@tailwindcss/vite';
+import { nitroV2Plugin } from '@tanstack/nitro-v2-vite-plugin';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
-import viteTsConfigPaths from 'vite-tsconfig-paths';
+import tsConfigPaths from 'vite-tsconfig-paths';
 
 const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 
@@ -15,11 +16,6 @@ const config = defineConfig(({ command, mode }) => {
   const useChecker = !process.env.VITEST && isBuild;
   const isLocalBuild = process.argv.includes('--local') || mode === 'development';
   const isVercelBuild = process.env.VERCEL === '1' || process.env.CI === '1';
-  const target = isLocalBuild
-    ? ('bun' as const)
-    : isVercelBuild
-      ? ('vercel' as const)
-      : ('bun' as const);
 
   // Generate a unique version identifier for both build tracking and asset versioning
   const buildId =
@@ -38,26 +34,28 @@ const config = defineConfig(({ command, mode }) => {
       'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId),
       'import.meta.env.VITE_BUILD_AT': JSON.stringify(buildAt),
     },
+    optimizeDeps: {
+      exclude: ['playwright-core', 'chromium-bidi'],
+    },
     plugins: [
       // this is the plugin that enables path aliases
-      viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
-      tailwindcss(),
-      tanstackStart({
-        customViteReactPlugin: true,
-        target,
-      }),
-      viteReact(),
+      tsConfigPaths({ projects: ['./tsconfig.json'] }),
       useChecker
         ? checker({
             typescript: isTypecheck,
             biome: isProduction,
           })
         : undefined,
+      tailwindcss(),
+      tanstackStart(),
+      nitroV2Plugin({
+        preset: isLocalBuild || !isVercelBuild ? 'bun' : 'node-server',
+      }),
+      viteReact(),
     ],
     worker: { format: 'es' },
     build: {
-      chunkSizeWarningLimit: 1250,
-      minify: isProduction ? 'esbuild' : false,
+      chunkSizeWarningLimit: 1500,
       reportCompressedSize: false, // Disable gzip size reporting to speed up build
       rollupOptions: {
         // Exclude test and stories files from build
@@ -66,7 +64,10 @@ const config = defineConfig(({ command, mode }) => {
           if (/\.(test|stories)\.(js|ts|jsx|tsx)$/.test(id)) {
             return true;
           }
-
+          // Exclude playwright-core (Node.js-only package)
+          if (id.includes('playwright-core')) {
+            return true;
+          }
           // Don't externalize React and React DOM - let them be bundled
           return false;
         },
@@ -89,12 +90,6 @@ const config = defineConfig(({ command, mode }) => {
               return 'vendor-tanstack';
             }
           },
-        },
-        // Optimize tree-shaking for CloudFlare
-        treeshake: {
-          moduleSideEffects: false,
-          propertyReadSideEffects: false,
-          tryCatchDeoptimization: false,
         },
       },
     },

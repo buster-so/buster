@@ -1,6 +1,6 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import { Link, useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
   useIsAnonymousUser,
@@ -12,7 +12,7 @@ import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons';
-import { Flag, Gear, House4, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
+import { Flag, House4, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
 import {
   COLLAPSED_HIDDEN,
@@ -31,21 +31,15 @@ import {
 } from '@/components/ui/sidebar/create-sidebar-item';
 import { Sidebar } from '@/components/ui/sidebar/SidebarComponent';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
-import {
-  closeContactSupportModal,
-  toggleContactSupportModal,
-  useContactSupportModalStore,
-} from '@/context/GlobalStore/useContactSupportModalStore';
-import {
-  closeInviteModal,
-  toggleInviteModal,
-  useInviteModalStore,
-} from '@/context/GlobalStore/useInviteModalStore';
+import { toggleContactSupportModal } from '@/context/GlobalStore/useContactSupportModalStore';
+import { toggleInviteModal } from '@/context/GlobalStore/useInviteModalStore';
 import { cn } from '@/lib/classMerge';
-import { InvitePeopleModal } from '../../modals/InvitePeopleModal';
-import { SupportModal } from '../../modals/SupportModal';
+import { LazyErrorBoundary } from '../../global/LazyErrorBoundary';
+import { toggleGlobalSearch } from '../../search/GlobalSearchModal';
 import { SidebarUserFooter } from '../SidebarUserFooter';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
+
+const LazyGlobalModals = lazy(() => import('./PrimaryGlobalModals'));
 
 const topItems: ISidebarList = createSidebarList({
   id: 'top-items',
@@ -196,7 +190,6 @@ export const SidebarPrimary = React.memo(() => {
   const isUserRegistered = useIsUserRegistered();
 
   const favoritesDropdownItems = useFavoriteSidebarPanel();
-  //  const selectedAssetType = useGetSelectedAssetTypeLoose();
 
   const tryGroupMemoized = useMemo(
     () => tryGroup(!restrictNewUserInvitations),
@@ -222,7 +215,11 @@ export const SidebarPrimary = React.memo(() => {
         useCollapsible={isUserRegistered}
       />
 
-      <GlobalModals />
+      <LazyErrorBoundary>
+        <Suspense fallback={null}>
+          <LazyGlobalModals />
+        </Suspense>
+      </LazyErrorBoundary>
     </>
   );
 });
@@ -236,6 +233,12 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
     navigate({ to: '/app/home' });
   });
 
+  useHotkeys('S', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleGlobalSearch(true);
+  });
+
   return (
     <div className={cn(COLLAPSED_JUSTIFY_CENTER, 'flex min-h-7 items-center')}>
       <Link to={'/app/home'}>
@@ -244,11 +247,16 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
       </Link>
       {!hideActions && (
         <div className={cn(COLLAPSED_HIDDEN, 'items-center gap-2')}>
-          <Tooltip title="Settings">
-            <Link to={'/app/settings/profile'}>
-              <Button prefix={<Gear />} variant="ghost" />
-            </Link>
+          <Tooltip title="Search" shortcuts={['S']}>
+            <Button
+              size="tall"
+              variant="ghost"
+              rounding={'large'}
+              prefix={<Magnifier />}
+              onClick={() => toggleGlobalSearch(true)}
+            />
           </Tooltip>
+
           <Tooltip title="Start a chat" shortcuts={['C']}>
             <Link to={'/app/home'}>
               <Button size="tall" rounding={'large'} prefix={<PencilSquareIcon />} />
@@ -259,19 +267,3 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
     </div>
   );
 };
-
-const GlobalModals = () => {
-  const { openInviteModal } = useInviteModalStore();
-  const isAnonymousUser = useIsAnonymousUser();
-  const { formType } = useContactSupportModalStore();
-
-  if (isAnonymousUser) return null;
-
-  return (
-    <>
-      <InvitePeopleModal open={openInviteModal} onClose={closeInviteModal} />
-      <SupportModal formType={formType} onClose={closeContactSupportModal} />
-    </>
-  );
-};
-GlobalModals.displayName = 'GlobalModals';

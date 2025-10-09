@@ -22,7 +22,7 @@ const useMetricAssetContext = () => {
           unsafeRelative: 'path',
           to: '../chart' as '/app/metrics/$metricId/chart',
           params: (prev) => ({ ...prev, metricId, ...params }),
-          search: (prev) => ({ ...prev }),
+          search: (prev) => prev,
         });
       }
 
@@ -40,7 +40,7 @@ const useMetricAssetContext = () => {
           unsafeRelative: 'path',
           to: '../chart' as '/app/metrics/$metricId/chart',
           params: (prev) => ({ ...prev, metricId, ...params }),
-          search: (prev) => ({ ...prev }),
+          search: (prev) => prev,
         });
       } else {
         splitterRef.current?.animateWidth('300px', 'right', 300);
@@ -48,7 +48,7 @@ const useMetricAssetContext = () => {
           unsafeRelative: 'path',
           to: '../chart' as '/app/metrics/$metricId/chart',
           params: (prev) => ({ ...prev, ...params, metricId }),
-          search: (prev) => ({ ...prev }),
+          search: (prev) => prev,
         });
       }
     }

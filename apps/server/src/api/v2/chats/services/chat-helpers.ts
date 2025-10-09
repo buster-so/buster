@@ -207,6 +207,7 @@ export async function buildChatWithMessages(
     permission,
     workspace_sharing: chat.workspaceSharing || 'none',
     workspace_member_count: workspaceMemberCount,
+    screenshot_taken_at: chat.screenshotTakenAt || null,
   };
 }
 

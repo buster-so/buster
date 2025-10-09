@@ -46,15 +46,11 @@ export const updateAssetScreenshotBucketKey = async (
     throw new Error(`Asset ${assetType} with id ${assetId} not found`);
   }
 
-  if (existing.screenshotBucketKey === screenshotBucketKey) {
-    return { updated: false };
-  }
-
   await db
     .update(table)
     .set({
       screenshotBucketKey,
-      updatedAt: new Date().toISOString(),
+      screenshotTakenAt: new Date().toISOString(),
     })
     .where(and(eq(table.id, assetId), isNull(table.deletedAt)));
 

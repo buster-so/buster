@@ -14,7 +14,7 @@ catalog:
   '@aws-sdk/s3-request-presigner': ^3.888.0
   '@electric-sql/client': ^1.0.12
   '@electric-sql/react': ^1.0.12
-  '@supabase/supabase-js': ^2.57.4
+  '@supabase/supabase-js': 2.57.4
   '@trigger.dev/build': ^4.0.2
   '@trigger.dev/sdk': ^4.0.2
   '@types/js-yaml': 4.0.9
@@ -23,6 +23,7 @@ catalog:
   ai: ^5.0.6
   axios: ^1.12.2
   braintrust: ^0.3.7
+  dayjs: ^1.11.18
   dotenv: ^17.2.2
   drizzle-orm: ^0.44.5
   hono: ^4.9.7

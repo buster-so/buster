@@ -15,6 +15,7 @@ declare global {
         SLACK_APP_SUPPORT_URL: string;
         SERVER_URL: string;
         NODE_ENV?: 'development' | 'production' | 'test';
+        VITE_PUBLIC_URL: string;
       }
     }
   }

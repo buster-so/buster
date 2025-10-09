@@ -1,62 +1,70 @@
-import type { AssetType } from '@buster/server-shared/assets';
 import {
   type StaticDataRouteOption,
   useMatches,
   useParams,
   useSearch,
 } from '@tanstack/react-router';
-import findLast from 'lodash/findLast';
 
 export const useSelectedAssetType = (): NonNullable<StaticDataRouteOption['assetType']> => {
-  const lastMatch = useMatches({
-    select: (matches) => {
-      return findLast(matches, (match) => match.staticData?.assetType);
-    },
-  });
-
-  if (typeof lastMatch === 'number') {
-    return 'chat';
-  }
-  // @ts-expect-error - lastMatch is not undefined
-  const data = lastMatch?.staticData?.assetType as StaticDataRouteOption['assetType'];
-  const { messageId } = useParams({
+  const { dashboardId, metricId, reportId, chatId, collectionId, messageId } = useParams({
     strict: false,
   });
-  if (messageId || !data) {
+
+  if (metricId) {
+    return 'metric_file';
+  }
+
+  if (messageId) {
     return 'reasoning';
   }
-  return data;
+
+  if (dashboardId) {
+    return 'dashboard_file';
+  }
+
+  if (reportId) {
+    return 'report_file';
+  }
+
+  if (chatId) {
+    return 'chat';
+  }
+
+  if (collectionId) {
+    return 'collection';
+  }
+
+  return 'metric_file';
 };
 
 export const useSelectedAssetId = () => {
-  const assetType = useSelectedAssetType();
-  const params = useParams({ strict: false });
+  const { dashboardId, metricId, reportId, chatId, collectionId, messageId } = useParams({
+    strict: false,
+  });
 
-  if (assetType === 'dashboard_file') {
-    return params?.dashboardId;
+  if (metricId) {
+    return metricId;
   }
 
-  if (assetType === 'report_file') {
-    return params?.reportId;
+  if (messageId) {
+    return messageId;
   }
 
-  if (assetType === 'collection') {
-    return params?.collectionId;
+  if (dashboardId) {
+    return dashboardId;
   }
 
-  if (assetType === 'metric_file') {
-    return params?.metricId;
+  if (reportId) {
+    return reportId;
   }
 
-  if (assetType === 'chat') {
-    return params?.chatId;
+  if (chatId) {
+    return chatId;
   }
 
-  if (assetType === 'reasoning') {
-    return params?.messageId;
+  if (collectionId) {
+    return collectionId;
   }
-
-  const _exhaustiveCheck: never = assetType;
 
   return null;
 };

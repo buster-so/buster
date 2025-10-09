@@ -1,4 +1,6 @@
 // Export all chat-related functionality
+
+export { hasChatScreenshotBeenTakenWithin } from './chat-screenshots';
 export {
   type Chat,
   type CreateChatInput,
@@ -14,13 +16,11 @@ export {
   updateChat,
   updateChatSharing,
 } from './chats';
-
 export {
   type GetChatTitleInput,
   GetChatTitleInputSchema,
   getChatTitle,
 } from './get-chat-title';
-
 export {
   type ListChatsRequest,
   ListChatsRequestSchema,

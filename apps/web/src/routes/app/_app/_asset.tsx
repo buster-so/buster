@@ -28,13 +28,3 @@ function RouteComponent() {
     </AppAssetCheckLayout>
   );
 }
-
-declare module '@tanstack/react-router' {
-  interface StaticDataRouteOption {
-    assetType?: AssetType | 'reasoning';
-  }
-
-  interface RouteContext {
-    assetType?: AssetType | 'reasoning';
-  }
-}

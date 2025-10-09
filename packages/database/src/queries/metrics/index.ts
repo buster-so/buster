@@ -36,4 +36,6 @@ export {
   getCollectionsAssociatedWithMetric,
   getDashboardsAssociatedWithMetric,
 } from './get-permissioned-asset-associations';
+
+export { hasMetricScreenshotBeenTakenWithin } from './metric-screenshots';
 export { updateMetric } from './update-metric';

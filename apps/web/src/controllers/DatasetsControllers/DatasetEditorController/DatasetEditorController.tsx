@@ -1,5 +1,3 @@
-'use client';
-
 import type { DataResult } from '@buster/server-shared/metrics';
 import isEmpty from 'lodash/isEmpty';
 import type React from 'react';
