@@ -1,6 +1,6 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import { Link, useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
   useIsAnonymousUser,
@@ -31,22 +31,15 @@ import {
 } from '@/components/ui/sidebar/create-sidebar-item';
 import { Sidebar } from '@/components/ui/sidebar/SidebarComponent';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
-import {
-  closeContactSupportModal,
-  toggleContactSupportModal,
-  useContactSupportModalStore,
-} from '@/context/GlobalStore/useContactSupportModalStore';
-import {
-  closeInviteModal,
-  toggleInviteModal,
-  useInviteModalStore,
-} from '@/context/GlobalStore/useInviteModalStore';
+import { toggleContactSupportModal } from '@/context/GlobalStore/useContactSupportModalStore';
+import { toggleInviteModal } from '@/context/GlobalStore/useInviteModalStore';
 import { cn } from '@/lib/classMerge';
-import { InvitePeopleModal } from '../../modals/InvitePeopleModal';
-import { SupportModal } from '../../modals/SupportModal';
-import { GlobalSearchModal, toggleGlobalSearch } from '../../search/GlobalSearchModal';
+import { LazyErrorBoundary } from '../../global/LazyErrorBoundary';
+import { toggleGlobalSearch } from '../../search/GlobalSearchModal';
 import { SidebarUserFooter } from '../SidebarUserFooter';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
+
+const LazyGlobalModals = lazy(() => import('./PrimaryGlobalModals'));
 
 const topItems: ISidebarList = createSidebarList({
   id: 'top-items',
@@ -222,7 +215,11 @@ export const SidebarPrimary = React.memo(() => {
         useCollapsible={isUserRegistered}
       />
 
-      <GlobalModals />
+      <LazyErrorBoundary>
+        <Suspense fallback={null}>
+          <LazyGlobalModals />
+        </Suspense>
+      </LazyErrorBoundary>
     </>
   );
 });
@@ -270,20 +267,3 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
     </div>
   );
 };
-
-const GlobalModals = () => {
-  const { openInviteModal } = useInviteModalStore();
-  const isAnonymousUser = useIsAnonymousUser();
-  const { formType } = useContactSupportModalStore();
-
-  if (isAnonymousUser) return null;
-
-  return (
-    <>
-      <InvitePeopleModal open={openInviteModal} onClose={closeInviteModal} />
-      <SupportModal formType={formType} onClose={closeContactSupportModal} />
-      <GlobalSearchModal />
-    </>
-  );
-};
-GlobalModals.displayName = 'GlobalModals';
