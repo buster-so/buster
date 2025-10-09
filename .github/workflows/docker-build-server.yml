@@ -67,7 +67,7 @@ jobs:
         run: |
           echo "📦 Creating server bundle with bun..."
           cd apps/server
-          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64 --external playwright-core --external playwright --external electron --external chromium-bidi --external @vitest/* --external vitest
+          bun build src/index.ts --outdir ./dist --target bun --external sharp --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64 --external playwright-core --external playwright --external electron --external chromium-bidi --external @vitest/* --external vitest
           ls -la dist/
           cd ../..
       
@@ -94,35 +94,53 @@ jobs:
       - name: Install Sharp for linux-x64
         run: |
           echo "📦 Installing Sharp with linux-x64 binaries..."
-          cd docker-context
+
+          # Go back to prod-deps directory to reinstall Sharp with correct platform
+          cd /tmp/prod-deps
 
           # Configure pnpm supportedArchitectures for linux-x64 with glibc
           echo "supportedArchitectures[os][]=linux" > .npmrc
           echo "supportedArchitectures[cpu][]=x64" >> .npmrc
           echo "supportedArchitectures[libc][]=glibc" >> .npmrc
-          echo "enable-pre-post-scripts=true" >> .npmrc
 
           echo "Configuration:"
           cat .npmrc
 
-          # Reinstall Sharp with correct architecture
-          pnpm add sharp@^0.34.4 --ignore-scripts=false
+          # Remove existing Sharp installation
+          rm -rf packages/server-shared/node_modules/sharp
+          rm -rf node_modules/.pnpm/*sharp*
+
+          # Reinstall Sharp with correct architecture and scripts enabled
+          pnpm install --filter @buster/server-shared --no-frozen-lockfile sharp
 
           # Verify Sharp was installed correctly for linux-x64
           echo ""
           echo "🔍 Verifying Sharp installation..."
-          if [ -d "node_modules/sharp" ]; then
-            echo "✅ Sharp package found"
-            echo "Sharp binaries:"
-            find node_modules/sharp -name "*.node" -o -name "sharp-*" | head -10
-          else
-            echo "❌ ERROR: Sharp package NOT found!"
+          SHARP_FOUND=false
+
+          if [ -d "packages/server-shared/node_modules/sharp" ]; then
+            echo "✅ Sharp package found in packages/server-shared/node_modules/sharp"
+            echo "Sharp contents:"
+            ls -la packages/server-shared/node_modules/sharp/ | head -20
+            echo ""
+            echo "Searching for .node binaries:"
+            find packages/server-shared/node_modules/sharp -name "*.node" -type f
+            SHARP_FOUND=true
+          fi
+
+          if [ "$SHARP_FOUND" = false ]; then
+            echo "❌ ERROR: Sharp package with linux-x64 binaries NOT found!"
+            echo "Checking all Sharp locations..."
+            find . -path "*/node_modules/sharp" -type d
             exit 1
           fi
 
-          # Clean up .npmrc
-          rm .npmrc
+          # Copy updated node_modules back to docker-context
           cd -
+          rm -rf docker-context/node_modules
+          cp -r /tmp/prod-deps/node_modules docker-context/
+
+          echo "✅ Sharp installation complete and copied to docker-context"
       
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
