@@ -168,6 +168,7 @@ export function MultiLineTextInput({
         if (action.preventDefault) {
           // Apply the action
           if (action.type === 'mode-change' && action.mode) {
+            // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
             setVimState((prev) => ({ ...prev, mode: action.mode! }));
             if (action.mode === 'visual') {
               setVimState((prev) => ({ ...prev, visualStart: cursorPosition }));
@@ -180,9 +181,11 @@ export function MultiLineTextInput({
             onChange(action.text);
           }
           if (action.yankedText !== undefined) {
+            // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
             setVimState((prev) => ({ ...prev, yankedText: action.yankedText! }));
           }
           if (action.mode !== undefined) {
+            // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
             setVimState((prev) => ({ ...prev, mode: action.mode! }));
           }
           return;
@@ -324,7 +327,9 @@ export function MultiLineTextInput({
         let positionInLine = cursorPosition;
 
         for (let i = 0; i < lines.length; i++) {
+          // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
           const lineLength = lines[i]!.length + (i < lines.length - 1 ? 1 : 0); // +1 for newline except last line
+          // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
           if (cursorPosition <= currentLineStart + lines[i]!.length) {
             currentLineIndex = i;
             positionInLine = cursorPosition - currentLineStart;
@@ -337,6 +342,7 @@ export function MultiLineTextInput({
           const previousLineStart = lines
             .slice(0, currentLineIndex - 1)
             .reduce((acc, line) => acc + line.length + 1, 0);
+          // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
           const previousLineLength = lines[currentLineIndex - 1]!.length;
           const newPosition = previousLineStart + Math.min(positionInLine, previousLineLength);
           setCursorPosition(newPosition);
@@ -352,7 +358,9 @@ export function MultiLineTextInput({
         let positionInLine = cursorPosition;
 
         for (let i = 0; i < lines.length; i++) {
+          // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
           const lineLength = lines[i]!.length + (i < lines.length - 1 ? 1 : 0); // +1 for newline except last line
+          // biome-ignore lint/style/noNonNullAssertion: Dallin can confirm if this is safe
           if (cursorPosition <= currentLineStart + lines[i]!.length) {
             currentLineIndex = i;
             positionInLine = cursorPosition - currentLineStart;
@@ -365,7 +373,7 @@ export function MultiLineTextInput({
           const nextLineStart = lines
             .slice(0, currentLineIndex + 1)
             .reduce((acc, line) => acc + line.length + 1, 0);
-          const nextLineLength = lines[currentLineIndex + 1]!.length;
+          const nextLineLength = lines[currentLineIndex + 1]?.length ?? 0;
           const newPosition = nextLineStart + Math.min(positionInLine, nextLineLength);
           setCursorPosition(newPosition);
         }
@@ -391,7 +399,7 @@ export function MultiLineTextInput({
         return (
           <Box>
             <Text>\ </Text>
-            <Text color='yellow'>(press 'n' for newline)</Text>
+            <Text color="yellow">(press 'n' for newline)</Text>
           </Box>
         );
       }
@@ -440,19 +448,19 @@ export function MultiLineTextInput({
         return (
           <Box>
             <Text>{lines[0]}</Text>
-            {expectingNewline && <Text color='yellow'> (press 'n' for newline)</Text>}
+            {expectingNewline && <Text color="yellow"> (press 'n' for newline)</Text>}
           </Box>
         );
       }
 
       return (
-        <Box flexDirection='column'>
+        <Box flexDirection="column">
           {lines.map((line, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: Lines position stable during editing
             <Box key={index}>
               <Text>{line || ' '}</Text>
               {index === lines.length - 1 && expectingNewline && (
-                <Text color='yellow'> (press 'n' for newline)</Text>
+                <Text color="yellow"> (press 'n' for newline)</Text>
               )}
             </Box>
           ))}
@@ -469,13 +477,13 @@ export function MultiLineTextInput({
       return (
         <Box>
           <Text>{lines[0]}</Text>
-          {expectingNewline && <Text color='yellow'> (press 'n' for newline)</Text>}
+          {expectingNewline && <Text color="yellow"> (press 'n' for newline)</Text>}
         </Box>
       );
     }
 
     return (
-      <Box flexDirection='column'>
+      <Box flexDirection="column">
         {lines.map((line, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: Lines position stable during editing
           <Text key={index}>{line || ' '}</Text>

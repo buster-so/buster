@@ -64,8 +64,13 @@ export function addReasoningContent(
   }
 
   // Append to existing assistant message
-  if (state.currentStepAssistantMessage && Array.isArray(state.currentStepAssistantMessage.content)) {
-    (state.currentStepAssistantMessage.content as Array<typeof reasoningContent>).push(reasoningContent);
+  if (
+    state.currentStepAssistantMessage &&
+    Array.isArray(state.currentStepAssistantMessage.content)
+  ) {
+    (state.currentStepAssistantMessage.content as (typeof reasoningContent)[]).push(
+      reasoningContent
+    );
   }
 
   return state;
@@ -99,8 +104,11 @@ export function addTextContent(
   }
 
   // Append to existing assistant message
-  if (state.currentStepAssistantMessage && Array.isArray(state.currentStepAssistantMessage.content)) {
-    (state.currentStepAssistantMessage.content as Array<typeof textContent>).push(textContent);
+  if (
+    state.currentStepAssistantMessage &&
+    Array.isArray(state.currentStepAssistantMessage.content)
+  ) {
+    (state.currentStepAssistantMessage.content as (typeof textContent)[]).push(textContent);
   }
 
   return state;
@@ -113,7 +121,7 @@ export function addToolCall(
   state: MessageAccumulatorState,
   toolCallId: string,
   toolName: string,
-  input: any
+  input: unknown
 ): MessageAccumulatorState {
   const toolCallContent = {
     type: 'tool-call' as const,
@@ -138,8 +146,11 @@ export function addToolCall(
   }
 
   // Append to existing assistant message (critical: use tracked reference!)
-  if (state.currentStepAssistantMessage && Array.isArray(state.currentStepAssistantMessage.content)) {
-    (state.currentStepAssistantMessage.content as Array<typeof toolCallContent>).push(toolCallContent);
+  if (
+    state.currentStepAssistantMessage &&
+    Array.isArray(state.currentStepAssistantMessage.content)
+  ) {
+    (state.currentStepAssistantMessage.content as (typeof toolCallContent)[]).push(toolCallContent);
   }
 
   return state;
@@ -153,7 +164,7 @@ export function addToolResult(
   state: MessageAccumulatorState,
   toolCallId: string,
   toolName: string,
-  output: any
+  output: string | Record<string, unknown>
 ): MessageAccumulatorState {
   const toolResultContent = {
     type: 'tool-result' as const,
@@ -181,7 +192,7 @@ export function addToolResult(
 
   // Append to existing tool message
   if (Array.isArray(state.currentToolMessage.content)) {
-    (state.currentToolMessage.content as Array<typeof toolResultContent>).push(toolResultContent);
+    (state.currentToolMessage.content as (typeof toolResultContent)[]).push(toolResultContent);
   }
 
   return state;

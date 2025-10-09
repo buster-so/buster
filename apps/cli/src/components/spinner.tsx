@@ -37,7 +37,7 @@ export function Spinner({ label = 'Loading', type = 'dots' }: SpinnerProps) {
   }, [spinner]);
 
   return (
-    <Text color='cyan'>
+    <Text color="cyan">
       {spinner.frames[frame]} {label}
     </Text>
   );

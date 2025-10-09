@@ -5,11 +5,11 @@ import yaml from 'js-yaml';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Model } from '../schemas';
 import {
-  ModelParsingError,
   fileContainsTodo,
   findTodoMarkers,
   formatZodIssues,
   generateDefaultSQL,
+  ModelParsingError,
   parseModelFile,
   parseModelFileStrict,
   resolveModelConfig,
@@ -901,7 +901,9 @@ dimensions:
 
       expect(result.models).toHaveLength(0);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0]?.issues[0]?.message).toContain('{{TODO}} markers and will be skipped');
+      expect(result.errors[0]?.issues[0]?.message).toContain(
+        '{{TODO}} markers and will be skipped'
+      );
     });
 
     it('should parse normally when no {{TODO}} exists', async () => {

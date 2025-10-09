@@ -40,7 +40,6 @@ function getRelativeTime(dateString: string): string {
 }
 
 export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: HistoryBrowserProps) {
-  const { exit } = useApp();
   const [conversations, setConversations] = useState<ConversationListItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -58,7 +57,9 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
             // Find first user message for title
             let title = 'Untitled conversation';
             if (fullConvo?.modelMessages) {
-              const firstUserMsg = fullConvo.modelMessages.find((msg: any) => msg.message.kind === 'user');
+              const firstUserMsg = fullConvo.modelMessages.find(
+                (msg) => msg.message.kind === 'user'
+              );
               if (firstUserMsg && firstUserMsg.message.kind === 'user') {
                 // Truncate to first line and max 60 chars
                 const content = firstUserMsg.message.content.split('\n')[0];
@@ -112,8 +113,8 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
 
   if (loading) {
     return (
-      <Box flexDirection='column' paddingX={1} paddingY={1}>
-        <Text color='#c4b5fd' bold>
+      <Box flexDirection="column" paddingX={1} paddingY={1}>
+        <Text color="#c4b5fd" bold>
           Resume Session
         </Text>
         <Box marginTop={1}>
@@ -125,8 +126,8 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
 
   if (conversations.length === 0) {
     return (
-      <Box flexDirection='column' paddingX={1} paddingY={1}>
-        <Text color='#c4b5fd' bold>
+      <Box flexDirection="column" paddingX={1} paddingY={1}>
+        <Text color="#c4b5fd" bold>
           Resume Session
         </Text>
         <Box marginTop={1}>
@@ -140,22 +141,22 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
   }
 
   return (
-    <Box flexDirection='column' paddingX={1} paddingY={1}>
-      <Text color='#c4b5fd' bold>
+    <Box flexDirection="column" paddingX={1} paddingY={1}>
+      <Text color="#c4b5fd" bold>
         Resume Session
       </Text>
 
-      <Box flexDirection='column' marginTop={1}>
+      <Box flexDirection="column" marginTop={1}>
         {conversations.map((convo, index) => {
           const isSelected = index === selectedIndex;
 
           return (
             <Box
               key={convo.chatId}
-              flexDirection='column'
+              flexDirection="column"
               marginBottom={1}
               paddingLeft={1}
-              borderStyle='single'
+              borderStyle="single"
               borderColor={isSelected ? '#c4b5fd' : 'gray'}
             >
               {/* Title */}

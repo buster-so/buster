@@ -14,7 +14,7 @@ describe('ToolBadge', () => {
 
   it('should render EXECUTE badge with orange color', () => {
     const { lastFrame } = render(
-      <ToolBadge tool='EXECUTE' filePath='/Users/test/project/test.sh' />
+      <ToolBadge tool="EXECUTE" filePath="/Users/test/project/test.sh" />
     );
 
     expect(lastFrame()).toContain('EXECUTE');
@@ -22,7 +22,7 @@ describe('ToolBadge', () => {
   });
 
   it('should render WRITE badge with magenta color', () => {
-    const { lastFrame } = render(<ToolBadge tool='WRITE' filePath='/Users/test/project/file.ts' />);
+    const { lastFrame } = render(<ToolBadge tool="WRITE" filePath="/Users/test/project/file.ts" />);
 
     expect(lastFrame()).toContain('WRITE');
     expect(lastFrame()).toContain('(file.ts)');
@@ -30,7 +30,7 @@ describe('ToolBadge', () => {
 
   it('should render READ badge with blue color', () => {
     const { lastFrame } = render(
-      <ToolBadge tool='READ' filePath='/Users/test/project/readme.md' />
+      <ToolBadge tool="READ" filePath="/Users/test/project/readme.md" />
     );
 
     expect(lastFrame()).toContain('READ');
@@ -39,7 +39,7 @@ describe('ToolBadge', () => {
 
   it('should render UPDATE badge with cyan color', () => {
     const { lastFrame } = render(
-      <ToolBadge tool='UPDATE' filePath='/Users/test/project/config.json' />
+      <ToolBadge tool="UPDATE" filePath="/Users/test/project/config.json" />
     );
 
     expect(lastFrame()).toContain('UPDATE');
@@ -48,7 +48,7 @@ describe('ToolBadge', () => {
 
   it('should use custom color when provided', () => {
     const { lastFrame } = render(
-      <ToolBadge tool='EXECUTE' filePath='/Users/test/project/test.sh' color='red' />
+      <ToolBadge tool="EXECUTE" filePath="/Users/test/project/test.sh" color="red" />
     );
 
     expect(lastFrame()).toContain('EXECUTE');
@@ -57,7 +57,7 @@ describe('ToolBadge', () => {
 
   it('should display relative path from getRelativePath', () => {
     const { lastFrame } = render(
-      <ToolBadge tool='READ' filePath='/Users/test/project/src/components/message.tsx' />
+      <ToolBadge tool="READ" filePath="/Users/test/project/src/components/message.tsx" />
     );
 
     expect(lastFrame()).toContain('(src/components/message.tsx)');

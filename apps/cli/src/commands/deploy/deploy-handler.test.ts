@@ -596,12 +596,15 @@ describe('deploy-handler', () => {
 
       // 3. Duplicate errors (from model3)
       const hasDuplicateErrors = allErrors.some(
-        (e: string) => e.includes('Duplicate dimension name') || e.includes('Duplicate measure name')
+        (e: string) =>
+          e.includes('Duplicate dimension name') || e.includes('Duplicate measure name')
       );
       expect(hasDuplicateErrors).toBe(true);
 
       // Should have failures from multiple files
-      const filesWithErrors = new Set((validationError as any).parseFailures.map((f: { file: string; error: string }) => f.file));
+      const filesWithErrors = new Set(
+        (validationError as any).parseFailures.map((f: { file: string; error: string }) => f.file)
+      );
       expect(filesWithErrors.size).toBeGreaterThanOrEqual(2); // At least 2 different files had errors
 
       // Verify error output was logged

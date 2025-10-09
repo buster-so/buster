@@ -1,5 +1,6 @@
 // Export update command components
 
+export { createUpdateCommand } from './command';
 export {
   getDirectUpdateInstructions,
   getHomebrewUpdateInstructions,
@@ -13,4 +14,3 @@ export {
   updateHandler,
 } from './update-handler';
 export { type UpdateOptions, UpdateOptionsSchema, type UpdateResult } from './update-schemas';
-export { createUpdateCommand } from './command';

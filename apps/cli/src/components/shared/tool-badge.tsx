@@ -17,8 +17,8 @@ export function ToolBadge({ tool, filePath, color }: ToolBadgeProps) {
   const badgeColor = color || UI_CONSTANTS.TOOL_COLORS[tool];
 
   return (
-    <Box flexDirection='row'>
-      <Text bold color='white' backgroundColor={badgeColor}>
+    <Box flexDirection="row">
+      <Text bold color="white" backgroundColor={badgeColor}>
         {tool}
       </Text>
       <Text color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}> ({relativePath})</Text>

@@ -21,6 +21,7 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
   const { args, result } = message;
 
   // Get command description and output based on tool type
+  // biome-ignore lint/correctness/noUnusedVariables: false positive
   let description = '';
   let output = '';
   let exitCode: number | undefined;
@@ -38,7 +39,7 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
       description = `Search for "${args.pattern}"${args.glob ? ` in ${args.glob}` : ''}`;
     }
     if (result && 'matches' in result) {
-      output = result.matches.map((m: any) => `${m.path}:${m.lineNum}: ${m.lineText}`).join('\n');
+      output = result.matches.map((m) => `${m.path}:${m.lineNum}: ${m.lineText}`).join('\n');
       success = result.totalMatches > 0;
     }
   } else if (message.kind === 'ls') {
@@ -56,10 +57,10 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
   const displayLines = getLastLines(output, UI_CONSTANTS.LINE_LIMITS.DEFAULT_PREVIEW, isExpanded);
 
   return (
-    <Box flexDirection='column' marginBottom={1}>
+    <Box flexDirection="column" marginBottom={1}>
       {/* EXECUTE badge with actual command in parentheses */}
-      <Box flexDirection='row'>
-        <Text bold color='white' backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
+      <Box flexDirection="row">
+        <Text bold color="white" backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
           EXECUTE
         </Text>
         <Text color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}> ({args.command})</Text>

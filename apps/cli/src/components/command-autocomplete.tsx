@@ -19,7 +19,7 @@ export function CommandAutocomplete({
   }
 
   return (
-    <Box flexDirection='column'>
+    <Box flexDirection="column">
       {displayCommands.map((command, index) => {
         const isSelected = index === selectedIndex;
         const commandText = `/${command.name}`;

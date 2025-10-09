@@ -216,16 +216,16 @@ export function Auth({ apiKey, host, local, cloud, clear, noSave, show }: AuthPr
 
   if (step === 'host') {
     return (
-      <Box flexDirection='column'>
+      <Box flexDirection="column">
         {existingCreds && (
           <Box marginBottom={1}>
-            <Text color='yellow'>⚠️ Existing credentials found. They will be overwritten.</Text>
+            <Text color="yellow">⚠️ Existing credentials found. They will be overwritten.</Text>
           </Box>
         )}
 
         <Box>
           <Text>Enter your Buster API host (default: {DEFAULT_HOST}): </Text>
-          <Text color='cyan'>{currentInput}</Text>
+          <Text color="cyan">{currentInput}</Text>
           <Text inverse> </Text>
         </Box>
 
@@ -242,28 +242,28 @@ export function Auth({ apiKey, host, local, cloud, clear, noSave, show }: AuthPr
     const maskedInput = '*'.repeat(currentInput.length);
 
     return (
-      <Box flexDirection='column'>
+      <Box flexDirection="column">
         {existingCreds && (
           <Box marginBottom={1}>
-            <Text color='yellow'>⚠️ Existing credentials found. They will be overwritten.</Text>
+            <Text color="yellow">⚠️ Existing credentials found. They will be overwritten.</Text>
           </Box>
         )}
 
         {/* Show the host that was entered */}
         <Box marginBottom={1}>
           <Text>Host: </Text>
-          <Text color='green'>{hostValue || DEFAULT_HOST}</Text>
+          <Text color="green">{hostValue || DEFAULT_HOST}</Text>
         </Box>
 
         {error && (
           <Box marginBottom={1}>
-            <Text color='red'>❌ {error}</Text>
+            <Text color="red">❌ {error}</Text>
           </Box>
         )}
 
         <Box>
           <Text>Enter your API key: </Text>
-          <Text color='cyan'>{maskedInput}</Text>
+          <Text color="cyan">{maskedInput}</Text>
           <Text inverse> </Text>
         </Box>
 
@@ -283,21 +283,21 @@ export function Auth({ apiKey, host, local, cloud, clear, noSave, show }: AuthPr
     const maskedKey = apiKeyValue.length > 6 ? `****${apiKeyValue.slice(-6)}` : '****';
 
     return (
-      <Box flexDirection='column'>
+      <Box flexDirection="column">
         {/* Show what we're validating */}
         <Box marginBottom={1}>
           <Text>Host: </Text>
-          <Text color='green'>{displayHost}</Text>
+          <Text color="green">{displayHost}</Text>
         </Box>
 
         <Box marginBottom={1}>
           <Text>API Key: </Text>
-          <Text color='green'>{maskedKey}</Text>
+          <Text color="green">{maskedKey}</Text>
         </Box>
 
         <Box>
           <Text>
-            <Spinner type='dots' /> Validating credentials...
+            <Spinner type="dots" /> Validating credentials...
           </Text>
         </Box>
       </Box>

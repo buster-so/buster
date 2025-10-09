@@ -45,7 +45,7 @@ describe('ContentLines', () => {
 
   it('should use custom color when provided', () => {
     const lines = ['colored line'];
-    const { lastFrame } = render(<ContentLines lines={lines} color='#ff0000' />);
+    const { lastFrame } = render(<ContentLines lines={lines} color="#ff0000" />);
 
     expect(lastFrame()).toContain('colored line');
   });

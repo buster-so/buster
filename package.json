@@ -49,13 +49,13 @@
   "dependencies": {
     "dotenv": "catalog:",
     "dotenv-cli": "^10.0.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.18.1",
     "tsx": "catalog:",
-    "turbo": "^2.5.7",
+    "turbo": "^2.5.8",
     "vitest": "catalog:"
   },
   "peerDependencies": {
