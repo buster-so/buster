@@ -40,7 +40,7 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
   return (
     <div className="px-3 pt-3 pb-3 min-w-[420px] min-h-[420px] flex flex-col gap-y-3 flex-1 h-full">
       {assetType === 'metric_file' ? (
-        <MetricScreenshotContainer assetId={assetId} screenshotUrl={screenshotUrl} />
+        <MetricScreenshotContainer key={assetId} assetId={assetId} screenshotUrl={screenshotUrl} />
       ) : (
         <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
       )}
@@ -157,13 +157,11 @@ const MetricScreenshotContainer = ({
   );
 
   const isLoadingContent =
-    (!isFetchedMetric || !isFetchedMetricData) && !isErrorMetric && !isErrorMetricData;
+    !isFetchedMetric || !isFetchedMetricData || isErrorMetric || isErrorMetricData;
 
   useSetTimeout(() => {
     setCanFetchData(true);
-  }, 1500);
-
-  console.log('isFetchedMetricData', isFetchedMetricData, canFetchData);
+  }, 1250);
 
   return (
     <AnimatePresence mode="wait">
@@ -179,7 +177,7 @@ const MetricScreenshotContainer = ({
           <ScreenshotImage
             screenshotUrl={screenshotUrl}
             assetType={'metric_file'}
-            className="animate-pulse"
+            className={cn(canFetchData && 'animate-pulse')}
           />
         ) : (
           <MetricChartCard
