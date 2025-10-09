@@ -48,12 +48,15 @@ jobs:
 
       - name: Verify Sharp for build phase
         run: |
+          pnpm install -g sharp
           echo "🔍 Verifying Sharp is available for build..."
+          cd packages/server-shared
           if pnpm list sharp --depth=0 2>/dev/null | grep -q "sharp"; then
             echo "✅ Sharp is installed and available for build"
             pnpm list sharp --depth=0
           else
-            echo "⚠️  Sharp not found in dependencies (this may be okay if not needed for build)"
+            echo "❌ ERROR: Sharp not found in @buster/server-shared!"
+            exit 1
           fi
 
       - name: Mount Turbo cache sticky disk
