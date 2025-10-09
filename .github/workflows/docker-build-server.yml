@@ -84,7 +84,22 @@ jobs:
           cd /tmp/prod-deps
 
           # Install with platform-specific flags for Sharp linux-x64 binaries
-          pnpm install --frozen-lockfile --prod --config.platform=linux --config.arch=x64 --config.libc=glibc
+          # Use npm_config env vars which pnpm respects for optional deps
+          npm_config_platform=linux \
+          npm_config_arch=x64 \
+          npm_config_libc=glibc \
+          pnpm install --frozen-lockfile --prod --include-optional
+
+          # Verify Sharp was installed correctly for linux-x64
+          echo "🔍 Verifying Sharp installation..."
+          if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -d "node_modules/@img/sharp-linuxmusl-x64" ]; then
+            echo "✅ Sharp linux-x64 binaries found"
+          else
+            echo "❌ Sharp linux-x64 binaries NOT found, attempting manual installation..."
+            cd packages/server-shared
+            npm_config_platform=linux npm_config_arch=x64 npm_config_libc=glibc pnpm add sharp --force
+            cd ../..
+          fi
 
           # Copy back to workspace
           cd -
