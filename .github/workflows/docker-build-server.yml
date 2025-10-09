@@ -84,29 +84,27 @@ jobs:
           cd /tmp/prod-deps
 
           # Install with platform-specific flags for Sharp linux-x64 binaries
-          # Set up .npmrc to force linux-x64 platform for optional dependencies
-          cat > .npmrc << EOF
-          platform=linux
-          arch=x64
-          libc=glibc
-          EOF
+          # Configure pnpm supportedArchitectures for linux-x64 with glibc
+          echo "supportedArchitectures[os][]=linux" > .npmrc
+          echo "supportedArchitectures[cpu][]=x64" >> .npmrc
+          echo "supportedArchitectures[libc][]=glibc" >> .npmrc
+          echo "enable-pre-post-scripts=true" >> .npmrc
 
           echo "📦 Installing production dependencies with linux-x64 Sharp binaries..."
-          pnpm install --frozen-lockfile --prod
+          cat .npmrc
+          pnpm install --frozen-lockfile --prod --ignore-scripts=false
 
           # Verify Sharp was installed correctly for linux-x64
           echo "🔍 Verifying Sharp installation..."
-          if [ -d "node_modules/@img/sharp-linux-x64" ]; then
-            echo "✅ Sharp linux-x64 binaries found"
-            ls -la node_modules/@img/sharp-linux-x64/
-          elif [ -d "node_modules/@img/sharp-linuxmusl-x64" ]; then
-            echo "✅ Sharp linuxmusl-x64 binaries found"
-            ls -la node_modules/@img/sharp-linuxmusl-x64/
+          if [ -d "packages/server-shared/node_modules/sharp" ]; then
+            echo "✅ Sharp package found"
+            ls -la packages/server-shared/node_modules/sharp/
+            echo "Checking for Sharp binaries..."
+            find packages/server-shared/node_modules/sharp -name "*.node" -o -name "sharp-*" | head -10
           else
-            echo "❌ WARNING: Sharp linux-x64 binaries NOT found!"
-            echo "Available Sharp binaries:"
-            ls -la node_modules/@img/ || echo "No @img directory found"
-            echo "This may cause runtime errors in the Docker container"
+            echo "❌ WARNING: Sharp package NOT found!"
+            echo "Searching for Sharp in workspace..."
+            find . -path "*/node_modules/sharp" -type d | head -5
           fi
 
           # Copy back to workspace
