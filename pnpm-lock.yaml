@@ -1395,6 +1395,9 @@ importers:
 
   packages/test-utils:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.5
+        version: 2.2.5
       '@buster/database':
         specifier: workspace:*
         version: link:../database
@@ -1415,6 +1418,9 @@ importers:
 
   packages/vitest-config:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.5
+        version: 2.2.5
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -1445,6 +1451,9 @@ importers:
 
   packages/web-tools:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.5
+        version: 2.2.5
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
