@@ -11,8 +11,8 @@ import {
   addToolCall,
   addToolResult,
   createMessageAccumulatorState,
-  resetStepState,
   type MessageAccumulatorState,
+  resetStepState,
 } from './message-accumulator';
 
 /**
@@ -38,7 +38,14 @@ export interface RunAnalyticsEngineerAgentParams {
  * Messages are emitted via callback for immediate UI updates and saved to disk for persistence
  */
 export async function runAnalyticsEngineerAgent(params: RunAnalyticsEngineerAgentParams) {
-  const { chatId, workingDirectory, isInResearchMode, onThinkingStateChange, onMessageUpdate, abortSignal } = params;
+  const {
+    chatId,
+    workingDirectory,
+    isInResearchMode,
+    onThinkingStateChange,
+    onMessageUpdate,
+    abortSignal,
+  } = params;
 
   // Load conversation history to maintain context across sessions
   const conversation = await loadConversation(chatId, workingDirectory);
@@ -108,7 +115,10 @@ export async function runAnalyticsEngineerAgent(params: RunAnalyticsEngineerAgen
     }
 
     if (part.type === 'reasoning-end') {
-      console.info('[DEBUGGING] Reasoning stream ended, total accumulated length:', accumulatedReasoning.length);
+      console.info(
+        '[DEBUGGING] Reasoning stream ended, total accumulated length:',
+        accumulatedReasoning.length
+      );
       if (accumulatedReasoning) {
         accumulatorState = addReasoningContent(accumulatorState, accumulatedReasoning);
         onMessageUpdate?.(accumulatorState.messages);
@@ -122,7 +132,10 @@ export async function runAnalyticsEngineerAgent(params: RunAnalyticsEngineerAgen
     }
 
     if (part.type === 'text-end') {
-      console.info('[DEBUGGING] Text stream ended, total accumulated length:', accumulatedText.length);
+      console.info(
+        '[DEBUGGING] Text stream ended, total accumulated length:',
+        accumulatedText.length
+      );
       if (accumulatedText) {
         accumulatorState = addTextContent(accumulatorState, accumulatedText);
         onMessageUpdate?.(accumulatorState.messages);
@@ -138,7 +151,12 @@ export async function runAnalyticsEngineerAgent(params: RunAnalyticsEngineerAgen
 
     if (part.type === 'tool-result') {
       console.info('[DEBUGGING] Tool result for:', part.toolName, 'ID:', part.toolCallId);
-      accumulatorState = addToolResult(accumulatorState, part.toolCallId, part.toolName, part.output);
+      accumulatorState = addToolResult(
+        accumulatorState,
+        part.toolCallId,
+        part.toolName,
+        part.output
+      );
       onMessageUpdate?.(accumulatorState.messages);
     }
 
@@ -149,6 +167,9 @@ export async function runAnalyticsEngineerAgent(params: RunAnalyticsEngineerAgen
     }
   }
 
-  console.info('[DEBUGGING] Stream processing complete. Total messages in conversation:', accumulatorState.messages.length);
+  console.info(
+    '[DEBUGGING] Stream processing complete. Total messages in conversation:',
+    accumulatorState.messages.length
+  );
   onThinkingStateChange?.(false);
 }

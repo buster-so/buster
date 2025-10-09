@@ -399,7 +399,7 @@ function transformToolInvocation(invocation: ToolInvocation): AgentMessage | nul
         result,
       };
 
-    case TOOL_NAMES.TASK:
+    case TOOL_NAMES.TASK: {
       if (!isTaskArgs(args)) {
         console.warn('Invalid task args:', args);
         return null;
@@ -427,6 +427,7 @@ function transformToolInvocation(invocation: ToolInvocation): AgentMessage | nul
             }
           : resultWithoutMessages,
       };
+    }
 
     case TOOL_NAMES.IDLE:
       if (!isIdleArgs(args)) {

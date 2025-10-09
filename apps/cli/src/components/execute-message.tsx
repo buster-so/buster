@@ -56,10 +56,10 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
   const displayLines = getLastLines(output, UI_CONSTANTS.LINE_LIMITS.DEFAULT_PREVIEW, isExpanded);
 
   return (
-    <Box flexDirection='column' marginBottom={1}>
+    <Box flexDirection="column" marginBottom={1}>
       {/* EXECUTE badge with actual command in parentheses */}
-      <Box flexDirection='row'>
-        <Text bold color='white' backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
+      <Box flexDirection="row">
+        <Text bold color="white" backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
           EXECUTE
         </Text>
         <Text color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}> ({args.command})</Text>

@@ -391,7 +391,7 @@ export function MultiLineTextInput({
         return (
           <Box>
             <Text>\ </Text>
-            <Text color='yellow'>(press 'n' for newline)</Text>
+            <Text color="yellow">(press 'n' for newline)</Text>
           </Box>
         );
       }
@@ -440,19 +440,19 @@ export function MultiLineTextInput({
         return (
           <Box>
             <Text>{lines[0]}</Text>
-            {expectingNewline && <Text color='yellow'> (press 'n' for newline)</Text>}
+            {expectingNewline && <Text color="yellow"> (press 'n' for newline)</Text>}
           </Box>
         );
       }
 
       return (
-        <Box flexDirection='column'>
+        <Box flexDirection="column">
           {lines.map((line, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: Lines position stable during editing
             <Box key={index}>
               <Text>{line || ' '}</Text>
               {index === lines.length - 1 && expectingNewline && (
-                <Text color='yellow'> (press 'n' for newline)</Text>
+                <Text color="yellow"> (press 'n' for newline)</Text>
               )}
             </Box>
           ))}
@@ -469,13 +469,13 @@ export function MultiLineTextInput({
       return (
         <Box>
           <Text>{lines[0]}</Text>
-          {expectingNewline && <Text color='yellow'> (press 'n' for newline)</Text>}
+          {expectingNewline && <Text color="yellow"> (press 'n' for newline)</Text>}
         </Box>
       );
     }
 
     return (
-      <Box flexDirection='column'>
+      <Box flexDirection="column">
         {lines.map((line, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: Lines position stable during editing
           <Text key={index}>{line || ' '}</Text>

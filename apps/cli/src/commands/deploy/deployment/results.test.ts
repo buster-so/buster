@@ -101,7 +101,13 @@ describe('formatDeploymentSummary', () => {
         updated: ['CHANGELOG.md'],
         deleted: ['deprecated.md'],
         failed: [{ name: 'failed.md', error: 'Storage error' }],
-        summary: { createdCount: 2, updatedCount: 1, deletedCount: 1, totalDocs: 4, failedCount: 1 },
+        summary: {
+          createdCount: 2,
+          updatedCount: 1,
+          deletedCount: 1,
+          totalDocs: 4,
+          failedCount: 1,
+        },
       },
     };
 
@@ -130,7 +136,13 @@ describe('formatDeploymentSummary', () => {
         updated: ['CHANGELOG.md'],
         deleted: ['old1.md', 'old2.md'],
         failed: [],
-        summary: { createdCount: 3, updatedCount: 1, deletedCount: 2, totalDocs: 6, failedCount: 0 },
+        summary: {
+          createdCount: 3,
+          updatedCount: 1,
+          deletedCount: 2,
+          totalDocs: 6,
+          failedCount: 0,
+        },
       },
     };
 
@@ -218,7 +230,13 @@ describe('formatDeploymentSummary', () => {
           { name: 'doc1.md', error: 'Doc error 1' },
           { name: 'doc2.md', error: 'Doc error 2' },
         ],
-        summary: { createdCount: 0, updatedCount: 0, deletedCount: 0, totalDocs: 0, failedCount: 2 },
+        summary: {
+          createdCount: 0,
+          updatedCount: 0,
+          deletedCount: 0,
+          totalDocs: 0,
+          failedCount: 2,
+        },
       },
     };
 

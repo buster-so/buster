@@ -45,11 +45,11 @@ export function SettingsCommand({ vimMode, toggle, show }: SettingsCommandProps)
 
   if (show || (!vimMode && !toggle)) {
     return (
-      <Box flexDirection='column' paddingX={2} paddingY={1}>
+      <Box flexDirection="column" paddingX={2} paddingY={1}>
         {message && <Text>{message}</Text>}
-        <Box flexDirection='column' marginTop={1}>
+        <Box flexDirection="column" marginTop={1}>
           <Text>
-            <Text color='cyan'>Vim Mode:</Text> {settings.vimMode ? 'enabled' : 'disabled'}
+            <Text color="cyan">Vim Mode:</Text> {settings.vimMode ? 'enabled' : 'disabled'}
           </Text>
         </Box>
         <Box marginTop={1}>

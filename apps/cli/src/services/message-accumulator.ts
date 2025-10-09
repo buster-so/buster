@@ -64,8 +64,13 @@ export function addReasoningContent(
   }
 
   // Append to existing assistant message
-  if (state.currentStepAssistantMessage && Array.isArray(state.currentStepAssistantMessage.content)) {
-    (state.currentStepAssistantMessage.content as Array<typeof reasoningContent>).push(reasoningContent);
+  if (
+    state.currentStepAssistantMessage &&
+    Array.isArray(state.currentStepAssistantMessage.content)
+  ) {
+    (state.currentStepAssistantMessage.content as Array<typeof reasoningContent>).push(
+      reasoningContent
+    );
   }
 
   return state;
@@ -99,7 +104,10 @@ export function addTextContent(
   }
 
   // Append to existing assistant message
-  if (state.currentStepAssistantMessage && Array.isArray(state.currentStepAssistantMessage.content)) {
+  if (
+    state.currentStepAssistantMessage &&
+    Array.isArray(state.currentStepAssistantMessage.content)
+  ) {
     (state.currentStepAssistantMessage.content as Array<typeof textContent>).push(textContent);
   }
 
@@ -138,8 +146,13 @@ export function addToolCall(
   }
 
   // Append to existing assistant message (critical: use tracked reference!)
-  if (state.currentStepAssistantMessage && Array.isArray(state.currentStepAssistantMessage.content)) {
-    (state.currentStepAssistantMessage.content as Array<typeof toolCallContent>).push(toolCallContent);
+  if (
+    state.currentStepAssistantMessage &&
+    Array.isArray(state.currentStepAssistantMessage.content)
+  ) {
+    (state.currentStepAssistantMessage.content as Array<typeof toolCallContent>).push(
+      toolCallContent
+    );
   }
 
   return state;

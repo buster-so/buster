@@ -24,7 +24,7 @@ export function WriteMessage({ message }: WriteMessageProps) {
 
   // For each file, show its content
   return (
-    <Box flexDirection='column' marginBottom={1}>
+    <Box flexDirection="column" marginBottom={1}>
       {args.files.map((file, fileIdx) => {
         // Split content into lines
         const contentLines = file.content.split('\n');
@@ -43,11 +43,11 @@ export function WriteMessage({ message }: WriteMessageProps) {
         return (
           <Box
             key={fileIdx}
-            flexDirection='column'
+            flexDirection="column"
             marginBottom={fileIdx < args.files.length - 1 ? 1 : 0}
           >
             {/* WRITE badge with relative file path */}
-            <ToolBadge tool='WRITE' filePath={file.path} />
+            <ToolBadge tool="WRITE" filePath={file.path} />
 
             {/* File content lines - always show with indentation */}
             {contentLines.length > 0 && (

@@ -76,8 +76,8 @@ export function EditMessage({ message }: EditMessageProps) {
 
   if (!diffString) {
     return (
-      <Box flexDirection='column' marginBottom={1}>
-        <ToolBadge tool='UPDATE' filePath={result.filePath} />
+      <Box flexDirection="column" marginBottom={1}>
+        <ToolBadge tool="UPDATE" filePath={result.filePath} />
         <StatusLine
           message={
             result.success
@@ -97,14 +97,14 @@ export function EditMessage({ message }: EditMessageProps) {
   const displayLines = isExpanded ? lines : lines.slice(0, UI_CONSTANTS.LINE_LIMITS.DIFF_PREVIEW);
 
   return (
-    <Box flexDirection='column' marginBottom={1}>
+    <Box flexDirection="column" marginBottom={1}>
       {/* UPDATE badge with file path */}
-      <ToolBadge tool='UPDATE' filePath={result.filePath} />
+      <ToolBadge tool="UPDATE" filePath={result.filePath} />
 
       {/* Summary line */}
       <StatusLine
         message={`Updated with ${additions} addition${additions !== 1 ? 's' : ''} and ${removals} removal${removals !== 1 ? 's' : ''}`}
-        status='success'
+        status="success"
       />
 
       {/* Diff lines - always show with indentation */}

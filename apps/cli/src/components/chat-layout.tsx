@@ -9,18 +9,18 @@ import { SimpleBigText } from './simple-big-text';
 
 export const ChatTitle = memo(function ChatTitle() {
   return (
-    <Box justifyContent='center'>
-      <SimpleBigText text='Buster' color='#f5f3ff' />
+    <Box justifyContent="center">
+      <SimpleBigText text="Buster" color="#f5f3ff" />
     </Box>
   );
 });
 
 export const ChatVersionTagline = memo(function ChatVersionTagline() {
   return (
-    <Box justifyContent='center' marginTop={1}>
+    <Box justifyContent="center" marginTop={1}>
       <Text>
-        <Text color='#a78bfa'>BUSTER v0.3.1</Text>
-        <Text color='#c4b5fd'> — Your AI Data Worker.</Text>
+        <Text color="#a78bfa">BUSTER v0.3.1</Text>
+        <Text color="#c4b5fd"> — Your AI Data Worker.</Text>
       </Text>
     </Box>
   );
@@ -36,9 +36,9 @@ export const ChatIntroText = memo(function ChatIntroText() {
   );
 
   return (
-    <Box flexDirection='column' alignItems='center' marginTop={1}>
+    <Box flexDirection="column" alignItems="center" marginTop={1}>
       {lines.map((line) => (
-        <Text key={line} color='#e0e7ff'>
+        <Text key={line} color="#e0e7ff">
           {line}
         </Text>
       ))}
@@ -49,15 +49,15 @@ export const ChatIntroText = memo(function ChatIntroText() {
 export function ChatStatusBar() {
   return (
     <Box
-      borderStyle='single'
-      borderColor='#4338ca'
+      borderStyle="single"
+      borderColor="#4338ca"
       paddingX={1}
       marginTop={2}
-      justifyContent='space-between'
-      width='100%'
+      justifyContent="space-between"
+      width="100%"
     >
-      <Text color='#c4b5fd'>Auto (Off) — all actions require approval · shift+tab cycles</Text>
-      <Text color='#c4b5fd'>BUSTER Engine</Text>
+      <Text color="#c4b5fd">Auto (Off) — all actions require approval · shift+tab cycles</Text>
+      <Text color="#c4b5fd">BUSTER Engine</Text>
     </Box>
   );
 }
@@ -267,9 +267,9 @@ export function ChatInput({
   };
 
   return (
-    <Box flexDirection='column'>
-      <Box borderStyle='single' borderColor='#4c1d95' paddingX={1} width='100%' flexDirection='row'>
-        <Text color='#a855f7' bold>
+    <Box flexDirection="column">
+      <Box borderStyle="single" borderColor="#4c1d95" paddingX={1} width="100%" flexDirection="row">
+        <Text color="#a855f7" bold>
           ❯{' '}
         </Text>
         <Box flexGrow={1}>
@@ -328,13 +328,13 @@ export function ChatHistory({ entries }: ChatHistoryProps) {
   }
 
   return (
-    <Box flexDirection='column' marginTop={1} width='100%'>
+    <Box flexDirection="column" marginTop={1} width="100%">
       {entries.map((entry) => {
         const lines = entry.value.split('\n');
         return (
-          <Box key={entry.id} flexDirection='column'>
+          <Box key={entry.id} flexDirection="column">
             {lines.map((line, index) => (
-              <Text key={`${entry.id}-line-${index}`} color='#e0e7ff'>
+              <Text key={`${entry.id}-line-${index}`} color="#e0e7ff">
                 {index === 0 ? '❯ ' : '  '}
                 {line}
               </Text>

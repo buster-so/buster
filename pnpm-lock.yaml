@@ -123,6 +123,9 @@ importers:
 
   apps/cli:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.5
+        version: 2.2.5
       '@buster/ai':
         specifier: workspace:*
         version: link:../../packages/ai
@@ -133,29 +136,29 @@ importers:
         specifier: workspace:*
         version: link:../../packages/server-shared
       chalk:
-        specifier: ^5.6.0
-        version: 5.6.0
+        specifier: ^5.6.2
+        version: 5.6.2
       commander:
-        specifier: ^14.0.0
-        version: 14.0.0
+        specifier: ^14.0.1
+        version: 14.0.1
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
       ink:
-        specifier: ^6.2.3
-        version: 6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1)
+        specifier: ^6.3.1
+        version: 6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1)
       ink-big-text:
         specifier: ^2.0.0
-        version: 2.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))(react@19.1.1)
+        version: 2.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))(react@19.1.1)
       ink-gradient:
         specifier: ^3.0.0
-        version: 3.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))
+        version: 3.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))
       ink-spinner:
         specifier: ^5.0.0
-        version: 5.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))(react@19.1.1)
+        version: 5.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))(react@19.1.1)
       ink-text-input:
         specifier: ^6.0.0
-        version: 6.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))(react@19.1.1)
+        version: 6.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))(react@19.1.1)
       js-yaml:
         specifier: 'catalog:'
         version: 4.1.0
@@ -166,8 +169,8 @@ importers:
         specifier: 'catalog:'
         version: 19.1.1
       semver:
-        specifier: ^7.6.3
-        version: 7.7.2
+        specifier: ^7.7.3
+        version: 7.7.3
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -182,8 +185,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/vitest-config
       '@types/bun':
-        specifier: ^1.2.21
-        version: 1.2.21(@types/react@19.1.13)
+        specifier: ^1.2.23
+        version: 1.2.23(@types/react@19.1.13)
       '@types/js-yaml':
         specifier: 'catalog:'
         version: 4.0.9
@@ -194,14 +197,14 @@ importers:
         specifier: 'catalog:'
         version: 19.1.13
       '@types/semver':
-        specifier: ^7.5.8
+        specifier: ^7.7.1
         version: 7.7.1
       ink-testing-library:
         specifier: ^4.0.0
         version: 4.0.0(@types/react@19.1.13)
       react-devtools-core:
-        specifier: ^6.1.5
-        version: 6.1.5
+        specifier: ^7.0.0
+        version: 7.0.0
       tsx:
         specifier: 'catalog:'
         version: 4.20.5
@@ -221,6 +224,9 @@ importers:
 
   apps/momentic:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.5
+        version: 2.2.5
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../../packages/env-utils
@@ -235,8 +241,8 @@ importers:
         version: 3.25.76
     devDependencies:
       momentic:
-        specifier: ^2.17.3
-        version: 2.17.3(@types/node@24.3.1)
+        specifier: ^2.17.8
+        version: 2.17.8(@types/node@24.3.1)
       tsx:
         specifier: 'catalog:'
         version: 4.20.5
@@ -6199,9 +6205,6 @@ packages:
   '@types/braces@3.0.5':
     resolution: {integrity: sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==}
 
-  '@types/bun@1.2.21':
-    resolution: {integrity: sha512-NiDnvEqmbfQ6dmZ3EeUO577s4P5bf4HCTXtI6trMc6f6RzirY5IrF3aIookuSpyslFzrnvv2lmEWv5HyC1X79A==}
-
   '@types/bun@1.2.23':
     resolution: {integrity: sha512-le8ueOY5b6VKYf19xT3McVbXqLqmxzPXHsQT/q9JHgikJ2X22wyTW3g3ohz2ZMnp7dod6aduIiq8A14Xyimm0A==}
 
@@ -7017,11 +7020,6 @@ packages:
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
-  bun-types@1.2.21:
-    resolution: {integrity: sha512-sa2Tj77Ijc/NTLS0/Odjq/qngmEPZfbfnOERi0KRUYhT9R8M4VBioWVmMWE5GrYbKMc+5lVybXygLdibHaqVqw==}
-    peerDependencies:
-      '@types/react': ^19
-
   bun-types@1.2.23:
     resolution: {integrity: sha512-R9f0hKAZXgFU3mlrA0YpE/fiDvwV0FT9rORApt2aQVWSuJDzZOyB5QLc0N/4HF57CS8IXJ6+L5E4W1bW6NS2Aw==}
     peerDependencies:
@@ -7110,8 +7108,8 @@ packages:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
 
-  chalk@5.6.0:
-    resolution: {integrity: sha512-46QrSQFyVSEyYAgQ22hQ+zDa60YHA4fBstHmtSApj1Y5vKtG27fWowW03jCk5KcbXEWPZUIR894aARCA/G1kfQ==}
+  chalk@5.6.2:
+    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   character-entities-html4@2.1.0:
@@ -7324,8 +7322,8 @@ packages:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
 
-  commander@14.0.0:
-    resolution: {integrity: sha512-2uM9rYjPvyq39NwLRqaiLtWHyDC1FvryJDa2ATTVims5YAS4PupsEQsDvP14FqhFr0P49CYDugi59xaxJlTXRA==}
+  commander@14.0.1:
+    resolution: {integrity: sha512-2JkV3gUZUVrbNA+1sjBOYLsMZ5cEEl8GTFP2a4AVz5hvasAMCQ1D2l2le/cX+pV4N6ZU17zjUahLpIXRrnWL8A==}
     engines: {node: '>=20'}
 
   commander@2.20.3:
@@ -8881,13 +8879,13 @@ packages:
       ink: '>=5'
       react: '>=18'
 
-  ink@6.2.3:
-    resolution: {integrity: sha512-fQkfEJjKbLXIcVWEE3MvpYSnwtbbmRsmeNDNz1pIuOFlwE+UF2gsy228J36OXKZGWJWZJKUigphBSqCNMcARtg==}
+  ink@6.3.1:
+    resolution: {integrity: sha512-3wGwITGrzL6rkWsi2gEKzgwdafGn4ZYd3u4oRp+sOPvfoxEHlnoB5Vnk9Uy5dMRUhDOqF3hqr4rLQ4lEzBc2sQ==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/react': '>=19.0.0'
       react: '>=19.0.0'
-      react-devtools-core: ^4.19.1
+      react-devtools-core: ^6.1.2
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -9975,8 +9973,8 @@ packages:
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
 
-  momentic@2.17.3:
-    resolution: {integrity: sha512-PiAcdojIpywPU0gOR9MApgRsqxY3VgmLMpimJubkVNslFI+re9DBFI/9avdAIKdezZBCRgtx1dgVGDmKmSBx+g==}
+  momentic@2.17.8:
+    resolution: {integrity: sha512-SGURZaQsz3L/YoaCQskYRhDuR7WCki2D99+sPwXRTYW8RF8Y0ApMCC98cFr+k8+1Q4H9On/Tlw5O2KFtMME5zQ==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -10973,8 +10971,8 @@ packages:
       date-fns: ^2.28.0 || ^3.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  react-devtools-core@6.1.5:
-    resolution: {integrity: sha512-ePrwPfxAnB+7hgnEr8vpKxL9cmnp7F322t8oqcPshbIQQhDKgFDW4tjhF2wjVbdXF9O/nyuy3sQWd9JGpiLPvA==}
+  react-devtools-core@7.0.0:
+    resolution: {integrity: sha512-PrvNhTqVMuY7dDRJGg9lfP/66AcnToVOLX4+qXjXEBnSAMcEhdaNkCoEYIpOLMtspbbW71vioYKYnckpQ7KISQ==}
 
   react-dnd-html5-backend@16.0.1:
     resolution: {integrity: sha512-Wu3dw5aDJmOGw8WjH1I1/yTH+vlXEL4vmjk5p+MHxP8HuHJS1lAGeIdG/hze1AvNeXWo/JgULV87LyQOr+r5jw==}
@@ -11365,8 +11363,8 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
-  semver@7.7.2:
-    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
+  semver@7.7.3:
+    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -15515,7 +15513,7 @@ snapshots:
       https-proxy-agent: 7.0.6
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
-      semver: 7.7.2
+      semver: 7.7.3
       tar: 7.4.3
     transitivePeerDependencies:
       - encoding
@@ -16098,7 +16096,7 @@ snapshots:
       '@opentelemetry/instrumentation': 0.57.2(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.28.0
       forwarded-parse: 2.1.2
-      semver: 7.7.2
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -16232,7 +16230,7 @@ snapshots:
       '@types/shimmer': 1.2.0
       import-in-the-middle: 1.14.2
       require-in-the-middle: 7.5.2
-      semver: 7.7.2
+      semver: 7.7.3
       shimmer: 1.2.1
     transitivePeerDependencies:
       - supports-color
@@ -19077,7 +19075,7 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.36.0
       '@trigger.dev/core': 4.0.2
-      chalk: 5.6.0
+      chalk: 5.6.2
       cronstrue: 2.59.0
       debug: 4.4.1
       evt: 2.5.9
@@ -19099,7 +19097,7 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.36.0
       '@trigger.dev/core': 4.0.4
-      chalk: 5.6.0
+      chalk: 5.6.2
       cronstrue: 2.59.0
       debug: 4.4.1
       evt: 2.5.9
@@ -19149,12 +19147,6 @@ snapshots:
       '@babel/types': 7.28.4
 
   '@types/braces@3.0.5': {}
-
-  '@types/bun@1.2.21(@types/react@19.1.13)':
-    dependencies:
-      bun-types: 1.2.21(@types/react@19.1.13)
-    transitivePeerDependencies:
-      - '@types/react'
 
   '@types/bun@1.2.23(@types/react@19.1.13)':
     dependencies:
@@ -20227,11 +20219,6 @@ snapshots:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
-  bun-types@1.2.21(@types/react@19.1.13):
-    dependencies:
-      '@types/node': 24.3.1
-      '@types/react': 19.1.13
-
   bun-types@1.2.23(@types/react@19.1.13):
     dependencies:
       '@types/node': 22.18.1
@@ -20329,7 +20316,7 @@ snapshots:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
-  chalk@5.6.0: {}
+  chalk@5.6.2: {}
 
   character-entities-html4@2.1.0: {}
 
@@ -20539,7 +20526,7 @@ snapshots:
 
   commander@12.1.0: {}
 
-  commander@14.0.0: {}
+  commander@14.0.1: {}
 
   commander@2.20.3: {}
 
@@ -20984,7 +20971,7 @@ snapshots:
       '@one-ini/wasm': 0.1.1
       commander: 10.0.1
       minimatch: 9.0.1
-      semver: 7.7.2
+      semver: 7.7.3
 
   ee-first@1.1.1: {}
 
@@ -22183,45 +22170,45 @@ snapshots:
 
   ini@1.3.8: {}
 
-  ink-big-text@2.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))(react@19.1.1):
+  ink-big-text@2.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))(react@19.1.1):
     dependencies:
       cfonts: 3.3.0
-      ink: 6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1)
+      ink: 6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1)
       prop-types: 15.8.1
       react: 19.1.1
 
-  ink-gradient@3.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1)):
+  ink-gradient@3.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1)):
     dependencies:
       '@types/gradient-string': 1.1.6
       gradient-string: 2.0.2
-      ink: 6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1)
+      ink: 6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1)
       prop-types: 15.8.1
       strip-ansi: 7.1.0
 
-  ink-spinner@5.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))(react@19.1.1):
+  ink-spinner@5.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))(react@19.1.1):
     dependencies:
       cli-spinners: 2.9.2
-      ink: 6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1)
+      ink: 6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1)
       react: 19.1.1
 
   ink-testing-library@4.0.0(@types/react@19.1.13):
     optionalDependencies:
       '@types/react': 19.1.13
 
-  ink-text-input@6.0.0(ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1))(react@19.1.1):
+  ink-text-input@6.0.0(ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1))(react@19.1.1):
     dependencies:
-      chalk: 5.6.0
-      ink: 6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1)
+      chalk: 5.6.2
+      ink: 6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1)
       react: 19.1.1
       type-fest: 4.41.0
 
-  ink@6.2.3(@types/react@19.1.13)(react-devtools-core@6.1.5)(react@19.1.1):
+  ink@6.3.1(@types/react@19.1.13)(react-devtools-core@7.0.0)(react@19.1.1):
     dependencies:
       '@alcalzone/ansi-tokenize': 0.2.0
       ansi-escapes: 7.0.0
       ansi-styles: 6.2.1
       auto-bind: 5.0.1
-      chalk: 5.6.0
+      chalk: 5.6.2
       cli-boxes: 3.0.0
       cli-cursor: 4.0.0
       cli-truncate: 4.0.0
@@ -22243,7 +22230,7 @@ snapshots:
       yoga-layout: 3.2.1
     optionalDependencies:
       '@types/react': 19.1.13
-      react-devtools-core: 6.1.5
+      react-devtools-core: 7.0.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -22426,7 +22413,7 @@ snapshots:
       '@babel/parser': 7.28.0
       '@istanbuljs/schema': 0.1.3
       istanbul-lib-coverage: 3.2.2
-      semver: 7.7.2
+      semver: 7.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -22674,7 +22661,7 @@ snapshots:
       lodash.isstring: 4.0.1
       lodash.once: 4.1.1
       ms: 2.1.3
-      semver: 7.7.2
+      semver: 7.7.3
 
   juice@11.0.1:
     dependencies:
@@ -22972,7 +22959,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   markdown-it@14.1.0:
     dependencies:
@@ -23594,7 +23581,7 @@ snapshots:
 
   moment@2.30.1: {}
 
-  momentic@2.17.3(@types/node@24.3.1):
+  momentic@2.17.8(@types/node@24.3.1):
     dependencies:
       '@actions/exec': 1.1.1
       '@actions/io': 1.1.3
@@ -23613,7 +23600,7 @@ snapshots:
       ai: 5.0.44(zod@3.25.76)
       axios: 1.12.2
       body-parser: 1.20.3
-      chalk: 5.6.0
+      chalk: 5.6.2
       commander: 11.1.0
       cors: 2.8.5
       cron-validator: 1.4.0
@@ -23653,7 +23640,7 @@ snapshots:
       puppeteer-extra-plugin-recaptcha: 3.6.8(playwright-extra@4.3.6(playwright-core@1.52.0)(playwright@1.52.0))
       quote: 0.4.0
       safe-stable-stringify: 2.5.0
-      semver: 7.7.2
+      semver: 7.7.3
       set-cookie-parser: 2.7.1
       simple-git: 3.28.0
       socket.io: 4.8.1
@@ -23978,7 +23965,7 @@ snapshots:
       rollup: 4.50.0
       rollup-plugin-visualizer: 6.0.3(rollup@4.50.0)
       scule: 1.3.0
-      semver: 7.7.2
+      semver: 7.7.3
       serve-placeholder: 2.0.2
       serve-static: 2.2.0
       source-map: 0.7.6
@@ -24951,7 +24938,7 @@ snapshots:
       date-fns: 4.1.0
       react: 19.1.1
 
-  react-devtools-core@6.1.5:
+  react-devtools-core@7.0.0:
     dependencies:
       shell-quote: 1.8.3
       ws: 7.5.10
@@ -25423,7 +25410,7 @@ snapshots:
 
   semver@6.3.1: {}
 
-  semver@7.7.2: {}
+  semver@7.7.3: {}
 
   send@0.19.0:
     dependencies:
@@ -25827,7 +25814,7 @@ snapshots:
       esbuild: 0.25.9
       esbuild-register: 3.6.0(esbuild@0.25.9)
       recast: 0.23.11
-      semver: 7.7.2
+      semver: 7.7.3
       ws: 8.18.3
     optionalDependencies:
       prettier: 3.6.2

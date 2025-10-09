@@ -38,30 +38,30 @@ export function UpdateCommand({ check, force, yes }: UpdateCommandProps) {
 
   if (status === 'error') {
     return (
-      <Box flexDirection='column'>
-        <Text color='red'>✗ Update failed</Text>
-        <Text color='red'>{error}</Text>
+      <Box flexDirection="column">
+        <Text color="red">✗ Update failed</Text>
+        <Text color="red">{error}</Text>
       </Box>
     );
   }
 
   if (status === 'done') {
     return (
-      <Box flexDirection='column'>
+      <Box flexDirection="column">
         <Text>{message}</Text>
       </Box>
     );
   }
 
   return (
-    <Box flexDirection='column'>
+    <Box flexDirection="column">
       <Box>
-        <Text color='blue'>
-          <Spinner type='dots' />
+        <Text color="blue">
+          <Spinner type="dots" />
         </Text>
         <Text> {status === 'checking' ? 'Checking for updates...' : 'Updating Buster CLI...'}</Text>
       </Box>
-      <Text color='dim'>Current version: v{getCurrentVersion()}</Text>
+      <Text color="dim">Current version: v{getCurrentVersion()}</Text>
     </Box>
   );
 }
