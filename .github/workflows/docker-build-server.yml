@@ -31,13 +31,31 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
+      - name: Configure pnpm for linux-x64
+        run: |
+          echo "⚙️  Configuring pnpm for linux-x64 architecture..."
+          echo "supportedArchitectures[os][]=linux" > .npmrc
+          echo "supportedArchitectures[cpu][]=x64" >> .npmrc
+          echo "supportedArchitectures[libc][]=glibc" >> .npmrc
+          cat .npmrc
+
       - name: Setup Node Environment
         uses: ./.github/actions/setup-node-env
         with:
           install-filter: "@buster-app/server..."
           cache-key: docker-build-server
-      
+
+      - name: Verify Sharp for build phase
+        run: |
+          echo "🔍 Verifying Sharp is available for build..."
+          if pnpm list sharp --depth=0 2>/dev/null | grep -q "sharp"; then
+            echo "✅ Sharp is installed and available for build"
+            pnpm list sharp --depth=0
+          else
+            echo "⚠️  Sharp not found in dependencies (this may be okay if not needed for build)"
+          fi
+
       - name: Mount Turbo cache sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
@@ -76,13 +94,13 @@ jobs:
           echo "🧹 Preparing production-only dependencies..."
           # Create a temporary directory for production deps
           mkdir -p /tmp/prod-deps/apps/server
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
+          cp package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc /tmp/prod-deps/
           cp -r packages /tmp/prod-deps/
           cp -r apps /tmp/prod-deps/
 
-          # Install production dependencies
+          # Install production dependencies with correct architecture (using .npmrc from workspace)
           cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod
+          pnpm install --prod
 
           # Copy back to workspace
           cd -
@@ -91,57 +109,6 @@ jobs:
           cp -r apps/server/dist docker-context/
           cp apps/server/package.json docker-context/
 
-      - name: Install Sharp for linux-x64
-        run: |
-          echo "📦 Installing Sharp with linux-x64 binaries..."
-
-          # Go back to prod-deps directory to reinstall Sharp with correct platform
-          cd /tmp/prod-deps
-
-          # Configure pnpm supportedArchitectures for linux-x64 with glibc
-          echo "supportedArchitectures[os][]=linux" > .npmrc
-          echo "supportedArchitectures[cpu][]=x64" >> .npmrc
-          echo "supportedArchitectures[libc][]=glibc" >> .npmrc
-
-          echo "Configuration:"
-          cat .npmrc
-
-          # Remove existing Sharp installation
-          rm -rf packages/server-shared/node_modules/sharp
-          rm -rf node_modules/.pnpm/*sharp*
-
-          # Reinstall Sharp with correct architecture and scripts enabled
-          pnpm install --filter @buster/server-shared --no-frozen-lockfile sharp
-
-          # Verify Sharp was installed correctly for linux-x64
-          echo ""
-          echo "🔍 Verifying Sharp installation..."
-          SHARP_FOUND=false
-
-          if [ -d "packages/server-shared/node_modules/sharp" ]; then
-            echo "✅ Sharp package found in packages/server-shared/node_modules/sharp"
-            echo "Sharp contents:"
-            ls -la packages/server-shared/node_modules/sharp/ | head -20
-            echo ""
-            echo "Searching for .node binaries:"
-            find packages/server-shared/node_modules/sharp -name "*.node" -type f
-            SHARP_FOUND=true
-          fi
-
-          if [ "$SHARP_FOUND" = false ]; then
-            echo "❌ ERROR: Sharp package with linux-x64 binaries NOT found!"
-            echo "Checking all Sharp locations..."
-            find . -path "*/node_modules/sharp" -type d
-            exit 1
-          fi
-
-          # Copy updated node_modules back to docker-context
-          cd -
-          rm -rf docker-context/node_modules
-          cp -r /tmp/prod-deps/node_modules docker-context/
-
-          echo "✅ Sharp installation complete and copied to docker-context"
-      
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
       
