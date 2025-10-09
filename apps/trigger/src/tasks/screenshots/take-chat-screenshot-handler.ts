@@ -53,10 +53,12 @@ const shouldTakeChatScreenshot = async (
     return true;
   }
 
-  const isScreenshotExpired = await hasChatScreenshotBeenTakenWithin(
+  const hasRecentScreenshot = await hasChatScreenshotBeenTakenWithin(
     args.chatId,
     dayjs().subtract(4, 'weeks')
   );
 
-  return !isScreenshotExpired;
+  logger.info('Has recent screenshot', { hasRecentScreenshot });
+
+  return !hasRecentScreenshot;
 };

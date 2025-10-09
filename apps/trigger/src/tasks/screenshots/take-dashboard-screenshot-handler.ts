@@ -25,6 +25,8 @@ export const takeDashboardScreenshotHandlerTask: ReturnType<
       isOnSaveEvent,
     });
 
+    logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
+
     if (!shouldTakeNewScreenshot) {
       return;
     }
@@ -54,10 +56,12 @@ const shouldTakenNewScreenshot = async ({
     return true;
   }
 
-  const isScreenshotExpired = await hasDashboardScreenshotBeenTakenWithin(
+  const hasRecentScreenshot = await hasDashboardScreenshotBeenTakenWithin(
     dashboardId,
     dayjs().subtract(24, 'hours')
   );
 
-  return !isScreenshotExpired;
+  logger.info('Is screenshot expired', { hasRecentScreenshot });
+
+  return !hasRecentScreenshot;
 };

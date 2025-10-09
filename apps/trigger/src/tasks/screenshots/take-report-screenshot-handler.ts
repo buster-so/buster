@@ -46,10 +46,10 @@ export const takeReportScreenshotHandlerTask: ReturnType<
 });
 
 const shouldTakenNewScreenshot = async ({ reportId }: { reportId: string }) => {
-  const isScreenshotExpired = await hasReportScreenshotBeenTakenWithin(
+  const hasRecentScreenshot = await hasReportScreenshotBeenTakenWithin(
     reportId,
     dayjs().subtract(24, 'hours')
   );
 
-  return !isScreenshotExpired;
+  return !hasRecentScreenshot;
 };

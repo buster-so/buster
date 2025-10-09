@@ -6,6 +6,7 @@ import {
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
+  getUserOrganizationId,
   getUsersWithAssetPermissions,
 } from '@buster/database/queries';
 import {
@@ -53,6 +54,27 @@ const app = new Hono().get(
       user,
       c
     );
+
+    const tag = `take-dashboard-screenshot-${id}`;
+    if (
+      await shouldTakeScreenshot({
+        tag,
+        key: screenshots_task_keys.take_dashboard_screenshot,
+        context: c,
+      })
+    ) {
+      console.log('Taking dashboard screenshot');
+      tasks.trigger(
+        screenshots_task_keys.take_dashboard_screenshot,
+        {
+          dashboardId: id,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+          isOnSaveEvent: false,
+        } satisfies TakeDashboardScreenshotTrigger,
+        { tags: [tag] }
+      );
+    }
 
     return c.json(response);
   }

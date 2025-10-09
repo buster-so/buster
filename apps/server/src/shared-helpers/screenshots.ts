@@ -6,7 +6,7 @@ import type { Context } from 'hono';
 // It checks if a job for the given tag and key is already running or queued before starting a new one.
 
 const currentlyCheckingTags = new Set<string>();
-const CACHE_TAG_EXPIRATION_TIME = 1000 * 15; // 15 seconds
+const CACHE_TAG_EXPIRATION_TIME = 1000 * 30; // 30 seconds
 
 export const shouldTakeScreenshot = async ({
   tag,
