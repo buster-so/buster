@@ -84,21 +84,29 @@ jobs:
           cd /tmp/prod-deps
 
           # Install with platform-specific flags for Sharp linux-x64 binaries
-          # Use npm_config env vars which pnpm respects for optional deps
-          npm_config_platform=linux \
-          npm_config_arch=x64 \
-          npm_config_libc=glibc \
+          # Set up .npmrc to force linux-x64 platform for optional dependencies
+          cat > .npmrc << EOF
+          platform=linux
+          arch=x64
+          libc=glibc
+          EOF
+
+          echo "📦 Installing production dependencies with linux-x64 Sharp binaries..."
           pnpm install --frozen-lockfile --prod
 
           # Verify Sharp was installed correctly for linux-x64
           echo "🔍 Verifying Sharp installation..."
-          if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -d "node_modules/@img/sharp-linuxmusl-x64" ]; then
+          if [ -d "node_modules/@img/sharp-linux-x64" ]; then
             echo "✅ Sharp linux-x64 binaries found"
+            ls -la node_modules/@img/sharp-linux-x64/
+          elif [ -d "node_modules/@img/sharp-linuxmusl-x64" ]; then
+            echo "✅ Sharp linuxmusl-x64 binaries found"
+            ls -la node_modules/@img/sharp-linuxmusl-x64/
           else
-            echo "❌ Sharp linux-x64 binaries NOT found, attempting manual installation..."
-            cd packages/server-shared
-            npm_config_platform=linux npm_config_arch=x64 npm_config_libc=glibc pnpm add sharp --force
-            cd ../..
+            echo "❌ WARNING: Sharp linux-x64 binaries NOT found!"
+            echo "Available Sharp binaries:"
+            ls -la node_modules/@img/ || echo "No @img directory found"
+            echo "This may cause runtime errors in the Docker container"
           fi
 
           # Copy back to workspace
