@@ -78,14 +78,16 @@ jobs:
           mkdir -p /tmp/prod-deps/apps/server
           cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
           cp -r packages /tmp/prod-deps/
-          cp apps/server/package.json /tmp/prod-deps/apps/server/
+          cp -r apps /tmp/prod-deps/
 
           # Install production dependencies with platform-specific optional deps
           cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod
 
-          # Force install Sharp for linux-x64 platform
-          pnpm add sharp --filter=@buster-app/server --prod --config.platform=linux --config.arch=x64
+          # Set environment to force Sharp to install linux-x64 binaries
+          export npm_config_platform=linux
+          export npm_config_arch=x64
+
+          pnpm install --frozen-lockfile --prod
 
           # Copy back to workspace
           cd -
