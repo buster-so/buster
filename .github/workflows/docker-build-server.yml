@@ -32,12 +32,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure pnpm for linux-x64
+      - name: Configure pnpm for linux-x64-glibc
         run: |
-          echo "⚙️  Configuring pnpm for linux-x64 architecture..."
-          echo "supportedArchitectures[os][]=linux" > .npmrc
+          echo "⚙️  Configuring pnpm for linux-x64-glibc architecture..."
+          echo "# Target: Debian-based Docker image (oven/bun:1.2.21-debian)" > .npmrc
+          echo "# This ensures Sharp installs linux-x64-glibc native binaries" >> .npmrc
+          echo "supportedArchitectures[os][]=linux" >> .npmrc
           echo "supportedArchitectures[cpu][]=x64" >> .npmrc
           echo "supportedArchitectures[libc][]=glibc" >> .npmrc
+          echo ""
+          echo "Configuration:"
           cat .npmrc
 
       - name: Setup Node Environment
@@ -48,16 +52,59 @@ jobs:
 
       - name: Verify Sharp for build phase
         run: |
-          pnpm install -g sharp
-          echo "🔍 Verifying Sharp is available for build..."
+          echo "🔍 Verifying Sharp is installed with correct architecture..."
           cd packages/server-shared
-          if pnpm list sharp --depth=0 2>/dev/null | grep -q "sharp"; then
-            echo "✅ Sharp is installed and available for build"
-            pnpm list sharp --depth=0
-          else
+
+          # Check Sharp is installed
+          if ! pnpm list sharp --depth=0 2>/dev/null | grep -q "sharp"; then
             echo "❌ ERROR: Sharp not found in @buster/server-shared!"
             exit 1
           fi
+
+          echo "✅ Sharp package found"
+          pnpm list sharp --depth=0
+
+          # Verify linux-x64 native binary exists
+          echo ""
+          echo "🔍 Checking for linux-x64-glibc native binaries..."
+
+          if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
+            echo "✅ Sharp linux-x64 platform package found:"
+            find node_modules -path "*/@img/sharp-linux-x64*" -type d
+
+            # List .node binaries
+            echo ""
+            echo "Native binaries (.node files):"
+            find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f || echo "⚠️  No .node files found yet"
+          else
+            echo "⚠️  Sharp linux-x64 platform package NOT found! Attempting to reinstall..."
+            echo "Available Sharp platform packages:"
+            find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
+
+            # Remove existing Sharp installation
+            rm -rf node_modules/sharp node_modules/.pnpm/*sharp*
+
+            # Reinstall Sharp with explicit architecture
+            echo ""
+            echo "📦 Reinstalling Sharp with linux-x64-glibc binaries..."
+            pnpm install sharp --force
+
+            # Verify again
+            echo ""
+            echo "🔍 Re-checking for linux-x64 binaries..."
+            if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
+              echo "✅ Sharp linux-x64 successfully installed on retry:"
+              find node_modules -path "*/@img/sharp-linux-x64*" -type d
+            else
+              echo "❌ ERROR: Still unable to install Sharp linux-x64 after retry!"
+              echo "Available Sharp platform packages:"
+              find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
+              exit 1
+            fi
+          fi
+
+          echo ""
+          echo "✅ Sharp linux-x64-glibc verified successfully"
 
       - name: Mount Turbo cache sticky disk
         uses: useblacksmith/stickydisk@v1
