@@ -230,6 +230,11 @@ jobs:
           cd /tmp/prod-deps
           pnpm install --prod
 
+          # Explicitly install Sharp platform binaries for production
+          echo ""
+          echo "📦 Ensuring Sharp platform binaries are installed for production..."
+          pnpm install @img/sharp-linux-x64 @img/sharp-libvips-linux-x64 --save-optional --no-frozen-lockfile
+
           # Copy back to workspace
           cd -
           mkdir -p docker-context
@@ -241,19 +246,45 @@ jobs:
         run: |
           echo "🔍 Final verification of Sharp in docker-context..."
 
-          if find docker-context/node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
-            echo "✅ Sharp linux-x64 platform package found in docker-context"
-            find docker-context/node_modules -path "*/@img/sharp-linux-x64*" -type d
-
-            echo ""
-            echo "Native binaries:"
-            find docker-context/node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f
-          else
-            echo "❌ ERROR: Sharp linux-x64 NOT found in production node_modules!"
-            echo "Available Sharp packages:"
-            find docker-context/node_modules -path "*/@img/sharp-*" -type d || echo "None found"
+          # Check if Sharp exists
+          if [ ! -d "docker-context/node_modules/sharp" ]; then
+            echo "❌ ERROR: Sharp package NOT found in docker-context/node_modules!"
             exit 1
           fi
+
+          echo "✅ Sharp package found in docker-context"
+
+          # Check for Sharp platform binaries (may be symlinks)
+          echo ""
+          echo "📦 Checking Sharp platform packages..."
+          if [ -d "docker-context/node_modules/@img/sharp-linux-x64" ] || [ -L "docker-context/node_modules/@img/sharp-linux-x64" ]; then
+            echo "✅ @img/sharp-linux-x64 found"
+            ls -la docker-context/node_modules/@img/sharp-linux-x64
+          else
+            echo "❌ @img/sharp-linux-x64 NOT found"
+          fi
+
+          if [ -d "docker-context/node_modules/@img/sharp-libvips-linux-x64" ] || [ -L "docker-context/node_modules/@img/sharp-libvips-linux-x64" ]; then
+            echo "✅ @img/sharp-libvips-linux-x64 found"
+            ls -la docker-context/node_modules/@img/sharp-libvips-linux-x64
+          else
+            echo "❌ @img/sharp-libvips-linux-x64 NOT found"
+          fi
+
+          # Check for .node binaries
+          echo ""
+          echo "🔍 Checking for native binaries (.node files)..."
+          if find -L docker-context/node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null | grep -q .; then
+            echo "✅ Native binaries found:"
+            find -L docker-context/node_modules/@img/sharp-linux-x64 -name "*.node" -type f
+            find -L docker-context/node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null || true
+          else
+            echo "❌ ERROR: No native binaries (.node files) found!"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ Sharp verification complete - all required files present"
 
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
