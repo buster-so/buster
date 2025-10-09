@@ -54,7 +54,7 @@ export const SearchModalContent = <M, T extends string>({
 
   return (
     <Command
-      className="min-w-[750px] w-[750px] min-h-[450px] max-h-[75vh] bg-background flex flex-col"
+      className="min-w-[750px] w-[80vw] max-w-[950px] min-h-[450px] max-h-[75vh] bg-background flex flex-col"
       value={focusedValue}
       onValueChange={setFocusedValue}
       onKeyDown={handleKeyDownGlobal}

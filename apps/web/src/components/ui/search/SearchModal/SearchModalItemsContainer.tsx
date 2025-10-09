@@ -28,7 +28,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
       <motion.div
         className="overflow-hidden flex flex-col shrink-0"
         initial={false}
-        animate={{ width: openSecondaryContent ? 320 : '100%' }}
+        animate={{ width: openSecondaryContent ? 'clamp(320px, 40%, 400px)' : '100%' }}
         transition={{ duration, ease: 'easeInOut' }}
       >
         <SearchModalContentItems

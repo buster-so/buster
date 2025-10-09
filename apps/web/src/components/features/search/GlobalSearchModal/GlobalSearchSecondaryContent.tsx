@@ -112,14 +112,7 @@ const ScreenshotImage = ({
   }, [imageUrl]);
 
   return (
-    <div
-      className="bg-background rounded border overflow-hidden w-full h-full relative"
-      style={{
-        height: '240px',
-        maxHeight: '240px',
-        minHeight: '240px',
-      }}
-    >
+    <div className="bg-background rounded border overflow-hidden w-full relative aspect-video">
       <motion.div
         className="absolute inset-0 flex items-center justify-center"
         initial={{ opacity: 1 }}
@@ -167,7 +160,7 @@ const MetricScreenshotContainer = ({
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className="h-[280px]"
+        className="aspect-video"
         key={isLoadingContent ? 'loading' : 'content'}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -264,71 +257,6 @@ const Ancestors = React.memo(
 
     const { chats, collections, dashboards, reports } = ancestors;
 
-    type AncestorObject = {
-      type: AssetType;
-      title: string;
-      id: string;
-      secondaryText: string;
-      isMain?: boolean;
-    };
-
-    const AncestorContainer = ({ isMain, type, title, secondaryText }: AncestorObject) => {
-      let Icon = <ASSET_ICONS.metrics />;
-      const router = useRouter();
-
-      if (type === 'chat') {
-        Icon = <ASSET_ICONS.chats />;
-      } else if (type === 'dashboard_file') {
-        Icon = <ASSET_ICONS.dashboards />;
-      } else if (type === 'report_file') {
-        Icon = <ASSET_ICONS.reports />;
-      } else if (type === 'collection') {
-        Icon = <ASSET_ICONS.collections />;
-      } else if (type === 'metric_file') {
-        Icon = <ASSET_ICONS.metrics />;
-      } else {
-        const _exhaustiveCheck: never = type;
-      }
-
-      const LinkWrapper = ({ children }: { children: React.ReactNode | React.ReactNode[] }) => {
-        if (isMain || !router) {
-          return <>{children}</>;
-        }
-        const link = createSimpleAssetRoute({
-          asset_type: type,
-          id: assetId,
-        }) as LinkProps;
-
-        return (
-          <Link {...link} preload={false}>
-            {children}
-          </Link>
-        );
-      };
-
-      return (
-        <LinkWrapper>
-          <React.Fragment>
-            <div
-              style={{
-                lineHeight: 0,
-              }}
-              className={cn(
-                'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
-                !isMain && router && 'cursor-pointer hover:text-foreground hover:underline',
-                'text-xs h-3.5'
-              )}
-            >
-              <span>{Icon}</span>
-              <span dangerouslySetInnerHTML={{ __html: title }} />
-              <span>{'•'}</span>
-              {secondaryText}
-            </div>
-          </React.Fragment>
-        </LinkWrapper>
-      );
-    };
-
     const allAncestors: AncestorObject[] = [
       {
         type,
@@ -375,3 +303,69 @@ const Ancestors = React.memo(
 );
 
 Ancestors.displayName = 'Ancestors';
+
+type AncestorObject = {
+  type: AssetType;
+  title: string;
+  id: string;
+  secondaryText: string;
+  isMain?: boolean;
+};
+
+const AncestorContainer = ({ isMain, type, title, secondaryText, id }: AncestorObject) => {
+  const router = useRouter();
+
+  let Icon = <ASSET_ICONS.metrics />;
+
+  if (type === 'chat') {
+    Icon = <ASSET_ICONS.chats />;
+  } else if (type === 'dashboard_file') {
+    Icon = <ASSET_ICONS.dashboards />;
+  } else if (type === 'report_file') {
+    Icon = <ASSET_ICONS.reports />;
+  } else if (type === 'collection') {
+    Icon = <ASSET_ICONS.collections />;
+  } else if (type === 'metric_file') {
+    Icon = <ASSET_ICONS.metrics />;
+  } else {
+    const _exhaustiveCheck: never = type;
+  }
+
+  const LinkWrapper = ({ children }: { children: React.ReactNode | React.ReactNode[] }) => {
+    if (isMain || !router) {
+      return <>{children}</>;
+    }
+    const link = createSimpleAssetRoute({
+      asset_type: type,
+      id,
+    }) as LinkProps;
+
+    return (
+      <Link {...link} preload={false} reloadDocument>
+        {children}
+      </Link>
+    );
+  };
+
+  return (
+    <LinkWrapper>
+      <React.Fragment>
+        <div
+          style={{
+            lineHeight: 0,
+          }}
+          className={cn(
+            'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
+            !isMain && router && 'cursor-pointer hover:text-foreground hover:underline',
+            'text-xs h-3.5'
+          )}
+        >
+          <span>{Icon}</span>
+          <span dangerouslySetInnerHTML={{ __html: title }} />
+          <span>{'•'}</span>
+          {secondaryText}
+        </div>
+      </React.Fragment>
+    </LinkWrapper>
+  );
+};

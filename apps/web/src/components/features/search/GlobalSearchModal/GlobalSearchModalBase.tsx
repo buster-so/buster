@@ -1,6 +1,5 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing */
 
-import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
@@ -71,11 +70,7 @@ export const GlobalSearchModalBase = ({
             asset_type: item.assetType,
             id: item.assetId,
           }) as Parameters<typeof navigate>[0];
-          await navigate(link);
-          onClose();
-          setTimeout(() => {
-            resetModal();
-          }, 200);
+          await navigate({ ...link, reloadDocument: true });
         },
       };
     };

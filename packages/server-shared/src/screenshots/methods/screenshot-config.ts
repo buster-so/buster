@@ -1,8 +1,8 @@
-const multiplier = 2;
+const multiplier = 0.5;
 
 export const DEFAULT_SCREENSHOT_CONFIG = {
-  width: 400 * multiplier,
-  height: 240 * multiplier,
+  width: 1600 * multiplier,
+  height: 900 * multiplier,
   type: 'webp' as const,
   deviceScaleFactor: 1.62,
 };
