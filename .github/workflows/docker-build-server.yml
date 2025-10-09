@@ -40,6 +40,9 @@ jobs:
           echo "supportedArchitectures[os][]=linux" >> .npmrc
           echo "supportedArchitectures[cpu][]=x64" >> .npmrc
           echo "supportedArchitectures[libc][]=glibc" >> .npmrc
+          echo "" >> .npmrc
+          echo "# Enable build scripts for Sharp to download native binaries" >> .npmrc
+          echo "enable-pre-post-scripts=true" >> .npmrc
           echo ""
           echo "Configuration:"
           cat .npmrc
@@ -70,6 +73,31 @@ jobs:
           if [ -f "node_modules/sharp/package.json" ]; then
             echo "Version: $(cat node_modules/sharp/package.json | grep '"version"' | head -1)"
             echo "Install script: $(cat node_modules/sharp/package.json | grep '"install"' | head -1)"
+          fi
+
+          # Check what Sharp platform packages are installed
+          echo ""
+          echo "📦 Installed Sharp platform-specific packages:"
+          if [ -d "node_modules/@img" ]; then
+            ls -la node_modules/@img/ | grep sharp || echo "No @img/sharp-* packages found"
+            echo ""
+            echo "Detailed package info:"
+            for dir in node_modules/@img/sharp-*; do
+              if [ -d "$dir" ]; then
+                echo "  - $(basename $dir): $(cat $dir/package.json 2>/dev/null | grep '"version"' | head -1)"
+              fi
+            done
+          else
+            echo "❌ @img directory not found in node_modules"
+          fi
+
+          # Check Sharp's node_modules for platform binaries
+          echo ""
+          echo "📦 Sharp's nested node_modules:"
+          if [ -d "node_modules/sharp/node_modules" ]; then
+            ls -la node_modules/sharp/node_modules/ || echo "Empty"
+          else
+            echo "No nested node_modules in Sharp"
           fi
 
           # Verify linux-x64 native binary exists
@@ -106,8 +134,15 @@ jobs:
             # Reinstall Sharp in THIS package only
             echo ""
             echo "📦 Reinstalling Sharp with linux-x64-glibc binaries..."
-            echo "Running: pnpm install --no-frozen-lockfile"
+            echo "Running: pnpm install --no-frozen-lockfile (with build scripts enabled)"
             pnpm install --no-frozen-lockfile
+
+            # Explicitly run Sharp's install script if it didn't run
+            if [ -f "node_modules/sharp/install/check.js" ]; then
+              echo ""
+              echo "Running Sharp's install script explicitly..."
+              cd node_modules/sharp && node install/check.js && cd ../..
+            fi
 
             # Verify again
             echo ""
