@@ -1406,6 +1406,9 @@ importers:
 
   packages/vitest-config:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.5
+        version: 2.2.5
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
