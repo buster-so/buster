@@ -28,7 +28,7 @@ const app = new Hono()
         password
       );
 
-      await triggerScreenshotIfNeeded<TakeMetricScreenshotTrigger>({
+      triggerScreenshotIfNeeded<TakeMetricScreenshotTrigger>({
         tag: `take-metric-screenshot-${id}`,
         key: screenshots_task_keys.take_metric_screenshot,
         context: c,

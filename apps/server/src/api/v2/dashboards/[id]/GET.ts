@@ -53,7 +53,7 @@ const app = new Hono().get(
       user
     );
 
-    await triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+    triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
       tag: `take-dashboard-screenshot-${id}`,
       key: screenshots_task_keys.take_dashboard_screenshot,
       context: c,

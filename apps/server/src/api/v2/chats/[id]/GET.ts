@@ -47,7 +47,7 @@ const app = new Hono().get(
 
     const response: GetChatResponse = await getChatHandler(getChatHandlerParams);
 
-    await triggerScreenshotIfNeeded<TakeChatScreenshotTrigger>({
+    triggerScreenshotIfNeeded<TakeChatScreenshotTrigger>({
       tag: `take-chat-screenshot-${id}`,
       key: screenshots_task_keys.take_chat_screenshot,
       context: c,
