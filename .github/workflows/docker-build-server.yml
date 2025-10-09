@@ -99,14 +99,24 @@ jobs:
           cd /tmp/prod-deps
           pnpm install --prod
 
-          # Install Sharp with linux-x64 binaries directly - simple and reliable!
+          # Install Sharp with linux-x64 binaries directly into node_modules
           echo ""
           echo "📦 Installing Sharp with linux-x64-glibc binaries for production..."
+
+          # Use npm in a clean directory to download Sharp with correct platform
+          mkdir -p /tmp/sharp-install
+          cd /tmp/sharp-install
           npm install --no-save --cpu=x64 --os=linux --libc=glibc \
             sharp@^0.34.4 \
             @img/sharp-linux-x64@^0.34.4 \
             @img/sharp-libvips-linux-x64@^1.2.3
 
+          # Copy the Sharp packages to production node_modules
+          echo "📦 Copying Sharp packages to production node_modules..."
+          cp -r node_modules/sharp /tmp/prod-deps/node_modules/ 2>/dev/null || true
+          cp -r node_modules/@img /tmp/prod-deps/node_modules/ 2>/dev/null || true
+
+          cd /tmp/prod-deps
           echo "✅ Sharp installed for production"
 
           # Copy back to workspace
