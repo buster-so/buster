@@ -147,17 +147,29 @@ jobs:
             # Verify again
             echo ""
             echo "🔍 Re-checking for linux-x64 binaries..."
+
+            # Show what was actually installed
+            echo "Installed @img packages:"
+            ls -la node_modules/@img/ 2>/dev/null | grep sharp || echo "No @img/sharp packages"
+
+            echo ""
+            echo "Sharp's nested dependencies:"
+            ls -la node_modules/sharp/node_modules/ 2>/dev/null || echo "No nested node_modules"
+
+            echo ""
+            echo "All Sharp-related packages in node_modules:"
+            find node_modules -name "*sharp*" -type d | head -20
+
             if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
+              echo ""
               echo "✅ Sharp linux-x64 successfully installed on retry:"
               find node_modules -path "*/@img/sharp-linux-x64*" -type d
               find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f
             else
+              echo ""
               echo "❌ ERROR: Still unable to install Sharp linux-x64 after retry!"
               echo "Available Sharp platform packages:"
               find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
-              echo ""
-              echo "Sharp install location and contents:"
-              ls -la node_modules/sharp/ 2>/dev/null || echo "Sharp directory not found"
               exit 1
             fi
           fi
