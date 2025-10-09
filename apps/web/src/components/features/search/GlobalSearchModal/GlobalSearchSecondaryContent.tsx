@@ -11,6 +11,7 @@ import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.
 import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
 import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
+import { useSetTimeout } from '@/hooks/useSetTimeout';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
@@ -145,17 +146,24 @@ const MetricScreenshotContainer = ({
   assetId: SearchTextData['assetId'];
   screenshotUrl: SearchTextData['screenshotUrl'];
 }) => {
+  const [canFetchData, setCanFetchData] = useState(false);
   const { isFetched: isFetchedMetric, isError: isErrorMetric } = useGetMetric({
     id: assetId,
     versionNumber: 'LATEST',
   });
-  const { isFetched: isFetchedMetricData, isError: isErrorMetricData } = useGetMetricData({
-    id: assetId,
-    versionNumber: 'LATEST',
-  });
+  const { isFetched: isFetchedMetricData, isError: isErrorMetricData } = useGetMetricData(
+    { id: assetId, versionNumber: 'LATEST' },
+    { enabled: canFetchData }
+  );
 
   const isLoadingContent =
     (!isFetchedMetric || !isFetchedMetricData) && !isErrorMetric && !isErrorMetricData;
+
+  useSetTimeout(() => {
+    setCanFetchData(true);
+  }, 1500);
+
+  console.log('isFetchedMetricData', isFetchedMetricData, canFetchData);
 
   return (
     <AnimatePresence mode="wait">
