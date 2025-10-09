@@ -10,7 +10,9 @@ import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
 import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.png';
 import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
 import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
+import InfoCircle from '@/components/ui/icons/NucleoIconOutlined/circle-info';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
+import { Tooltip } from '@/components/ui/tooltip';
 import { useSetTimeout } from '@/hooks/useSetTimeout';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
@@ -50,6 +52,7 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
         createdBy={createdBy}
         createdByAvatarUrl={createdByAvatarUrl}
         createdByName={createdByName}
+        screenshotUrl={screenshotUrl}
       />
 
       <hr className="border-t" />
@@ -194,25 +197,38 @@ const MetricScreenshotContainer = ({
   );
 };
 
+const PillContainer = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div
+      className={cn(
+        'flex bg-background items-center gap-1 text-secondary border rounded h-4.5 px-1 text-xs',
+        className
+      )}
+      style={{
+        lineHeight: 0,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const MetaContent = ({
   updatedAt,
   createdBy,
   createdByAvatarUrl,
   createdByName,
-}: Pick<SearchTextData, 'updatedAt' | 'createdBy' | 'createdByAvatarUrl' | 'createdByName'>) => {
-  const PillContainer = ({ children }: { children: React.ReactNode }) => {
-    return (
-      <div
-        className="flex bg-background items-center gap-1 text-secondary border rounded h-4.5 px-1 text-xs"
-        style={{
-          lineHeight: 0,
-        }}
-      >
-        {children}
-      </div>
-    );
-  };
-
+  screenshotUrl,
+}: Pick<
+  SearchTextData,
+  'updatedAt' | 'createdBy' | 'createdByAvatarUrl' | 'createdByName' | 'screenshotUrl'
+>) => {
   return (
     <div className="flex flex-wrap gap-1">
       {createdBy && (
@@ -235,6 +251,15 @@ const MetaContent = ({
           format: 'lll',
         })}
       </PillContainer>
+      {!screenshotUrl && (
+        <Tooltip title="Thumbnail will be available after the asset is loaded.">
+          <PillContainer className="hover:bg-item-hover">
+            <div className="text-icon-color cursor-help">
+              <InfoCircle />
+            </div>
+          </PillContainer>
+        </Tooltip>
+      )}
     </div>
   );
 };
