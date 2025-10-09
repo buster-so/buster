@@ -146,8 +146,8 @@ describe('Deploy Handler Validation', () => {
       expect.fail('Should have thrown DeploymentValidationError');
     } catch (error) {
       expect(error).toBeInstanceOf(DeploymentValidationError);
-      expect(error.message).toMatch(/Cannot deploy.*TODO/);
-      expect(error.todoFiles).toHaveLength(1);
+      expect((error as DeploymentValidationError).message).toMatch(/Cannot deploy.*TODO/);
+      expect((error as DeploymentValidationError).todoFiles).toHaveLength(1);
     }
   });
 

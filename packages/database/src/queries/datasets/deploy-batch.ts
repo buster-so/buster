@@ -201,6 +201,13 @@ async function upsertDatasetInTransaction(
     model: model.name,
     ymlFile: model.yml_file,
     databaseIdentifier: model.database,
+    metadata: {
+      rowCount: 0,
+      sampleSize: 0,
+      samplingMethod: 'none',
+      columnProfiles: [],
+      introspectedAt: new Date().toISOString(),
+    },
     updatedAt: sql`now()`,
     deletedAt: null,
   };

@@ -7,19 +7,29 @@ export type GatewayProviderOrder = string[];
 
 export type AnthropicOptions = {
   cacheControl?: { type: 'ephemeral' };
+  thinking?: {
+    type: 'enabled';
+    budgetTokens: number;
+  };
 };
 
 export type BedrockOptions = {
   cachePoint?: { type: 'default' };
   additionalModelRequestFields?: {
     anthropic_beta?: string[];
+    reasoning_config?: {
+      type: 'enabled';
+      budget_tokens: number;
+    };
   };
 };
 
 export type OpenAIOptions = {
-  // parallelToolCalls?: boolean;
+  parallelToolCalls?: boolean;
   reasoningEffort?: 'low' | 'medium' | 'high' | 'minimal';
   verbosity?: 'low' | 'medium' | 'high';
+  include?: string[];
+  store?: boolean;
 };
 
 // Main provider options types
@@ -50,6 +60,37 @@ export const DEFAULT_ANTHROPIC_OPTIONS: AnthropicProviderOptions = {
     cachePoint: { type: 'default' },
     additionalModelRequestFields: {
       anthropic_beta: ['fine-grained-tool-streaming-2025-05-14'],
+    },
+  },
+};
+
+export const DEFAULT_ANALYTICS_ENGINEER_OPTIONS = {
+  gateway: {
+    only: ['bedrock'],
+  },
+  openai: {
+    parallelToolCalls: true,
+    parallel_tool_calls: true,
+    reasoningEffort: 'high',
+    verbosity: 'low',
+    include: ['reasoning.encrypted_content'],
+    store: false,
+  },
+  anthropic: {
+    cacheControl: { type: 'ephemeral' },
+    thinking: {
+      type: 'enabled',
+      budgetTokens: 10000, // Set desired tokens for reasoning
+    },
+  },
+  bedrock: {
+    cachePoint: { type: 'default' },
+    additionalModelRequestFields: {
+      anthropic_beta: ['fine-grained-tool-streaming-2025-05-14'],
+      reasoning_config: {
+        type: 'enabled',
+        budget_tokens: 10000, // Adjust as needed
+      },
     },
   },
 };

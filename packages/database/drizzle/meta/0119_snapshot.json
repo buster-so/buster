@@ -1,5 +1,5 @@
 {
-  "id": "3c1cc154-d1f6-484b-8aa2-0ba661948d0e",
+  "id": "c06a7ccb-7f3d-4dd3-a280-91a47494c328",
   "prevId": "f1684d66-5cda-40f9-a515-716ffa02680d",
   "version": "7",
   "dialect": "postgresql",
@@ -427,12 +427,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -530,19 +524,6 @@
           "tableTo": "organizations",
           "columnsFrom": [
             "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "asset_search_v2_created_by_fkey": {
-          "name": "asset_search_v2_created_by_fkey",
-          "tableFrom": "asset_search_v2",
-          "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
           ],
           "columnsTo": [
             "id"
@@ -2105,6 +2086,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\n      \"rowCount\": 0,\n      \"sampleSize\": 0,\n      \"samplingMethod\": \"none\",\n      \"columnProfiles\": [],\n      \"introspectedAt\": \"2024-01-01T00:00:00.000Z\"\n    }'::jsonb"
         }
       },
       "indexes": {},

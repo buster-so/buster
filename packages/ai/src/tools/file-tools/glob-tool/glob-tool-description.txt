@@ -1,0 +1,23 @@
+- Fast file pattern matching tool that works with any codebase size
+- Finds files using glob patterns (wildcards)
+- Supports common glob syntax:
+  - `*` matches any characters within a single path segment (e.g., "*.ts" matches all TypeScript files)
+  - `**` matches zero or more path segments (e.g., "src/**/*.js" matches all JavaScript files in src and subdirectories)
+  - `?` matches exactly one character
+  - `[abc]` matches any character in the set
+  - `{a,b,c}` matches any of the alternatives
+- Returns matching file paths sorted by modification time (newest first)
+- By default, returns up to 100 files starting from the first match
+- You can optionally specify offset and limit for pagination:
+  - offset: File index to start from (0-indexed, defaults to 0)
+  - limit: Maximum number of files to return (defaults to 100)
+  - Example: { pattern: "*.ts", offset: 100, limit: 50 } returns files 100-149
+- The response includes a "truncated" flag to indicate if more files are available beyond the limit
+- Use this tool when you need to find files by name patterns or directory structure
+- Examples:
+  - Find all TypeScript files: { pattern: "*.ts" }
+  - Find all test files: { pattern: "**/*.test.ts" }
+  - Find all files in docs: { pattern: "docs/**/*" }
+  - Find all Python or JavaScript files: { pattern: "**/*.{py,js}" }
+- For searching file contents, use the grep tool instead
+- For listing directory structure, use the ls tool instead

@@ -47,6 +47,7 @@ import {
   VerificationSchema,
   WorkspaceSharingSchema,
 } from './schema-types';
+import type { DatasetMetadata } from './schema-types/dataset-metadata';
 
 export const assetPermissionRoleEnum = pgEnum(
   'asset_permission_role_enum',
@@ -508,6 +509,15 @@ export const datasets = pgTable(
     model: text(),
     ymlFile: text('yml_file'),
     databaseIdentifier: text('database_identifier'),
+    metadata: jsonb()
+      .$type<DatasetMetadata>()
+      .default(sql`'{
+      "rowCount": 0,
+      "sampleSize": 0,
+      "samplingMethod": "none",
+      "columnProfiles": [],
+      "introspectedAt": "2024-01-01T00:00:00.000Z"
+    }'::jsonb`),
   },
   (table) => [
     foreignKey({

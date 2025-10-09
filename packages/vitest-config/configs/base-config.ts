@@ -8,7 +8,7 @@ export const baseConfig = defineConfig(async () => {
   return {
     plugins: [tsconfigPaths() as unknown as Plugin],
     test: {
-      include: ['**/*.test.ts', '**/*.spec.ts'],
+      include: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
       exclude: ['**/node_modules/**', '**/dist/**', '**/build/**'],
       globals: true,
       testTimeout: 1000 * 60 * 2, // 2 minutes

@@ -18,7 +18,16 @@ export interface QueryRequest {
 /**
  * Query parameter type for parameterized queries
  */
-export type QueryParameter = string | number | boolean | null | Date | Buffer;
+export type QueryParameter =
+  | string
+  | number
+  | boolean
+  | null
+  | Date
+  | Buffer
+  | string[]
+  | number[]
+  | boolean[];
 
 /**
  * Query execution options

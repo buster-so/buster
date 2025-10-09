@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { glob } from 'fast-glob';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { discoverAndPrepareDocs, discoverDocFiles, prepareDocsForDeployment } from './discovery';
 
 // Mock dependencies

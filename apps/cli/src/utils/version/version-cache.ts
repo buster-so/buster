@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { type VersionCache, VersionCacheSchema } from './version-schemas';
@@ -72,7 +72,6 @@ export async function getCachedVersion(): Promise<VersionCache | null> {
  */
 export async function clearVersionCache(): Promise<void> {
   try {
-    const { unlink } = await import('node:fs/promises');
     await unlink(CACHE_FILE);
   } catch {
     // Cache file might not exist, that's fine

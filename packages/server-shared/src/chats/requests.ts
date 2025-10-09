@@ -59,3 +59,12 @@ export type DuplicateChatRequest = z.infer<typeof DuplicateChatRequestSchema>;
 // Logs list request (same as chats list)
 export const GetLogsListRequestSchema = GetChatsListRequestSchema;
 export type GetLogsListRequest = z.infer<typeof GetLogsListRequestSchema>;
+
+// Request for creating a CLI chat
+export const CliChatCreateRequestSchema = z.object({
+  prompt: z.string().describe('User prompt for the CLI chat'),
+  chat_id: z.string().optional().describe('Optional existing chat ID to continue'),
+  message_id: z.string().optional().describe('Optional message ID to continue from'),
+});
+
+export type CliChatCreateRequest = z.infer<typeof CliChatCreateRequestSchema>;

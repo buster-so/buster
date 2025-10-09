@@ -2,6 +2,8 @@ import { tool } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 
+export const IDLE_TOOL_NAME = 'idle';
+
 // Input/Output schemas
 const IdleInputSchema = z.object({
   final_response: z
@@ -19,6 +21,7 @@ const IdleOutputSchema = z.object({
 // Optional context for consistency with other tools
 const IdleContextSchema = z.object({
   messageId: z.string().optional().describe('The message ID for tracking tool execution.'),
+  onToolEvent: z.any().optional(),
 });
 
 export type IdleInput = z.infer<typeof IdleInputSchema>;
@@ -29,18 +32,32 @@ async function processIdle(): Promise<IdleOutput> {
   return { success: true };
 }
 
-function createIdleExecute() {
+function createIdleExecute<TAgentContext extends IdleContext = IdleContext>(
+  context?: TAgentContext
+) {
   return wrapTraced(
-    async (): Promise<IdleOutput> => {
-      return await processIdle();
+    async (args: IdleInput) => {
+      const result: IdleOutput = await processIdle();
+
+      // Emit typed tool event when idle tool completes
+      context?.onToolEvent?.({
+        tool: IDLE_TOOL_NAME,
+        event: 'complete',
+        result,
+        args,
+      });
+
+      return result;
     },
     { name: 'idle-tool' }
   );
 }
 
 // Factory: simple tool without streaming lifecycle
-export function createIdleTool() {
-  const execute = createIdleExecute();
+export function createIdleTool<TAgentContext extends IdleContext = IdleContext>(
+  context?: TAgentContext
+) {
+  const execute = createIdleExecute(context);
 
   return tool({
     description:

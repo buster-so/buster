@@ -27,6 +27,7 @@ describe('transformers', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         },
       ];
 
@@ -95,6 +96,7 @@ describe('transformers', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         },
       ];
 
@@ -263,11 +265,11 @@ describe('transformers', () => {
       const { valid, invalid } = validateModelsForDeployment(models);
 
       expect(valid).toHaveLength(1);
-      expect(valid[0].name).toBe('valid_model');
+      expect(valid[0]?.name).toBe('valid_model');
 
       expect(invalid).toHaveLength(2);
-      expect(invalid[0].errors).toContain('Model name is required');
-      expect(invalid[1].errors).toContain('schema is required');
+      expect(invalid[0]?.errors).toContain('Model name is required');
+      expect(invalid[1]?.errors).toContain('schema is required');
     });
 
     it('should require at least one dimension or measure', () => {
@@ -280,13 +282,14 @@ describe('transformers', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const { valid, invalid } = validateModelsForDeployment([model]);
 
       expect(valid).toHaveLength(0);
       expect(invalid).toHaveLength(1);
-      expect(invalid[0].errors).toContain('Model must have at least one dimension or measure');
+      expect(invalid[0]?.errors).toContain('Model must have at least one dimension or measure');
     });
   });
 
@@ -302,6 +305,7 @@ describe('transformers', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         },
         {
           name: 'orders',
@@ -312,6 +316,7 @@ describe('transformers', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         },
         {
           name: 'analytics',
@@ -322,6 +327,7 @@ describe('transformers', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         },
       ];
 
@@ -377,6 +383,7 @@ describe('transformers', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = modelToDeployModel(model);

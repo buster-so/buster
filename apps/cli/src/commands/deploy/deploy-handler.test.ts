@@ -42,7 +42,7 @@ describe('deploy-handler', () => {
             data_source: 'global_postgres',
             database: 'global_db',
             schema: 'global_schema',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -62,12 +62,22 @@ describe('deploy-handler', () => {
         capturedRequest = request;
         return {
           success: request.models.map((m) => ({
-            model_name: m.name,
-            data_source: m.data_source_name,
+            name: m.name,
+            dataSource: m.data_source_name,
+            schema: m.schema,
           })),
           updated: [],
-          no_change: [],
+          noChange: [],
           failures: [],
+          deleted: [],
+          summary: {
+            totalModels: request.models.length,
+            successCount: request.models.length,
+            updateCount: 0,
+            noChangeCount: 0,
+            failureCount: 0,
+            deletedCount: 0,
+          },
         } as DeployResponse;
       });
 
@@ -79,6 +89,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       await deployHandler(options);
@@ -86,9 +97,9 @@ describe('deploy-handler', () => {
       // Verify the model inherited the global config
       expect(capturedRequest).toBeDefined();
       expect(capturedRequest?.models).toHaveLength(1);
-      expect(capturedRequest?.models[0].data_source_name).toBe('global_postgres');
-      expect(capturedRequest?.models[0].database).toBe('global_db');
-      expect(capturedRequest?.models[0].schema).toBe('global_schema');
+      expect(capturedRequest?.models[0]?.data_source_name).toBe('global_postgres');
+      expect(capturedRequest?.models[0]?.database).toBe('global_db');
+      expect(capturedRequest?.models[0]?.schema).toBe('global_schema');
     });
 
     it('should allow models to override global config', async () => {
@@ -100,7 +111,7 @@ describe('deploy-handler', () => {
             data_source: 'global_postgres',
             database: 'global_db',
             schema: 'global_schema',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -123,12 +134,22 @@ describe('deploy-handler', () => {
         capturedRequest = request;
         return {
           success: request.models.map((m) => ({
-            model_name: m.name,
-            data_source: m.data_source_name,
+            name: m.name,
+            dataSource: m.data_source_name,
+            schema: m.schema,
           })),
           updated: [],
-          no_change: [],
+          noChange: [],
           failures: [],
+          deleted: [],
+          summary: {
+            totalModels: request.models.length,
+            successCount: request.models.length,
+            updateCount: 0,
+            noChangeCount: 0,
+            failureCount: 0,
+            deletedCount: 0,
+          },
         } as DeployResponse;
       });
 
@@ -140,6 +161,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       await deployHandler(options);
@@ -147,9 +169,9 @@ describe('deploy-handler', () => {
       // Verify the model overrides worked correctly
       expect(capturedRequest).toBeDefined();
       expect(capturedRequest?.models).toHaveLength(1);
-      expect(capturedRequest?.models[0].data_source_name).toBe('model_mysql'); // Overridden
-      expect(capturedRequest?.models[0].database).toBe('global_db'); // Inherited
-      expect(capturedRequest?.models[0].schema).toBe('model_sales'); // Overridden
+      expect(capturedRequest?.models[0]?.data_source_name).toBe('model_mysql'); // Overridden
+      expect(capturedRequest?.models[0]?.database).toBe('global_db'); // Inherited
+      expect(capturedRequest?.models[0]?.schema).toBe('model_sales'); // Overridden
     });
 
     it('should handle multiple models with different override patterns', async () => {
@@ -161,7 +183,7 @@ describe('deploy-handler', () => {
             data_source: 'global_postgres',
             database: 'global_db',
             schema: 'global_schema',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -203,12 +225,22 @@ describe('deploy-handler', () => {
         capturedRequest = request;
         return {
           success: request.models.map((m) => ({
-            model_name: m.name,
-            data_source: m.data_source_name,
+            name: m.name,
+            dataSource: m.data_source_name,
+            schema: m.schema,
           })),
           updated: [],
-          no_change: [],
+          noChange: [],
           failures: [],
+          deleted: [],
+          summary: {
+            totalModels: request.models.length,
+            successCount: request.models.length,
+            updateCount: 0,
+            noChangeCount: 0,
+            failureCount: 0,
+            deletedCount: 0,
+          },
         } as DeployResponse;
       });
 
@@ -220,6 +252,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       await deployHandler(options);
@@ -256,7 +289,7 @@ describe('deploy-handler', () => {
             data_source: 'global_postgres',
             database: 'global_db',
             schema: 'global_schema',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -278,8 +311,17 @@ describe('deploy-handler', () => {
         return {
           success: [],
           updated: [],
-          no_change: [],
+          noChange: [],
           failures: [],
+          deleted: [],
+          summary: {
+            totalModels: 0,
+            successCount: 0,
+            updateCount: 0,
+            noChangeCount: 0,
+            failureCount: 0,
+            deletedCount: 0,
+          },
         } as DeployResponse;
       });
 
@@ -291,6 +333,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       // Should throw error because models key is not supported
@@ -309,13 +352,13 @@ describe('deploy-handler', () => {
             data_source: 'postgres',
             database: 'pg_db',
             schema: 'public',
-          },
+          } as any,
           {
             name: 'bigquery-project',
             data_source: 'bigquery',
             database: 'analytics',
             schema: 'events',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -335,12 +378,22 @@ describe('deploy-handler', () => {
         capturedRequests.push(request);
         return {
           success: request.models.map((m) => ({
-            model_name: m.name,
-            data_source: m.data_source_name,
+            name: m.name,
+            dataSource: m.data_source_name,
+            schema: m.schema,
           })),
           updated: [],
-          no_change: [],
+          noChange: [],
           failures: [],
+          deleted: [],
+          summary: {
+            totalModels: request.models.length,
+            successCount: request.models.length,
+            updateCount: 0,
+            noChangeCount: 0,
+            failureCount: 0,
+            deletedCount: 0,
+          },
         } as DeployResponse;
       });
 
@@ -352,6 +405,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       await deployHandler(options);
@@ -361,21 +415,21 @@ describe('deploy-handler', () => {
 
       // Since projects run in parallel, we need to check both deployments regardless of order
       const postgresDeployment = capturedRequests.find(
-        (r) => r.models[0].data_source_name === 'postgres'
+        (r) => r.models[0]?.data_source_name === 'postgres'
       );
       const bigqueryDeployment = capturedRequests.find(
-        (r) => r.models[0].data_source_name === 'bigquery'
+        (r) => r.models[0]?.data_source_name === 'bigquery'
       );
 
       // Check postgres deployment
       expect(postgresDeployment).toBeDefined();
-      expect(postgresDeployment!.models[0].database).toBe('pg_db');
-      expect(postgresDeployment!.models[0].schema).toBe('public');
+      expect(postgresDeployment!.models[0]?.database).toBe('pg_db');
+      expect(postgresDeployment!.models[0]?.schema).toBe('public');
 
       // Check bigquery deployment
       expect(bigqueryDeployment).toBeDefined();
-      expect(bigqueryDeployment!.models[0].database).toBe('analytics');
-      expect(bigqueryDeployment!.models[0].schema).toBe('events');
+      expect(bigqueryDeployment!.models[0]?.database).toBe('analytics');
+      expect(bigqueryDeployment!.models[0]?.schema).toBe('events');
     });
   });
 
@@ -384,6 +438,7 @@ describe('deploy-handler', () => {
       const options: DeployOptions = {
         dryRun: false,
         verbose: true,
+        debug: false,
       };
 
       const result = validateDeployOptions(options);
@@ -397,6 +452,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: false,
         verbose: false,
+        debug: false,
       };
 
       const result = validateDeployOptions(options);
@@ -410,6 +466,7 @@ describe('deploy-handler', () => {
         path: '/non/existent/path',
         dryRun: false,
         verbose: false,
+        debug: false,
       };
 
       const result = validateDeployOptions(options);
@@ -428,7 +485,7 @@ describe('deploy-handler', () => {
             name: 'test-project',
             data_source: 'postgres',
             schema: 'public',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -479,8 +536,17 @@ describe('deploy-handler', () => {
       const mockDeploy = vi.fn(async () => ({
         success: [],
         updated: [],
-        no_change: [],
+        noChange: [],
         failures: [],
+        deleted: [],
+        summary: {
+          totalModels: 0,
+          successCount: 0,
+          updateCount: 0,
+          noChangeCount: 0,
+          failureCount: 0,
+          deletedCount: 0,
+        },
       }));
 
       const { createDryRunDeployer } = await import('./deployment/strategies');
@@ -493,6 +559,7 @@ describe('deploy-handler', () => {
           path: testDir,
           dryRun: true,
           verbose: true,
+          debug: false,
         });
         expect.fail('Should have thrown DeploymentValidationError');
       } catch (error) {
@@ -513,14 +580,14 @@ describe('deploy-handler', () => {
 
       // 1. Zod schema validation errors (from model1)
       const hasSchemaErrors = allErrors.some(
-        (e) => e.includes('Expected') || e.includes('Invalid') || e.includes('Required')
+        (e: string) => e.includes('Expected') || e.includes('Invalid') || e.includes('Required')
       );
       expect(hasSchemaErrors).toBe(true);
 
       // 2. Business rule validation errors (from model2)
       // At least one of these should be present
       const hasBusinessRuleErrors = allErrors.some(
-        (e) =>
+        (e: string) =>
           e.includes('at least one dimension or measure') ||
           e.includes('must have an expression') ||
           e.includes('Duplicate filter name')
@@ -529,12 +596,12 @@ describe('deploy-handler', () => {
 
       // 3. Duplicate errors (from model3)
       const hasDuplicateErrors = allErrors.some(
-        (e) => e.includes('Duplicate dimension name') || e.includes('Duplicate measure name')
+        (e: string) => e.includes('Duplicate dimension name') || e.includes('Duplicate measure name')
       );
       expect(hasDuplicateErrors).toBe(true);
 
       // Should have failures from multiple files
-      const filesWithErrors = new Set(validationError!.parseFailures.map((f) => f.file));
+      const filesWithErrors = new Set((validationError as any).parseFailures.map((f: { file: string; error: string }) => f.file));
       expect(filesWithErrors.size).toBeGreaterThanOrEqual(2); // At least 2 different files had errors
 
       // Verify error output was logged
@@ -550,7 +617,7 @@ describe('deploy-handler', () => {
             name: 'test-project',
             data_source: 'postgres',
             schema: 'public',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -594,6 +661,7 @@ describe('deploy-handler', () => {
           path: testDir,
           dryRun: true,
           verbose: false,
+          debug: false,
         })
       ).rejects.toThrow('Cannot deploy');
 
@@ -609,6 +677,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       await expect(deployHandler(options)).rejects.toThrow('No buster.yml found');
@@ -623,7 +692,7 @@ describe('deploy-handler', () => {
             data_source: 'postgres',
             database: 'db',
             schema: 'public',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -636,8 +705,17 @@ describe('deploy-handler', () => {
       const mockDeploy = vi.fn(async () => ({
         success: [],
         updated: [],
-        no_change: [],
+        noChange: [],
         failures: [],
+        deleted: [],
+        summary: {
+          totalModels: 0,
+          successCount: 0,
+          updateCount: 0,
+          noChangeCount: 0,
+          failureCount: 0,
+          deletedCount: 0,
+        },
       }));
 
       const { createDryRunDeployer } = await import('./deployment/strategies');
@@ -647,6 +725,7 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       // Should throw validation error for invalid files
@@ -665,7 +744,7 @@ describe('deploy-handler', () => {
             data_source: 'postgres',
             database: 'db',
             schema: 'public',
-          },
+          } as any,
         ],
       };
       await writeFile(join(testDir, 'buster.yml'), yaml.dump(busterConfig));
@@ -691,13 +770,14 @@ describe('deploy-handler', () => {
         path: testDir,
         dryRun: true,
         verbose: false,
+        debug: false,
       };
 
       const result = await deployHandler(options);
 
       // Should handle the deployment error and return failure result
       expect(result.failures).toHaveLength(1);
-      expect(result.failures[0].errors[0]).toContain('Deployment error');
+      expect(result.failures[0]?.errors[0]).toContain('Deployment error');
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Deployment failed'));
     });
   });

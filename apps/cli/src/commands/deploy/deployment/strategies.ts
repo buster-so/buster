@@ -89,13 +89,9 @@ export async function createAuthenticatedDeployer(): Promise<DeployFunction> {
   const credentials = await getCredentials();
 
   if (!credentials?.apiKey) {
-    const isCIEnvironment = process.env.CI || !process.stdin.isTTY;
-    if (isCIEnvironment) {
-      throw new Error(
-        'Not authenticated. Please set BUSTER_API_KEY environment variable or use --api-key flag.'
-      );
-    }
-    throw new Error('Not authenticated. Please run: buster auth');
+    throw new Error(
+      'Not authenticated. Please set BUSTER_API_KEY environment variable or run "buster auth" to save credentials.'
+    );
   }
 
   const sdk = createBusterSDK({

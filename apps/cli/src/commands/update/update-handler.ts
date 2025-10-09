@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync } from 'node:fs';
-import { chmod, mkdir, rename, unlink } from 'node:fs/promises';
+import { createReadStream, createWriteStream, existsSync } from 'node:fs';
+import { chmod, mkdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { arch, platform, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
@@ -102,7 +102,6 @@ async function downloadFile(url: string, destination: string): Promise<void> {
  * Verify file checksum
  */
 async function verifyChecksum(filePath: string, expectedChecksum: string): Promise<boolean> {
-  const { createReadStream } = await import('node:fs');
   const hash = createHash('sha256');
   const stream = createReadStream(filePath);
 
@@ -315,7 +314,6 @@ export async function updateHandler(options: UpdateOptions): Promise<UpdateResul
     ]);
 
     // Read and validate checksum
-    const { readFile } = await import('node:fs/promises');
     const checksumContent = await readFile(checksumPath, 'utf-8');
 
     // SHA256 checksums are 64 hex characters
@@ -346,7 +344,6 @@ export async function updateHandler(options: UpdateOptions): Promise<UpdateResul
     await replaceBinary(extractedBinary);
 
     // Clean up temp directory
-    const { rm } = await import('node:fs/promises');
     await rm(tempDir, { recursive: true, force: true });
 
     return {
@@ -361,7 +358,6 @@ export async function updateHandler(options: UpdateOptions): Promise<UpdateResul
   } catch (error) {
     // Clean up on error
     try {
-      const { rm } = await import('node:fs/promises');
       await rm(tempDir, { recursive: true, force: true });
     } catch {
       // Ignore cleanup errors
