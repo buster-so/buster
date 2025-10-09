@@ -1,12 +1,12 @@
 import { getPermissionedDatasets } from '../datasets/permissions';
 import {
-  type ParsedDataset,
-  type ParsedTable,
   checkQueryIsReadOnly,
   extractColumnReferences,
   extractDatasetsFromYml,
   extractPhysicalTables,
   extractTablesFromYml,
+  type ParsedDataset,
+  type ParsedTable,
   tablesMatch,
   validateWildcardUsage,
 } from './parser-helpers';

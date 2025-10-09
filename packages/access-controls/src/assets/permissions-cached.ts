@@ -1,5 +1,5 @@
-import { checkPermission } from './checks';
 import type { AssetPermissionCheck } from './checks';
+import { checkPermission } from './checks';
 
 /**
  * Cached version of hasAssetPermission

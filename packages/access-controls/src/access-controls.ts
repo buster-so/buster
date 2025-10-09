@@ -464,11 +464,8 @@ export async function hasAllDatasetsAccess(userId: string, datasetIds: string[])
   // --- Step 3: Check specific permissions for each dataset ---
   for (const datasetId of input.datasetIds) {
     const datasetOrgId = datasetInfos.find(
-      (info: {
-        id: string;
-        organizationId: string;
-        deletedAt: string | null;
-      }) => info.id === datasetId
+      (info: { id: string; organizationId: string; deletedAt: string | null }) =>
+        info.id === datasetId
     )?.organizationId;
 
     if (!datasetOrgId) {
