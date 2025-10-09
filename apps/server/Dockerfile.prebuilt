@@ -29,6 +29,25 @@ COPY --chown=bunuser:bunuser dist ./dist
 COPY --chown=bunuser:bunuser node_modules ./node_modules
 COPY --chown=bunuser:bunuser package.json ./
 
+# Verify Sharp installation for linux-x64-glibc
+RUN echo "=== Verifying Sharp installation ===" && \
+    if find node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then \
+      echo "✅ Sharp linux-x64 platform package found"; \
+      find node_modules -path "*/@img/sharp-linux-x64*" -type d; \
+      if find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f | grep -q .; then \
+        echo "✅ Sharp native binaries (.node files) found:"; \
+        find node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f; \
+      else \
+        echo "❌ ERROR: Sharp native binaries NOT found!"; \
+        exit 1; \
+      fi; \
+    else \
+      echo "❌ ERROR: Sharp linux-x64 platform package NOT found!"; \
+      echo "Available Sharp packages:"; \
+      find node_modules -path "*/@img/sharp-*" -type d || echo "None found"; \
+      exit 1; \
+    fi
+
 # Show image info
 RUN echo "=== Production image ready ===" && \
     echo "Commit: ${COMMIT_SHA:-unknown}" && \

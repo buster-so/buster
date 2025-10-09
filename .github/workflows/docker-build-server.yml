@@ -159,6 +159,24 @@ jobs:
           cp -r apps/server/dist docker-context/
           cp apps/server/package.json docker-context/
 
+      - name: Verify Sharp in production node_modules
+        run: |
+          echo "🔍 Final verification of Sharp in docker-context..."
+
+          if find docker-context/node_modules -path "*/@img/sharp-linux-x64*" -type d | grep -q .; then
+            echo "✅ Sharp linux-x64 platform package found in docker-context"
+            find docker-context/node_modules -path "*/@img/sharp-linux-x64*" -type d
+
+            echo ""
+            echo "Native binaries:"
+            find docker-context/node_modules -path "*/@img/sharp-linux-x64*/*.node" -type f
+          else
+            echo "❌ ERROR: Sharp linux-x64 NOT found in production node_modules!"
+            echo "Available Sharp packages:"
+            find docker-context/node_modules -path "*/@img/sharp-*" -type d || echo "None found"
+            exit 1
+          fi
+
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
       
