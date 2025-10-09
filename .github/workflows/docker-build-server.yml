@@ -41,8 +41,8 @@ jobs:
           echo "supportedArchitectures[cpu][]=x64" >> .npmrc
           echo "supportedArchitectures[libc][]=glibc" >> .npmrc
           echo "" >> .npmrc
-          echo "# Enable build scripts for Sharp to download native binaries" >> .npmrc
-          echo "enable-pre-post-scripts=true" >> .npmrc
+          echo "# CRITICAL: Include optional dependencies (Sharp platform binaries)" >> .npmrc
+          echo "optional=true" >> .npmrc
           echo ""
           echo "Configuration:"
           cat .npmrc
@@ -134,15 +134,18 @@ jobs:
             # Reinstall Sharp in THIS package only
             echo ""
             echo "📦 Reinstalling Sharp with linux-x64-glibc binaries..."
-            echo "Running: pnpm install --no-frozen-lockfile (with build scripts enabled)"
-            pnpm install --no-frozen-lockfile
+            echo "Running: pnpm install sharp --no-optional=false"
+            pnpm install sharp --no-optional=false
 
-            # Explicitly run Sharp's install script if it didn't run
-            if [ -f "node_modules/sharp/install/check.js" ]; then
-              echo ""
-              echo "Running Sharp's install script explicitly..."
-              cd node_modules/sharp && node install/check.js && cd ../..
-            fi
+            # Manually install the platform-specific Sharp package
+            echo ""
+            echo "📦 Manually installing @img/sharp-linux-x64 package..."
+            pnpm install @img/sharp-linux-x64 --save-optional || echo "Failed to install @img/sharp-linux-x64"
+
+            # Try the glibc-specific version
+            echo ""
+            echo "📦 Trying @img/sharp-libvips-linux-x64 package..."
+            pnpm install @img/sharp-libvips-linux-x64 --save-optional || echo "Failed to install @img/sharp-libvips-linux-x64"
 
             # Verify again
             echo ""
