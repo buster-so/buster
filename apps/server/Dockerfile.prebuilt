@@ -3,7 +3,7 @@
 # This expects the app to be already built by GitHub Actions
 # ================================================================
 
-FROM oven/bun:1.2.21-alpine AS runtime
+FROM oven/bun:1.2.21-debian AS runtime
 
 WORKDIR /app
 
