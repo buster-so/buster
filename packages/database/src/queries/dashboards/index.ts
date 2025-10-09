@@ -1,3 +1,4 @@
+export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';
 export {
   type DashboardFile,
   type DashboardFileContext,
@@ -7,8 +8,6 @@ export {
   type AssociatedCollection,
   getCollectionsAssociatedWithDashboard,
 } from './get-collections-associated-with-dashboard';
-
-export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';
 export {
   type GetDashboardByIdInput,
   GetDashboardByIdInputSchema,

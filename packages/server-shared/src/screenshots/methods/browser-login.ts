@@ -11,7 +11,11 @@ type BrowserParamsBase<T> = {
     page,
     browser,
     type,
-  }: { page: Page; browser: Browser; type: 'png' | 'webp' }) => Promise<T>;
+  }: {
+    page: Page;
+    browser: Browser;
+    type: 'png' | 'webp';
+  }) => Promise<T>;
 };
 
 export const BrowserParamsContextSchema = z.object({

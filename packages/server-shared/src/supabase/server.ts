@@ -1,4 +1,4 @@
-import { type User, createClient } from '@supabase/supabase-js';
+import { createClient, type User } from '@supabase/supabase-js';
 
 const createSupabaseClient = () => {
   const supabaseUrl = process.env.SUPABASE_URL;
