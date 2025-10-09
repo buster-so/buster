@@ -53,137 +53,6 @@ jobs:
           install-filter: "@buster-app/server..."
           cache-key: docker-build-server
 
-      - name: Verify Sharp for build phase
-        run: |
-          echo "🔍 Verifying Sharp is installed with correct architecture..."
-          cd packages/server-shared
-
-          # Check Sharp is installed
-          if ! pnpm list sharp --depth=0 2>/dev/null | grep -q "sharp"; then
-            echo "❌ ERROR: Sharp not found in @buster/server-shared!"
-            exit 1
-          fi
-
-          echo "✅ Sharp package found"
-          pnpm list sharp --depth=0
-
-          # Show Sharp version and info
-          echo ""
-          echo "📋 Sharp package details:"
-          if [ -f "node_modules/sharp/package.json" ]; then
-            echo "Version: $(cat node_modules/sharp/package.json | grep '"version"' | head -1)"
-            echo "Install script: $(cat node_modules/sharp/package.json | grep '"install"' | head -1)"
-          fi
-
-          # Check what Sharp platform packages are installed
-          echo ""
-          echo "📦 Installed Sharp platform-specific packages:"
-          if [ -d "node_modules/@img" ]; then
-            ls -la node_modules/@img/ | grep sharp || echo "No @img/sharp-* packages found"
-            echo ""
-            echo "Detailed package info:"
-            for dir in node_modules/@img/sharp-*; do
-              if [ -d "$dir" ]; then
-                echo "  - $(basename $dir): $(cat $dir/package.json 2>/dev/null | grep '"version"' | head -1)"
-              fi
-            done
-          else
-            echo "❌ @img directory not found in node_modules"
-          fi
-
-          # Check Sharp's node_modules for platform binaries
-          echo ""
-          echo "📦 Sharp's nested node_modules:"
-          if [ -d "node_modules/sharp/node_modules" ]; then
-            ls -la node_modules/sharp/node_modules/ || echo "Empty"
-          else
-            echo "No nested node_modules in Sharp"
-          fi
-
-          # Verify linux-x64 native binary exists
-          echo ""
-          echo "🔍 Checking for linux-x64-glibc native binaries..."
-          echo "Current .npmrc configuration:"
-          cat ../../.npmrc
-
-          if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -L "node_modules/@img/sharp-linux-x64" ]; then
-            echo "✅ Sharp linux-x64 platform package found:"
-            ls -la node_modules/@img/sharp-linux-x64 2>/dev/null || true
-
-            # List .node binaries - follow symlinks with -L
-            echo ""
-            echo "Native binaries (.node files):"
-            find -L node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null || echo "⚠️  No .node files found"
-            find -L node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null || echo "⚠️  No libvips .node files found"
-          else
-            echo "⚠️  Sharp linux-x64 platform package NOT found! Attempting to reinstall..."
-            echo "Available Sharp platform packages:"
-            find node_modules -path "*/@img/sharp-*" -type d || echo "None found"
-
-            # Show what architecture pnpm thinks we're on
-            echo ""
-            echo "Current environment:"
-            echo "uname -m: $(uname -m)"
-            echo "NODE_ARCH: ${NODE_ARCH:-not set}"
-
-            # Remove existing Sharp and related packages
-            echo ""
-            echo "Removing existing Sharp installation..."
-            rm -rf node_modules/sharp
-            find node_modules/.pnpm -name "*sharp*" -type d -exec rm -rf {} + 2>/dev/null || true
-
-            # Reinstall Sharp in THIS package only
-            echo ""
-            echo "📦 Reinstalling Sharp with linux-x64-glibc binaries..."
-            echo "Running: pnpm install sharp --no-optional=false"
-            pnpm install sharp --no-optional=false
-
-            # Manually install the platform-specific Sharp package
-            echo ""
-            echo "📦 Manually installing @img/sharp-linux-x64 package..."
-            pnpm install @img/sharp-linux-x64 --save-optional || echo "Failed to install @img/sharp-linux-x64"
-
-            # Try the glibc-specific version
-            echo ""
-            echo "📦 Trying @img/sharp-libvips-linux-x64 package..."
-            pnpm install @img/sharp-libvips-linux-x64 --save-optional || echo "Failed to install @img/sharp-libvips-linux-x64"
-
-            # Verify again
-            echo ""
-            echo "🔍 Re-checking for linux-x64 binaries..."
-
-            # Show what was actually installed
-            echo "Installed @img packages:"
-            ls -la node_modules/@img/ 2>/dev/null | grep sharp || echo "No @img/sharp packages"
-
-            echo ""
-            echo "Sharp's nested dependencies:"
-            ls -la node_modules/sharp/node_modules/ 2>/dev/null || echo "No nested node_modules"
-
-            echo ""
-            echo "All Sharp-related packages in node_modules:"
-            find node_modules -name "*sharp*" -type d | head -20
-
-            if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -L "node_modules/@img/sharp-linux-x64" ]; then
-              echo ""
-              echo "✅ Sharp linux-x64 successfully installed on retry!"
-              ls -la node_modules/@img/sharp*
-              echo ""
-              echo "Native binaries:"
-              find -L node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null
-              find -L node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null
-            else
-              echo ""
-              echo "❌ ERROR: Still unable to install Sharp linux-x64 after retry!"
-              echo "Available @img packages:"
-              ls -la node_modules/@img/ 2>/dev/null || echo "None found"
-              exit 1
-            fi
-          fi
-
-          echo ""
-          echo "✅ Sharp linux-x64-glibc verified successfully"
-
       - name: Mount Turbo cache sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
@@ -228,27 +97,17 @@ jobs:
 
           # Install production dependencies with correct architecture (using .npmrc from workspace)
           cd /tmp/prod-deps
+          pnpm install --prod
 
-          # First add Sharp platform binaries to package.json
-          echo "📦 Adding Sharp platform binaries to workspace..."
-          pnpm add -w @img/sharp-linux-x64@^0.34.4 @img/sharp-libvips-linux-x64@^1.2.3 --save-optional --save-prod --ignore-scripts
-
-          # Now install all production dependencies including Sharp binaries
-          # Note: Sharp's build script is ignored by pnpm security, but that's OK
-          # because Sharp v0.34+ uses optionalDependencies (@img/sharp-*) instead of build scripts
+          # Install Sharp with linux-x64 binaries directly - simple and reliable!
           echo ""
-          echo "📦 Installing production dependencies..."
-          pnpm install --prod --ignore-scripts
+          echo "📦 Installing Sharp with linux-x64-glibc binaries for production..."
+          npm install --no-save --cpu=x64 --os=linux --libc=glibc \
+            sharp@^0.34.4 \
+            @img/sharp-linux-x64@^0.34.4 \
+            @img/sharp-libvips-linux-x64@^1.2.3
 
-          # Verify Sharp and platform packages were installed
-          echo ""
-          echo "🔍 Verifying Sharp installation in /tmp/prod-deps..."
-          if [ -d "node_modules/sharp" ]; then
-            echo "✅ Sharp found"
-            ls -la node_modules/@img/sharp* 2>/dev/null || echo "⚠️  No @img/sharp packages yet"
-          else
-            echo "❌ Sharp not found!"
-          fi
+          echo "✅ Sharp installed for production"
 
           # Copy back to workspace
           cd -
