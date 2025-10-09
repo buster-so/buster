@@ -67,7 +67,7 @@ jobs:
         run: |
           echo "📦 Creating server bundle with bun..."
           cd apps/server
-          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64
+          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64 --external playwright-core --external playwright --external electron --external chromium-bidi --external @vitest/* --external vitest
           ls -la dist/
           cd ../..
       
