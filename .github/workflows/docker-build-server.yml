@@ -88,7 +88,7 @@ jobs:
           npm_config_platform=linux \
           npm_config_arch=x64 \
           npm_config_libc=glibc \
-          pnpm install --frozen-lockfile --prod --include-optional
+          pnpm install --frozen-lockfile --prod
 
           # Verify Sharp was installed correctly for linux-x64
           echo "🔍 Verifying Sharp installation..."
