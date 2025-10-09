@@ -48,7 +48,7 @@ export const takeReportScreenshotHandlerTask: ReturnType<
 const shouldTakenNewScreenshot = async ({ reportId }: { reportId: string }) => {
   const hasRecentScreenshot = await hasReportScreenshotBeenTakenWithin(
     reportId,
-    dayjs().subtract(24, 'hours')
+    dayjs().subtract(6, 'hours')
   );
 
   return !hasRecentScreenshot;
