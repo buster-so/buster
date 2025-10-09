@@ -5,12 +5,7 @@
   "version": "0.0.4",
   "scripts": {
     "prebuild": "tsx scripts/validate-env.ts",
-    "build:vercel": "pnpm prebuild && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build -- --typecheck",
-    "build:vercel:staging": "pnpm prebuild && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build --mode staging -- --typecheck",
-    "build:vercel:production": "pnpm prebuild && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build --mode production -- --typecheck",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build -- --typecheck",
-    "build:staging": "cross-env NODE_OPTIONS=--max-old-space-size=8192 pnpm run prebuild && vite build --mode staging -- --typecheck",
-    "build:production": "cross-env NODE_OPTIONS=--max-old-space-size=8192 pnpm run prebuild && vite build --mode production -- --typecheck",
     "build:local": "pnpm prebuild && cross-env NODE_OPTIONS=--max-old-space-size=12288 vite build -- --typecheck --local",
     "build-storybook": "storybook build",
     "build:visualize": "cross-env NODE_OPTIONS=--max-old-space-size=8192 npx vite-bundle-visualizer",
