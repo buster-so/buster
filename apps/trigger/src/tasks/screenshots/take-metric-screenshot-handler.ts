@@ -15,7 +15,7 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
 > = schemaTask({
   id: screenshots_task_keys.take_metric_screenshot,
   schema: TakeMetricScreenshotTriggerSchema,
-  maxDuration: 60 * 3, // 3 minutes max
+  maxDuration: 60 * 2, // 2 minutes max
   retry: {
     maxAttempts: 1,
     minTimeoutInMs: 1000, // 1 second

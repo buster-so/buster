@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DEFAULT_SCREENSHOT_CONFIG } from './methods/screenshot-config';
 import { BaseScreenshotSearchSchema } from './requests.base';
 
 export const GetMetricScreenshotParamsSchema = z.object({
@@ -8,8 +9,8 @@ export const GetMetricScreenshotParamsSchema = z.object({
 export const GetMetricScreenshotQuerySchema = z
   .object({
     version_number: z.coerce.number().min(1).optional(),
-    width: z.coerce.number().min(100).max(3840).default(800),
-    height: z.coerce.number().min(100).max(2160).default(450),
+    width: z.coerce.number().min(100).max(3840).default(DEFAULT_SCREENSHOT_CONFIG.width),
+    height: z.coerce.number().min(100).max(2160).default(DEFAULT_SCREENSHOT_CONFIG.height),
     type: z.enum(['png', 'jpeg']).default('png').optional(),
   })
   .merge(BaseScreenshotSearchSchema);

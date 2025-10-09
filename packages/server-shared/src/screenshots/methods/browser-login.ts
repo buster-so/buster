@@ -92,6 +92,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     });
 
     await page.goto(fullPath, { waitUntil: 'networkidle' });
+    console.info('Page loaded', { fullPath, height, width });
 
     const result = await callback({ page, browser });
 

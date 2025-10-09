@@ -45,6 +45,11 @@ export const GlobalSearchModalBase = ({
   const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
+  const resetModal = () => {
+    setViewedItem(null);
+    onChangeValue('');
+  };
+
   const searchItems: SearchItems[] = useMemo(() => {
     const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
       const Icon = assetTypeToIcon(item.assetType);
@@ -68,6 +73,9 @@ export const GlobalSearchModalBase = ({
           }) as Parameters<typeof navigate>[0];
           await navigate(link);
           onClose();
+          setTimeout(() => {
+            resetModal();
+          }, 200);
         },
       };
     };
