@@ -136,6 +136,7 @@
     "@buster/vitest-config": "workspace:*",
     "@supabase/supabase-js": "catalog:",
     "playwright": "^1.55.1",
+    "sharp": "^0.34.4",
     "zod": "catalog:"
   },
   "devDependencies": {

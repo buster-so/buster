@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { BrowserParamsContextSchema, browserLogin } from './browser-login';
 import { createHrefFromLink } from './create-href-from-link';
 import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
+import { takeScreenshot } from './take-screenshot';
 
 export const GetDashboardScreenshotHandlerArgsSchema = z
   .object({
@@ -15,8 +16,6 @@ export type GetDashboardScreenshotHandlerArgs = z.infer<
 >;
 
 export const getDashboardScreenshot = async (args: GetDashboardScreenshotHandlerArgs) => {
-  const { type = DEFAULT_SCREENSHOT_CONFIG.type } = args;
-
   const { result: screenshotBuffer } = await browserLogin({
     ...args,
     fullPath: createHrefFromLink({
@@ -26,10 +25,7 @@ export const getDashboardScreenshot = async (args: GetDashboardScreenshotHandler
         version_number: args.version_number,
       },
     }),
-    callback: async ({ page }) => {
-      const screenshotBuffer = await page.screenshot({ type });
-      return screenshotBuffer;
-    },
+    callback: takeScreenshot,
   });
 
   return screenshotBuffer;

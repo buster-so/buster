@@ -7,7 +7,11 @@ type BrowserParamsBase<T> = {
   width?: number | undefined;
   height?: number | undefined;
   fullPath: string;
-  callback: ({ page, browser }: { page: Page; browser: Browser }) => Promise<T>;
+  callback: ({
+    page,
+    browser,
+    type,
+  }: { page: Page; browser: Browser; type: 'png' | 'webp' }) => Promise<T>;
 };
 
 export const BrowserParamsContextSchema = z.object({
@@ -15,13 +19,13 @@ export const BrowserParamsContextSchema = z.object({
   organizationId: z.string(),
   width: z.number().min(100).max(3840).default(DEFAULT_SCREENSHOT_CONFIG.width).optional(),
   height: z.number().min(100).max(7000).default(DEFAULT_SCREENSHOT_CONFIG.height).optional(),
-  type: z.enum(['png', 'jpeg']).default(DEFAULT_SCREENSHOT_CONFIG.type).optional(),
   deviceScaleFactor: z
     .number()
     .min(1)
     .max(4)
     .default(DEFAULT_SCREENSHOT_CONFIG.deviceScaleFactor)
     .optional(),
+  type: z.enum(['png', 'webp']).default(DEFAULT_SCREENSHOT_CONFIG.type).optional(),
 });
 
 export type BrowserParamsContext = z.infer<typeof BrowserParamsContextSchema>;
@@ -35,6 +39,8 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   fullPath,
   callback,
   accessToken,
+  deviceScaleFactor,
+  type,
 }: BrowserParams<T>) => {
   if (!accessToken) {
     throw new Error('Missing Authorization header');
@@ -70,7 +76,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   try {
     const context = await browser.newContext({
       viewport: { width, height },
-      deviceScaleFactor: DEFAULT_SCREENSHOT_CONFIG.deviceScaleFactor, // High-DPI rendering for better quality screenshots
+      deviceScaleFactor: deviceScaleFactor || DEFAULT_SCREENSHOT_CONFIG.deviceScaleFactor, // High-DPI rendering for better quality screenshots
     });
 
     // Format cookie value as Supabase expects: base64-<encoded_session>
@@ -102,7 +108,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
 
     await page.goto(fullPath, { waitUntil: 'networkidle' });
 
-    const result = await callback({ page, browser });
+    const result = await callback({ page, browser, type: type || DEFAULT_SCREENSHOT_CONFIG.type });
 
     if (pageError) {
       throw pageError;
