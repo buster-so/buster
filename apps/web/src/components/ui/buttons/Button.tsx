@@ -85,7 +85,7 @@ export const buttonVariants = cva(
   }
 );
 
-export const buttonIconVariants = cva('', {
+export const buttonIconVariants = cva('button-icon', {
   variants: {
     variant: {
       default: 'text-icon-color',
