@@ -4,7 +4,9 @@ on:
   push:
     branches: [main, staging]
     paths:
-      - 'packages/database/**'
+      - 'packages/database/drizzle/**'
+      - 'packages/database/src/schema-types/**'
+      - 'packages/database/drizzle.config.ts'
       - '.github/workflows/database-migrations.yml'
   workflow_dispatch:
     inputs:
