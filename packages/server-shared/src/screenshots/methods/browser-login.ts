@@ -98,13 +98,14 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     const isLocalhost =
       domain === 'localhost' || domain === '127.0.0.1' || domain.endsWith('.local');
 
-    const cookieConfig = {
+    const cookieConfig: Parameters<typeof context.addCookies>[0][0] = {
       name: supabaseCookieKey,
       value: cookieValue,
       path: '/',
-      httpOnly: false, // Set to false so JavaScript can access it
+      httpOnly: false,
       secure: url.protocol === 'https:',
-      sameSite: 'Lax' as const,
+      sameSite: 'Lax',
+      expires: jwtPayload.exp,
       ...(isLocalhost ? {} : { domain }),
     };
 
