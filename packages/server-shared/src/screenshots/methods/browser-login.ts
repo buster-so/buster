@@ -105,6 +105,8 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       expires: jwtPayload.exp,
     };
 
+    console.log(JSON.stringify(cookieConfig, null, 2));
+
     await context.addCookies([cookieConfig]);
 
     const page = await context.newPage();
