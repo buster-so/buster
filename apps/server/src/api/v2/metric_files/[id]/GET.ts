@@ -6,6 +6,7 @@ import {
 } from '@buster/server-shared/metrics';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import {
   buildMetricResponse,
   fetchAndProcessMetricData,
@@ -56,12 +57,17 @@ export async function getMetricHandler(
   { metricId, ...params }: GetMetricHandlerParams,
   user: User
 ): Promise<GetMetricResponse> {
-  // Use shared helper to fetch and process metric data
-  const processedData = await fetchAndProcessMetricData(metricId, user, {
-    publicAccessPreviouslyVerified: false,
-    ...params,
-  });
+  try {
+    // Use shared helper to fetch and process metric data
+    const processedData = await fetchAndProcessMetricData(metricId, user, {
+      publicAccessPreviouslyVerified: false,
+      ...params,
+    });
 
-  // Build and return the complete metric response
-  return await buildMetricResponse(processedData, user.id);
+    // Build and return the complete metric response
+    return await buildMetricResponse(processedData, user.id);
+  } catch (error) {
+    console.error('Error fetching metric:', error);
+    throw new HTTPException(500, { message: 'Failed to fetch metric' });
+  }
 }
