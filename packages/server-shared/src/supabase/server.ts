@@ -1,11 +1,10 @@
 import { createClient, type User } from '@supabase/supabase-js';
-import { env } from '../env';
 
 //@ts-expect-error - window is not defined on the server
 const isServer = typeof window === 'undefined';
 
 const createSupabaseClient = () => {
-  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL;
 
   if (!isServer) {
     throw new Error('createSupabaseClient is not available on the client');
@@ -15,7 +14,7 @@ const createSupabaseClient = () => {
     throw new Error('SUPABASE_URL is not set');
   }
 
-  const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseServiceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');

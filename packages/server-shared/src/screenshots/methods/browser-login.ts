@@ -1,6 +1,5 @@
 import type { Browser, Page } from 'playwright';
 import { z } from 'zod';
-import { env } from '../../env';
 import { getSupabaseCookieKey, getSupabaseUser } from '../../supabase/server';
 import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
 
@@ -86,12 +85,19 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
 
     // Format cookie value as Supabase expects: base64-<encoded_session>
     const cookieValue = `base64-${Buffer.from(JSON.stringify(session)).toString('base64')}`;
+    const publicUrl = process.env.VITE_PUBLIC_URL;
+
+    if (!publicUrl) {
+      throw new Error('VITE_PUBLIC_URL environment variable is required for browser screenshots');
+    }
+
+    const domain = new URL(publicUrl).hostname;
 
     await context.addCookies([
       {
         name: supabaseCookieKey,
         value: cookieValue,
-        domain: new URL(env.VITE_PUBLIC_URL || {}).hostname,
+        domain,
         path: '/',
         httpOnly: true,
         secure: true,
