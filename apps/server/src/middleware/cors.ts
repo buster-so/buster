@@ -8,6 +8,11 @@ export const corsMiddleware = cors({
         return origin;
       }
     : (origin) => {
+        // Handle missing or empty origin (health checks, direct API calls, etc.)
+        if (!origin) {
+          return undefined;
+        }
+
         try {
           const url = new URL(origin);
           const hostname = url.hostname;
