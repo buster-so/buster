@@ -1,0 +1,1 @@
+ALTER TABLE "datasets" ADD COLUMN IF NOT EXISTS "metadata" jsonb DEFAULT '{"rowCount":0,"sampleSize":0,"samplingMethod":"none","columnProfiles":[],"introspectedAt":"2024-01-01T00:00:00.000Z"}'::jsonb;
