@@ -13,198 +13,10 @@ env:
 
 jobs:
   # Lint job - runs first
-  # lint:
-  #   name: Lint
-  #   runs-on: blacksmith-2vcpu-ubuntu-2404
-  #   timeout-minutes: 5
-  #   environment: testing
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Node Environment
-  #       uses: ./.github/actions/setup-node-env
-  #       with:
-  #         cache-key: lint-build-test
-
-  #     - name: Lint all packages
-  #       run: pnpm turbo lint
-
-  # # Build job - runs after lint
-  # build:
-  #   name: Build
-  #   needs: lint
-  #   runs-on: blacksmith-4vcpu-ubuntu-2404
-  #   timeout-minutes: 10
-  #   environment: testing
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Node Environment
-  #       uses: ./.github/actions/setup-node-env
-  #       with:
-  #         cache-key: lint-build-test
-
-  #     - name: Build all packages
-  #       run: pnpm turbo build
-  #       env:
-  #         TURBO_CACHE_DIR: .turbo
-  #         SKIP_ENV_CHECK: true
-  #         TURBO_TELEMETRY_DISABLED: 1
-  #         MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
-  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  #         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  #         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-  #         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-  #         SUPABASE_PUBLIC_URL: ${{ secrets.SUPABASE_PUBLIC_URL }}
-  #         VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
-  #         VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
-  #         VITE_PUBLIC_WEB_SOCKET_URL: ${{ secrets.VITE_PUBLIC_WEB_SOCKET_URL }}
-  #         VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
-  #         VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
-  #         VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
-  #         VITE_PUBLIC_WS_URL: ${{ secrets.VITE_PUBLIC_WS_URL }}
-  #         VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_PUBLIC_POSTHOG_KEY }}
-  #         VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
-  #         VITE_SLACK_APP_SUPPORT_URL: ${{ secrets.VITE_SLACK_APP_SUPPORT_URL }}
-  #         VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY }}
-  #         SERVER_PORT: ${{ secrets.SERVER_PORT }}
-  #         ELECTRIC_PROXY_URL: ${{ secrets.ELECTRIC_PROXY_URL }}
-  #         ELECTRIC_PORT: ${{ secrets.ELECTRIC_PORT }}
-  #         ELECTRIC_INSECURE: ${{ secrets.ELECTRIC_INSECURE }}
-  #         ELECTRIC_SECRET: ${{ secrets.ELECTRIC_SECRET }}
-  #         ELECTRIC_SOURCE_ID: ${{ secrets.ELECTRIC_SOURCE_ID }}
-  #         RERANK_API_KEY: ${{ secrets.RERANK_API_KEY }}
-  #         RERANK_MODEL: ${{ secrets.RERANK_MODEL }}
-  #         RERANK_BASE_URL: ${{ secrets.RERANK_BASE_URL }}
-  #         LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-  #         LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
-  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  #         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  #         TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
-  #         TURBOPUFFER_REGION: ${{ secrets.TURBOPUFFER_REGION }}
-  #         POSTHOG_TELEMETRY_KEY: ${{ secrets.POSTHOG_TELEMETRY_KEY }}
-  #         BRAINTRUST_KEY: ${{ secrets.BRAINTRUST_KEY }}
-  #         BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
-  #         TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
-  #         TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
-  #         R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-  #         R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-  #         R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-  #         R2_BUCKET: ${{ secrets.R2_BUCKET }}
-  #         GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
-  #         GITHUB_APP_PRIVATE_KEY_BASE64: ${{ secrets.GITHUB_APP_PRIVATE_KEY_BASE64 }}
-  #         GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
-  #         ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
-  #         LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
-  #         BUSTER_URL: ${{ secrets.BUSTER_URL }}
-  #         BUSTER_WH_TOKEN: ${{ secrets.BUSTER_WH_TOKEN }}
-  #         POOLER_URL: ${{ secrets.POOLER_URL }}
-  #         SERVER_URL: ${{ secrets.SERVER_URL }}
-  #         JWT_SECRET: ${{ secrets.JWT_SECRET }}
-  #         SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
-  #         SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
-  #         SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-  #         SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
-  #         AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
-  #         DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
-
-  # # Unit test job - runs after build completes
-  # unit_test:
-  #   name: Unit Test
-  #   needs: build
-  #   runs-on: blacksmith-4vcpu-ubuntu-2404
-  #   timeout-minutes: 10
-  #   environment: testing
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Node Environment
-  #       uses: ./.github/actions/setup-node-env
-  #       with:
-  #         cache-key: lint-build-test
-
-  #     - name: Run all unit tests
-  #       run: pnpm turbo test:unit
-  #       env:
-  #         TURBO_CACHE_DIR: .turbo
-  #         SKIP_ENV_CHECK: true
-  #         TURBO_TELEMETRY_DISABLED: 1
-  #         MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
-  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  #         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  #         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-  #         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-  #         SUPABASE_PUBLIC_URL: ${{ secrets.SUPABASE_PUBLIC_URL }}
-  #         VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
-  #         VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
-  #         VITE_PUBLIC_WEB_SOCKET_URL: ${{ secrets.VITE_PUBLIC_WEB_SOCKET_URL }}
-  #         VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
-  #         VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
-  #         VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
-  #         VITE_PUBLIC_WS_URL: ${{ secrets.VITE_PUBLIC_WS_URL }}
-  #         VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_PUBLIC_POSTHOG_KEY }}
-  #         VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
-  #         VITE_SLACK_APP_SUPPORT_URL: ${{ secrets.VITE_SLACK_APP_SUPPORT_URL }}
-  #         VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY }}
-  #         SERVER_PORT: ${{ secrets.SERVER_PORT }}
-  #         ELECTRIC_PROXY_URL: ${{ secrets.ELECTRIC_PROXY_URL }}
-  #         ELECTRIC_PORT: ${{ secrets.ELECTRIC_PORT }}
-  #         ELECTRIC_INSECURE: ${{ secrets.ELECTRIC_INSECURE }}
-  #         ELECTRIC_SECRET: ${{ secrets.ELECTRIC_SECRET }}
-  #         ELECTRIC_SOURCE_ID: ${{ secrets.ELECTRIC_SOURCE_ID }}
-  #         RERANK_API_KEY: ${{ secrets.RERANK_API_KEY }}
-  #         RERANK_MODEL: ${{ secrets.RERANK_MODEL }}
-  #         RERANK_BASE_URL: ${{ secrets.RERANK_BASE_URL }}
-  #         LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-  #         LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
-  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  #         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  #         TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
-  #         TURBOPUFFER_REGION: ${{ secrets.TURBOPUFFER_REGION }}
-  #         POSTHOG_TELEMETRY_KEY: ${{ secrets.POSTHOG_TELEMETRY_KEY }}
-  #         BRAINTRUST_KEY: ${{ secrets.BRAINTRUST_KEY }}
-  #         BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
-  #         TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
-  #         TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
-  #         R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-  #         R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-  #         R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-  #         R2_BUCKET: ${{ secrets.R2_BUCKET }}
-  #         GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
-  #         GITHUB_APP_PRIVATE_KEY_BASE64: ${{ secrets.GITHUB_APP_PRIVATE_KEY_BASE64 }}
-  #         GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
-  #         ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
-  #         LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
-  #         BUSTER_URL: ${{ secrets.BUSTER_URL }}
-  #         BUSTER_WH_TOKEN: ${{ secrets.BUSTER_WH_TOKEN }}
-  #         POOLER_URL: ${{ secrets.POOLER_URL }}
-  #         SERVER_URL: ${{ secrets.SERVER_URL }}
-  #         JWT_SECRET: ${{ secrets.JWT_SECRET }}
-  #         SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
-  #         SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
-  #         SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-  #         SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
-  #         AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
-  #         DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
-
-  #     - name: Upload test coverage
-  #       uses: actions/upload-artifact@v4
-  #       if: always()
-  #       with:
-  #         name: coverage
-  #         path: |
-  #           **/coverage/**
-  #           !**/coverage/tmp/**
-  #         retention-days: 7
-
-  # E2E test job - runs after build completes
-  e2e_test:
-    name: End-to-End Test
-    runs-on: blacksmith-32vcpu-ubuntu-2404
-    timeout-minutes: 40
+  lint:
+    name: Lint
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 5
     environment: testing
     steps:
       - name: Checkout code
@@ -215,25 +27,26 @@ jobs:
         with:
           cache-key: lint-build-test
 
-      - name: Pre-pull Docker images
-        run: |
-          echo "🐳 Pre-pulling Docker images for faster startup..."
-          # Pull all images in parallel
-          docker pull electricsql/electric &
-          docker pull supabase/postgres:15.1.0.147 &
-          docker pull supabase/gotrue:v2.149.0 &
-          docker pull supabase/realtime:v2.28.32 &
-          docker pull supabase/postgrest:v12.2.0 &
-          docker pull supabase/storage-api:v0.46.4 &
-          docker pull supabase/postgres-meta:v0.83.2 &
-          docker pull supabase/studio:20240422.09 &
-          docker pull supabase/edge-runtime:v1.53.4 &
-          docker pull kong:2.8.1 &
-          docker pull darthsim/imgproxy:v3.8.0 &
-          wait
-          echo "✅ Docker images pre-pulled successfully"
+      - name: Lint all packages
+        run: pnpm turbo lint
 
-      - name: build all packages
+  # Build job - runs after lint
+  build:
+    name: Build
+    needs: lint
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    environment: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          cache-key: lint-build-test
+
+      - name: Build all packages
         run: pnpm turbo build
         env:
           TURBO_CACHE_DIR: .turbo
@@ -241,8 +54,6 @@ jobs:
           TURBO_TELEMETRY_DISABLED: 1
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_POOL_SIZE: 100
-          SQLX_POOL_SIZE: 100
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -298,6 +109,129 @@ jobs:
           SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+
+  # Unit test job - runs after build completes
+  unit_test:
+    name: Unit Test
+    needs: build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    environment: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          cache-key: lint-build-test
+
+      - name: Run all unit tests
+        run: pnpm turbo test:unit
+        env:
+          TURBO_CACHE_DIR: .turbo
+          SKIP_ENV_CHECK: true
+          TURBO_TELEMETRY_DISABLED: 1
+          MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_PUBLIC_URL: ${{ secrets.SUPABASE_PUBLIC_URL }}
+          VITE_PUBLIC_API_URL: ${{ secrets.VITE_PUBLIC_API_URL }}
+          VITE_PUBLIC_API2_URL: ${{ secrets.VITE_PUBLIC_API2_URL }}
+          VITE_PUBLIC_WEB_SOCKET_URL: ${{ secrets.VITE_PUBLIC_WEB_SOCKET_URL }}
+          VITE_PUBLIC_URL: ${{ secrets.VITE_PUBLIC_URL }}
+          VITE_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_PUBLIC_SUPABASE_URL }}
+          VITE_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_PUBLIC_SUPABASE_ANON_KEY }}
+          VITE_PUBLIC_WS_URL: ${{ secrets.VITE_PUBLIC_WS_URL }}
+          VITE_PUBLIC_POSTHOG_KEY: ${{ secrets.VITE_PUBLIC_POSTHOG_KEY }}
+          VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
+          VITE_SLACK_APP_SUPPORT_URL: ${{ secrets.VITE_SLACK_APP_SUPPORT_URL }}
+          VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_PRIVATE_SUPABASE_SERVICE_ROLE_KEY }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          ELECTRIC_PROXY_URL: ${{ secrets.ELECTRIC_PROXY_URL }}
+          ELECTRIC_PORT: ${{ secrets.ELECTRIC_PORT }}
+          ELECTRIC_INSECURE: ${{ secrets.ELECTRIC_INSECURE }}
+          ELECTRIC_SECRET: ${{ secrets.ELECTRIC_SECRET }}
+          ELECTRIC_SOURCE_ID: ${{ secrets.ELECTRIC_SOURCE_ID }}
+          RERANK_API_KEY: ${{ secrets.RERANK_API_KEY }}
+          RERANK_MODEL: ${{ secrets.RERANK_MODEL }}
+          RERANK_BASE_URL: ${{ secrets.RERANK_BASE_URL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
+          TURBOPUFFER_REGION: ${{ secrets.TURBOPUFFER_REGION }}
+          POSTHOG_TELEMETRY_KEY: ${{ secrets.POSTHOG_TELEMETRY_KEY }}
+          BRAINTRUST_KEY: ${{ secrets.BRAINTRUST_KEY }}
+          BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
+          TRIGGER_SECRET_KEY: ${{ secrets.TRIGGER_SECRET_KEY }}
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
+          GITHUB_APP_PRIVATE_KEY_BASE64: ${{ secrets.GITHUB_APP_PRIVATE_KEY_BASE64 }}
+          GITHUB_WEBHOOK_SECRET: ${{ secrets.GITHUB_WEBHOOK_SECRET }}
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          BUSTER_URL: ${{ secrets.BUSTER_URL }}
+          BUSTER_WH_TOKEN: ${{ secrets.BUSTER_WH_TOKEN }}
+          POOLER_URL: ${{ secrets.POOLER_URL }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+          SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          SLACK_APP_SUPPORT_URL: ${{ secrets.SLACK_APP_SUPPORT_URL }}
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+          DAYTONA_API_KEY: ${{ secrets.DAYTONA_API_KEY }}
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: |
+            **/coverage/**
+            !**/coverage/tmp/**
+          retention-days: 7
+
+  # E2E test job - runs after build completes
+  e2e_test:
+    name: End-to-End Test
+    runs-on: blacksmith-32vcpu-ubuntu-2404
+    timeout-minutes: 40
+    environment: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          cache-key: lint-build-test
+
+      - name: Pre-pull Docker images
+        run: |
+          echo "🐳 Pre-pulling Docker images for faster startup..."
+          # Pull all images in parallel
+          docker pull electricsql/electric &
+          docker pull supabase/postgres:15.1.0.147 &
+          docker pull supabase/gotrue:v2.149.0 &
+          docker pull supabase/realtime:v2.28.32 &
+          docker pull supabase/postgrest:v12.2.0 &
+          docker pull supabase/storage-api:v0.46.4 &
+          docker pull supabase/postgres-meta:v0.83.2 &
+          docker pull supabase/studio:20240422.09 &
+          docker pull supabase/edge-runtime:v1.53.4 &
+          docker pull kong:2.8.1 &
+          docker pull darthsim/imgproxy:v3.8.0 &
+          wait
+          echo "✅ Docker images pre-pulled successfully"
 
       - name: Start services in background
         run: |
@@ -388,7 +322,7 @@ jobs:
                 echo "✅ $service_name is ready (localhost:$port)"
                 return 0
               fi
-              echo "⏳ Attempt $i/60: $service_name not ready yet..."
+              echo "⏳ Attempt $i/90: $service_name not ready yet..."
               sleep 5
             done
             
@@ -403,9 +337,6 @@ jobs:
           check_port 3002/healthcheck "Api V2"
 
           echo "🎉 All services are ready!"
-          echo "⏳ Waiting 2 minutes for services to fully stabilize..."
-          sleep 120
-          echo "✅ Stabilization period complete, ready for tests!"
 
       - name: Run Momentic E2E Tests
         id: momentic-tests
@@ -417,12 +348,6 @@ jobs:
         env:
           MOMENTIC_API_KEY: ${{ secrets.MOMENTIC_API_KEY }}
 
-      - name: Keep job alive on failure for debugging
-        if: failure()
-        run: |
-          echo "Job failed. Keeping VM alive for 30 minutes for debugging..."
-          echo "SSH connection info is available in the Setup runner step above"
-          sleep 1800
 
       - name: Stop services
         if: always()
