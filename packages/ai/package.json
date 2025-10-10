@@ -61,12 +61,14 @@
     "glob": "^11.0.3",
     "minimatch": "^10.0.3",
     "node-sql-parser": "^5.3.12",
+    "pluralize": "^8.0.0",
     "uuid": "^11.1.0",
     "yaml": "^2.8.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "^1.2.23",
-    "@types/diff": "^8.0.0"
+    "@types/diff": "^8.0.0",
+    "@types/pluralize": "^0.0.33"
   }
 }
