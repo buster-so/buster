@@ -49,3 +49,4 @@ dist
 build
 .next
 .turbo
+node_modules

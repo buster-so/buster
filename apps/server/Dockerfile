@@ -18,30 +18,10 @@ RUN bun install -g pnpm
 # Copy everything needed for install
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json .pnpmrc ./
 
-# Create package directory structure first, then copy package.json files
-# This ensures pnpm installs dependencies in the right places
-RUN mkdir -p apps/server apps/trigger packages/access-controls packages/ai packages/data-source \
-    packages/database packages/env-utils packages/github packages/sandbox packages/sdk \
-    packages/search packages/server-shared packages/slack packages/test-utils \
-    packages/typescript-config packages/vitest-config packages/web-tools
-
+# Copy all package.json files while preserving directory structure
+COPY packages ./packages
 COPY apps/server/package.json ./apps/server/
 COPY apps/trigger/package.json ./apps/trigger/
-COPY packages/access-controls/package.json ./packages/access-controls/
-COPY packages/ai/package.json ./packages/ai/
-COPY packages/data-source/package.json ./packages/data-source/
-COPY packages/database/package.json ./packages/database/
-COPY packages/env-utils/package.json ./packages/env-utils/
-COPY packages/github/package.json ./packages/github/
-COPY packages/sandbox/package.json ./packages/sandbox/
-COPY packages/sdk/package.json ./packages/sdk/
-COPY packages/search/package.json ./packages/search/
-COPY packages/server-shared/package.json ./packages/server-shared/
-COPY packages/slack/package.json ./packages/slack/
-COPY packages/test-utils/package.json ./packages/test-utils/
-COPY packages/typescript-config/package.json ./packages/typescript-config/
-COPY packages/vitest-config/package.json ./packages/vitest-config/
-COPY packages/web-tools/package.json ./packages/web-tools/
 
 # Install ALL dependencies - now pnpm will create package-level node_modules
 RUN pnpm install --frozen-lockfile
