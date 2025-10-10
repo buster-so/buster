@@ -33,7 +33,7 @@ export const BusterChatInputButtons = React.memo(
     onSubmit,
     onStop,
     submitting,
-    disabled,
+    disabled: disabledProp,
     mode,
     onModeChange,
     onDictate,
@@ -51,7 +51,7 @@ export const BusterChatInputButtons = React.memo(
     const onChangeValue = useMentionInputSuggestionsOnChangeValue();
     const getValue = useMentionInputSuggestionsGetValue();
 
-    const disableSubmit = !hasValue;
+    const disableSubmit = !hasValue || disabledProp;
 
     useEffect(() => {
       if (listening && transcript) {
@@ -89,11 +89,11 @@ export const BusterChatInputButtons = React.memo(
                 variant={'ghost'}
                 prefix={<Microphone />}
                 onClick={listening ? onStopListening : onStartListening}
-                disabled={disabled}
+                disabled={disableSubmit}
                 size={'tall'}
                 className={cn(
                   'origin-center transform-gpu transition-all duration-300 ease-out will-change-transform text-text-secondary',
-                  !disabled && 'hover:scale-110 active:scale-95',
+                  !disableSubmit ? 'hover:scale-110 active:scale-95' : '',
                   listening && 'bg-item-active shadow border text-foreground',
                   listening && !hasPermission && 'bg-red-100! border border-red-300!'
                 )}
@@ -129,10 +129,10 @@ export const BusterChatInputButtons = React.memo(
                     }
               }
               loading={submitting}
-              disabled={disabled || disableSubmit}
+              disabled={disableSubmit}
               className={cn(
-                'origin-center transform-gpu transition-all duration-300 ease-out will-change-transform',
-                !disabled && 'hover:scale-110 active:scale-95'
+                'origin-center transform-gpu transition-all duration-300 ease-out will-change-transform disabled:shadow-none [&:disabled_.button-icon]:text-border',
+                !disableSubmit && 'hover:scale-110 active:scale-95'
               )}
             />
           </AppTooltip>

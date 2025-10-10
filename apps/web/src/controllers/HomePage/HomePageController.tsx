@@ -1,12 +1,16 @@
 import { ClientOnly } from '@tanstack/react-router';
 import type React from 'react';
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
+import { LazyErrorBoundary } from '@/components/features/global/LazyErrorBoundary';
 import { BusterChatInput } from '@/components/features/input/BusterChatInput';
 import { Title } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
-import { NewChatWarning } from './NewChatWarning';
 import { useNewChatWarning } from './useNewChatWarning';
+
+const LazyNewChatWarning = lazy(() =>
+  import('./NewChatWarning').then((mod) => ({ default: mod.NewChatWarning }))
+);
 
 enum TimeOfDay {
   MORNING = 'morning',
@@ -27,7 +31,11 @@ export const HomePageController: React.FC<{
     <div className={cn('flex flex-col items-center px-5 py-5 h-full')}>
       {showWarning ? (
         <div className="mt-18 flex w-full max-w-[650px] flex-col space-y-6">
-          <NewChatWarning {...newChatWarningProps} />
+          <LazyErrorBoundary>
+            <Suspense fallback={null}>
+              <LazyNewChatWarning {...newChatWarningProps} />
+            </Suspense>
+          </LazyErrorBoundary>
         </div>
       ) : (
         <ClientOnly>

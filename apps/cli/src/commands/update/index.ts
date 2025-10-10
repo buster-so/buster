@@ -1,5 +1,6 @@
 // Export update command components
 
+export { createUpdateCommand } from './command';
 export {
   getDirectUpdateInstructions,
   getHomebrewUpdateInstructions,

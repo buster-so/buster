@@ -28,11 +28,12 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@buster/database": "workspace:*",
+    "@buster/env-utils": "workspace:*",
+    "@buster/server-shared": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@buster/env-utils": "workspace:*",
-    "@buster/database": "workspace:*",
-    "@buster/server-shared": "workspace:*",
+    "@octokit/webhooks": "^14.1.3",
     "octokit": "^5.0.3",
     "zod": "catalog:"
   },

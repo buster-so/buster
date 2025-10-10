@@ -26,6 +26,7 @@ interface ChatSplitterProps {
   autoSaveId: string;
   defaultLayout: LayoutSize;
   selectedLayout: LayoutMode;
+  isScreenshotMode?: boolean;
 }
 
 export const ChatLayout: React.FC<ChatSplitterProps> = ({
@@ -34,6 +35,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({
   children,
   defaultLayout,
   selectedLayout,
+  isScreenshotMode = false,
 }) => {
   const appSplitterRef = useRef<AppSplitterRef>(null);
   const selectedAssetId = useSelectedAssetId();
@@ -59,7 +61,11 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({
   return (
     <AppSplitter
       ref={appSplitterRef}
-      leftChildren={renderLeftPanel && <ChatContainer chatId={chatId} isEmbed={isEmbed} />}
+      leftChildren={
+        renderLeftPanel && (
+          <ChatContainer chatId={chatId} isEmbed={isEmbed} isScreenshotMode={isScreenshotMode} />
+        )
+      }
       rightChildren={renderRightPanel && children}
       autoSaveId={autoSaveId}
       defaultLayout={defaultLayout}

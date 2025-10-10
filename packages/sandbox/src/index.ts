@@ -33,3 +33,5 @@ export type {
   UploadResult,
   FileUploadItem,
 } from './filesystem/add-files';
+
+export { runDocsAgent } from './execute/run-docs-agent';

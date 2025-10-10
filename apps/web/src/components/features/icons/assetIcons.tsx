@@ -17,12 +17,17 @@ export const ASSET_ICONS = {
   metrics: SquareChart,
   metircsAdd: SquareChartPlus,
   chats: Messages,
+  chat: Messages,
   dashboards: Grid,
+  dashboard: Grid,
+  dashboard_file: Grid,
   collections: Folder5,
   dashboardAdd: GridPlus,
   collectionAdd: FolderPlus,
   table: Table,
   reports: FileContent,
+  report: FileContent,
+  report_file: FileContent,
 };
 
 export const assetTypeToIcon = (assetType: ShareAssetType) => {

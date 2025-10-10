@@ -10,7 +10,7 @@ import {
   usersToOrganizations,
 } from '../../schema';
 import type { ChatListItem, PaginatedResponse } from '../../schema-types';
-import { PaginationInputSchema, createPaginatedResponse } from '../../schema-types';
+import { createPaginatedResponse, PaginationInputSchema } from '../../schema-types';
 
 export const ListChatsRequestSchema = z
   .object({

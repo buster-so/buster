@@ -276,7 +276,7 @@
     @apply border-border outline-ring/0;
   }
   body {
-    @apply bg-background-secondary text-foreground text-base h-full w-full;
+    @apply bg-background-secondary text-foreground text-base h-full w-full min-w-[800px];
   }
   html {
     @apply h-full w-full;

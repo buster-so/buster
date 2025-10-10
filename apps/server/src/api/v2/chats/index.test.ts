@@ -83,6 +83,7 @@ describe('POST /chats', () => {
     workspace_sharing: 'full_access',
     workspace_member_count: 0,
     individual_permissions: [],
+    screenshot_taken_at: null,
   };
 
   beforeEach(() => {
@@ -108,7 +109,11 @@ describe('POST /chats', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toEqual(mockChat);
-    expect(createChatHandler).toHaveBeenCalledWith({ prompt: 'Hello world' }, mockUser);
+    expect(createChatHandler).toHaveBeenCalledWith(
+      { prompt: 'Hello world' },
+      mockUser,
+      expect.anything()
+    );
   });
 
   it('should create a chat with existing chat_id', async () => {
@@ -120,7 +125,8 @@ describe('POST /chats', () => {
     expect(response.status).toBe(200);
     expect(createChatHandler).toHaveBeenCalledWith(
       { chat_id: '123e4567-e89b-12d3-a456-426614174003', prompt: 'Follow up message' },
-      mockUser
+      mockUser,
+      expect.anything()
     );
   });
 
@@ -133,7 +139,8 @@ describe('POST /chats', () => {
     expect(response.status).toBe(200);
     expect(createChatHandler).toHaveBeenCalledWith(
       { asset_id: '123e4567-e89b-12d3-a456-426614174004', asset_type: 'metric_file' },
-      mockUser
+      mockUser,
+      expect.anything()
     );
   });
 
@@ -153,7 +160,11 @@ describe('POST /chats', () => {
     vi.mocked(createChatHandler).mockRejectedValue(chatError.toResponse());
 
     const response = await makeRequest(app, { prompt: 'Hello' });
-    expect(createChatHandler).toHaveBeenCalledWith({ prompt: 'Hello' }, mockUser);
+    expect(createChatHandler).toHaveBeenCalledWith(
+      { prompt: 'Hello' },
+      mockUser,
+      expect.anything()
+    );
 
     expect(response.status).toBe(403);
     const data = await response.json();
@@ -186,7 +197,7 @@ describe('POST /chats', () => {
     const response = await makeRequest(app, {});
 
     expect(response.status).toBe(200);
-    expect(createChatHandler).toHaveBeenCalledWith({}, mockUser);
+    expect(createChatHandler).toHaveBeenCalledWith({}, mockUser, expect.anything());
   });
 
   it('should support legacy fields', async () => {
@@ -197,6 +208,10 @@ describe('POST /chats', () => {
 
     expect(response.status).toBe(200);
     // Handler should receive the request but won't use legacy fields
-    expect(createChatHandler).toHaveBeenCalledWith(expect.objectContaining({}), mockUser);
+    expect(createChatHandler).toHaveBeenCalledWith(
+      expect.objectContaining({}),
+      mockUser,
+      expect.anything()
+    );
   });
 });

@@ -108,6 +108,10 @@
       "types": "./dist/screenshots/index.d.ts",
       "default": "./dist/screenshots/index.js"
     },
+    "./screenshots/methods": {
+      "types": "./dist/screenshots/methods/index.d.ts",
+      "default": "./dist/screenshots/methods/index.js"
+    },
     "./library": {
       "types": "./dist/library/index.d.ts",
       "default": "./dist/library/index.js"
@@ -130,6 +134,10 @@
     "@buster/database": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
+    "@supabase/supabase-js": "catalog:",
+    "playwright": "^1.55.1",
+    "sharp": "^0.34.4",
+    "@biomejs/biome": "2.2.5",
     "zod": "catalog:"
   },
   "devDependencies": {

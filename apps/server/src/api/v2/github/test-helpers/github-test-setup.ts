@@ -9,15 +9,15 @@
  */
 export function skipIfNoGitHubCredentials(): boolean {
   const hasCredentials = !!(
-    process.env.GITHUB_APP_ID &&
-    process.env.GITHUB_APP_PRIVATE_KEY_BASE64 &&
-    process.env.GITHUB_WEBHOOK_SECRET
+    process.env.GH_APP_ID &&
+    process.env.GH_APP_PRIVATE_KEY_BASE64 &&
+    process.env.GH_WEBHOOK_SECRET
   );
 
   if (!hasCredentials) {
     console.info('⚠️  Skipping GitHub integration tests - credentials not available');
     console.info(
-      '   Set GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY_BASE64, and GITHUB_WEBHOOK_SECRET to run these tests'
+      '   Set GH_APP_ID, GH_APP_PRIVATE_KEY_BASE64, and GH_WEBHOOK_SECRET to run these tests'
     );
     return true;
   }

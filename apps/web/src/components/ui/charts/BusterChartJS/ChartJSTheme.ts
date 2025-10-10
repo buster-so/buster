@@ -1,5 +1,3 @@
-'use client';
-
 import { DEFAULT_CHART_THEME } from '@buster/server-shared/metrics';
 import {
   ArcElement,
@@ -25,15 +23,10 @@ import {
 } from 'chart.js';
 import ChartJsAnnotationPlugin from 'chartjs-plugin-annotation';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import ChartDeferred from 'chartjs-plugin-deferred';
 import { truncateText } from '@/lib/text';
 import { isServer } from '@/lib/window';
-import { ChartMountedPlugin } from './core/plugins';
+import { ChartMountedPlugin } from './core/plugins/chartjs-plugin-mounted';
 import ChartTrendlinePlugin from './core/plugins/chartjs-plugin-trendlines';
-import './core/plugins/chartjs-plugin-dayjs';
-import './core/plugins/chartjs-scale-tick-duplicate';
-import './core/plugins/chartjs-plugin-trendlines';
-import { timeout } from '@/lib/timeout';
 
 ChartJS.register(
   LineController,

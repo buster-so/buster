@@ -130,10 +130,12 @@ describe('downloadMetricFileHandler', () => {
           metricId: mockMetricId,
           userId: mockUser.id,
           organizationId: mockOrganizationId,
+          reportFileId: undefined,
+          metricVersionNumber: undefined,
         },
         {
           idempotencyKey: `export-${mockUser.id}-${mockMetricId}`,
-          idempotencyKeyTTL: '5m',
+          idempotencyKeyTTL: '2m',
         }
       );
 
@@ -143,7 +145,7 @@ describe('downloadMetricFileHandler', () => {
         fileSize: 1024,
         fileName: 'metric-456.csv',
         rowCount: 100,
-        message: 'Download link expires in 60 seconds. Please start your download immediately.',
+        message: 'Download link expires in 2 minutes. Please start your download immediately.',
       });
     });
 

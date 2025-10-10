@@ -22,6 +22,15 @@ export const prefetchColorPalettes = async (queryClient: QueryClient) => {
   return queryClient;
 };
 
+export const ensureColorPalettes = async (queryClient: QueryClient) => {
+  const res = await queryClient.ensureQueryData({
+    ...dictionariesQueryKeys.colorPalettes,
+    queryFn: getColorPalettes,
+  });
+
+  return res;
+};
+
 export const useGetCurrencies = () => {
   return useQuery({
     ...dictionariesQueryKeys.getCurrencies,

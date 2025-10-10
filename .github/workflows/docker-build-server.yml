@@ -1,3 +1,5 @@
+
+
 name: Build and Push Server Docker Image
 
 on:
@@ -8,7 +10,6 @@ on:
       - 'packages/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docker-build-server.yml'
-      - '.github/workflows/deploy.yml'
 
 # Only one build per branch at a time, queue others
 concurrency:
@@ -22,107 +23,55 @@ env:
 jobs:
   build-and-push:
     runs-on: blacksmith-8vcpu-ubuntu-2404
+    timeout-minutes: 20
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      - name: Setup Node Environment
-        uses: ./.github/actions/setup-node-env
-        with:
-          install-filter: "@buster-app/server..."
-          cache-key: docker-build-server
-      
-      - name: Mount Turbo cache sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-turbo-cache-${{ github.ref_name }}
-          path: ./.turbo
-      
+
       - name: Mount Docker buildkit sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
           key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}
           path: /tmp/.buildkit-cache
-      
-      - name: Build with Turbo
-        run: |
-          echo "🔨 Building server with Turbo..."
-          # Build with optimized settings for Docker
-          pnpm turbo run build --filter=@buster-app/server...
-          echo "✅ Build complete!"
-        env:
-          NODE_ENV: production
-          DOCKER_BUILD: true
-          CI: true
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
-      
-      - name: Build server bundle
-        run: |
-          echo "📦 Creating server bundle with bun..."
-          cd apps/server
-          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64
-          ls -la dist/
-          cd ../..
-      
-      - name: Prepare production dependencies
-        run: |
-          echo "🧹 Preparing production-only dependencies..."
-          # Create a temporary directory for production deps
-          mkdir -p /tmp/prod-deps/apps/server
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
-          cp -r packages /tmp/prod-deps/
-          cp apps/server/package.json /tmp/prod-deps/apps/server/
-          
-          # Install production dependencies only, skip optional dependencies
-          cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod --no-optional
-          
-          # Copy back to workspace
-          cd -
-          mkdir -p docker-context
-          cp -r /tmp/prod-deps/node_modules docker-context/
-          cp -r apps/server/dist docker-context/
-          cp apps/server/package.json docker-context/
-      
+
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
-      
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Extract metadata and determine tags
         id: meta
         run: |
           SHA_SHORT=$(git rev-parse --short=7 HEAD)
           echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
-          
+
           if [[ "${{ github.ref_name }}" == "main" ]]; then
             # For main: use commit SHA and latest
             echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            # For staging: use staging-SHA and staging
+          else
+            # For all other branches: use staging-SHA and staging
             echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
           fi
-          
+
           # Set build timestamp
           echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-      
+
       - name: Build and push Docker image
         uses: useblacksmith/build-push-action@v2
         with:
-          context: ./docker-context
-          file: ./apps/server/Dockerfile.prebuilt
+          context: .
+          file: ./apps/server/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: |
@@ -133,10 +82,10 @@ jobs:
           build-args: |
             COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
             BUILD_DATE=${{ steps.meta.outputs.timestamp }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=local,src=/tmp/.buildkit-cache
           cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
-      
+
       - name: Output image details
         run: |
           echo "✅ Docker image built and pushed successfully!"

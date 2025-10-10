@@ -24,8 +24,8 @@ const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB max file size
  * 4. Executes the metric's SQL query
  * 5. Converts results to CSV format
  * 6. Uploads to R2 storage
- * 7. Generates a 60-second presigned URL for download
- * 8. Schedules cleanup after 60 seconds
+ * 7. Generates a 2 min presigned URL for download
+ * 8. Schedules cleanup after 2 mins
  */
 export const exportMetricData: ReturnType<
   typeof schemaTask<
@@ -314,12 +314,12 @@ export const exportMetricData: ReturnType<
 
       logger.log('File uploaded successfully');
 
-      // Step 8: Generate presigned URL with 60-second expiry
+      // Step 8: Generate presigned URL with 2min expiry
       let downloadUrl: string;
 
       try {
-        downloadUrl = await storageProvider.getSignedUrl(key, 60); // 60 seconds
-        logger.log('Presigned URL generated', { expiresIn: 60 });
+        downloadUrl = await storageProvider.getSignedUrl(key, 120); // 120 seconds / 2 mins
+        logger.log('Presigned URL generated', { expiresIn: 120 });
       } catch (error) {
         logger.error('Failed to generate presigned URL', {
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -332,15 +332,15 @@ export const exportMetricData: ReturnType<
         };
       }
 
-      // Step 9: Schedule cleanup after 60 seconds (matches URL expiry)
+      // Step 9: Schedule cleanup after 2 mins (matches URL expiry) and trigger job idempotency
       try {
         const { cleanupExportFile } = await import('./cleanup-export-file');
         await cleanupExportFile.trigger(
           { key, organizationId: payload.organizationId },
-          { delay: '60s' } // 60 seconds delay
+          { delay: '2m' } // 2 min delay
         );
 
-        logger.log('Cleanup scheduled for 60 seconds');
+        logger.log('Cleanup scheduled for 2 mins');
       } catch (error) {
         // Non-critical error, just log
         logger.warn('Failed to schedule cleanup', { error });
@@ -359,7 +359,7 @@ export const exportMetricData: ReturnType<
       return {
         success: true,
         downloadUrl,
-        expiresAt: new Date(Date.now() + 60000).toISOString(), // 60 seconds from now
+        expiresAt: new Date(Date.now() + 120000).toISOString(), // 2 mins from now
         fileSize: csvSize,
         rowCount: rowCount,
         fileName,

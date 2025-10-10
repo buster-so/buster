@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { create } from 'mutative';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
-import { useGetLatestDashboardVersionMemoized } from '../dashboardVersionNumber';
 import { shareDashboard, unshareDashboard, updateDashboardShare } from '../requests';
 
 /**

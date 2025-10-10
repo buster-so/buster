@@ -45,6 +45,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -65,6 +66,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -83,6 +85,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -101,6 +104,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -119,6 +123,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -138,6 +143,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -158,6 +164,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, {});
@@ -175,6 +182,7 @@ describe('parsing', () => {
           metrics: [],
           filters: [],
           relationships: [],
+          clarifications: [],
         };
 
         const partialConfig = {
@@ -199,9 +207,10 @@ describe('parsing', () => {
             { name: 'name', searchable: true, type: 'string' },
           ],
           measures: [{ name: 'count', type: 'integer' }],
-          metrics: [{ name: 'total', expr: 'sum(count)' }],
-          filters: [{ name: 'active', expr: 'status = "active"' }],
+          metrics: [{ name: 'total', expr: 'sum(count)', args: [] }],
+          filters: [{ name: 'active', expr: 'status = "active"', args: [] }],
           relationships: [{ name: 'user_rel', source_col: 'user_id', ref_col: 'users.id' }],
+          clarifications: [],
         };
 
         const resolved = resolveModelConfig(model, baseConfig);
@@ -224,6 +233,7 @@ describe('parsing', () => {
             metrics: [],
             filters: [],
             relationships: [],
+            clarifications: [],
           },
           {
             name: 'model2',
@@ -233,6 +243,7 @@ describe('parsing', () => {
             metrics: [],
             filters: [],
             relationships: [],
+            clarifications: [],
           },
           {
             name: 'model3',
@@ -243,25 +254,26 @@ describe('parsing', () => {
             metrics: [],
             filters: [],
             relationships: [],
+            clarifications: [],
           },
         ];
 
         const resolved = models.map((m) => resolveModelConfig(m, baseConfig));
 
         // Model 1: inherits all from global
-        expect(resolved[0].data_source_name).toBe('global_postgres');
-        expect(resolved[0].database).toBe('global_db');
-        expect(resolved[0].schema).toBe('global_schema');
+        expect(resolved[0]?.data_source_name).toBe('global_postgres');
+        expect(resolved[0]?.database).toBe('global_db');
+        expect(resolved[0]?.schema).toBe('global_schema');
 
         // Model 2: overrides data_source, inherits others
-        expect(resolved[1].data_source_name).toBe('custom_source');
-        expect(resolved[1].database).toBe('global_db');
-        expect(resolved[1].schema).toBe('global_schema');
+        expect(resolved[1]?.data_source_name).toBe('custom_source');
+        expect(resolved[1]?.database).toBe('global_db');
+        expect(resolved[1]?.schema).toBe('global_schema');
 
         // Model 3: overrides database and schema, inherits data_source
-        expect(resolved[2].data_source_name).toBe('global_postgres');
-        expect(resolved[2].database).toBe('custom_db');
-        expect(resolved[2].schema).toBe('custom_schema');
+        expect(resolved[2]?.data_source_name).toBe('global_postgres');
+        expect(resolved[2]?.database).toBe('custom_db');
+        expect(resolved[2]?.schema).toBe('custom_schema');
       });
     });
   });
@@ -284,10 +296,10 @@ describe('parsing', () => {
 
       expect(result.models).toHaveLength(1);
       expect(result.errors).toHaveLength(0);
-      expect(result.models[0].name).toBe('users');
-      expect(result.models[0].description).toBe('User model');
-      expect(result.models[0].dimensions).toHaveLength(1);
-      expect(result.models[0].measures).toHaveLength(1);
+      expect(result.models[0]?.name).toBe('users');
+      expect(result.models[0]?.description).toBe('User model');
+      expect(result.models[0]?.dimensions).toHaveLength(1);
+      expect(result.models[0]?.measures).toHaveLength(1);
     });
 
     it('should only parse single model files (no models key)', async () => {
@@ -334,7 +346,7 @@ describe('parsing', () => {
 
       expect(result.models).toHaveLength(0);
       expect(result.errors.length).toBeGreaterThan(0);
-      expect(result.errors[0].issues.length).toBeGreaterThan(0);
+      expect(result.errors[0]?.issues.length).toBeGreaterThan(0);
 
       // Check that we get specific validation issues
       const allIssues = result.errors.flatMap((e) => formatZodIssues(e.issues));
@@ -399,9 +411,9 @@ describe('parsing', () => {
 
       expect(result.models).toHaveLength(1);
       expect(result.errors).toHaveLength(0);
-      expect(result.models[0].name).toBe('valid_model');
-      expect(result.models[0].dimensions).toHaveLength(1);
-      expect(result.models[0].measures).toHaveLength(1);
+      expect(result.models[0]?.name).toBe('valid_model');
+      expect(result.models[0]?.dimensions).toHaveLength(1);
+      expect(result.models[0]?.measures).toHaveLength(1);
     });
 
     it('should collect ALL Zod validation errors at once, not just the first', async () => {
@@ -504,6 +516,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -520,6 +533,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -536,6 +550,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -552,9 +567,10 @@ describe('parsing', () => {
         name: 'test',
         dimensions: [{ name: 'id', searchable: false }],
         measures: [],
-        metrics: [{ name: 'empty_metric', expr: '' }],
+        metrics: [{ name: 'empty_metric', expr: '', args: [] }],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -569,8 +585,9 @@ describe('parsing', () => {
         dimensions: [{ name: 'id', searchable: false }],
         measures: [],
         metrics: [],
-        filters: [{ name: 'empty_filter', expr: '' }],
+        filters: [{ name: 'empty_filter', expr: '', args: [] }],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -587,6 +604,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [{ name: 'incomplete', source_col: '', ref_col: 'users.id' }],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -600,12 +618,13 @@ describe('parsing', () => {
         name: '',
         dimensions: [],
         measures: [],
-        metrics: [{ name: 'metric1', expr: '' }],
+        metrics: [{ name: 'metric1', expr: '', args: [] }],
         filters: [
-          { name: 'filter1', expr: 'valid' },
-          { name: 'filter2', expr: '' }, // Changed to test empty expression instead of duplicate
+          { name: 'filter1', expr: 'valid', args: [] },
+          { name: 'filter2', expr: '', args: [] }, // Changed to test empty expression instead of duplicate
         ],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -629,6 +648,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -660,6 +680,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -686,6 +707,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -703,6 +725,7 @@ describe('parsing', () => {
             name: 'metric1',
             expr: 'sum({{TODO}})',
             description: 'Metric {{TODO}}',
+            args: [],
           },
         ],
         filters: [
@@ -710,9 +733,11 @@ describe('parsing', () => {
             name: 'filter1',
             expr: 'status = {{TODO}}',
             description: '{{TODO}} add description',
+            args: [],
           },
         ],
         relationships: [],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -742,6 +767,7 @@ describe('parsing', () => {
             ref_col: 'products.id',
           },
         ],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -789,6 +815,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -817,6 +844,7 @@ describe('parsing', () => {
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const todos = findTodoMarkers(model);
@@ -873,7 +901,9 @@ dimensions:
 
       expect(result.models).toHaveLength(0);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].issues[0].message).toContain('{{TODO}} markers and will be skipped');
+      expect(result.errors[0]?.issues[0]?.message).toContain(
+        '{{TODO}} markers and will be skipped'
+      );
     });
 
     it('should parse normally when no {{TODO}} exists', async () => {
@@ -890,7 +920,7 @@ dimensions:
 
       expect(result.models).toHaveLength(1);
       expect(result.errors).toHaveLength(0);
-      expect(result.models[0].name).toBe('test_model');
+      expect(result.models[0]?.name).toBe('test_model');
     });
   });
 
@@ -904,6 +934,7 @@ dimensions:
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -921,6 +952,7 @@ dimensions:
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const result = validateModel(model);
@@ -942,6 +974,7 @@ dimensions:
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const sql = generateDefaultSQL(model);
@@ -958,6 +991,7 @@ dimensions:
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const sql = generateDefaultSQL(model);
@@ -973,6 +1007,7 @@ dimensions:
         metrics: [],
         filters: [],
         relationships: [],
+        clarifications: [],
       };
 
       const sql = generateDefaultSQL(model);

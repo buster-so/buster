@@ -2,7 +2,11 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { dashboardFiles } from '../../schema';
-import { WorkspaceSharingSchema } from '../../schema-types';
+import {
+  DashboardVersionHistorySchema,
+  DashboardYmlSchema,
+  WorkspaceSharingSchema,
+} from '../../schema-types';
 
 // Type for updating dashboardFiles - excludes read-only fields
 type UpdateDashboardData = Partial<
@@ -14,6 +18,8 @@ const UpdateDashboardInputSchema = z.object({
   dashboardId: z.string().uuid('Dashboard ID must be a valid UUID'),
   userId: z.string().uuid('User ID must be a valid UUID'),
   name: z.string().optional(),
+  content: DashboardYmlSchema.optional(),
+  versionHistory: DashboardVersionHistorySchema.optional(),
   publicly_accessible: z.boolean().optional(),
   public_expiry_date: z.string().nullable().optional(),
   public_password: z.string().nullable().optional(),
@@ -33,6 +39,8 @@ export const updateDashboard = async (params: UpdateDashboardInput): Promise<voi
     dashboardId,
     userId,
     name,
+    content,
+    versionHistory,
     publicly_accessible,
     public_expiry_date,
     public_password,
@@ -45,7 +53,17 @@ export const updateDashboard = async (params: UpdateDashboardInput): Promise<voi
       updatedAt: new Date().toISOString(),
     };
 
-    // Only add fields that are provided
+    // Add content if provided
+    if (content !== undefined) {
+      updateData.content = content;
+    }
+
+    // Add version history if provided
+    if (versionHistory !== undefined) {
+      updateData.versionHistory = versionHistory;
+    }
+
+    // Only add other fields that are provided
     if (name !== undefined) {
       updateData.name = name;
     }

@@ -56,4 +56,17 @@ export const GetGitHubIntegrationResponseSchema = z.object({
     .optional(),
 });
 
+export const AuthDetailsAppInstallationResponseSchema = z.object({
+  type: z.literal('token'),
+  tokenType: z.literal('installation'),
+  token: z.string(),
+  installationId: z.number(),
+  permissions: z.record(z.string(), z.string()),
+  createdAt: z.string().datetime(),
+  expiresAt: z.string().datetime(),
+  repositorySelection: z.enum(['all', 'selected']),
+});
+
+export type AuthDetailsResponse = z.infer<typeof AuthDetailsAppInstallationResponseSchema>;
+
 export type GetGitHubIntegrationResponse = z.infer<typeof GetGitHubIntegrationResponseSchema>;

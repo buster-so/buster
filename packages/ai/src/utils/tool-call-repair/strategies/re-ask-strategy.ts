@@ -1,7 +1,11 @@
 import type { LanguageModelV2ToolCall } from '@ai-sdk/provider';
 import { type ModelMessage, NoSuchToolError, generateText, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
-import { ANALYST_AGENT_NAME, DOCS_AGENT_NAME, THINK_AND_PREP_AGENT_NAME } from '../../../agents';
+import {
+  ANALYST_AGENT_NAME,
+  ANALYST_ENGINEER_AGENT_NAME,
+  THINK_AND_PREP_AGENT_NAME,
+} from '../../../agents';
 import { GPT5Mini, Sonnet4 } from '../../../llm';
 import { DEFAULT_ANTHROPIC_OPTIONS, DEFAULT_OPENAI_OPTIONS } from '../../../llm/providers/gateway';
 import type { RepairContext } from '../types';
@@ -133,7 +137,7 @@ function buildErrorMessage(context: RepairContext): string {
       
       You'll be able to use those when they are available to you.`;
 
-    case DOCS_AGENT_NAME:
+    case ANALYST_ENGINEER_AGENT_NAME:
       return `Tool "${toolCall.toolName}" is not available. Available tools: ${agentContext.availableTools.join(', ')}.
       
       Please use one of the available tools to complete your task.`;

@@ -21,6 +21,7 @@
     { "path": "./packages/sandbox" },
     
     // Apps
+    { "path": "./apps/cli" },
     { "path": "./apps/server" },
     { "path": "./apps/trigger" },
     { "path": "./apps/web" },

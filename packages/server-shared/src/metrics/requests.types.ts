@@ -61,7 +61,6 @@ export const BulkUpdateMetricVerificationStatusRequestSchema = z.array(
 
 export type GetMetricParams = z.infer<typeof GetMetricParamsSchema>;
 export type GetMetricQuery = z.infer<typeof GetMetricQuerySchema>;
-export type GetMetricDataRequest = z.infer<typeof GetMetricDataRequestSchema>;
 export type GetMetricListRequest = z.infer<typeof GetMetricListRequestSchema>;
 export type UpdateMetricRequest = z.infer<typeof UpdateMetricRequestSchema>;
 export type DeleteMetricRequest = z.infer<typeof DeleteMetricRequestSchema>;

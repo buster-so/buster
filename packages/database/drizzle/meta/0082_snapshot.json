@@ -5587,26 +5587,12 @@
     "public.asset_permission_role_enum": {
       "name": "asset_permission_role_enum",
       "schema": "public",
-      "values": [
-        "owner",
-        "viewer",
-        "full_access",
-        "can_edit",
-        "can_filter",
-        "can_view"
-      ]
+      "values": ["owner", "viewer", "full_access", "can_edit", "can_filter", "can_view"]
     },
     "public.asset_type_enum": {
       "name": "asset_type_enum",
       "schema": "public",
-      "values": [
-        "dashboard",
-        "thread",
-        "collection",
-        "chat",
-        "metric_file",
-        "dashboard_file"
-      ]
+      "values": ["dashboard", "thread", "collection", "chat", "metric_file", "dashboard_file"]
     },
     "public.data_source_onboarding_status_enum": {
       "name": "data_source_onboarding_status_enum",
@@ -5656,13 +5642,7 @@
     "public.table_type_enum": {
       "name": "table_type_enum",
       "schema": "public",
-      "values": [
-        "TABLE",
-        "VIEW",
-        "MATERIALIZED_VIEW",
-        "EXTERNAL_TABLE",
-        "TEMPORARY_TABLE"
-      ]
+      "values": ["TABLE", "VIEW", "MATERIALIZED_VIEW", "EXTERNAL_TABLE", "TEMPORARY_TABLE"]
     },
     "public.team_role_enum": {
       "name": "team_role_enum",
@@ -5672,13 +5652,7 @@
     "public.user_organization_role_enum": {
       "name": "user_organization_role_enum",
       "schema": "public",
-      "values": [
-        "workspace_admin",
-        "data_admin",
-        "querier",
-        "restricted_querier",
-        "viewer"
-      ]
+      "values": ["workspace_admin", "data_admin", "querier", "restricted_querier", "viewer"]
     },
     "public.user_organization_status_enum": {
       "name": "user_organization_status_enum",
@@ -5688,13 +5662,7 @@
     "public.verification_enum": {
       "name": "verification_enum",
       "schema": "public",
-      "values": [
-        "verified",
-        "backlogged",
-        "inReview",
-        "requested",
-        "notRequested"
-      ]
+      "values": ["verified", "backlogged", "inReview", "requested", "notRequested"]
     }
   },
   "schemas": {},

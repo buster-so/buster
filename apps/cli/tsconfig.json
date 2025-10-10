@@ -1,12 +1,19 @@
 {
   "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
     "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
-    "outDir": "./dist",
-    "rootDir": "./src",
     "jsx": "react-jsx",
-    "types": ["bun", "node"]
+    "types": ["bun", "node"],
+    "lib": ["ES2021", "DOM"]
   },
-  "include": ["src/**/*", "env.d.ts"],
-  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../../packages/ai" },
+    { "path": "../../packages/sdk" },
+    { "path": "../../packages/server-shared" },
+    { "path": "../../packages/vitest-config" }
+  ]
 }

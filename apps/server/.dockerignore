@@ -1,121 +1,52 @@
-# Dependencies
-node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-.pnpm
+# Server-specific dockerignore for building inside Docker
+# This is used when building from the ROOT context with -f apps/server/Dockerfile
+
+# We NEED node_modules and dist from the build context
+# So DON'T exclude them here
+
+# Exclude git
+.git
+.gitignore
+.gitattributes
+
+# Exclude CI/CD
+.github
+
+# Exclude docs
+*.md
+docs/
+
+# Exclude logs
+*.log
+logs/
+
+# Exclude editor
+.vscode
+.idea
+*.swp
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
+
+# Exclude tests (saves space)
+**/*.test.*
+**/*.spec.*
+__tests__/
+coverage/
+
+# Exclude temporary
+tmp/
+temp/
+.turbo
+
+# Exclude env files (pass via --env-file or env vars)
+.env
+.env.*
 
 # Build outputs
 dist
 build
 .next
 .turbo
-
-# Development files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Editor files
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# OS files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Git
-.git
-.gitignore
-.gitattributes
-
-# Docker
-Dockerfile*
-.dockerignore
-docker-compose*.yml
-
-# Testing
-coverage
-.nyc_output
-.coverage
-*.lcov
-
-# Logs
-logs
-*.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-.env.test
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-# Temporary folders
-tmp/
-temp/
-
-# Documentation (not needed for runtime)
-*.md
-docs/
-
-# Tests (not needed for production)
-**/*.test.*
-**/*.spec.*
-__tests__/
-test/
-tests/
-
-# Development configuration
-.prettierrc*
-.eslintrc*
-.babelrc*
-jest.config.*
-vitest.config.*
-tsconfig.json
-
-# Exclude other apps (we only want server)
-apps/web
-apps/cli
-apps/electric-server
-apps/trigger 
+node_modules

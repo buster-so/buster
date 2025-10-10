@@ -35,7 +35,6 @@ import { z } from 'zod';
 
 // Get DocDeployResultSchema from deploy namespace
 const DocDeployResultSchema = deploy.DocDeployResultSchema;
-type DocDeployResult = deploy.DocDeployResult;
 
 // Re-export all the shared schemas from server-shared
 export {

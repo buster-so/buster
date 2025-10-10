@@ -21,4 +21,8 @@ export const GetDashboardResponseSchema = z.object({
   ...ShareConfigSchema.shape,
 });
 
+// PUT Dashboard response schema - reuses the same structure as GET
+export const UpdateDashboardResponseSchema = GetDashboardResponseSchema;
+
 export type GetDashboardResponse = z.infer<typeof GetDashboardResponseSchema>;
+export type UpdateDashboardResponse = z.infer<typeof UpdateDashboardResponseSchema>;

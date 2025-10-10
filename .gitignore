@@ -94,3 +94,4 @@ apps/web/.env.prod
 apps/web/.env.production
 apps/web/.env.staging
 .vercel
+.env.docker

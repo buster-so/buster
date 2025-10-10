@@ -1,4 +1,9 @@
-import type { DashboardConfig, GetDashboardResponse } from '@buster/server-shared/dashboards';
+import type {
+  DashboardConfig,
+  GetDashboardParams,
+  GetDashboardQuery,
+  GetDashboardResponse,
+} from '@buster/server-shared/dashboards';
 import type {
   ShareDeleteRequest,
   ShareDeleteResponse,
@@ -26,15 +31,8 @@ export const getDashboardById = async ({
   id,
   password,
   version_number,
-}: {
-  /** The unique identifier of the dashboard */
-  id: string;
-  /** Optional password for accessing protected dashboards */
-  password?: string;
-  /** The version number of the dashboard */
-  version_number?: number;
-}) => {
-  return await mainApi
+}: GetDashboardParams & GetDashboardQuery) => {
+  return await mainApiV2
     .get<GetDashboardResponse>(`/dashboards/${id}`, {
       params: { password, version_number },
     })
@@ -66,7 +64,7 @@ export const dashboardsUpdateDashboard = async (params: {
   /** restore the dashboard to a specific version */
   restore_to_version?: number;
 }) => {
-  return await mainApi
+  return await mainApiV2
     .put<GetDashboardResponse>(`/dashboards/${params.id}`, params)
     .then((res) => res.data);
 };

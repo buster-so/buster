@@ -11,6 +11,7 @@ import docsRoutes from './docs';
 import electricShapeRoutes from './electric-shape';
 import githubRoutes from './github';
 import libraryRoutes from './library';
+import { llm } from './llm';
 import metricFilesRoutes from './metric_files';
 import organizationRoutes from './organization';
 import publicRoutes from './public';
@@ -23,6 +24,7 @@ import slackRoutes from './slack';
 import sqlRoutes from './sql';
 import supportRoutes from './support';
 import titleRoutes from './title';
+import { tools } from './tools';
 import userRoutes from './users';
 
 const app = new Hono()
@@ -34,6 +36,7 @@ const app = new Hono()
   .route('/electric-shape', electricShapeRoutes)
   .route('/healthcheck', healthcheckRoutes)
   .route('/chats', chatsRoutes)
+  .route('/llm', llm)
   .route('/library', libraryRoutes)
   .route('/metric_files', metricFilesRoutes)
   .route('/github', githubRoutes)
@@ -42,6 +45,7 @@ const app = new Hono()
   .route('/support', supportRoutes)
   .route('/security', securityRoutes)
   .route('/shortcuts', shortcutsRoutes)
+  .route('/tools', tools)
   .route('/organizations', organizationRoutes)
   .route('/dictionaries', dictionariesRoutes)
   .route('/title', titleRoutes)

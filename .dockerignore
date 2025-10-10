@@ -77,7 +77,6 @@ Cargo.lock
 apps/api
 apps/cli
 
-# Other apps (only building server)
+# Other apps (only building server, but server depends on trigger)
 apps/web
-apps/trigger
 apps/electric-server

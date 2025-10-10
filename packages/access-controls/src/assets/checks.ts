@@ -1,9 +1,9 @@
+import type { User } from '@buster/database/queries';
 import {
   type CheckAssetPermissionParams,
   checkAssetPermission as checkDbAssetPermission,
   getUserOrganizationsByUserId,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { AssetType } from '@buster/database/schema-types';
 import type { AssetPermissionRole, OrganizationMembership, WorkspaceSharing } from '../types';
 import { getHighestPermission, isPermissionSufficient } from '../types/asset-permissions';

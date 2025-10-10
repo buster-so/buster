@@ -10,28 +10,28 @@ export function getGitHubAppCredentials(): {
   privateKey: string;
   webhookSecret: string;
 } {
-  const appId = process.env.GITHUB_APP_ID;
-  const privateKeyBase64 = process.env.GITHUB_APP_PRIVATE_KEY_BASE64;
-  const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+  const appId = process.env.GH_APP_ID;
+  const privateKeyBase64 = process.env.GH_APP_PRIVATE_KEY_BASE64;
+  const webhookSecret = process.env.GH_WEBHOOK_SECRET;
 
   if (!appId) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GITHUB_APP_ID environment variable is not set'
+      'GH_APP_ID environment variable is not set'
     );
   }
 
   if (!privateKeyBase64) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GITHUB_APP_PRIVATE_KEY_BASE64 environment variable is not set'
+      'GH_APP_PRIVATE_KEY_BASE64 environment variable is not set'
     );
   }
 
   if (!webhookSecret) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GITHUB_WEBHOOK_SECRET environment variable is not set'
+      'GH_WEBHOOK_SECRET environment variable is not set'
     );
   }
 
@@ -47,7 +47,7 @@ export function getGitHubAppCredentials(): {
   } catch (_error) {
     throw createGitHubError(
       GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'Failed to decode GITHUB_APP_PRIVATE_KEY_BASE64: Invalid base64 encoding'
+      'Failed to decode GH_APP_PRIVATE_KEY_BASE64: Invalid base64 encoding'
     );
   }
 

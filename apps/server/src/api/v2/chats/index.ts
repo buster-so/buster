@@ -14,6 +14,7 @@ import { z } from 'zod';
 import GET from './GET';
 import chatById from './[id]';
 import { cancelChatHandler } from './cancel-chat';
+import cliChat from './cli';
 import { createChatHandler } from './handler';
 
 const app = new Hono()
@@ -21,12 +22,13 @@ const app = new Hono()
   .use('*', requireAuth)
   .route('/', GET)
   .route('/:id', chatById)
+  .route('/cli', cliChat)
   // POST /chats - Create a new chat
   .post('/', zValidator('json', ChatCreateRequestSchema), async (c) => {
     const request = c.req.valid('json');
     const user = c.get('busterUser');
 
-    const response: ChatWithMessages = await createChatHandler(request, user);
+    const response: ChatWithMessages = await createChatHandler(request, user, c);
 
     const validatedResponse = ChatWithMessagesSchema.safeParse(response);
 

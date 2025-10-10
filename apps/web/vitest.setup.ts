@@ -2,6 +2,23 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 
+// Mock environment variables
+vi.mock('@/env', () => ({
+  env: {
+    VITE_PUBLIC_API2_URL: 'https://api2.test.com',
+    VITE_PUBLIC_API_URL: 'https://api.test.com',
+    VITE_PUBLIC_SUPABASE_ANON_KEY: 'mock-anon-key',
+    VITE_PUBLIC_SUPABASE_URL: 'https://supabase.test.com',
+    VITE_PUBLIC_URL: 'https://test.com',
+    VITE_PUBLIC_ENABLE_TANSTACK_PANEL: undefined,
+    VITE_PUBLIC_POSTHOG_HOST: undefined,
+    VITE_PUBLIC_POSTHOG_KEY: undefined,
+    VITE_PUBLIC_USER: undefined,
+    VITE_PUBLIC_USER_PASSWORD: undefined,
+    VITE_PUBLIC_WEB_SOCKET_URL: undefined,
+  },
+}));
+
 // Mock react-hotkeys-hook
 vi.mock('react-hotkeys-hook', () => ({
   useHotkeys: vi.fn(),

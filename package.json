@@ -17,7 +17,7 @@
     "db:dump": "turbo run db:dump --filter @buster/database",
     "db:migrate": "turbo run db:migrate --filter @buster/database",
     "db:generate": "turbo run db:generate --filter @buster/database",
-    "db:push": "turbo run db:push --filter @buster/database",
+    "db:push": "pnpm --filter @buster/database run db:push",
     "db:studio": "turbo run db:studio --filter @buster/database",
     "db:stop": "turbo run db:stop --filter @buster/database",
     "dev": "turbo dev",
@@ -49,13 +49,13 @@
   "dependencies": {
     "dotenv": "catalog:",
     "dotenv-cli": "^10.0.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.18.1",
     "tsx": "catalog:",
-    "turbo": "^2.5.7",
+    "turbo": "^2.5.8",
     "vitest": "catalog:"
   },
   "peerDependencies": {

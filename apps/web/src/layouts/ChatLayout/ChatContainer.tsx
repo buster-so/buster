@@ -6,11 +6,19 @@ import { ChatHeader } from './ChatHeader';
 export const CHAT_CONTAINER_ID = 'chat-container-content';
 
 export const ChatContainer = React.memo(
-  ({ chatId, isEmbed }: { chatId: string | undefined; isEmbed: boolean }) => {
+  ({
+    chatId,
+    isEmbed,
+    isScreenshotMode,
+  }: {
+    chatId: string | undefined;
+    isEmbed: boolean;
+    isScreenshotMode: boolean;
+  }) => {
     return (
       <AppPageLayout
         headerSizeVariant="default"
-        header={<ChatHeader isEmbed={isEmbed} />}
+        header={<ChatHeader isEmbed={isEmbed} isScreenshotMode={isScreenshotMode} />}
         headerBorderVariant="ghost"
         headerClassName="bg-page-background"
         mainClassName="bg-page-background"
@@ -18,7 +26,7 @@ export const ChatContainer = React.memo(
         id={CHAT_CONTAINER_ID}
         className="flex h-full w-full min-w-[295px] flex-col"
       >
-        <ChatContent chatId={chatId} isEmbed={isEmbed} />
+        <ChatContent chatId={chatId} isEmbed={isEmbed} doNotScrollToBottom={isScreenshotMode} />
       </AppPageLayout>
     );
   }

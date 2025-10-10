@@ -7,20 +7,31 @@ import { BUSTER_SIGN_UP_URL } from '../config/externalRoutes';
 
 export const Route = createFileRoute('/app')({
   context: ({ context }) => ({ ...context, getAppLayout }),
-  beforeLoad: async () => {
+  beforeLoad: async ({ matches }) => {
+    const lastMatch = matches[matches.length - 1];
     try {
       const supabaseSession = await getSupabaseSession();
       const { isExpired, accessToken = '' } = supabaseSession;
       if (isExpired || !accessToken) {
         console.error('Access token is expired or not found');
-        throw redirect({ to: '/auth/login', replace: true, statusCode: 307 });
+        throw redirect({
+          to: '/auth/login',
+          search: { next: lastMatch.pathname },
+          replace: true,
+          statusCode: 307,
+        });
       }
       return {
         supabaseSession,
       };
     } catch (error) {
       console.error('Error in app route beforeLoad:', error);
-      throw redirect({ to: '/auth/login', replace: true, statusCode: 307 });
+      throw redirect({
+        to: '/auth/login',
+        search: { next: lastMatch.pathname },
+        replace: true,
+        statusCode: 307,
+      });
     }
   },
   loader: async ({ context }) => {

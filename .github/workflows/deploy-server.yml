@@ -23,7 +23,13 @@ jobs:
         run: |
           echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
           echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      
+
+      - name: Cache Porter CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.porter
+          key: porter-cli-${{ runner.os }}-${{ runner.arch }}
+
       - name: Setup porter
         uses: porter-dev/setup-porter@v0.1.0
       

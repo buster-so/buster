@@ -1,7 +1,6 @@
 export {
-  getDataSourceCredentials,
-  GetDataSourceCredentialsInputSchema,
   type GetDataSourceCredentialsInput,
+  GetDataSourceCredentialsInputSchema,
+  getDataSourceCredentials,
 } from './get-data-source-credentials';
-export { getSecretByName } from './vault';
-export { createSecret, deleteSecret, updateSecret } from './vault';
+export { createSecret, deleteSecret, getSecretByName, updateSecret } from './vault';

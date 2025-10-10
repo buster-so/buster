@@ -55,7 +55,7 @@ describe('config-loader', () => {
               data_source: 'postgres',
               database: 'test_db',
               schema: 'public',
-            },
+            } as any,
           ],
         };
 
@@ -63,8 +63,8 @@ describe('config-loader', () => {
 
         const { config: result, configPath } = await loadBusterConfig(testDir);
         expect(result.projects).toHaveLength(1);
-        expect(result.projects[0].name).toBe('test-project');
-        expect(result.projects[0].data_source).toBe('postgres');
+        expect(result.projects[0]?.name).toBe('test-project');
+        expect(result.projects[0]?.data_source).toBe('postgres');
         expect(configPath).toBe(join(testDir, 'buster.yml'));
       });
 
@@ -76,7 +76,7 @@ describe('config-loader', () => {
               data_source: 'mysql',
               database: 'yaml_db',
               schema: 'default',
-            },
+            } as any,
           ],
         };
 
@@ -84,7 +84,7 @@ describe('config-loader', () => {
 
         const { config: result, configPath } = await loadBusterConfig(testDir);
         expect(result.projects).toHaveLength(1);
-        expect(result.projects[0].name).toBe('yaml-project');
+        expect(result.projects[0]?.name).toBe('yaml-project');
         expect(configPath).toBe(join(testDir, 'buster.yaml'));
       });
 
@@ -131,7 +131,7 @@ describe('config-loader', () => {
               data_source: 'postgres',
               database: 'db1',
               schema: 'public',
-            },
+            } as any,
           ],
         };
 
@@ -141,7 +141,7 @@ describe('config-loader', () => {
         // Search from parent should find subdirectory's buster.yml
         const { config: result, configPath } = await loadBusterConfig(testDir);
         expect(result.projects).toHaveLength(1);
-        expect(result.projects[0].name).toBe('sub-project');
+        expect(result.projects[0]?.name).toBe('sub-project');
         expect(configPath).toBe(join(subDir, 'buster.yml'));
       });
 
@@ -158,7 +158,7 @@ describe('config-loader', () => {
               data_source: 'bigquery',
               database: 'db_a',
               schema: 'dataset',
-            },
+            } as any,
           ],
         };
 
@@ -169,7 +169,7 @@ describe('config-loader', () => {
               data_source: 'postgres',
               database: 'db_b',
               schema: 'public',
-            },
+            } as any,
           ],
         };
 
@@ -181,7 +181,7 @@ describe('config-loader', () => {
         const { config: result } = await loadBusterConfig(testDir);
         expect(result.projects).toHaveLength(1);
         // The actual project found depends on directory traversal order
-        expect(['project-a', 'project-b']).toContain(result.projects[0].name);
+        expect(['project-a', 'project-b']).toContain(result.projects[0]?.name);
       });
     });
 
@@ -208,7 +208,7 @@ describe('config-loader', () => {
               data_source: 'postgres',
               database: 'db',
               schema: 'public',
-            },
+            } as any,
           ],
         };
 
@@ -239,7 +239,11 @@ describe('config-loader', () => {
     };
 
     it('should resolve configuration with project name', () => {
-      const resolved = resolveConfiguration(defaultConfig, { dryRun: false }, 'test-project');
+      const resolved = resolveConfiguration(
+        defaultConfig,
+        { dryRun: false, verbose: false, debug: false },
+        'test-project'
+      );
 
       expect(resolved.data_source_name).toBe('postgres');
       expect(resolved.database).toBe('test_db');
@@ -249,7 +253,11 @@ describe('config-loader', () => {
     });
 
     it('should use first project when no name specified', () => {
-      const resolved = resolveConfiguration(defaultConfig, { dryRun: false });
+      const resolved = resolveConfiguration(defaultConfig, {
+        dryRun: false,
+        verbose: false,
+        debug: false,
+      });
 
       expect(resolved.data_source_name).toBe('postgres');
     });
@@ -262,20 +270,28 @@ describe('config-loader', () => {
             data_source: 'postgres',
             database: 'test_db',
             schema: 'public',
-          },
+          } as any,
         ],
       };
 
-      const resolved = resolveConfiguration(config, { dryRun: false });
+      const resolved = resolveConfiguration(config, {
+        dryRun: false,
+        verbose: false,
+        debug: false,
+      });
 
       expect(resolved.include).toEqual(['**/*.yml', '**/*.yaml']);
       expect(resolved.exclude).toEqual([]);
     });
 
     it('should throw error for non-existent project name', () => {
-      expect(() => resolveConfiguration(defaultConfig, { dryRun: false }, 'non-existent')).toThrow(
-        "Project 'non-existent' not found in buster.yml"
-      );
+      expect(() =>
+        resolveConfiguration(
+          defaultConfig,
+          { dryRun: false, verbose: false, debug: false },
+          'non-existent'
+        )
+      ).toThrow("Project 'non-existent' not found in buster.yml");
     });
 
     it('should throw error when no projects defined', () => {
@@ -283,9 +299,9 @@ describe('config-loader', () => {
         projects: [],
       };
 
-      expect(() => resolveConfiguration(config, { dryRun: false })).toThrow(
-        'No projects defined in buster.yml'
-      );
+      expect(() =>
+        resolveConfiguration(config, { dryRun: false, verbose: false, debug: false })
+      ).toThrow('No projects defined in buster.yml');
     });
   });
 });

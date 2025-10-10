@@ -1,6 +1,6 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import type { DocsAgentOptions } from '../../../agents/docs-agent/docs-agent';
+import type { AnalyticsEngineerAgentOptions } from '../../../agents/analytics-engineer-agent/types';
 import { createSuperExecuteSqlExecute } from './super-execute-sql-execute';
 
 export const SuperExecuteSqlInputSchema = z.object({
@@ -110,7 +110,7 @@ export const executeSqlDocsAgent = tool({
   inputSchema: SuperExecuteSqlInputSchema,
   outputSchema: SuperExecuteSqlOutputSchema,
   execute: async (input, { experimental_context: context }) => {
-    const rawContext = context as DocsAgentOptions;
+    const rawContext = context as AnalyticsEngineerAgentOptions;
 
     const superExecuteSqlContext = SuperExecuteSqlContextSchema.parse({
       dataSourceId: rawContext.dataSourceId,

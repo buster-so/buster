@@ -137,6 +137,7 @@ describe('ChatWithMessagesSchema', () => {
       permission: 'owner',
       workspace_sharing: 'full_access',
       workspace_member_count: 0,
+      screenshot_taken_at: '2024-01-01T00:00:00Z',
     };
 
     const result = ChatWithMessagesSchema.safeParse(validChat);
@@ -172,6 +173,7 @@ describe('ChatWithMessagesSchema', () => {
       public_enabled_by: null,
       public_password: null,
       permission: 'owner',
+      screenshot_taken_at: null,
       // Optional fields omitted
     };
 
@@ -210,6 +212,7 @@ describe('ChatWithMessagesSchema', () => {
       permission: 'owner',
       workspace_sharing: 'full_access',
       workspace_member_count: 0,
+      screenshot_taken_at: null,
     };
 
     const result = ChatWithMessagesSchema.safeParse(chatWithInvalidPermissions);
@@ -238,6 +241,7 @@ describe('ChatWithMessagesSchema', () => {
       workspace_sharing: 'full_access',
       workspace_member_count: 0,
       individual_permissions: [],
+      screenshot_taken_at: null,
     };
 
     const result = ChatWithMessagesSchema.safeParse(chatWithValidDate);
