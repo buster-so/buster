@@ -92,24 +92,18 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     }
 
     const url = new URL(publicUrl);
-    const domain = url.hostname;
-
-    // For localhost/127.0.0.1, don't set domain at all (let browser handle it)
-    const isLocalhost =
-      domain === 'localhost' || domain === '127.0.0.1' || domain.endsWith('.local');
+    const domain = url.hostname || process.env.VITE_PUBLIC_URL;
 
     const cookieConfig: Parameters<typeof context.addCookies>[0][0] = {
       name: supabaseCookieKey,
       value: cookieValue,
+      domain,
       path: '/',
       httpOnly: false,
       secure: url.protocol === 'https:',
       sameSite: 'Lax',
       expires: jwtPayload.exp,
-      ...(isLocalhost ? {} : { domain }),
     };
-
-    console.log('cookieConfig', JSON.stringify(cookieConfig, null, 2));
 
     await context.addCookies([cookieConfig]);
 
