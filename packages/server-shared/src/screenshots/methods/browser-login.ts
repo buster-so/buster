@@ -95,7 +95,8 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     const domain = url.hostname;
 
     // For localhost/127.0.0.1, don't set domain at all (let browser handle it)
-    const isLocalhost = domain === 'localhost' || domain === '127.0.0.1' || domain.endsWith('.local');
+    const isLocalhost =
+      domain === 'localhost' || domain === '127.0.0.1' || domain.endsWith('.local');
 
     const cookieConfig = {
       name: supabaseCookieKey,
@@ -106,6 +107,8 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       sameSite: 'Lax' as const,
       ...(isLocalhost ? {} : { domain }),
     };
+
+    console.log('cookieConfig', cookieConfig);
 
     await context.addCookies([cookieConfig]);
 
