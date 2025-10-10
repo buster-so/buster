@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { createFileRoute } from '@tanstack/react-router'
-import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HealthcheckRouteImport } from './routes/healthcheck'
@@ -154,11 +153,7 @@ import { Route as AppAppAssetChatsChatIdReportsReportIdMetricsMetricIdContentCha
 import { Route as AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdContentSqlRouteImport } from './routes/app/_app/_asset/chats.$chatId/dashboards.$dashboardId/metrics.$metricId/_content/sql'
 import { Route as AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdContentResultsRouteImport } from './routes/app/_app/_asset/chats.$chatId/dashboards.$dashboardId/metrics.$metricId/_content/results'
 import { Route as AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdContentChartRouteImport } from './routes/app/_app/_asset/chats.$chatId/dashboards.$dashboardId/metrics.$metricId/_content/chart'
-import { ServerRoute as AuthConfirmServerRouteImport } from './routes/auth.confirm'
-import { ServerRoute as AuthCallbackServerRouteImport } from './routes/auth.callback'
-import { ServerRoute as ScreenshotsMetricsMetricIdIndexServerRouteImport } from './routes/screenshots/metrics.$metricId.index'
 
-const ScreenshotsRouteImport = createFileRoute('/screenshots')()
 const EmbedChatChatIdReportsReportIdRouteImport = createFileRoute(
   '/embed/chat/$chatId/reports/$reportId',
 )()
@@ -207,13 +202,7 @@ const AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdRouteImport =
   createFileRoute(
     '/app/_app/_asset/chats/$chatId/dashboards/$dashboardId/metrics/$metricId',
   )()
-const rootServerRouteImport = createServerRootRoute()
 
-const ScreenshotsRoute = ScreenshotsRouteImport.update({
-  id: '/screenshots',
-  path: '/screenshots',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const HealthcheckRoute = HealthcheckRouteImport.update({
   id: '/healthcheck',
   path: '/healthcheck',
@@ -1189,22 +1178,6 @@ const AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdContentChartRout
         AppAppAssetChatsChatIdDashboardsDashboardIdMetricsMetricIdContentRoute,
     } as any,
   )
-const AuthConfirmServerRoute = AuthConfirmServerRouteImport.update({
-  id: '/auth/confirm',
-  path: '/auth/confirm',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
-const AuthCallbackServerRoute = AuthCallbackServerRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
-const ScreenshotsMetricsMetricIdIndexServerRoute =
-  ScreenshotsMetricsMetricIdIndexServerRouteImport.update({
-    id: '/screenshots/metrics/$metricId/',
-    path: '/screenshots/metrics/$metricId/',
-    getParentRoute: () => rootServerRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -1469,7 +1442,6 @@ export interface FileRoutesById {
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/info/getting-started': typeof InfoGettingStartedRoute
-  '/screenshots': typeof ScreenshotsRouteWithChildren
   '/screenshots/_content': typeof ScreenshotsContentRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/_app/_asset': typeof AppAppAssetRouteWithChildren
@@ -1881,7 +1853,6 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/reset-password'
     | '/info/getting-started'
-    | '/screenshots'
     | '/screenshots/_content'
     | '/app/'
     | '/app/_app/_asset'
@@ -2037,54 +2008,10 @@ export interface RootRouteChildren {
   EmbedRoute: typeof EmbedRouteWithChildren
   HealthcheckRoute: typeof HealthcheckRoute
   InfoGettingStartedRoute: typeof InfoGettingStartedRoute
-  ScreenshotsRoute: typeof ScreenshotsRouteWithChildren
-}
-export interface FileServerRoutesByFullPath {
-  '/auth/callback': typeof AuthCallbackServerRoute
-  '/auth/confirm': typeof AuthConfirmServerRoute
-  '/screenshots/metrics/$metricId': typeof ScreenshotsMetricsMetricIdIndexServerRoute
-}
-export interface FileServerRoutesByTo {
-  '/auth/callback': typeof AuthCallbackServerRoute
-  '/auth/confirm': typeof AuthConfirmServerRoute
-  '/screenshots/metrics/$metricId': typeof ScreenshotsMetricsMetricIdIndexServerRoute
-}
-export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport
-  '/auth/callback': typeof AuthCallbackServerRoute
-  '/auth/confirm': typeof AuthConfirmServerRoute
-  '/screenshots/metrics/$metricId/': typeof ScreenshotsMetricsMetricIdIndexServerRoute
-}
-export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths:
-    | '/auth/callback'
-    | '/auth/confirm'
-    | '/screenshots/metrics/$metricId'
-  fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/auth/callback' | '/auth/confirm' | '/screenshots/metrics/$metricId'
-  id:
-    | '__root__'
-    | '/auth/callback'
-    | '/auth/confirm'
-    | '/screenshots/metrics/$metricId/'
-  fileServerRoutesById: FileServerRoutesById
-}
-export interface RootServerRouteChildren {
-  AuthCallbackServerRoute: typeof AuthCallbackServerRoute
-  AuthConfirmServerRoute: typeof AuthConfirmServerRoute
-  ScreenshotsMetricsMetricIdIndexServerRoute: typeof ScreenshotsMetricsMetricIdIndexServerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/screenshots': {
-      id: '/screenshots'
-      path: '/screenshots'
-      fullPath: '/screenshots'
-      preLoaderRoute: typeof ScreenshotsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/healthcheck': {
       id: '/healthcheck'
       path: '/healthcheck'
@@ -2129,7 +2056,7 @@ declare module '@tanstack/react-router' {
     }
     '/screenshots/_content': {
       id: '/screenshots/_content'
-      path: '/screenshots'
+      path: ''
       fullPath: '/screenshots'
       preLoaderRoute: typeof ScreenshotsContentRouteImport
       parentRoute: typeof ScreenshotsRoute
@@ -3186,31 +3113,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-declare module '@tanstack/react-start/server' {
-  interface ServerFileRoutesByPath {
-    '/auth/confirm': {
-      id: '/auth/confirm'
-      path: '/auth/confirm'
-      fullPath: '/auth/confirm'
-      preLoaderRoute: typeof AuthConfirmServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-    '/screenshots/metrics/$metricId/': {
-      id: '/screenshots/metrics/$metricId/'
-      path: '/screenshots/metrics/$metricId'
-      fullPath: '/screenshots/metrics/$metricId'
-      preLoaderRoute: typeof ScreenshotsMetricsMetricIdIndexServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
-  }
-}
 
 interface AppAppAssetChatsChatIdDashboardsDashboardIdLayoutRouteChildren {
   AppAppAssetChatsChatIdDashboardsDashboardIdLayoutIndexRoute: typeof AppAppAssetChatsChatIdDashboardsDashboardIdLayoutIndexRoute
@@ -4212,30 +4114,6 @@ const EmbedRouteChildren: EmbedRouteChildren = {
 
 const EmbedRouteWithChildren = EmbedRoute._addFileChildren(EmbedRouteChildren)
 
-interface ScreenshotsContentRouteChildren {
-  ScreenshotsContentMetricsMetricIdContentRoute: typeof ScreenshotsContentMetricsMetricIdContentRoute
-}
-
-const ScreenshotsContentRouteChildren: ScreenshotsContentRouteChildren = {
-  ScreenshotsContentMetricsMetricIdContentRoute:
-    ScreenshotsContentMetricsMetricIdContentRoute,
-}
-
-const ScreenshotsContentRouteWithChildren =
-  ScreenshotsContentRoute._addFileChildren(ScreenshotsContentRouteChildren)
-
-interface ScreenshotsRouteChildren {
-  ScreenshotsContentRoute: typeof ScreenshotsContentRouteWithChildren
-}
-
-const ScreenshotsRouteChildren: ScreenshotsRouteChildren = {
-  ScreenshotsContentRoute: ScreenshotsContentRouteWithChildren,
-}
-
-const ScreenshotsRouteWithChildren = ScreenshotsRoute._addFileChildren(
-  ScreenshotsRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
@@ -4243,17 +4121,17 @@ const rootRouteChildren: RootRouteChildren = {
   EmbedRoute: EmbedRouteWithChildren,
   HealthcheckRoute: HealthcheckRoute,
   InfoGettingStartedRoute: InfoGettingStartedRoute,
-  ScreenshotsRoute: ScreenshotsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-const rootServerRouteChildren: RootServerRouteChildren = {
-  AuthCallbackServerRoute: AuthCallbackServerRoute,
-  AuthConfirmServerRoute: AuthConfirmServerRoute,
-  ScreenshotsMetricsMetricIdIndexServerRoute:
-    ScreenshotsMetricsMetricIdIndexServerRoute,
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
 }
-export const serverRouteTree = rootServerRouteImport
-  ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>()
