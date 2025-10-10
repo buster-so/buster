@@ -4,7 +4,7 @@ name: Build and Push Server Docker Image
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main, staging, nate/optimize-builds]
     paths:
       - 'apps/server/**'
       - 'packages/**'
@@ -19,36 +19,21 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: buster-so/buster-server
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
-  build-and-push:
-    runs-on: blacksmith-8vcpu-ubuntu-2404
-    timeout-minutes: 35
-    permissions:
-      contents: read
-      packages: write
-
+  prepare-metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+      tags: ${{ steps.meta.outputs.tags }}
+      timestamp: ${{ steps.meta.outputs.timestamp }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Mount Docker buildkit sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}
-          path: /tmp/.buildkit-cache
-
-      - name: Set up Docker Builder
-        uses: useblacksmith/setup-docker-builder@v1
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata and determine tags
         id: meta
@@ -67,34 +52,106 @@ jobs:
           # Set build timestamp
           echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
+  build-and-push:
+    needs: prepare-metadata
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [amd64, arm64]
+        include:
+          - platform: amd64
+            runner: blacksmith-8vcpu-ubuntu-2404
+            docker_platform: linux/amd64
+          - platform: arm64
+            runner: blacksmith-8vcpu-ubuntu-2404-arm
+            docker_platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mount Docker buildkit sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}-${{ matrix.platform }}
+          path: /tmp/.buildkit-cache
+
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push Docker image
         uses: useblacksmith/build-push-action@v2
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
         with:
           context: .
           file: ./apps/server/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ needs.prepare-metadata.outputs.tags }}-${{ matrix.platform }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+            org.opencontainers.image.created=${{ needs.prepare-metadata.outputs.timestamp }}
             org.opencontainers.image.ref.name=${{ github.ref_name }}
           build-args: |
-            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
-            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
-          platforms: linux/amd64,linux/arm64
+            COMMIT_SHA=${{ needs.prepare-metadata.outputs.sha_short }}
+            BUILD_DATE=${{ needs.prepare-metadata.outputs.timestamp }}
+            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
+            TURBO_TEAM=${{ vars.TURBO_TEAM }}
+          platforms: ${{ matrix.docker_platform }}
           cache-from: type=local,src=/tmp/.buildkit-cache
           cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
+
+  create-manifest:
+    needs: [prepare-metadata, build-and-push]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          # Parse tags from prepare-metadata output
+          TAGS="${{ needs.prepare-metadata.outputs.tags }}"
+
+          for TAG in ${TAGS//,/ }; do
+            echo "Creating manifest for $TAG"
+            docker buildx imagetools create -t $TAG \
+              ${TAG}-amd64 \
+              ${TAG}-arm64
+          done
 
       - name: Output image details
         run: |
           echo "✅ Docker image built and pushed successfully!"
           echo "📦 Image tags:"
-          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+          echo "${{ needs.prepare-metadata.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
           echo ""
           echo "🔧 To use in Porter:"
           if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.sha_short }}"
+            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.prepare-metadata.outputs.sha_short }}"
           else
-            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ steps.meta.outputs.sha_short }}"
+            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ needs.prepare-metadata.outputs.sha_short }}"
           fi
