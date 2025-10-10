@@ -1,0 +1,14 @@
+- Fast content search tool that works with any codebase size
+- Searches file contents using regular expressions
+- Supports full regex syntax (eg. "log.*Error", "function\s+\w+", etc.)
+- Filter files by pattern with the glob parameter (eg. "*.js", "*.{ts,tsx}")
+- Returns matches sorted by file modification time (newest first)
+- By default, returns up to 100 matches starting from the first match
+- You can optionally specify offset and limit for pagination:
+  - offset: Match index to start from (0-indexed, defaults to 0)
+  - limit: Maximum number of matches to return (defaults to 100)
+  - Example: { pattern: "TODO", offset: 100, limit: 50 } returns matches 100-149
+- The response includes a "truncated" flag to indicate if more matches are available beyond the limit
+- Use this tool when you need to find files containing specific patterns
+- If you need to identify/count the number of matches within files, use the Bash tool with `rg` (ripgrep) directly. Do NOT use `grep`.
+- When you are doing an open ended search that may require multiple rounds of globbing and grepping, use the Task tool instead

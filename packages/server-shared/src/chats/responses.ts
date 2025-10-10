@@ -39,3 +39,7 @@ export type DeleteChatsResponse = z.infer<typeof DeleteChatsResponseSchema>;
 
 export const ShareChatResponseSchema = ChatWithMessagesSchema;
 export type ShareChatResponse = z.infer<typeof ShareChatResponseSchema>;
+
+// Response for creating a CLI chat
+export const CliChatCreateResponseSchema = ChatWithMessagesSchema;
+export type CliChatCreateResponse = z.infer<typeof CliChatCreateResponseSchema>;

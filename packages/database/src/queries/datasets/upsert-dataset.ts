@@ -1,6 +1,7 @@
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { z } from 'zod';
+import { db } from '../../connection';
 import { getErrorHint, parseDatabaseError } from '../../helpers/error-parser';
 import { datasets } from '../../schema';
 
@@ -24,7 +25,6 @@ export type UpsertDatasetParams = z.infer<typeof UpsertDatasetSchema>;
  * Returns the dataset ID and whether it was updated or created
  */
 export async function upsertDataset(
-  db: PostgresJsDatabase,
   params: UpsertDatasetParams
 ): Promise<{ datasetId: string; updated: boolean }> {
   // Validate params at runtime
@@ -80,6 +80,13 @@ export async function upsertDataset(
       model: name,
       ymlFile: yml_file,
       databaseIdentifier: database,
+      metadata: {
+        rowCount: 0,
+        sampleSize: 0,
+        samplingMethod: 'none',
+        columnProfiles: [],
+        introspectedAt: new Date().toISOString(),
+      },
       updatedAt: sql`now()`,
       deletedAt: null, // Ensure we're not soft-deleted
     };

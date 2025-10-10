@@ -17,7 +17,7 @@
     "db:dump": "turbo run db:dump --filter @buster/database",
     "db:migrate": "turbo run db:migrate --filter @buster/database",
     "db:generate": "turbo run db:generate --filter @buster/database",
-    "db:push": "turbo run db:push --filter @buster/database",
+    "db:push": "pnpm --filter @buster/database run db:push",
     "db:studio": "turbo run db:studio --filter @buster/database",
     "db:stop": "turbo run db:stop --filter @buster/database",
     "dev": "turbo dev",

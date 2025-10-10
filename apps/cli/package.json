@@ -7,21 +7,22 @@
     "buster": "./dist/index.js"
   },
   "scripts": {
-    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
-    "build": "bun build src/index.tsx --outdir dist --target node",
+    "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || (tsx scripts/validate-env.ts && pnpm run typecheck)",
+    "build": "bun build src/index.tsx --outdir dist --target bun",
     "build:dry-run": "tsc --noEmit",
     "build:standalone": "bun build src/index.tsx --compile --outfile dist/buster",
     "start": "bun run dist/index.js",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check . --write",
+    "lint": "biome check --write",
     "test": "vitest run",
-    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:unit": "vitest run --exclude '**/*.int.test.ts' --exclude '**/*.integration.test.ts'",
     "test:integration": "vitest run **/*.int.test.ts **/*.integration.test.ts",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@buster/ai": "workspace:*",
     "@buster/sdk": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "chalk": "^5.6.0",
@@ -39,7 +40,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.3",
     "@buster/env-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",

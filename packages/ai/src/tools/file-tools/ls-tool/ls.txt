@@ -1,0 +1,10 @@
+Lists files and directories in a tree structure for a given path. The path parameter must be an absolute path, not a relative path. You can control the depth of traversal with the depth parameter (defaults to 3 levels). Directories beyond the depth limit are shown with "... (depth limit)". You can optionally provide an array of glob patterns to ignore with the ignore parameter.
+
+By default, returns up to 100 files starting from the first file. You can use pagination with offset and limit parameters:
+- offset: File index to start from (0-indexed, defaults to 0)
+- limit: Maximum number of files to return (defaults to 100)
+- Example: { path: "/project", offset: 100, limit: 50 } returns files 100-149
+
+The response includes a "truncated" flag to indicate if more files are available beyond the limit. If truncated, consider using pagination with offset parameter, more specific ignore patterns, or reducing the depth parameter to focus the listing.
+
+You should generally prefer the Glob and Grep tools, if you know which directories to search.

@@ -191,7 +191,7 @@ describe('discovery', () => {
 
       expect(included).toHaveLength(4);
       expect(excluded).toHaveLength(1);
-      expect(excluded[0].file).toBe('models/users.yml');
+      expect(excluded[0]?.file).toBe('models/users.yml');
     });
 
     it('should handle wildcard patterns', async () => {
@@ -203,7 +203,7 @@ describe('discovery', () => {
 
       expect(included).toHaveLength(4);
       expect(excluded).toHaveLength(1);
-      expect(excluded[0].file).toBe('metrics/revenue.yml');
+      expect(excluded[0]?.file).toBe('metrics/revenue.yml');
     });
 
     it('should work with absolute file paths', async () => {
@@ -217,7 +217,7 @@ describe('discovery', () => {
 
       expect(included).toHaveLength(2);
       expect(excluded).toHaveLength(1);
-      expect(excluded[0].file).toBe('test/test.yml');
+      expect(excluded[0]?.file).toBe('test/test.yml');
     });
 
     it('should match first pattern when multiple patterns match', async () => {

@@ -101,6 +101,34 @@ class UserService {  // Never do this
 }
 ```
 
+### Import Patterns
+- **Always use top-level imports** - Import all dependencies at the top of the file
+- **No dynamic imports** - Avoid `await import()` in the middle of functions
+- **Rationale** - Prioritize code simplicity and consistency over premature optimization
+- **Exception** - Only use dynamic imports if you have clear evidence of measurable startup performance issues
+
+```typescript
+// Good: Top-level imports
+import { runHeadless } from '../services/headless-handler';
+import { render } from 'ink';
+
+export function handleCommand(options) {
+  if (options.prompt) {
+    return runHeadless(options);
+  }
+  return render(<Main />);
+}
+
+// Bad: Dynamic imports without justification
+export async function handleCommand(options) {
+  if (options.prompt) {
+    const { runHeadless } = await import('../services/headless-handler');
+    return runHeadless(options);
+  }
+  return render(<Main />);
+}
+```
+
 ## Cross-Cutting Concerns
 
 ### Environment Variables

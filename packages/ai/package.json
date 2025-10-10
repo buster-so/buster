@@ -56,6 +56,7 @@
     "ai": "catalog:",
     "autoevals": "^0.0.131",
     "braintrust": "catalog:",
+    "diff": "^8.0.2",
     "drizzle-orm": "catalog:",
     "glob": "^11.0.3",
     "minimatch": "^10.0.3",
@@ -63,5 +64,9 @@
     "uuid": "^11.1.0",
     "yaml": "^2.8.1",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.23",
+    "@types/diff": "^8.0.0"
   }
 }

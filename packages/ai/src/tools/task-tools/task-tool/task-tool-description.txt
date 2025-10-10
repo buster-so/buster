@@ -1,0 +1,53 @@
+Launch a sub-agent to handle complex, multi-step tasks autonomously.
+
+The sub-agent has access to all file tools (read, write, edit, bash, grep, glob, ls), database tools (runSql, retrieveMetadata), and planning tools (todoWrite) to complete its assigned task.
+
+When NOT to use the Task tool:
+- If you want to read a specific file path, use the Read tool instead - it's faster
+- If you are searching for code within a specific file or set of 2-3 files, use the Read tool instead
+- If you can complete the task yourself with 1-2 tool calls
+- For simple, single-step operations that don't require autonomous planning
+
+WHEN to use the Task tool:
+- Complex multi-step tasks that require autonomous planning and execution
+- Research tasks with multiple concurrent questions or areas to investigate
+- Tasks that benefit from dedicated focus and their own todo list tracking
+- When you need to parallelize work across multiple independent sub-tasks
+
+Usage notes:
+1. Launch multiple agents concurrently whenever possible to maximize performance. To do this, use a single message with multiple tool calls.
+2. When a sub-agent completes, it returns a single summary message back to you. The result is not visible to the user. You should send a text message to the user with a concise summary of the results.
+3. Each sub-agent invocation is stateless. You cannot send additional messages to it, nor can it communicate with you outside of its final report. Therefore, your prompt should contain a highly detailed task description for the sub-agent to perform autonomously, and you should specify exactly what information it should return in its final message.
+4. Sub-agent outputs should generally be trusted.
+5. Clearly tell the sub-agent whether you expect it to write code/files or just do research (search, file reads, database queries, etc.), since it is not aware of the user's original intent.
+6. Sub-agents cannot spawn other sub-agents - they must complete their work directly.
+
+Example usage for concurrent research:
+
+<example>
+user: "I need to understand how authentication works in this dbt project - check the models, tests, and any documentation"
+assistant thinking: This requires investigating multiple areas concurrently - models, tests, and docs. I should launch 3 sub-agents in parallel.
+assistant: I'll research the authentication implementation by launching 3 concurrent sub-agents to investigate models, tests, and documentation.
+<launches 3 Task tool calls in parallel>
+1. description: "Research auth models", prompt: "Search for and read all models related to authentication (models with 'auth', 'user', 'login' in names). For each model, analyze the SQL logic, columns, and relationships. Return a summary of what authentication data is tracked and how it flows through the models."
+2. description: "Research auth tests", prompt: "Search for and read all tests related to authentication (look in schema.yml files for tests on auth-related models). Analyze what is being tested and what the assertions validate. Return a summary of the test coverage for authentication."
+3. description: "Research auth docs", prompt: "Search for and read any documentation about authentication (look for .md files, model descriptions in schema.yml). Return a summary of what the documentation explains about authentication patterns and usage."
+</example>
+
+<example>
+user: "Can you update the customer model documentation to include all the latest columns?"
+assistant thinking: This is a single focused task that requires reading the model, checking metadata, and updating YAML. Perfect for a sub-agent.
+assistant: I'll delegate this to a sub-agent to research the customer model and update its documentation.
+<launches single Task tool call>
+description: "Update customer model docs", prompt: "Your task is to update the customer model documentation. Steps: 1) Read the customer model SQL file to understand the logic, 2) Use retrieveMetadata to get current column information, 3) Read the existing schema.yml for the customer model, 4) Update the schema.yml to document all columns with descriptions based on the model logic and metadata. Ensure all columns have descriptions and that the model-level description accurately reflects what the model does. Return a summary of what was updated."
+</example>
+
+<example>
+user: "Help me understand the sales data pipeline"
+assistant thinking: This is a broad research task that could involve multiple models, their relationships, and data flow. I should break this into focused research areas and run them concurrently.
+assistant: I'll investigate the sales pipeline by researching the source data, transformation models, and final marts in parallel.
+<launches 3 Task tool calls in parallel>
+1. description: "Research sales sources", prompt: "Search for and analyze all staging models related to sales (stg_sales*, stg_orders*, etc.). Read the SQL files and understand what source data is being pulled. Use retrieveMetadata if needed to see actual column data. Return a summary of what sales data is available and how it's structured."
+2. description: "Research sales transforms", prompt: "Search for and analyze intermediate models that transform sales data (int_sales*, fct_orders*, etc.). Read the SQL to understand the transformation logic, joins, and aggregations. Return a summary of how raw sales data is transformed."
+3. description: "Research sales marts", prompt: "Search for and analyze final sales mart models (marts/sales/* or dim_*, fct_sales*, etc.). Read the SQL and schema.yml docs. Return a summary of what final sales analytics tables are available and what questions they answer."
+</example>

@@ -7,12 +7,6 @@ export * from './analyst-agent-steps/extract-values-step/extract-values-search-s
 export * from './analyst-agent-steps/create-todos-step/create-todos-step';
 export * from './analyst-agent-steps/analysis-type-router-step/analysis-type-router-step';
 
-// Docs agent steps
-export * from './docs-agent-steps/create-docs-todo-list-step/create-docs-todos-step';
-export * from './docs-agent-steps/get-repository-tree-step/get-repository-tree-step';
-export * from './docs-agent-steps/docs-agent-step/docs-agent-step';
-export * from './docs-agent-steps/initialize-context-step';
-
 // Message post-processing steps
 export * from './message-post-processing-steps/format-initial-message-step/format-initial-message-step';
 export * from './message-post-processing-steps/format-follow-up-message-step/format-follow-up-message-step';

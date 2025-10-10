@@ -18,6 +18,7 @@ export * from './dictionary';
 export * from './docs';
 export * from './github';
 export * from './message';
+export * from './metadata';
 export * from './metrics';
 export * from './organization';
 export * from './public-chat';

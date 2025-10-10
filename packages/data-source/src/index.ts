@@ -70,6 +70,26 @@ export type {
   TableType,
 } from './types/introspection';
 
+// New introspection types
+export type {
+  IntrospectionFilters,
+  TableMetadata,
+  StructuralMetadata,
+  ColumnSchema,
+  TableSample,
+} from './introspection/types';
+
+// Introspection utilities
+export {
+  getStructuralMetadata,
+  sampleTable,
+  getDynamicSampleSize,
+  validateFilters,
+} from './introspection';
+
+// Error handling utilities
+export { classifyError } from './errors/data-source-errors';
+
 // Utility exports
 export {
   RateLimiter,

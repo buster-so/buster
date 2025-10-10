@@ -108,7 +108,7 @@ export async function deployHandler(
           };
 
           // Upsert the dataset
-          const { updated } = await upsertDataset(tx, datasetParams);
+          const { updated } = await upsertDataset(datasetParams);
 
           if (updated) {
             modelResult.updated.push({

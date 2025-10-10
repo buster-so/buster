@@ -14,7 +14,7 @@ export function BusterBanner({ showSubtitle = true, inline = false }: BannerProp
   const content = (
     <>
       <Box>
-        <SimpleBigText text="BUSTER" color="#7C3AED" />
+        <SimpleBigText text='BUSTER' color='#7C3AED' />
       </Box>
       {showSubtitle && (
         <Box marginTop={1}>
@@ -26,12 +26,12 @@ export function BusterBanner({ showSubtitle = true, inline = false }: BannerProp
 
   // For inline mode (root command), don't add padding
   if (inline) {
-    return <Box flexDirection="column">{content}</Box>;
+    return <Box flexDirection='column'>{content}</Box>;
   }
 
   // For centered mode (init, deploy commands), add padding and center
   return (
-    <Box paddingY={2} paddingX={2} flexDirection="column" alignItems="center">
+    <Box paddingY={2} paddingX={2} flexDirection='column' alignItems='center'>
       {content}
     </Box>
   );

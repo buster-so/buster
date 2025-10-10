@@ -41,3 +41,6 @@ export * from './chat';
 export * from './pagination';
 
 export * from './library';
+
+// Export dataset-metadata types
+export * from './dataset-metadata';

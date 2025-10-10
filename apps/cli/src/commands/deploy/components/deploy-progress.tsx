@@ -24,9 +24,9 @@ export function DeployProgress({
   const percentage = total > 0 ? Math.round((current / total) * 100) : 0;
 
   return (
-    <Box flexDirection="column" marginY={1}>
+    <Box flexDirection='column' marginY={1}>
       <Box>
-        {!isComplete && <Spinner type="dots" />}
+        {!isComplete && <Spinner type='dots' />}
         <Text color={isComplete ? 'green' : 'cyan'}>
           {' '}
           [{current}/{total}] {status}
@@ -35,14 +35,14 @@ export function DeployProgress({
 
       {currentFile && (
         <Box marginLeft={2}>
-          <Text color="dim">File: {currentFile}</Text>
+          <Text color='dim'>File: {currentFile}</Text>
         </Box>
       )}
 
       {currentModel && (
         <Box marginLeft={2}>
-          <Text color="dim">Model: </Text>
-          <Text color="magenta">{currentModel}</Text>
+          <Text color='dim'>Model: </Text>
+          <Text color='magenta'>{currentModel}</Text>
         </Box>
       )}
 
@@ -63,9 +63,9 @@ function ProgressBar({ percentage, width }: { percentage: number; width: number 
 
   return (
     <Box>
-      <Text color="green">{'█'.repeat(filled)}</Text>
-      <Text color="dim">{'░'.repeat(empty)}</Text>
-      <Text color="cyan"> {percentage}%</Text>
+      <Text color='green'>{'█'.repeat(filled)}</Text>
+      <Text color='dim'>{'░'.repeat(empty)}</Text>
+      <Text color='cyan'> {percentage}%</Text>
     </Box>
   );
 }

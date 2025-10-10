@@ -84,7 +84,7 @@ export function AnimatedLogo({ color = '#7C3AED' }: AnimatedLogoProps) {
   const currentFrame = BUSTER_LOGO_FRAMES[opacity];
 
   return (
-    <Box flexDirection="column" alignItems="center">
+    <Box flexDirection='column' alignItems='center'>
       <Text color={color}>{currentFrame}</Text>
     </Box>
   );
