@@ -2,9 +2,8 @@
 # Buster Server Dockerfile - Builds inside Docker with Turbo
 # =============================================================================
 #
-# Build and run:
-#   cd apps/server
-#   docker build -t buster-server .
+# Build and run (from monorepo root):
+#   docker build -t buster-server -f apps/server/Dockerfile .
 #   docker run -p 3002:3002 --env-file .env.docker buster-server
 #
 # =============================================================================
@@ -17,12 +16,12 @@ FROM base AS deps
 RUN bun install -g pnpm
 
 # Copy everything needed for install from monorepo root
-COPY ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../turbo.json ../../.pnpmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json .pnpmrc ./
 
 # Copy all package.json files while preserving directory structure
-COPY ../../packages ./packages
-COPY package.json ./apps/server/
-COPY ../trigger/package.json ./apps/trigger/
+COPY packages ./packages
+COPY apps/server/package.json ./apps/server/
+COPY apps/trigger/package.json ./apps/trigger/
 
 # Install ALL dependencies - now pnpm will create package-level node_modules
 RUN pnpm install --frozen-lockfile
