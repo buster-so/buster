@@ -1,4 +1,8 @@
-import { type ChartEncodes, DEFAULT_COLUMN_LABEL_FORMAT } from '@buster/server-shared/metrics';
+import {
+  type ChartEncodes,
+  type ColumnMetaData,
+  DEFAULT_COLUMN_LABEL_FORMAT,
+} from '@buster/server-shared/metrics';
 import { renderHook } from '@testing-library/react';
 import type { LinearScaleOptions } from 'chart.js';
 import { describe, expect, it } from 'vitest';
@@ -128,5 +132,101 @@ describe('useYAxis', () => {
 
     const { result } = renderHook(() => useYAxis(props));
     expect(result.current?.max).toBe(100);
+  });
+
+  describe('usePercentageModeAxis logic', () => {
+    it('should return "100" for bar chart with percentage-stack', () => {
+      const props = {
+        ...defaultProps,
+        selectedChartType: 'bar',
+        barGroupType: 'percentage-stack' as const,
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      expect(result.current?.max).toBe(100);
+      expect(result.current?.min).toBe(0);
+    });
+
+    it('should return "clamp" for columns with percent style format', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 95,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // With clamp mode and max_value of 95, max should be Math.max(100, 95 * 1.05) = 100
+      expect(result.current?.max).toBe(100);
+      expect(result.current?.min).toBe(0);
+    });
+  });
+
+  describe('max value calculation logic', () => {
+    it('should return 100 when usePercentageModeAxis is "100"', () => {
+      const props = {
+        ...defaultProps,
+        barGroupType: 'percentage-stack' as const,
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      expect(result.current?.max).toBe(100);
+    });
+
+    it('should return Math.max(100, yMaxValue * 1.05) when usePercentageModeAxis is "clamp" and yMaxValue > 95.24', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 120,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // 120 * 1.05 = 126, Math.max(100, 126) = 126
+      expect(result.current?.max).toBe(126);
+    });
+
+    it('should return 100 when usePercentageModeAxis is "clamp" and yMaxValue <= 95.24', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 80,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // 80 * 1.05 = 84, Math.max(100, 84) = 100
+      expect(result.current?.max).toBe(100);
+    });
   });
 });

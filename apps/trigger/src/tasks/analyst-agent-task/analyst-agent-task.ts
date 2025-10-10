@@ -25,9 +25,7 @@ import { type PermissionedDataset, getPermissionedDatasets } from '@buster/acces
 import { type AnalystWorkflowInput, runAnalystWorkflow } from '@buster/ai';
 
 import type { ModelMessage } from 'ai';
-import { getSupabaseCookieKey, getSupabaseUser } from '../../utils/supabase';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
-import type { TakeDashboardScreenshotTrigger } from '../screenshots/schemas';
 import { screenshots_task_keys } from '../screenshots/task-keys';
 import { analyst_agent_task_keys } from './task-keys';
 
@@ -519,19 +517,16 @@ export const analystAgentTask: ReturnType<
 
       //unfortuatenly slack messages don't have an access token...
       if (payload.access_token) {
-        const supabaseUser = await getSupabaseUser(payload.access_token);
-        if (supabaseUser) {
-          await tasks.trigger(
-            screenshots_task_keys.take_chat_screenshot,
-            {
-              chatId: messageContext.chatId,
-              organizationId: messageContext.organizationId,
-              accessToken: payload.access_token,
-              isNewChatMessage: true,
-            } satisfies TakeChatScreenshotTrigger,
-            { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
-          );
-        }
+        await tasks.trigger(
+          screenshots_task_keys.take_chat_screenshot,
+          {
+            chatId: messageContext.chatId,
+            organizationId: messageContext.organizationId,
+            accessToken: payload.access_token,
+            isNewChatMessage: true,
+          } satisfies TakeChatScreenshotTrigger,
+          { concurrencyKey: `take-dashboard-screenshot-${payload.message_id}` }
+        );
       }
 
       // Log final performance metrics
