@@ -64,8 +64,6 @@ export const BusterChatInputButtons = React.memo(
       onDictateListeningChange?.(listening);
     }, [listening, onDictateListeningChange]);
 
-    console.log('disableSubmit', disableSubmit);
-
     return (
       <div className="flex justify-between items-center gap-2">
         <AppSegmented

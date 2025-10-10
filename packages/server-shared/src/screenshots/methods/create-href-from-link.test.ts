@@ -1,4 +1,21 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mock env before importing the module that uses it
+// Use getters to read from process.env so test modifications work
+vi.mock('../../env', () => ({
+  env: {
+    get VITE_PUBLIC_URL() {
+      return process.env.VITE_PUBLIC_URL ?? 'https://example.com';
+    },
+    get SUPABASE_URL() {
+      return process.env.SUPABASE_URL ?? 'https://example.com';
+    },
+    get SUPABASE_SERVICE_ROLE_KEY() {
+      return process.env.SUPABASE_SERVICE_ROLE_KEY ?? '123';
+    },
+  },
+}));
+
 import { createHrefFromLink } from './create-href-from-link';
 
 describe('createHrefFromLink', () => {
@@ -6,6 +23,8 @@ describe('createHrefFromLink', () => {
 
   beforeEach(() => {
     process.env.VITE_PUBLIC_URL = 'https://example.com';
+    process.env.SUPABASE_URL = 'https://example.com';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = '123';
   });
 
   afterEach(() => {
