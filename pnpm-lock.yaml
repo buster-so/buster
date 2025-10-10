@@ -21,9 +21,6 @@ catalogs:
     '@supabase/supabase-js':
       specifier: 2.57.4
       version: 2.57.4
-    '@t3-oss/env-core':
-      specifier: ^0.13.8
-      version: 0.13.8
     '@types/js-yaml':
       specifier: 4.0.9
       version: 4.0.9
@@ -641,7 +638,7 @@ importers:
         specifier: 'catalog:'
         version: 2.57.4
       '@t3-oss/env-core':
-        specifier: 'catalog:'
+        specifier: ^0.13.8
         version: 0.13.8(typescript@5.9.3)(zod@3.25.76)
       '@tailwindcss/vite':
         specifier: ^4.1.14
@@ -1384,9 +1381,6 @@ importers:
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.57.4
-      '@t3-oss/env-core':
-        specifier: 'catalog:'
-        version: 0.13.8(typescript@5.9.3)(zod@3.25.76)
       playwright:
         specifier: ^1.55.1
         version: 1.55.1
