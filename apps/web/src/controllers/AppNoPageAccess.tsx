@@ -35,6 +35,8 @@ export const AppNoPageAccess: React.FC<{
         buttonText: 'Login to view asset',
         link: {
           to: '/auth/login',
+          reloadDocument: true,
+          replace: true,
           search: {
             next: currentUrl,
           },
