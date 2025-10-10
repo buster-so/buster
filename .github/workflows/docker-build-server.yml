@@ -4,7 +4,7 @@ name: Build and Push Server Docker Image
 
 on:
   push:
-    branches: [main, staging, nate/optimize-builds]
+    branches: [main, staging]
     paths:
       - 'apps/server/**'
       - 'packages/**'
@@ -117,13 +117,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare platform-specific tags
+        id: platform-tags
+        run: |
+          # Convert comma-separated tags to newline-separated with platform suffix
+          TAGS="${{ needs.prepare-metadata.outputs.tags }}"
+          PLATFORM_TAGS=""
+          for TAG in ${TAGS//,/ }; do
+            if [ -n "$PLATFORM_TAGS" ]; then
+              PLATFORM_TAGS="${PLATFORM_TAGS},"
+            fi
+            PLATFORM_TAGS="${PLATFORM_TAGS}${TAG}-${{ matrix.platform }}"
+          done
+          echo "tags=${PLATFORM_TAGS}" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: useblacksmith/build-push-action@v2
         with:
           context: .
           file: ./apps/server/Dockerfile
           push: true
-          tags: ${{ needs.prepare-metadata.outputs.tags }}-${{ matrix.platform }}
+          tags: ${{ steps.platform-tags.outputs.tags }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
