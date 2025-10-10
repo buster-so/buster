@@ -4,6 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["@buster/database#build"],
+      "cache": true,
       "outputs": ["target/release/**"],
       "inputs": ["server/**/*", "libs/**/*", "Cargo.toml", "Cargo.lock"]
     },

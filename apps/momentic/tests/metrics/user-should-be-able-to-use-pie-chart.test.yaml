@@ -27,11 +27,11 @@ steps:
   - id: 925aa181-3576-41ba-87e4-fd59595e4a69
     type: PRESET_ACTION
     command:
-      id: d83bbcf4-87ce-4429-82d9-8da30ad4666e
+      id: f4f2b3bc-690b-49aa-b2cf-609800f449bb
       type: CLICK
       target:
         type: description
-        elementDescriptor: the div with text 'Top 5 Sales Representatives by Total Sales'
+        elementDescriptor: the div with text 'Top Customer by Lifetime Value'
   - id: 05169d64-25d9-4afc-9bf1-2c9d0a89a3c8
     type: PRESET_ACTION
     command:
@@ -40,31 +40,54 @@ steps:
       target:
         type: description
         elementDescriptor: the edit chart button
-  - id: 97dbcc93-16ce-4d02-a994-a59ea63958db
+  - id: b2d7ecd4-9918-449f-a099-a4c00592c30c
     type: PRESET_ACTION
     command:
-      id: 32e11609-d8c3-4ce2-b0fe-9b979d38d952
+      id: 4714c87a-1e07-4c36-bd1b-9d8428dec518
       type: CLICK
       target:
         type: description
-        elementDescriptor: the button to select the pie chart type
-  - id: c038c50b-8ab3-4f42-813d-9f44bf8112c8
+        elementDescriptor: the pie chart type button in the Chart type selector
+  - id: 12f453a3-244c-42dc-a068-885939c4f899
     type: PRESET_ACTION
     command:
-      id: 693853ae-ab03-4bcb-8eda-2c0b8409abd1
+      id: b84c0c87-c0a6-43bb-a567-8bae9474c362
+      type: MOUSE_DRAG
+      target:
+        type: description
+        elementDescriptor: the drag-handle button for the available item 'Customerid' in
+          the Available list
+      deltaX: "6"
+      deltaY: "-246"
+      steps: 1
+  - id: a18a2e90-efec-471f-b9df-dd6c072e0f40
+    type: PRESET_ACTION
+    command:
+      id: 873ad06a-9783-4186-8104-1168870792f1
+      type: MOUSE_DRAG
+      target:
+        type: description
+        elementDescriptor: the available items list entry for 'Lifetime Value' (drag
+          handle/icon in the Available section)
+      deltaX: "-2"
+      deltaY: "-199"
+      steps: 1
+  - id: 4eb57c88-4bff-4a3e-9004-a4a73fe558c2
+    type: PRESET_ACTION
+    command:
+      id: 72d5dd39-fe1e-4ab8-85b1-f11400c1ac6d
       type: CLICK
       target:
         type: description
-        elementDescriptor: the save button
+        elementDescriptor: the Save button in the page bottom action bar next to Reset
   - id: e5dcec3e-c0ba-412a-af68-c2d65c6af47b
     type: PRESET_ACTION
     command:
-      id: ff186b5d-9a1a-4a6a-afd7-ef694248a8fc
+      id: b1a13c0a-bc34-493c-96be-514141302c0f
       type: AI_ASSERTION
-      assertion: We should see a pie chart with 45.4 or some close dollar amount in
-        the middle with a total, there should be a legen that looks nice with no
-        words cut off, there should be 5 distinct colors on the chart, it'll be
-        a donut chart.  you should confirm that the state looks like its saved.
+      assertion: We should see a pie chart with a total, there should be a legend that
+        looks nice with no words cut off it'll be a donut chart.  you should
+        confirm that the state looks like its saved.
 afterSteps:
   - id: e37dd2b1-ac2e-4112-820f-66f3b11d19e9
     type: PRESET_ACTION

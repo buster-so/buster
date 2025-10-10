@@ -27,11 +27,11 @@ steps:
   - id: 82d0093d-445f-4cee-ae50-8bfeab9d2839
     type: PRESET_ACTION
     command:
-      id: e0ebae5b-6e63-474a-8dec-76469cd00e6c
+      id: 7d103dd3-c372-4645-9690-c488ffc77cdf
       type: CLICK
       target:
         type: description
-        elementDescriptor: the div with text 'split customers by active status'
+        elementDescriptor: The first chat title in the list
   - id: 65a93bf7-1ee7-48ae-883b-52feeb64de76
     type: PRESET_ACTION
     command:
