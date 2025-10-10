@@ -30,3 +30,20 @@ export async function createSandbox(options: CreateSandboxOptions = {}) {
 
   return sandbox;
 }
+
+export async function createSandboxFromSnapshot(snapshotName: string) {
+  const daytonaApiKeyExists = envSchema.safeParse(process.env);
+  if (!daytonaApiKeyExists.success) {
+    throw new Error('DAYTONA_API_KEY environment variable is required');
+  }
+
+  const daytona = new Daytona({ apiKey: daytonaApiKeyExists.data.DAYTONA_API_KEY, target: 'us' });
+
+  const sandbox = await daytona.create({
+    snapshot: snapshotName,
+    autoStopInterval: 5, // Will stop the sandbox after 5 minutes of inactivity,
+    autoDeleteInterval: 60, // Will delete the sandbox 1hr after it stops
+  });
+
+  return sandbox;
+}
