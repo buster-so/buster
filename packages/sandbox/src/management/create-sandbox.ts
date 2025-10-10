@@ -43,7 +43,7 @@ export async function createSandboxFromSnapshot(snapshotName: string) {
     snapshot: snapshotName,
     autoStopInterval: 5, // Will stop the sandbox after 5 minutes of inactivity,
     autoDeleteInterval: 60, // Will delete the sandbox 1hr after it stops
-  })
+  });
 
   return sandbox;
 }

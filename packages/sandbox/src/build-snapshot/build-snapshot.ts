@@ -8,7 +8,6 @@
 //   DAYTONA_API_KEY: z.string().min(1, 'DAYTONA_API_KEY environment variable is required'),
 // });
 
-
 // async function buildSnapshot() {
 //   const env = envSchema.parse(process.env);
 //   const image = Image.fromDockerfile('src/build-snapshot/Dockerfile');

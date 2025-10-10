@@ -25,20 +25,21 @@ export async function getGithubIntegrationByInstallationId(
   return integration;
 }
 
-export async function getApiKeyForInstallationId(installationId: number): Promise<string | undefined> {
-
+export async function getApiKeyForInstallationId(
+  installationId: number
+): Promise<string | undefined> {
   const installationIdString = installationId.toString();
-  const [ orgId ] = await db.select({
-    id: githubIntegrations.organizationId,
-  })
-  .from(githubIntegrations)
-  .where(eq(githubIntegrations.installationId, installationIdString))
-  .limit(1);
+  const [orgId] = await db
+    .select({
+      id: githubIntegrations.organizationId,
+    })
+    .from(githubIntegrations)
+    .where(eq(githubIntegrations.installationId, installationIdString))
+    .limit(1);
 
   if (!orgId) {
     return undefined;
   }
-
 
   const result = await db
     .select({
@@ -49,5 +50,4 @@ export async function getApiKeyForInstallationId(installationId: number): Promis
     .limit(1);
 
   return result[0]?.key;
-
 }

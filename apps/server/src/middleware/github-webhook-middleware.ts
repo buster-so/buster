@@ -23,7 +23,7 @@ function getOrSetApp() {
       console.info(`Pull request opened by ${username} in ${owner}/${repo}#${issue_number}`);
     });
 
-    githubApp.webhooks.on('pull_request.reopened', async({ payload }) => {
+    githubApp.webhooks.on('pull_request.reopened', async ({ payload }) => {
       const owner = payload.repository.owner.login;
       const repo = payload.repository.name;
       const issue_number = payload.pull_request.number;
@@ -70,13 +70,21 @@ function getOrSetApp() {
               message: 'No API key found for installation id',
             });
           }
-          await runDocsAgent(authDetails.token, payload.repository.html_url, branch, commentBody, apiKey);
+          await runDocsAgent(
+            authDetails.token,
+            payload.repository.html_url,
+            branch,
+            commentBody,
+            apiKey
+          );
         }
       }
     });
 
     githubApp.webhooks.on('installation', ({ payload }) => {
-      console.info(`Installation event received: ${payload.action} for installation id ${payload.installation.id}`);
+      console.info(
+        `Installation event received: ${payload.action} for installation id ${payload.installation.id}`
+      );
     });
   }
   return githubApp;

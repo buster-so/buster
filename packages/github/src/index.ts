@@ -27,4 +27,4 @@ export * from '@buster/server-shared/github';
 export type { App } from 'octokit';
 
 // Define webhook event name type (used for x-github-event header)
-export type { WebhookEventName } from '@octokit/webhooks/types'; 
+export type { WebhookEventName } from '@octokit/webhooks/types';
