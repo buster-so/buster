@@ -203,6 +203,7 @@ jobs:
   # E2E test job - runs after build completes
   e2e_test:
     name: End-to-End Test
+    needs: build
     runs-on: blacksmith-32vcpu-ubuntu-2404
     timeout-minutes: 40
     environment: testing
