@@ -91,19 +91,23 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       throw new Error('VITE_PUBLIC_URL environment variable is required for browser screenshots');
     }
 
-    const domain = new URL(publicUrl).hostname;
+    const url = new URL(publicUrl);
+    const domain = url.hostname;
 
-    await context.addCookies([
-      {
-        name: supabaseCookieKey,
-        value: cookieValue,
-        domain,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-        sameSite: 'Lax',
-      },
-    ]);
+    // For localhost/127.0.0.1, don't set domain at all (let browser handle it)
+    const isLocalhost = domain === 'localhost' || domain === '127.0.0.1' || domain.endsWith('.local');
+
+    const cookieConfig = {
+      name: supabaseCookieKey,
+      value: cookieValue,
+      path: '/',
+      httpOnly: false, // Set to false so JavaScript can access it
+      secure: url.protocol === 'https:',
+      sameSite: 'Lax' as const,
+      ...(isLocalhost ? {} : { domain }),
+    };
+
+    await context.addCookies([cookieConfig]);
 
     const page = await context.newPage();
 
