@@ -237,3 +237,4 @@ FOR EACH ROW EXECUTE FUNCTION sync_dashboard_files_to_text_search();
 CREATE TRIGGER sync_report_files_text_search
 AFTER INSERT OR UPDATE OR DELETE ON report_files
 FOR EACH ROW EXECUTE FUNCTION sync_report_files_to_text_search();
+

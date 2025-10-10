@@ -1,8 +1,14 @@
+ALTER TABLE "chats" ADD COLUMN IF NOT EXISTS "screenshot_taken_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "collections" ADD COLUMN IF NOT EXISTS "screenshot_taken_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "dashboard_files" ADD COLUMN IF NOT EXISTS "screenshot_taken_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "metric_files" ADD COLUMN IF NOT EXISTS"screenshot_taken_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "report_files" ADD COLUMN IF NOT EXISTS"screenshot_taken_at" timestamp with time zone;--> statement-breakpoint
+
 -- Step 1: Truncate the asset_search_v2 table to start fresh
 TRUNCATE TABLE "asset_search_v2";--> statement-breakpoint
 
 -- Step 2: Add the created_by column as NOT NULL (since table is empty)
-ALTER TABLE "asset_search_v2" ADD COLUMN if not exists "created_by" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "asset_search_v2" ADD COLUMN IF NOT EXISTS "created_by" uuid NOT NULL;--> statement-breakpoint
 
 -- Step 3: Add the foreign key constraint for created_by
 ALTER TABLE "asset_search_v2" ADD CONSTRAINT "asset_search_v2_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
