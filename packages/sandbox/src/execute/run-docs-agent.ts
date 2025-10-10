@@ -1,4 +1,10 @@
+import { z } from 'zod';
 import { createSandboxFromSnapshot } from '../management/create-sandbox';
+
+// Define schema for environment validation
+const envSchema = z.object({
+  BUSTER_HOST: z.string().min(1, 'BUSTER_HOST environment variable is required'),
+});
 
 export async function runDocsAgent(
   installationToken: string,
@@ -13,6 +19,9 @@ export async function runDocsAgent(
   const busterAppGitEmail = 'buster-app@buster.so';
   const sessionName = 'buster-docs-agent-session';
 
+  // Validate environment
+  const env = envSchema.parse(process.env);
+
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
     workspacePath, // path
@@ -25,10 +34,8 @@ export async function runDocsAgent(
   const envExportCommands = [
     `export GITHUB_TOKEN=${installationToken}`,
     `export BUSTER_API_KEY=${apiKey}`,
+    `export BUSTER_HOST=${env.BUSTER_HOST}`,
   ];
-  if (process.env.ENVIRONMENT === 'development' && process.env.BUSTER_HOST) {
-    envExportCommands.push(`export BUSTER_HOST=${process.env.BUSTER_HOST}`);
-  }
 
   await sandbox.process.createSession(sessionName);
   await sandbox.process.executeSessionCommand(sessionName, {
