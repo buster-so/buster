@@ -21,6 +21,17 @@ export default defineConfig({
     '@buster/test-utils',
     '@buster/typescript-config',
     '@buster/vitest-config',
+    '@buster/ai',
+    '@buster/data-source',
+    '@buster/github',
+    '@buster/search',
+    '@buster/slack',
+    '@buster/test-utils',
+    '@buster/typescript-config',
+    '@buster/vitest-config',
+    '@buster/web-tools',
+    '@buster/sandbox',
+    '@buster-app/trigger',
   ],
   noExternal: [
     // Bundle these specific packages if needed
