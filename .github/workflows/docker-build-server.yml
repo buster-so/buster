@@ -1,3 +1,5 @@
+
+
 name: Build and Push Server Docker Image
 
 on:
@@ -31,28 +33,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Configure pnpm for linux-x64-glibc
-        run: |
-          echo "⚙️  Configuring pnpm for linux-x64-glibc architecture..."
-          echo "# Target: Debian-based Docker image (oven/bun:1.2.21-debian)" > .npmrc
-          echo "# This ensures Sharp installs linux-x64-glibc native binaries" >> .npmrc
-          echo "supportedArchitectures[os][]=linux" >> .npmrc
-          echo "supportedArchitectures[cpu][]=x64" >> .npmrc
-          echo "supportedArchitectures[libc][]=glibc" >> .npmrc
-          echo "" >> .npmrc
-          echo "# CRITICAL: Include optional dependencies (Sharp platform binaries)" >> .npmrc
-          echo "optional=true" >> .npmrc
-          echo ""
-          echo "Configuration:"
-          cat .npmrc
-
+      
       - name: Setup Node Environment
         uses: ./.github/actions/setup-node-env
         with:
           install-filter: "@buster-app/server..."
           cache-key: docker-build-server
-
+      
       - name: Mount Turbo cache sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
@@ -82,7 +69,7 @@ jobs:
         run: |
           echo "📦 Creating server bundle with bun..."
           cd apps/server
-          bun build src/index.ts --outdir ./dist --target bun --external sharp --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64 --external playwright-core --external playwright --external electron --external chromium-bidi --external @vitest/* --external vitest
+          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64
           ls -la dist/
           cd ../..
       
@@ -91,85 +78,21 @@ jobs:
           echo "🧹 Preparing production-only dependencies..."
           # Create a temporary directory for production deps
           mkdir -p /tmp/prod-deps/apps/server
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc /tmp/prod-deps/
+          cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
           cp -r packages /tmp/prod-deps/
-          cp -r apps /tmp/prod-deps/
-
-          # Install production dependencies with correct architecture (using .npmrc from workspace)
+          cp apps/server/package.json /tmp/prod-deps/apps/server/
+          
+          # Install production dependencies only, skip optional dependencies
           cd /tmp/prod-deps
-          pnpm install --prod
-
-          # Install Sharp with linux-x64 binaries directly into node_modules
-          echo ""
-          echo "📦 Installing Sharp with linux-x64-glibc binaries for production..."
-
-          # Use npm in a clean directory to download Sharp with correct platform
-          mkdir -p /tmp/sharp-install
-          cd /tmp/sharp-install
-          npm install --no-save --cpu=x64 --os=linux --libc=glibc \
-            sharp@^0.34.4 \
-            @img/sharp-linux-x64@^0.34.4 \
-            @img/sharp-libvips-linux-x64@^1.2.3
-
-          # Copy the Sharp packages to production node_modules
-          echo "📦 Copying Sharp packages to production node_modules..."
-          cp -r node_modules/sharp /tmp/prod-deps/node_modules/ 2>/dev/null || true
-          cp -r node_modules/@img /tmp/prod-deps/node_modules/ 2>/dev/null || true
-
-          cd /tmp/prod-deps
-          echo "✅ Sharp installed for production"
-
+          pnpm install --frozen-lockfile --prod --no-optional
+          
           # Copy back to workspace
           cd -
           mkdir -p docker-context
           cp -r /tmp/prod-deps/node_modules docker-context/
           cp -r apps/server/dist docker-context/
           cp apps/server/package.json docker-context/
-
-      - name: Verify Sharp in production node_modules
-        run: |
-          echo "🔍 Final verification of Sharp in docker-context..."
-
-          # Check if Sharp exists
-          if [ ! -d "docker-context/node_modules/sharp" ]; then
-            echo "❌ ERROR: Sharp package NOT found in docker-context/node_modules!"
-            exit 1
-          fi
-
-          echo "✅ Sharp package found in docker-context"
-
-          # Check for Sharp platform binaries (may be symlinks)
-          echo ""
-          echo "📦 Checking Sharp platform packages..."
-          if [ -d "docker-context/node_modules/@img/sharp-linux-x64" ] || [ -L "docker-context/node_modules/@img/sharp-linux-x64" ]; then
-            echo "✅ @img/sharp-linux-x64 found"
-            ls -la docker-context/node_modules/@img/sharp-linux-x64
-          else
-            echo "❌ @img/sharp-linux-x64 NOT found"
-          fi
-
-          if [ -d "docker-context/node_modules/@img/sharp-libvips-linux-x64" ] || [ -L "docker-context/node_modules/@img/sharp-libvips-linux-x64" ]; then
-            echo "✅ @img/sharp-libvips-linux-x64 found"
-            ls -la docker-context/node_modules/@img/sharp-libvips-linux-x64
-          else
-            echo "❌ @img/sharp-libvips-linux-x64 NOT found"
-          fi
-
-          # Check for .node binaries
-          echo ""
-          echo "🔍 Checking for native binaries (.node files)..."
-          if find -L docker-context/node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null | grep -q .; then
-            echo "✅ Native binaries found:"
-            find -L docker-context/node_modules/@img/sharp-linux-x64 -name "*.node" -type f
-            find -L docker-context/node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null || true
-          else
-            echo "❌ ERROR: No native binaries (.node files) found!"
-            exit 1
-          fi
-
-          echo ""
-          echo "✅ Sharp verification complete - all required files present"
-
+      
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
       

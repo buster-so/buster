@@ -3,7 +3,7 @@
 # This expects the app to be already built by GitHub Actions
 # ================================================================
 
-FROM oven/bun:1.2.21-debian AS runtime
+FROM oven/bun:1.2.21-alpine AS runtime
 
 WORKDIR /app
 
@@ -28,32 +28,6 @@ RUN addgroup --system --gid 1001 bunuser && \
 COPY --chown=bunuser:bunuser dist ./dist
 COPY --chown=bunuser:bunuser node_modules ./node_modules
 COPY --chown=bunuser:bunuser package.json ./
-
-# Verify Sharp installation for linux-x64-glibc
-RUN echo "=== Verifying Sharp installation ===" && \
-    if [ ! -d "node_modules/sharp" ]; then \
-      echo "❌ ERROR: Sharp package NOT found!"; \
-      exit 1; \
-    fi && \
-    echo "✅ Sharp package found" && \
-    if [ -d "node_modules/@img/sharp-linux-x64" ] || [ -L "node_modules/@img/sharp-linux-x64" ]; then \
-      echo "✅ Sharp linux-x64 platform package found"; \
-      ls -la node_modules/@img/sharp-linux-x64 || true; \
-      if find -L node_modules/@img/sharp-linux-x64 -name "*.node" -type f 2>/dev/null | grep -q .; then \
-        echo "✅ Sharp native binaries (.node files) found:"; \
-        find -L node_modules/@img/sharp-linux-x64 -name "*.node" -type f; \
-        find -L node_modules/@img/sharp-libvips-linux-x64 -name "*.node" -type f 2>/dev/null || true; \
-      else \
-        echo "❌ ERROR: Sharp native binaries NOT found!"; \
-        ls -la node_modules/@img/ || true; \
-        exit 1; \
-      fi; \
-    else \
-      echo "❌ ERROR: Sharp linux-x64 platform package NOT found!"; \
-      echo "Available @img packages:"; \
-      ls -la node_modules/@img/ || echo "None found"; \
-      exit 1; \
-    fi
 
 # Show image info
 RUN echo "=== Production image ready ===" && \
