@@ -5,11 +5,10 @@ import type {
 } from '@buster/server-shared/metrics';
 import React, { useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { prefetchGetCurrencies, useGetCurrencies } from '@/api/buster_rest/dictionaries';
+import { useGetCurrencies } from '@/api/buster_rest/dictionaries';
 import { Text } from '@/components/ui/typography';
 import { useUpdateMetricChart } from '@/context/Metrics/useUpdateMetricChart';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { useMount } from '@/hooks/useMount';
 import { cn } from '@/lib/classMerge';
 import { formatLabel } from '@/lib/columnFormatter';
 import { SelectAxisContainerId } from '../config';

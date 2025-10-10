@@ -5,6 +5,7 @@ import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 export const EditCompactNumbers: React.FC<{
   compactNumbers: ColumnLabelFormat['compactNumbers'];
+
   onUpdateColumnConfig: (columnLabelFormat: Partial<ColumnLabelFormat>) => void;
 }> = React.memo(({ compactNumbers, onUpdateColumnConfig }) => {
   const onChange = (v: boolean) => {
@@ -12,7 +13,7 @@ export const EditCompactNumbers: React.FC<{
   };
 
   return (
-    <LabelAndInput label="Compact numbers">
+    <LabelAndInput label="Compact">
       <div className="flex justify-end">
         <Switch checked={compactNumbers} onCheckedChange={onChange} />
       </div>
