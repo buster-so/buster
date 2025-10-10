@@ -44,9 +44,17 @@ export async function runDocsAgent(
   await sandbox.process.executeSessionCommand(sessionName, {
     command: `gh auth setup-git && git config --global user.email "${busterAppGitEmail}" && git config --global user.name "${busterAppGitUsername}"`,
   });
-  await sandbox.process.executeSessionCommand(sessionName, {
+  const command = await sandbox.process.executeSessionCommand(sessionName, {
     command: `cd ${workspacePath} && buster --prompt "${prompt}"`,
     runAsync: true,
   });
+
+  const logs = await sandbox.process.getSessionCommandLogs(
+    sessionName,
+    command.cmdId ?? '',
+    (stdout) => console.info('[STDOUT]:', stdout)
+  );
+
+  console.info('[SANDBOXLOGS]:', logs);
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
