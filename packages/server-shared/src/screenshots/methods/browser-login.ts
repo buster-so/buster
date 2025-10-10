@@ -109,7 +109,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       ...(isLocalhost ? {} : { domain }),
     };
 
-    console.log('cookieConfig', cookieConfig);
+    console.log('cookieConfig', JSON.stringify(cookieConfig, null, 2));
 
     await context.addCookies([cookieConfig]);
 
