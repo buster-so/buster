@@ -92,20 +92,18 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     }
 
     const url = new URL(publicUrl);
-    const domain = url.hostname || process.env.VITE_PUBLIC_URL;
 
     const cookieConfig: Parameters<typeof context.addCookies>[0][0] = {
       name: supabaseCookieKey,
       value: cookieValue,
-      domain,
-      path: '/',
+      url: publicUrl,
+      expires: jwtPayload.exp,
       httpOnly: false,
       secure: url.protocol === 'https:',
-      sameSite: 'Lax',
-      expires: jwtPayload.exp,
+      sameSite: 'Lax' as 'Strict' | 'Lax' | 'None',
     };
 
-    console.log(JSON.stringify(cookieConfig, null, 2));
+    console.info('cookieConfig', JSON.stringify(cookieConfig, null, 2));
 
     await context.addCookies([cookieConfig]);
 
