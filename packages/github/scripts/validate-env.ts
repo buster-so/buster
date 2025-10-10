@@ -11,9 +11,9 @@ loadRootEnv();
 // Making them optional for build time to allow packages to be built without GitHub setup
 const requiredEnv = {
   // GitHub App configuration (required for runtime)
-  GITHUB_APP_ID: process.env.GITHUB_APP_ID,
-  GITHUB_APP_PRIVATE_KEY_BASE64: process.env.GITHUB_APP_PRIVATE_KEY_BASE64,
-  GITHUB_WEBHOOK_SECRET: process.env.GITHUB_WEBHOOK_SECRET,
+  GH_APP_ID: process.env.GH_APP_ID,
+  GH_APP_PRIVATE_KEY_BASE64: process.env.GH_APP_PRIVATE_KEY_BASE64,
+  GH_WEBHOOK_SECRET: process.env.GH_WEBHOOK_SECRET,
 };
 
 // Validate environment variables

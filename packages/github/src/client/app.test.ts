@@ -24,11 +24,11 @@ describe('github-app', () => {
   describe('getGitHubAppCredentials', () => {
     it('should return credentials when all environment variables are set', () => {
       // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = Buffer.from(
+      process.env.GH_APP_ID = '123456';
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = Buffer.from(
         '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
       ).toString('base64');
-      process.env.GITHUB_WEBHOOK_SECRET = 'webhook-secret';
+      process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
       // Act
       const credentials = getGitHubAppCredentials();
@@ -41,60 +41,57 @@ describe('github-app', () => {
       });
     });
 
-    it('should throw error when GITHUB_APP_ID is missing', () => {
+    it('should throw error when GH_APP_ID is missing', () => {
       // Arrange
-      delete process.env.GITHUB_APP_ID;
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = 'test';
-      process.env.GITHUB_WEBHOOK_SECRET = 'test';
+      delete process.env.GH_APP_ID;
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = 'test';
+      process.env.GH_WEBHOOK_SECRET = 'test';
+
+      // Act & Assert
+      expect(() => getGitHubAppCredentials()).toThrow('GH_APP_ID environment variable is not set');
+    });
+
+    it('should throw error when GH_APP_PRIVATE_KEY_BASE64 is missing', () => {
+      // Arrange
+      process.env.GH_APP_ID = '123456';
+      delete process.env.GH_APP_PRIVATE_KEY_BASE64;
+      process.env.GH_WEBHOOK_SECRET = 'test';
 
       // Act & Assert
       expect(() => getGitHubAppCredentials()).toThrow(
-        'GITHUB_APP_ID environment variable is not set'
+        'GH_APP_PRIVATE_KEY_BASE64 environment variable is not set'
       );
     });
 
-    it('should throw error when GITHUB_APP_PRIVATE_KEY_BASE64 is missing', () => {
+    it('should throw error when GH_WEBHOOK_SECRET is missing', () => {
       // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      delete process.env.GITHUB_APP_PRIVATE_KEY_BASE64;
-      process.env.GITHUB_WEBHOOK_SECRET = 'test';
+      process.env.GH_APP_ID = '123456';
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = 'test';
+      delete process.env.GH_WEBHOOK_SECRET;
 
       // Act & Assert
       expect(() => getGitHubAppCredentials()).toThrow(
-        'GITHUB_APP_PRIVATE_KEY_BASE64 environment variable is not set'
-      );
-    });
-
-    it('should throw error when GITHUB_WEBHOOK_SECRET is missing', () => {
-      // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = 'test';
-      delete process.env.GITHUB_WEBHOOK_SECRET;
-
-      // Act & Assert
-      expect(() => getGitHubAppCredentials()).toThrow(
-        'GITHUB_WEBHOOK_SECRET environment variable is not set'
+        'GH_WEBHOOK_SECRET environment variable is not set'
       );
     });
 
     it('should throw error when private key base64 is invalid', () => {
       // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = 'not-valid-base64!@#$%';
-      process.env.GITHUB_WEBHOOK_SECRET = 'test';
+      process.env.GH_APP_ID = '123456';
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = 'not-valid-base64!@#$%';
+      process.env.GH_WEBHOOK_SECRET = 'test';
 
       // Act & Assert
       expect(() => getGitHubAppCredentials()).toThrow(
-        'Failed to decode GITHUB_APP_PRIVATE_KEY_BASE64: Invalid base64 encoding'
+        'Failed to decode GH_APP_PRIVATE_KEY_BASE64: Invalid base64 encoding'
       );
     });
 
     it('should throw error when private key format is invalid', () => {
       // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 =
-        Buffer.from('not-a-private-key').toString('base64');
-      process.env.GITHUB_WEBHOOK_SECRET = 'test';
+      process.env.GH_APP_ID = '123456';
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = Buffer.from('not-a-private-key').toString('base64');
+      process.env.GH_WEBHOOK_SECRET = 'test';
 
       // Act & Assert
       expect(() => getGitHubAppCredentials()).toThrow(
@@ -106,11 +103,11 @@ describe('github-app', () => {
   describe('createGitHubApp', () => {
     it('should create GitHub App with valid credentials', () => {
       // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = Buffer.from(
+      process.env.GH_APP_ID = '123456';
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = Buffer.from(
         '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
       ).toString('base64');
-      process.env.GITHUB_WEBHOOK_SECRET = 'webhook-secret';
+      process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
       const mockApp = { octokit: {} };
       (App as any).mockImplementation(() => mockApp);
@@ -131,11 +128,11 @@ describe('github-app', () => {
 
     it('should throw error when App creation fails', () => {
       // Arrange
-      process.env.GITHUB_APP_ID = '123456';
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64 = Buffer.from(
+      process.env.GH_APP_ID = '123456';
+      process.env.GH_APP_PRIVATE_KEY_BASE64 = Buffer.from(
         '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----'
       ).toString('base64');
-      process.env.GITHUB_WEBHOOK_SECRET = 'webhook-secret';
+      process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
       (App as any).mockImplementation(() => {
         throw new Error('Failed to create app');

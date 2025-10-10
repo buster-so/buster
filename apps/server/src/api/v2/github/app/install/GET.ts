@@ -34,7 +34,7 @@ export async function appInstallHandler(userId: string): Promise<{ redirectUrl: 
   });
 
   // Get GitHub App ID from environment
-  const appId = process.env.GITHUB_APP_ID;
+  const appId = process.env.GH_APP_ID;
   if (!appId) {
     throw new HTTPException(500, {
       message: 'GitHub App not configured',
@@ -42,7 +42,7 @@ export async function appInstallHandler(userId: string): Promise<{ redirectUrl: 
   }
 
   // Build the GitHub installation URL
-  const appName = process.env.GITHUB_APP_NAME;
+  const appName = process.env.GH_APP_NAME;
   if (!appName) {
     throw new HTTPException(500, {
       message: 'GitHub App name not configured',
