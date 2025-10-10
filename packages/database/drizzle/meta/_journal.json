@@ -855,6 +855,13 @@
       "when": 1759938996590,
       "tag": "0122_same_calypso",
       "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1760116161364,
+      "tag": "0123_wooden_shockwave",
+      "breakpoints": true
     }
   ]
 }
