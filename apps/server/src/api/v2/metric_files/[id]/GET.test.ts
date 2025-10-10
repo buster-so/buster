@@ -174,7 +174,7 @@ describe('getMetricHandler', () => {
       mockFetchAndProcessMetricData.mockRejectedValue(error);
 
       await expect(getMetricHandler({ metricId: 'nonexistent-metric' }, mockUser)).rejects.toThrow(
-        'Metric not found'
+        'Failed to fetch metric'
       );
 
       expect(mockFetchAndProcessMetricData).toHaveBeenCalledWith('nonexistent-metric', mockUser, {
@@ -187,7 +187,7 @@ describe('getMetricHandler', () => {
       mockBuildMetricResponse.mockRejectedValue(error);
 
       await expect(getMetricHandler({ metricId: 'metric-123' }, mockUser)).rejects.toThrow(
-        'Failed to build response'
+        'Failed to fetch metric'
       );
 
       expect(mockFetchAndProcessMetricData).toHaveBeenCalled();

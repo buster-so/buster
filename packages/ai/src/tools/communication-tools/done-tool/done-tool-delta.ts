@@ -9,6 +9,7 @@ import {
   OptimisticJsonParser,
   getOptimisticValue,
 } from '../../../utils/streaming/optimistic-json-parser';
+import { formatElapsedTime } from '../../shared/format-elapsed-time';
 import type { DoneToolContext, DoneToolInput, DoneToolState } from './done-tool';
 import {
   createDoneToolRawLlmMessageEntry,
@@ -197,17 +198,9 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
       // Mark final reasoning now (after assets have been handled above) and before text streams
       if (context.messageId) {
         try {
-          const currentTime = Date.now();
-          const elapsedTimeMs = currentTime - context.workflowStartTime;
-          const elapsedSeconds = Math.floor(elapsedTimeMs / 1000);
-
-          let timeString: string;
-          if (elapsedSeconds < 60) {
-            timeString = `${elapsedSeconds} seconds`;
-          } else {
-            const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-            timeString = `${elapsedMinutes} minutes`;
-          }
+          const timeString = formatElapsedTime(context.workflowStartTime, Date.now(), {
+            includeDecimals: false,
+          });
 
           await updateMessage(context.messageId, {
             finalReasoningMessage: `Reasoned for ${timeString}`,

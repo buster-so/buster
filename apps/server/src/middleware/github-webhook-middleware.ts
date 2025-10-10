@@ -9,8 +9,8 @@ let githubApp: App | undefined;
 
 function getOrSetApp() {
   if (!githubApp) {
-    if (!process.env.GITHUB_WEBHOOK_SECRET) {
-      throw new Error('GITHUB_WEBHOOK_SECRET is not set');
+    if (!process.env.GH_WEBHOOK_SECRET) {
+      throw new Error('GH_WEBHOOK_SECRET is not set');
     }
     githubApp = createGitHubApp();
 
