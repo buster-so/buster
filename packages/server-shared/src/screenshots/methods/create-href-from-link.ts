@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { env } from '../../env';
 
 const CreateHrefFromLinkParamsSchema = z.object({
   to: z.string().describe('Route path with param placeholders like /path/$paramName'),
@@ -40,7 +41,7 @@ export function createHrefFromLink(input: CreateHrefFromLinkParams): string {
   const fullPath = queryString ? `${path}?${queryString}` : path;
 
   // Get base URL from environment
-  const baseUrl = process.env.VITE_PUBLIC_URL || '';
+  const baseUrl = env.VITE_PUBLIC_URL || '';
 
   return `${baseUrl}${fullPath}`;
 }

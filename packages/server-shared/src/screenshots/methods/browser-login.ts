@@ -1,5 +1,6 @@
 import type { Browser, Page } from 'playwright';
 import { z } from 'zod';
+import { env } from '../../env';
 import { getSupabaseCookieKey, getSupabaseUser } from '../../supabase/server';
 import { DEFAULT_SCREENSHOT_CONFIG } from './screenshot-config';
 
@@ -90,7 +91,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       {
         name: supabaseCookieKey,
         value: cookieValue,
-        domain: new URL(process.env.VITE_PUBLIC_URL || {}).hostname,
+        domain: new URL(env.VITE_PUBLIC_URL || {}).hostname,
         path: '/',
         httpOnly: true,
         secure: true,
