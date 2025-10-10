@@ -1,18 +1,24 @@
-import { createSandboxFromSnapshot } from "../management/create-sandbox";
+import { createSandboxFromSnapshot } from '../management/create-sandbox';
 
-export async function runDocsAgent(installationToken: string, repoUrl: string, branch: string, prompt: string, apiKey: string) {
+export async function runDocsAgent(
+  installationToken: string,
+  repoUrl: string,
+  branch: string,
+  prompt: string,
+  apiKey: string
+) {
   const sandbox = await createSandboxFromSnapshot('buster-docs-agent-snapshot');
   const workspacePath = `/workspace/repo/`;
-  const busterAppGitUsername = "buster-app";
-  const busterAppGitEmail = "buster-app@buster.so";
-  const sessionName = "buster-docs-agent-session";
+  const busterAppGitUsername = 'buster-app';
+  const busterAppGitEmail = 'buster-app@buster.so';
+  const sessionName = 'buster-docs-agent-session';
 
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
     workspacePath, // path
     branch, // branch "staging"
     undefined, // commit id
-    "2058659", // username
+    '2058659', // username
     installationToken // password
   );
 
@@ -23,7 +29,7 @@ export async function runDocsAgent(installationToken: string, repoUrl: string, b
   if (process.env.ENVIRONMENT === 'development' && process.env.BUSTER_HOST) {
     envExportCommands.push(`export BUSTER_HOST=${process.env.BUSTER_HOST}`);
   }
-  
+
   await sandbox.process.createSession(sessionName);
   await sandbox.process.executeSessionCommand(sessionName, {
     command: `${envExportCommands.join(' && ')}`,
@@ -35,5 +41,5 @@ export async function runDocsAgent(installationToken: string, repoUrl: string, b
     command: `cd ${workspacePath} && buster --prompt "${prompt}"`,
     runAsync: true,
   });
-  console.info('[Daytona Sandbox Started]', {sessionId: sessionName, sandboxId: sandbox.id})
+  console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
