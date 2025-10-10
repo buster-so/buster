@@ -20,7 +20,6 @@
     "deploy": "echo 'y' | npx trigger.dev@latest deploy",
     "build": "echo 'No build step required' && tsc --noEmit",
     "build:dry-run": "echo 'No build step required but we run it to make sure env is loaded' && tsc --noEmit",
-    "postinstall": "npx -y playwright@latest install --with-deps chromium",
     "lint": "biome check --write",
     "test": "vitest run",
     "test:watch": "vitest watch",

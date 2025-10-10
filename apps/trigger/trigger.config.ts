@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { esbuildPlugin } from '@trigger.dev/build/extensions';
+import { playwright } from '@trigger.dev/build/extensions/playwright';
 import { defineConfig } from '@trigger.dev/sdk';
 
 export default defineConfig({
@@ -37,6 +38,9 @@ export default defineConfig({
       'chromium-bidi',
     ],
     extensions: [
+      playwright({
+        browsers: ['chromium'],
+      }),
       esbuildPlugin({
         name: 'buster-path-resolver',
         setup(build) {
