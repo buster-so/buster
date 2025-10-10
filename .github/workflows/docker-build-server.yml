@@ -58,8 +58,8 @@ jobs:
           if [[ "${{ github.ref_name }}" == "main" ]]; then
             # For main: use commit SHA and latest
             echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            # For staging: use staging-SHA and staging
+          else
+            # For all other branches: use staging-SHA and staging
             echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
           fi
 
