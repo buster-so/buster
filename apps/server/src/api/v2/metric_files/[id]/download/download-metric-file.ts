@@ -15,7 +15,7 @@ import { HTTPException } from 'hono/http-exception';
  * 4. Waits for the task to complete (max 2 minutes)
  * 5. Returns a presigned URL for downloading the CSV file
  *
- * The download URL expires after 60 seconds for security
+ * The download URL expires after 2 minutes for security
  */
 export async function downloadMetricFileHandler(
   metricId: string,
@@ -53,7 +53,7 @@ export async function downloadMetricFileHandler(
 
   try {
     // Trigger the export task with idempotency to prevent duplicates
-    // If the same user tries to download the same metric within 5 minutes,
+    // If the same user tries to download the same metric within 2 minutes,
     // it will return the existing task instead of creating a new one
     const handle = await tasks.trigger(
       'export-metric-data',
@@ -70,7 +70,7 @@ export async function downloadMetricFileHandler(
           : reportFileId
             ? `export-${user.id}-${metricId}-${reportFileId}`
             : `export-${user.id}-${metricId}`,
-        idempotencyKeyTTL: '5m', // 5 minutes TTL
+        idempotencyKeyTTL: '2m', // 2 minutes TTL
       }
     );
 
@@ -158,7 +158,7 @@ export async function downloadMetricFileHandler(
       fileSize: output.fileSize || 0,
       fileName: output.fileName || `metric-${metricId}.csv`,
       rowCount: output.rowCount || 0,
-      message: 'Download link expires in 60 seconds. Please start your download immediately.',
+      message: 'Download link expires in 2 minutes. Please start your download immediately.',
     };
   } catch (error) {
     // Re-throw HTTPException as-is
