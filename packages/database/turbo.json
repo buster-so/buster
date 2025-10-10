@@ -14,7 +14,7 @@
     "db:migrate": {
       "cache": false,
       "persistent": false,
-      "dependsOn": []
+      "dependsOn": ["@buster-app/supabase#start"]
     },
     "db:seed": {
       "cache": false,
@@ -41,6 +41,11 @@
       "cache": false,
       "persistent": true,
       "dependsOn": ["db:migrate"]
+    },
+    "start": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["@buster-app/supabase#start", "db:migrate"]
     }
   }
 }

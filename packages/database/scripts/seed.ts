@@ -349,6 +349,8 @@ async function seed() {
         }
       }
 
+      db.execute(sql`SELECT populate_metric_files_to_report_files()`);
+
       console.log('\n=== Seed completed successfully! ===');
 
       // Show summary
