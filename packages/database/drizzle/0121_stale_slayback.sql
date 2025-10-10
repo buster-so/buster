@@ -30,6 +30,8 @@ BEGIN
             END ||
             CASE 
                 WHEN response_messages IS NOT NULL AND 
+                     jsonb_typeof(response_messages) = 'array' AND
+                     jsonb_array_length(response_messages) > 0 AND
                      (request_message IS NOT NULL AND request_message != '') THEN
                     E'\n' || COALESCE((
                         SELECT string_agg(
@@ -41,7 +43,9 @@ BEGIN
                           AND jsonb_extract_path_text(response_item, 'message') IS NOT NULL
                           AND jsonb_extract_path_text(response_item, 'message') != ''
                     ), '')
-                WHEN response_messages IS NOT NULL THEN
+                WHEN response_messages IS NOT NULL AND 
+                     jsonb_typeof(response_messages) = 'array' AND
+                     jsonb_array_length(response_messages) > 0 THEN
                     COALESCE((
                         SELECT string_agg(
                             jsonb_extract_path_text(response_item, 'message'),
@@ -64,7 +68,9 @@ BEGIN
           AND (
               (request_message IS NOT NULL AND request_message != '') 
               OR 
-              (response_messages IS NOT NULL AND jsonb_array_length(response_messages) > 0)
+              (response_messages IS NOT NULL AND 
+               jsonb_typeof(response_messages) = 'array' AND 
+               jsonb_array_length(response_messages) > 0)
           );
         
         INSERT INTO public.asset_search_v2 (
@@ -102,7 +108,11 @@ BEGIN
         )
         VALUES (
             NEW.id, 'metric_file', COALESCE(NEW.name, ''), 
-            COALESCE(NEW.content ->> 'description', ''),
+            CASE 
+                WHEN NEW.content IS NOT NULL AND jsonb_typeof(NEW.content) = 'object' 
+                THEN COALESCE(NEW.content ->> 'description', '')
+                ELSE ''
+            END,
             NEW.organization_id, NEW.created_by,
             NEW.created_at, NEW.updated_at, NEW.deleted_at, NEW.screenshot_bucket_key
         )
@@ -130,8 +140,16 @@ BEGIN
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
         -- Get metric titles and descriptions from IDs in dashboard content JSON
         SELECT STRING_AGG(
-            COALESCE(mf.content ->> 'name', mf.name) || E'\n' || 
-            COALESCE(mf.content ->> 'description', ''), 
+            CASE 
+                WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                THEN COALESCE(mf.content ->> 'name', mf.name)
+                ELSE mf.name
+            END || E'\n' || 
+            CASE 
+                WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                THEN COALESCE(mf.content ->> 'description', '')
+                ELSE ''
+            END, 
             E'\n\n'
         ) INTO metric_text
         FROM public.metric_files mf
@@ -140,7 +158,15 @@ BEGIN
             SELECT DISTINCT jsonb_extract_path_text(item_value, 'id')
             FROM jsonb_array_elements(NEW.content -> 'rows') AS row_value,
                  jsonb_array_elements(row_value -> 'items') AS item_value
-            WHERE jsonb_extract_path_text(item_value, 'id') ~ '^[a-f0-9-]{36}$'
+            WHERE NEW.content IS NOT NULL 
+              AND jsonb_typeof(NEW.content) = 'object'
+              AND NEW.content ? 'rows'
+              AND jsonb_typeof(NEW.content -> 'rows') = 'array'
+              AND jsonb_typeof(row_value) = 'object'
+              AND row_value ? 'items'
+              AND jsonb_typeof(row_value -> 'items') = 'array'
+              AND jsonb_typeof(item_value) = 'object'
+              AND jsonb_extract_path_text(item_value, 'id') ~ '^[a-f0-9-]{36}$'
         )
         AND mf.deleted_at IS NULL;
 
@@ -150,7 +176,11 @@ BEGIN
         )
         VALUES (
             NEW.id, 'dashboard_file', COALESCE(NEW.name, ''), 
-            TRIM(COALESCE(NEW.content ->> 'description', '') || ' ' || COALESCE(metric_text, '')),
+            TRIM(CASE 
+                WHEN NEW.content IS NOT NULL AND jsonb_typeof(NEW.content) = 'object' 
+                THEN COALESCE(NEW.content ->> 'description', '')
+                ELSE ''
+            END || ' ' || COALESCE(metric_text, '')),
             NEW.organization_id, NEW.created_by,
             NEW.created_at, NEW.updated_at, NEW.deleted_at, NEW.screenshot_bucket_key
         )
@@ -179,8 +209,16 @@ BEGIN
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
         -- Get metric names and descriptions for extracted IDs
         SELECT STRING_AGG(
-            COALESCE(mf.content ->> 'name', mf.name) || E'\n' || 
-            COALESCE(mf.content ->> 'description', ''), 
+            CASE 
+                WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                THEN COALESCE(mf.content ->> 'name', mf.name)
+                ELSE mf.name
+            END || E'\n' || 
+            CASE 
+                WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                THEN COALESCE(mf.content ->> 'description', '')
+                ELSE ''
+            END, 
             E'\n\n'
         ) INTO metric_text
         FROM public.metric_files mf
@@ -237,4 +275,3 @@ FOR EACH ROW EXECUTE FUNCTION sync_dashboard_files_to_text_search();
 CREATE TRIGGER sync_report_files_text_search
 AFTER INSERT OR UPDATE OR DELETE ON report_files
 FOR EACH ROW EXECUTE FUNCTION sync_report_files_to_text_search();
-
