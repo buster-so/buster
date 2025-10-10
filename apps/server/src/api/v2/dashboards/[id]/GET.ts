@@ -44,28 +44,33 @@ const app = new Hono().get(
       `Processing GET request for dashboard with ID: ${id}, user_id: ${user.id}, version_number: ${version_number}`
     );
 
-    const response: GetDashboardResponse = await getDashboardHandler(
-      {
-        dashboardId: id,
-        versionNumber: version_number,
-        password,
-      },
-      user
-    );
+    try {
+      const response: GetDashboardResponse = await getDashboardHandler(
+        {
+          dashboardId: id,
+          versionNumber: version_number,
+          password,
+        },
+        user
+      );
 
-    triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
-      tag: `take-dashboard-screenshot-${id}`,
-      key: screenshots_task_keys.take_dashboard_screenshot,
-      context: c,
-      payload: {
-        dashboardId: id,
-        organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-        accessToken: c.get('accessToken'),
-        isOnSaveEvent: false,
-      },
-    });
+      triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+        tag: `take-dashboard-screenshot-${id}`,
+        key: screenshots_task_keys.take_dashboard_screenshot,
+        context: c,
+        payload: {
+          dashboardId: id,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+          isOnSaveEvent: false,
+        },
+      });
 
-    return c.json(response);
+      return c.json(response);
+    } catch (error) {
+      console.error('Error fetching dashboard:', error);
+      throw new HTTPException(500, { message: 'Failed to fetch dashboard' });
+    }
   }
 );
 

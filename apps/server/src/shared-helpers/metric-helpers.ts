@@ -97,8 +97,6 @@ export async function fetchAndProcessMetricData(
 
   // Parse version history
   const versionHistory = metricFile.versionHistory;
-  console.info(metricFile.id);
-  console.info(versionHistory);
   const versions: Array<{ version_number: number; updated_at: string }> = [];
 
   Object.values(versionHistory).forEach((version) => {
