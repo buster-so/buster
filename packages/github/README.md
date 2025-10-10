@@ -54,10 +54,10 @@ The app also handles webhook events for installation lifecycle:
 
 Required environment variables (set in root `.env`):
 ```bash
-GITHUB_APP_ID=your_app_id
-GITHUB_APP_PRIVATE_KEY_BASE64=base64_encoded_private_key
-GITHUB_WEBHOOK_SECRET=your_webhook_secret
-GITHUB_APP_NAME=your_app_name  # Used in OAuth redirect URLs
+GH_APP_ID=your_app_id
+GH_APP_PRIVATE_KEY_BASE64=base64_encoded_private_key
+GH_WEBHOOK_SECRET=your_webhook_secret
+GH_APP_NAME=your_app_name  # Used in OAuth redirect URLs
 ```
 
 ## Token Storage
