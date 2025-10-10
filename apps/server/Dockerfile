@@ -29,10 +29,6 @@ RUN pnpm install --frozen-lockfile
 # Build stage - build directly from deps
 FROM deps AS build
 
-# Accept Turbo cache tokens as build args
-ARG TURBO_TOKEN
-ARG TURBO_TEAM
-
 # Copy ALL source code
 COPY . .
 
@@ -41,11 +37,13 @@ COPY . .
 RUN find /app/packages -name "package.json" -exec sed -i '/"prebuild":/d' {} \; && \
     sed -i '/"prebuild":/d' /app/apps/server/package.json
 
-# Build with Turbo (with remote caching if tokens provided)
+# Build with Turbo (with remote caching if tokens provided via secrets)
 ENV NODE_ENV=production
-ENV TURBO_TOKEN=$TURBO_TOKEN
-ENV TURBO_TEAM=$TURBO_TEAM
-RUN pnpm turbo build --filter=@buster-app/server...
+RUN --mount=type=secret,id=turbo_token \
+    --mount=type=secret,id=turbo_team \
+    export TURBO_TOKEN=$(cat /run/secrets/turbo_token 2>/dev/null || echo "") && \
+    export TURBO_TEAM=$(cat /run/secrets/turbo_team 2>/dev/null || echo "") && \
+    pnpm turbo build --filter=@buster-app/server...
 
 # Production stage
 FROM oven/bun:1-slim
