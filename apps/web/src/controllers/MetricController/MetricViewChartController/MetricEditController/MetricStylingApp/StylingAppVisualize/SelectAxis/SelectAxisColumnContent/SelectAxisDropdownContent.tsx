@@ -15,6 +15,7 @@ import { formatLabel } from '@/lib/columnFormatter';
 import { SelectAxisContainerId } from '../config';
 import { useAxisContextMetricId } from '../useSelectAxisContext';
 import { EditBarRoundness } from './EditBarRoundness';
+import { EditCompactNumbers } from './EditCompactNumbers';
 import { EditCurrency } from './EditCurrency';
 import { EditDateFormat } from './EditDateFormat';
 import { EditDateType } from './EditDateType';
@@ -298,6 +299,7 @@ const LabelSettings: React.FC<{
     displayName,
     replaceMissingDataWith,
     isUTC,
+    compactNumbers,
   } = columnLabelFormat;
 
   const isPieChart = selectedChartType === 'pie';
@@ -373,7 +375,6 @@ const LabelSettings: React.FC<{
         <EditMultiplyBy multiplier={multiplier} onUpdateColumnConfig={onUpdateColumnConfig} />
       ),
     },
-
     {
       enabled: isDate && convertNumberTo,
       key: 'dateType',
@@ -418,6 +419,16 @@ const LabelSettings: React.FC<{
       Component: (
         <EditReplaceMissingData
           replaceMissingDataWith={replaceMissingDataWith}
+          onUpdateColumnConfig={onUpdateColumnConfig}
+        />
+      ),
+    },
+    {
+      enabled: isNumber,
+      key: 'compactNumbers',
+      Component: (
+        <EditCompactNumbers
+          compactNumbers={compactNumbers}
           onUpdateColumnConfig={onUpdateColumnConfig}
         />
       ),

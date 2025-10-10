@@ -212,3 +212,33 @@ export const WithLongTextValue: Story = {
     </div>
   ),
 };
+
+export const WithCompactNumbers: Story = {
+  args: {
+    data: [{ total_messages: 1099 }],
+    metricColumnId: 'total_messages',
+    columnLabelFormats: {
+      total_messages: {
+        isUTC: false,
+        style: 'number',
+        prefix: '',
+        suffix: '',
+        currency: 'USD',
+        columnType: 'number',
+        dateFormat: 'auto',
+        multiplier: 1,
+        displayName: '',
+        compactNumbers: true,
+        convertNumberTo: null,
+        useRelativeTime: false,
+        numberSeparatorStyle: ',',
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+        makeLabelHumanReadable: true,
+        replaceMissingDataWith: 0,
+      },
+    },
+    metricHeader: 'Platform Messages',
+    metricSubHeader: 'Last 30 Days',
+  },
+};
