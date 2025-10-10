@@ -81,7 +81,7 @@ jobs:
           build-args: |
             COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
             BUILD_DATE=${{ steps.meta.outputs.timestamp }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=local,src=/tmp/.buildkit-cache
           cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
 
