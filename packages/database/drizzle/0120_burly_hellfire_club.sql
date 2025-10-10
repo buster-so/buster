@@ -32,6 +32,8 @@ SELECT
             END ||
             CASE 
                 WHEN response_messages IS NOT NULL AND 
+                     jsonb_typeof(response_messages) = 'array' AND
+                     jsonb_array_length(response_messages) > 0 AND
                      (request_message IS NOT NULL AND request_message != '') THEN
                     E'\n' || COALESCE((
                         SELECT string_agg(
@@ -43,7 +45,9 @@ SELECT
                           AND jsonb_extract_path_text(response_item, 'message') IS NOT NULL
                           AND jsonb_extract_path_text(response_item, 'message') != ''
                     ), '')
-                WHEN response_messages IS NOT NULL THEN
+                WHEN response_messages IS NOT NULL AND 
+                     jsonb_typeof(response_messages) = 'array' AND
+                     jsonb_array_length(response_messages) > 0 THEN
                     COALESCE((
                         SELECT string_agg(
                             jsonb_extract_path_text(response_item, 'message'),
@@ -65,7 +69,9 @@ SELECT
           AND (
               (request_message IS NOT NULL AND request_message != '') 
               OR 
-              (response_messages IS NOT NULL AND jsonb_array_length(response_messages) > 0)
+              (response_messages IS NOT NULL AND 
+               jsonb_typeof(response_messages) = 'array' AND 
+               jsonb_array_length(response_messages) > 0)
           )
     ),
     c.organization_id,
@@ -86,7 +92,11 @@ SELECT
     mf.id,
     'metric_file'::asset_type_enum,
     COALESCE(mf.name, ''),
-    COALESCE(mf.content ->> 'description', ''),
+    CASE 
+        WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+        THEN COALESCE(mf.content ->> 'description', '')
+        ELSE ''
+    END,
     mf.organization_id,
     mf.created_by,
     mf.created_at,
@@ -105,11 +115,23 @@ SELECT
     df.id,
     'dashboard_file'::asset_type_enum,
     COALESCE(df.name, ''),
-    TRIM(COALESCE(df.content ->> 'description', '') || ' ' || COALESCE((
+    TRIM(CASE 
+        WHEN df.content IS NOT NULL AND jsonb_typeof(df.content) = 'object' 
+        THEN COALESCE(df.content ->> 'description', '')
+        ELSE ''
+    END || ' ' || COALESCE((
         -- Get metric titles and descriptions from IDs in dashboard content JSON
         SELECT STRING_AGG(
-            COALESCE(mf.content ->> 'name', mf.name) || E'\n' || 
-            COALESCE(mf.content ->> 'description', ''), 
+            CASE 
+                WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                THEN COALESCE(mf.content ->> 'name', mf.name)
+                ELSE mf.name
+            END || E'\n' || 
+            CASE 
+                WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                THEN COALESCE(mf.content ->> 'description', '')
+                ELSE ''
+            END, 
             E'\n\n'
         )
         FROM public.metric_files mf
@@ -118,7 +140,15 @@ SELECT
             SELECT DISTINCT jsonb_extract_path_text(item_value, 'id')
             FROM jsonb_array_elements(df.content -> 'rows') AS row_value,
                  jsonb_array_elements(row_value -> 'items') AS item_value
-            WHERE jsonb_extract_path_text(item_value, 'id') ~ '^[a-f0-9-]{36}$'
+            WHERE df.content IS NOT NULL 
+              AND jsonb_typeof(df.content) = 'object'
+              AND df.content ? 'rows'
+              AND jsonb_typeof(df.content -> 'rows') = 'array'
+              AND jsonb_typeof(row_value) = 'object'
+              AND row_value ? 'items'
+              AND jsonb_typeof(row_value -> 'items') = 'array'
+              AND jsonb_typeof(item_value) = 'object'
+              AND jsonb_extract_path_text(item_value, 'id') ~ '^[a-f0-9-]{36}$'
         )
         AND mf.deleted_at IS NULL
     ), '')),
@@ -129,7 +159,8 @@ SELECT
     df.deleted_at,
     df.screenshot_bucket_key
 FROM public.dashboard_files df
-WHERE df.created_by IS NOT NULL;--> statement-breakpoint
+WHERE df.created_by IS NOT NULL
+  AND (df.content IS NULL OR jsonb_typeof(df.content) = 'object');--> statement-breakpoint
 
 -- Step 7: Repopulate report_files with enhanced content including metric information
 INSERT INTO public.asset_search_v2 (
@@ -149,8 +180,16 @@ SELECT
         COALESCE((
             -- Get metric names and descriptions for extracted IDs
             SELECT STRING_AGG(
-                COALESCE(mf.content ->> 'name', mf.name) || E'\n' || 
-                COALESCE(mf.content ->> 'description', ''), 
+                CASE 
+                    WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                    THEN COALESCE(mf.content ->> 'name', mf.name)
+                    ELSE mf.name
+                END || E'\n' || 
+                CASE 
+                    WHEN mf.content IS NOT NULL AND jsonb_typeof(mf.content) = 'object' 
+                    THEN COALESCE(mf.content ->> 'description', '')
+                    ELSE ''
+                END, 
                 E'\n\n'
             )
             FROM public.metric_files mf
@@ -171,3 +210,4 @@ SELECT
     rf.screenshot_bucket_key
 FROM public.report_files rf
 WHERE rf.created_by IS NOT NULL;
+
