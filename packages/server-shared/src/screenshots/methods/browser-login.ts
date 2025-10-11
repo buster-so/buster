@@ -139,7 +139,14 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     });
 
     console.info('Navigating to fullPath');
-    await page.goto(fullPath, { waitUntil: 'networkidle' });
+    await page.goto(fullPath, { waitUntil: 'networkidle', timeout: 20000 });
+    //wait for page to fully stabilize
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await Promise.all([
+      page.waitForLoadState('networkidle'),
+      page.waitForLoadState('domcontentloaded'),
+      page.waitForLoadState('load'),
+    ]);
 
     console.info('Callback');
     const result = await callback({ page, browser, type: type || DEFAULT_SCREENSHOT_CONFIG.type });
