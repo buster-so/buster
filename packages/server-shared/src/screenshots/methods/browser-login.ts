@@ -62,8 +62,12 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   ]);
   const supabaseCookieKey = getSupabaseCookieKey();
 
-  if (!supabaseUser || supabaseUser?.is_anonymous || !supabaseCookieKey) {
-    throw new Error('User not authenticated');
+  if (!supabaseCookieKey) {
+    throw new Error('Supabase cookie key not found');
+  }
+
+  if (!supabaseUser || supabaseUser?.is_anonymous) {
+    throw new Error('User not authenticated', { cause: supabaseUser });
   }
 
   const session = {
