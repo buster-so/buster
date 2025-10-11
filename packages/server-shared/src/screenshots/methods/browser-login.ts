@@ -62,18 +62,13 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   ]);
   const supabaseCookieKey = getSupabaseCookieKey();
 
-  if (!supabaseUser || supabaseUser?.is_anonymous || !supabaseCookieKey) {
-    throw new Error('User not authenticated');
+  if (!supabaseCookieKey) {
+    throw new Error('Supabase cookie key not found');
   }
 
-  const session = {
-    access_token: accessToken,
-    token_type: 'bearer',
-    expires_in: 3600,
-    expires_at: jwtPayload.exp,
-    refresh_token: '',
-    user: supabaseUser,
-  };
+  if (!supabaseUser || supabaseUser?.is_anonymous) {
+    throw new Error('User not authenticated', { cause: supabaseUser });
+  }
 
   const browser = await chromium.launch();
 
@@ -84,6 +79,21 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     });
 
     // Format cookie value as Supabase expects: base64-<encoded_session>
+    // Create a minimal session object to stay under cookie size limits (4KB)
+    // Full user data can be fetched by the client using the access token
+    const session = {
+      access_token: accessToken,
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: jwtPayload.exp,
+      refresh_token: '',
+      user: {
+        id: supabaseUser.id,
+        aud: supabaseUser.aud,
+        role: supabaseUser.role,
+        email: supabaseUser.email,
+      },
+    };
     const cookieValue = `base64-${Buffer.from(JSON.stringify(session)).toString('base64')}`;
     const publicUrl = process.env.VITE_PUBLIC_URL;
 
@@ -93,17 +103,20 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
 
     const url = new URL(publicUrl);
 
+    // Ensure expires is a number (Unix timestamp in seconds)
+    const expiresTimestamp =
+      typeof jwtPayload.exp === 'number' ? jwtPayload.exp : Number.parseInt(jwtPayload.exp, 10);
+
     const cookieConfig: Parameters<typeof context.addCookies>[0][0] = {
       name: supabaseCookieKey,
       value: cookieValue,
-      url: publicUrl,
-      expires: jwtPayload.exp,
+      domain: url.hostname,
+      path: '/',
+      expires: expiresTimestamp,
       httpOnly: false,
       secure: url.protocol === 'https:',
       sameSite: 'Lax' as 'Strict' | 'Lax' | 'None',
     };
-
-    console.info('cookieConfig', JSON.stringify(cookieConfig, null, 2));
 
     await context.addCookies([cookieConfig]);
 

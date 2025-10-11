@@ -108,15 +108,15 @@ describe('createHrefFromLink', () => {
     expect(result).toBe('https://example.com/health?check=full');
   });
 
-  it('should work with empty base URL', () => {
+  it('should throw error when VITE_PUBLIC_URL is empty', () => {
     process.env.VITE_PUBLIC_URL = '';
 
-    const result = createHrefFromLink({
-      to: '/metrics/$metricId',
-      params: { metricId: '123' },
-    });
-
-    expect(result).toBe('/metrics/123');
+    expect(() => {
+      createHrefFromLink({
+        to: '/metrics/$metricId',
+        params: { metricId: '123' },
+      });
+    }).toThrow('VITE_PUBLIC_URL environment variable is required for createHrefFromLink');
   });
 
   it('should handle complex screenshot route', () => {
