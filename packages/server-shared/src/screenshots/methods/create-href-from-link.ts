@@ -44,7 +44,7 @@ export function createHrefFromLink(input: CreateHrefFromLinkParams): string {
   }
 
   // Get base URL from environment
-  const baseUrl = process.env.VITE_PUBLIC_URL || '';
+  const baseUrl = process.env.VITE_PUBLIC_URL;
 
   return `${baseUrl}${fullPath}`;
 }
