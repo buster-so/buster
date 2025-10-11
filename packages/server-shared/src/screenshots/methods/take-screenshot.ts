@@ -6,7 +6,7 @@ export const takeScreenshot = async ({ page, type }: { page: Page; type: 'png' |
   await Promise.all([
     page.waitForLoadState('networkidle'),
     page.waitForLoadState('load'),
-    new Promise((resolve) => setTimeout(resolve, 250)),
+    new Promise((resolve) => setTimeout(resolve, 200)),
   ]);
   await page.waitForLoadState('domcontentloaded');
   const screenshotBuffer = await page.screenshot({ type: 'png' });

@@ -1,6 +1,7 @@
 import { GetMetricScreenshotQuerySchema } from '@buster/server-shared/screenshots';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ensureMetricData, prefetchGetMetric } from '@/api/buster_rest/metrics';
+import { BusterChartDynamic } from '@/components/ui/charts/BusterChartDynamic';
 import { useGetMetricParams } from '@/context/Metrics/useGetMetricParams';
 import { MetricViewChartController } from '@/controllers/MetricController/MetricViewChartController';
 
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/screenshots/metrics/$metricId/content')({
         id: params.metricId,
         version_number: version_number,
       }),
+      BusterChartDynamic.preload(),
     ]);
     if (!metric || !metricData) {
       throw redirect({
@@ -33,6 +35,7 @@ export const Route = createFileRoute('/screenshots/metrics/$metricId/content')({
 
   component: () => {
     const { metricId, metricVersionNumber } = useGetMetricParams();
+
     return (
       <MetricViewChartController
         metricId={metricId}

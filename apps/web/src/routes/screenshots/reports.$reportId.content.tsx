@@ -2,6 +2,7 @@ import { GetReportScreenshotQuerySchema } from '@buster/server-shared/screenshot
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
 import { prefetchGetReport } from '@/api/buster_rest/reports';
+import { BusterChartDynamic } from '@/components/ui/charts/BusterChartDynamic';
 import { ReportPageController } from '@/controllers/ReportPageControllers';
 
 export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
@@ -15,8 +16,10 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
   },
   loader: async ({ context, params }) => {
     const { version_number } = context;
-    const report = await prefetchGetReport(context.queryClient, params.reportId, version_number);
-
+    const [report] = await Promise.all([
+      prefetchGetReport(context.queryClient, params.reportId, version_number),
+      BusterChartDynamic.preload(),
+    ]);
     if (!report) {
       throw redirect({
         to: '/app/home',

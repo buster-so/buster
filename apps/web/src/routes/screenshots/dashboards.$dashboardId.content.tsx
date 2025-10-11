@@ -2,6 +2,7 @@ import { GetDashboardScreenshotQuerySchema } from '@buster/server-shared/screens
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
+import { BusterChartDynamic } from '@/components/ui/charts/BusterChartDynamic';
 import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParams';
 import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
 
@@ -16,11 +17,14 @@ export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/conte
   },
   loader: async ({ context, params }) => {
     const { version_number } = context;
-    const dashboard = await prefetchGetDashboard({
-      queryClient: context.queryClient,
-      id: params.dashboardId,
-      version_number: version_number,
-    });
+    const [dashboard] = await Promise.all([
+      prefetchGetDashboard({
+        queryClient: context.queryClient,
+        id: params.dashboardId,
+        version_number: version_number,
+      }),
+      BusterChartDynamic.preload(),
+    ]);
 
     if (!dashboard) {
       throw redirect({
