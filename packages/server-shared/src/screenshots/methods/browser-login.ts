@@ -141,7 +141,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     console.info('Navigating to fullPath');
     await page.goto(fullPath, { waitUntil: 'networkidle', timeout: 20000 });
     //wait for page to fully stabilize
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 250));
     await Promise.all([
       page.waitForLoadState('networkidle'),
       page.waitForLoadState('domcontentloaded'),
