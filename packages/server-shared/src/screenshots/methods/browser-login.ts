@@ -73,10 +73,14 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
   const browser = await chromium.launch();
 
   try {
+    console.info('Creating browser context');
     const context = await browser.newContext({
       viewport: { width, height },
       deviceScaleFactor: deviceScaleFactor || DEFAULT_SCREENSHOT_CONFIG.deviceScaleFactor, // High-DPI rendering for better quality screenshots
+      locale: 'en-US',
+      timezoneId: 'America/Denver',
     });
+    console.info('Browser context created');
 
     // Format cookie value as Supabase expects: base64-<encoded_session>
     // Create a minimal session object to stay under cookie size limits (4KB)
@@ -117,9 +121,11 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       secure: url.protocol === 'https:',
       sameSite: 'Lax' as 'Strict' | 'Lax' | 'None',
     };
+    console.info('Adding cookies');
 
     await context.addCookies([cookieConfig]);
 
+    console.info('Creating new page');
     const page = await context.newPage();
 
     let pageError: Error | null = null;
@@ -132,8 +138,10 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       }
     });
 
+    console.info('Navigating to fullPath');
     await page.goto(fullPath, { waitUntil: 'networkidle' });
 
+    console.info('Callback');
     const result = await callback({ page, browser, type: type || DEFAULT_SCREENSHOT_CONFIG.type });
 
     if (pageError) {
