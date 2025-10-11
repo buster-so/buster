@@ -5,9 +5,10 @@ export const takeScreenshot = async ({ page, type }: { page: Page; type: 'png' |
   //this might look redundant but it's important to wait for the page to fully stabilize
   await Promise.all([
     page.waitForLoadState('networkidle'),
-    page.waitForLoadState('domcontentloaded'),
     page.waitForLoadState('load'),
+    new Promise((resolve) => setTimeout(resolve, 250)),
   ]);
+  await page.waitForLoadState('domcontentloaded');
   const screenshotBuffer = await page.screenshot({ type: 'png' });
   if (type === 'png') {
     return await sharp(screenshotBuffer)
