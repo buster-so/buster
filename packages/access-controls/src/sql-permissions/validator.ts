@@ -224,11 +224,11 @@ export function createPermissionErrorMessage(
     const tableList = unauthorizedTables.join(', ');
     if (unauthorizedTables.length === 1) {
       messages.push(
-        `You do not have access to table: ${tableList}. Please request access to this table or use a different table that you have permissions for.`
+        `You don't have access to table: ${tableList}, or it may not exist. Please verify the table name and request access if needed.`
       );
     } else {
       messages.push(
-        `You do not have access to the following tables: ${tableList}. Please request access to these tables or modify your query to use only authorized tables.`
+        `You don't have access to the following tables: ${tableList}, or they may not exist. Please verify the table names and request access if needed.`
       );
     }
   }
@@ -252,7 +252,7 @@ export function createPermissionErrorMessage(
     for (const [table, columns] of columnsByTable) {
       const columnList = columns.join(', ');
       columnMessages.push(
-        `Table '${table}': columns [${columnList}] are not available in your permitted dataset`
+        `Table '${table}': columns [${columnList}] are either not accessible to you or may not exist in the dataset`
       );
     }
 
@@ -271,5 +271,5 @@ export function createPermissionErrorMessage(
     return '';
   }
 
-  return `Insufficient permissions: ${messages.join('. ')}`;
+  return `Access restricted or resource not found: ${messages.join('. ')}`;
 }
