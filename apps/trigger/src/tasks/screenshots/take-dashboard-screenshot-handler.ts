@@ -28,6 +28,7 @@ export const takeDashboardScreenshotHandlerTask: ReturnType<
     logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
 
     if (!shouldTakeNewScreenshot) {
+      logger.info('Dashboard screenshot already taken', { dashboardId });
       return;
     }
 
