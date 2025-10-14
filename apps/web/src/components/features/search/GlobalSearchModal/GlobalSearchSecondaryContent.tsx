@@ -108,7 +108,8 @@ const ScreenshotImage = ({
       setIsLoaded(true);
     } else {
       img.onload = () => setIsLoaded(true);
-      img.onerror = () => {
+      img.onerror = (e) => {
+        console.error('Error loading image', e, imageUrl);
         setHasError(true);
         setIsLoaded(true);
       };
@@ -392,7 +393,10 @@ const AncestorContainer = ({ isMain, type, title, secondaryText, id }: AncestorO
           )}
         >
           <span className="shrink-0">{Icon}</span>
-          <span dangerouslySetInnerHTML={{ __html: `${title} ${title}` }} className="truncate min-w-0" />
+          <span
+            dangerouslySetInnerHTML={{ __html: `${title} ${title}` }}
+            className="truncate min-w-0"
+          />
           <span className="shrink-0">{'•'}</span>
           <span className="shrink-0 mr-0.5">{secondaryText}</span>
         </div>
