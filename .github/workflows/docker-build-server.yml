@@ -52,35 +52,16 @@ jobs:
           # Set build timestamp
           echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-  # Determine which platforms to build
-  determine-platforms:
-    runs-on: ubuntu-latest
-    needs: prepare-metadata
-    outputs:
-      platforms: ${{ steps.set-platforms.outputs.platforms }}
-    steps:
-      - name: Set platforms based on branch
-        id: set-platforms
-        run: |
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo 'platforms=["amd64", "arm64"]' >> $GITHUB_OUTPUT
-          else
-            echo 'platforms=["amd64"]' >> $GITHUB_OUTPUT
-          fi
-
   build-and-push:
-    needs: [prepare-metadata, determine-platforms]
+    needs: [prepare-metadata]
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJSON(needs.determine-platforms.outputs.platforms) }}
+        platform: ["amd64"]
         include:
           - platform: amd64
             runner: blacksmith-8vcpu-ubuntu-2404
             docker_platform: linux/amd64
-          - platform: arm64
-            runner: blacksmith-8vcpu-ubuntu-2404-arm
-            docker_platform: linux/arm64
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     permissions:
@@ -154,7 +135,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
 
   create-manifest:
-    needs: [prepare-metadata, determine-platforms, build-and-push]
+    needs: [prepare-metadata, build-and-push]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -174,16 +155,9 @@ jobs:
 
           for TAG in ${TAGS//,/ }; do
             echo "Creating manifest for $TAG"
-            if [[ "${{ github.ref_name }}" == "main" ]]; then
-              # Main branch: include both platforms
-              docker buildx imagetools create -t $TAG \
-                ${TAG}-amd64 \
-                ${TAG}-arm64
-            else
-              # Other branches: AMD64 only
-              docker buildx imagetools create -t $TAG \
-                ${TAG}-amd64
-            fi
+            # AMD64 only for all branches
+            docker buildx imagetools create -t $TAG \
+              ${TAG}-amd64
           done
 
       - name: Output image details
