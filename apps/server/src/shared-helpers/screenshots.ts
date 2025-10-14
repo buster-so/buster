@@ -20,6 +20,7 @@ const shouldTakeScreenshot = async ({
   const hasReferrer = !!context.req.header('referer');
 
   if (!hasReferrer || cooldownCheckingTags.has(tag)) {
+    console.info('Should not take screenshot', { tag, key, hasReferrer });
     return false;
   }
 
@@ -34,6 +35,8 @@ const shouldTakeScreenshot = async ({
         limit: 1,
       })
       .then((res) => res.data[0]);
+
+    console.info('Last task', { lastTask });
 
     return !lastTask;
   } catch (error) {
@@ -63,6 +66,7 @@ export async function triggerScreenshotIfNeeded<TTrigger>({
   payload: TTrigger;
   shouldTrigger?: boolean;
 }): Promise<void> {
+  console.info('Trigger screenshot if needed', { tag, key, shouldTrigger });
   if (
     shouldTrigger &&
     (await shouldTakeScreenshot({
