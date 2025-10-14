@@ -26,6 +26,7 @@ export const takeChatScreenshotHandlerTask: ReturnType<
     });
 
     if (!shouldTakeNewScreenshot) {
+      logger.info('Chat screenshot already taken', { chatId });
       return;
     }
 

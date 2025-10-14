@@ -383,18 +383,18 @@ const AncestorContainer = ({ isMain, type, title, secondaryText, id }: AncestorO
       <React.Fragment>
         <div
           style={{
-            lineHeight: 0,
+            lineHeight: 1,
           }}
           className={cn(
             'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
             !isMain && router && 'cursor-pointer hover:text-foreground hover:underline',
-            'text-xs h-3.5 overflow-hidden'
+            'text-xs h-3.5 overflow-hidden '
           )}
         >
           <span className="shrink-0">{Icon}</span>
-          <span dangerouslySetInnerHTML={{ __html: title }} className="truncate min-w-0" />
+          <span dangerouslySetInnerHTML={{ __html: `${title} ${title}` }} className="truncate min-w-0" />
           <span className="shrink-0">{'•'}</span>
-          <span className="shrink-0">{secondaryText}</span>
+          <span className="shrink-0 mr-0.5">{secondaryText}</span>
         </div>
       </React.Fragment>
     </LinkWrapper>

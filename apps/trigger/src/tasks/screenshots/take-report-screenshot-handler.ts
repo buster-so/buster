@@ -25,6 +25,7 @@ export const takeReportScreenshotHandlerTask: ReturnType<
     });
 
     if (!shouldTakeNewScreenshot) {
+      logger.info('Report screenshot already taken', { reportId });
       return;
     }
 

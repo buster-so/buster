@@ -34,6 +34,7 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
     logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
 
     if (!shouldTakeNewScreenshot) {
+      logger.info('Metric screenshot already taken', { metricId });
       return;
     }
 
