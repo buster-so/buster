@@ -22,9 +22,7 @@ export const createAxiosInstance = (baseURL = BASE_URL_V2) => {
 
   // Response interceptor with retry logic for auth errors
   apiInstance.interceptors.response.use(
-    (resp) => {
-      return resp;
-    },
+    (resp) => resp,
     async (error: AxiosError) => {
       const errorCode = error.response?.status;
 
