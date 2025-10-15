@@ -36,23 +36,21 @@ export const Route = createFileRoute('/app')({
   },
   loader: async ({ context }) => {
     const { queryClient, supabaseSession } = context;
-    try {
-      const [user] = await Promise.all([prefetchGetMyUserInfo(queryClient)]);
-      if (user && user?.organizations?.length === 0) {
-        throw redirect({ href: BUSTER_SIGN_UP_URL, replace: true, statusCode: 307 });
-      }
 
-      return {
-        supabaseSession,
-      };
-    } catch (error) {
-      if (error instanceof Response && error.status === 307) {
-        return {
-          supabaseSession,
-        };
-      }
-      throw redirect({ to: '/auth/login', replace: true, statusCode: 307 });
+    const user = await prefetchGetMyUserInfo(queryClient);
+
+    if (!user?.organizations?.[0]?.id) {
+      throw redirect({
+        href: BUSTER_SIGN_UP_URL,
+        replace: true,
+        reloadDocument: true,
+        statusCode: 307,
+      });
     }
+
+    return {
+      supabaseSession,
+    };
   },
   component: () => {
     const { supabaseSession } = Route.useLoaderData();
