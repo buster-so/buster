@@ -93,7 +93,7 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
       ? sql<string>`pgroonga_highlight_html(${assetSearchV2.title}, pgroonga_query_extract_keywords(${fullSearchString}))`
       : assetSearchV2.title;
 
-    const snippetLength = 160;
+    const snippetLength = 50;
     const additionalSnippetSql = fullSearchString
       ? sql<string>`coalesce(
            (pgroonga_snippet_html(${assetSearchV2.additionalText},
@@ -124,7 +124,6 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
       .where(and(...allConditions))
       .orderBy(
         sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
-        sql`pgroonga_score("asset_search_v2".tableoid, "asset_search_v2".ctid) DESC`,
         desc(assetSearchV2.updatedAt)
       )
       .limit(paginationCheckCount)
