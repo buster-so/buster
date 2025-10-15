@@ -38,7 +38,6 @@ export const SearchModalContent = <M, T extends string>({
     if (e.metaKey || e.ctrlKey) {
       isCommandKeyPressedRef.current = true;
     }
-    // handleKeyDown(e);
   };
 
   const handleKeyUpGlobal = (e: React.KeyboardEvent) => {

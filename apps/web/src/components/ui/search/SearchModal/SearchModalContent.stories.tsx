@@ -64,6 +64,8 @@ export const Default: Story = {
     placeholder: 'Search for something',
     filterContent: <div>Filter</div>,
     filterDropdownContent: <div>Filter Dropdown</div>,
+    loading: true,
+    showTopLoading: true,
   },
   render: (args) => {
     const [searchValue, setSearchValue] = useState('');
