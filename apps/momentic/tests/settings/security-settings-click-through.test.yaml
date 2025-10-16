@@ -12,10 +12,11 @@ retries: 0
 envs:
   - name: development
     default: true
+disabled: true
 steps:
-  - id: d9608c58-b53a-4ef1-bb11-8aea2301b7a3
+  - id: e73b0581-6df6-4138-9c61-7311d72d4af9
     type: MODULE
-    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+    moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
   - id: eafec31c-bab0-4d2e-bdaf-535c11ca4564
     type: MODULE
     moduleId: e9a183c5-556a-4621-b640-577e955c8a26
@@ -53,7 +54,7 @@ steps:
       target:
         type: description
         elementDescriptor: the add button next to the domain input field
-  - id: 31cdbf8e-7a84-4636-a217-700c78bf17b9
+  - id: 6054e0dc-c952-4785-a476-a636d678b110
     type: MODULE
     moduleId: d5944b6b-f9c3-4952-8f0e-bec9bc31da95
   - id: 1554f3eb-7b62-436b-83b2-061347c583cd

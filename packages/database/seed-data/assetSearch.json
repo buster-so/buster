@@ -1,5 +1,35 @@
 [
   {
+    "id": "64aee1a8-f36c-44fb-9a36-866340f98e40",
+    "assetId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "assetType": "dashboard",
+    "content": "Business Performance KPIs",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:36.198+00",
+    "updatedAt": "2025-10-12 22:41:36.198+00",
+    "deletedAt": null
+  },
+  {
+    "id": "fc1d26ad-b7e6-4d8c-b88b-79f8d2642084",
+    "assetId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "assetType": "dashboard",
+    "content": "Sales Performance Dashboard",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:44:04.803+00",
+    "updatedAt": "2025-10-12 22:44:04.803+00",
+    "deletedAt": null
+  },
+  {
+    "id": "adc99321-1cd0-45ce-8bb5-05d7b379127b",
+    "assetId": "2b685e73-ea18-472b-a662-5dc7aa7a7be5",
+    "assetType": "dashboard",
+    "content": "Inventory Dashboard",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:55:13.05+00",
+    "updatedAt": "2025-10-12 22:55:13.05+00",
+    "deletedAt": null
+  },
+  {
     "id": "7ae05512-a554-4dc4-af99-33377aecb6ec",
     "assetId": "8005c5dd-b5fe-4378-b6e4-781167a66faa",
     "assetType": "metric",
@@ -17,6 +47,216 @@
     "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
     "createdAt": "2025-09-19 21:07:58.851+00",
     "updatedAt": "2025-09-19 21:07:58.851+00",
+    "deletedAt": null
+  },
+  {
+    "id": "5f3ec4cc-6abe-4f36-9177-297d55d18998",
+    "assetId": "271fabca-b05d-4e12-84b7-1a2315051fac",
+    "assetType": "metric",
+    "content": "Total Sales Revenue",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:28.043+00",
+    "updatedAt": "2025-10-12 22:41:28.043+00",
+    "deletedAt": null
+  },
+  {
+    "id": "dcb527ee-8edb-4761-b39d-6925bb3f1498",
+    "assetId": "3b71f848-1b5e-40db-985d-38fab11a761a",
+    "assetType": "metric",
+    "content": "Total Orders",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:27.811+00",
+    "updatedAt": "2025-10-12 22:41:27.811+00",
+    "deletedAt": null
+  },
+  {
+    "id": "fea429b1-8ae8-493a-a109-f7e25bb15d7b",
+    "assetId": "4c33a67d-498a-4f69-91a7-60282bae8677",
+    "assetType": "metric",
+    "content": "Average Order Value",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:28.066+00",
+    "updatedAt": "2025-10-12 22:41:28.066+00",
+    "deletedAt": null
+  },
+  {
+    "id": "9e92c1d9-0590-434c-8425-9aeb1dfd817c",
+    "assetId": "007afd5b-d673-42b2-a0d1-f9a2afa2a9c9",
+    "assetType": "metric",
+    "content": "Total Customers",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:27.816+00",
+    "updatedAt": "2025-10-12 22:41:27.816+00",
+    "deletedAt": null
+  },
+  {
+    "id": "b16238ad-0611-44be-817b-6a8e0c88a12a",
+    "assetId": "17362efb-a9c2-4081-8bd0-07aef93165f1",
+    "assetType": "metric",
+    "content": "Gross Profit Margin",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:28.047+00",
+    "updatedAt": "2025-10-12 22:41:28.047+00",
+    "deletedAt": null
+  },
+  {
+    "id": "ad0cc94c-baae-492f-aa8a-d3c184acbf03",
+    "assetId": "4ec85989-76ac-4cec-8aa1-e64c5d7d5266",
+    "assetType": "metric",
+    "content": "Order Fulfillment Rate",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:41:27.817+00",
+    "updatedAt": "2025-10-12 22:41:27.817+00",
+    "deletedAt": null
+  },
+  {
+    "id": "7885c41d-2f62-418f-a05f-beb7c3ce2e09",
+    "assetId": "6ebd2875-30f3-42e1-bbf4-11dec97ad154",
+    "assetType": "metric",
+    "content": "Top Customer by Lifetime Value",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:42:41.58+00",
+    "updatedAt": "2025-10-12 22:42:41.58+00",
+    "deletedAt": null
+  },
+  {
+    "id": "8bbe75c8-a3fd-49b7-879f-1a35f2e4b99a",
+    "assetId": "358d7e79-3e16-41f1-8b1a-ee89b89ac385",
+    "assetType": "metric",
+    "content": "Most Frequent Purchases by Top Customer",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:42:41.586+00",
+    "updatedAt": "2025-10-12 22:42:41.586+00",
+    "deletedAt": null
+  },
+  {
+    "id": "45cfa5c0-28a7-462c-845a-630b893f5f3e",
+    "assetId": "2d150079-91d4-4611-8a7b-bfaec0c37d2d",
+    "assetType": "metric",
+    "content": "Total Sales Revenue Last 6 Months",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.358+00",
+    "updatedAt": "2025-10-12 22:43:55.358+00",
+    "deletedAt": null
+  },
+  {
+    "id": "d6ff2868-3db2-4b94-9889-93f74b307e20",
+    "assetId": "c988b4b4-0db5-49d7-b771-cf7db6900e96",
+    "assetType": "metric",
+    "content": "Total Orders Last 6 Months",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.345+00",
+    "updatedAt": "2025-10-12 22:43:55.345+00",
+    "deletedAt": null
+  },
+  {
+    "id": "e24d4643-191f-477e-a45d-e912f02f176c",
+    "assetId": "f4dc4702-f67f-4aef-810e-6b428129c287",
+    "assetType": "metric",
+    "content": "Monthly Sales Trend",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.445+00",
+    "updatedAt": "2025-10-12 22:43:55.445+00",
+    "deletedAt": null
+  },
+  {
+    "id": "21f4c5a4-53ad-4a58-b2b2-f3aa0672daf5",
+    "assetId": "7bb6d4e4-0a46-4caf-abe0-1000c807c587",
+    "assetType": "metric",
+    "content": "Monthly Order Volume",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.426+00",
+    "updatedAt": "2025-10-12 22:43:55.426+00",
+    "deletedAt": null
+  },
+  {
+    "id": "8aed8b54-0505-4b71-b7ba-28b66532480f",
+    "assetId": "d8f114f9-afa1-4411-8969-87d790dd2a7c",
+    "assetType": "metric",
+    "content": "Average Order Value Trend",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.416+00",
+    "updatedAt": "2025-10-12 22:43:55.416+00",
+    "deletedAt": null
+  },
+  {
+    "id": "57334897-ae5f-4c80-8f08-32617a215d2d",
+    "assetId": "81679dcf-e928-46c8-9c05-129459403cfd",
+    "assetType": "metric",
+    "content": "Sales by Product Category",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.45+00",
+    "updatedAt": "2025-10-12 22:43:55.45+00",
+    "deletedAt": null
+  },
+  {
+    "id": "3b592285-e6ba-4a98-a301-cfb7583062f8",
+    "assetId": "0f2bad93-6e30-47c3-9dd7-96754a123f4c",
+    "assetType": "metric",
+    "content": "Sales by Territory Top 10",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.498+00",
+    "updatedAt": "2025-10-12 22:43:55.498+00",
+    "deletedAt": null
+  },
+  {
+    "id": "3ff93361-552f-4e48-8f94-f1194b228944",
+    "assetId": "68602202-5d06-45dd-89f3-e971c6ca03b1",
+    "assetType": "metric",
+    "content": "Current Month Sales",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:43:55.405+00",
+    "updatedAt": "2025-10-12 22:43:55.405+00",
+    "deletedAt": null
+  },
+  {
+    "id": "0a3c15f4-c5ed-4251-bab9-096a65390593",
+    "assetId": "8357b9fb-10e2-4d1b-ae0a-c0c7093345bd",
+    "assetType": "metric",
+    "content": "Total Current Inventory",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:49:07.73+00",
+    "updatedAt": "2025-10-12 22:49:07.73+00",
+    "deletedAt": null
+  },
+  {
+    "id": "d1a4322b-460a-4919-a19a-7a656110b125",
+    "assetId": "2067deb5-33f5-4bd6-9f15-a411f1848187",
+    "assetType": "metric",
+    "content": "Total Incoming Inventory",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:50:22.52+00",
+    "updatedAt": "2025-10-12 22:50:22.52+00",
+    "deletedAt": null
+  },
+  {
+    "id": "1a802d35-b4de-4afd-9a37-e1fd1e123fce",
+    "assetId": "3b332367-f33e-4de7-a4b5-0bd4cf0f3694",
+    "assetType": "metric",
+    "content": "Total Outgoing Inventory",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:52:08.52+00",
+    "updatedAt": "2025-10-12 22:52:08.52+00",
+    "deletedAt": null
+  },
+  {
+    "id": "c7a66a06-305a-4acb-a8db-89f821930e86",
+    "assetId": "1739379e-8e11-44bf-874a-63ac4bbb35a0",
+    "assetType": "metric",
+    "content": "Inventory Shipped Last 30 Days",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-12 22:54:06.14+00",
+    "updatedAt": "2025-10-12 22:54:06.14+00",
+    "deletedAt": null
+  },
+  {
+    "id": "0e703781-95a0-41c9-8115-f130ca609168",
+    "assetId": "98486855-7672-4a6b-a8ab-2a6b19c4328a",
+    "assetType": "metric",
+    "content": "Total Customer Count",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdAt": "2025-10-16 05:10:35.357+00",
+    "updatedAt": "2025-10-16 05:10:35.357+00",
     "deletedAt": null
   }
 ]

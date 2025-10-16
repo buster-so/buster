@@ -51,6 +51,9 @@
     }
   },
   "globalEnv": [
+    "TURBO_CACHE_DIR",
+    "TURBO_TELEMETRY_DISABLED",
+    "SKIP_ENV_CHECK",
     "NODE_ENV",
     "NODE_TLS_REJECT_UNAUTHORIZED",
     "CI",
@@ -97,6 +100,7 @@
     "AI_GATEWAY_API_KEY",
     "BRAINTRUST_KEY",
     "TRIGGER_SECRET_KEY",
+    "TRIGGER_ACCESS_TOKEN",
     "R2_ACCOUNT_ID",
     "R2_ACCESS_KEY_ID",
     "R2_SECRET_ACCESS_KEY",
@@ -110,7 +114,9 @@
     "SLACK_CLIENT_SECRET",
     "SLACK_SIGNING_SECRET",
     "MOMENTIC_API_KEY",
-    "NODE_TLS_REJECT_UNAUTHORIZED"
+    "NODE_TLS_REJECT_UNAUTHORIZED",
+    "BUSTER_WH_TOKEN",
+    "JWT_SECRET"
   ],
-  "envMode": "strict"
+  "envMode": "loose"
 }

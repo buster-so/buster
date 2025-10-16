@@ -13,17 +13,12 @@ envs:
   - name: development
     default: true
 steps:
-  - id: 2e410c6f-7191-42dd-9a3c-505386ba6d15
+  - id: 05d611a5-98cb-428a-81dd-4a654dadd54f
     type: MODULE
-    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
-  - id: 9f7438cb-de54-4ecd-8232-98f9f0b8459a
-    type: PRESET_ACTION
-    command:
-      id: 3f1a2f55-5435-4676-ad09-cc2082b597e7
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: settings profile button with circle icon
+    moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
+  - id: fe149d0c-a5d0-46a3-a165-f36011864ad0
+    type: MODULE
+    moduleId: e9a183c5-556a-4621-b640-577e955c8a26
   - id: 4911b93f-ef66-4b14-bf5d-55833568f1c4
     type: PRESET_ACTION
     command:

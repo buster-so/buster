@@ -1,44 +1,36 @@
 [
   {
-    "id": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
-    "email": "chad@buster.so",
-    "name": "chad",
+    "id": "a4187a36-34f2-4fd7-8873-02c8af358b32",
+    "email": "support@buster.so",
+    "name": null,
     "config": {},
-    "createdAt": "2025-09-19 21:10:02.583798+00",
-    "updatedAt": "2025-09-19 18:42:11.761303+00",
+    "createdAt": "2025-10-12 22:37:47.352342+00",
+    "updatedAt": "2025-10-12 22:37:47.352342+00",
     "attributes": {
-      "user_id": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
-      "user_email": "chad@buster.so",
-      "organization_id": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
-      "organization_role": "workspace_admin"
+      "user_id": "a4187a36-34f2-4fd7-8873-02c8af358b32",
+      "user_email": "support@buster.so"
     },
     "avatarUrl": null,
     "suggestedPrompts": {
-      "updatedAt": "2025-09-19T18:52:25.717Z",
+      "updatedAt": "2025-09-19T19:10:16.634Z",
       "suggestedPrompts": {
         "help": [
-          "what types of analyses can you perform on quarterly revenue data",
-          "how do you connect new metrics to dashboards",
-          "can you break down revenue by product and vendor accessory",
-          "what data sources do you need to create these reports and dashboards"
+          "what types of analyses can you perform?",
+          "what questions can I as buster?",
+          "what data models are available for queries?",
+          "can you explain your forecasting capabilities?"
         ],
         "report": [
-          "generate a revenue breakdown report for last four quarters by product category",
-          "create a supplier and territory profitability report for the latest four quarters",
-          "produce a quarterly revenue vs discount impact narrative for last year",
-          "summarize customer growth and revenue by cohort over four quarters"
+          "provide a trend analysis of quarterly profits",
+          "evaluate product performance across regions"
         ],
         "dashboard": [
-          "build a quarterly revenue dashboard with QoQ growth and AOV",
-          "create a dashboard comparing top 10 products across the last four quarters",
-          "design a vendor activity and spend dashboard for the last 3 years",
-          "make a dashboard showing revenue by product category and region last 4 quarters"
+          "create a sales performance dashboard",
+          "design a revenue forecast dashboard"
         ],
         "visualization": [
-          "which product earned the most revenue in the last four quarters",
-          "show quarterly discount impact trend",
-          "display revenue by customer count vs revenue per customer this year",
-          "plot year over year revenue growth rate by quarter forSignature Cycles"
+          "create a metric for monthly sales",
+          "show top vendors by purchase volume"
         ]
       }
     },
@@ -162,6 +154,53 @@
         "visualization": [
           "create a metric for monthly sales",
           "show top vendors by purchase volume"
+        ]
+      }
+    },
+    "personalizationEnabled": false,
+    "personalizationConfig": {},
+    "lastUsedShortcuts": []
+  },
+  {
+    "id": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "email": "chad@buster.so",
+    "name": "chad",
+    "config": {},
+    "createdAt": "2025-09-19 21:10:02.583798+00",
+    "updatedAt": "2025-09-19 18:42:11.761303+00",
+    "attributes": {
+      "user_id": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+      "user_email": "chad@buster.so",
+      "organization_id": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+      "organization_role": "workspace_admin"
+    },
+    "avatarUrl": null,
+    "suggestedPrompts": {
+      "updatedAt": "2025-10-16T05:09:43.141Z",
+      "suggestedPrompts": {
+        "help": [
+          "what can you analyze about inventory and sales together",
+          "how do you forecast future inventory requirements",
+          "can you show me the data lineage and model relationships for inventory metrics",
+          "what types of visualizations do you support for time-series analyses"
+        ],
+        "report": [
+          "summarize current inventory health and trends",
+          "compare last quarter vs this quarter inventory movement",
+          "analyze top selling product category by region",
+          "evaluate supplier lead times impact on stockouts"
+        ],
+        "dashboard": [
+          "create an inventory health dashboard",
+          "build a sales vs inventory dashboard",
+          "design a vendor performance dashboard",
+          "make a customer lifetime value dashboard"
+        ],
+        "visualization": [
+          "which product category drives most revenue last quarter",
+          "what is monthly revenue trend over the last six months",
+          "top 5 customers by revenue and frequency of orders",
+          "distribution of orders by territory"
         ]
       }
     },
