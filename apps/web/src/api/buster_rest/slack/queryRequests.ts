@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { slackQueryKeys } from '@/api/query_keys/slack';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import {
@@ -16,6 +16,14 @@ export const useGetSlackIntegration = (enabled = true) => {
     queryFn: getSlackIntegration,
     enabled,
   });
+};
+
+export const prefetchSlackIntegration = async (queryClient: QueryClient) => {
+  await queryClient.prefetchQuery({
+    ...slackQueryKeys.slackGetIntegration,
+    queryFn: getSlackIntegration,
+  });
+  return queryClient.getQueryData(slackQueryKeys.slackGetIntegration.queryKey);
 };
 
 // GET /api/v2/slack/channels
