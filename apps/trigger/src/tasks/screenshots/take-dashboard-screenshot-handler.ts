@@ -52,7 +52,10 @@ export const takeDashboardScreenshotHandlerTask: ReturnType<
 const shouldTakenNewScreenshot = async ({
   dashboardId,
   isOnSaveEvent,
-}: { dashboardId: string; isOnSaveEvent: boolean }) => {
+}: {
+  dashboardId: string;
+  isOnSaveEvent: boolean;
+}) => {
   if (isOnSaveEvent) {
     return true;
   }

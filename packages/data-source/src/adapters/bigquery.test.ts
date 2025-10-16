@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { BigQueryCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { BigQueryAdapter } from './bigquery';
 
 // Create mock BigQuery instance

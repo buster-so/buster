@@ -18,7 +18,7 @@ export const ChatHeaderTitle: React.FC<{
   chatId: string;
   isStreamingMessage: boolean;
   isScreenshotMode: boolean;
-}> = ({ chatTitle, chatId, isStreamingMessage, isScreenshotMode }) => {
+}> = ({ chatTitle, chatId, isStreamingMessage }) => {
   const { mutateAsync: updateChat } = useUpdateChat();
   const isStreamFinished = !isStreamingMessage;
 
@@ -34,10 +34,7 @@ export const ChatHeaderTitle: React.FC<{
         transition={{
           duration: isStreamFinished ? 0 : 0.2,
         }}
-        className={cn(
-          'flex w-full items-center overflow-hidden',
-          isScreenshotMode && 'mx-auto max-w-[600px] pl-4'
-        )}
+        className={'flex w-full items-center overflow-hidden'}
       >
         <EditableTitle
           className="w-full"

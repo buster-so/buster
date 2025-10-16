@@ -1,6 +1,10 @@
-import { createAdapter } from '@buster/data-source';
-import { DataSourceType, getDynamicSampleSize, getStructuralMetadata } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
+import {
+  createAdapter,
+  DataSourceType,
+  getDynamicSampleSize,
+  getStructuralMetadata,
+} from '@buster/data-source';
 import {
   getDataSourceCredentials,
   getDataSourceWithDetails,

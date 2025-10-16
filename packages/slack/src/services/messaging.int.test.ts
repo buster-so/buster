@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
-  MessageTemplates,
   createActionsBlock,
   createSectionBlock,
   formatSimpleMessage,
+  MessageTemplates,
 } from '../utils/message-formatter';
 import { SlackMessagingService } from './messaging';
 

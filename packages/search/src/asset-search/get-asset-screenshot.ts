@@ -1,4 +1,4 @@
-import { type StorageProvider, getProviderForOrganization } from '@buster/data-source';
+import { getProviderForOrganization, type StorageProvider } from '@buster/data-source';
 import { z } from 'zod';
 
 const GetAssetScreenshotParamsSchema = z.object({

@@ -1,6 +1,6 @@
 import type { WebClient } from '@slack/web-api';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type MockWebClient, createMockWebClient } from '../mocks';
+import { createMockWebClient, type MockWebClient } from '../mocks';
 import { convertMarkdownToSlack } from '../utils/markdown-to-slack';
 import { SlackMessagingService } from './messaging';
 

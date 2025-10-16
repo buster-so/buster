@@ -34,7 +34,7 @@ export const GlobalSearchModalBase = ({
   value,
   items,
   onChangeValue,
-  loading,
+  loading = false,
   openSecondaryContent,
   scrollContainerRef,
   filtersParams,
@@ -44,10 +44,12 @@ export const GlobalSearchModalBase = ({
   const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
-  const resetModal = () => {
-    setViewedItem(null);
-    onChangeValue('');
-  };
+  const showBottomLoading = items.length >= 20;
+
+  // const resetModal = () => {
+  //   setViewedItem(null);
+  //   onChangeValue('');
+  // };
 
   const searchItems: SearchItems[] = useMemo(() => {
     const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
@@ -141,6 +143,7 @@ export const GlobalSearchModalBase = ({
       placeholder="Search..."
       loading={loading}
       showTopLoading={true}
+      showBottomLoading={showBottomLoading}
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent && !!viewedItem}
       shouldFilter={false}

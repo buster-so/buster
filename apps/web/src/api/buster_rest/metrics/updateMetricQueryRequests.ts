@@ -8,6 +8,7 @@ import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { getOriginalMetric, setOriginalMetric } from '@/context/Metrics/useOriginalMetricStore';
 import { prepareMetricUpdateMetric, upgradeMetricToIMetric } from '@/lib/metrics';
+import { dashboardQueryKeys } from '../../query_keys/dashboard';
 import { useAddAssetToCollection, useRemoveAssetFromCollection } from '../collections';
 import { useGetUserFavorites } from '../users';
 import { useGetLatestMetricVersionMemoized } from './metricVersionNumber';
@@ -62,6 +63,17 @@ export const useSaveMetric = (params?: { updateOnSave?: boolean }) => {
       if (updateOnSave && data) {
         setMetricQueryData(queryClient, newMetric);
       }
+
+      const allDashboardsAssignedToMetric = data.dashboards.map((dashboard) => dashboard.id);
+      allDashboardsAssignedToMetric.forEach((dashboardId) => {
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryKeys
+            .dashboardGetDashboard(dashboardId, 'LATEST')
+            .queryKey.slice(0, 3),
+          refetchType: 'all',
+        });
+      });
+
       navigate({
         to: '.',
         ignoreBlocker: true,

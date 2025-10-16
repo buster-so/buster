@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { MySQLCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { MySQLAdapter } from './mysql';
 
 // Check if MySQL test credentials are available

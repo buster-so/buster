@@ -8,18 +8,18 @@ import type { Filter } from '@turbopuffer/turbopuffer/resources/custom';
 import type { Namespace } from '@turbopuffer/turbopuffer/resources/namespaces';
 import { z } from 'zod';
 import {
+  createUniqueKey,
+  generateNamespace,
+  isValidForEmbedding,
+  type SearchableValue,
+  SearchableValueSchema,
   type SearchRequest,
   SearchRequestSchema,
   type SearchResponse,
-  type SearchableValue,
-  SearchableValueSchema,
   type TurbopufferQuery,
   TurbopufferQuerySchema,
   type UpsertResult,
   UpsertResultSchema,
-  createUniqueKey,
-  generateNamespace,
-  isValidForEmbedding,
 } from './types';
 
 // ============================================================================

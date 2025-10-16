@@ -14,12 +14,7 @@ export async function getGithubIntegrationByInstallationId(
   const [integration] = await db
     .select()
     .from(githubIntegrations)
-    .where(
-      and(
-        eq(githubIntegrations.installationId, installationId),
-        isNull(githubIntegrations.deletedAt)
-      )
-    )
+    .where(and(eq(githubIntegrations.installationId, installationId)))
     .limit(1);
 
   return integration;

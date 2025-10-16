@@ -5,7 +5,7 @@ import { Box, Text, useApp, useInput } from 'ink';
 import Spinner from 'ink-spinner';
 import TextInput from 'ink-text-input';
 import { useEffect, useState } from 'react';
-import { BusterBanner } from '../../components/banner';
+import { BusterBanner } from '../../components';
 import { type Credentials, getCredentials, saveCredentials } from '../../utils/credentials';
 
 interface InitProps {

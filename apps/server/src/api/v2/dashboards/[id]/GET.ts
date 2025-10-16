@@ -18,7 +18,7 @@ import type { DashboardYml } from '@buster/server-shared/dashboards';
 import type { VerificationStatus } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
 import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
-import { type Context, Hono } from 'hono';
+import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
 import { throwUnauthorizedError } from '../../../../shared-helpers/asset-public-access';
