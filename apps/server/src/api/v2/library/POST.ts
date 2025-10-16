@@ -1,6 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
 import { bulkUpdateLibraryField, getUserOrganizationId } from '@buster/database/queries';
-import type { LibraryAssetIdentifier } from '@buster/database/schema-types';
 import {
   type LibraryPostRequestBody,
   LibraryPostRequestBodySchema,

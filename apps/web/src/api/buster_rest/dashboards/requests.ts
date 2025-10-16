@@ -1,8 +1,12 @@
 import type {
   DashboardConfig,
+  DeleteDashboardsRequest,
+  DeleteDashboardsResponse,
   GetDashboardParams,
   GetDashboardQuery,
   GetDashboardResponse,
+  GetDashboardsQuery,
+  GetDashboardsResponse,
 } from '@buster/server-shared/dashboards';
 import type {
   ShareDeleteRequest,
@@ -11,20 +15,14 @@ import type {
   SharePostResponse,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
-import type { BusterDashboardListItem } from '@/api/asset_interfaces/dashboard';
-import { mainApi, mainApiV2 } from '@/api/buster_rest/instances';
+import { mainApiV2 } from '@/api/buster_rest/instances';
 
-export const dashboardsGetList = async (params: {
-  /** The page number to fetch */
-  page_token: number;
-  /** Number of items per page */
-  page_size: number;
-  /** Filter for dashboards shared with the current user */
-  shared_with_me?: boolean;
-  /** Filter for dashboards owned by the current user */
-  only_my_dashboards?: boolean;
-}) => {
-  return mainApi.get<BusterDashboardListItem[]>('/dashboards', { params }).then((res) => res.data);
+export const dashboardsGetList = async (
+  params: GetDashboardsQuery
+): Promise<GetDashboardsResponse> => {
+  return mainApiV2.get<GetDashboardsResponse>('/dashboards', { params }).then((res) => {
+    return res.data;
+  });
 };
 
 export const getDashboardById = async ({
@@ -45,7 +43,7 @@ export const dashboardsCreateDashboard = async (params: {
   /** Optional description of the dashboard */
   description?: string | null;
 }) => {
-  return await mainApi.post<GetDashboardResponse>('/dashboards', params).then((res) => res.data);
+  return await mainApiV2.post<GetDashboardResponse>('/dashboards', params).then((res) => res.data);
 };
 
 export const dashboardsUpdateDashboard = async (params: {
@@ -69,8 +67,10 @@ export const dashboardsUpdateDashboard = async (params: {
     .then((res) => res.data);
 };
 
-export const dashboardsDeleteDashboard = async (data: { ids: string[] }) => {
-  return await mainApi.delete<null>('/dashboards', { data }).then((res) => res.data);
+export const dashboardsDeleteDashboard = async (data: DeleteDashboardsRequest) => {
+  return await mainApiV2
+    .delete<DeleteDashboardsResponse>('/dashboards', { data })
+    .then((res) => res.data);
 };
 
 // share dashboards

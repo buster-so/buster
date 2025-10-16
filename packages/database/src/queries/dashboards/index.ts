@@ -1,9 +1,16 @@
+export {
+  type CreateDashboardInput,
+  CreateDashboardInputSchema,
+  type CreateDashboardOutput,
+  createDashboard,
+} from './create-dashboard';
 export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';
 export {
   type DashboardFile,
   type DashboardFileContext,
   getChatDashboardFiles,
 } from './dashboards';
+export { deleteDashboard } from './delete-dashboard';
 export {
   type AssociatedCollection,
   getCollectionsAssociatedWithDashboard,
@@ -18,5 +25,11 @@ export {
   GetDashboardTitleInputSchema,
   getDashboardTitle,
 } from './get-dashboard-title';
+export {
+  type ListDashboardsRequest,
+  ListDashboardsRequestSchema,
+  type ListDashboardsResponse,
+  listDashboards,
+} from './list-dashboards';
 export { manageMetricAssociations } from './manage-metric-associations';
 export { updateDashboard } from './update-dashboard';

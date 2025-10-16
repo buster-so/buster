@@ -1,4 +1,5 @@
 import z from 'zod';
+import { VerificationSchema } from './verification';
 
 // Dashboard Config Schema
 export const DashboardConfigSchema = z.object({
@@ -39,6 +40,21 @@ export const DashboardVersionHistorySchema = z.record(
   })
 );
 
+export const DashboardListItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  created_at: z.string(),
+  last_edited: z.string(),
+  owner: z.object({
+    id: z.string(),
+    name: z.string(),
+    avatar_url: z.string().nullable(),
+  }),
+  status: VerificationSchema,
+  is_shared: z.boolean(),
+});
+
 export type DashboardConfig = z.infer<typeof DashboardConfigSchema>;
 export type DashboardYml = z.infer<typeof DashboardYmlSchema>;
 export type DashboardVersionHistory = z.infer<typeof DashboardVersionHistorySchema>;
+export type DashboardListItem = z.infer<typeof DashboardListItemSchema>;

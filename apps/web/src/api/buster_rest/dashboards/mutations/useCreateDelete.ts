@@ -55,8 +55,12 @@ export const useDeleteDashboards = () => {
     const onMutate = () => {
       const queryKey = dashboardQueryKeys.dashboardGetList().queryKey;
       queryClient.setQueryData(queryKey, (v) => {
+        if (!v) return v;
         const ids = typeof dashboardId === 'string' ? [dashboardId] : dashboardId;
-        return v?.filter((t) => !ids.includes(t.id)) || [];
+        return {
+          ...v,
+          data: v.data.filter((t) => !ids.includes(t.id)),
+        };
       });
     };
 

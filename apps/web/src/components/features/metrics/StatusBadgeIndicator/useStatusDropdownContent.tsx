@@ -12,7 +12,7 @@ const statuses: VerificationStatus[] = [
   'backlogged',
 ];
 
-const requiresAdminItems = ['inReview', 'verified', 'backlogged'];
+const requiresAdminItems: VerificationStatus[] = ['inReview', 'verified', 'backlogged'];
 
 export const useStatusDropdownContent = ({
   isAdmin,
