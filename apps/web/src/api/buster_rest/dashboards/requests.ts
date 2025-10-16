@@ -45,7 +45,7 @@ export const dashboardsCreateDashboard = async (params: {
   /** Optional description of the dashboard */
   description?: string | null;
 }) => {
-  return await mainApi.post<GetDashboardResponse>('/dashboards', params).then((res) => res.data);
+  return await mainApiV2.post<GetDashboardResponse>('/dashboards', params).then((res) => res.data);
 };
 
 export const dashboardsUpdateDashboard = async (params: {

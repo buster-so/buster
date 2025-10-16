@@ -16,13 +16,10 @@ import { getDashboardHandler } from './[id]/GET';
 const app = new Hono()
   .use(requireAuth)
   .use(requireOrganization)
-
   .post('/', zValidator('json', PostDashboardRequestSchema), async (c) => {
     const request = c.req.valid('json');
     const user = c.get('busterUser');
     const org = c.get('userOrganizationInfo');
-
-    console.info(`Processing POST request to create dashboard for user: ${user.id}`);
 
     try {
       const response = await createDashboardHandler(request, user, org.organizationId);
@@ -50,10 +47,7 @@ const app = new Hono()
 
 export default app;
 
-/**
- * Handler to create a new dashboard
- */
-export async function createDashboardHandler(
+async function createDashboardHandler(
   request: PostDashboardRequest,
   user: User,
   organizationId: string
@@ -88,12 +82,7 @@ export async function createDashboardHandler(
   });
 
   // Use the existing getDashboardHandler to fetch the complete dashboard response
-  const response = await getDashboardHandler(
-    {
-      dashboardId: newDashboard.id,
-    },
-    user
-  );
+  const response = await getDashboardHandler({ dashboardId: newDashboard.id }, user);
 
   return response;
 }

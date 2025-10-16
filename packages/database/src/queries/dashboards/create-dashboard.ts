@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { db } from '../../connection';
 import { dashboardFiles } from '../../schema';
-import { DashboardYmlSchema } from '../../schema-types';
+import { type DashboardYml, DashboardYmlSchema } from '../../schema-types/dashboards';
 
 // Input validation schema for creating a dashboard
 export const CreateDashboardInputSchema = z.object({
@@ -19,7 +19,7 @@ export type CreateDashboardOutput = {
   id: string;
   name: string;
   fileName: string;
-  content: unknown;
+  content: DashboardYml;
   organizationId: string;
   createdBy: string;
   createdAt: string;
@@ -50,7 +50,13 @@ export async function createDashboard(input: CreateDashboardInput): Promise<Crea
         createdBy: userId,
         createdAt: now,
         updatedAt: now,
-        versionHistory: {},
+        versionHistory: {
+          '1': {
+            content: content,
+            updated_at: now,
+            version_number: 1,
+          },
+        },
       })
       .returning({
         id: dashboardFiles.id,

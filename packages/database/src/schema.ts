@@ -22,6 +22,7 @@ import {
 import {
   AssetPermissionRoleSchema,
   AssetTypeSchema,
+  type DashboardYml,
   DataSourceOnboardingStatusSchema,
   DatasetTypeSchema,
   DocsTypeSchema,
@@ -716,7 +717,7 @@ export const dashboardFiles = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: varchar().notNull(),
     fileName: varchar('file_name').notNull(),
-    content: jsonb().notNull().default([]),
+    content: jsonb().$type<DashboardYml>().notNull(),
     filter: varchar(),
     organizationId: uuid('organization_id').notNull(),
     createdBy: uuid('created_by').notNull(),
