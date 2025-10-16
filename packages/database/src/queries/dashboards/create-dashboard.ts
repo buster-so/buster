@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { db } from '../../connection';
-import { dashboardFiles } from '../../schema';
+import { assetPermissions, dashboardFiles } from '../../schema';
 import { type DashboardYml, DashboardYmlSchema } from '../../schema-types/dashboards';
 
 // Input validation schema for creating a dashboard
@@ -39,43 +39,61 @@ export async function createDashboard(input: CreateDashboardInput): Promise<Crea
   try {
     const now = new Date().toISOString();
 
-    // Insert the new dashboard
-    const [newDashboard] = await db
-      .insert(dashboardFiles)
-      .values({
-        name,
-        fileName,
-        content,
-        organizationId,
-        createdBy: userId,
+    // Use a transaction to ensure both dashboard and permission are created atomically
+    const result = await db.transaction(async (tx) => {
+      // Insert the new dashboard
+      const [newDashboard] = await tx
+        .insert(dashboardFiles)
+        .values({
+          name,
+          fileName,
+          content,
+          organizationId,
+          createdBy: userId,
+          createdAt: now,
+          updatedAt: now,
+          versionHistory: {
+            '1': {
+              content: content,
+              updated_at: now,
+              version_number: 1,
+            },
+          },
+        })
+        .returning({
+          id: dashboardFiles.id,
+          name: dashboardFiles.name,
+          fileName: dashboardFiles.fileName,
+          content: dashboardFiles.content,
+          organizationId: dashboardFiles.organizationId,
+          createdBy: dashboardFiles.createdBy,
+          createdAt: dashboardFiles.createdAt,
+          updatedAt: dashboardFiles.updatedAt,
+        });
+
+      if (!newDashboard) {
+        throw new Error('Failed to create dashboard - no data returned from insert');
+      }
+
+      // Insert user permission for the dashboard
+      await tx.insert(assetPermissions).values({
+        identityId: userId,
+        identityType: 'user',
+        assetId: newDashboard.id,
+        assetType: 'dashboard_file',
+        role: 'owner',
         createdAt: now,
         updatedAt: now,
-        versionHistory: {
-          '1': {
-            content: content,
-            updated_at: now,
-            version_number: 1,
-          },
-        },
-      })
-      .returning({
-        id: dashboardFiles.id,
-        name: dashboardFiles.name,
-        fileName: dashboardFiles.fileName,
-        content: dashboardFiles.content,
-        organizationId: dashboardFiles.organizationId,
-        createdBy: dashboardFiles.createdBy,
-        createdAt: dashboardFiles.createdAt,
-        updatedAt: dashboardFiles.updatedAt,
+        createdBy: userId,
+        updatedBy: userId,
       });
 
-    if (!newDashboard) {
-      throw new Error('Failed to create dashboard - no data returned from insert');
-    }
+      return newDashboard;
+    });
 
-    console.info(`Successfully created dashboard ${newDashboard.id}`);
+    console.info(`Successfully created dashboard ${result.id} with owner permissions for user ${userId}`);
 
-    return newDashboard;
+    return result;
   } catch (error) {
     console.error('Failed to create dashboard:', error);
     throw new Error(

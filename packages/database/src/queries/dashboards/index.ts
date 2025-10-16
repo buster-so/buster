@@ -25,5 +25,11 @@ export {
   getDashboardTitle,
 } from './get-dashboard-title';
 export { deleteDashboard } from './delete-dashboard';
+export {
+  type ListDashboardsRequest,
+  type ListDashboardsResponse,
+  ListDashboardsRequestSchema,
+  listDashboards,
+} from './list-dashboards';
 export { manageMetricAssociations } from './manage-metric-associations';
 export { updateDashboard } from './update-dashboard';

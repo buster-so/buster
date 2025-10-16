@@ -1,6 +1,8 @@
+import { DashboardListItemSchema } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { MetricSchema } from '../metrics';
-import { ShareConfigSchema, ShareRoleSchema } from '../share';
+import { PaginatedResponseSchema } from '../type-utilities/pagination';
+import { ShareConfigSchema } from '../share';
 import { DashboardSchema } from './dashboard.types';
 
 export const GetDashboardResponseSchema = z.object({
@@ -25,6 +27,9 @@ export const GetDashboardResponseSchema = z.object({
 export const UpdateDashboardResponseSchema = GetDashboardResponseSchema;
 export const PostDashboardResponseSchema = GetDashboardResponseSchema;
 
+// GET Dashboards list response schema
+export const GetDashboardsResponseSchema = PaginatedResponseSchema(DashboardListItemSchema);
+
 // DELETE Dashboard response schema (single)
 export const DeleteDashboardResponseSchema = z.object({
   success: z.boolean(),
@@ -40,6 +45,7 @@ export const DeleteDashboardsResponseSchema = z.object({
 });
 
 export type GetDashboardResponse = z.infer<typeof GetDashboardResponseSchema>;
+export type GetDashboardsResponse = z.infer<typeof GetDashboardsResponseSchema>;
 export type PostDashboardResponse = z.infer<typeof PostDashboardResponseSchema>;
 export type UpdateDashboardResponse = z.infer<typeof UpdateDashboardResponseSchema>;
 export type DeleteDashboardResponse = z.infer<typeof DeleteDashboardResponseSchema>;

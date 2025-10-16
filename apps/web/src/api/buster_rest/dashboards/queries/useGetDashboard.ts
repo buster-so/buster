@@ -122,13 +122,14 @@ export const useGetDashboardsList = (
   const filters = useMemo(() => {
     return {
       ...params,
-      page_token: 0,
+      page_token: 1,
       page_size: 3500,
     };
   }, [params]);
-
+  const queryOpts = dashboardQueryKeys.dashboardGetList(filters);
   return useQuery({
-    ...dashboardQueryKeys.dashboardGetList(filters),
+    queryKey: queryOpts.queryKey,
+    staleTime: 3000,
     queryFn: () => dashboardsGetList(filters),
     ...options,
   });
@@ -149,8 +150,9 @@ export const prefetchGetDashboardsList = async (
   const lastQueryKey = options.queryKey[options.queryKey.length - 1];
   const compiledParams = lastQueryKey as Parameters<typeof dashboardsGetList>[0];
   await queryClient.prefetchQuery({
-    ...options,
-    queryFn: () => dashboardsGetList(compiledParams),
+    queryKey: options.queryKey,
+    staleTime: 3000,
+    queryFn: async () => dashboardsGetList(compiledParams),
   });
 
   return queryClient;
