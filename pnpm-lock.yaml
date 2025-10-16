@@ -1267,6 +1267,9 @@ importers:
 
   packages/github:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
       '@buster/database':
         specifier: workspace:*
         version: link:../database
