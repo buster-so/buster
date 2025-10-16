@@ -12,6 +12,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
   secondaryContent,
   openSecondaryContent,
   loading,
+  showBottomLoading,
   scrollContainerRef,
 }: {
   searchItems: SearchItems<M, T>[];
@@ -20,6 +21,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
   secondaryContent: SearchModalContentProps<M, T>['secondaryContent'];
   openSecondaryContent: SearchModalContentProps<M, T>['openSecondaryContent'];
   scrollContainerRef: SearchModalContentProps<M, T>['scrollContainerRef'];
+  showBottomLoading: SearchModalContentProps<M, T>['showBottomLoading'];
 }) => {
   const hasResults = useCommandState((x) => x.filtered.count) > 0;
 
@@ -36,6 +38,7 @@ export const SearchModalItemsContainer = <M, T extends string>({
           loading={loading}
           onSelectGlobal={onSelectGlobal}
           scrollContainerRef={scrollContainerRef}
+          showBottomLoading={showBottomLoading}
         />
       </motion.div>
       <AnimatePresence>

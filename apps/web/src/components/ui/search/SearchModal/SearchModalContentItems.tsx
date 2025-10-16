@@ -23,10 +23,12 @@ export const SearchModalContentItems = <M, T extends string>({
   loading,
   onSelectGlobal,
   scrollContainerRef,
-}: Pick<SearchModalContentProps<M, T>, 'scrollContainerRef' | 'loading' | 'searchItems'> &
+  showBottomLoading,
+}: Pick<
+  SearchModalContentProps<M, T>,
+  'scrollContainerRef' | 'loading' | 'searchItems' | 'showBottomLoading'
+> &
   CommonProps<M, T>) => {
-  const hasFiredRef = useRef(false);
-
   return (
     <Command.List
       className={cn(
@@ -43,7 +45,7 @@ export const SearchModalContentItems = <M, T extends string>({
         />
       ))}
 
-      {loading && (
+      {showBottomLoading && loading && (
         <div className="flex items-center justify-center my-1.5">
           <Text size={'sm'} variant={'secondary'}>
             Loading...
