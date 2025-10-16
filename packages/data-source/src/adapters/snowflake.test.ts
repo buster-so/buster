@@ -1,7 +1,7 @@
 import snowflake from 'snowflake-sdk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { SnowflakeCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { SnowflakeAdapter } from './snowflake';
 
 // Get mocked snowflake-sdk

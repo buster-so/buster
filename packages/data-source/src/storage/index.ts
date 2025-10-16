@@ -1,16 +1,16 @@
 // Storage abstraction layer exports
-export * from './types';
-export * from './utils';
+
+export { createGCSProvider } from './providers/gcs-provider';
+export { createR2Provider } from './providers/r2-provider';
 
 // Storage providers
 export { createS3Provider } from './providers/s3-provider';
-export { createR2Provider } from './providers/r2-provider';
-export { createGCSProvider } from './providers/gcs-provider';
-
 // Storage factory functions
 export {
   createStorageProvider,
-  getProviderForOrganization,
   getDefaultProvider,
+  getProviderForOrganization,
   testStorageCredentials,
 } from './storage-factory';
+export * from './types';
+export * from './utils';

@@ -1,7 +1,7 @@
 export {
+  batchCheckCacheExists,
   checkCacheExists,
+  generateCacheKey,
   getCachedMetricData,
   setCachedMetricData,
-  batchCheckCacheExists,
-  generateCacheKey,
 } from './metric-cache';

@@ -1,15 +1,5 @@
 import type { DatabaseAdapter } from '../adapters/base';
 import { DataSourceType } from '../types/credentials';
-import type {
-  IntrospectionDialect,
-  IntrospectionFilters,
-  StructuralMetadata,
-  StructuralMetadataFetcher,
-  TableMetadata,
-  TableSample,
-  TableSampler,
-} from './types';
-
 import { getTableSample as getBigQueryTableSample } from './dialects/bigquery/sampling';
 import { getStructuralMetadata as getBigQueryStructuralMetadata } from './dialects/bigquery/structural';
 import { getTableSample as getMySQLTableSample } from './dialects/mysql/sampling';
@@ -23,6 +13,15 @@ import { getTableSample as getSnowflakeTableSample } from './dialects/snowflake/
 import { getStructuralMetadata as getSnowflakeStructuralMetadata } from './dialects/snowflake/structural';
 import { getTableSample as getSQLServerTableSample } from './dialects/sqlserver/sampling';
 import { getStructuralMetadata as getSQLServerStructuralMetadata } from './dialects/sqlserver/structural';
+import type {
+  IntrospectionDialect,
+  IntrospectionFilters,
+  StructuralMetadata,
+  StructuralMetadataFetcher,
+  TableMetadata,
+  TableSample,
+  TableSampler,
+} from './types';
 
 /**
  * Factory function to create a structural metadata fetcher based on dialect

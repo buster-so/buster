@@ -1,7 +1,7 @@
 import sql from 'mssql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { SQLServerCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { SQLServerAdapter } from './sqlserver';
 
 // Mock mssql module
@@ -31,7 +31,7 @@ describe('SQLServerAdapter', () => {
     };
 
     // Mock the ConnectionPool constructor
-    mockedSql.ConnectionPool = vi.fn().mockReturnValue(mockPool);
+    mockedSql.ConnectionPool = vi.fn(() => mockPool) as any;
 
     // Mock SQL Server data types
     mockedSql.NVarChar = vi.fn();
@@ -120,7 +120,7 @@ describe('SQLServerAdapter', () => {
         database: 'testdb',
         username: 'testuser',
         password: 'testpass',
-      };
+      } as any;
 
       await expect(adapter.initialize(credentials)).rejects.toThrow(
         'Invalid credentials type. Expected sqlserver, got postgres'

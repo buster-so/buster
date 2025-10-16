@@ -4,8 +4,8 @@ import type { DataSourceIntrospector } from './introspection/base';
 import type { Credentials, DataSourceType } from './types/credentials';
 import type {
   Column,
-  DataSourceIntrospectionResult,
   Database,
+  DataSourceIntrospectionResult,
   Schema,
   Table,
   TableStatistics,
