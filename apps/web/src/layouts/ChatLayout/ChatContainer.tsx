@@ -26,7 +26,12 @@ export const ChatContainer = React.memo(
         id={CHAT_CONTAINER_ID}
         className="flex h-full w-full min-w-[295px] flex-col"
       >
-        <ChatContent chatId={chatId} isEmbed={isEmbed} doNotScrollToBottom={isScreenshotMode} />
+        <ChatContent
+          chatId={chatId}
+          isEmbed={isEmbed}
+          isScreenshotMode={isScreenshotMode}
+          doNotScrollToBottom={isScreenshotMode}
+        />
       </AppPageLayout>
     );
   }

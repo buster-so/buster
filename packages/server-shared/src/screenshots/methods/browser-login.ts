@@ -10,10 +10,14 @@ type BrowserParamsBase<T> = {
   callback: ({
     page,
     browser,
+    width,
+    height,
     type,
   }: {
     page: Page;
     browser: Browser;
+    width: number;
+    height: number;
     type: 'png' | 'webp';
   }) => Promise<T>;
 };
@@ -149,7 +153,13 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
     ]);
 
     console.info('Callback');
-    const result = await callback({ page, browser, type: type || DEFAULT_SCREENSHOT_CONFIG.type });
+    const result = await callback({
+      page,
+      browser,
+      width,
+      height,
+      type: type || DEFAULT_SCREENSHOT_CONFIG.type,
+    });
 
     if (pageError) {
       throw pageError;
