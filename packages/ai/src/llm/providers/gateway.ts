@@ -86,7 +86,11 @@ export const DEFAULT_ANALYTICS_ENGINEER_OPTIONS = {
   bedrock: {
     cachePoint: { type: 'default' },
     additionalModelRequestFields: {
-      anthropic_beta: ['fine-grained-tool-streaming-2025-05-14'],
+      anthropic_beta: [
+        'fine-grained-tool-streaming-2025-05-14',
+        'interleaved-thinking-2025-05-14',
+        'context-1m-2025-08-07',
+      ],
       reasoning_config: {
         type: 'enabled',
         budget_tokens: 10000, // Adjust as needed

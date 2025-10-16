@@ -20,7 +20,8 @@ const isProd = process.env.NODE_ENV === 'production';
 
 console.log(`🔨 Building CLI${isProd ? ' (production)' : ''}...`);
 
-const result = await $`bun build src/index.tsx --compile --outfile dist/buster --external @duckdb/node-bindings --external @duckdb/node-api --define import.meta.env.PROD=${isProd ? 'true' : 'false'}`.nothrow();
+const result =
+  await $`bun build src/index.tsx --compile --outfile dist/buster --external @duckdb/node-bindings --external @duckdb/node-api --define import.meta.env.PROD=${isProd ? 'true' : 'false'}`.nothrow();
 
 if (result.exitCode !== 0) {
   console.error('❌ Build failed');

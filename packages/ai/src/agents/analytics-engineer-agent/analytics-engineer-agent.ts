@@ -54,11 +54,23 @@ export function createAnalyticsEngineerAgent(
         return streamText({
           model: analyticsEngineerAgentOptions.model || Sonnet4,
           providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+          headers: {
+            'anthropic-beta':
+              'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07,interleaved-thinking-2025-05-14',
+          },
           tools: toolSet,
           messages: [systemMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           maxOutputTokens: 64000,
           // temperature: 0,
+          onError: ({ error }) => {
+            // Log error with context for debugging
+            console.error('Analytics Engineer Agent streaming error:', {
+              error,
+              chatId: analyticsEngineerAgentOptions.chatId,
+              messageId: analyticsEngineerAgentOptions.messageId,
+            });
+          },
         });
       },
       {

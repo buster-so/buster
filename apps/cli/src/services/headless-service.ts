@@ -26,13 +26,15 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
   const {
     prompt,
     chatId: providedChatId,
-    messageId,
+    messageId: providedMessageId,
     workingDirectory,
     isInResearchMode,
   } = validated;
 
   // Use provided chatId or generate new one
   const chatId = providedChatId || randomUUID();
+  // Use provided messageId or generate new one
+  const messageId = providedMessageId || randomUUID();
 
   // Load existing conversation or start fresh
   const conversation = await loadConversation(chatId, workingDirectory);
@@ -56,6 +58,8 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     messageId,
     workingDirectory,
     isInResearchMode,
+    prompt, // Pass prompt for database message creation
+    messages: updatedMessages, // Pass all messages including new user message
   });
 
   return chatId;
