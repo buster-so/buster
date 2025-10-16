@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
   BatchConfigSchema,
+  createUniqueKey,
   DeduplicationResultSchema,
   ErrorTypeSchema,
+  generateNamespace,
+  isValidForEmbedding,
+  parseUniqueKey,
+  SearchableValueSchema,
   SearchRequestSchema,
   SearchResponseSchema,
   SearchResultSchema,
-  SearchableValueSchema,
   SyncErrorSchema,
   SyncJobMetadataSchema,
   SyncJobPayloadSchema,
@@ -14,10 +18,6 @@ import {
   TurbopufferDocumentSchema,
   TurbopufferQuerySchema,
   UpsertResultSchema,
-  createUniqueKey,
-  generateNamespace,
-  isValidForEmbedding,
-  parseUniqueKey,
 } from './types';
 
 describe('Searchable Values Types', () => {

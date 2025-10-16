@@ -2,7 +2,9 @@
   "name": "@buster-app/supabase",
   "version": "0.0.1",
   "private": false,
-  "dependencies": {},
+  "dependencies": {
+    "@biomejs/biome": "2.2.6"
+  },
   "scripts": {
     "lint": "biome check . --write",
     "lint:fix": "biome check . --write",

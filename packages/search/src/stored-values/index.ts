@@ -1,33 +1,33 @@
 // Export all search functionality
-export {
-  searchValuesByEmbedding,
-  searchValuesByEmbeddingWithFilters,
-  searchValuesAcrossTargets,
-  extractSearchableColumnsFromYaml,
-  healthCheck,
-  StoredValuesError,
-  type StoredValueResult,
-  type SearchTarget,
-  type SearchOptions,
-  type EmbeddingOptions,
-} from './search';
 
 // Export schemas and validation
 export {
-  StoredValueResultSchema,
-  SearchTargetSchema,
-  SearchOptionsSchema,
   EmbeddingOptionsSchema,
-  UuidSchema,
   EmbeddingSchema,
+  SearchOptionsSchema,
+  SearchTargetSchema,
   SearchTermsSchema,
+  StoredValueResultSchema,
+  UuidSchema,
 } from './schemas';
+export {
+  type EmbeddingOptions,
+  extractSearchableColumnsFromYaml,
+  healthCheck,
+  type SearchOptions,
+  type SearchTarget,
+  type StoredValueResult,
+  StoredValuesError,
+  searchValuesAcrossTargets,
+  searchValuesByEmbedding,
+  searchValuesByEmbeddingWithFilters,
+} from './search';
 
 // Export utility functions (with prefixed names to avoid conflicts)
 export {
-  formatSchemaName as formatStoredValuesSchemaName,
+  buildWhereClause as buildStoredValuesWhereClause,
   escapeSqlString as escapeStoredValuesSqlString,
   formatHalfvecLiteral,
-  buildWhereClause as buildStoredValuesWhereClause,
+  formatSchemaName as formatStoredValuesSchemaName,
   isValidEmbedding,
 } from './utils';

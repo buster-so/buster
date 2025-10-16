@@ -1,5 +1,5 @@
 import type { SearchTextData, SearchTextRequest, SearchTextResponse } from '@buster/server-shared';
-import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { performTextSearch } from './search';
 
 // Mock dependencies

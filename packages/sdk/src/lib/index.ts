@@ -1,15 +1,12 @@
 // Main SDK export
-export { createBusterSDK } from './client';
-export type { BusterSDK } from './client';
-
-// Config types
-export type { SDKConfig } from './config';
-
-// Error types
-export { SDKError, NetworkError } from './errors';
 
 // Auth exports
-export { validateApiKey, isApiKeyValid } from './auth';
-
+export { isApiKeyValid, validateApiKey } from './auth';
+export type { BusterSDK } from './client';
+export { createBusterSDK } from './client';
+// Config types
+export type { SDKConfig } from './config';
 // Deploy function
 export { deploy } from './deploy';
+// Error types
+export { NetworkError, SDKError } from './errors';
