@@ -1,9 +1,9 @@
-import { GithubActionDocumentationPostSchema } from '@buster/server-shared/github';
-import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
 import { createChat, createMessage, getActiveGithubIntegration } from '@buster/database/queries';
 import { generateNewInstallationToken } from '@buster/github';
 import { runDocsAgent } from '@buster/sandbox';
+import { GithubActionDocumentationPostSchema } from '@buster/server-shared/github';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 
 const app = new Hono().post(
   '/',
@@ -24,7 +24,6 @@ const app = new Hono().post(
       headSha,
     });
 
-
     // Get the Github App installation token for the organization
     const installationResult = await getActiveGithubIntegration(apiKey.organizationId);
 
@@ -42,6 +41,7 @@ const app = new Hono().post(
 
     const newChat = await createChat({
       title: `Documentation for PR ${prNumber}`,
+      chatType: 'data_engineer',
       organizationId: apiKey.organizationId,
       userId: apiKey.ownerId,
     });
@@ -61,11 +61,13 @@ const app = new Hono().post(
       apiKey: apiKey.id,
     });
 
-    return c.json({ 
-      message: 'Kicked off documentation agent',
-      messageId: newMessage.id
-     }, 202);
-
+    return c.json(
+      {
+        message: 'Kicked off documentation agent',
+        messageId: newMessage.id,
+      },
+      202
+    );
   }
 );
 

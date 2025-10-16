@@ -20,7 +20,8 @@ export type RunDocsAgentParams = z.infer<typeof runDocsAgentParamsSchema>;
 
 export async function runDocsAgent(params: RunDocsAgentParams) {
   // Validate input parameters
-  const { installationToken, repoUrl, branch, prompt, apiKey } = runDocsAgentParamsSchema.parse(params);
+  const { installationToken, repoUrl, branch, prompt, apiKey } =
+    runDocsAgentParamsSchema.parse(params);
 
   const sandbox = await createSandboxFromSnapshot('buster-docs-agent-snapshot');
   const workspacePath = `/workspace/repo/`;

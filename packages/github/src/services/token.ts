@@ -228,7 +228,7 @@ export async function getInstallationTokenByOrgId(
  * Generate a new installation token from GitHub
  */
 export async function generateNewInstallationToken(
-  installationId: string,
+  installationId: string
 ): Promise<InstallationTokenResponse> {
   try {
     const app = createGitHubApp();

@@ -76,8 +76,7 @@ function getOrSetApp() {
             branch: branch,
             prompt: commentBody,
             apiKey: apiKey,
-          }
-          );
+          });
         }
       }
     });

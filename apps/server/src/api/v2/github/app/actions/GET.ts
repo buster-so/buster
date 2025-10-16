@@ -19,10 +19,13 @@ const app = new Hono().get(
       const result = await getMessageStatus(messageId);
 
       if (result.status === 'Failed') {
-        return c.json({
-          messageId,
-          ...result,
-        }, 500);
+        return c.json(
+          {
+            messageId,
+            ...result,
+          },
+          500
+        );
       }
 
       const response: GithubActionDocumentationStatusResponse = {
