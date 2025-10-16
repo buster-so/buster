@@ -58,7 +58,9 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
     let fullSearchString = searchString;
 
     if (searchString) {
-      fullSearchString = `${searchString}*`;
+      // Remove trailing punctuation before adding wildcard to avoid pgroonga query parsing issues
+      const trimmedSearch = searchString.replace(/[.,;:!?'")\]}-]+$/, '').trim();
+      fullSearchString = trimmedSearch ? `${trimmedSearch}*` : searchString;
       filterConditions.push(
         sql`ARRAY[${assetSearchV2.title}, ${assetSearchV2.additionalText}] &@~ ${fullSearchString}`
       );
