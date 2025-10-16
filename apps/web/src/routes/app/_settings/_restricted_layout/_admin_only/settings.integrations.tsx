@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prefetchS3Integration } from '@/api/buster_rest/s3-integrations';
 import { prefetchSlackIntegration } from '@/api/buster_rest/slack';
+import { GithubIntegrations } from '@/components/features/integrations/GithubIntegrations';
 import { SlackIntegrations } from '@/components/features/integrations/SlackIntegrations';
 import { StorageIntegrations } from '@/components/features/integrations/StorageIntegrations';
 import { SettingsPageHeader } from '@/components/features/settings';
@@ -34,6 +35,7 @@ function RouteComponent() {
       />
 
       <div className="flex flex-col space-y-6">
+        <GithubIntegrations />
         <SlackIntegrations />
         <StorageIntegrations />
       </div>

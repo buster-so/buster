@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paragraph, Title } from '@/components/ui/typography';
+import { Paragraph, Text, Title } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
 
 interface SettingsCardsProps {
@@ -40,6 +40,34 @@ const SettingsCard = ({ sections }: { sections: React.ReactNode[] }) => {
           {section}
         </div>
       ))}
+    </div>
+  );
+};
+
+export const SettingCardContent = ({
+  title,
+  description,
+  children,
+  icon,
+}: {
+  children: React.ReactNode;
+  title?: string;
+  description?: string;
+  icon?: React.ReactNode;
+}) => {
+  return (
+    <div className="flex items-center justify-between gap-x-2">
+      <div className="flex space-x-2">
+        <div className="bg-item-select flex items-center justify-center rounded p-2">{icon}</div>
+        <div className="flex flex-col space-y-0.5">
+          <Text>{title}</Text>
+          <Text variant="secondary" size={'xs'}>
+            {description}
+          </Text>
+        </div>
+      </div>
+
+      {children}
     </div>
   );
 };
