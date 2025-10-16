@@ -1,8 +1,10 @@
+import type { GetGitHubIntegrationResponse } from '@buster/server-shared/github';
 import React, { useMemo } from 'react';
 import { useGetGitHubIntegration, useInitiateGitHubAppInstall } from '@/api/buster_rest/github';
 import { Button } from '@/components/ui/buttons';
-import { Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
+import { createDropdownItems, Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
 import GithubIcon from '@/components/ui/icons/customIcons/Github';
+import LinkSlash from '@/components/ui/icons/NucleoIconOutlined/link-slash';
 import { Text } from '@/components/ui/typography';
 import { SettingCardContent, SettingsCards } from '../settings';
 
@@ -25,26 +27,48 @@ export const GithubIntegrations = React.memo(() => {
               </span>
             }
           >
-            {!isConnected ? <ConnectGithubButton /> : <ConnectedDropdown />}
+            {!isConnected || !githubIntegration ? (
+              <ConnectGithubButton />
+            ) : (
+              <ConnectedDropdown githubIntegration={githubIntegration} />
+            )}
           </SettingCardContent>,
         ],
       },
     ];
-  }, [isConnected]);
+  }, [isConnected, githubIntegration]);
 
   return <SettingsCards title="Github" description="Connect Buster with Github" cards={cards} />;
 });
 
 GithubIntegrations.displayName = 'GithubIntegrations';
 
-const ConnectedDropdown = () => {
-  const dropdownItems: IDropdownItems = [];
+const ConnectedDropdown = ({
+  githubIntegration,
+}: {
+  githubIntegration: GetGitHubIntegrationResponse;
+}) => {
+  const disconnectGitHubIntegration = () => {};
+  const isPending = false;
+  const accountName = githubIntegration.integration?.github_org_name;
+
+  const dropdownItems: IDropdownItems = createDropdownItems([
+    {
+      label: 'Disconnect',
+      value: 'disconnect',
+      loading: isPending,
+      onClick: () => {
+        disconnectGitHubIntegration();
+      },
+      icon: <LinkSlash />,
+    },
+  ]);
 
   return (
     <Dropdown items={dropdownItems} align="end" side="bottom" selectType="single">
       <div className="hover:bg-item-hover flex! cursor-pointer items-center space-x-1.5 rounded p-1.5">
         <div className="bg-success-foreground h-2.5 w-2.5 rounded-full" />
-        <Text className="select-none">Connected</Text>
+        <Text className="select-none">{accountName || 'Connected'}</Text>
       </div>
     </Dropdown>
   );
