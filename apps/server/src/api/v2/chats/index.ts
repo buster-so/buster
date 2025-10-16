@@ -41,21 +41,12 @@ const app = new Hono()
       400
     );
   })
-  .patch(
-    '/:chat_id',
-    zValidator(
-      'json',
-      z.object({
-        stop: z.boolean(),
-      })
-    ),
-    async (c) => {
-      //TODO
-      return c.json({
-        message: `TODO: Stop this chat ${c.req.param('chat_id')}`,
-      });
-    }
-  )
+  .patch('/:chat_id', zValidator('json', z.object({ stop: z.boolean() })), async (c) => {
+    //TODO
+    return c.json({
+      message: `TODO: Stop this chat ${c.req.param('chat_id')}`,
+    });
+  })
   // DELETE /chats/:chat_id/cancel - Cancel a chat and its running triggers
   .delete('/:chat_id/cancel', zValidator('param', CancelChatParamsSchema), async (c) => {
     const params = c.req.valid('param');

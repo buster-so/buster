@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { SnowflakeCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { SnowflakeAdapter } from './snowflake';
 
 // Check if Snowflake test credentials are available

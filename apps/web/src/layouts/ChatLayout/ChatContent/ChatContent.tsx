@@ -11,12 +11,14 @@ import { ChatMessageBlock } from './ChatMessageBlock';
 import { FollowUpChatInput } from './FollowupChatInput';
 
 const autoClass = 'mx-auto max-w-[600px] w-full';
+const screenshotAutoClass = 'mx-auto max-w-full w-full';
 
 export const ChatContent: React.FC<{
   chatId: string | undefined;
   isEmbed: boolean;
+  isScreenshotMode: boolean;
   doNotScrollToBottom: boolean;
-}> = React.memo(({ chatId, isEmbed, doNotScrollToBottom }) => {
+}> = React.memo(({ chatId, isEmbed, isScreenshotMode, doNotScrollToBottom }) => {
   const chatMessageIds = useGetChatMessageIds(chatId);
   const containerRef = useRef<HTMLElement>(null);
 
@@ -47,7 +49,7 @@ export const ChatContent: React.FC<{
       >
         <ClientOnly>
           {chatMessageIds?.map((messageId, index) => (
-            <div key={messageId} className={autoClass}>
+            <div key={messageId} className={isScreenshotMode ? screenshotAutoClass : autoClass}>
               <ChatMessageBlock
                 key={messageId}
                 messageId={messageId}

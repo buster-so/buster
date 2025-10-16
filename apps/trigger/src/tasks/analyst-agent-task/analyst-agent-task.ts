@@ -1,9 +1,15 @@
 import { randomUUID } from 'node:crypto';
-import { logger, schemaTask, tasks } from '@trigger.dev/sdk';
-import { analystQueue } from '../../queues/analyst-queue';
-import type { TakeChatScreenshotTrigger } from '../../tasks/screenshots/schemas';
-import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './types';
-
+// Access control imports
+import { getPermissionedDatasets, type PermissionedDataset } from '@buster/access-controls';
+// AI package imports
+import {
+  type AnalystWorkflowInput,
+  currentSpan,
+  initLogger,
+  type ModelMessage,
+  runAnalystWorkflow,
+  wrapTraced,
+} from '@buster/ai';
 // Task 2 & 4: Database helpers (IMPLEMENTED)
 import {
   getBraintrustMetadata,
@@ -16,22 +22,18 @@ import {
   updateMessage,
   updateMessageEntries,
 } from '@buster/database/queries';
-
-// Access control imports
-import { type PermissionedDataset, getPermissionedDatasets } from '@buster/access-controls';
-
-// AI package imports
-import {
-  type AnalystWorkflowInput,
-  type ModelMessage,
-  currentSpan,
-  initLogger,
-  runAnalystWorkflow,
-  wrapTraced,
-} from '@buster/ai';
+import { logger, schemaTask, tasks } from '@trigger.dev/sdk';
+import { analystQueue } from '../../queues/analyst-queue';
+import type { TakeChatScreenshotTrigger } from '../../tasks/screenshots/schemas';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 import { screenshots_task_keys } from '../screenshots/task-keys';
 import { analyst_agent_task_keys } from './task-keys';
+import {
+  AnalystAgentTaskInputSchema,
+  AnalystAgentTaskInputSchema,
+  type AnalystAgentTaskOutput,
+  type AnalystAgentTaskOutput,
+} from './types';
 
 /**
  * Resource usage tracker for the entire task execution
@@ -246,7 +248,6 @@ function logPerformanceMetrics(
  *
  * All tasks 1-5 are fully implemented and integrated. Workflow integration is complete and functional.
  */
-//@ts-ignore
 export const analystAgentTask: ReturnType<
   typeof schemaTask<
     typeof analyst_agent_task_keys.analyst_agent_task,

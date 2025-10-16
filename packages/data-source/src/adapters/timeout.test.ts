@@ -4,8 +4,8 @@ import type {
   MySQLCredentials,
   PostgreSQLCredentials,
   RedshiftCredentials,
-  SQLServerCredentials,
   SnowflakeCredentials,
+  SQLServerCredentials,
 } from '../types/credentials';
 import { BigQueryAdapter } from './bigquery';
 import { MySQLAdapter } from './mysql';

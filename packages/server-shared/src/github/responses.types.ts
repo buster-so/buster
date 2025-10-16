@@ -50,8 +50,7 @@ export const GetGitHubIntegrationResponseSchema = z.object({
       github_org_id: z.string(),
       installation_id: z.string(),
       installed_at: z.string().datetime(),
-      last_used_at: z.string().datetime().optional(),
-      repository_count: z.number().optional(),
+      last_used_at: z.string().datetime().nullable().optional(),
     })
     .optional(),
 });

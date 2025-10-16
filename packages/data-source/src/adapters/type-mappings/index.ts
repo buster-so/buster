@@ -9,9 +9,9 @@ import { getMySQLSimpleType, mapMySQLType } from './mysql';
 import { getPostgreSQLSimpleType, mapPostgreSQLType } from './postgresql';
 import { getSnowflakeSimpleType, mapSnowflakeType } from './snowflake';
 
-export * from './postgresql';
-export * from './mysql';
 export * from './bigquery';
+export * from './mysql';
+export * from './postgresql';
 export * from './snowflake';
 
 /**

@@ -6,11 +6,11 @@
 
 import { z } from 'zod';
 import {
+  createUniqueKey,
   type DeduplicationResult,
   DeduplicationResultSchema,
   type SearchableValue,
   SearchableValueSchema,
-  createUniqueKey,
 } from './types';
 
 // ============================================================================

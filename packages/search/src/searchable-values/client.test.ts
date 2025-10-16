@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  TurbopufferError,
   createNamespaceIfNotExists,
   deleteSearchableValues,
   getAllSearchableValues,
   queryExistingKeys,
+  TurbopufferError,
   upsertSearchableValues,
 } from './client';
 import type { SearchableValue, TurbopufferQuery } from './types';

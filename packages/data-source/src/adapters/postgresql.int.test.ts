@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { PostgreSQLCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { PostgreSQLAdapter } from './postgresql';
 
 // Check if PostgreSQL test credentials are available

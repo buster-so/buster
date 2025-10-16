@@ -2,11 +2,11 @@ import { promises as fs } from 'node:fs';
 import type { Sandbox } from '@daytonaio/sdk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  type FileInput,
-  type UploadOptions,
   addFiles,
+  type FileInput,
   joinPaths,
   normalizePath,
+  type UploadOptions,
   uploadDirectory,
   uploadMultipleFiles,
   uploadSingleFile,

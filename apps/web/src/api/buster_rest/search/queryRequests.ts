@@ -37,11 +37,10 @@ export const useSearchInfinite = ({
   enabled?: boolean;
   mounted?: boolean;
 }) => {
-  const { searchQuery } = params;
   return useInfiniteScroll<SearchTextData>({
     queryKey: ['search', 'results', 'infinite', params] as const,
-    staleTime: 1000 * 45, // 45 seconds
-    queryFn: ({ pageParam = 1 }) => search({ query: searchQuery, page: pageParam, ...params }),
+    staleTime: 1000 * 40, // 40 seconds
+    queryFn: ({ pageParam = 1 }) => search({ page: pageParam, ...params }),
     placeholderData: keepPreviousData,
     enabled,
     scrollConfig,

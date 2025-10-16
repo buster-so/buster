@@ -14,3 +14,12 @@ export const useIsEmbed = () => {
 
   return !!embedMatch || !!screenshotMatch;
 };
+
+export const useIsScreenshotMode = () => {
+  const matchRoute = useMatchRoute();
+  const screenshotMatch = matchRoute({
+    to: '/screenshots',
+    fuzzy: true,
+  });
+  return !!screenshotMatch;
+};

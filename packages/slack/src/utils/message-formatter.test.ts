@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MessageTemplates,
   createActionsBlock,
   createContextBlock,
   createDividerBlock,
@@ -11,6 +10,7 @@ import {
   formatLink,
   formatSimpleMessage,
   formatUserMention,
+  MessageTemplates,
 } from './message-formatter';
 
 describe('message-formatter', () => {
