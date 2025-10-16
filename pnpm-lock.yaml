@@ -350,7 +350,11 @@ importers:
         specifier: ^4.17.12
         version: 4.17.12
 
-  apps/supabase: {}
+  apps/supabase:
+    dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
 
   apps/trigger:
     dependencies:
