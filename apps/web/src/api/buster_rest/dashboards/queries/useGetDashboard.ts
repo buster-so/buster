@@ -148,7 +148,6 @@ export const prefetchGetDashboardsList = async (
 
   const lastQueryKey = options.queryKey[options.queryKey.length - 1];
   const compiledParams = lastQueryKey as Parameters<typeof dashboardsGetList>[0];
-
   await queryClient.prefetchQuery({
     ...options,
     queryFn: () => dashboardsGetList(compiledParams),

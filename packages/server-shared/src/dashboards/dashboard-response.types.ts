@@ -23,6 +23,8 @@ export const GetDashboardResponseSchema = z.object({
 
 // PUT Dashboard response schema - reuses the same structure as GET
 export const UpdateDashboardResponseSchema = GetDashboardResponseSchema;
+export const PostDashboardResponseSchema = GetDashboardResponseSchema;
 
 export type GetDashboardResponse = z.infer<typeof GetDashboardResponseSchema>;
+export type PostDashboardResponse = z.infer<typeof PostDashboardResponseSchema>;
 export type UpdateDashboardResponse = z.infer<typeof UpdateDashboardResponseSchema>;

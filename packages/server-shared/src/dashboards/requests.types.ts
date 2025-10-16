@@ -25,8 +25,16 @@ export const UpdateDashboardRequestSchema = z.object({
   restore_to_version: z.number().optional(),
 });
 
+export const PostDashboardRequestSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  config: DashboardConfigSchema.optional(),
+  file: z.string().optional(),
+});
+
 // Export inferred types
 export type GetDashboardParams = z.infer<typeof GetDashboardParamsSchema>;
 export type GetDashboardQuery = z.infer<typeof GetDashboardQuerySchema>;
 export type UpdateDashboardParams = z.infer<typeof UpdateDashboardParamsSchema>;
 export type UpdateDashboardRequest = z.infer<typeof UpdateDashboardRequestSchema>;
+export type PostDashboardRequest = z.infer<typeof PostDashboardRequestSchema>;
