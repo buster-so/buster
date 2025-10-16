@@ -1,6 +1,10 @@
 {
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
     "build:standalone": {
       "dependsOn": ["build"],
       "outputs": ["dist/buster"],
