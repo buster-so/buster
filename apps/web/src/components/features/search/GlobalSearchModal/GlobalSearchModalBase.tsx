@@ -44,6 +44,8 @@ export const GlobalSearchModalBase = ({
   const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
+  const showBottomLoading = items.length >= 20;
+
   // const resetModal = () => {
   //   setViewedItem(null);
   //   onChangeValue('');
@@ -141,6 +143,7 @@ export const GlobalSearchModalBase = ({
       placeholder="Search..."
       loading={loading}
       showTopLoading={true}
+      showBottomLoading={showBottomLoading}
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent && !!viewedItem}
       shouldFilter={false}

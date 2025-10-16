@@ -44,6 +44,7 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   placeholder?: string;
   loading?: boolean;
   showTopLoading?: boolean;
+  showBottomLoading?: boolean;
   secondaryContent?: React.ReactNode | null;
   openSecondaryContent?: boolean; //if undefined it will close and open with the secondary content
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
