@@ -5,9 +5,9 @@ import type { Sandbox } from '@daytonaio/sdk';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createSandbox } from '../management/create-sandbox';
 import {
+  addFiles,
   type FileInput,
   type UploadProgress,
-  addFiles,
   uploadDirectory,
   uploadMultipleFiles,
 } from './add-files';
