@@ -19,11 +19,7 @@
               "id": "4c33a67d-498a-4f69-91a7-60282bae8677"
             }
           ],
-          "columnSizes": [
-            4,
-            4,
-            4
-          ]
+          "columnSizes": [4, 4, 4]
         },
         {
           "id": "2",
@@ -38,11 +34,7 @@
               "id": "4ec85989-76ac-4cec-8aa1-e64c5d7d5266"
             }
           ],
-          "columnSizes": [
-            4,
-            4,
-            4
-          ]
+          "columnSizes": [4, 4, 4]
         }
       ],
       "description": "Key performance indicators dashboard showing overall business health including revenue, orders, customers, profitability, and operational efficiency metrics for the last 12 months"
@@ -74,11 +66,7 @@
                   "id": "4c33a67d-498a-4f69-91a7-60282bae8677"
                 }
               ],
-              "columnSizes": [
-                4,
-                4,
-                4
-              ]
+              "columnSizes": [4, 4, 4]
             },
             {
               "id": "2",
@@ -93,11 +81,7 @@
                   "id": "4ec85989-76ac-4cec-8aa1-e64c5d7d5266"
                 }
               ],
-              "columnSizes": [
-                4,
-                4,
-                4
-              ]
+              "columnSizes": [4, 4, 4]
             }
           ],
           "description": "Key performance indicators dashboard showing overall business health including revenue, orders, customers, profitability, and operational efficiency metrics for the last 12 months"
@@ -134,11 +118,7 @@
               "id": "68602202-5d06-45dd-89f3-e971c6ca03b1"
             }
           ],
-          "columnSizes": [
-            4,
-            4,
-            4
-          ]
+          "columnSizes": [4, 4, 4]
         },
         {
           "id": "2",
@@ -147,9 +127,7 @@
               "id": "f4dc4702-f67f-4aef-810e-6b428129c287"
             }
           ],
-          "columnSizes": [
-            12
-          ]
+          "columnSizes": [12]
         },
         {
           "id": "3",
@@ -161,10 +139,7 @@
               "id": "d8f114f9-afa1-4411-8969-87d790dd2a7c"
             }
           ],
-          "columnSizes": [
-            6,
-            6
-          ]
+          "columnSizes": [6, 6]
         },
         {
           "id": "4",
@@ -176,10 +151,7 @@
               "id": "0f2bad93-6e30-47c3-9dd7-96754a123f4c"
             }
           ],
-          "columnSizes": [
-            6,
-            6
-          ]
+          "columnSizes": [6, 6]
         }
       ],
       "description": "Comprehensive sales performance dashboard showing revenue trends, order volume, average order value, and breakdowns by product category and territory for the last 6 months"
@@ -211,11 +183,7 @@
                   "id": "68602202-5d06-45dd-89f3-e971c6ca03b1"
                 }
               ],
-              "columnSizes": [
-                4,
-                4,
-                4
-              ]
+              "columnSizes": [4, 4, 4]
             },
             {
               "id": "2",
@@ -224,9 +192,7 @@
                   "id": "f4dc4702-f67f-4aef-810e-6b428129c287"
                 }
               ],
-              "columnSizes": [
-                12
-              ]
+              "columnSizes": [12]
             },
             {
               "id": "3",
@@ -238,10 +204,7 @@
                   "id": "d8f114f9-afa1-4411-8969-87d790dd2a7c"
                 }
               ],
-              "columnSizes": [
-                6,
-                6
-              ]
+              "columnSizes": [6, 6]
             },
             {
               "id": "4",
@@ -253,10 +216,7 @@
                   "id": "0f2bad93-6e30-47c3-9dd7-96754a123f4c"
                 }
               ],
-              "columnSizes": [
-                6,
-                6
-              ]
+              "columnSizes": [6, 6]
             }
           ],
           "description": "Comprehensive sales performance dashboard showing revenue trends, order volume, average order value, and breakdowns by product category and territory for the last 6 months"
@@ -290,10 +250,7 @@
               "id": "2067deb5-33f5-4bd6-9f15-a411f1848187"
             }
           ],
-          "columnSizes": [
-            6,
-            6
-          ]
+          "columnSizes": [6, 6]
         },
         {
           "id": "2",
@@ -305,10 +262,7 @@
               "id": "1739379e-8e11-44bf-874a-63ac4bbb35a0"
             }
           ],
-          "columnSizes": [
-            6,
-            6
-          ]
+          "columnSizes": [6, 6]
         }
       ],
       "description": "Comprehensive overview of current inventory levels, incoming inventory from suppliers, outgoing inventory to customers, and recent shipment activity"
@@ -337,10 +291,7 @@
                   "id": "2067deb5-33f5-4bd6-9f15-a411f1848187"
                 }
               ],
-              "columnSizes": [
-                6,
-                6
-              ]
+              "columnSizes": [6, 6]
             },
             {
               "id": "2",
@@ -352,10 +303,7 @@
                   "id": "1739379e-8e11-44bf-874a-63ac4bbb35a0"
                 }
               ],
-              "columnSizes": [
-                6,
-                6
-              ]
+              "columnSizes": [6, 6]
             }
           ],
           "description": "Comprehensive overview of current inventory levels, incoming inventory from suppliers, outgoing inventory to customers, and recent shipment activity"
