@@ -28,12 +28,7 @@ import type { TakeChatScreenshotTrigger } from '../../tasks/screenshots/schemas'
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 import { screenshots_task_keys } from '../screenshots/task-keys';
 import { analyst_agent_task_keys } from './task-keys';
-import {
-  AnalystAgentTaskInputSchema,
-  AnalystAgentTaskInputSchema,
-  type AnalystAgentTaskOutput,
-  type AnalystAgentTaskOutput,
-} from './types';
+import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './types';
 
 /**
  * Resource usage tracker for the entire task execution
