@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
-    "dotenv": "catalog:"
+    "dotenv": "catalog:",
+    "@biomejs/biome": "2.2.6"
   }
 }
