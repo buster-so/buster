@@ -5,7 +5,7 @@ import { HTTPException } from 'hono/http-exception';
 import { requireAuth } from '../../../../../middleware/auth';
 import { storeInstallationState } from '../../services/installation-state';
 
-const app = new Hono().get('/', requireAuth, async (c) => {
+const app = new Hono().post('/', requireAuth, async (c) => {
   const user = c.get('busterUser');
   console.info('Github app/install received');
   const response = await appInstallHandler(user.id);

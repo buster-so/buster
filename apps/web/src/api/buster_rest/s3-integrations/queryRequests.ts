@@ -1,5 +1,5 @@
 import type { CreateS3IntegrationRequest } from '@buster/server-shared/s3-integrations';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { s3IntegrationsQueryKeys } from '@/api/query_keys/s3Integrations';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -12,6 +12,14 @@ export const useGetS3Integration = (enabled = true) => {
     queryFn: getS3Integration,
     enabled,
   });
+};
+
+export const prefetchS3Integration = async (queryClient: QueryClient) => {
+  await queryClient.prefetchQuery({
+    ...s3IntegrationsQueryKeys.s3IntegrationGet,
+    queryFn: getS3Integration,
+  });
+  return queryClient.getQueryData(s3IntegrationsQueryKeys.s3IntegrationGet.queryKey);
 };
 
 // POST /api/v2/s3-integrations
