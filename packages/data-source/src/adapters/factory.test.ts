@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type {
   BigQueryCredentials,
   Credentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   RedshiftCredentials,
-  SQLServerCredentials,
   SnowflakeCredentials,
+  SQLServerCredentials,
 } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { createAdapterInstance, getSupportedTypes, isSupported } from './factory';
 
 // Type for testing unsupported data source types

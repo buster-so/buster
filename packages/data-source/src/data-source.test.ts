@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DatabaseAdapter } from './adapters/base';
-import { DataSource, QueryRouter } from './data-source';
 import type { DataSourceConfig } from './data-source';
+import { DataSource, QueryRouter } from './data-source';
 import type { DataSourceIntrospector } from './introspection/base';
 import { DataSourceType } from './types/credentials';
 

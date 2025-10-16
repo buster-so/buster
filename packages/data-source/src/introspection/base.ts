@@ -1,8 +1,8 @@
 import type {
   Column,
   ColumnStatistics,
-  DataSourceIntrospectionResult,
   Database,
+  DataSourceIntrospectionResult,
   ForeignKey,
   Index,
   Schema,

@@ -1,5 +1,5 @@
 import { getS3IntegrationByOrganizationId, getSecretByName } from '@buster/database/queries';
-import { type Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { createGCSProvider } from './providers/gcs-provider';
 import { createR2Provider } from './providers/r2-provider';
 import { createS3Provider } from './providers/s3-provider';
