@@ -1,3 +1,9 @@
+export {
+  type CreateDashboardInput,
+  CreateDashboardInputSchema,
+  type CreateDashboardOutput,
+  createDashboard,
+} from './create-dashboard';
 export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';
 export {
   type DashboardFile,

@@ -29,7 +29,6 @@ export const PostDashboardRequestSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   config: DashboardConfigSchema.optional(),
-  file: z.string().optional(),
 });
 
 // Export inferred types
