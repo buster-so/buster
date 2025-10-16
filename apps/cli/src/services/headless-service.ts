@@ -10,6 +10,7 @@ import { runChatAgent } from './chat-service';
 export const HeadlessServiceParamsSchema = z.object({
   prompt: z.string().min(1).describe('User prompt to send to the agent'),
   chatId: z.string().uuid().optional().describe('Existing chat session ID to resume'),
+  messageId: z.string().uuid().optional().describe('Message ID for tracking'),
   workingDirectory: z.string().default(process.cwd()).describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
 });
@@ -22,10 +23,18 @@ export type HeadlessServiceParams = z.infer<typeof HeadlessServiceParamsSchema>;
  */
 export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<string> {
   const validated = HeadlessServiceParamsSchema.parse(params);
-  const { prompt, chatId: providedChatId, workingDirectory, isInResearchMode } = validated;
+  const {
+    prompt,
+    chatId: providedChatId,
+    messageId: providedMessageId,
+    workingDirectory,
+    isInResearchMode,
+  } = validated;
 
   // Use provided chatId or generate new one
   const chatId = providedChatId || randomUUID();
+  // Use provided messageId or generate new one
+  const messageId = providedMessageId || randomUUID();
 
   // Load existing conversation or start fresh
   const conversation = await loadConversation(chatId, workingDirectory);
@@ -46,8 +55,11 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
   // Run agent with silent callbacks
   await runChatAgent({
     chatId,
+    messageId,
     workingDirectory,
     isInResearchMode,
+    prompt, // Pass prompt for database message creation
+    messages: updatedMessages, // Pass all messages including new user message
   });
 
   return chatId;

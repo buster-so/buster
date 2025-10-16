@@ -3,6 +3,8 @@ import type {
   LanguageModelV2CallOptions,
   LanguageModelV2StreamPart,
 } from '@ai-sdk/provider';
+import { wrapLanguageModel } from 'ai';
+import { BraintrustMiddleware } from 'braintrust';
 import { z } from 'zod';
 
 const ProxyModelConfigSchema = z.object({
@@ -197,4 +199,15 @@ export function createProxyModel(config: ProxyModelConfig): LanguageModelV2 {
       };
     },
   };
+}
+
+/**
+ * Creates a wrapped proxy model with Braintrust middleware for observability.
+ * This allows tracking all LLM calls made through the proxy at the CLI level.
+ */
+export function proxyModel(config: ProxyModelConfig) {
+  return wrapLanguageModel({
+    model: createProxyModel(config),
+    middleware: BraintrustMiddleware({ debug: true }),
+  });
 }

@@ -2,7 +2,14 @@ import { randomUUID } from 'node:crypto';
 // Access control imports
 import { getPermissionedDatasets, type PermissionedDataset } from '@buster/access-controls';
 // AI package imports
-import { type AnalystWorkflowInput, runAnalystWorkflow } from '@buster/ai';
+import {
+  type AnalystWorkflowInput,
+  currentSpan,
+  initLogger,
+  type ModelMessage,
+  runAnalystWorkflow,
+  wrapTraced,
+} from '@buster/ai';
 // Task 2 & 4: Database helpers (IMPLEMENTED)
 import {
   getBraintrustMetadata,
@@ -16,8 +23,6 @@ import {
   updateMessageEntries,
 } from '@buster/database/queries';
 import { logger, schemaTask, tasks } from '@trigger.dev/sdk';
-import type { ModelMessage } from 'ai';
-import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { analystQueue } from '../../queues/analyst-queue';
 import type { TakeChatScreenshotTrigger } from '../../tasks/screenshots/schemas';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
