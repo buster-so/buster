@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { prefetchGitHubIntegration } from '@/api/buster_rest/github';
 import { prefetchS3Integration } from '@/api/buster_rest/s3-integrations';
 import { prefetchSlackIntegration } from '@/api/buster_rest/slack';
 import { GithubIntegrations } from '@/components/features/integrations/GithubIntegrations';
@@ -21,6 +22,7 @@ export const Route = createFileRoute(
     await Promise.all([
       prefetchSlackIntegration(context.queryClient),
       prefetchS3Integration(context.queryClient),
+      prefetchGitHubIntegration(context.queryClient),
     ]);
   },
   component: RouteComponent,
