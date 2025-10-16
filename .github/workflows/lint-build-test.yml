@@ -127,9 +127,6 @@ jobs:
         with:
           cache-key: lint-build-test
 
-      - name: Build packages (restore from cache)
-        run: pnpm turbo build
-
       - name: Run all unit tests
         run: pnpm turbo test:unit
 
