@@ -1406,6 +1406,9 @@ importers:
 
   packages/slack:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../env-utils
