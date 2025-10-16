@@ -6,7 +6,7 @@ import {
   buildMetricResponse,
   fetchAndProcessMetricData,
 } from '../../../../shared-helpers/metric-helpers';
-import { getMetricHandler } from './GET';
+import { getMetricHandler } from './getMetricHandler';
 
 // Mock the metric helpers
 vi.mock('../../../../shared-helpers/metric-helpers', () => ({
