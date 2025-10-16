@@ -215,6 +215,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          install-supabase: 'true'
 
       - name: Pre-pull Docker images
         run: |

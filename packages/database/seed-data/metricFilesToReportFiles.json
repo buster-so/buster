@@ -1,0 +1,58 @@
+[
+  {
+    "metricFileId": "6ebd2875-30f3-42e1-bbf4-11dec97ad154",
+    "reportFileId": "906d6f10-be3f-40b9-b232-674296b35c43",
+    "createdAt": "2025-10-12 22:42:56.085+00",
+    "updatedAt": "2025-10-12 22:42:56.085+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "358d7e79-3e16-41f1-8b1a-ee89b89ac385",
+    "reportFileId": "906d6f10-be3f-40b9-b232-674296b35c43",
+    "createdAt": "2025-10-12 22:42:56.085+00",
+    "updatedAt": "2025-10-12 22:42:56.085+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "8357b9fb-10e2-4d1b-ae0a-c0c7093345bd",
+    "reportFileId": "edf0a6b5-3987-49b8-a98a-a9617f4935ea",
+    "createdAt": "2025-10-12 22:49:14.005+00",
+    "updatedAt": "2025-10-12 22:49:14.005+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "2067deb5-33f5-4bd6-9f15-a411f1848187",
+    "reportFileId": "5d1d529e-66c2-4fb7-9cc7-9da43bf4a2de",
+    "createdAt": "2025-10-12 22:50:29.301+00",
+    "updatedAt": "2025-10-12 22:50:29.301+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "3b332367-f33e-4de7-a4b5-0bd4cf0f3694",
+    "reportFileId": "d8a1fc17-99cb-48f5-9b3f-ea8fd3368c85",
+    "createdAt": "2025-10-12 22:52:17.677+00",
+    "updatedAt": "2025-10-12 22:52:17.677+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "1739379e-8e11-44bf-874a-63ac4bbb35a0",
+    "reportFileId": "dbc8e2bf-f5a1-4b2e-a564-770f611d1325",
+    "createdAt": "2025-10-12 22:54:13.995+00",
+    "updatedAt": "2025-10-12 22:54:13.995+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "98486855-7672-4a6b-a8ab-2a6b19c4328a",
+    "reportFileId": "716ae0b6-99d8-43c7-a775-c18d4781f180",
+    "createdAt": "2025-10-16 05:10:41.889+00",
+    "updatedAt": "2025-10-16 05:10:41.889+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  }
+]

@@ -1,0 +1,375 @@
+[
+  {
+    "id": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "name": "Business Performance KPIs",
+    "fileName": "Business Performance KPIs",
+    "content": {
+      "name": "Business Performance KPIs",
+      "rows": [
+        {
+          "id": "1",
+          "items": [
+            {
+              "id": "271fabca-b05d-4e12-84b7-1a2315051fac"
+            },
+            {
+              "id": "3b71f848-1b5e-40db-985d-38fab11a761a"
+            },
+            {
+              "id": "4c33a67d-498a-4f69-91a7-60282bae8677"
+            }
+          ],
+          "columnSizes": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2",
+          "items": [
+            {
+              "id": "007afd5b-d673-42b2-a0d1-f9a2afa2a9c9"
+            },
+            {
+              "id": "17362efb-a9c2-4081-8bd0-07aef93165f1"
+            },
+            {
+              "id": "4ec85989-76ac-4cec-8aa1-e64c5d7d5266"
+            }
+          ],
+          "columnSizes": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "description": "Key performance indicators dashboard showing overall business health including revenue, orders, customers, profitability, and operational efficiency metrics for the last 12 months"
+    },
+    "filter": null,
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:41:36.198+00",
+    "updatedAt": "2025-10-12 22:41:36.198+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": {
+          "name": "Business Performance KPIs",
+          "rows": [
+            {
+              "id": "1",
+              "items": [
+                {
+                  "id": "271fabca-b05d-4e12-84b7-1a2315051fac"
+                },
+                {
+                  "id": "3b71f848-1b5e-40db-985d-38fab11a761a"
+                },
+                {
+                  "id": "4c33a67d-498a-4f69-91a7-60282bae8677"
+                }
+              ],
+              "columnSizes": [
+                4,
+                4,
+                4
+              ]
+            },
+            {
+              "id": "2",
+              "items": [
+                {
+                  "id": "007afd5b-d673-42b2-a0d1-f9a2afa2a9c9"
+                },
+                {
+                  "id": "17362efb-a9c2-4081-8bd0-07aef93165f1"
+                },
+                {
+                  "id": "4ec85989-76ac-4cec-8aa1-e64c5d7d5266"
+                }
+              ],
+              "columnSizes": [
+                4,
+                4,
+                4
+              ]
+            }
+          ],
+          "description": "Key performance indicators dashboard showing overall business health including revenue, orders, customers, profitability, and operational efficiency metrics for the last 12 months"
+        },
+        "updated_at": "2025-10-12T22:41:36.198Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "name": "Sales Performance Dashboard",
+    "fileName": "Sales Performance Dashboard",
+    "content": {
+      "name": "Sales Performance Dashboard",
+      "rows": [
+        {
+          "id": "1",
+          "items": [
+            {
+              "id": "2d150079-91d4-4611-8a7b-bfaec0c37d2d"
+            },
+            {
+              "id": "c988b4b4-0db5-49d7-b771-cf7db6900e96"
+            },
+            {
+              "id": "68602202-5d06-45dd-89f3-e971c6ca03b1"
+            }
+          ],
+          "columnSizes": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "id": "2",
+          "items": [
+            {
+              "id": "f4dc4702-f67f-4aef-810e-6b428129c287"
+            }
+          ],
+          "columnSizes": [
+            12
+          ]
+        },
+        {
+          "id": "3",
+          "items": [
+            {
+              "id": "7bb6d4e4-0a46-4caf-abe0-1000c807c587"
+            },
+            {
+              "id": "d8f114f9-afa1-4411-8969-87d790dd2a7c"
+            }
+          ],
+          "columnSizes": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "4",
+          "items": [
+            {
+              "id": "81679dcf-e928-46c8-9c05-129459403cfd"
+            },
+            {
+              "id": "0f2bad93-6e30-47c3-9dd7-96754a123f4c"
+            }
+          ],
+          "columnSizes": [
+            6,
+            6
+          ]
+        }
+      ],
+      "description": "Comprehensive sales performance dashboard showing revenue trends, order volume, average order value, and breakdowns by product category and territory for the last 6 months"
+    },
+    "filter": null,
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:44:04.803+00",
+    "updatedAt": "2025-10-12 22:44:04.803+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": {
+          "name": "Sales Performance Dashboard",
+          "rows": [
+            {
+              "id": "1",
+              "items": [
+                {
+                  "id": "2d150079-91d4-4611-8a7b-bfaec0c37d2d"
+                },
+                {
+                  "id": "c988b4b4-0db5-49d7-b771-cf7db6900e96"
+                },
+                {
+                  "id": "68602202-5d06-45dd-89f3-e971c6ca03b1"
+                }
+              ],
+              "columnSizes": [
+                4,
+                4,
+                4
+              ]
+            },
+            {
+              "id": "2",
+              "items": [
+                {
+                  "id": "f4dc4702-f67f-4aef-810e-6b428129c287"
+                }
+              ],
+              "columnSizes": [
+                12
+              ]
+            },
+            {
+              "id": "3",
+              "items": [
+                {
+                  "id": "7bb6d4e4-0a46-4caf-abe0-1000c807c587"
+                },
+                {
+                  "id": "d8f114f9-afa1-4411-8969-87d790dd2a7c"
+                }
+              ],
+              "columnSizes": [
+                6,
+                6
+              ]
+            },
+            {
+              "id": "4",
+              "items": [
+                {
+                  "id": "81679dcf-e928-46c8-9c05-129459403cfd"
+                },
+                {
+                  "id": "0f2bad93-6e30-47c3-9dd7-96754a123f4c"
+                }
+              ],
+              "columnSizes": [
+                6,
+                6
+              ]
+            }
+          ],
+          "description": "Comprehensive sales performance dashboard showing revenue trends, order volume, average order value, and breakdowns by product category and territory for the last 6 months"
+        },
+        "updated_at": "2025-10-12T22:44:04.803Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "2b685e73-ea18-472b-a662-5dc7aa7a7be5",
+    "name": "Inventory Dashboard",
+    "fileName": "Inventory Dashboard",
+    "content": {
+      "name": "Inventory Dashboard",
+      "rows": [
+        {
+          "id": "1",
+          "items": [
+            {
+              "id": "8357b9fb-10e2-4d1b-ae0a-c0c7093345bd"
+            },
+            {
+              "id": "2067deb5-33f5-4bd6-9f15-a411f1848187"
+            }
+          ],
+          "columnSizes": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "2",
+          "items": [
+            {
+              "id": "3b332367-f33e-4de7-a4b5-0bd4cf0f3694"
+            },
+            {
+              "id": "1739379e-8e11-44bf-874a-63ac4bbb35a0"
+            }
+          ],
+          "columnSizes": [
+            6,
+            6
+          ]
+        }
+      ],
+      "description": "Comprehensive overview of current inventory levels, incoming inventory from suppliers, outgoing inventory to customers, and recent shipment activity"
+    },
+    "filter": null,
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:55:13.05+00",
+    "updatedAt": "2025-10-12 22:55:13.05+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": {
+          "name": "Inventory Dashboard",
+          "rows": [
+            {
+              "id": "1",
+              "items": [
+                {
+                  "id": "8357b9fb-10e2-4d1b-ae0a-c0c7093345bd"
+                },
+                {
+                  "id": "2067deb5-33f5-4bd6-9f15-a411f1848187"
+                }
+              ],
+              "columnSizes": [
+                6,
+                6
+              ]
+            },
+            {
+              "id": "2",
+              "items": [
+                {
+                  "id": "3b332367-f33e-4de7-a4b5-0bd4cf0f3694"
+                },
+                {
+                  "id": "1739379e-8e11-44bf-874a-63ac4bbb35a0"
+                }
+              ],
+              "columnSizes": [
+                6,
+                6
+              ]
+            }
+          ],
+          "description": "Comprehensive overview of current inventory levels, incoming inventory from suppliers, outgoing inventory to customers, and recent shipment activity"
+        },
+        "updated_at": "2025-10-12T22:55:13.050Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  }
+]

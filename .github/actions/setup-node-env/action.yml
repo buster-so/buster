@@ -22,6 +22,10 @@ inputs:
     description: 'Optional cache key for the cache action'
     required: false
     default: 'default'
+  install-supabase:
+    description: 'Whether to install Supabase CLI'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -63,6 +67,7 @@ runs:
         bun-version: ${{ inputs.bun-version }}
 
     - name: Setup Supabase CLI
+      if: ${{ inputs.install-supabase == 'true' }}
       uses: supabase/setup-cli@v1
       with:
         version: latest
