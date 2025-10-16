@@ -134,6 +134,3 @@ steps:
       type: AI_ASSERTION
       assertion: Confirm /app/reports is in the url and there is a report with text
         and metric graphics
-  - id: e230c41a-b5a5-45ad-8e8b-10b85f6714ec
-    type: MODULE
-    moduleId: d5944b6b-f9c3-4952-8f0e-bec9bc31da95

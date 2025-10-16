@@ -27,12 +27,11 @@ steps:
   - id: 341f3233-f380-4acb-a00c-7987da78ffc7
     type: PRESET_ACTION
     command:
-      id: d48eee61-a38a-4065-b967-1bf1739a726e
+      id: 2a8b7f81-9b39-4c37-a86a-d1f93d9abca1
       type: CLICK
       target:
         type: description
-        elementDescriptor: On any Metric title from the list that does not already exist
-          under the Favorites on the left navigation panel
+        elementDescriptor: On div with 'Total Outgoing Inventory' text
   - id: 67c6dc53-130b-495c-b5f8-17207e93c285
     type: PRESET_ACTION
     command:
