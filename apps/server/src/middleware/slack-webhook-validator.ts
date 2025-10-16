@@ -1,7 +1,7 @@
 import {
-  type SlackWebhookPayload,
   handleUrlVerification,
   parseSlackWebhookPayload,
+  type SlackWebhookPayload,
   verifySlackRequest,
 } from '@buster/slack';
 import type { Context, MiddlewareHandler } from 'hono';

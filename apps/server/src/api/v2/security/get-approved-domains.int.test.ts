@@ -9,8 +9,8 @@ import { getApprovedDomainsHandler } from './get-approved-domains';
 import {
   cleanupTestOrganization,
   cleanupTestUser,
-  createTestOrgMemberInDb,
   createTestOrganizationInDb,
+  createTestOrgMemberInDb,
   createTestUserInDb,
   createUserWithoutOrganization,
 } from './test-db-utils';

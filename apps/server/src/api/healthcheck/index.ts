@@ -1,7 +1,7 @@
 import { dbPing } from '@buster/database/connection';
 import type { HealthCheckResponse } from '@buster/server-shared/healthcheck';
-import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { Hono } from 'hono';
 
 async function checkDatabase(): Promise<{
   status: 'pass' | 'fail' | 'warn';

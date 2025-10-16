@@ -1,7 +1,7 @@
 import type { User } from '@buster/database/queries';
 import { getDoc, getUserOrganizationId } from '@buster/database/queries';
 import { HTTPException } from 'hono/http-exception';
-import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { getDocHandler } from './GET';
 
 vi.mock('@buster/database/queries');

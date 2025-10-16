@@ -1,6 +1,6 @@
 import { hasAssetPermission } from '@buster/access-controls';
-import { executeMetricQuery, getCachedMetricData, setCachedMetricData } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
+import { executeMetricQuery, getCachedMetricData, setCachedMetricData } from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import {
   extractSqlFromMetricContent,

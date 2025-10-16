@@ -1,8 +1,10 @@
 import type { User } from '@buster/database/queries';
 import type { GetMetricResponse } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';
-import { fetchAndProcessMetricData } from '../../../../shared-helpers/metric-helpers';
-import { buildMetricResponse } from '../../../../shared-helpers/metric-helpers';
+import {
+  buildMetricResponse,
+  fetchAndProcessMetricData,
+} from '../../../../shared-helpers/metric-helpers';
 
 export interface GetMetricHandlerParams {
   metricId: string;

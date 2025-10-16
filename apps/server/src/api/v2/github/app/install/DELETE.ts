@@ -1,8 +1,8 @@
 import {
-  type User,
   getActiveGithubIntegration,
   getUserOrganizationId,
   softDeleteGithubIntegration,
+  type User,
 } from '@buster/database/queries';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';

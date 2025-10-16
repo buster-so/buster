@@ -3,20 +3,20 @@ import { getSecretByName } from '@buster/database/queries';
 import { chats, slackIntegrations } from '@buster/database/schema';
 import type { SlackEventsResponse } from '@buster/server-shared/slack';
 import {
-  SlackMessagingService,
-  type SlackWebhookPayload,
   addReaction,
   isAppMentionEvent,
   isEventCallback,
   isMessageImEvent,
+  SlackMessagingService,
+  type SlackWebhookPayload,
 } from '@buster/slack';
 import { tasks } from '@trigger.dev/sdk';
 import { and, eq } from 'drizzle-orm';
 import type { Context } from 'hono';
 import {
-  type SlackAuthenticationResult,
   authenticateSlackUser,
   getUserIdFromAuthResult,
+  type SlackAuthenticationResult,
 } from './services/slack-authentication';
 
 /**

@@ -135,10 +135,7 @@ export class SlackOAuthService {
   /**
    * Handle OAuth callback
    */
-  async handleOAuthCallback(params: {
-    code: string;
-    state: string;
-  }): Promise<{
+  async handleOAuthCallback(params: { code: string; state: string }): Promise<{
     success: boolean;
     integrationId: string;
     metadata?: OAuthMetadata;

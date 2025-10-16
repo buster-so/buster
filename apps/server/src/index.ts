@@ -1,8 +1,8 @@
+// Load environment variables from root .env file
+import { loadRootEnv } from '@buster/env-utils';
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-// Load environment variables from root .env file
-import { loadRootEnv } from '@buster/env-utils';
 loadRootEnv();
 
 // Initialize Braintrust logger
@@ -11,14 +11,13 @@ import { initBraintrustLogger } from '@buster/ai';
 // Initialize Braintrust logger
 initBraintrustLogger();
 
-// Import custom middleware
-import { corsMiddleware } from './middleware/cors';
-import { loggerMiddleware } from './middleware/logger';
-
 import { HTTPException } from 'hono/http-exception';
 import healthcheckRoutes from './api/healthcheck';
 // Import API route modules
 import v2Routes from './api/v2';
+// Import custom middleware
+import { corsMiddleware } from './middleware/cors';
+import { loggerMiddleware } from './middleware/logger';
 
 export const runtime = 'nodejs';
 

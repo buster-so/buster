@@ -2,14 +2,13 @@ import {
   getActiveGithubIntegration,
   getGithubIntegrationByInstallationId,
 } from '@buster/database/queries';
-import type { InstallationTokenResponse } from '@buster/server-shared/github';
-import { GitHubErrorCode } from '@buster/server-shared/github';
-
 import {
   generateNewInstallationToken,
   isTokenExpired,
   retrieveInstallationToken,
 } from '@buster/github';
+import type { InstallationTokenResponse } from '@buster/server-shared/github';
+import { GitHubErrorCode } from '@buster/server-shared/github';
 
 /**
  * Get an installation token for a specific installation ID

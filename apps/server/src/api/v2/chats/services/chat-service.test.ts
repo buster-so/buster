@@ -1,9 +1,5 @@
-import type { Chat, Message } from '@buster/database/queries';
-import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { initializeChat } from './chat-service';
-
 import { checkPermission } from '@buster/access-controls';
+import type { Chat, Message } from '@buster/database/queries';
 // Import mocked functions
 import {
   createChat,
@@ -13,6 +9,9 @@ import {
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
 } from '@buster/database/queries';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { initializeChat } from './chat-service';
 
 const mockUser = {
   id: '550e8400-e29b-41d4-a716-446655440001',

@@ -1,11 +1,11 @@
-import { type Credentials, DataSourceType, createAdapter } from '@buster/data-source';
+import { type Credentials, createAdapter, DataSourceType } from '@buster/data-source';
 import { getDataSourceCredentials } from '@buster/database/queries';
 import type {
+  ApiKeyContext,
   GetMetadataRequest,
   GetMetadataResponse,
   GetTableStatisticsOutput,
 } from '@buster/server-shared';
-import type { ApiKeyContext } from '@buster/server-shared';
 import { runs, tasks } from '@trigger.dev/sdk';
 import { HTTPException } from 'hono/http-exception';
 
@@ -15,7 +15,7 @@ import { HTTPException } from 'hono/http-exception';
  */
 function validateIdentifier(identifier: string, fieldName: string): void {
   // Allow alphanumeric, underscores, hyphens, dots, and spaces (for some database names)
-  const validPattern = /^[a-zA-Z0-9_\-\.\s]+$/;
+  const validPattern = /^[a-zA-Z0-9_\-.\s]+$/;
 
   if (!validPattern.test(identifier)) {
     throw new HTTPException(400, {

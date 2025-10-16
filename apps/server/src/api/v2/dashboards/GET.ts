@@ -1,4 +1,4 @@
-import { type User, listDashboards } from '@buster/database/queries';
+import { listDashboards, type User } from '@buster/database/queries';
 import {
   GetDashboardsQuerySchema,
   type GetDashboardsResponse,

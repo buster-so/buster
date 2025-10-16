@@ -32,7 +32,7 @@
     "@buster/vitest-config": "workspace:*",
     "@buster/env-utils": "workspace:*",
     "@buster/server-shared": "workspace:*",
-    "@biomejs/biome": "2.2.6",
+
     "zod": "catalog:"
   },
   "devDependencies": {

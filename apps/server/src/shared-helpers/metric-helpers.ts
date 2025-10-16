@@ -1,16 +1,16 @@
 import { checkPermission } from '@buster/access-controls';
 import {
-  type MetricFile,
-  type User,
   getAssetsAssociatedWithMetric,
   getMetricFileById,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
+  type MetricFile,
+  type User,
 } from '@buster/database/queries';
 import {
   type ChartConfigProps,
-  DEFAULT_CHART_THEME,
   type DataMetadata,
+  DEFAULT_CHART_THEME,
   type GetMetricResponse,
   type Metric,
   type MetricYml,

@@ -1,5 +1,6 @@
 import { type Credentials, createAdapter, toCredentials } from '@buster/data-source';
 import { db } from '@buster/database/connection';
+import type { User } from '@buster/database/queries';
 import {
   deleteLogsWriteBackConfig,
   getDataSourceByName,
@@ -9,7 +10,6 @@ import {
   upsertDoc,
   upsertLogsWriteBackConfig,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import { dataSources } from '@buster/database/schema';
 import type { deploy } from '@buster/server-shared';
 import { and, eq, isNull } from 'drizzle-orm';

@@ -54,7 +54,7 @@
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
     "dayjs": "catalog:",
-    "@biomejs/biome": "2.2.6",
+
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",

@@ -25,7 +25,7 @@
     "@buster/ai": "workspace:*",
     "@buster/sdk": "workspace:*",
     "@buster/server-shared": "workspace:*",
-    "@biomejs/biome": "2.2.6",
+
     "chalk": "^5.6.2",
     "commander": "^14.0.1",
     "fast-glob": "^3.3.3",

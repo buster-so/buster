@@ -3,8 +3,8 @@ import {
   getGithubIntegrationByInstallationId,
   updateGithubIntegration,
 } from '@buster/database/queries';
-import { AuthDetailsAppInstallationResponseSchema, createGitHubApp } from '@buster/github';
 import type { App, WebhookEventName } from '@buster/github';
+import { AuthDetailsAppInstallationResponseSchema, createGitHubApp } from '@buster/github';
 import { runDocsAgent } from '@buster/sandbox';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
