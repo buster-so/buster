@@ -2,7 +2,7 @@ import { program as commander } from 'commander';
 import { render } from 'ink';
 import { Main } from '../commands/main/main';
 import { getCurrentVersion } from '../commands/update/update-handler';
-import { runHeadless } from '../services/headless-handler';
+import { runHeadlessAgent } from '../services';
 import { setupPreActionHook } from './hooks';
 
 interface RootOptions {
@@ -33,8 +33,9 @@ program.action(async (options: RootOptions) => {
   // Check if running in headless mode
   if (options.prompt) {
     try {
-      const chatId = await runHeadless({
+      const chatId = await runHeadlessAgent({
         prompt: options.prompt,
+        workingDirectory: process.cwd(),
         ...(options.chatId && { chatId: options.chatId }),
         ...(options.research && { isInResearchMode: options.research }),
       });

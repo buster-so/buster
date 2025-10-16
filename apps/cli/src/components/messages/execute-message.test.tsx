@@ -1,10 +1,10 @@
 import { render } from 'ink-testing-library';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AgentMessage } from '../types/agent-messages';
+import type { AgentMessage } from '../../types/agent-messages';
 import { ExecuteMessage } from './execute-message';
 
 // Mock the useExpansion hook
-vi.mock('../hooks/use-expansion', () => ({
+vi.mock('../../hooks/use-expansion', () => ({
   useExpansion: vi.fn(() => [false, vi.fn()]),
 }));
 

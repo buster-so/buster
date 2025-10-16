@@ -1,20 +1,19 @@
 import { Box, Text, useApp, useInput } from 'ink';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AgentMessageComponent,
   ChatFooter,
-  type ChatHistoryEntry,
   ChatInput,
   ChatIntroText,
   ChatTitle,
   ChatVersionTagline,
+  HistoryBrowser,
+  SettingsForm,
   VimStatus,
-} from '../../components/chat-layout';
-import { HistoryBrowser } from '../../components/history-browser';
-import { AgentMessageComponent } from '../../components/message';
-import { SettingsForm } from '../../components/settings-form';
+} from '../../components';
 import { ExpansionContext } from '../../hooks/use-expansion';
-import type { CliAgentMessage } from '../../services/analytics-engineer-handler';
-import { runAnalyticsEngineerAgent } from '../../services/analytics-engineer-handler';
+import type { CliAgentMessage } from '../../services';
+import { runChatAgent } from '../../services';
 import type { Conversation } from '../../utils/conversation-history';
 import { loadConversation, saveModelMessages } from '../../utils/conversation-history';
 import { getCurrentChatId, initNewSession, setSessionChatId } from '../../utils/session';
@@ -24,6 +23,11 @@ import { transformModelMessagesToUI } from '../../utils/transform-messages';
 import type { VimMode } from '../../utils/vim-mode';
 
 type AppMode = 'Planning' | 'Auto-accept' | 'None';
+
+interface ChatHistoryEntry {
+  id: number;
+  value: string;
+}
 
 export function Main() {
   const { exit } = useApp();
@@ -45,8 +49,7 @@ export function Main() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream
-  // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
-  const handleMessageUpdate = useCallback((modelMessages: any[]) => {
+  const handleMessageUpdate = useCallback((modelMessages: import('@buster/ai').ModelMessage[]) => {
     const transformedMessages = transformModelMessagesToUI(modelMessages);
 
     // Update message counter to highest ID
@@ -122,12 +125,11 @@ export function Main() {
       // Load existing model messages and append the new user message
       const conversation = await loadConversation(chatId, cwd);
       const existingModelMessages = conversation?.modelMessages || [];
-      const userMessage = {
+      const userMessage: import('@buster/ai').ModelMessage = {
         role: 'user',
         content: trimmed,
       };
-      // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
-      const updatedModelMessages = [...existingModelMessages, userMessage] as any;
+      const updatedModelMessages = [...existingModelMessages, userMessage];
 
       // Update UI state immediately
       handleMessageUpdate(updatedModelMessages);
@@ -144,15 +146,19 @@ export function Main() {
       abortControllerRef.current = abortController;
 
       // Run agent with callback for message updates
-      await runAnalyticsEngineerAgent({
-        chatId,
-        workingDirectory: cwd,
-        abortSignal: abortController.signal,
-        onThinkingStateChange: (thinking) => {
-          setIsThinking(thinking);
+      await runChatAgent(
+        {
+          chatId,
+          workingDirectory: cwd,
+          abortSignal: abortController.signal,
         },
-        onMessageUpdate: handleMessageUpdate,
-      });
+        {
+          onThinkingStateChange: (thinking) => {
+            setIsThinking(thinking);
+          },
+          onMessageUpdate: handleMessageUpdate,
+        }
+      );
     } catch (error) {
       // Handle abort gracefully
       if (error instanceof Error && error.name === 'AbortError') {

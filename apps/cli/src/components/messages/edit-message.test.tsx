@@ -1,14 +1,14 @@
 import { render } from 'ink-testing-library';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AgentMessage } from '../types/agent-messages';
+import type { AgentMessage } from '../../types/agent-messages';
 import { EditMessage } from './edit-message';
 
 // Mock hooks and utilities
-vi.mock('../hooks/use-expansion', () => ({
+vi.mock('../../hooks/use-expansion', () => ({
   useExpansion: vi.fn(() => [false, vi.fn()]),
 }));
 
-vi.mock('../utils/file-path', () => ({
+vi.mock('../../utils/file-path', () => ({
   getRelativePath: vi.fn((path: string) => path.replace('/Users/test/project/', '')),
 }));
 

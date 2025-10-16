@@ -1,5 +1,5 @@
 import { Box, Text } from 'ink';
-import type { SlashCommand } from '../utils/slash-commands';
+import type { SlashCommand } from '../../utils/slash-commands';
 
 interface CommandAutocompleteProps {
   commands: SlashCommand[];
