@@ -5,7 +5,8 @@ import { DatasetsIndividualLayout } from '@/controllers/DatasetsControllers/Data
 
 export const Route = createFileRoute('/app/_app/datasets/$datasetId')({
   beforeLoad: async ({ params, matches }) => {
-    const isDatasetRoot = last(matches)?.pathname === '/app/datasets/$datasetId';
+    const isDatasetRoot = last(matches)?.fullPath === Route.fullPath;
+
     if (isDatasetRoot) {
       throw redirect({
         to: '/app/datasets/$datasetId/overview',
