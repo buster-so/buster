@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { updateMessageEntries } from '@buster/database/queries';
 import type { ToolCallOptions } from 'ai';
 import {
-  OptimisticJsonParser,
   getOptimisticValue,
+  OptimisticJsonParser,
 } from '../../../../utils/streaming/optimistic-json-parser';
 import type {
   CreateMetricStateFile,

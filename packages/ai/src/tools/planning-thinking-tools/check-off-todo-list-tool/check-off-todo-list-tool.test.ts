@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createCheckOffTodoListTool } from './check-off-todo-list-tool';
 import type {
   CheckOffTodoListToolInput,
   CheckOffTodoListToolOutput,
 } from './check-off-todo-list-tool';
+import { createCheckOffTodoListTool } from './check-off-todo-list-tool';
 
 describe('checkOffTodoList', () => {
   let checkOffTodoListTool: ReturnType<typeof createCheckOffTodoListTool>;

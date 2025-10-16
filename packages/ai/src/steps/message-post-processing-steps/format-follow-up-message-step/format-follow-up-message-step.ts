@@ -1,5 +1,5 @@
-import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
+import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
@@ -85,7 +85,7 @@ Your process:
 </output_format>
 
 <example>
-- Summary Message: "Scott sent a followup request to change metric to show \"total count of customers\".\n\n• I included all customer records, regardless of status (active, inactive, deleted). If incorrect, this likely inflates the count."
+- Summary Message: "Scott sent a followup request to change metric to show "total count of customers".\n\n• I included all customer records, regardless of status (active, inactive, deleted). If incorrect, this likely inflates the count."
 - Title: "Customer Count Includes All Statuses"
 </example>
 `;

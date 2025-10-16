@@ -1,22 +1,22 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "extends": ["../../biome.json"],
+  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "extends": ["../../biome2.json"],
   "files": {
-    "include": ["src/**/*"]
+    "includes": ["src/**/*"]
   },
   "overrides": [
     {
-      "include": ["**/*.ts"],
+      "includes": ["**/*.ts"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
+            "noConsole": "off"
           }
         }
       }
     },
     {
-      "include": ["evals/**/*.ts"],
+      "includes": ["evals/**/*.ts"],
       "linter": {
         "enabled": false
       }

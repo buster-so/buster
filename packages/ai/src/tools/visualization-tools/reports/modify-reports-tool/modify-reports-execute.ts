@@ -3,9 +3,9 @@ import {
   closeReportUpdateQueue,
   updateMessageEntries,
   updateMetricsToReports,
+  updateReportWithVersion,
   waitForPendingReportUpdates,
 } from '@buster/database/queries';
-import { updateReportWithVersion } from '@buster/database/queries';
 import { reportFiles } from '@buster/database/schema';
 import type { ChatMessageResponseMessage } from '@buster/server-shared/chats';
 import { wrapTraced } from 'braintrust';

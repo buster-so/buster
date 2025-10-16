@@ -5,10 +5,7 @@ import { initLogger } from 'braintrust';
  * @param options Optional configuration to override defaults
  * @returns Initialized Braintrust logger
  */
-export function initBraintrustLogger(options?: {
-  apiKey?: string;
-  projectName?: string;
-}) {
+export function initBraintrustLogger(options?: { apiKey?: string; projectName?: string }) {
   const apiKey = options?.apiKey || process.env.BRAINTRUST_KEY;
   const projectName = options?.projectName || process.env.ENVIRONMENT || 'development';
 

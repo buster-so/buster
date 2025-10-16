@@ -9,8 +9,8 @@ vi.mock('@buster/database/queries', () => ({
 
 // Import the module for mocking
 import {
-  OptimisticJsonParser,
   getOptimisticValue,
+  OptimisticJsonParser,
 } from '../../../../utils/streaming/optimistic-json-parser';
 
 // Mock the optimistic JSON parser

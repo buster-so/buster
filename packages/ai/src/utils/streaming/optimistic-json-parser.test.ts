@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { OptimisticJsonParser, getOptimisticValue } from './optimistic-json-parser';
+import { getOptimisticValue, OptimisticJsonParser } from './optimistic-json-parser';
 
 describe('OptimisticJsonParser', () => {
   describe('Basic Parsing', () => {
