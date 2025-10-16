@@ -1,7 +1,7 @@
 import { Box, Text, useApp, useInput } from 'ink';
 import { useEffect, useState } from 'react';
-import type { Conversation } from '../utils/conversation-history';
-import { listConversations, loadConversation } from '../utils/conversation-history';
+import type { Conversation } from '../../utils/conversation-history';
+import { listConversations, loadConversation } from '../../utils/conversation-history';
 
 interface HistoryBrowserProps {
   workingDirectory: string;
@@ -57,12 +57,13 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
             // Find first user message for title
             let title = 'Untitled conversation';
             if (fullConvo?.modelMessages) {
-              const firstUserMsg = fullConvo.modelMessages.find(
-                (msg) => msg.message.kind === 'user'
-              );
-              if (firstUserMsg && firstUserMsg.message.kind === 'user') {
+              const firstUserMsg = fullConvo.modelMessages.find((msg) => msg.role === 'user');
+              if (firstUserMsg && firstUserMsg.role === 'user') {
                 // Truncate to first line and max 60 chars
-                const content = firstUserMsg.message.content.split('\n')[0];
+                const content =
+                  typeof firstUserMsg.content === 'string'
+                    ? firstUserMsg.content.split('\n')[0] || 'Untitled conversation'
+                    : 'Complex message';
                 title = content.length > 60 ? `${content.slice(0, 57)}...` : content;
               }
             }

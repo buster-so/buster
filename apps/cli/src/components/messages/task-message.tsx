@@ -1,10 +1,10 @@
 import { Box, Text } from 'ink';
-import { UI_CONSTANTS } from '../constants/ui';
-import { useExpansion } from '../hooks/use-expansion';
-import type { AgentMessage } from '../types/agent-messages';
-import { AgentMessageComponent } from './message';
-import { IndentedContent } from './shared/indented-content';
-import { StatusLine } from './shared/status-line';
+import { UI_CONSTANTS } from '../../constants/ui';
+import { useExpansion } from '../../hooks/use-expansion';
+import type { AgentMessage } from '../../types/agent-messages';
+import { IndentedContent } from '../shared/indented-content';
+import { StatusLine } from '../shared/status-line';
+import { AgentMessageComponent } from './message-router';
 
 interface TaskMessageProps {
   message: Extract<AgentMessage, { kind: 'task' }>;

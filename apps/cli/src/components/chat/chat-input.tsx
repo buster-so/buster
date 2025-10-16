@@ -1,109 +1,20 @@
 import { Box, Text } from 'ink';
-import { memo, useEffect, useMemo, useState } from 'react';
-import { type FileSearchResult, searchFiles } from '../utils/file-search';
-import { type SlashCommand, searchCommands } from '../utils/slash-commands';
-import { CommandAutocomplete } from './command-autocomplete';
-import { FileAutocompleteDisplay } from './file-autocomplete-display';
-import { MultiLineTextInput, replaceMention } from './multi-line-text-input';
-import { SimpleBigText } from './simple-big-text';
-
-export const ChatTitle = memo(function ChatTitle() {
-  return (
-    <Box justifyContent="center">
-      <SimpleBigText text="Buster" color="#f5f3ff" />
-    </Box>
-  );
-});
-
-export const ChatVersionTagline = memo(function ChatVersionTagline() {
-  return (
-    <Box justifyContent="center" marginTop={1}>
-      <Text>
-        <Text color="#a78bfa">BUSTER v0.3.1</Text>
-        <Text color="#c4b5fd"> — Your AI Data Worker.</Text>
-      </Text>
-    </Box>
-  );
-});
-
-export const ChatIntroText = memo(function ChatIntroText() {
-  const lines = useMemo(
-    () => [
-      'You are standing in an open terminal. An AI awaits your commands.',
-      'ENTER send • \\n newline • @ files • / commands',
-    ],
-    []
-  );
-
-  return (
-    <Box flexDirection="column" alignItems="center" marginTop={1}>
-      {lines.map((line) => (
-        <Text key={line} color="#e0e7ff">
-          {line}
-        </Text>
-      ))}
-    </Box>
-  );
-});
-
-export function ChatStatusBar() {
-  return (
-    <Box
-      borderStyle="single"
-      borderColor="#4338ca"
-      paddingX={1}
-      marginTop={2}
-      justifyContent="space-between"
-      width="100%"
-    >
-      <Text color="#c4b5fd">Auto (Off) — all actions require approval · shift+tab cycles</Text>
-      <Text color="#c4b5fd">BUSTER Engine</Text>
-    </Box>
-  );
-}
-
-interface VimStatusProps {
-  vimMode?: 'normal' | 'insert' | 'visual';
-  vimEnabled?: boolean;
-  hideWhenAutocomplete?: boolean;
-}
-
-export function VimStatus({ vimMode, vimEnabled, hideWhenAutocomplete }: VimStatusProps) {
-  if (!vimEnabled || !vimMode || hideWhenAutocomplete) {
-    return <Text> </Text>; // Return empty text to maintain layout
-  }
-
-  let modeText = '';
-  let modeColor = '#c4b5fd';
-
-  switch (vimMode) {
-    case 'normal':
-      modeText = 'NORMAL';
-      modeColor = '#60a5fa'; // blue
-      break;
-    case 'insert':
-      modeText = 'INSERT';
-      modeColor = '#86efac'; // green
-      break;
-    case 'visual':
-      modeText = 'VISUAL';
-      modeColor = '#fbbf24'; // yellow
-      break;
-  }
-
-  return (
-    <Text color={modeColor} bold>
-      -- {modeText} --
-    </Text>
-  );
-}
+import { useEffect, useState } from 'react';
+import type { FileSearchResult } from '../../utils/file-search';
+import { searchFiles } from '../../utils/file-search';
+import type { SlashCommand } from '../../utils/slash-commands';
+import { searchCommands } from '../../utils/slash-commands';
+import type { VimMode } from '../../utils/vim-mode';
+import { CommandAutocomplete } from '../input/command-autocomplete';
+import { FileAutocompleteDisplay } from '../input/file-autocomplete-display';
+import { MultiLineTextInput, replaceMention } from '../input/multi-line-text-input';
 
 interface ChatInputProps {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  onVimModeChange?: (mode: 'normal' | 'insert' | 'visual') => void;
+  onVimModeChange?: (mode: VimMode) => void;
   onCommandExecute?: (command: SlashCommand) => void;
   onAutocompleteStateChange?: (isOpen: boolean) => void;
   isThinking?: boolean;
@@ -305,43 +216,6 @@ export function ChatInput({
           />
         </Box>
       )}
-    </Box>
-  );
-}
-
-export function ChatFooter() {
-  return <Text dimColor>? for help</Text>;
-}
-
-export interface ChatHistoryEntry {
-  id: number;
-  value: string;
-}
-
-interface ChatHistoryProps {
-  entries: ChatHistoryEntry[];
-}
-
-export function ChatHistory({ entries }: ChatHistoryProps) {
-  if (entries.length === 0) {
-    return null;
-  }
-
-  return (
-    <Box flexDirection="column" marginTop={1} width="100%">
-      {entries.map((entry) => {
-        const lines = entry.value.split('\n');
-        return (
-          <Box key={entry.id} flexDirection="column">
-            {lines.map((line, index) => (
-              <Text key={`${entry.id}-line-${index}`} color="#e0e7ff">
-                {index === 0 ? '❯ ' : '  '}
-                {line}
-              </Text>
-            ))}
-          </Box>
-        );
-      })}
     </Box>
   );
 }
