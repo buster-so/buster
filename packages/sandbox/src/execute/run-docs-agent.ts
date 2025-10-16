@@ -52,7 +52,8 @@ export async function runDocsAgent(
   const logs = await sandbox.process.getSessionCommandLogs(
     sessionName,
     command.cmdId ?? '',
-    (stdout) => console.info('[STDOUT]:', stdout)
+    (stdout) => console.info('[STDOUT]:', stdout),
+    (stderr) => console.error('[STDERR]:', stderr)
   );
 
   console.info('[SANDBOXLOGS]:', logs);

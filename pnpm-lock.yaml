@@ -1133,7 +1133,7 @@ importers:
         version: 10.0.3
       node-sql-parser:
         specifier: ^5.3.12
-        version: 5.3.12
+        version: 5.3.13
       pluralize:
         specifier: ^8.0.0
         version: 8.0.0
@@ -1305,6 +1305,9 @@ importers:
 
   packages/sandbox:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../env-utils
@@ -1315,8 +1318,8 @@ importers:
         specifier: workspace:*
         version: link:../vitest-config
       '@daytonaio/sdk':
-        specifier: ^0.24.2
-        version: 0.24.2
+        specifier: ^0.110.2
+        version: 0.110.2(ws@8.18.3)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2291,11 +2294,11 @@ packages:
   '@dabh/diagnostics@2.0.3':
     resolution: {integrity: sha512-hrlQOIi7hAfzsMqlGSFyVucrx38O+j6wiGOf//H2ecvIEqYN4ADBSS2iLMh5UFyDunCNniUIPk/q3riFv45xRA==}
 
-  '@daytonaio/api-client@0.24.2':
-    resolution: {integrity: sha512-g9UGuXCHJHbn27dHmdV6gBURgMqi/msbXzn9kTTtNGfl8uWpIBkkOEnN8/NLHF9hlpucs5nxrOEGOo0Sn5UEmQ==}
+  '@daytonaio/api-client@0.110.2':
+    resolution: {integrity: sha512-iWUbLBCcCvhkxcXK70DazRetlR2x3497VRdIBNGbDASpxSUkS0KDc8uCYZGr5INfDqgaUge+70ChM+9BU146xg==}
 
-  '@daytonaio/sdk@0.24.2':
-    resolution: {integrity: sha512-OC6zORq0Fc2G0c6B1j2/0VSzQ6Gvq/0ti78vzePeq13DU1rXsmXeJjVUXUfcMRQDcc0hO+evRrx5VL5rdMDIrQ==}
+  '@daytonaio/sdk@0.110.2':
+    resolution: {integrity: sha512-04Ra3GnjNLu/sh4B0zVHjFYb/Ek7MUershup3LIIysTT+pJvW/VYcFEJ2lh/w9iR2DEB1Vk7KspGjZNO5ZUctw==}
 
   '@dnd-kit/accessibility@3.1.1':
     resolution: {integrity: sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==}
@@ -9307,6 +9310,11 @@ packages:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
 
+  isomorphic-ws@5.0.0:
+    resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
+    peerDependencies:
+      ws: '*'
+
   istanbul-lib-coverage@3.2.2:
     resolution: {integrity: sha512-O8dpsF+r0WV/8MNRKfnmrtCWhuKjxrq2w+jpzBL5UZKTi2LeVWnWOmWRxFlesJONmc+wLAGvKQZEOanko0LFTg==}
     engines: {node: '>=8'}
@@ -10393,6 +10401,10 @@ packages:
 
   node-sql-parser@5.3.12:
     resolution: {integrity: sha512-GQBwA2e44qjbK0MzFwh5bNYefniV6cKT4KfjNDpuh/2EWipUEK1BCMc//moSidp8EF6fHB/EqJwUH9GCh9MAPg==}
+    engines: {node: '>=8'}
+
+  node-sql-parser@5.3.13:
+    resolution: {integrity: sha512-heyWv3lLjKHpcBDMUSR+R0DohRYZTYq+Ro3hJ4m9Ia8ccdKbL5UijIaWr2L4co+bmmFuvBVZ4v23QW2PqvBFAA==}
     engines: {node: '>=8'}
 
   nodejs-file-downloader@4.13.0:
@@ -13857,7 +13869,7 @@ snapshots:
   '@aws-sdk/lib-storage@3.848.0(@aws-sdk/client-s3@3.888.0)':
     dependencies:
       '@aws-sdk/client-s3': 3.888.0
-      '@smithy/abort-controller': 4.0.4
+      '@smithy/abort-controller': 4.1.1
       '@smithy/middleware-endpoint': 4.2.2
       '@smithy/smithy-client': 4.6.2
       buffer: 5.6.0
@@ -14743,28 +14755,32 @@ snapshots:
       enabled: 2.0.0
       kuler: 2.0.0
 
-  '@daytonaio/api-client@0.24.2':
+  '@daytonaio/api-client@0.110.2':
     dependencies:
       axios: 1.12.2
     transitivePeerDependencies:
       - debug
 
-  '@daytonaio/sdk@0.24.2':
+  '@daytonaio/sdk@0.110.2(ws@8.18.3)':
     dependencies:
       '@aws-sdk/client-s3': 3.888.0
       '@aws-sdk/lib-storage': 3.848.0(@aws-sdk/client-s3@3.888.0)
-      '@daytonaio/api-client': 0.24.2
+      '@daytonaio/api-client': 0.110.2
       '@iarna/toml': 2.2.5
       axios: 1.12.2
+      busboy: 1.6.0
       dotenv: 17.2.2
       expand-tilde: 2.0.2
       fast-glob: 3.3.3
       form-data: 4.0.4
+      isomorphic-ws: 5.0.0(ws@8.18.3)
+      pathe: 2.0.3
       shell-quote: 1.8.3
       tar: 6.2.1
     transitivePeerDependencies:
       - aws-crt
       - debug
+      - ws
 
   '@dnd-kit/accessibility@3.1.1(react@19.1.1)':
     dependencies:
@@ -20385,7 +20401,6 @@ snapshots:
   busboy@1.6.0:
     dependencies:
       streamsearch: 1.1.0
-    optional: true
 
   bytes@3.1.2: {}
 
@@ -22544,6 +22559,10 @@ snapshots:
 
   isobject@3.0.1: {}
 
+  isomorphic-ws@5.0.0(ws@8.18.3):
+    dependencies:
+      ws: 8.18.3
+
   istanbul-lib-coverage@3.2.2: {}
 
   istanbul-lib-hook@3.0.0:
@@ -24163,6 +24182,11 @@ snapshots:
       big-integer: 1.6.52
 
   node-sql-parser@5.3.12:
+    dependencies:
+      '@types/pegjs': 0.10.6
+      big-integer: 1.6.52
+
+  node-sql-parser@5.3.13:
     dependencies:
       '@types/pegjs': 0.10.6
       big-integer: 1.6.52
@@ -25978,8 +26002,7 @@ snapshots:
 
   stream-shift@1.0.3: {}
 
-  streamsearch@1.1.0:
-    optional: true
+  streamsearch@1.1.0: {}
 
   streamx@2.22.1:
     dependencies:
