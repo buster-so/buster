@@ -1,7 +1,7 @@
 export { normalizeEscapedText } from './escape-normalizer';
 export {
-  OptimisticJsonParser,
-  parseOptimisticJson,
   getOptimisticValue,
+  OptimisticJsonParser,
   type OptimisticParseResult,
+  parseOptimisticJson,
 } from './optimistic-json-parser';

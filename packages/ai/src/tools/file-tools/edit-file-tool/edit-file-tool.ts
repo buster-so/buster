@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { createEditFileToolExecute } from './edit-file-tool-execute';
 import DESCRIPTION from './edit.txt';
+import { createEditFileToolExecute } from './edit-file-tool-execute';
 
 export const EDIT_FILE_TOOL_NAME = 'edit';
 

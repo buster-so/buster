@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import GREP_TOOL_DESCRIPTION from './grep-tool-description.txt';
 import { createGrepSearchToolExecute as createGrepToolExecute } from './grep-tool.test';
+import GREP_TOOL_DESCRIPTION from './grep-tool-description.txt';
 
 export const GREP_TOOL_NAME = 'grep';
 

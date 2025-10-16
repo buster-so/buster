@@ -6,8 +6,8 @@ import {
 } from '@buster/database/schema-types';
 import type { ToolCallOptions } from 'ai';
 import {
-  OptimisticJsonParser,
   getOptimisticValue,
+  OptimisticJsonParser,
 } from '../../../utils/streaming/optimistic-json-parser';
 import { formatElapsedTime } from '../../shared/format-elapsed-time';
 import type { DoneToolContext, DoneToolInput, DoneToolState } from './done-tool';

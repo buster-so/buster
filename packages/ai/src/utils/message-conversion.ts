@@ -193,7 +193,7 @@ function convertToolResultPart(part: unknown): unknown | unknown[] | null {
 
   // Convert result → output with proper structure
   if ('result' in p && !('output' in p)) {
-    const { result, experimental_content, isError, ...rest } = p;
+    const { result, isError, ...rest } = p;
 
     // Ensure toolCallId exists and is valid
     // If it's missing or invalid, skip this result

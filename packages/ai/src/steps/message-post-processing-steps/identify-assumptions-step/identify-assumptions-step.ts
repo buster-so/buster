@@ -1,7 +1,7 @@
 import type { PermissionedDataset } from '@buster/access-controls';
 import { UserPersonalizationConfigSchema } from '@buster/database/schema-types';
-import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
+import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';

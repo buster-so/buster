@@ -1,5 +1,5 @@
 import type { LanguageModelV2ToolCall } from '@ai-sdk/provider';
-import { InvalidToolInputError, generateObject } from 'ai';
+import { generateObject, InvalidToolInputError } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { GPT5Mini, Sonnet4 } from '../../../llm';
 import { DEFAULT_ANTHROPIC_OPTIONS, DEFAULT_OPENAI_OPTIONS } from '../../../llm/providers/gateway';

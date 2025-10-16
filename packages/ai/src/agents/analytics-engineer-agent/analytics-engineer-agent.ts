@@ -1,4 +1,4 @@
-import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
+import { hasToolCall, type ModelMessage, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import {
   DEFAULT_ANALYTICS_ENGINEER_OPTIONS,

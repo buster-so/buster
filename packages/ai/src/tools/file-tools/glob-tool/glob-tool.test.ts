@@ -1,6 +1,5 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
-import { dirname } from 'node:path';
+import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { GlobToolContext } from './glob-tool';

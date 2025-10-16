@@ -1,10 +1,6 @@
 export type { ModelMessage } from 'ai';
-
-export * from './workflows';
-export * from './utils';
 export * from './embeddings';
 export * from './tasks';
-
 // Export tool types for CLI usage
 export type {
   IdleInput,
@@ -15,9 +11,17 @@ export type {
   BashToolOutput,
 } from './tools/file-tools/bash-tool/bash-tool';
 export type {
+  EditFileToolInput,
+  EditFileToolOutput,
+} from './tools/file-tools/edit-file-tool/edit-file-tool';
+export type {
   GrepToolInput,
   GrepToolOutput,
 } from './tools/file-tools/grep-tool/grep-tool';
+export type {
+  LsToolInput,
+  LsToolOutput,
+} from './tools/file-tools/ls-tool/ls-tool';
 export type {
   ReadFileToolInput,
   ReadFileToolOutput,
@@ -26,11 +30,5 @@ export type {
   WriteFileToolInput,
   WriteFileToolOutput,
 } from './tools/file-tools/write-file-tool/write-file-tool';
-export type {
-  EditFileToolInput,
-  EditFileToolOutput,
-} from './tools/file-tools/edit-file-tool/edit-file-tool';
-export type {
-  LsToolInput,
-  LsToolOutput,
-} from './tools/file-tools/ls-tool/ls-tool';
+export * from './utils';
+export * from './workflows';

@@ -1,5 +1,5 @@
 import type { LanguageModelV2ToolCall } from '@ai-sdk/provider';
-import { type ModelMessage, NoSuchToolError, generateText, streamText } from 'ai';
+import { generateText, type ModelMessage, NoSuchToolError, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import {
   ANALYST_AGENT_NAME,

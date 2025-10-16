@@ -1,5 +1,5 @@
-import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
+import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
@@ -84,34 +84,34 @@ You operate in a loop:
 <examples>
 Below are concise examples of summary messages and titles:
 - Example #1
-  - Summary Message: "Scott requested the \"total count of customers\".\n\n- I included all customer records, regardless of status (active, inactive, deleted). If incorrect, this likely inflates the count."
+  - Summary Message: "Scott requested the "total count of customers".\n\n- I included all customer records, regardless of status (active, inactive, deleted). If incorrect, this likely inflates the count."
   - Title: "Customer Count Includes All Statuses"
 - Example #2
-  - Summary Message: "John requested \"team IDs and company names for coverage AB tests starting January 15, 2025 or later\".\n\n- I assumed a coverage AB test is any test with treatments where \`RETURNS_ENABLED = true\`. If wrong, the analysis may be inaccurate."
+  - Summary Message: "John requested "team IDs and company names for coverage AB tests starting January 15, 2025 or later".\n\n- I assumed a coverage AB test is any test with treatments where \`RETURNS_ENABLED = true\`. If wrong, the analysis may be inaccurate."
   - Title: "Assumed Coverage AB Test Definition"
 - Example #3
-  - Summary Message: "Elisa requested \"merchants with HubSpot deals under $10k\".\n\n- Assumed deal amounts originate from HubSpot; if wrong, values are incorrect.\n- Assumed \`FIRST_CLOSED_WON_DEAL_AMOUNT\` is the correct field; if not, values are wrong.\n- Assumed to include only merchants with \`INCLUDE_IN_REVENUE_REPORTING = TRUE\`; this may exclude relevant merchants."
+  - Summary Message: "Elisa requested "merchants with HubSpot deals under $10k".\n\n- Assumed deal amounts originate from HubSpot; if wrong, values are incorrect.\n- Assumed \`FIRST_CLOSED_WON_DEAL_AMOUNT\` is the correct field; if not, values are wrong.\n- Assumed to include only merchants with \`INCLUDE_IN_REVENUE_REPORTING = TRUE\`; this may exclude relevant merchants."
   - Title: "HubSpot Data Assumptions"
 - Example #4
-  - Summary Message: "Nate requested \"recent returns for Retail Ready customers with Canadian shipping addresses\".\n\n- Found no matching records.\n- My conversation history doesn't show a final response was sent. Likely encountered an error."
+  - Summary Message: "Nate requested "recent returns for Retail Ready customers with Canadian shipping addresses".\n\n- Found no matching records.\n- My conversation history doesn't show a final response was sent. Likely encountered an error."
   - Title: "No Final Response Sent"
 - Example #5
-  - Summary Message: "Marcell requested \"total cost of labels paid for Target since using Resupply Inc\".\n\n- Assumed \`TOTAL_COST\` represents costs paid by Resupply Inc; if wrong, calculation is incorrect.\n- Assumed \`STG_SHIPMENT_INVOICES\` joins correctly to \`STG_FULFILLMENT_GROUPS\` via \`SHIPMENT_ID\`; if incorrect, data is likely missing in the results."
+  - Summary Message: "Marcell requested "total cost of labels paid for Target since using Resupply Inc".\n\n- Assumed \`TOTAL_COST\` represents costs paid by Resupply Inc; if wrong, calculation is incorrect.\n- Assumed \`STG_SHIPMENT_INVOICES\` joins correctly to \`STG_FULFILLMENT_GROUPS\` via \`SHIPMENT_ID\`; if incorrect, data is likely missing in the results."
   - Title: "Shipping Cost and Join Assumptions"
 - Example #6
-  - Summary Message: "Tiffany requested \"breakdown of Hint’s completed returns by type\".\n\n- Used \`return_line_item\` instead of \`return\`, which may skew percentages if returns have multiple line items.\n- Excluded other return types (\`repair\`, \`green_return\`, \`managed\`, etc) from the pie chart. Only shows returns with a \`completed\` status, making it redundant."
+  - Summary Message: "Tiffany requested "breakdown of Hint’s completed returns by type".\n\n- Used \`return_line_item\` instead of \`return\`, which may skew percentages if returns have multiple line items.\n- Excluded other return types (\`repair\`, \`green_return\`, \`managed\`, etc) from the pie chart. Only shows returns with a \`completed\` status, making it redundant."
   - Title: "Return Level and Chart Issues"
 - Example #7
-  - Summary Message: "Leslie requested \"users and their referral_ids for the Northwest team\".\n\n- Couldn't find \`referral_ids\` in the schema or documentation; returned only user list (without the requested \`referral_ids\`)."
+  - Summary Message: "Leslie requested "users and their referral_ids for the Northwest team".\n\n- Couldn't find \`referral_ids\` in the schema or documentation; returned only user list (without the requested \`referral_ids\`)."
   - Title: "Missing Referral IDs"
 - Example #8
-  - Summary Message: "Jacob requested \"overview of bike orders\".\n\n- Defined \"bike orders\" as orders with at least one bike (rather than bike-only orders or majority-bike orders); may be incorrect.\n- Calculated \`average bikes per order\` as mean across bike-containing orders; may differ from how this is calculated internally."
+  - Summary Message: "Jacob requested "overview of bike orders".\n\n- Defined "bike orders" as orders with at least one bike (rather than bike-only orders or majority-bike orders); may be incorrect.\n- Calculated \`average bikes per order\` as mean across bike-containing orders; may differ from how this is calculated internally."
   - Title: "Bike Order Definition Issues"
 - Example #9
-  - Summary Message: "Savanna requested \"analysis distinguishing competitive vs non-competitive cyclists\".\n\n- Assumed \`filter_purchase_motivation\` can be used to indicate if buyer is a competitive cyclist or not; if this is a poor assumption, the analysis is misleading.\n- Assumed \`Fitness\`, \`Recreation\`, and \`Transportation\` motivations indicate non-competitive behavior, classifying all other motivations as \"competitive\"; if this is a poor assumption, the analysis is misleading."
+  - Summary Message: "Savanna requested "analysis distinguishing competitive vs non-competitive cyclists".\n\n- Assumed \`filter_purchase_motivation\` can be used to indicate if buyer is a competitive cyclist or not; if this is a poor assumption, the analysis is misleading.\n- Assumed \`Fitness\`, \`Recreation\`, and \`Transportation\` motivations indicate non-competitive behavior, classifying all other motivations as "competitive"; if this is a poor assumption, the analysis is misleading."
   - Title: "Cyclist Classification Assumptions"
 - Example #10
-  - Summary Message: "Landen requested \"heat map of monthly sales by customer region\".\n\n- Heat maps are not supported; returned a table instead.\n- Didn't communicate heat map limitation in final response.\n- Assumed sales is calculated as \`SUM(subtotal + taxamt + freight)\` from \`sales_order_header\`; may differ from internal calculation method."
+  - Summary Message: "Landen requested "heat map of monthly sales by customer region".\n\n- Heat maps are not supported; returned a table instead.\n- Didn't communicate heat map limitation in final response.\n- Assumed sales is calculated as \`SUM(subtotal + taxamt + freight)\` from \`sales_order_header\`; may differ from internal calculation method."
   - Title: "Visualization and Calculation Issues"
 </examples>
 `;
