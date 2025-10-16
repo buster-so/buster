@@ -106,28 +106,23 @@ export async function getApiKeyOrganization(apiKeyId: string): Promise<{
  * @param apiKeyId The API key ID
  * @returns The user data if found, null otherwise
  */
-export async function getApiKeyOwner(apiKeyId: string): Promise<{
-  id: string;
-  email: string;
-  name: string | null;
+export async function getOrganizationForApiKey(apiKeyId: string): Promise<{
+  organizationId: string;
 } | null> {
   const db = getDb();
 
   try {
     const result = await db
       .select({
-        id: users.id,
-        email: users.email,
-        name: users.name,
+        organizationId: apiKeys.organizationId,
       })
       .from(apiKeys)
-      .innerJoin(users, eq(apiKeys.ownerId, users.id))
       .where(and(eq(apiKeys.id, apiKeyId), isNull(apiKeys.deletedAt)))
       .limit(1);
 
     return result[0] || null;
   } catch (error) {
-    console.error('Error getting API key owner:', error);
+    console.error('Error getting API key associated organization:', error);
     return null;
   }
 }

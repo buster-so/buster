@@ -70,12 +70,13 @@ function getOrSetApp() {
               message: 'No API key found for installation id',
             });
           }
-          await runDocsAgent(
-            authDetails.token,
-            payload.repository.html_url,
-            branch,
-            commentBody,
-            apiKey
+          await runDocsAgent({
+            installationToken: authDetails.token,
+            repoUrl: payload.repository.html_url,
+            branch: branch,
+            prompt: commentBody,
+            apiKey: apiKey,
+          }
           );
         }
       }
