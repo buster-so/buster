@@ -22,8 +22,8 @@ import {
 import {
   AssetPermissionRoleSchema,
   AssetTypeSchema,
-  type DashboardYml,
   ChatTypeSchema,
+  type DashboardYml,
   DataSourceOnboardingStatusSchema,
   DatasetTypeSchema,
   DocsTypeSchema,
