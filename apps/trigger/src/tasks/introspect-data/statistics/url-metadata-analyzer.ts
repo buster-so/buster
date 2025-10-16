@@ -66,7 +66,7 @@ export class UrlMetadataAnalyzer {
           domain,
           CASE 
             WHEN domain IS NOT NULL AND domain LIKE '%.%'
-            THEN REGEXP_EXTRACT(domain, '\.([^.]+)$', 1)
+            THEN REGEXP_EXTRACT(domain, '.([^.]+)$', 1)
             ELSE NULL
           END as tld
         FROM url_parsing

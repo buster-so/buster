@@ -1,10 +1,9 @@
 import { generateSearchableValueEmbeddings } from '@buster/ai';
-import { type DatabaseAdapter, createAdapter } from '@buster/data-source';
-import { getDefaultProvider } from '@buster/data-source';
+import { createAdapter, type DatabaseAdapter, getDefaultProvider } from '@buster/data-source';
 import { getDataSourceCredentials } from '@buster/database/queries';
 import {
-  type SearchableValue,
   processWithCache,
+  type SearchableValue,
   updateCache,
   upsertSearchableValues,
 } from '@buster/search';
