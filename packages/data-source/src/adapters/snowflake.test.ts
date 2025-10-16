@@ -287,7 +287,9 @@ describe('SnowflakeAdapter', () => {
       mockStream.on.mockImplementation((event: string, handler: (data?: unknown) => void) => {
         if (event === 'data') {
           setTimeout(() => {
-            mockRows.forEach((row) => handler(row));
+            for (const row of mockRows) {
+              handler(row);
+            }
           }, 0);
         } else if (event === 'end') {
           setTimeout(() => handler(), 0);

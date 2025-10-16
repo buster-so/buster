@@ -13,13 +13,15 @@ import { mapSnowflakeType } from './type-mappings/snowflake';
 type SnowflakeError = snowflake.SnowflakeError;
 
 interface SnowflakeStatement {
-  getColumns?: () => Array<{
-    getName(): string;
-    getType(): string;
-    isNullable(): boolean;
-    getScale(): number;
-    getPrecision(): number;
-  }>;
+  getColumns?: () =>
+    | Array<{
+        getName(): string;
+        getType(): string;
+        isNullable(): boolean;
+        getScale(): number;
+        getPrecision(): number;
+      }>
+    | undefined;
   streamRows?: (options?: { start?: number; end?: number }) => NodeJS.ReadableStream;
   cancel?: (callback: (err: Error | undefined) => void) => void;
 }

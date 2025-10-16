@@ -218,7 +218,9 @@ describe('SQLServerAdapter', () => {
         // Simulate async behavior
         setTimeout(() => {
           recordsetCallback?.({ id: { name: 'id', type: () => ({ name: 'int' }) } });
-          rows.forEach((row) => rowCallback?.(row));
+          for (const row of rows) {
+            rowCallback?.(row);
+          }
           doneCallback?.();
         }, 0);
       });
@@ -253,7 +255,9 @@ describe('SQLServerAdapter', () => {
         // Simulate async behavior
         setTimeout(() => {
           recordsetCallback?.({ id: { name: 'id', type: () => ({ name: 'int' }) } });
-          rows.forEach((row) => rowCallback?.(row));
+          for (const row of rows) {
+            rowCallback?.(row);
+          }
           doneCallback?.();
         }, 0);
       });
@@ -350,7 +354,9 @@ describe('SQLServerAdapter', () => {
         // Simulate async behavior
         setTimeout(() => {
           recordsetCallback?.({ id: { name: 'id', type: () => ({ name: 'int' }) } });
-          rows.forEach((row) => rowCallback?.(row));
+          for (const row of rows) {
+            rowCallback?.(row);
+          }
           doneCallback?.();
         }, 0);
       });
