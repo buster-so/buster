@@ -1,6 +1,6 @@
 import type { WebClient } from '@slack/web-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type MockWebClient, createMockWebClient } from '../mocks';
+import { createMockWebClient, type MockWebClient } from '../mocks';
 import { SlackChannelService } from './channels';
 
 describe('SlackChannelService', () => {
