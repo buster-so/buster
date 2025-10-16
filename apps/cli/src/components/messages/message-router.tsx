@@ -1,6 +1,6 @@
 import { Box, Text } from 'ink';
-import { UI_CONSTANTS } from '../constants/ui';
-import type { AgentMessage } from '../types/agent-messages';
+import { UI_CONSTANTS } from '../../constants/ui';
+import type { AgentMessage } from '../../types/agent-messages';
 import { EditMessage } from './edit-message';
 import { ExecuteMessage } from './execute-message';
 import { ReadMessage } from './read-message';

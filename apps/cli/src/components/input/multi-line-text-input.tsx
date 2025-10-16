@@ -1,8 +1,8 @@
 import { Box, Text, useInput } from 'ink';
 import { useEffect, useRef, useState } from 'react';
-import { getSetting } from '../utils/settings';
-import type { VimMode, VimState } from '../utils/vim-mode';
-import { handleVimKeybinding } from '../utils/vim-mode';
+import { getSetting } from '../../utils/settings';
+import type { VimMode, VimState } from '../../utils/vim-mode';
+import { handleVimKeybinding } from '../../utils/vim-mode';
 
 interface MultiLineTextInputProps {
   value: string;

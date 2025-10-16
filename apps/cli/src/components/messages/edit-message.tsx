@@ -1,11 +1,11 @@
 import { Box, Text } from 'ink';
-import { UI_CONSTANTS } from '../constants/ui';
-import { useExpansion } from '../hooks/use-expansion';
-import type { AgentMessage } from '../types/agent-messages';
-import { ExpansionHint } from './shared/expansion-hint';
-import { IndentedContent } from './shared/indented-content';
-import { StatusLine } from './shared/status-line';
-import { ToolBadge } from './shared/tool-badge';
+import { UI_CONSTANTS } from '../../constants/ui';
+import { useExpansion } from '../../hooks/use-expansion';
+import type { AgentMessage } from '../../types/agent-messages';
+import { ExpansionHint } from '../shared/expansion-hint';
+import { IndentedContent } from '../shared/indented-content';
+import { StatusLine } from '../shared/status-line';
+import { ToolBadge } from '../shared/tool-badge';
 
 interface EditMessageProps {
   message: Extract<AgentMessage, { kind: 'edit' }>;

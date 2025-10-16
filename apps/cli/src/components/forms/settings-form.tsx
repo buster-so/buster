@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from 'ink';
 import { useEffect, useState } from 'react';
-import { loadSettings, type Settings, saveSettings } from '../utils/settings';
+import { loadSettings, type Settings, saveSettings } from '../../utils/settings';
 
 interface SettingsFormProps {
   onClose: () => void;
