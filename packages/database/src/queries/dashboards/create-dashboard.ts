@@ -91,7 +91,9 @@ export async function createDashboard(input: CreateDashboardInput): Promise<Crea
       return newDashboard;
     });
 
-    console.info(`Successfully created dashboard ${result.id} with owner permissions for user ${userId}`);
+    console.info(
+      `Successfully created dashboard ${result.id} with owner permissions for user ${userId}`
+    );
 
     return result;
   } catch (error) {

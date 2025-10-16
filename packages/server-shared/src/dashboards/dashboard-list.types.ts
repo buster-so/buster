@@ -1,4 +1,4 @@
 export {
-  DashboardListItemSchema,
   type DashboardListItem,
+  DashboardListItemSchema,
 } from '@buster/database/schema-types';

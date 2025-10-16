@@ -10,6 +10,7 @@ export {
   type DashboardFileContext,
   getChatDashboardFiles,
 } from './dashboards';
+export { deleteDashboard } from './delete-dashboard';
 export {
   type AssociatedCollection,
   getCollectionsAssociatedWithDashboard,
@@ -24,11 +25,10 @@ export {
   GetDashboardTitleInputSchema,
   getDashboardTitle,
 } from './get-dashboard-title';
-export { deleteDashboard } from './delete-dashboard';
 export {
   type ListDashboardsRequest,
-  type ListDashboardsResponse,
   ListDashboardsRequestSchema,
+  type ListDashboardsResponse,
   listDashboards,
 } from './list-dashboards';
 export { manageMetricAssociations } from './manage-metric-associations';

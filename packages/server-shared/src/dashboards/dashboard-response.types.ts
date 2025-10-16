@@ -1,8 +1,8 @@
 import { DashboardListItemSchema } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { MetricSchema } from '../metrics';
-import { PaginatedResponseSchema } from '../type-utilities/pagination';
 import { ShareConfigSchema } from '../share';
+import { PaginatedResponseSchema } from '../type-utilities/pagination';
 import { DashboardSchema } from './dashboard.types';
 
 export const GetDashboardResponseSchema = z.object({
