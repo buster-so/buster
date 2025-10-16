@@ -1262,6 +1262,9 @@ importers:
 
   packages/env-utils:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -1416,6 +1419,9 @@ importers:
 
   packages/slack:
     dependencies:
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../env-utils
