@@ -61,7 +61,10 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
 const shouldTakenNewScreenshot = async ({
   metricId,
   isOnSaveEvent,
-}: { metricId: string; isOnSaveEvent: boolean }) => {
+}: {
+  metricId: string;
+  isOnSaveEvent: boolean;
+}) => {
   if (isOnSaveEvent) {
     return true;
   }

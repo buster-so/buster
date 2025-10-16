@@ -1,5 +1,5 @@
-import { checkCacheExists, executeMetricQuery, setCachedMetricData } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
+import { checkCacheExists, executeMetricQuery, setCachedMetricData } from '@buster/data-source';
 import {
   extractSqlFromMetricContent,
   getDataSourceCredentials,

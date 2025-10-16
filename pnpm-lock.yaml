@@ -364,6 +364,9 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: 'catalog:'
         version: 3.888.0
+      '@biomejs/biome':
+        specifier: 2.2.6
+        version: 2.2.6
       '@buster-app/supabase':
         specifier: workspace:*
         version: link:../supabase
