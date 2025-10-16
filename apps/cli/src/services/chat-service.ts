@@ -1,4 +1,4 @@
-import type { ModelMessage } from '@buster/ai';
+import { initLogger, type ModelMessage } from '@buster/ai';
 import { z } from 'zod';
 import { executeAgent, type ProxyConfig } from '../handlers/agent-handler';
 import { processAgentStream } from '../handlers/stream-handler';
@@ -18,6 +18,7 @@ export interface CliAgentMessage {
  */
 export const ChatServiceParamsSchema = z.object({
   chatId: z.string().uuid().describe('Chat session identifier'),
+  messageId: z.string().uuid().optional().describe('Message ID for tracking'),
   workingDirectory: z.string().describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
   abortSignal: z.instanceof(AbortSignal).optional().describe('Abort controller signal'),
@@ -43,57 +44,78 @@ export async function runChatAgent(
   callbacks: ChatServiceCallbacks = {}
 ): Promise<void> {
   const validated = ChatServiceParamsSchema.parse(params);
-  const { chatId, workingDirectory, isInResearchMode, abortSignal } = validated;
+  const { chatId, messageId, workingDirectory, isInResearchMode, abortSignal } = validated;
   const { onThinkingStateChange, onMessageUpdate } = callbacks;
 
-  // Load conversation history to maintain context across sessions
-  const conversation = await loadConversation(chatId, workingDirectory);
+  // Initialize Braintrust logger for observability
+  // Development: uses .env values (BRAINTRUST_KEY, ENVIRONMENT)
+  // Production: uses hard-coded production values
+  // Bun sets import.meta.env.PROD to true only in production builds
+  const isDev = !import.meta.env.PROD;
+  const braintrustApiKey = isDev
+    ? process.env.BRAINTRUST_KEY || 'bt-st-KNPNMOdNPNKi1GdwRxMDA3KL71qw7PECV42zBUWSOv1Geovg'
+    : 'bt-st-KNPNMOdNPNKi1GdwRxMDA3KL71qw7PECV42zBUWSOv1Geovg';
+  const environment = isDev ? process.env.ENVIRONMENT || 'development' : 'production';
 
-  // Get the stored model messages (full conversation including tool calls/results)
-  const previousMessages: ModelMessage[] = conversation
-    ? (conversation.modelMessages as ModelMessage[])
-    : [];
+  const braintrustLogger = initLogger({
+    apiKey: braintrustApiKey,
+    projectName: environment,
+  });
 
-  // Get proxy configuration
-  const proxyConfigRaw = await getProxyConfig();
-  const proxyConfig: ProxyConfig = {
-    ...proxyConfigRaw,
-    modelId: 'anthropic/claude-sonnet-4.5',
-  };
+  try {
+    // Load conversation history to maintain context across sessions
+    const conversation = await loadConversation(chatId, workingDirectory);
 
-  // Execute agent and get stream
-  const stream = await executeAgent(
-    {
-      chatId,
-      workingDirectory,
-      userId: 'cli-user',
-      organizationId: 'cli',
-      dataSourceId: '',
-      isInResearchMode,
-      abortSignal,
-    },
-    proxyConfig,
-    previousMessages
-  );
+    // Get the stored model messages (full conversation including tool calls/results)
+    const previousMessages: ModelMessage[] = conversation
+      ? (conversation.modelMessages as ModelMessage[])
+      : [];
 
-  // Process the stream and accumulate messages
-  const streamCallbacks: {
-    onMessageUpdate?: (messages: ModelMessage[]) => void;
-    onThinkingStateChange?: (thinking: boolean) => void;
-    onSaveMessages: (messages: ModelMessage[]) => Promise<void>;
-  } = {
-    onSaveMessages: async (messages) => {
-      await saveModelMessages(chatId, workingDirectory, messages);
-    },
-  };
+    // Get proxy configuration
+    const proxyConfigRaw = await getProxyConfig();
+    const proxyConfig: ProxyConfig = {
+      ...proxyConfigRaw,
+      modelId: 'anthropic/claude-sonnet-4.5',
+    };
 
-  if (onMessageUpdate) {
-    streamCallbacks.onMessageUpdate = onMessageUpdate;
+    // Execute agent and get stream
+    const stream = await executeAgent(
+      {
+        chatId,
+        messageId,
+        workingDirectory,
+        userId: 'cli-user',
+        organizationId: 'cli',
+        dataSourceId: '',
+        isInResearchMode,
+        abortSignal,
+      },
+      proxyConfig,
+      previousMessages
+    );
+
+    // Process the stream and accumulate messages
+    const streamCallbacks: {
+      onMessageUpdate?: (messages: ModelMessage[]) => void;
+      onThinkingStateChange?: (thinking: boolean) => void;
+      onSaveMessages: (messages: ModelMessage[]) => Promise<void>;
+    } = {
+      onSaveMessages: async (messages) => {
+        await saveModelMessages(chatId, workingDirectory, messages);
+      },
+    };
+
+    if (onMessageUpdate) {
+      streamCallbacks.onMessageUpdate = onMessageUpdate;
+    }
+
+    if (onThinkingStateChange) {
+      streamCallbacks.onThinkingStateChange = onThinkingStateChange;
+    }
+
+    await processAgentStream(stream.fullStream, previousMessages, streamCallbacks);
+  } finally {
+    // Flush Braintrust logger to ensure all traces are sent
+    await braintrustLogger.flush();
   }
-
-  if (onThinkingStateChange) {
-    streamCallbacks.onThinkingStateChange = onThinkingStateChange;
-  }
-
-  await processAgentStream(stream.fullStream, previousMessages, streamCallbacks);
 }

@@ -1,7 +1,11 @@
 import { getPermissionedDatasets } from '@buster/access-controls';
-import postProcessingWorkflow, {
+import {
   type PostProcessingWorkflowOutput,
-} from '@buster/ai/workflows/message-post-processing-workflow/message-post-processing-workflow';
+  currentSpan,
+  initLogger,
+  postProcessingWorkflow,
+  wrapTraced,
+} from '@buster/ai';
 import { db, eq, getDb } from '@buster/database/connection';
 import {
   getBraintrustMetadata,
@@ -21,7 +25,6 @@ import type {
   PostProcessingMessage,
 } from '@buster/server-shared/message';
 import { logger, schemaTask, tasks } from '@trigger.dev/sdk/v3';
-import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { z } from 'zod/v4';
 import type { logsWriteBackTask } from '../logs-write-back';
 import {

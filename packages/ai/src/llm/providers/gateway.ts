@@ -111,6 +111,9 @@ const gateway = createGateway({
   ...(process.env.AI_GATEWAY_API_KEY && { apiKey: process.env.AI_GATEWAY_API_KEY }),
 });
 
+// Export raw gateway for use in proxy endpoint (no middleware to avoid double logging)
+export { gateway };
+
 // Export a function that creates wrapped models with Braintrust middleware
 export const gatewayModel = (modelId: string) => {
   return wrapLanguageModel({

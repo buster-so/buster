@@ -1,4 +1,4 @@
-import { gatewayModel } from '@buster/ai/llm/providers/gateway';
+import { gateway } from '@buster/ai/llm/providers/gateway';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { stream } from 'hono/streaming';
@@ -20,8 +20,9 @@ export const POST = new Hono().post(
 
       console.info('[PROXY] Request received', { model });
 
-      // Get the gateway model
-      const modelInstance = gatewayModel(model);
+      // Use raw gateway without Braintrust middleware to avoid double logging
+      // Logging happens at the CLI level (proxy model) instead
+      const modelInstance = gateway(model);
 
       // Call the model's doStream method directly (this is a model-level operation)
       const result = await modelInstance.doStream(options);

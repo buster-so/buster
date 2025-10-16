@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { logger, schemaTask, tasks } from '@trigger.dev/sdk';
-import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { analystQueue } from '../../queues/analyst-queue';
 import type { TakeChatScreenshotTrigger } from '../../tasks/screenshots/schemas';
 import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './types';
@@ -22,9 +21,14 @@ import {
 import { type PermissionedDataset, getPermissionedDatasets } from '@buster/access-controls';
 
 // AI package imports
-import { type AnalystWorkflowInput, runAnalystWorkflow } from '@buster/ai';
-
-import type { ModelMessage } from 'ai';
+import {
+  type AnalystWorkflowInput,
+  type ModelMessage,
+  currentSpan,
+  initLogger,
+  runAnalystWorkflow,
+  wrapTraced,
+} from '@buster/ai';
 import type { messagePostProcessingTask } from '../message-post-processing/message-post-processing';
 import { screenshots_task_keys } from '../screenshots/task-keys';
 import { analyst_agent_task_keys } from './task-keys';

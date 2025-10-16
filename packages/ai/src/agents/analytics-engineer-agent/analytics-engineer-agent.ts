@@ -1,5 +1,5 @@
 import { type ModelMessage, hasToolCall, stepCountIs, streamText } from 'ai';
-import { wrapTraced } from 'braintrust';
+import { currentSpan, wrapTraced } from 'braintrust';
 import {
   DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
   DEFAULT_ANTHROPIC_OPTIONS,
@@ -39,8 +39,19 @@ export function createAnalyticsEngineerAgent(
     const toolSet = await createAnalyticsEngineerToolset(analyticsEngineerAgentOptions);
 
     return wrapTraced(
-      () =>
-        streamText({
+      () => {
+        // Log metadata for Braintrust tracing (similar to trigger analyst-agent-task)
+        currentSpan().log({
+          metadata: {
+            chatId: analyticsEngineerAgentOptions.chatId,
+            messageId: analyticsEngineerAgentOptions.messageId,
+            userId: analyticsEngineerAgentOptions.userId,
+            organizationId: analyticsEngineerAgentOptions.organizationId,
+            dataSourceId: analyticsEngineerAgentOptions.dataSourceId,
+          },
+        });
+
+        return streamText({
           model: analyticsEngineerAgentOptions.model || Sonnet4,
           providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
           tools: toolSet,
@@ -48,7 +59,8 @@ export function createAnalyticsEngineerAgent(
           stopWhen: STOP_CONDITIONS,
           maxOutputTokens: 64000,
           // temperature: 0,
-        }),
+        });
+      },
       {
         name: 'Analytics Engineer Agent',
       }

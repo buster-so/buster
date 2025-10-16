@@ -9,6 +9,7 @@ interface RootOptions {
   cwd?: string;
   prompt?: string;
   chatId?: string;
+  messageId?: string;
   research?: boolean;
 }
 
@@ -19,6 +20,7 @@ export const program = commander
   .option('--cwd <path>', 'Set working directory for the CLI')
   .option('--prompt <prompt>', 'Run agent in headless mode with the given prompt')
   .option('--chatId <id>', 'Continue an existing conversation (used with --prompt)')
+  .option('--messageId <id>', 'Message ID for tracking (used with --prompt)')
   .option('--research', 'Run agent in research mode (read-only, no file modifications)');
 
 setupPreActionHook(program);
@@ -37,6 +39,7 @@ program.action(async (options: RootOptions) => {
         prompt: options.prompt,
         workingDirectory: process.cwd(),
         ...(options.chatId && { chatId: options.chatId }),
+        ...(options.messageId && { messageId: options.messageId }),
         ...(options.research && { isInResearchMode: options.research }),
       });
       console.log(chatId);
