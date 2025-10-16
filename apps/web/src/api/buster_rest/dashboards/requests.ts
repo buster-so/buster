@@ -1,5 +1,7 @@
 import type {
   DashboardConfig,
+  DeleteDashboardsRequest,
+  DeleteDashboardsResponse,
   GetDashboardParams,
   GetDashboardQuery,
   GetDashboardResponse,
@@ -69,8 +71,10 @@ export const dashboardsUpdateDashboard = async (params: {
     .then((res) => res.data);
 };
 
-export const dashboardsDeleteDashboard = async (data: { ids: string[] }) => {
-  return await mainApi.delete<null>('/dashboards', { data }).then((res) => res.data);
+export const dashboardsDeleteDashboard = async (data: DeleteDashboardsRequest) => {
+  return await mainApiV2
+    .delete<DeleteDashboardsResponse>('/dashboards', { data })
+    .then((res) => res.data);
 };
 
 // share dashboards

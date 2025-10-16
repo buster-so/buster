@@ -25,6 +25,22 @@ export const GetDashboardResponseSchema = z.object({
 export const UpdateDashboardResponseSchema = GetDashboardResponseSchema;
 export const PostDashboardResponseSchema = GetDashboardResponseSchema;
 
+// DELETE Dashboard response schema (single)
+export const DeleteDashboardResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+
+// DELETE Dashboards response schema (bulk)
+export const DeleteDashboardsResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  deleted_count: z.number(),
+  failed_ids: z.array(z.string()).optional(),
+});
+
 export type GetDashboardResponse = z.infer<typeof GetDashboardResponseSchema>;
 export type PostDashboardResponse = z.infer<typeof PostDashboardResponseSchema>;
 export type UpdateDashboardResponse = z.infer<typeof UpdateDashboardResponseSchema>;
+export type DeleteDashboardResponse = z.infer<typeof DeleteDashboardResponseSchema>;
+export type DeleteDashboardsResponse = z.infer<typeof DeleteDashboardsResponseSchema>;

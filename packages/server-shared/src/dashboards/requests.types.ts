@@ -31,9 +31,22 @@ export const PostDashboardRequestSchema = z.object({
   config: DashboardConfigSchema.optional(),
 });
 
+// DELETE Dashboard request schema - accepts either single ID or array of IDs
+export const DeleteDashboardParamsSchema = z.object({
+  id: z.string().uuid('Dashboard ID must be a valid UUID'),
+});
+
+export const DeleteDashboardsRequestSchema = z.object({
+  ids: z
+    .array(z.string().uuid('Dashboard ID must be a valid UUID'))
+    .min(1, 'At least one dashboard ID is required'),
+});
+
 // Export inferred types
 export type GetDashboardParams = z.infer<typeof GetDashboardParamsSchema>;
 export type GetDashboardQuery = z.infer<typeof GetDashboardQuerySchema>;
 export type UpdateDashboardParams = z.infer<typeof UpdateDashboardParamsSchema>;
 export type UpdateDashboardRequest = z.infer<typeof UpdateDashboardRequestSchema>;
 export type PostDashboardRequest = z.infer<typeof PostDashboardRequestSchema>;
+export type DeleteDashboardParams = z.infer<typeof DeleteDashboardParamsSchema>;
+export type DeleteDashboardsRequest = z.infer<typeof DeleteDashboardsRequestSchema>;
