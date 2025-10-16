@@ -108,6 +108,18 @@ jobs:
         with:
           cache-key: lint-build-test
 
+      - name: Mount Rust target directory
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-rust-target
+          path: ./apps/api/target
+
+      - name: Mount Cargo cache
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-cargo-cache
+          path: ~/.cargo
+
       - name: Build all packages
         run: pnpm turbo build
 
