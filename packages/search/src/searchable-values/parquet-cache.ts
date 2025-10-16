@@ -7,8 +7,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { type StorageProvider, getDefaultProvider } from '@buster/data-source';
-import { type DuckDBContext, closeConnection, createConnection, executeQuery } from './deduplicate';
+import { getDefaultProvider, type StorageProvider } from '@buster/data-source';
+import { closeConnection, createConnection, type DuckDBContext, executeQuery } from './deduplicate';
 import type { SearchableValue } from './types';
 
 // ============================================================================

@@ -34,7 +34,8 @@
     "@buster/data-source": "workspace:*",
     "@buster/database": "workspace:*",
     "@buster/server-shared": "workspace:*",
-    "@turbopuffer/turbopuffer": "^1.0.0",
+    "@turbopuffer/turbopuffer": "^1.3.0",
+    "@biomejs/biome": "2.2.6",
     "zod": "^3.22.4"
   },
   "optionalDependencies": {
