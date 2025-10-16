@@ -1,5 +1,5 @@
 import { Box, Text } from 'ink';
-import type { FileSearchResult } from '../utils/file-search';
+import type { FileSearchResult } from '../../utils/file-search';
 
 interface FileAutocompleteDisplayProps {
   items: FileSearchResult[];

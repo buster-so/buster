@@ -1,6 +1,7 @@
 import { mkdir, readdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import type { ModelMessage } from '@buster/ai';
 import { z } from 'zod';
 
 // Schema for a conversation file - single source of truth
@@ -10,7 +11,9 @@ const ConversationSchema = z.object({
   createdAt: z.string().datetime().describe('ISO timestamp when conversation was created'),
   updatedAt: z.string().datetime().describe('ISO timestamp when conversation was last updated'),
   // AI SDK messages array - single source of truth for conversation state
-  modelMessages: z.array(z.any()).describe('Array of CoreMessage objects (user, assistant, tool)'),
+  modelMessages: z
+    .custom<ModelMessage[]>()
+    .describe('Array of ModelMessage objects (user, assistant, tool)'),
 });
 
 export type Conversation = z.infer<typeof ConversationSchema>;
@@ -117,8 +120,7 @@ export async function loadConversation(
 export async function saveModelMessages(
   chatId: string,
   workingDirectory: string,
-  // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
-  modelMessages: any[]
+  modelMessages: ModelMessage[]
 ): Promise<void> {
   let conversation = await loadConversation(chatId, workingDirectory);
 
@@ -128,8 +130,7 @@ export async function saveModelMessages(
   }
 
   // Replace the model messages with the new array
-  // biome-ignore lint/suspicious/noExplicitAny: We need to fix this to actually make it typesafe
-  conversation.modelMessages = modelMessages as any[];
+  conversation.modelMessages = modelMessages;
   conversation.updatedAt = new Date().toISOString();
 
   // Save back to disk

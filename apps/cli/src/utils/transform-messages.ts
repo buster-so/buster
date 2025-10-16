@@ -1,5 +1,5 @@
 import type { ModelMessage } from '@buster/ai';
-import type { CliAgentMessage } from '../services/analytics-engineer-handler';
+import type { CliAgentMessage } from '../services';
 import type { AgentMessage } from '../types/agent-messages';
 
 /**

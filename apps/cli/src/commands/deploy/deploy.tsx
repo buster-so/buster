@@ -1,7 +1,6 @@
 import { Box, Text } from 'ink';
 import { useEffect, useState } from 'react';
-import { BusterBanner } from '../../components/banner';
-import { Spinner } from '../../components/spinner';
+import { BusterBanner, Spinner } from '../../components';
 import { DeployProgress } from './components/deploy-progress';
 import { DeploySummary } from './components/deploy-summary';
 import { deployHandler, validateDeployOptions } from './deploy-handler';

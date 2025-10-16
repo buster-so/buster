@@ -1,11 +1,11 @@
 import { Box, Text } from 'ink';
-import { UI_CONSTANTS } from '../constants/ui';
-import { useExpansion } from '../hooks/use-expansion';
-import type { AgentMessage } from '../types/agent-messages';
-import { getLastLines } from '../utils/content-preview';
-import { ContentLines } from './shared/content-lines';
-import { ExpansionHint } from './shared/expansion-hint';
-import { IndentedContent } from './shared/indented-content';
+import { UI_CONSTANTS } from '../../constants/ui';
+import { useExpansion } from '../../hooks/use-expansion';
+import type { AgentMessage } from '../../types/agent-messages';
+import { getLastLines } from '../../utils/content-preview';
+import { ContentLines } from '../shared/content-lines';
+import { ExpansionHint } from '../shared/expansion-hint';
+import { IndentedContent } from '../shared/indented-content';
 
 interface ExecuteMessageProps {
   message: Extract<AgentMessage, { kind: 'bash' | 'grep' | 'ls' }>;

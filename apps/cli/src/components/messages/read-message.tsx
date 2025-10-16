@@ -1,13 +1,13 @@
 import { Box } from 'ink';
-import { UI_CONSTANTS } from '../constants/ui';
-import { useExpansion } from '../hooks/use-expansion';
-import type { AgentMessage } from '../types/agent-messages';
-import { getPreviewLines } from '../utils/content-preview';
-import { ContentLines } from './shared/content-lines';
-import { ExpansionHint } from './shared/expansion-hint';
-import { IndentedContent } from './shared/indented-content';
-import { StatusLine } from './shared/status-line';
-import { ToolBadge } from './shared/tool-badge';
+import { UI_CONSTANTS } from '../../constants/ui';
+import { useExpansion } from '../../hooks/use-expansion';
+import type { AgentMessage } from '../../types/agent-messages';
+import { getPreviewLines } from '../../utils/content-preview';
+import { ContentLines } from '../shared/content-lines';
+import { ExpansionHint } from '../shared/expansion-hint';
+import { IndentedContent } from '../shared/indented-content';
+import { StatusLine } from '../shared/status-line';
+import { ToolBadge } from '../shared/tool-badge';
 
 interface ReadMessageProps {
   message: Extract<AgentMessage, { kind: 'read' }>;
