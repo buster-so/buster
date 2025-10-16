@@ -20,7 +20,7 @@ const app = new Hono().get(
 
     const chat = await getChatById(chatId);
     if (!chat) {
-      throw new HTTPException(404, { message: 'Metric not found' });
+      throw new HTTPException(404, { message: 'Chat not found' });
     }
 
     const permission = await checkPermission({
