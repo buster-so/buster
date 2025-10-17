@@ -18,7 +18,6 @@ export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
     const { version_number } = context;
     const [report] = await Promise.all([
       prefetchGetReport(context.queryClient, params.reportId, version_number),
-      BusterChartDynamic.preload(),
     ]);
     if (!report) {
       throw redirect({
