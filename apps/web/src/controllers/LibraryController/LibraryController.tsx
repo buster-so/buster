@@ -10,12 +10,7 @@ export type LibraryControllerProps = {
   layout: LibraryLayout;
 };
 
-export const LibraryController: React.FC<LibraryControllerProps> = ({
-  filters,
-  layout: initialLayout,
-}) => {
-  const { layout, setLayout } = useLibraryLayout({ initialLayout });
-
+export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, layout }) => {
   const { scrollContainerRef, allResults, isLoading, hasNextPage, isFetchingNextPage } =
     useLibraryAssetsInfinite({
       ...filters,
@@ -25,9 +20,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
       },
     });
   return (
-    <AppPageLayout
-      header={<LibraryHeader setLayout={setLayout} layout={layout} filters={filters} />}
-    >
+    <AppPageLayout header={<LibraryHeader layout={layout} filters={filters} />}>
       {layout}
     </AppPageLayout>
   );

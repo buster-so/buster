@@ -20,6 +20,7 @@ export const searchParamsSchema = z.object({
   end_date: z.string().datetime().optional(),
   owner_id: z.string().uuid().optional(),
   asset_type: z.array(AssetTypeSchema).optional(),
+  layout: layoutSchema.optional(),
   filter: z.enum(['all', 'owned_by_me', 'shared_with_me']).default('all').optional(),
 });
 

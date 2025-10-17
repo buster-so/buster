@@ -129,7 +129,7 @@
     "@uploadthing/react": "^7.3.3",
     "axios": "catalog:",
     "canvas-confetti": "^1.9.3",
-    "chart.js": "4.5.1",
+    "chart.js": "4.5.0",
     "chartjs-adapter-dayjs-4": "^1.0.4",
     "chartjs-plugin-annotation": "^3.1.0",
     "chartjs-plugin-datalabels": "^2.2.0",

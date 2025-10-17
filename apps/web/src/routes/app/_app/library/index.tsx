@@ -23,7 +23,7 @@ export const Route = createFileRoute('/app/_app/library/')({
 });
 
 function RouteComponent() {
-  const { libraryLayout } = Route.useLoaderData();
   const filters = Route.useSearch();
+  const { libraryLayout } = Route.useLoaderData();
   return <LibraryController filters={filters} layout={libraryLayout} />;
 }
