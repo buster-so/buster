@@ -22,6 +22,8 @@ import {
 import {
   AssetPermissionRoleSchema,
   AssetTypeSchema,
+  ChatTypeSchema,
+  type DashboardYml,
   DataSourceOnboardingStatusSchema,
   DatasetTypeSchema,
   DocsTypeSchema,
@@ -110,6 +112,8 @@ export const messageAnalysisModeEnum = pgEnum(
   'message_analysis_mode_enum',
   MessageAnalysisModeSchema.options
 );
+
+export const chatTypeEnum = pgEnum('chat_type_enum', ChatTypeSchema.options);
 
 export const apiKeys = pgTable(
   'api_keys',
@@ -716,7 +720,7 @@ export const dashboardFiles = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: varchar().notNull(),
     fileName: varchar('file_name').notNull(),
-    content: jsonb().notNull().default([]),
+    content: jsonb().$type<DashboardYml>().notNull(),
     filter: varchar(),
     organizationId: uuid('organization_id').notNull(),
     createdBy: uuid('created_by').notNull(),
@@ -874,6 +878,7 @@ export const chats = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     title: text().notNull(),
+    chatType: chatTypeEnum('chat_type').default('analyst').notNull(),
     organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()

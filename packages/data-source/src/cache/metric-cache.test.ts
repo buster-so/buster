@@ -1,5 +1,5 @@
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
-import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { getProviderForOrganization } from '../storage';
 import type { StorageProvider } from '../storage/types';
 import {

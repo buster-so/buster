@@ -13,11 +13,15 @@ export interface StreamHandlerCallbacks {
   onMessageUpdate?: (messages: ModelMessage[]) => void;
   onThinkingStateChange?: (thinking: boolean) => void;
   onSaveMessages?: (messages: ModelMessage[]) => Promise<void>;
+  onError?: (error: unknown) => void;
+  onAbort?: () => void;
+  currentTurnStartIndex?: number;
 }
 
 /**
  * Processes agent stream and accumulates messages
  * Pure function that handles stream events and updates accumulator state
+ * Only saves messages from currentTurnStartIndex onward to prevent accumulation
  */
 export async function processAgentStream(
   stream: AsyncIterable<{
@@ -27,11 +31,12 @@ export async function processAgentStream(
     toolName?: string;
     input?: unknown;
     output?: unknown;
+    error?: unknown;
   }>,
   initialMessages: ModelMessage[],
   callbacks: StreamHandlerCallbacks
 ): Promise<ModelMessage[]> {
-  const { onMessageUpdate, onThinkingStateChange, onSaveMessages } = callbacks;
+  const { onMessageUpdate, onThinkingStateChange, onSaveMessages, onError, onAbort } = callbacks;
 
   // Initialize message accumulator state
   let accumulatorState = createMessageAccumulatorState(initialMessages);
@@ -60,7 +65,7 @@ export async function processAgentStream(
         if (accumulatedReasoning) {
           accumulatorState = addReasoningContent(accumulatorState, accumulatedReasoning);
           onMessageUpdate?.(accumulatorState.messages);
-          await onSaveMessages?.(accumulatorState.messages);
+          // Don't save here - wait for finish-step to ensure tool results are included
         }
       }
 
@@ -72,7 +77,7 @@ export async function processAgentStream(
         if (accumulatedText) {
           accumulatorState = addTextContent(accumulatorState, accumulatedText);
           onMessageUpdate?.(accumulatorState.messages);
-          await onSaveMessages?.(accumulatorState.messages);
+          // Don't save here - wait for finish-step to ensure tool results are included
         }
       }
 
@@ -108,7 +113,34 @@ export async function processAgentStream(
 
       if (part.type === 'finish-step') {
         // Save once at end of step to ensure all tool calls/results are captured atomically
-        await onSaveMessages?.(accumulatorState.messages);
+        // Only save messages from current turn (not full history)
+        const messagesToSave =
+          callbacks.currentTurnStartIndex !== undefined
+            ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
+            : accumulatorState.messages;
+        await onSaveMessages?.(messagesToSave);
+      }
+
+      if (part.type === 'error') {
+        // Handle stream-level errors
+        onError?.(part.error);
+        // Still save messages up to this point (current turn only)
+        const messagesToSave =
+          callbacks.currentTurnStartIndex !== undefined
+            ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
+            : accumulatorState.messages;
+        await onSaveMessages?.(messagesToSave);
+      }
+
+      if (part.type === 'abort') {
+        // Handle abort events
+        onAbort?.();
+        // Save messages before abort (current turn only)
+        const messagesToSave =
+          callbacks.currentTurnStartIndex !== undefined
+            ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
+            : accumulatorState.messages;
+        await onSaveMessages?.(messagesToSave);
       }
     }
   } finally {

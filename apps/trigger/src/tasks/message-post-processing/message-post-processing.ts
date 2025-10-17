@@ -1,7 +1,11 @@
 import { getPermissionedDatasets } from '@buster/access-controls';
-import postProcessingWorkflow, {
+import {
+  currentSpan,
+  initLogger,
   type PostProcessingWorkflowOutput,
-} from '@buster/ai/workflows/message-post-processing-workflow/message-post-processing-workflow';
+  postProcessingWorkflow,
+  wrapTraced,
+} from '@buster/ai';
 import { db, eq, getDb } from '@buster/database/connection';
 import {
   getBraintrustMetadata,
@@ -21,7 +25,6 @@ import type {
   PostProcessingMessage,
 } from '@buster/server-shared/message';
 import { logger, schemaTask, tasks } from '@trigger.dev/sdk/v3';
-import { currentSpan, initLogger, wrapTraced } from 'braintrust';
 import { z } from 'zod/v4';
 import type { logsWriteBackTask } from '../logs-write-back';
 import {
@@ -32,8 +35,8 @@ import {
   sendSlackReplyNotification,
   trackSlackNotification,
 } from './helpers';
-import { DataFetchError, MessageNotFoundError, TaskInputSchema } from './types';
 import type { TaskInput, TaskOutput } from './types';
+import { DataFetchError, MessageNotFoundError, TaskInputSchema } from './types';
 
 /**
  * Extract only the specific fields we want to save to the database
@@ -333,7 +336,7 @@ export const messagePostProcessingTask: ReturnType<
           messageId: payload.messageId,
           error: errorMessage,
         });
-        console.error('Failed to update database with post-processing result:', {
+        logger.error('Failed to update database with post-processing result:', {
           messageId: payload.messageId,
           error: errorMessage,
           stack: dbError instanceof Error ? dbError.stack : undefined,
@@ -467,7 +470,7 @@ export const messagePostProcessingTask: ReturnType<
           organizationId: messageContext.organizationId,
           error: errorMessage,
         });
-        console.error('Failed to send Slack notification:', {
+        logger.error('Failed to send Slack notification:', {
           messageId: payload.messageId,
           organizationId: messageContext.organizationId,
           error: errorMessage,
@@ -539,7 +542,7 @@ export const messagePostProcessingTask: ReturnType<
         executionTimeMs: Date.now() - startTime,
       });
 
-      console.error('Post-processing task execution failed:', {
+      logger.error('Post-processing task execution failed:', {
         messageId: payload.messageId,
         error: errorMessage,
         stack: error instanceof Error ? error.stack : undefined,

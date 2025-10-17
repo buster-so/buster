@@ -45,7 +45,7 @@ export const GlobalSearchModal = () => {
     return;
   }, [selectedAssets, hasQuery]);
 
-  const { allResults, isLoading, scrollContainerRef } = useSearchInfinite({
+  const { allResults, isFetching, scrollContainerRef } = useSearchInfinite({
     page_size: 20,
     assetTypes,
     startDate: selectedDateRange?.from?.toISOString(),
@@ -64,7 +64,7 @@ export const GlobalSearchModal = () => {
       value={searchQuery}
       items={allResults}
       onChangeValue={setSearchQuery}
-      loading={isLoading}
+      loading={isFetching}
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent}
       onSetFilters={onSetFilters}

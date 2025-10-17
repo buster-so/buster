@@ -1,8 +1,8 @@
+import { initLogger, wrapTraced } from '@buster/ai';
 import { db, eq } from '@buster/database/connection';
 import { messages } from '@buster/database/schema';
 import { createTestChat, createTestMessage } from '@buster/test-utils';
 import { runs, tasks } from '@trigger.dev/sdk';
-import { initLogger, wrapTraced } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { analyst_agent_task_keys } from '../../src/task-keys';
 import type { analystAgentTask } from '../../src/tasks/analyst-agent-task';

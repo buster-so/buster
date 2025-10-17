@@ -3,8 +3,8 @@ import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,
-  DataSourceIntrospectionResult,
   Database,
+  DataSourceIntrospectionResult,
   Schema,
   Table,
   TableStatistics,

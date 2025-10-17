@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { DataSource } from '../data-source';
 import type { DataSourceConfig } from '../data-source';
-import { TEST_TIMEOUT, hasCredentials, testConfig } from '../setup';
-import { DataSourceType } from '../types/credentials';
+import { DataSource } from '../data-source';
+import { hasCredentials, TEST_TIMEOUT, testConfig } from '../setup';
 import type {
   BigQueryCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   SnowflakeCredentials,
 } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 
 // Helper functions to create credentials for each data source type
 function createPostgreSQLCredentials(): PostgreSQLCredentials {

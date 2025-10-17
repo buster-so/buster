@@ -4,8 +4,8 @@ import { z } from 'zod';
 // Re-export the introspection types from data-source package
 export type {
   IntrospectionFilters,
-  TableMetadata,
   StructuralMetadata,
+  TableMetadata,
   TableSample,
 } from '@buster/data-source';
 

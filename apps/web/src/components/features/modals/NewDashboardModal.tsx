@@ -16,11 +16,6 @@ export const NewDashboardModal: React.FC<{
   const [title, setTitle] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { mutateAsync: createNewDashboard, isPending: isCreatingDashboard } = useCreateDashboard();
-  const { mutateAsync: updateDashboard, isPending: isUpdatingDashboard } = useUpdateDashboard({
-    updateOnSave: false,
-    updateVersion: false,
-    saveToServer: true,
-  });
 
   const disableSubmit = !inputHasText(title);
 
@@ -35,10 +30,6 @@ export const NewDashboardModal: React.FC<{
     if (isCreatingDashboard || disableSubmit) return;
     const res = await createNewDashboard({ name: title, description: '' });
     const newDashboardId = res.dashboard.id;
-
-    if (newDashboardId) {
-      await updateDashboard({ id: newDashboardId, name: title });
-    }
 
     if (onDashboardCreated && newDashboardId) {
       onDashboardCreated(newDashboardId);
@@ -61,11 +52,11 @@ export const NewDashboardModal: React.FC<{
       primaryButton: {
         text: 'Create dashboard',
         onClick: onCreateNewDashboard,
-        loading: isCreatingDashboard || isUpdatingDashboard,
+        loading: isCreatingDashboard,
         disabled: disableSubmit,
       },
     };
-  }, [isCreatingDashboard, isUpdatingDashboard, disableSubmit]);
+  }, [isCreatingDashboard, disableSubmit]);
 
   useEffect(() => {
     if (open) {

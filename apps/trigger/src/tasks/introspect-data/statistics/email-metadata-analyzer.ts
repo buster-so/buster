@@ -69,7 +69,7 @@ export class EmailMetadataAnalyzer {
           domain,
           CASE 
             WHEN domain IS NOT NULL AND domain LIKE '%.%'
-            THEN REGEXP_EXTRACT(domain, '\.([^.]+)$', 1)
+            THEN REGEXP_EXTRACT(domain, '.([^.]+)$', 1)
             ELSE NULL
           END as tld
         FROM email_parsing
@@ -195,7 +195,7 @@ export class EmailMetadataAnalyzer {
           ${escapedColumn}::VARCHAR as email,
           CASE 
             -- Basic email pattern validation
-            WHEN ${escapedColumn}::VARCHAR SIMILAR TO '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
+            WHEN ${escapedColumn}::VARCHAR SIMILAR TO '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}'
             THEN 'valid'
             -- Common issues
             WHEN ${escapedColumn}::VARCHAR NOT LIKE '%@%'
@@ -274,11 +274,11 @@ export class EmailMetadataAnalyzer {
         SELECT 
           local_part,
           CASE 
-            WHEN local_part SIMILAR TO '[a-z]+\.[a-z]+' THEN 'firstname.lastname'
+            WHEN local_part SIMILAR TO '[a-z]+.[a-z]+' THEN 'firstname.lastname'
             WHEN local_part SIMILAR TO '[a-z]+[0-9]+' THEN 'name_with_numbers'
             WHEN local_part SIMILAR TO '[a-z]+_[a-z]+' THEN 'underscore_separated'
             WHEN local_part SIMILAR TO '[a-z]+'  THEN 'single_word'
-            WHEN local_part SIMILAR TO '[a-z]+\+[a-z0-9]+' THEN 'plus_addressing'
+            WHEN local_part SIMILAR TO '[a-z]++[a-z0-9]+' THEN 'plus_addressing'
             ELSE 'other'
           END as pattern_type
         FROM local_part_analysis

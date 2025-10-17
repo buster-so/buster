@@ -1,4 +1,5 @@
 import pkg from 'node-sql-parser';
+
 const { Parser } = pkg;
 
 export interface QueryTypeCheckResult {
