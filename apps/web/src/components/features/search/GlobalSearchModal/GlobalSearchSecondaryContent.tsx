@@ -182,6 +182,7 @@ const MetricScreenshotContainer = ({
             screenshotUrl={screenshotUrl}
             assetType={'metric_file'}
             className={cn(canFetchData && 'animate-pulse')}
+            key={`${assetId}-image`} //force re-render when the assetId changes
           />
         ) : (
           <MetricChartCard
