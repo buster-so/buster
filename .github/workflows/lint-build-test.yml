@@ -108,7 +108,7 @@ jobs:
           cache-key: lint-build-test
 
       - name: Build all packages
-        run: pnpm turbo build
+        run: pnpm turbo build --filter='!@buster-app/api-legacy'
 
   # Unit test job - runs after build completes
   unit_test:

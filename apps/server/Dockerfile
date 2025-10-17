@@ -25,12 +25,10 @@ COPY apps/server/package.json ./apps/server/
 COPY apps/trigger/package.json ./apps/trigger/
 
 # Install ALL dependencies with network reliability settings from .pnpmrc
-# Use BuildKit cache mount for pnpm store (matches store-dir in .pnpmrc)
-# Add timeout to kill hung installs (5 minutes max)
-RUN --mount=type=cache,target=/root/.pnpm-store,id=pnpm-store \
-    timeout 300 pnpm install --frozen-lockfile --reporter=append-only || \
-    (echo "Install timed out after 5 minutes, retrying once..." && \
-     timeout 300 pnpm install --frozen-lockfile --reporter=append-only)
+# Add timeout to kill hung installs (3 minutes max)
+RUN timeout 180 pnpm install --frozen-lockfile --reporter=append-only || \
+    (echo "Install timed out after 3 minutes, retrying once..." && \
+     timeout 180 pnpm install --frozen-lockfile --reporter=append-only)
 
 # Build stage - build directly from deps
 FROM deps AS build
