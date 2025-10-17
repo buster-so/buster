@@ -50,9 +50,6 @@ export const createCspHeader = (isEmbed = false): string => {
         "'self'",
         'blob:',
         'data:', // Allow data URLs for PDF exports and other data URI downloads
-        localDomains,
-        supabaseOrigin,
-        supabaseWsOrigin,
         'https://*.vercel.app',
         'https://*.supabase.co',
         'wss://*.supabase.co',
@@ -90,6 +87,9 @@ export const createCspHeader = (isEmbed = false): string => {
         apiUrl,
         api2Url,
         profilePictureURL,
+        localDomains,
+        supabaseOrigin,
+        supabaseWsOrigin,
       ]
         .map((source) => source.replace(/\s+/g, ' ').trim())
         .filter(Boolean);

@@ -22,6 +22,7 @@ export const corsMiddleware = cors({
             'buster.so',
             'staging.buster.so',
             'preview.buster.so',
+            'platform.buster.so',
             'www.buster.so',
           ];
 
