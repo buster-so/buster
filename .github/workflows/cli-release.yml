@@ -73,7 +73,7 @@ jobs:
       - name: Build dependencies with Turbo
         run: |
           echo "🔨 Building CLI dependencies with Turbo..."
-          pnpm turbo run build --filter=@buster-app/cli^...
+          pnpm turbo run build --filter=@buster-app/cli^... --filter=@buster/search
         env:
           NODE_ENV: production
           SKIP_ENV_CHECK: true

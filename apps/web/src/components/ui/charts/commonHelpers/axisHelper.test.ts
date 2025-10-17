@@ -43,7 +43,12 @@ describe('formatYAxisLabel', () => {
     // Verify
     expect(formatLabel).toHaveBeenCalledWith(
       value,
-      { columnType: 'number', style: 'percent' },
+      {
+        columnType: 'number',
+        style: 'percent',
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+      },
       false
     );
   });
