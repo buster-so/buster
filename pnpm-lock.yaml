@@ -1132,7 +1132,7 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3
       node-sql-parser:
-        specifier: ^5.3.12
+        specifier: ^5.3.13
         version: 5.3.13
       pluralize:
         specifier: ^8.0.0
