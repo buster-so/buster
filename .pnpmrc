@@ -23,3 +23,10 @@ registry=https://registry.npmjs.org/
 
 # Enable side effects caching for performance
 side-effects-cache=true
+
+# Network reliability settings to prevent install hangs
+network-timeout=120000
+fetch-retries=1
+fetch-retry-mintimeout=10000
+fetch-retry-maxtimeout=30000
+fetch-timeout=120000
