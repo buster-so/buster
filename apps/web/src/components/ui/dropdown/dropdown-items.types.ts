@@ -26,6 +26,7 @@ export type IDropdownItem<
   linkIcon?: 'arrow-right' | 'arrow-external' | 'caret-right' | 'none';
   selectType?: DropdownProps<T>['selectType'];
   className?: string;
+  onSearch?: (search: string) => void;
 };
 
 export interface DropdownDivider {
