@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DataSourceType } from '../types/credentials';
 import type { SQLServerCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 import { SQLServerAdapter } from './sqlserver';
 
 // Check if SQLServer test credentials are available

@@ -161,7 +161,7 @@ const ConnectedSlackChannels = React.memo(() => {
     isLoadingSlackChannels || isLoadingSlackIntegration || isRefetchingSlackChannels;
 
   return (
-    <div className="flex items-center justify-between space-x-4">
+    <div className="flex items-center justify-between space-x-4 group">
       <div className="flex flex-col space-y-0.5">
         <Text>Alerts channel</Text>
         <Text variant="secondary" size={'xs'}>
@@ -175,8 +175,9 @@ const ConnectedSlackChannels = React.memo(() => {
               <Button
                 size={'tall'}
                 variant="ghost"
+                className="group-hover:flex hidden"
                 loading={showLoadingButton}
-                suffix={
+                prefix={
                   !showLoadingButton && (
                     <span className="flex items-center justify-center text-base">
                       <Refresh />

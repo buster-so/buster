@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { ModelMessage } from '@buster/ai';
 import { createAnalyticsEngineerAgent } from '@buster/ai/agents/analytics-engineer-agent/analytics-engineer-agent';
-import { createProxyModel } from '@buster/ai/llm/providers/proxy-model';
+import { proxyModel } from '@buster/ai/llm/providers/proxy-model';
 import { z } from 'zod';
 
 /**
@@ -20,6 +20,7 @@ export type ProxyConfig = z.infer<typeof ProxyConfigSchema>;
  */
 export const AgentHandlerParamsSchema = z.object({
   chatId: z.string().uuid().describe('Chat session identifier'),
+  messageId: z.string().uuid().optional().describe('Message ID for tracking'),
   workingDirectory: z.string().describe('Working directory path'),
   userId: z.string().default('cli-user').describe('User identifier'),
   organizationId: z.string().default('cli').describe('Organization identifier'),
@@ -38,8 +39,9 @@ export async function createConfiguredAgent(params: AgentHandlerParams, proxyCon
   const validated = AgentHandlerParamsSchema.parse(params);
   const validatedProxy = ProxyConfigSchema.parse(proxyConfig);
 
-  // Create proxy model that routes through server
-  const proxyModel = createProxyModel({
+  // Create proxy model with Braintrust middleware for observability
+  // This logs all LLM calls at the CLI level (proxy model) rather than server level (gateway model)
+  const model = proxyModel({
     baseURL: validatedProxy.baseURL,
     apiKey: validatedProxy.apiKey,
     modelId: validatedProxy.modelId,
@@ -52,9 +54,9 @@ export async function createConfiguredAgent(params: AgentHandlerParams, proxyCon
     chatId: validated.chatId,
     dataSourceId: validated.dataSourceId,
     organizationId: validated.organizationId,
-    messageId: randomUUID(),
+    messageId: validated.messageId || randomUUID(),
     todosList: [],
-    model: proxyModel,
+    model,
     abortSignal: validated.abortSignal,
     apiKey: validatedProxy.apiKey,
     apiUrl: validatedProxy.baseURL,

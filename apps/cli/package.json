@@ -8,10 +8,9 @@
   },
   "scripts": {
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || (tsx scripts/validate-env.ts && pnpm run typecheck)",
-    "build": "bun build src/index.tsx --outdir dist --target bun",
+    "build": "bun run build.ts",
     "build:dry-run": "tsc --noEmit",
-    "build:standalone": "bun build src/index.tsx --compile --outfile dist/buster",
-    "start": "bun run dist/index.js",
+    "dev": "bun run src/index.tsx",
     "typecheck": "tsc --noEmit",
     "lint": "biome check --write",
     "test": "vitest run",

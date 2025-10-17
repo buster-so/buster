@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import { createApiKeyAuthMiddleware } from '../../../../middleware/api-key-auth';
+import { chatById } from './[id]';
 import { publicChatHandler } from './handler';
 
 const app = new Hono();
@@ -69,5 +70,8 @@ app.post(
     }
   }
 );
+
+// Mount chat by ID route (includes messages)
+app.route('/:chatId', chatById);
 
 export default app;

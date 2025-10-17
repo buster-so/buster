@@ -1,3 +1,4 @@
+import type { ModelMessage } from '@buster/ai';
 import { Box, Text, useApp, useInput } from 'ink';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -15,7 +16,8 @@ import { ExpansionContext } from '../../hooks/use-expansion';
 import type { CliAgentMessage } from '../../services';
 import { runChatAgent } from '../../services';
 import type { Conversation } from '../../utils/conversation-history';
-import { loadConversation, saveModelMessages } from '../../utils/conversation-history';
+import { saveModelMessages } from '../../utils/conversation-history';
+import { loadConversation } from '../../utils/load-conversation-from-api';
 import { getCurrentChatId, initNewSession, setSessionChatId } from '../../utils/session';
 import { getSetting } from '../../utils/settings';
 import type { SlashCommand } from '../../utils/slash-commands';
@@ -49,7 +51,7 @@ export function Main() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream
-  const handleMessageUpdate = useCallback((modelMessages: import('@buster/ai').ModelMessage[]) => {
+  const handleMessageUpdate = useCallback((modelMessages: ModelMessage[]) => {
     const transformedMessages = transformModelMessagesToUI(modelMessages);
 
     // Update message counter to highest ID
@@ -122,10 +124,11 @@ export function Main() {
     const cwd = workingDirectory.current;
 
     try {
-      // Load existing model messages and append the new user message
+      // Load existing model messages from API
       const conversation = await loadConversation(chatId, cwd);
+
       const existingModelMessages = conversation?.modelMessages || [];
-      const userMessage: import('@buster/ai').ModelMessage = {
+      const userMessage: ModelMessage = {
         role: 'user',
         content: trimmed,
       };
@@ -151,12 +154,22 @@ export function Main() {
           chatId,
           workingDirectory: cwd,
           abortSignal: abortController.signal,
+          prompt: trimmed, // Pass the user prompt for database creation
+          messages: updatedModelMessages, // Pass all messages including new user message
         },
         {
           onThinkingStateChange: (thinking) => {
             setIsThinking(thinking);
           },
           onMessageUpdate: handleMessageUpdate,
+          onError: (error) => {
+            console.error('Agent stream error:', error);
+            setIsThinking(false);
+          },
+          onAbort: () => {
+            console.warn('Agent stream aborted');
+            setIsThinking(false);
+          },
         }
       );
     } catch (error) {

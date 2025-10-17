@@ -202,7 +202,7 @@ export async function getInstallationToken(
   // Generate a new token
   console.info(`Generating new token for installation ${installationId}`);
 
-  return await generateNewInstallationToken(installationId, integration.id);
+  return await generateNewInstallationToken(installationId);
 }
 
 /**
@@ -228,8 +228,7 @@ export async function getInstallationTokenByOrgId(
  * Generate a new installation token from GitHub
  */
 export async function generateNewInstallationToken(
-  installationId: string,
-  integrationId: string
+  installationId: string
 ): Promise<InstallationTokenResponse> {
   try {
     const app = createGitHubApp();
@@ -239,25 +238,6 @@ export async function generateNewInstallationToken(
       installation_id: Number.parseInt(installationId, 10),
     });
 
-    // Store the new token in vault
-    const vaultKey = await storeInstallationToken(
-      installationId,
-      data.token,
-      data.expires_at,
-      data.permissions,
-      data.repository_selection
-    );
-
-    // Update the integration with the new vault key
-    await updateGithubIntegration(integrationId, {
-      tokenVaultKey: vaultKey,
-      status: 'active', // Ensure status is active after successful token generation
-    });
-
-    console.info(
-      `Generated new token for installation ${installationId}, expires at ${data.expires_at}`
-    );
-
     return {
       token: data.token,
       expires_at: data.expires_at,
@@ -266,16 +246,7 @@ export async function generateNewInstallationToken(
     };
   } catch (error) {
     console.error(`Failed to generate token for installation ${installationId}:`, error);
-
-    // If token generation fails, mark the integration as failed
-    await updateGithubIntegration(integrationId, {
-      status: 'suspended',
-    });
-
-    throw createGitHubError(
-      GitHubErrorCode.TOKEN_GENERATION_FAILED,
-      `Failed to generate token: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    throw Error(`Failed to generate installation token`);
   }
 }
 

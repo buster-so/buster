@@ -1,4 +1,8 @@
-import { getApiKeyForInstallationId } from '@buster/database/queries';
+import {
+  getApiKeyForInstallationId,
+  getGithubIntegrationByInstallationId,
+  updateGithubIntegration,
+} from '@buster/database/queries';
 import { AuthDetailsAppInstallationResponseSchema, createGitHubApp } from '@buster/github';
 import type { App, WebhookEventName } from '@buster/github';
 import { runDocsAgent } from '@buster/sandbox';
@@ -70,21 +74,106 @@ function getOrSetApp() {
               message: 'No API key found for installation id',
             });
           }
-          await runDocsAgent(
-            authDetails.token,
-            payload.repository.html_url,
-            branch,
-            commentBody,
-            apiKey
-          );
+          await runDocsAgent({
+            installationToken: authDetails.token,
+            repoUrl: payload.repository.html_url,
+            branch: branch,
+            prompt: commentBody,
+            apiKey: apiKey,
+          });
         }
       }
     });
 
-    githubApp.webhooks.on('installation', ({ payload }) => {
-      console.info(
-        `Installation event received: ${payload.action} for installation id ${payload.installation.id}`
+    githubApp.webhooks.on('installation', async ({ payload }) => {
+      // Get existing integration once for all actions
+      const existing = await getGithubIntegrationByInstallationId(
+        payload.installation.id.toString()
       );
+
+      if (!existing) {
+        // Handle cases where no integration exists
+        if (payload.action === 'created') {
+          console.error(
+            `Installation failed for ${payload.installation.id} because it was not installed from our link and we don't have organization and user info required`
+          );
+        } else {
+          console.warn(
+            `Installation ${payload.action} but no integration found for installation id ${payload.installation.id}`
+          );
+        }
+        return;
+      }
+
+      // Prepare update data based on action
+      let updateData: {
+        githubOrgName?: string;
+        status?: 'pending' | 'active' | 'suspended' | 'revoked';
+        permissions?: Record<string, string>;
+        deletedAt?: string;
+      } = {};
+      let actionDescription = '';
+
+      switch (payload.action) {
+        case 'created': {
+          let orgName = 'Unknown Github User';
+          if (payload.installation.account) {
+            orgName =
+              'login' in payload.installation.account
+                ? payload.installation.account.login // Github User
+                : payload.installation.account.name; // Github Enterprise
+          }
+          updateData = {
+            githubOrgName: orgName,
+            status: 'active',
+            permissions: payload.installation.permissions,
+          };
+          actionDescription = 'created';
+          break;
+        }
+        case 'deleted': {
+          updateData = {
+            status: 'revoked',
+            deletedAt: new Date().toISOString(),
+          };
+          actionDescription = 'deleted';
+          break;
+        }
+        case 'suspend': {
+          updateData = {
+            status: 'suspended',
+          };
+          actionDescription = 'suspended';
+          break;
+        }
+        case 'unsuspend': {
+          updateData = {
+            status: 'active',
+          };
+          actionDescription = 'unsuspended';
+          break;
+        }
+        case 'new_permissions_accepted': {
+          updateData = {
+            permissions: payload.installation.permissions,
+          };
+          actionDescription = 'permissions updated';
+          break;
+        }
+      }
+
+      // Perform the update
+      const updated = await updateGithubIntegration(existing.id, updateData);
+
+      if (updated) {
+        console.info(
+          `Installation ${actionDescription} for installation id ${payload.installation.id} successfully`
+        );
+      } else {
+        console.error(
+          `Failed to ${payload.action} GitHub integration for installation id ${payload.installation.id}`
+        );
+      }
     });
   }
   return githubApp;

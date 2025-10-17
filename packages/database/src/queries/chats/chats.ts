@@ -3,7 +3,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { chats, messages, userFavorites, users } from '../../schema';
-import { MessageAnalysisModeSchema } from '../../schema-types';
+import { ChatTypeSchema, MessageAnalysisModeSchema } from '../../schema-types';
 
 // Type inference from schema
 export type Chat = InferSelectModel<typeof chats>;
@@ -20,6 +20,7 @@ type UpdateableChatFields = Partial<
  */
 export const CreateChatInputSchema = z.object({
   title: z.string().min(1),
+  chatType: ChatTypeSchema.optional(),
   userId: z.string().uuid(),
   organizationId: z.string().uuid(),
 });
@@ -57,6 +58,7 @@ export async function createChat(input: CreateChatInput): Promise<Chat> {
         createdBy: validated.userId,
         updatedBy: validated.userId,
         publiclyAccessible: false,
+        chatType: validated.chatType || 'analyst',
       })
       .returning();
 

@@ -4,9 +4,9 @@ import { SlackIntegrationError } from '../types/errors';
 import {
   type SlackRequestHeaders,
   type SlackWebhookPayload,
-  type UrlVerification,
   slackRequestHeadersSchema,
   slackWebhookPayloadSchema,
+  type UrlVerification,
   urlVerificationSchema,
 } from '../types/webhooks';
 

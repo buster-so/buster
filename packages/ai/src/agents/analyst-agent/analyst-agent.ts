@@ -205,7 +205,6 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
           providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
           headers: {
             'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07',
-            anthropic_beta: 'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07',
           },
           tools: {
             [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
@@ -256,6 +255,14 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
             console.info('Analyst Agent finished');
             // Ensure all pending database updates complete before stream terminates
             await waitForPendingUpdates(analystAgentOptions.messageId);
+          },
+          onError: ({ error }) => {
+            // Log error with context for debugging
+            console.error('Analyst Agent streaming error:', {
+              error,
+              chatId: analystAgentOptions.chatId,
+              messageId: analystAgentOptions.messageId,
+            });
           },
         }),
       {

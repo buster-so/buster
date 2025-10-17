@@ -1,9 +1,9 @@
 import { afterEach, describe, expect } from 'vitest';
-import { DataSource } from '../data-source';
 import type { DataSourceConfig } from '../data-source';
-import { TEST_TIMEOUT, skipIfNoCredentials, testConfig } from '../setup';
-import { DataSourceType } from '../types/credentials';
+import { DataSource } from '../data-source';
+import { skipIfNoCredentials, TEST_TIMEOUT, testConfig } from '../setup';
 import type { SQLServerCredentials } from '../types/credentials';
+import { DataSourceType } from '../types/credentials';
 
 function createSQLServerCredentials(): SQLServerCredentials {
   if (
