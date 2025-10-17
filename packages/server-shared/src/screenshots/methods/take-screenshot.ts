@@ -13,10 +13,11 @@ export const takeScreenshot = async ({
   height: number;
 }) => {
   //this might look redundant but it's important to wait for the page to fully stabilize
+  await new Promise((resolve) => setTimeout(resolve, 400)); //longer than the skeleton loader minimum
   await Promise.all([
     page.waitForLoadState('networkidle'),
     page.waitForLoadState('load'),
-    new Promise((resolve) => setTimeout(resolve, 600)), //longer than the skeleton loader minimum
+    new Promise((resolve) => setTimeout(resolve, 400)), //longer than the skeleton loader minimum
   ]);
   await page.waitForLoadState('domcontentloaded');
 
