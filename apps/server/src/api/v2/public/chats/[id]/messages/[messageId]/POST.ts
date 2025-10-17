@@ -2,13 +2,13 @@ import { checkPermission } from '@buster/access-controls';
 import type { ModelMessage } from '@buster/ai';
 import { db } from '@buster/database/connection';
 import {
-  type User,
   createAssetPermission,
   createMessage,
   getChatById,
   getMessagesForChatWithUserDetails,
+  getUser,
+  type User,
 } from '@buster/database/queries';
-import { getUser } from '@buster/database/queries';
 import { chats, messages } from '@buster/database/schema';
 import {
   CreateMessageRequestBodySchema,
