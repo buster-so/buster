@@ -56,7 +56,6 @@
   },
   "devDependencies": {
     "@types/js-yaml": "catalog:",
-    "@types/lodash-es": "^4.17.12",
-    "@biomejs/biome": "2.2.6"
+    "@types/lodash-es": "^4.17.12"
   }
 }

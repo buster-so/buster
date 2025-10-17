@@ -334,9 +334,6 @@ importers:
         specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
-      '@biomejs/biome':
-        specifier: 2.2.6
-        version: 2.2.6
       '@types/js-yaml':
         specifier: 'catalog:'
         version: 4.0.9
@@ -344,11 +341,7 @@ importers:
         specifier: ^4.17.12
         version: 4.17.12
 
-  apps/supabase:
-    dependencies:
-      '@biomejs/biome':
-        specifier: 2.2.6
-        version: 2.2.6
+  apps/supabase: {}
 
   apps/trigger:
     dependencies:
@@ -1244,9 +1237,6 @@ importers:
 
   packages/env-utils:
     dependencies:
-      '@biomejs/biome':
-        specifier: 2.2.6
-        version: 2.2.6
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -1464,9 +1454,6 @@ importers:
 
   packages/web-tools:
     dependencies:
-      '@biomejs/biome':
-        specifier: 2.2.6
-        version: 2.2.6
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
