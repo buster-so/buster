@@ -116,19 +116,19 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   }
 
   // Execute Buster CLI command in async mode
-  const command =await sandbox.process.executeSessionCommand(sessionName, {
+  await sandbox.process.executeSessionCommand(sessionName, {
     command: `cd ${repositoryPath} && buster ${cliArgs.join(' ')}`,
     runAsync: true,
   });
 
-  // Use for debugging logs if needed
-  const logs = await sandbox.process.getSessionCommandLogs(
-    sessionName,
-    command.cmdId ?? '',
-    (chunk) => console.info('[STDOUT]:', chunk),
-    (chunk) => console.error('[STDERR]:', chunk)
-  );
-  console.info('[SANDBOXLOGS]:', logs);
+  // // Use for debugging logs if needed
+  // const logs = await sandbox.process.getSessionCommandLogs(
+  //   sessionName,
+  //   command.cmdId ?? '',
+  //   (chunk) => console.info('[STDOUT]:', chunk),
+  //   (chunk) => console.error('[STDERR]:', chunk)
+  // );
+  // console.info('[SANDBOXLOGS]:', logs);
 
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
@@ -166,10 +166,13 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
     env.GH_APP_ID, // username
     installationToken // password
   );
-    // Install Buster CLI
+  // Install Buster CLI
 
-    await sandbox.process.executeCommand(`curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`, repositoryPath);
-    await sandbox.process.executeCommand(`buster --version`, repositoryPath);
+  await sandbox.process.executeCommand(
+    `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`,
+    repositoryPath
+  );
+  await sandbox.process.executeCommand(`buster --version`, repositoryPath);
 
   await sandbox.process.executeCommand(
     `gh auth setup-git && git config --global user.email "${busterAppGitEmail}" && git config --global user.name "${busterAppGitUsername}"`,
@@ -191,12 +194,6 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
     cliArgs.push(`--contextFilePath "${contextPath}/${contextFileName}"`);
   }
 
-  console.info('Repository path:', repositoryPath);
-  console.info('Environment variables:', {
-    GITHUB_TOKEN: installationToken,
-    BUSTER_API_KEY: apiKey,
-    BUSTER_HOST: env.BUSTER_HOST,
-  });
   const command = await sandbox.process.executeCommand(
     `buster ${cliArgs.join(' ')}`,
     repositoryPath,

@@ -75,8 +75,6 @@ const app = new Hono().post(
     const installationTokenResult = await generateNewInstallationToken(installationId);
 
     // Create a new chat and message for the documentation request
-    const prompt = `Please take a look at the current pull request or push and update the documentation if needed.`;
-
     const newChat = await createChat({
       title: context.prNumber
         ? `Documentation for PR ${context.prNumber}`
@@ -86,18 +84,18 @@ const app = new Hono().post(
       userId: apiKey.ownerId,
     });
 
+    const messageContent = `Run documentation agent for the repository ${context.repo} on branch ${context.head_branch}`;
     const newMessage = await createMessage({
       chatId: newChat.id,
-      content: prompt,
+      content: messageContent,
       userId: apiKey.ownerId,
     });
 
     // Kick off the documentation agent
-    await runDocsAgentSync({
+    await runDocsAgentAsync({
       installationToken: installationTokenResult.token,
       repoUrl: repositoryUrl,
       branch: branchName,
-      prompt: prompt,
       apiKey: apiKey.key,
       chatId: newChat.id,
       messageId: newMessage.id,

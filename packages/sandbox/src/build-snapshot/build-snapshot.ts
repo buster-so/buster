@@ -47,7 +47,7 @@ async function buildSnapshots() {
           },
         },
         {
-          onLogs: (log) => console.log(`[${adapter}] ${log}`)
+          onLogs: (log) => console.log(`[${adapter}] ${log}`),
         }
       );
       console.log(`✅ Successfully built snapshot: ${snapshotName}`);
@@ -73,7 +73,7 @@ async function buildSnapshots() {
     }
   });
 
-  const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+  const successful = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
   console.log(`\n🎉 Built ${successful}/${dbtAdapters.length} snapshots successfully!`);
 }
 

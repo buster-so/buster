@@ -116,7 +116,7 @@ Based on profiling results:
 - [ ] Run `git push`
 
 ## Step 10: PR Comment
-- [ ] Post comment summarizing:
+- [ ] If there is a PR provided then comment on the PR by running command `gh pr comment <pr-number> --body "Your comment text here."`. Comment should include a summary of:
   - [ ] Models documented
   - [ ] Tests added
   - [ ] Key data insights
