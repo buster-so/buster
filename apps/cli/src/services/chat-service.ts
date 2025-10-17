@@ -5,6 +5,7 @@ import { executeAgent, type ProxyConfig } from '../handlers/agent-handler';
 import { processAgentStream } from '../handlers/stream-handler';
 import type { AgentMessage } from '../types/agent-messages';
 import { getProxyConfig } from '../utils/ai-proxy';
+import { readContextFile } from '../utils/context-file';
 import { saveModelMessages } from '../utils/conversation-history';
 import { getCredentials } from '../utils/credentials';
 
@@ -30,6 +31,10 @@ export const ChatServiceParamsSchema = z.object({
     .array(z.any())
     .optional()
     .describe('Conversation messages including user message to pass to agent'),
+  contextFilePath: z
+    .string()
+    .optional()
+    .describe('Path to context file to include as system message'),
 });
 
 export type ChatServiceParams = z.infer<typeof ChatServiceParamsSchema>;
@@ -62,6 +67,7 @@ export async function runChatAgent(
     abortSignal,
     prompt: userPrompt,
     messages: providedMessages,
+    contextFilePath,
   } = validated;
   const { onThinkingStateChange, onMessageUpdate, onError, onAbort } = callbacks;
 
@@ -85,7 +91,19 @@ export async function runChatAgent(
 
   try {
     // Use provided messages (caller is responsible for loading conversation and adding user message)
-    const previousMessages: ModelMessage[] = (providedMessages as ModelMessage[]) || [];
+    let previousMessages: ModelMessage[] = (providedMessages as ModelMessage[]) || [];
+
+    // Prepend context file as system message if provided
+    if (contextFilePath) {
+      const contextContent = readContextFile(contextFilePath, workingDirectory);
+      previousMessages = [
+        {
+          role: 'system',
+          content: contextContent,
+        },
+        ...previousMessages,
+      ];
+    }
 
     // Find the index of the last user message (start of current turn)
     // This is where we want to start saving messages (not the full history)

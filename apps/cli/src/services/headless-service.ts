@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { ModelMessage } from '@buster/ai';
 import { z } from 'zod';
+import { readContextFile } from '../utils/context-file';
 import { loadConversation, saveModelMessages } from '../utils/conversation-history';
 import { runChatAgent } from './chat-service';
 
@@ -13,6 +14,10 @@ export const HeadlessServiceParamsSchema = z.object({
   messageId: z.string().uuid().optional().describe('Message ID for tracking'),
   workingDirectory: z.string().default(process.cwd()).describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
+  contextFilePath: z
+    .string()
+    .optional()
+    .describe('Path to context file to include as system message'),
 });
 
 export type HeadlessServiceParams = z.infer<typeof HeadlessServiceParamsSchema>;
@@ -29,6 +34,7 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     messageId: providedMessageId,
     workingDirectory,
     isInResearchMode,
+    contextFilePath,
   } = validated;
 
   // Use provided chatId or generate new one
@@ -42,12 +48,29 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     ? (conversation.modelMessages as ModelMessage[])
     : [];
 
+  // Prepare messages array
+  const messages: ModelMessage[] = [];
+
+  // Add context file as system message if provided
+  if (contextFilePath) {
+    const contextContent = readContextFile(contextFilePath, workingDirectory);
+    messages.push({
+      role: 'system',
+      content: contextContent,
+    });
+  }
+
+  // Add existing conversation messages
+  messages.push(...existingMessages);
+
   // Add user message
   const userMessage: ModelMessage = {
     role: 'user',
     content: prompt,
   };
-  const updatedMessages = [...existingMessages, userMessage];
+  messages.push(userMessage);
+
+  const updatedMessages = messages;
 
   // Save messages with user message
   await saveModelMessages(chatId, workingDirectory, updatedMessages);
