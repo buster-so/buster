@@ -1,20 +1,13 @@
+import { type ModelMessage, stepCountIs, streamText } from 'ai';
 import { currentSpan, wrapTraced } from 'braintrust';
-import {  type ModelMessage, stepCountIs, streamText } from 'ai';
-import {
-  DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
-
-} from '../../llm/providers/gateway';
+import { DEFAULT_ANALYTICS_ENGINEER_OPTIONS } from '../../llm/providers/gateway';
 import { Sonnet4 } from '../../llm/sonnet-4';
 import { createAnalyticsEngineerToolset } from './create-analytics-engineer-toolset';
 import {
   getDocsAgentSystemPrompt as getAnalyticsEngineerAgentSystemPrompt,
   getAnalyticsEngineerSubagentSystemPrompt,
 } from './get-analytics-engineer-agent-system-prompt';
-import type {
-  AnalyticsEngineerAgentOptions,
-  AnalyticsEngineerAgentStreamOptions,
-  TodoItem,
-} from './types';
+import type { AnalyticsEngineerAgentOptions, AnalyticsEngineerAgentStreamOptions } from './types';
 
 export const ANALYST_ENGINEER_AGENT_NAME = 'analyticsEngineerAgent';
 
