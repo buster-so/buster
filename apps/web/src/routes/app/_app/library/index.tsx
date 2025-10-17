@@ -1,22 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getCookie } from '@/api/server-functions/getCookie';
+import { LAYOUT_COOKIE_NAME } from '@/context/Library/useLibraryLayout';
+import { LibraryController } from '@/controllers/LibraryController/LibraryController';
 import {
   type LibraryLayout,
-  layoutSchema,
   searchParamsSchema,
+  wrappedLayoutSchema,
 } from '@/controllers/LibraryController/schema';
-
-const LAYOUT_COOKIE_NAME = 'library-layout';
 
 export const Route = createFileRoute('/app/_app/library/')({
   component: RouteComponent,
   validateSearch: searchParamsSchema,
   beforeLoad: async () => {
-    const libraryLayout: LibraryLayout = await getCookie({
-      data: { cookieName: LAYOUT_COOKIE_NAME },
-    }).then((v) => {
-      return layoutSchema.catch('grid').parse(v);
-    });
+    const libraryLayout: LibraryLayout = await getCookie({ data: LAYOUT_COOKIE_NAME }).then((v) =>
+      wrappedLayoutSchema.parse(v)
+    );
     return { libraryLayout };
   },
   loader: async ({ context }) => {
@@ -26,5 +24,6 @@ export const Route = createFileRoute('/app/_app/library/')({
 
 function RouteComponent() {
   const { libraryLayout } = Route.useLoaderData();
-  return <div>Hello "/app/_app/library/"! {libraryLayout}</div>;
+  const filters = Route.useSearch();
+  return <LibraryController filters={filters} layout={libraryLayout} />;
 }

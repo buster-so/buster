@@ -1,4 +1,4 @@
-import type { SearchPaginatedResponse } from '@buster/server-shared';
+import type { PaginatedResponse, SearchPaginatedResponse } from '@buster/server-shared';
 import type {
   InfiniteData,
   QueryKey,
@@ -26,13 +26,18 @@ type InfiniteScrollConfig = {
 };
 
 /**
+ * Pagination response types - supports both search and standard pagination
+ */
+type PaginationResponse<TData> = SearchPaginatedResponse<TData> | PaginatedResponse<TData>;
+
+/**
  * Hook options extending react-query's infinite query options
  */
 type UseInfiniteScrollOptions<TData, TError = ApiError> = Omit<
   UseInfiniteQueryOptions<
-    SearchPaginatedResponse<TData>,
+    PaginationResponse<TData>,
     TError,
-    InfiniteData<SearchPaginatedResponse<TData>>,
+    InfiniteData<PaginationResponse<TData>>,
     QueryKey,
     number
   >,
@@ -49,7 +54,7 @@ type UseInfiniteScrollOptions<TData, TError = ApiError> = Omit<
  * Return type for useInfiniteScroll hook
  */
 type UseInfiniteScrollResult<TData, TError = ApiError> = UseInfiniteQueryResult<
-  InfiniteData<SearchPaginatedResponse<TData>>,
+  InfiniteData<PaginationResponse<TData>>,
   TError
 > & {
   /**
@@ -94,10 +99,21 @@ export function useInfiniteScroll<TData, TError = ApiError>(
   const queryResult = useInfiniteQuery({
     ...queryOptions,
     getNextPageParam: (lastPage) => {
-      if (!lastPage.pagination.has_more) {
-        return undefined;
+      // Handle SearchPaginatedResponse (has_more)
+      if ('has_more' in lastPage.pagination) {
+        if (!lastPage.pagination.has_more) {
+          return undefined;
+        }
+        return lastPage.pagination.page + 1;
       }
-      return lastPage.pagination.page + 1;
+      // Handle PaginatedResponse (total_pages)
+      if ('total_pages' in lastPage.pagination) {
+        if (lastPage.pagination.page >= lastPage.pagination.total_pages) {
+          return undefined;
+        }
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
     },
     initialPageParam: 1,
   });

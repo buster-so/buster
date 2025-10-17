@@ -10,7 +10,7 @@ export const getAppLayout = async ({
   preservedSide?: 'left' | 'right';
 }) => {
   const cookieName = createAutoSaveId(id);
-  const cookieValue = await getCookie({ data: { cookieName } });
+  const cookieValue = await getCookie({ data: cookieName });
 
   if (!cookieValue) {
     return null;
