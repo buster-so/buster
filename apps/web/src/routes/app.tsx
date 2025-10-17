@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest/users/queryRequests';
 import { getAppLayout } from '@/api/server-functions/getAppLayout';
+import { isDev } from '@/config/dev';
 import { AppProviders } from '@/context/Providers';
 import { getSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
 import { BUSTER_SIGN_UP_URL } from '../config/externalRoutes';
@@ -39,7 +40,7 @@ export const Route = createFileRoute('/app')({
 
     const user = await prefetchGetMyUserInfo(queryClient);
 
-    if (!user?.organizations?.[0]?.id) {
+    if (!user?.organizations?.[0]?.id && !isDev) {
       throw redirect({
         href: BUSTER_SIGN_UP_URL,
         replace: true,
