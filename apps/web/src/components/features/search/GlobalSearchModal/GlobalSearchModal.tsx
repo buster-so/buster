@@ -50,7 +50,7 @@ export const GlobalSearchModal = () => {
     assetTypes,
     startDate: selectedDateRange?.from?.toISOString(),
     endDate: selectedDateRange?.to?.toISOString(),
-    searchQuery: debouncedSearchQuery,
+    query: debouncedSearchQuery,
     includeAssetAncestors: true,
     includeScreenshots: true,
     scrollConfig: {

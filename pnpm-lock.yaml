@@ -740,20 +740,20 @@ importers:
         specifier: ^1.9.3
         version: 1.9.3
       chart.js:
-        specifier: 4.5.1
-        version: 4.5.1
+        specifier: 4.5.0
+        version: 4.5.0
       chartjs-adapter-dayjs-4:
         specifier: ^1.0.4
-        version: 1.0.4(chart.js@4.5.1)(dayjs@1.11.18)
+        version: 1.0.4(chart.js@4.5.0)(dayjs@1.11.18)
       chartjs-plugin-annotation:
         specifier: ^3.1.0
-        version: 3.1.0(chart.js@4.5.1)
+        version: 3.1.0(chart.js@4.5.0)
       chartjs-plugin-datalabels:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.5.1)
+        version: 2.2.0(chart.js@4.5.0)
       chartjs-plugin-deferred:
         specifier: ^2.0.0
-        version: 2.0.0(chart.js@4.5.1)
+        version: 2.0.0(chart.js@4.5.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -7193,8 +7193,8 @@ packages:
   chardet@2.1.0:
     resolution: {integrity: sha512-bNFETTG/pM5ryzQ9Ad0lJOTa6HWD/YsScAR3EnCPZRPlQh77JocYktSHOUHelyhm8IARL+o4c4F1bP5KVOjiRA==}
 
-  chart.js@4.5.1:
-    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
+  chart.js@4.5.0:
+    resolution: {integrity: sha512-aYeC/jDgSEx8SHWZvANYMioYMZ2KX02W6f6uVfyteuCGcadDLcYVHdfdygsTQkQ4TKn5lghoojAsPj5pu0SnvQ==}
     engines: {pnpm: '>=8'}
 
   chartjs-adapter-dayjs-4@1.0.4:
@@ -20318,26 +20318,26 @@ snapshots:
 
   chardet@2.1.0: {}
 
-  chart.js@4.5.1:
+  chart.js@4.5.0:
     dependencies:
       '@kurkle/color': 0.3.4
 
-  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.5.1)(dayjs@1.11.18):
+  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.5.0)(dayjs@1.11.18):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.5.0
       dayjs: 1.11.18
 
-  chartjs-plugin-annotation@3.1.0(chart.js@4.5.1):
+  chartjs-plugin-annotation@3.1.0(chart.js@4.5.0):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.5.0
 
-  chartjs-plugin-datalabels@2.2.0(chart.js@4.5.1):
+  chartjs-plugin-datalabels@2.2.0(chart.js@4.5.0):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.5.0
 
-  chartjs-plugin-deferred@2.0.0(chart.js@4.5.1):
+  chartjs-plugin-deferred@2.0.0(chart.js@4.5.0):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.5.0
 
   check-error@2.1.1: {}
 

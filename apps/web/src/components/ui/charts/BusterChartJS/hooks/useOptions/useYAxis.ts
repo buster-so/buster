@@ -67,6 +67,13 @@ export const useYAxis = ({
     if (y2AxisKeys.length > 0 && minTickValue !== undefined) return DEFAULT_Y2_AXIS_COUNT;
   }, [minTickValue]);
 
+  const yMinValue = useMemo(() => {
+    return yAxisKeys.reduce((min, key) => {
+      const column = columnMetadata?.find((col) => col.name === key);
+      return Math.min(min, Number(column?.min_value ?? 0));
+    }, Infinity);
+  }, [columnMetadata, yAxisKeys]);
+
   const yMaxValue = useMemo(() => {
     return yAxisKeys.reduce((max, key) => {
       const column = columnMetadata?.find((col) => col.name === key);
@@ -129,6 +136,16 @@ export const useYAxis = ({
     isSupportedChartForAxisTitles: isSupportedType,
   });
 
+  const percentageModeMax = useMemo(() => {
+    if (!isSupportedType || !usePercentageModeAxis) return 100;
+    const isLessThan1 = yMaxValue < 1;
+    const hasMultiply100 = Object.values(yAxisColumnFormats).some(
+      (format) => format.style === 'percent' && format.multiplier === 100
+    );
+    if (hasMultiply100 && isLessThan1) return 1;
+    return 100;
+  }, [yMaxValue, usePercentageModeAxis, yAxisColumnFormats]);
+
   const tickCallback = useMemoizedFn(function (
     this: Scale,
     value: string | number,
@@ -166,12 +183,12 @@ export const useYAxis = ({
           count: defaultTickCount,
           includeBounds: true,
         },
-        min: usePercentageModeAxis ? 0 : minTickValue,
+        min: usePercentageModeAxis ? Math.min(0, yMinValue) : minTickValue,
         max:
           usePercentageModeAxis === 'clamp'
-            ? Math.max(100, yMaxValue * 1.05)
+            ? Math.max(percentageModeMax, yMaxValue * 1.05)
             : usePercentageModeAxis === '100'
-              ? 100
+              ? percentageModeMax
               : maxTickValue,
         border: {
           display: yAxisShowAxisLabel,
@@ -179,6 +196,7 @@ export const useYAxis = ({
       } as DeepPartial<ScaleChartOptions<'bar'>['scales']['y']>;
     }, [
       tickCallback,
+      percentageModeMax,
       type,
       title,
       stacked,
