@@ -15,7 +15,8 @@ export interface DynamicReportEditorProps extends ReportEditorProps {
 }
 
 export const DynamicReportEditor = ({ loadingOptions, ...props }: DynamicReportEditorProps) => {
-  const { delay = 200, idleTimeout = 500, forceImmediate = false } = loadingOptions || {};
+  const { delay = 200, forceImmediate = false } = loadingOptions || {};
+  const idleTimeout = loadingOptions?.idleTimeout || props.mode === 'export' ? 0 : 500;
 
   const { isReady: isPageReady } = usePageReady({
     ...loadingOptions,
