@@ -141,11 +141,11 @@ class ResourceTracker {
       },
       cpuUsage: finalCpuUsage
         ? {
-            userTimeMs: Math.round(finalCpuUsage.user / 1000),
-            systemTimeMs: Math.round(finalCpuUsage.system / 1000),
-            totalTimeMs: Math.round(totalCpuTime / 1000),
-            estimatedUsagePercent: Math.round(cpuPercentage * 100) / 100,
-          }
+          userTimeMs: Math.round(finalCpuUsage.user / 1000),
+          systemTimeMs: Math.round(finalCpuUsage.system / 1000),
+          totalTimeMs: Math.round(totalCpuTime / 1000),
+          estimatedUsagePercent: Math.round(cpuPercentage * 100) / 100,
+        }
         : { error: 'CPU usage not available' },
       stageBreakdown: this.snapshots.map((snapshot, index) => {
         const prevSnapshot = index > 0 ? this.snapshots[index - 1] : null;
@@ -427,12 +427,12 @@ export const analystAgentTask: ReturnType<
         conversationHistory.length > 0
           ? conversationHistory
           : [
-              {
-                role: 'user',
-                // v5 supports string content directly for user messages
-                content: messageContext.requestMessage,
-              },
-            ];
+            {
+              role: 'user',
+              // v5 supports string content directly for user messages
+              content: messageContext.requestMessage,
+            },
+          ];
 
       const workflowInput: AnalystWorkflowInput = {
         messages: modelMessages,
@@ -485,6 +485,11 @@ export const analystAgentTask: ReturnType<
           name: 'Analyst Agent Task Workflow',
         }
       );
+
+      // Mark the message as completed
+      await updateMessage(payload.message_id, {
+        isCompleted: true,
+      });
 
       // Wrap workflow execution to capture and log errors before re-throwing
       try {
