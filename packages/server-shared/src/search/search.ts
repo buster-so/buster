@@ -4,6 +4,7 @@ import {
   TextSearchResultSchema,
 } from '@buster/database/schema-types';
 import { z } from 'zod';
+import { UserInfoResponseSchema } from '../access-controls';
 import { AssetTypeSchema } from '../assets';
 import {
   PaginatedRequestSchema,

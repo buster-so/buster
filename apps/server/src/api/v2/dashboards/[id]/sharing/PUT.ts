@@ -1,4 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
+import type { User } from '@buster/database/queries';
 import {
   bulkCreateAssetPermissions,
   findUsersByEmails,
@@ -6,11 +7,10 @@ import {
   getUserOrganizationId,
   updateDashboard,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
 import { type ShareUpdateRequest, ShareUpdateRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { getDashboardHandler } from '../GET';
 

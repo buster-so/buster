@@ -9,8 +9,8 @@ import { getWorkspaceSettingsHandler } from './get-workspace-settings';
 import {
   cleanupTestOrganization,
   cleanupTestUser,
-  createTestOrgMemberInDb,
   createTestOrganizationInDb,
+  createTestOrgMemberInDb,
   createTestUserInDb,
   createUserWithoutOrganization,
 } from './test-db-utils';

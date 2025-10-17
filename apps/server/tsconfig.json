@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json"
+    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
+    "paths": {
+      "@shared-helpers/*": ["./src/shared-helpers/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"],

@@ -1,19 +1,23 @@
 import { checkPermission } from '@buster/access-controls';
 import {
-  type User,
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
+  getUserOrganizationId,
   getUsersWithAssetPermissions,
+  type User,
 } from '@buster/database/queries';
+import type { DashboardYml } from '@buster/server-shared/dashboards';
 import {
   GetDashboardParamsSchema,
   GetDashboardQuerySchema,
   type GetDashboardResponse,
 } from '@buster/server-shared/dashboards';
-import type { DashboardYml } from '@buster/server-shared/dashboards';
 import type { VerificationStatus } from '@buster/server-shared/share';
+import { screenshots_task_keys } from '@buster-app/trigger/task-keys';
+import type { TakeDashboardScreenshotTrigger } from '@buster-app/trigger/task-schemas';
 import { zValidator } from '@hono/zod-validator';
+import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import yaml from 'js-yaml';
@@ -40,16 +44,33 @@ const app = new Hono().get(
       `Processing GET request for dashboard with ID: ${id}, user_id: ${user.id}, version_number: ${version_number}`
     );
 
-    const response: GetDashboardResponse = await getDashboardHandler(
-      {
-        dashboardId: id,
-        versionNumber: version_number,
-        password,
-      },
-      user
-    );
+    try {
+      const response: GetDashboardResponse = await getDashboardHandler(
+        {
+          dashboardId: id,
+          versionNumber: version_number,
+          password,
+        },
+        user
+      );
 
-    return c.json(response);
+      triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+        tag: `take-dashboard-screenshot-${id}`,
+        key: screenshots_task_keys.take_dashboard_screenshot,
+        context: c,
+        payload: {
+          dashboardId: id,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+          isOnSaveEvent: false,
+        },
+      });
+
+      return c.json(response);
+    } catch (error) {
+      console.error('Error fetching dashboard:', error);
+      throw new HTTPException(500, { message: 'Failed to fetch dashboard' });
+    }
   }
 );
 
@@ -151,9 +172,18 @@ export async function getDashboardHandler(
   const versions: Array<{ version_number: number; updated_at: string }> = [];
 
   Object.values(versionHistory).forEach((version) => {
+    //@ts-expect-error - versionNumber is sometimes camelCase due to v1 endpoint
+    const v = version as {
+      version_number: number;
+      versionNumber: number;
+      updated_at: string;
+      updatedAt: string;
+    };
+    const versionNumber: number = v.version_number ? v.version_number : v.versionNumber;
+    const updatedAt: string = v.updated_at ? v.updated_at : v.updatedAt;
     versions.push({
-      version_number: version.version_number,
-      updated_at: version.updated_at,
+      version_number: versionNumber,
+      updated_at: updatedAt,
     });
   });
   versions.sort((a, b) => a.version_number - b.version_number);

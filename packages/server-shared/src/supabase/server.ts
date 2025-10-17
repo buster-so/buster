@@ -1,0 +1,47 @@
+import { createClient, type User } from '@supabase/supabase-js';
+
+//@ts-expect-error - window is not defined on the server
+const isServer = typeof window === 'undefined';
+
+const createSupabaseClient = () => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+
+  if (!isServer) {
+    throw new Error('createSupabaseClient is not available on the client');
+  }
+
+  if (!supabaseUrl) {
+    throw new Error('SUPABASE_URL is not set');
+  }
+
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseServiceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+  return supabase;
+};
+
+let globalSupabase: ReturnType<typeof createSupabaseClient> | null = null;
+
+export const getSupabaseClient = () => {
+  if (!globalSupabase) {
+    globalSupabase = createSupabaseClient();
+  }
+  return globalSupabase;
+};
+
+export const getSupabaseCookieKey = (): string => {
+  const supabase = getSupabaseClient();
+  const supabaseCookieKey = (supabase as unknown as { storageKey: string }).storageKey;
+  return supabaseCookieKey;
+};
+
+export const getSupabaseUser = async (jwtToken: string): Promise<User | null> => {
+  const supabase = getSupabaseClient();
+  const supabaseUser = await supabase.auth.getUser(jwtToken);
+  return supabaseUser.data.user;
+};

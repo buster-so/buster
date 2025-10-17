@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 import { useDeleteS3Integration, useGetS3Integration } from '@/api/buster_rest/s3-integrations';
 import { Button } from '@/components/ui/buttons';
@@ -7,7 +7,7 @@ import { Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
 import Bucket from '@/components/ui/icons/NucleoIconOutlined/bucket';
 import LinkSlash from '@/components/ui/icons/NucleoIconOutlined/link-slash';
 import { Text } from '@/components/ui/typography';
-import { SettingsCards } from '../settings/SettingsCard';
+import { SettingCardContent, SettingsCards } from '../settings/SettingsCard';
 import { IntegrationSkeleton } from './IntegrationSkeleton';
 
 export const StorageIntegrations = React.memo(() => {
@@ -48,24 +48,15 @@ StorageIntegrations.displayName = 'StorageIntegrations';
 
 const ConnectStorageCard = React.memo(() => {
   const { data: s3Integration } = useGetS3Integration();
-  const navigate = useNavigate();
 
   const isConnected = s3Integration !== null;
 
   return (
-    <div className="flex items-center justify-between gap-x-2">
-      <div className="flex space-x-2">
-        <div className="bg-item-select flex items-center justify-center rounded p-2">
-          <Bucket strokewidth={1.5} />
-        </div>
-        <div className="flex flex-col space-y-0.5">
-          <Text>Storage account</Text>
-          <Text variant="secondary" size={'xs'}>
-            Link your storage bucket to use file storage with Buster
-          </Text>
-        </div>
-      </div>
-
+    <SettingCardContent
+      title="Storage account"
+      description="Link your storage bucket to use file storage with Buster"
+      icon={<Bucket strokewidth={1.5} />}
+    >
       {isConnected ? (
         <ConnectedDropdown />
       ) : (
@@ -75,7 +66,7 @@ const ConnectStorageCard = React.memo(() => {
           </Button>
         </Link>
       )}
-    </div>
+    </SettingCardContent>
   );
 });
 

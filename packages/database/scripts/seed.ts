@@ -1,9 +1,9 @@
 #!/usr/bin/env node
+/** biome-ignore-all lint/suspicious/noExplicitAny: I guess this is okay? */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { eq, sql } from 'drizzle-orm';
-import { getTableName } from 'drizzle-orm';
+import { eq, getTableName, sql } from 'drizzle-orm';
 import { db } from '../src/connection';
 import * as schema from '../src/schema';
 
@@ -80,7 +80,7 @@ async function upsertData(tx: any, tableName: string, table: any, data: any[]) {
       } else {
         // For regular tables with id field, use onConflictDoUpdate
         for (const record of batch) {
-          const { id, createdAt, ...updateFields } = record;
+          const { id, ...updateFields } = record;
 
           // Most tables have an 'id' column as primary key
           if (id && table.id) {
@@ -326,6 +326,7 @@ async function seed() {
               ) as secret_id
             `);
 
+            // @ts-expect-error biome-ignore lint/suspicious/noExplicitAny: Need dallin to check...
             const secretId = result?.rows?.[0]?.secret_id;
 
             if (secretId) {
@@ -347,6 +348,8 @@ async function seed() {
           }
         }
       }
+
+      db.execute(sql`SELECT populate_metric_files_to_report_files()`);
 
       console.log('\n=== Seed completed successfully! ===');
 

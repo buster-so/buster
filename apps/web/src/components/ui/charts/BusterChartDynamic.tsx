@@ -10,9 +10,9 @@ const BusterChartLazy = lazy(() =>
 export const BusterChartDynamic = (props: Parameters<typeof BusterChartLazy>[0]) => (
   <LazyErrorBoundary>
     <Suspense fallback={<PreparingYourRequestLoader text="Loading chart..." />}>
-      <ClientOnly>
-        <BusterChartLazy {...props} />
-      </ClientOnly>
+      <BusterChartLazy {...props} />
     </Suspense>
   </LazyErrorBoundary>
 );
+
+BusterChartDynamic.preload = async () => await import('./BusterChart');

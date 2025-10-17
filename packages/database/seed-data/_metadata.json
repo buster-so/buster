@@ -1,6 +1,6 @@
 {
-  "extractedAt": "2025-09-19T22:52:13.191Z",
-  "tableCount": 22,
+  "extractedAt": "2025-10-16T05:24:27.137Z",
+  "tableCount": 27,
   "tables": [
     {
       "name": "organizations",
@@ -9,7 +9,7 @@
     },
     {
       "name": "users",
-      "recordCount": 6,
+      "recordCount": 7,
       "dependencies": []
     },
     {
@@ -19,18 +19,28 @@
     },
     {
       "name": "assetPermissions",
-      "recordCount": 6,
+      "recordCount": 42,
       "dependencies": ["users"]
     },
     {
       "name": "assetSearch",
-      "recordCount": 2,
+      "recordCount": 26,
       "dependencies": []
     },
     {
-      "name": "chats",
-      "recordCount": 3,
+      "name": "assetSearchV2",
+      "recordCount": 40,
       "dependencies": ["organizations", "users"]
+    },
+    {
+      "name": "chats",
+      "recordCount": 8,
+      "dependencies": ["organizations", "users"]
+    },
+    {
+      "name": "dashboardFiles",
+      "recordCount": 3,
+      "dependencies": ["users"]
     },
     {
       "name": "dataSources",
@@ -74,23 +84,43 @@
     },
     {
       "name": "messages",
-      "recordCount": 3,
+      "recordCount": 12,
       "dependencies": ["chats", "users"]
     },
     {
       "name": "messagesToFiles",
-      "recordCount": 2,
+      "recordCount": 32,
       "dependencies": ["messages"]
     },
     {
       "name": "metricFiles",
-      "recordCount": 2,
+      "recordCount": 23,
       "dependencies": ["users", "dataSources"]
+    },
+    {
+      "name": "metricFilesToDashboardFiles",
+      "recordCount": 18,
+      "dependencies": ["metricFiles", "dashboardFiles", "users"]
+    },
+    {
+      "name": "reportFiles",
+      "recordCount": 6,
+      "dependencies": ["users", "organizations"]
+    },
+    {
+      "name": "metricFilesToReportFiles",
+      "recordCount": 7,
+      "dependencies": ["metricFiles", "reportFiles", "users"]
     },
     {
       "name": "permissionGroupsToIdentities",
       "recordCount": 5,
       "dependencies": ["users"]
+    },
+    {
+      "name": "shortcuts",
+      "recordCount": 5,
+      "dependencies": ["users", "organizations"]
     },
     {
       "name": "teams",
@@ -101,11 +131,6 @@
       "name": "teamsToUsers",
       "recordCount": 2,
       "dependencies": ["teams", "users"]
-    },
-    {
-      "name": "textSearch",
-      "recordCount": 58,
-      "dependencies": ["organizations"]
     },
     {
       "name": "usersToOrganizations",
@@ -119,6 +144,7 @@
     "apiKeys",
     "assetPermissions",
     "assetSearch",
+    "assetSearchV2",
     "chats",
     "collections",
     "collectionsToAssets",
@@ -133,6 +159,7 @@
     "datasetsToPermissionGroups",
     "docs",
     "githubIntegrations",
+    "logsWriteBackConfigs",
     "messages",
     "messagesToFiles",
     "slackIntegrations",
@@ -149,7 +176,6 @@
     "shortcuts",
     "teams",
     "teamsToUsers",
-    "textSearch",
     "userFavorites",
     "usersToOrganizations"
   ],
@@ -157,6 +183,7 @@
     "apiKeys": ["organizations", "users"],
     "assetPermissions": ["users"],
     "assetSearch": [],
+    "assetSearchV2": ["organizations", "users"],
     "chats": ["organizations", "users"],
     "collections": ["organizations", "users"],
     "collectionsToAssets": ["users"],
@@ -170,6 +197,7 @@
     "datasetsToPermissionGroups": ["datasets", "permissionGroups"],
     "docs": ["organizations"],
     "githubIntegrations": ["organizations", "users"],
+    "logsWriteBackConfigs": ["organizations", "dataSources"],
     "messages": ["chats", "users"],
     "messagesToFiles": ["messages"],
     "messagesToSlackMessages": ["messages", "slackMessageTracking"],
@@ -188,7 +216,6 @@
     "slackMessageTracking": ["slackIntegrations"],
     "teams": ["organizations", "users"],
     "teamsToUsers": ["teams", "users"],
-    "textSearch": ["organizations"],
     "userFavorites": ["users"],
     "users": [],
     "usersToOrganizations": ["organizations", "users"]

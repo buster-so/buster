@@ -1,7 +1,17 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
   "extends": ["../../biome.json"],
   "files": {
-    "include": ["src/**/*"]
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.js",
+      "src/**/*.jsx",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/.trigger",
+      "!**/.turbo",
+      "!**/coverage"
+    ]
   }
 }

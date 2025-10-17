@@ -10,7 +10,7 @@ import {
   usersToOrganizations,
 } from '../../schema';
 import type { ChatListItem, PaginatedResponse } from '../../schema-types';
-import { PaginationInputSchema, createPaginatedResponse } from '../../schema-types';
+import { createPaginatedResponse, PaginationInputSchema } from '../../schema-types';
 
 export const ListChatsRequestSchema = z
   .object({
@@ -130,6 +130,7 @@ export async function listChats(params: ListChatsRequest): Promise<ListChatsResp
 
   // Where conditions for filtering chats
   const contentFilterConditions = and(
+    eq(chats.chatType, 'analyst'),
     isNull(chats.deletedAt),
     ne(chats.title, ''),
     or(

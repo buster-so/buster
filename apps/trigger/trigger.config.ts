@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { esbuildPlugin } from '@trigger.dev/build/extensions';
+import { playwright } from '@trigger.dev/build/extensions/playwright';
 import { defineConfig } from '@trigger.dev/sdk';
 
 export default defineConfig({
@@ -33,8 +34,13 @@ export default defineConfig({
       '@duckdb/node-bindings-darwin-x64',
       '@duckdb/node-bindings-darwin-arm64',
       '@duckdb/node-bindings-win32-x64',
+      'playwright-core',
+      'chromium-bidi',
     ],
     extensions: [
+      playwright({
+        browsers: ['chromium'],
+      }),
       esbuildPlugin({
         name: 'buster-path-resolver',
         setup(build) {

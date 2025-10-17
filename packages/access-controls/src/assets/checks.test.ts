@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { checkPermission, computeEffectivePermission } from './checks';
 import type { AssetPermissionResult } from './checks';
+import { checkPermission, computeEffectivePermission } from './checks';
 
 // Mock database queries
 vi.mock('@buster/database/queries', () => ({

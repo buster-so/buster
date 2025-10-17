@@ -1,7 +1,26 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      ".vscode/**/*",
+      "**/.html",
+      "**/*.json",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.css",
+      "**/*.mjs",
+      "**/*.cjs",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/build",
+      "!**/coverage",
+      "!**/.output",
+      "!apps/api",
+      "!apps/supabase"
+    ]
   },
   "linter": {
     "enabled": true,
@@ -10,7 +29,7 @@
       "correctness": {
         "noUnusedVariables": "error",
         "noUnusedImports": "off",
-        "useExhaustiveDependencies": "warn"
+        "useExhaustiveDependencies": "off"
       },
       "style": {
         "noNonNullAssertion": "error",
@@ -21,37 +40,70 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noConsoleLog": "warn"
+        "noConsole": "warn",
+        "noTemplateCurlyInString": "off"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "off",
         "noForEach": "off"
+      },
+      "nursery": {
+        "useSortedClasses": "off"
       },
       "performance": {
         "noDelete": "error"
       }
     }
   },
+  "overrides": [
+    {
+      "includes": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx",
+        "**/*.stories.tsx",
+        "**/*.setup.*",
+        "**/*.js"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noConsole": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          },
+          "correctness": {
+            "noUnusedFunctionParameters": "off",
+            "noUnusedVariables": "off"
+          },
+          "performance": {
+            "noDelete": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.css"],
+      "linter": {
+        "enabled": false
+      }
+    }
+  ],
   "formatter": {
     "enabled": true,
-    "formatWithErrors": false,
+    "formatWithErrors": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100,
-    "lineEnding": "lf",
-    "ignore": [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/build/**",
-      "**/coverage/**",
-      "**/.next/**",
-      "**/drizzle/**"
-    ]
+    "lineEnding": "lf"
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
-      "jsxQuoteStyle": "single",
+      "jsxQuoteStyle": "double",
       "trailingCommas": "es5",
       "semicolons": "always",
       "arrowParentheses": "always"
@@ -63,113 +115,14 @@
     }
   },
   "css": {
+    "parser": {
+      "cssModules": true
+    },
     "formatter": {
       "enabled": true,
       "indentStyle": "space",
       "indentWidth": 2,
       "lineWidth": 100
     }
-  },
-  "files": {
-    "include": [
-      "packages/**/*.ts",
-      "packages/**/*.tsx",
-      "packages/**/*.js",
-      "packages/**/*.jsx",
-      "packages/**/*.json",
-      "packages/**/*.css",
-      "packages/**/*.mjs",
-      "packages/**/*.cjs",
-      "packages/**/*.mts",
-      "packages/**/*.cts",
-      "packages/**/package.json",
-      "packages/**/tsconfig.json",
-      "packages/**/*.config.js",
-      "packages/**/*.config.ts",
-      "server/**/*.ts",
-      "server/**/*.js",
-      "trigger/**/*.ts",
-      "trigger/**/*.js",
-      "vitest.config.ts",
-      "biome.json",
-      "./package.json",
-      "./turbo.json",
-      "./biome2.json"
-    ],
-    "ignore": [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/build/**",
-      "**/coverage/**",
-      "**/.next/**",
-      "**/target/**",
-      "**/drizzle/**",
-      "**/*.d.ts",
-      "**/generated/**",
-      "**/.trigger/**",
-      "**/.mastra/**",
-      "**/output/**",
-      "**/playground/**",
-      "/api/**",
-      "cli/**",
-      "packages/**/node_modules/**",
-      "packages/**/dist/**",
-      "packages/**/build/**",
-      "apps/web/**",
-      "**/supabase/**"
-    ]
-  },
-  "overrides": [
-    {
-      "include": [
-        "**/tests/**/*",
-        "**/test/**/*",
-        "**/__tests__/**/*",
-        "**/*.test.*",
-        "**/*.spec.*",
-        "**/*.setup.*",
-        "**/setup.*"
-      ],
-      "linter": {
-        "rules": {
-          "style": {
-            "noNonNullAssertion": "off"
-          },
-          "correctness": {
-            "noUnusedVariables": "off"
-          },
-          "suspicious": {
-            "noConsoleLog": "off",
-            "noExplicitAny": "off"
-          },
-          "performance": {
-            "noDelete": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["**/*.js"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsoleLog": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["**/*.stories.tsx"],
-      "linter": {
-        "rules": {
-          "style": {
-            "noNonNullAssertion": "off"
-          },
-          "correctness": {
-            "noUnusedVariables": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

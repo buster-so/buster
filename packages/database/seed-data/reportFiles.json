@@ -1,0 +1,164 @@
+[
+  {
+    "id": "edf0a6b5-3987-49b8-a98a-a9617f4935ea",
+    "name": "Total Current Inventory",
+    "content": "<metric metricId=\"8357b9fb-10e2-4d1b-ae0a-c0c7093345bd\" versionNumber=\"\" width=\"100%\" caption=\"\"></metric>\n\nYou currently have **335,974 units** of inventory on hand across all products and locations. This represents the total quantity of items available in your warehouses and storage facilities.\n\n## Methodology\n\nThis metric is calculated by summing the `quantity` field from the `product_inventory` table, which tracks on-hand inventory by product and location. The quantity represents the current stock levels at the time of the last inventory update and includes all products across all storage locations, shelves, and bins in your system.\n",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:49:12.032+00",
+    "updatedAt": "2025-10-12 22:49:21.296+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": "<metric metricId=\"8357b9fb-10e2-4d1b-ae0a-c0c7093345bd\"/>\n\nYou currently have **335,974 units** of inventory on hand across all products and locations. This represents the total quantity of items available in your warehouses and storage facilities.\n\n## Methodology\n\nThis metric is calculated by summing the `quantity` field from the `product_inventory` table, which tracks on-hand inventory by product and location. The quantity represents the current stock levels at the time of the last inventory update and includes all products across all storage locations, shelves, and bins in your system.",
+        "updated_at": "2025-10-12T22:49:14.001Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "906d6f10-be3f-40b9-b232-674296b35c43",
+    "name": "Top Customer Analysis",
+    "content": "<metric metricId=\"6ebd2875-30f3-42e1-bbf4-11dec97ad154\" versionNumber=\"\" width=\"100%\" caption=\"\"></metric>\n\n**Roger Harui is your top customer with a lifetime value of $877,107.19.** This customer has generated substantial revenue through consistent, high-volume purchases focused primarily on mountain bikes and related components.\n\n## Purchase Patterns\n\n<metric metricId=\"358d7e79-3e16-41f1-8b1a-ee89b89ac385\" versionNumber=\"\" width=\"100%\" caption=\"\"></metric>\n\nRoger Harui's purchasing behavior reveals a clear focus on the **Mountain-200 series bikes**, which appear in 8 separate orders each across multiple sizes (38, 42, and 46) and colors (Black and Silver). This pattern suggests Roger operates as a bike retailer maintaining inventory across various size options to serve different customer needs. The consistent ordering of **HL Mountain Frames** and **ML/HL Mountain Handlebars** (appearing in 6-8 orders) indicates ongoing component purchases, likely for bike assembly, repairs, or customization services.\n\nThe purchase frequency demonstrates a reliable, repeat-buying pattern with the same core products appearing across multiple orders, making Roger a highly predictable and valuable customer for inventory planning and relationship management.\n\n## Methodology\n\nThis analysis identified the top customer using the `customer_all_time_clv.metric_clv_all_time` field, which represents the sum of all `sales_order_detail.linetotal` values across the customer's entire order history. Customer identity was enriched by joining to the `person` table via `customer.personid` to obtain the customer's name.\n\nPurchase frequency was calculated by counting distinct `sales_order_header.salesorderid` values for each product purchased by the top customer. This metric represents how many separate orders contained each product, providing insight into which items the customer purchases most consistently over time. Products were identified by joining `sales_order_detail` to `product` on `productid`.\n",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:42:46.262+00",
+    "updatedAt": "2025-10-12 22:43:28.073+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": "<metric metricId=\"6ebd2875-30f3-42e1-bbf4-11dec97ad154\"/>\n\n**Roger Harui is your top customer with a lifetime value of $877,107.19.** This customer has generated substantial revenue through consistent, high-volume purchases focused primarily on mountain bikes and related components.\n\n## Purchase Patterns\n\n<metric metricId=\"358d7e79-3e16-41f1-8b1a-ee89b89ac385\"/>\n\nRoger Harui's purchasing behavior reveals a clear focus on the **Mountain-200 series bikes**, which appear in 8 separate orders each across multiple sizes (38, 42, and 46) and colors (Black and Silver). This pattern suggests Roger operates as a bike retailer maintaining inventory across various size options to serve different customer needs. The consistent ordering of **HL Mountain Frames** and **ML/HL Mountain Handlebars** (appearing in 6-8 orders) indicates ongoing component purchases, likely for bike assembly, repairs, or customization services.\n\nThe purchase frequency demonstrates a reliable, repeat-buying pattern with the same core products appearing across multiple orders, making Roger a highly predictable and valuable customer for inventory planning and relationship management.\n\n## Methodology\n\nThis analysis identified the top customer using the `customer_all_time_clv.metric_clv_all_time` field, which represents the sum of all `sales_order_detail.linetotal` values across the customer's entire order history. Customer identity was enriched by joining to the `person` table via `customer.personid` to obtain the customer's name.\n\nPurchase frequency was calculated by counting distinct `sales_order_header.salesorderid` values for each product purchased by the top customer. This metric represents how many separate orders contained each product, providing insight into which items the customer purchases most consistently over time. Products were identified by joining `sales_order_detail` to `product` on `productid`.",
+        "updated_at": "2025-10-12T22:42:56.082Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "5d1d529e-66c2-4fb7-9cc7-9da43bf4a2de",
+    "name": "Total Incoming Inventory",
+    "content": "<metric metricId=\"2067deb5-33f5-4bd6-9f15-a411f1848187\"/>\n\nYou currently have **21,338 units** of incoming inventory on open purchase orders. This represents products that have been ordered from vendors but not yet fully received into your warehouses.\n\nThis incoming inventory is spread across **380 purchase order lines** where the ordered quantity exceeds the received quantity, indicating partial or pending deliveries.\n\n## Methodology\n\nThis metric is calculated by summing the outstanding quantity on all purchase order lines from the `purchase_order_detail` table. The outstanding quantity is determined by subtracting `receivedqty` from `orderqty` for each purchase order line where items are still pending receipt. This gives you visibility into inventory that is in transit or awaiting delivery from your suppliers.",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:50:26.997+00",
+    "updatedAt": "2025-10-12 22:50:29.299+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": "<metric metricId=\"2067deb5-33f5-4bd6-9f15-a411f1848187\"/>\n\nYou currently have **21,338 units** of incoming inventory on open purchase orders. This represents products that have been ordered from vendors but not yet fully received into your warehouses.\n\nThis incoming inventory is spread across **380 purchase order lines** where the ordered quantity exceeds the received quantity, indicating partial or pending deliveries.\n\n## Methodology\n\nThis metric is calculated by summing the outstanding quantity on all purchase order lines from the `purchase_order_detail` table. The outstanding quantity is determined by subtracting `receivedqty` from `orderqty` for each purchase order line where items are still pending receipt. This gives you visibility into inventory that is in transit or awaiting delivery from your suppliers.",
+        "updated_at": "2025-10-12T22:50:29.299Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "d8a1fc17-99cb-48f5-9b3f-ea8fd3368c85",
+    "name": "Total Outgoing Inventory",
+    "content": "<metric metricId=\"3b332367-f33e-4de7-a4b5-0bd4cf0f3694\" versionNumber=\"\" width=\"100%\" caption=\"\"></metric>\n\nYou currently have **0 units** of outgoing inventory. This means there are no customer orders awaiting shipment in your system.\n\nAnalysis of your sales order data shows that **all 31,465 sales orders** in the system have already been shipped (status = 5). There are no orders in \"In Process,\" \"Approved,\" or \"Backordered\" status that would represent inventory allocated to customers but not yet shipped.\n\n## Methodology\n\nThis metric is calculated by summing the `orderqty` from `sales_order_detail` for all sales orders where the order status is less than 5 (not yet shipped). Order statuses include: 1 = In Process, 2 = Approved, 3 = Backordered, 4 = Rejected, 5 = Shipped, 6 = Cancelled. Since all orders in your current dataset have status 5 (Shipped), there is no outgoing inventory awaiting fulfillment.\n",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:52:13.391+00",
+    "updatedAt": "2025-10-12 22:52:29.955+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": "<metric metricId=\"3b332367-f33e-4de7-a4b5-0bd4cf0f3694\"/>\n\nYou currently have **0 units** of outgoing inventory. This means there are no customer orders awaiting shipment in your system.\n\nAnalysis of your sales order data shows that **all 31,465 sales orders** in the system have already been shipped (status = 5). There are no orders in \"In Process,\" \"Approved,\" or \"Backordered\" status that would represent inventory allocated to customers but not yet shipped.\n\n## Methodology\n\nThis metric is calculated by summing the `orderqty` from `sales_order_detail` for all sales orders where the order status is less than 5 (not yet shipped). Order statuses include: 1 = In Process, 2 = Approved, 3 = Backordered, 4 = Rejected, 5 = Shipped, 6 = Cancelled. Since all orders in your current dataset have status 5 (Shipped), there is no outgoing inventory awaiting fulfillment.",
+        "updated_at": "2025-10-12T22:52:17.675Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "dbc8e2bf-f5a1-4b2e-a564-770f611d1325",
+    "name": "Inventory Shipped Last 30 Days",
+    "content": "<metric metricId=\"1739379e-8e11-44bf-874a-63ac4bbb35a0\" versionNumber=\"\" width=\"100%\" caption=\"\"></metric>\n\nIn the last 30 days, **2,209 units** of inventory were shipped to customers. This represents inventory that left your facilities through **976 sales orders** across **2,209 order line items**.\n\nThis outbound inventory flow provides visibility into your recent fulfillment activity and can be used to track inventory turnover and demand patterns.\n\n## Methodology\n\nThis metric is calculated by summing the `orderqty` from `sales_order_detail` for all sales orders where the `shipdate` falls within the last 30 days (from today's date). The shipdate represents when the order was actually shipped to the customer, providing an accurate measure of inventory that physically left your facilities during this period.\n",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-12 22:54:10.175+00",
+    "updatedAt": "2025-10-12 22:54:21.524+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": "<metric metricId=\"1739379e-8e11-44bf-874a-63ac4bbb35a0\"/>\n\nIn the last 30 days, **2,209 units** of inventory were shipped to customers. This represents inventory that left your facilities through **976 sales orders** across **2,209 order line items**.\n\nThis outbound inventory flow provides visibility into your recent fulfillment activity and can be used to track inventory turnover and demand patterns.\n\n## Methodology\n\nThis metric is calculated by summing the `orderqty` from `sales_order_detail` for all sales orders where the `shipdate` falls within the last 30 days (from today's date). The shipdate represents when the order was actually shipped to the customer, providing an accurate measure of inventory that physically left your facilities during this period.",
+        "updated_at": "2025-10-12T22:54:13.993Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  },
+  {
+    "id": "716ae0b6-99d8-43c7-a775-c18d4781f180",
+    "name": "Total Customer Count",
+    "content": "<metric metricId=\"98486855-7672-4a6b-a8ab-2a6b19c4328a\" versionNumber=\"\" width=\"100%\" caption=\"\"></metric>\n\nAdventure Works currently has **19,820 total customers** in the system. This count includes both individual customers and store accounts across all sales territories and time periods.\n\n## Methodology\n\nThe total customer count is calculated using `COUNT(DISTINCT customerid)` from the `customer` table, which serves as the canonical customer dimension in the Adventure Works data warehouse. This count represents all customers who have been registered in the system, regardless of their purchase history or current status.\n",
+    "organizationId": "bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce",
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e",
+    "createdAt": "2025-10-16 05:10:40.179+00",
+    "updatedAt": "2025-10-16 05:10:49.654+00",
+    "deletedAt": null,
+    "publiclyAccessible": false,
+    "publiclyEnabledBy": null,
+    "publicExpiryDate": null,
+    "versionHistory": {
+      "1": {
+        "content": "<metric metricId=\"98486855-7672-4a6b-a8ab-2a6b19c4328a\"/>\n\nAdventure Works currently has **19,820 total customers** in the system. This count includes both individual customers and store accounts across all sales territories and time periods.\n\n## Methodology\n\nThe total customer count is calculated using `COUNT(DISTINCT customerid)` from the `customer` table, which serves as the canonical customer dimension in the Adventure Works data warehouse. This count represents all customers who have been registered in the system, regardless of their purchase history or current status.",
+        "updated_at": "2025-10-16T05:10:41.883Z",
+        "version_number": 1
+      }
+    },
+    "publicPassword": null,
+    "workspaceSharing": "none",
+    "workspaceSharingEnabledBy": null,
+    "workspaceSharingEnabledAt": null,
+    "screenshotBucketKey": null,
+    "screenshotTakenAt": null,
+    "savedToLibrary": false
+  }
+]

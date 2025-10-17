@@ -5,15 +5,14 @@
  * for handling GitHub App installations and tokens
  */
 
-// Installation webhook handling
-export { handleInstallationCallback } from './handle-installation-callback';
-
 // Token generation and retrieval
 export {
   getInstallationToken,
   getInstallationTokenByOrgId,
   verifyInstallationOwnership,
 } from './get-installation-token';
+// Installation webhook handling
+export { handleInstallationCallback } from './handle-installation-callback';
 
 // Token storage in Vault
 export {

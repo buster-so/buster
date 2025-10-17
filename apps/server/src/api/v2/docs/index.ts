@@ -9,10 +9,10 @@ import { Hono } from 'hono';
 import { requireAuth } from '../../../middleware/auth';
 import { standardErrorHandler } from '../../../utils/response';
 import { listDocsHandler } from './GET';
-import { createDocHandler } from './POST';
 import { deleteDocHandler } from './id/DELETE';
 import { getDocHandler } from './id/GET';
 import { updateDocHandler } from './id/PUT';
+import { createDocHandler } from './POST';
 
 const app = new Hono()
   .use('*', requireAuth)

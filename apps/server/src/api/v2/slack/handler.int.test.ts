@@ -7,8 +7,8 @@ import type {
   SlackErrorResponse,
 } from '@buster/server-shared/slack';
 import { and, eq } from 'drizzle-orm';
-import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import slackRoutes from './index';

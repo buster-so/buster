@@ -1,22 +1,23 @@
+import type { ModelMessage } from '@buster/ai';
 import { Box, Text, useApp, useInput } from 'ink';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AgentMessageComponent,
   ChatFooter,
-  type ChatHistoryEntry,
   ChatInput,
   ChatIntroText,
   ChatTitle,
   ChatVersionTagline,
+  HistoryBrowser,
+  SettingsForm,
   VimStatus,
-} from '../../components/chat-layout';
-import { HistoryBrowser } from '../../components/history-browser';
-import { AgentMessageComponent } from '../../components/message';
-import { SettingsForm } from '../../components/settings-form';
+} from '../../components';
 import { ExpansionContext } from '../../hooks/use-expansion';
-import type { CliAgentMessage } from '../../services/analytics-engineer-handler';
-import { runAnalyticsEngineerAgent } from '../../services/analytics-engineer-handler';
+import type { CliAgentMessage } from '../../services';
+import { runChatAgent } from '../../services';
 import type { Conversation } from '../../utils/conversation-history';
-import { loadConversation, saveModelMessages } from '../../utils/conversation-history';
+import { saveModelMessages } from '../../utils/conversation-history';
+import { loadConversation } from '../../utils/load-conversation-from-api';
 import { getCurrentChatId, initNewSession, setSessionChatId } from '../../utils/session';
 import { getSetting } from '../../utils/settings';
 import type { SlashCommand } from '../../utils/slash-commands';
@@ -25,10 +26,15 @@ import type { VimMode } from '../../utils/vim-mode';
 
 type AppMode = 'Planning' | 'Auto-accept' | 'None';
 
+interface ChatHistoryEntry {
+  id: number;
+  value: string;
+}
+
 export function Main() {
   const { exit } = useApp();
   const [input, setInput] = useState('');
-  const [history, setHistory] = useState<ChatHistoryEntry[]>([]);
+  const [_history, setHistory] = useState<ChatHistoryEntry[]>([]);
   const [messages, setMessages] = useState<CliAgentMessage[]>([]);
   const historyCounter = useRef(0);
   const messageCounter = useRef(0);
@@ -45,7 +51,7 @@ export function Main() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream
-  const handleMessageUpdate = useCallback((modelMessages: any[]) => {
+  const handleMessageUpdate = useCallback((modelMessages: ModelMessage[]) => {
     const transformedMessages = transformModelMessagesToUI(modelMessages);
 
     // Update message counter to highest ID
@@ -74,7 +80,6 @@ export function Main() {
 
     initSession();
   }, []);
-
 
   useInput((value, key) => {
     if (key.ctrl && value === 'c') {
@@ -119,14 +124,15 @@ export function Main() {
     const cwd = workingDirectory.current;
 
     try {
-      // Load existing model messages and append the new user message
+      // Load existing model messages from API
       const conversation = await loadConversation(chatId, cwd);
+
       const existingModelMessages = conversation?.modelMessages || [];
-      const userMessage = {
+      const userMessage: ModelMessage = {
         role: 'user',
         content: trimmed,
       };
-      const updatedModelMessages = [...existingModelMessages, userMessage] as any;
+      const updatedModelMessages = [...existingModelMessages, userMessage];
 
       // Update UI state immediately
       handleMessageUpdate(updatedModelMessages);
@@ -143,15 +149,29 @@ export function Main() {
       abortControllerRef.current = abortController;
 
       // Run agent with callback for message updates
-      await runAnalyticsEngineerAgent({
-        chatId,
-        workingDirectory: cwd,
-        abortSignal: abortController.signal,
-        onThinkingStateChange: (thinking) => {
-          setIsThinking(thinking);
+      await runChatAgent(
+        {
+          chatId,
+          workingDirectory: cwd,
+          abortSignal: abortController.signal,
+          prompt: trimmed, // Pass the user prompt for database creation
+          messages: updatedModelMessages, // Pass all messages including new user message
         },
-        onMessageUpdate: handleMessageUpdate,
-      });
+        {
+          onThinkingStateChange: (thinking) => {
+            setIsThinking(thinking);
+          },
+          onMessageUpdate: handleMessageUpdate,
+          onError: (error) => {
+            console.error('Agent stream error:', error);
+            setIsThinking(false);
+          },
+          onAbort: () => {
+            console.warn('Agent stream aborted');
+            setIsThinking(false);
+          },
+        }
+      );
     } catch (error) {
       // Handle abort gracefully
       if (error instanceof Error && error.name === 'AbortError') {
@@ -224,7 +244,7 @@ export function Main() {
 
   if (showSettings) {
     return (
-      <Box flexDirection='column' paddingX={1} paddingY={2}>
+      <Box flexDirection="column" paddingX={1} paddingY={2}>
         <SettingsForm
           onClose={() => {
             setShowSettings(false);
@@ -238,7 +258,7 @@ export function Main() {
 
   if (showHistory) {
     return (
-      <Box flexDirection='column' paddingX={1} paddingY={2}>
+      <Box flexDirection="column" paddingX={1} paddingY={2}>
         <HistoryBrowser
           workingDirectory={workingDirectory.current}
           onSelect={handleResumeConversation}
@@ -250,24 +270,24 @@ export function Main() {
 
   return (
     <ExpansionContext.Provider value={{ isExpanded }}>
-      <Box flexDirection='column' paddingX={1} paddingY={2} gap={1}>
+      <Box flexDirection="column" paddingX={1} paddingY={2} gap={1}>
         <ChatTitle />
         <ChatVersionTagline />
         <ChatIntroText />
-        <Box flexDirection='column' marginTop={1}>
+        <Box flexDirection="column" marginTop={1}>
           {messageList}
         </Box>
         {isThinking && (
           <Box marginLeft={2} marginTop={1}>
-            <Text color='gray' italic>
+            <Text color="gray" italic>
               Thinking...
             </Text>
           </Box>
         )}
-        <Box flexDirection='column'>
+        <Box flexDirection="column">
           <Box height={1}>
             {appMode !== 'None' && (
-              <Text color='#c4b5fd' bold>
+              <Text color="#c4b5fd" bold>
                 {appMode === 'Planning' ? 'Planning Mode' : 'Auto-accept Mode'}
               </Text>
             )}
@@ -282,7 +302,7 @@ export function Main() {
             onAutocompleteStateChange={setIsAutocompleteOpen}
             isThinking={isThinking}
           />
-          <Box justifyContent='space-between'>
+          <Box justifyContent="space-between">
             <VimStatus
               vimMode={currentVimMode}
               vimEnabled={vimEnabled}

@@ -1,24 +1,35 @@
 export {
-  getChatDashboardFiles,
-  type DashboardFileContext,
+  type CreateDashboardInput,
+  CreateDashboardInputSchema,
+  type CreateDashboardOutput,
+  createDashboard,
+} from './create-dashboard';
+export { hasDashboardScreenshotBeenTakenWithin } from './dashboard-screenshots';
+export {
   type DashboardFile,
+  type DashboardFileContext,
+  getChatDashboardFiles,
 } from './dashboards';
-
+export { deleteDashboard } from './delete-dashboard';
 export {
-  getDashboardTitle,
-  GetDashboardTitleInputSchema,
-  type GetDashboardTitleInput,
-} from './get-dashboard-title';
-
-export {
-  getDashboardById,
-  GetDashboardByIdInputSchema,
-  type GetDashboardByIdInput,
-} from './get-dashboard-by-id';
-
-export { updateDashboard } from './update-dashboard';
-
-export {
-  getCollectionsAssociatedWithDashboard,
   type AssociatedCollection,
+  getCollectionsAssociatedWithDashboard,
 } from './get-collections-associated-with-dashboard';
+export {
+  type GetDashboardByIdInput,
+  GetDashboardByIdInputSchema,
+  getDashboardById,
+} from './get-dashboard-by-id';
+export {
+  type GetDashboardTitleInput,
+  GetDashboardTitleInputSchema,
+  getDashboardTitle,
+} from './get-dashboard-title';
+export {
+  type ListDashboardsRequest,
+  ListDashboardsRequestSchema,
+  type ListDashboardsResponse,
+  listDashboards,
+} from './list-dashboards';
+export { manageMetricAssociations } from './manage-metric-associations';
+export { updateDashboard } from './update-dashboard';

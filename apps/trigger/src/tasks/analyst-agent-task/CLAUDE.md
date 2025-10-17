@@ -123,7 +123,7 @@ import type { analystAgentTask } from '~/trigger/src/tasks/analyst-agent-task';
 
 // Basic trigger
 const handle = await tasks.trigger<typeof analystAgentTask>(
-  'analyst-agent-task',
+  analyst_agent_task_keys.analyst_agent_task,
   { message_id: 'uuid-message-id-here' }
 );
 

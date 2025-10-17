@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import { requireAuth } from '../../../middleware/auth';
-import GET from './GET';
-import POST from './POST';
 import userIdGet from './[id]/GET';
 import userIdPatch from './[id]/PATCH';
 import userIdSuggestedPrompts from './[id]/suggested-prompts/GET';
+import GET from './GET';
+import POST from './POST';
 
 const app = new Hono()
   // Apply authentication globally to ALL routes in this router

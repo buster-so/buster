@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { DataSource, QueryRouter } from './data-source';
 import type { DataSourceConfig } from './data-source';
-import { DataSourceType } from './types/credentials';
+import { DataSource, QueryRouter } from './data-source';
 import type { MySQLCredentials, PostgreSQLCredentials } from './types/credentials';
+import { DataSourceType } from './types/credentials';
 
 // Test timeout - 5 seconds
 const TEST_TIMEOUT = 5000;

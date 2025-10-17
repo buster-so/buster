@@ -60,15 +60,8 @@ const BusterListRowComponentInner = React.forwardRef(
       ...style,
     };
 
-    const linkProps = row.link
-      ? {
-          preloadDelay: row.preloadDelay,
-          preload: row.preload,
-        }
-      : undefined;
-
     return (
-      <LinkWrapper link={link} {...linkProps}>
+      <LinkWrapper link={link} {...row}>
         <div
           onClick={onContainerClick}
           style={rowStyles}
@@ -169,7 +162,7 @@ const LinkWrapper: React.FC<
     <Link
       {...link}
       preload={preload ?? false}
-      preloadDelay={preloadDelay}
+      preloadDelay={preloadDelay ?? 50}
       activeOptions={activeOptions}
     >
       {children}

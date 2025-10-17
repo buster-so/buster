@@ -1,10 +1,10 @@
 import { db } from '@buster/database/connection';
 import {
   type AssetDetailsResult,
-  type Message,
-  type User,
   createMessage,
   createMessageFileAssociation,
+  type Message,
+  type User,
 } from '@buster/database/queries';
 import { chats } from '@buster/database/schema';
 import type {

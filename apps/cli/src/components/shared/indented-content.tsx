@@ -12,7 +12,7 @@ interface IndentedContentProps {
  */
 export function IndentedContent({ children }: IndentedContentProps) {
   return (
-    <Box flexDirection='column' paddingLeft={UI_CONSTANTS.PADDING.INDENT}>
+    <Box flexDirection="column" paddingLeft={UI_CONSTANTS.PADDING.INDENT}>
       {children}
     </Box>
   );

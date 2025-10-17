@@ -3,118 +3,114 @@
  * Provides types, schemas, and utilities for managing searchable text values
  */
 
-// Export all types and schemas
-export {
-  // Core schemas
-  SearchableValueSchema,
-  TurbopufferQuerySchema,
-  DeduplicationResultSchema,
-  TurbopufferDocumentSchema,
-  UpsertResultSchema,
-  // Sync job schemas
-  SyncJobPayloadSchema,
-  SyncJobStatusSchema,
-  SyncJobMetadataSchema,
-  // Configuration schemas
-  BatchConfigSchema,
-  // Search schemas
-  SearchRequestSchema,
-  SearchResultSchema,
-  SearchResponseSchema,
-  // Error handling schemas
-  ErrorTypeSchema,
-  SyncErrorSchema,
-  // Types
-  type SearchableValue,
-  type TurbopufferQuery,
-  type DeduplicationResult,
-  type TurbopufferDocument,
-  type UpsertResult,
-  type SyncJobPayload,
-  type SyncJobStatus,
-  type SyncJobMetadata,
-  type BatchConfig,
-  type SearchRequest,
-  type SearchResult,
-  type SearchResponse,
-  type ErrorType,
-  type SyncError,
-  // Utility functions
-  createUniqueKey,
-  parseUniqueKey,
-  generateNamespace,
-  isValidForEmbedding,
-} from './types';
-
 // Export client functionality with composable functions
 export {
-  // Core functions
-  queryExistingKeys,
-  upsertSearchableValues,
+  buildFilter,
+  calculateBackoffDelay,
+  checkNamespaceExists,
+  chunk,
+  // Client factory functions
+  createClient,
   createNamespaceIfNotExists,
   deleteSearchableValues,
   getAllSearchableValues,
-  searchSimilarValues,
-  checkNamespaceExists,
+  getNamespace,
   // Pure utility functions
   isRetryableError,
-  calculateBackoffDelay,
-  buildFilter,
-  valuesToColumns,
-  chunk,
-  // Higher-order functions
-  withRetry,
-  // Client factory functions
-  createClient,
-  getNamespace,
-  // Error class
-  TurbopufferError,
+  // Core functions
+  queryExistingKeys,
   // Types
   type RetryOptions,
+  searchSimilarValues,
+  // Error class
+  TurbopufferError,
+  upsertSearchableValues,
+  valuesToColumns,
+  // Higher-order functions
+  withRetry,
 } from './client';
-
 // Export deduplication functionality
 export {
-  // Main deduplication functions
-  deduplicateValues,
-  checkExistence,
-  getDeduplicationStats,
   // Utility functions
   batchArray,
-  escapeSqlString,
-  formatSqlInClause,
+  checkExistence,
+  closeConnection,
   // Connection management (for advanced use cases)
   createConnection,
-  closeConnection,
-  executeQuery,
   // Types
   type DuckDBContext,
+  // Main deduplication functions
+  deduplicateValues,
+  escapeSqlString,
+  executeQuery,
+  formatSqlInClause,
+  getDeduplicationStats,
 } from './deduplicate';
-
 // Export DuckDB helper functions for type safety
 export {
-  isConnectionOpen,
+  createConnectionWithCleanup,
   hasActiveConnection,
+  isConnectionOpen,
+  safeCleanup,
   withConnection,
   withContext,
-  safeCleanup,
-  createConnectionWithCleanup,
 } from './duckdb-helpers';
-
 // Export parquet caching functionality
 export {
-  // Cache operations
-  processWithCache,
-  updateCache,
   downloadParquetCache,
-  uploadParquetCache,
   // Parquet operations
   exportValuesToParquet,
-  readValuesFromParquet,
   findNewValues,
   // Utility functions
   generateColumnHash,
   generateStorageKey,
   // Types
   type ParquetCacheResult,
+  // Cache operations
+  processWithCache,
+  readValuesFromParquet,
+  updateCache,
+  uploadParquetCache,
 } from './parquet-cache';
+// Export all types and schemas
+export {
+  type BatchConfig,
+  // Configuration schemas
+  BatchConfigSchema,
+  // Utility functions
+  createUniqueKey,
+  type DeduplicationResult,
+  DeduplicationResultSchema,
+  type ErrorType,
+  // Error handling schemas
+  ErrorTypeSchema,
+  generateNamespace,
+  isValidForEmbedding,
+  parseUniqueKey,
+  // Types
+  type SearchableValue,
+  // Core schemas
+  SearchableValueSchema,
+  type SearchRequest,
+  // Search schemas
+  SearchRequestSchema,
+  type SearchResponse,
+  SearchResponseSchema,
+  type SearchResult,
+  SearchResultSchema,
+  type SyncError,
+  SyncErrorSchema,
+  type SyncJobMetadata,
+  SyncJobMetadataSchema,
+  type SyncJobPayload,
+  // Sync job schemas
+  SyncJobPayloadSchema,
+  type SyncJobStatus,
+  SyncJobStatusSchema,
+  type TurbopufferDocument,
+  TurbopufferDocumentSchema,
+  type TurbopufferQuery,
+  TurbopufferQuerySchema,
+  type UpsertResult,
+  UpsertResultSchema,
+} from './types';

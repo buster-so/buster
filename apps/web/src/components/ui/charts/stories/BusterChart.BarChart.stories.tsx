@@ -2208,3 +2208,66 @@ export const BarChatWithProblemDates: Story = {
     ],
   },
 };
+
+export const PercentageValueScaleBar: Story = {
+  args: {
+    selectedChartType: 'bar',
+    barGroupType: 'stack',
+    barLayout: 'vertical',
+    barAndLineAxis: {
+      x: ['category'],
+      y: ['sales'],
+      category: [],
+      tooltip: null,
+      colorBy: [],
+    },
+    columnSettings: {
+      sales: {
+        ...DEFAULT_COLUMN_SETTINGS,
+      },
+      category: {
+        ...DEFAULT_COLUMN_SETTINGS,
+      },
+    },
+    columnLabelFormats: {
+      sales: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        columnType: 'number',
+        style: 'percent',
+      },
+      category: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        columnType: 'text',
+        style: 'string',
+      },
+    },
+    data: [
+      {
+        category: 'Electronics',
+        sales: 55.67,
+      },
+      {
+        category: 'Clothing',
+        sales: 34.33,
+      },
+    ],
+    columnMetadata: [
+      {
+        name: 'category',
+        min_value: 'Electronics',
+        max_value: 'Clothing',
+        unique_values: 2,
+        simple_type: 'text',
+        type: 'text',
+      },
+      {
+        name: 'sales',
+        min_value: 34.33,
+        max_value: 55.67,
+        unique_values: 2,
+        simple_type: 'number',
+        type: 'numeric',
+      },
+    ],
+  },
+};

@@ -101,29 +101,6 @@ steps:
       type: AI_ASSERTION
       assertion: "Editing panel is displayed from the right with tabs for Visualize,
         Styling, and Colors. "
-  - id: bae7b04d-e6b4-4bc7-896c-e93538922edd
-    type: PRESET_ACTION
-    command:
-      id: cddb9248-02c0-43f0-902b-af542886ddab
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: Last scatter plot icon 3rd row down and 4th across in the
-          group of visualization icons.
-  - id: 2ae8fae5-6fa8-44d7-a4c6-db8fc2369138
-    type: PRESET_ACTION
-    command:
-      id: 383a4142-98e2-473e-9887-331a6248d62f
-      type: AI_ASSERTION
-      assertion: Confirm there is a pop up at the bottom with "Unsaved Changes Reset Save"
-  - id: cf787422-678e-454d-a3ce-cff9ef444195
-    type: PRESET_ACTION
-    command:
-      id: 7128c793-178a-482c-82f2-e1ae14802f49
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: reset next to Unsaved changes
   - id: edf92c40-e10e-4a7c-b39c-729cee49f6bc
     type: PRESET_ACTION
     command:
@@ -134,14 +111,14 @@ steps:
         type: description
         elementDescriptor: The title above the metric
       value: momentic-test-metric
-  - id: 15239cdc-448c-4e0f-91fb-08339c565966
+  - id: 77ee7abc-2ddb-4c05-955f-4b61884fd52b
     type: PRESET_ACTION
     command:
-      id: ccec315a-7369-4a8a-950a-3bbba76c89aa
+      id: 8ad2f04d-bb15-42c4-bdc9-62baf6795888
       type: CLICK
       target:
         type: description
-        elementDescriptor: The empty whitespace below the metric
+        elementDescriptor: the metric view chart content panel (metric-view-chart-content)
   - id: df94543c-3fb2-4862-ab45-fb68dfc09639
     type: PRESET_ACTION
     command:

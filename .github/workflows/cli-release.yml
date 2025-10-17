@@ -47,7 +47,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9.15.0
+          version: 10.18.3
 
       - name: Setup Node.js
         uses: useblacksmith/setup-node@v5
@@ -84,17 +84,23 @@ jobs:
         working-directory: ./apps/cli
         run: |
           echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
-          # Note: Bun compiles for the host platform, cross-compilation happens via matrix strategy
-          bun build src/index.tsx --compile --outfile dist/buster-cli
-          
+          # Use the main build script (creates standalone binary with DuckDB external config)
+          bun run build
+
+          # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
+          mv dist/buster dist/buster-cli
+
           # Make binary executable on Unix systems
           if [[ "${{ runner.os }}" != "Windows" ]]; then
             chmod +x dist/buster-cli
           fi
-          
+
           # Display binary info
           ls -lah dist/
         shell: bash
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
 
       - name: Test binary (Unix)
         if: runner.os != 'Windows'

@@ -11,10 +11,10 @@ import { requireAuth } from '../../../middleware/auth';
 import '../../../types/hono.types'; //I added this to fix intermitent type errors. Could probably be removed.
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
-import GET from './GET';
 import chatById from './[id]';
 import { cancelChatHandler } from './cancel-chat';
 import cliChat from './cli';
+import GET from './GET';
 import { createChatHandler } from './handler';
 
 const app = new Hono()
@@ -28,7 +28,7 @@ const app = new Hono()
     const request = c.req.valid('json');
     const user = c.get('busterUser');
 
-    const response: ChatWithMessages = await createChatHandler(request, user);
+    const response: ChatWithMessages = await createChatHandler(request, user, c);
 
     const validatedResponse = ChatWithMessagesSchema.safeParse(response);
 
@@ -41,21 +41,12 @@ const app = new Hono()
       400
     );
   })
-  .patch(
-    '/:chat_id',
-    zValidator(
-      'json',
-      z.object({
-        stop: z.boolean(),
-      })
-    ),
-    async (c) => {
-      //TODO
-      return c.json({
-        message: `TODO: Stop this chat ${c.req.param('chat_id')}`,
-      });
-    }
-  )
+  .patch('/:chat_id', zValidator('json', z.object({ stop: z.boolean() })), async (c) => {
+    //TODO
+    return c.json({
+      message: `TODO: Stop this chat ${c.req.param('chat_id')}`,
+    });
+  })
   // DELETE /chats/:chat_id/cancel - Cancel a chat and its running triggers
   .delete('/:chat_id/cancel', zValidator('param', CancelChatParamsSchema), async (c) => {
     const params = c.req.valid('param');

@@ -1,0 +1,146 @@
+[
+  {
+    "metricFileId": "271fabca-b05d-4e12-84b7-1a2315051fac",
+    "dashboardFileId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "createdAt": "2025-10-12 22:41:36.272+00",
+    "updatedAt": "2025-10-12 22:41:36.272+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "3b71f848-1b5e-40db-985d-38fab11a761a",
+    "dashboardFileId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "createdAt": "2025-10-12 22:41:36.272+00",
+    "updatedAt": "2025-10-12 22:41:36.272+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "4c33a67d-498a-4f69-91a7-60282bae8677",
+    "dashboardFileId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "createdAt": "2025-10-12 22:41:36.272+00",
+    "updatedAt": "2025-10-12 22:41:36.272+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "007afd5b-d673-42b2-a0d1-f9a2afa2a9c9",
+    "dashboardFileId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "createdAt": "2025-10-12 22:41:36.272+00",
+    "updatedAt": "2025-10-12 22:41:36.272+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "17362efb-a9c2-4081-8bd0-07aef93165f1",
+    "dashboardFileId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "createdAt": "2025-10-12 22:41:36.272+00",
+    "updatedAt": "2025-10-12 22:41:36.272+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "4ec85989-76ac-4cec-8aa1-e64c5d7d5266",
+    "dashboardFileId": "b9f84657-097f-4d04-8cc1-ff6dd11359cf",
+    "createdAt": "2025-10-12 22:41:36.272+00",
+    "updatedAt": "2025-10-12 22:41:36.272+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "2d150079-91d4-4611-8a7b-bfaec0c37d2d",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "c988b4b4-0db5-49d7-b771-cf7db6900e96",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "68602202-5d06-45dd-89f3-e971c6ca03b1",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "f4dc4702-f67f-4aef-810e-6b428129c287",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "7bb6d4e4-0a46-4caf-abe0-1000c807c587",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "d8f114f9-afa1-4411-8969-87d790dd2a7c",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "81679dcf-e928-46c8-9c05-129459403cfd",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "0f2bad93-6e30-47c3-9dd7-96754a123f4c",
+    "dashboardFileId": "ae4077e3-da53-47a3-ae63-57d03c9a3ced",
+    "createdAt": "2025-10-12 22:44:04.827+00",
+    "updatedAt": "2025-10-12 22:44:04.827+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "8357b9fb-10e2-4d1b-ae0a-c0c7093345bd",
+    "dashboardFileId": "2b685e73-ea18-472b-a662-5dc7aa7a7be5",
+    "createdAt": "2025-10-12 22:55:13.064+00",
+    "updatedAt": "2025-10-12 22:55:13.064+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "2067deb5-33f5-4bd6-9f15-a411f1848187",
+    "dashboardFileId": "2b685e73-ea18-472b-a662-5dc7aa7a7be5",
+    "createdAt": "2025-10-12 22:55:13.064+00",
+    "updatedAt": "2025-10-12 22:55:13.064+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "3b332367-f33e-4de7-a4b5-0bd4cf0f3694",
+    "dashboardFileId": "2b685e73-ea18-472b-a662-5dc7aa7a7be5",
+    "createdAt": "2025-10-12 22:55:13.064+00",
+    "updatedAt": "2025-10-12 22:55:13.064+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  },
+  {
+    "metricFileId": "1739379e-8e11-44bf-874a-63ac4bbb35a0",
+    "dashboardFileId": "2b685e73-ea18-472b-a662-5dc7aa7a7be5",
+    "createdAt": "2025-10-12 22:55:13.064+00",
+    "updatedAt": "2025-10-12 22:55:13.064+00",
+    "deletedAt": null,
+    "createdBy": "c2dd64cd-f7f3-4884-bc91-d46ae431901e"
+  }
+]

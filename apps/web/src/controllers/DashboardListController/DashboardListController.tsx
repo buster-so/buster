@@ -28,7 +28,7 @@ export const DashboardListController: React.FC = () => {
     >
       <DashboardListContent
         loading={!isFetchedDashboardsList}
-        dashboardsList={dashboardsList}
+        dashboardsList={dashboardsList?.data ?? []}
         openNewDashboardModal={openNewDashboardModal}
         setOpenNewDashboardModal={setOpenNewDashboardModal}
       />

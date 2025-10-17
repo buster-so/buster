@@ -42,7 +42,7 @@ export const useThreeDotFavoritesOptions = ({
     }
 
     if (assetType === 'dashboard_file' && dashboardList) {
-      return dashboardList?.map((d) => ({
+      return dashboardList?.data?.map((d) => ({
         id: d.id,
         name: d.name,
       }));

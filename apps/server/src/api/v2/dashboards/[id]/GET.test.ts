@@ -1,15 +1,15 @@
 import { checkPermission } from '@buster/access-controls';
 import {
-  type User,
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
+  type User,
 } from '@buster/database/queries';
 import { DEFAULT_CHART_CONFIG } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getPubliclyEnabledByUser } from '../../../../shared-helpers/get-publicly-enabled-by-user';
 import {
   buildMetricResponse,
@@ -97,6 +97,19 @@ describe('getDashboardHandler', () => {
     publiclyEnabledBy: null,
     workspaceSharing: 'none',
   };
+
+  // Mock Hono context
+  const mockContext = {
+    env: {},
+    get: vi.fn((key: string) => {
+      if (key === 'accessToken') return 'mock-access-token';
+      return undefined;
+    }),
+    set: vi.fn(),
+    req: {
+      header: vi.fn(() => undefined),
+    },
+  } as any;
 
   beforeEach(() => {
     vi.clearAllMocks();

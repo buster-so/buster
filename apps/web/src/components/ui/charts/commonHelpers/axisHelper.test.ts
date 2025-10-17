@@ -29,7 +29,7 @@ describe('formatYAxisLabel', () => {
         currency: 'USD',
       } as ColumnLabelFormat,
     } as Record<string, ColumnLabelFormat>;
-    const usePercentageModeAxis = true;
+    const usePercentageModeAxis = '100';
 
     // Execute
     const result = formatYAxisLabel(

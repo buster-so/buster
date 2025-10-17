@@ -6,7 +6,7 @@ import {
   slackIntegrations,
   slackMessageTracking,
 } from '@buster/database/schema';
-import { SlackMessageSource, convertMarkdownToSlack } from '@buster/slack';
+import { convertMarkdownToSlack, SlackMessageSource } from '@buster/slack';
 import { logger } from '@trigger.dev/sdk/v3';
 
 export interface SlackNotificationParams {

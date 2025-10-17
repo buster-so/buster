@@ -13,7 +13,7 @@ dev:
 	PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -d postgres -U postgres -f libs/database/seed.sql || true && \
 	export RUST_LOG=debug && \
 	export CARGO_INCREMENTAL=1 && \
-	nice cargo watch -C server -x run
+	cd server && nice cargo-watch -x run
 
 update-seed:
 	PGPASSWORD=postgres pg_dump -h 127.0.0.1 -p 54322 -U postgres -d postgres \
@@ -42,10 +42,10 @@ stop:
 fast:
 	export RUST_LOG=debug && \
 	export CARGO_INCREMENTAL=1 && \
-	nice cargo watch -C server -x run
+	cd server && nice cargo-watch -x run
 
 fast-no-migrations:
 	export RUST_LOG=debug && \
 	export CARGO_INCREMENTAL=1 && \
 	export SKIP_MIGRATIONS=true && \
-	nice cargo watch -C server -x run
+	cd server && nice cargo-watch -x run

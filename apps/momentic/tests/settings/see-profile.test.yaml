@@ -13,9 +13,9 @@ envs:
   - name: development
     default: true
 steps:
-  - id: 0c900352-79c3-44c0-bf51-26c6a9e1c65b
+  - id: 21740e8c-7863-4654-94f4-b737625ce153
     type: MODULE
-    moduleId: 77f747c9-9821-4bfa-9d02-0a57836065da
+    moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
   - id: 3177d899-9baf-499f-8dc3-edc2270ccb64
     type: MODULE
     moduleId: e9a183c5-556a-4621-b640-577e955c8a26

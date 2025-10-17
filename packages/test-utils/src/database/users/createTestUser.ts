@@ -7,10 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  * @param params - Optional parameters to override defaults
  * @returns The user ID
  */
-export async function createTestUser(params?: {
-  email?: string;
-  name?: string;
-}): Promise<string> {
+export async function createTestUser(params?: { email?: string; name?: string }): Promise<string> {
   try {
     const userId = uuidv4();
     const email = params?.email || `test-${uuidv4()}@example.com`;

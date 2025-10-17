@@ -5,6 +5,7 @@ import { organizations, users, usersToOrganizations } from '@buster/database/sch
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 type Organization = InferSelectModel<typeof organizations>;
+
 import type { UserOrganizationRole } from '@buster/access-controls';
 import { and, eq, isNull } from 'drizzle-orm';
 

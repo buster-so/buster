@@ -1,0 +1,83 @@
+fileType: momentic/test
+id: 8ec6aa4d-6bcc-4bd5-adb5-c17c346ccf73
+name: user-should-be-able-to-use-stacked-bar
+description: the user should be able to click and save a pie chart.
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: f88fb988-6893-4a09-8366-ea89c38d9367
+    type: MODULE
+    moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
+  - id: 292ed32d-c649-4321-bd7b-29516169fb74
+    type: PRESET_ACTION
+    command:
+      id: b2d94baa-b0ba-4555-8846-f0d87c47b237
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the metrics link in the left sidebar
+  - id: 925aa181-3576-41ba-87e4-fd59595e4a69
+    type: PRESET_ACTION
+    command:
+      id: b9a4f4d3-83e2-4a28-8d7f-45a84ad0e289
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the div with text 'Monthly Order Volume'
+  - id: 05169d64-25d9-4afc-9bf1-2c9d0a89a3c8
+    type: PRESET_ACTION
+    command:
+      id: 17fe1de6-cd73-4c2c-b16b-de3a303e6a08
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the edit chart button
+  - id: da101b4c-f999-4136-9aa9-fc24ca6e98b6
+    type: PRESET_ACTION
+    command:
+      id: 0bb103d6-31ad-4b02-83fe-f117a27ead56
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the stacked bar chart-type button in the Chart type selector
+          (data-testid select-chart-type-stackedBar)
+  - id: 4eb57c88-4bff-4a3e-9004-a4a73fe558c2
+    type: PRESET_ACTION
+    command:
+      id: 72d5dd39-fe1e-4ab8-85b1-f11400c1ac6d
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the Save button in the page bottom action bar next to Reset
+  - id: e5dcec3e-c0ba-412a-af68-c2d65c6af47b
+    type: PRESET_ACTION
+    command:
+      id: 4cc134c4-5f29-4afd-bcd3-3075a0574f7f
+      type: AI_ASSERTION
+      assertion: We should see a stacked bar chart. The xaxis whould be labeled Orders
+        and the yaxis should have Month in it.
+afterSteps:
+  - id: e37dd2b1-ac2e-4112-820f-66f3b11d19e9
+    type: PRESET_ACTION
+    command:
+      id: 92620cbd-0f4a-4fb5-91b7-92df614179d9
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the grouped column chart icon
+  - id: c12e98f0-7a17-4853-ae7d-a086f615d2ca
+    type: PRESET_ACTION
+    command:
+      id: 5084ca86-7234-44f4-8e08-48760591a996
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the save button at the bottom of the chart

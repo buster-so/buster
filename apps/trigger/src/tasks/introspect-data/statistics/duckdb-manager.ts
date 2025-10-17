@@ -452,19 +452,19 @@ export class DuckDBManager {
   /**
    * Map DuckDB type string to our enum
    */
-  private mapDuckDBTypeToEnum(typeStr: string): DuckDBColumnType {
-    const upperType = typeStr.toUpperCase();
+  // private mapDuckDBTypeToEnum(typeStr: string): DuckDBColumnType {
+  //   const upperType = typeStr.toUpperCase();
 
-    if (upperType.includes('INT')) return DuckDBColumnType.BIGINT;
-    if (upperType.includes('DOUBLE') || upperType.includes('FLOAT')) return DuckDBColumnType.DOUBLE;
-    if (upperType.includes('DECIMAL') || upperType.includes('NUMERIC'))
-      return DuckDBColumnType.DECIMAL;
-    if (upperType.includes('BOOL')) return DuckDBColumnType.BOOLEAN;
-    if (upperType.includes('TIMESTAMP')) return DuckDBColumnType.TIMESTAMP;
-    if (upperType.includes('DATE')) return DuckDBColumnType.DATE;
+  //   if (upperType.includes('INT')) return DuckDBColumnType.BIGINT;
+  //   if (upperType.includes('DOUBLE') || upperType.includes('FLOAT')) return DuckDBColumnType.DOUBLE;
+  //   if (upperType.includes('DECIMAL') || upperType.includes('NUMERIC'))
+  //     return DuckDBColumnType.DECIMAL;
+  //   if (upperType.includes('BOOL')) return DuckDBColumnType.BOOLEAN;
+  //   if (upperType.includes('TIMESTAMP')) return DuckDBColumnType.TIMESTAMP;
+  //   if (upperType.includes('DATE')) return DuckDBColumnType.DATE;
 
-    return DuckDBColumnType.VARCHAR;
-  }
+  //   return DuckDBColumnType.VARCHAR;
+  // }
 
   /**
    * Create table with proper column definitions

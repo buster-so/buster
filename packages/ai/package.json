@@ -47,26 +47,36 @@
     "@buster/database": "workspace:*",
     "@buster/env-utils": "workspace:*",
     "@buster/sandbox": "workspace:*",
-    "@buster/search": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster/web-tools": "workspace:*",
+
     "ai": "catalog:",
     "autoevals": "^0.0.131",
-    "braintrust": "catalog:",
+    "braintrust": "0.4.4",
     "diff": "^8.0.2",
     "drizzle-orm": "catalog:",
     "glob": "^11.0.3",
     "minimatch": "^10.0.3",
-    "node-sql-parser": "^5.3.12",
+    "node-sql-parser": "^5.3.13",
+    "pluralize": "^8.0.0",
     "uuid": "^11.1.0",
     "yaml": "^2.8.1",
     "zod": "catalog:"
   },
+  "peerDependencies": {
+    "@buster/search": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@buster/search": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/bun": "^1.2.23",
-    "@types/diff": "^8.0.0"
+    "@types/diff": "^8.0.0",
+    "@types/pluralize": "^0.0.33"
   }
 }

@@ -30,6 +30,7 @@
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
+    "start": "pnpm db:migrate && tsx scripts/seed.ts",
     "db:init": "echo 'Initializing database...'",
     "db:seed": "tsx scripts/seed.ts",
     "db:dump": "tsx scripts/dump.ts",
@@ -47,15 +48,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@buster-app/supabase": "workspace:*",
     "@buster/env-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@buster-app/supabase": "workspace:*",
     "ai": "catalog:",
-    "drizzle-kit": "^0.31.4",
+    "dayjs": "catalog:",
+
+    "drizzle-kit": "^0.31.5",
     "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",
-    "lru-cache": "^11.2.1",
+    "lru-cache": "^11.2.2",
     "postgres": "^3.4.7",
     "zod": "catalog:"
   }

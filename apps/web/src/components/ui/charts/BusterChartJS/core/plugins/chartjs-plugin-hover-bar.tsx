@@ -27,7 +27,7 @@ export const ChartHoverBarPlugin: Plugin<ChartType, ChartHoverBarPluginOptions> 
   },
   beforeDraw: (chart, _args, options) => {
     // Early return if not a bar chart (check only once during initialization)
-    if (!chart.$pluginHoverBarManager.enabled) return;
+    if (!chart.$pluginHoverBarManager?.enabled) return;
 
     const {
       ctx,

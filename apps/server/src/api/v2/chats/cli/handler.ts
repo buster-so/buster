@@ -37,5 +37,6 @@ export async function createCliChatHandler(
     workspace_member_count: 0,
     message_ids: [],
     is_favorited: false,
+    screenshot_taken_at: null,
   };
 }

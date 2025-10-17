@@ -84,18 +84,18 @@ vi.mock('node:fs', () => ({
 
 // Import after mocks are set up
 import {
-  type DuckDBConnection,
   batchArray,
   checkExistence,
   closeConnection,
   createConnection,
+  type DuckDBConnection,
   deduplicateValues,
   escapeSqlString,
   executeQuery,
   formatSqlInClause,
   getDeduplicationStats,
 } from './deduplicate';
-import { type SearchableValue, createUniqueKey } from './types';
+import { createUniqueKey, type SearchableValue } from './types';
 
 // Helper to get mock connection for setting up test-specific behavior
 const getMockConnection = async (): Promise<any> => {

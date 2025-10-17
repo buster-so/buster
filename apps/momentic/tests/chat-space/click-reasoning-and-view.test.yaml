@@ -27,19 +27,19 @@ steps:
   - id: 82d0093d-445f-4cee-ae50-8bfeab9d2839
     type: PRESET_ACTION
     command:
-      id: e0ebae5b-6e63-474a-8dec-76469cd00e6c
+      id: 0bb32fa5-266d-48a8-b762-320ea3a5fb89
       type: CLICK
       target:
         type: description
-        elementDescriptor: the div with text 'split customers by active status'
+        elementDescriptor: The 'Total Customer Count' chat title
   - id: 65a93bf7-1ee7-48ae-883b-52feeb64de76
     type: PRESET_ACTION
     command:
-      id: fe1fe369-a60c-4044-9243-42299d1f6173
+      id: ac880dfd-0775-4a65-b6a2-f3a0d9cde68d
       type: CLICK
       target:
         type: description
-        elementDescriptor: the span with text 'reasoned for 1 minutes'
+        elementDescriptor: the span with text 'reasoned for 55 seconds'
   - id: 5f5f3f0a-b465-49fd-a318-cb9e3d8f9b6f
     type: PRESET_ACTION
     command:
@@ -64,8 +64,8 @@ steps:
   - id: ac5b870d-f124-4615-9af0-515e62b848c1
     type: PRESET_ACTION
     command:
-      id: ac7e4a43-5b6a-4eea-8698-8d462d5471a4
+      id: 01d91a1e-593a-4c70-94c8-2f47f7f43a3b
       type: AI_ASSERTION
-      assertion: Confirm that there is a reasoned for 1 minute or some sort of
+      assertion: Confirm that there is a reasoned for 55 seconds or some sort of
         concluding node of the dots and lines that you see along the left side
-        of the reasoning.
+        of the screen

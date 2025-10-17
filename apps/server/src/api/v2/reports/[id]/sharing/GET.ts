@@ -1,10 +1,10 @@
 import { checkPermission } from '@buster/access-controls';
+import type { User } from '@buster/database/queries';
 import {
   checkAssetPermission,
   getReportFileById,
   listAssetPermissions,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { ShareGetResponse } from '@buster/server-shared/reports';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';

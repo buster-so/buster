@@ -178,9 +178,9 @@ const token = await getInstallationToken(installationId);
 
 Required (set in root .env):
 ```bash
-GITHUB_APP_ID
-GITHUB_APP_PRIVATE_KEY_BASE64
-GITHUB_WEBHOOK_SECRET
+GH_APP_ID
+GH_APP_PRIVATE_KEY_BASE64
+GH_WEBHOOK_SECRET
 ```
 
 ## Common Mistakes to Avoid

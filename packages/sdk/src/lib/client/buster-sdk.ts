@@ -1,10 +1,20 @@
 import type { deploy as deployTypes } from '@buster/server-shared';
+import type {
+  CreateMessageRequestBodySchema,
+  CreateMessageResponse,
+  GetRawMessagesResponse,
+  UpdateMessageRequestBodySchema,
+  UpdateMessageResponse,
+} from '@buster/server-shared/message';
 import { isApiKeyValid } from '../auth';
 import { type SDKConfig, SDKConfigSchema } from '../config';
 import { deploy } from '../deploy';
+import { get, post, put } from '../http';
 
 type UnifiedDeployRequest = deployTypes.UnifiedDeployRequest;
 type UnifiedDeployResponse = deployTypes.UnifiedDeployResponse;
+type CreateMessageRequest = typeof CreateMessageRequestBodySchema._type;
+type UpdateMessageRequest = typeof UpdateMessageRequestBodySchema._type;
 
 // Simplified SDK interface - only what the CLI actually uses
 export interface BusterSDK {
@@ -13,6 +23,19 @@ export interface BusterSDK {
     isApiKeyValid: (apiKey?: string) => Promise<boolean>;
   };
   deploy: (request: UnifiedDeployRequest) => Promise<UnifiedDeployResponse>;
+  messages: {
+    create: (
+      chatId: string,
+      messageId: string,
+      data: CreateMessageRequest
+    ) => Promise<CreateMessageResponse>;
+    update: (
+      chatId: string,
+      messageId: string,
+      data: UpdateMessageRequest
+    ) => Promise<UpdateMessageResponse>;
+    getRawMessages: (chatId: string) => Promise<GetRawMessagesResponse>;
+  };
 }
 
 // Create SDK instance
@@ -26,5 +49,21 @@ export function createBusterSDK(config: Partial<SDKConfig>): BusterSDK {
       isApiKeyValid: (apiKey?: string) => isApiKeyValid(validatedConfig, apiKey),
     },
     deploy: (request) => deploy(validatedConfig, request),
+    messages: {
+      create: (chatId, messageId, data) =>
+        post<CreateMessageResponse>(
+          validatedConfig,
+          `/public/chats/${chatId}/messages/${messageId}`,
+          data
+        ),
+      update: (chatId, messageId, data) =>
+        put<UpdateMessageResponse>(
+          validatedConfig,
+          `/public/chats/${chatId}/messages/${messageId}`,
+          data
+        ),
+      getRawMessages: (chatId) =>
+        get<GetRawMessagesResponse>(validatedConfig, `/public/chats/${chatId}/messages`),
+    },
   };
 }

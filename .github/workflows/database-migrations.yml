@@ -5,6 +5,7 @@ on:
     branches: [main, staging]
     paths:
       - 'packages/database/drizzle/**'
+      - 'packages/database/src/schema-types/**'
       - 'packages/database/drizzle.config.ts'
       - '.github/workflows/database-migrations.yml'
   workflow_dispatch:
@@ -29,34 +30,9 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.17.1
-          
-      - name: Setup Node.js
-        uses: useblacksmith/setup-node@v5
-        with:
-          node-version: 22
-          cache: 'pnpm'
-      
-      - name: Fix pnpm store permissions
-        run: |
-          STORE_PATH=$(pnpm store path --silent)
-          if [ -d "$STORE_PATH" ]; then
-            sudo chown -R $(whoami):$(whoami) "$STORE_PATH" || true
-            chmod -R u+rw "$STORE_PATH" || true
-          fi
-      
-      - name: Mount Turbo cache sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-turbo-cache
-          path: ./.turbo
-          
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
       
       - name: Run migrations
         run: pnpm run db:migrate

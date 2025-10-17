@@ -1,8 +1,8 @@
 import { materialize } from '@buster/test-utils';
 import type { ToolCallOptions } from 'ai';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createCreateDashboardsTool } from './create-dashboards-tool';
 import type { CreateDashboardsContext, CreateDashboardsInput } from './create-dashboards-tool';
+import { createCreateDashboardsTool } from './create-dashboards-tool';
 
 vi.mock('@buster/database', () => ({
   updateMessageEntries: vi.fn(),

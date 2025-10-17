@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
-import GET from './GET';
 import CALLBACK_GET from './callback/GET';
+import DELETE from './DELETE';
+import POST from './POST';
 
-const app = new Hono().route('/', GET).route('/callback', CALLBACK_GET);
+const app = new Hono().route('/', POST).route('/', DELETE).route('/callback', CALLBACK_GET);
 
 export default app;

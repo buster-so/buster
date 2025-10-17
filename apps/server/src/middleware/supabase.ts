@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const createSupabaseClient = () => {
+const createSupabaseClient = () => {
   const supabaseUrl = process.env.SUPABASE_URL;
 
   if (!supabaseUrl) {

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type WebSearchToolOutput, createWebSearchTool } from './web-search-tool';
+import { createWebSearchTool, type WebSearchToolOutput } from './web-search-tool';
 
 vi.mock('@buster/web-tools', () => {
   const mockFirecrawlService = {

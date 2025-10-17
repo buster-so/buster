@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 // Re-export all internal types
 export * from './types/asset-permissions';
-export * from './types/dataset-permissions';
 export * from './types/cascading-permissions';
+export * from './types/dataset-permissions';
 export * from './types/errors';
 
 // Custom error class for access control operations (legacy - use AccessControlError instead)

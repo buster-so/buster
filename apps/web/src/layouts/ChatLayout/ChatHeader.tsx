@@ -4,21 +4,24 @@ import { ChatHeaderTitle } from '@/components/features/chat/ChatHeaderTitle';
 import { useGetActiveChatTitle, useIsStreamingMessage } from '@/context/Chats';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 
-export const ChatHeader: React.FC<{ isEmbed: boolean }> = React.memo(({ isEmbed }) => {
-  const chatId = useGetChatId();
-  const chatTitle = useGetActiveChatTitle();
-  const isStreamingMessage = useIsStreamingMessage();
+export const ChatHeader: React.FC<{ isEmbed: boolean; isScreenshotMode: boolean }> = React.memo(
+  ({ isEmbed, isScreenshotMode }) => {
+    const chatId = useGetChatId();
+    const chatTitle = useGetActiveChatTitle();
+    const isStreamingMessage = useIsStreamingMessage();
 
-  return (
-    <>
-      <ChatHeaderTitle
-        chatTitle={chatTitle || ''}
-        chatId={chatId || ''}
-        isStreamingMessage={isStreamingMessage}
-      />
-      {!isEmbed && <ChatHeaderOptions />}
-    </>
-  );
-});
+    return (
+      <>
+        <ChatHeaderTitle
+          chatTitle={chatTitle || ''}
+          chatId={chatId || ''}
+          isStreamingMessage={isStreamingMessage}
+          isScreenshotMode={isScreenshotMode}
+        />
+        {!isEmbed && <ChatHeaderOptions />}
+      </>
+    );
+  }
+);
 
 ChatHeader.displayName = 'ChatContainerHeader';

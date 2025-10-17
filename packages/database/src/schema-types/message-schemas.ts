@@ -11,6 +11,10 @@ export type MessageFeedback = z.infer<typeof MessageFeedbackSchema>;
 export const MessageAnalysisModeSchema = z.enum(['auto', 'standard', 'investigation']);
 export type MessageAnalysisMode = z.infer<typeof MessageAnalysisModeSchema>;
 
+// Chat Type enum
+export const ChatTypeSchema = z.enum(['analyst', 'data_engineer']);
+export type ChatType = z.infer<typeof ChatTypeSchema>;
+
 // Docs type enum
 export const DocsTypeSchema = z.enum(['analyst', 'normal']);
 export type DocsType = z.infer<typeof DocsTypeSchema>;

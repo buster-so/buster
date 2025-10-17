@@ -30,6 +30,7 @@
     "@buster/env-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
+
     "uuid": "catalog:"
   }
 }

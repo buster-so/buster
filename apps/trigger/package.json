@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "private": false,
   "type": "module",
+  "exports": {
+    "./task-keys": {
+      "types": "./src/task-keys.ts",
+      "default": "./src/task-keys.ts"
+    },
+    "./task-schemas": {
+      "types": "./src/task-schemas.ts",
+      "default": "./src/task-schemas.ts"
+    }
+  },
   "scripts": {
     "dev": "echo 'y' | npx trigger.dev@latest dev --env-file ../../.env",
     "dev:fast": "echo 'y' | npx trigger.dev@latest dev",
@@ -22,6 +32,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "catalog:",
+    "@buster-app/supabase": "workspace:*",
     "@buster/access-controls": "workspace:*",
     "@buster/ai": "workspace:*",
     "@buster/data-source": "workspace:^",
@@ -29,17 +40,18 @@
     "@buster/search": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/slack": "workspace:*",
-    "@buster-app/supabase": "workspace:*",
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster/web-tools": "workspace:*",
-    "@duckdb/node-api": "1.3.2-alpha.26",
-    "@duckdb/node-bindings": "1.3.2-alpha.26",
+    "@duckdb/node-api": "1.4.1-r.1",
+    "@duckdb/node-bindings": "1.4.1-r.1",
+    "@supabase/supabase-js": "catalog:",
     "@trigger.dev/sdk": "4.0.4",
     "@types/js-yaml": "catalog:",
+
     "ai": "catalog:",
-    "braintrust": "catalog:",
+    "dayjs": "catalog:",
     "drizzle-orm": "catalog:",
     "js-yaml": "catalog:",
     "vitest": "catalog:",

@@ -1,10 +1,10 @@
+import type { User } from '@buster/database/queries';
 import {
   checkChatsContainingAsset,
   checkCollectionsContainingAsset,
   checkDashboardsContainingMetric,
   checkReportsContainingMetric,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { AssetType } from '@buster/database/schema-types';
 import type { AssetPermissionRole, WorkspaceSharing } from '../types/asset-permissions';
 import { AccessControlError } from '../types/errors';

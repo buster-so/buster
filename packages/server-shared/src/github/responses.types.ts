@@ -50,10 +50,35 @@ export const GetGitHubIntegrationResponseSchema = z.object({
       github_org_id: z.string(),
       installation_id: z.string(),
       installed_at: z.string().datetime(),
-      last_used_at: z.string().datetime().optional(),
-      repository_count: z.number().optional(),
+      last_used_at: z.string().datetime().nullable().optional(),
     })
     .optional(),
 });
 
+export const AuthDetailsAppInstallationResponseSchema = z.object({
+  type: z.literal('token'),
+  tokenType: z.literal('installation'),
+  token: z.string(),
+  installationId: z.number(),
+  permissions: z.record(z.string(), z.string()),
+  createdAt: z.string().datetime(),
+  expiresAt: z.string().datetime(),
+  repositorySelection: z.enum(['all', 'selected']),
+});
+
+export type AuthDetailsResponse = z.infer<typeof AuthDetailsAppInstallationResponseSchema>;
+
 export type GetGitHubIntegrationResponse = z.infer<typeof GetGitHubIntegrationResponseSchema>;
+
+// Response schemas for GitHub Action Documentation endpoints
+export const GithubActionDocumentationStatusSchema = z.object({
+  messageId: z.string().describe('Message ID that was requested'),
+  status: z
+    .enum(['Complete', 'Failed', 'InProgress'])
+    .describe('Current status of the documentation generation'),
+  errorReason: z.string().optional().describe('Error reason when status is Failed'),
+});
+
+export type GithubActionDocumentationStatusResponse = z.infer<
+  typeof GithubActionDocumentationStatusSchema
+>;

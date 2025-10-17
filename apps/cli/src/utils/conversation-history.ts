@@ -1,6 +1,7 @@
-import { mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import type { ModelMessage } from '@buster/ai';
 import { z } from 'zod';
 
 // Schema for a conversation file - single source of truth
@@ -10,7 +11,9 @@ const ConversationSchema = z.object({
   createdAt: z.string().datetime().describe('ISO timestamp when conversation was created'),
   updatedAt: z.string().datetime().describe('ISO timestamp when conversation was last updated'),
   // AI SDK messages array - single source of truth for conversation state
-  modelMessages: z.array(z.any()).describe('Array of CoreMessage objects (user, assistant, tool)'),
+  modelMessages: z
+    .custom<ModelMessage[]>()
+    .describe('Array of ModelMessage objects (user, assistant, tool)'),
 });
 
 export type Conversation = z.infer<typeof ConversationSchema>;
@@ -44,13 +47,6 @@ const HISTORY_DIR = join(homedir(), '.buster', 'history');
  */
 function encodePathForDirectory(path: string): string {
   return Buffer.from(path).toString('base64url');
-}
-
-/**
- * Decodes a directory name back to the original path
- */
-function decodePathFromDirectory(encoded: string): string {
-  return Buffer.from(encoded, 'base64url').toString('utf-8');
 }
 
 /**
@@ -112,7 +108,7 @@ export async function loadConversation(
     const data = await readFile(filePath, 'utf-8');
     const parsed = JSON.parse(data);
     return ConversationSchema.parse(parsed);
-  } catch (error) {
+  } catch (_error) {
     // File doesn't exist or is invalid
     return null;
   }
@@ -124,7 +120,7 @@ export async function loadConversation(
 export async function saveModelMessages(
   chatId: string,
   workingDirectory: string,
-  modelMessages: any[]
+  modelMessages: ModelMessage[]
 ): Promise<void> {
   let conversation = await loadConversation(chatId, workingDirectory);
 
@@ -134,7 +130,7 @@ export async function saveModelMessages(
   }
 
   // Replace the model messages with the new array
-  conversation.modelMessages = modelMessages as any[];
+  conversation.modelMessages = modelMessages;
   conversation.updatedAt = new Date().toISOString();
 
   // Save back to disk
@@ -174,7 +170,7 @@ export async function listConversations(
     return conversations
       .filter((c): c is NonNullable<typeof c> => c !== null)
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  } catch (error) {
+  } catch (_error) {
     // Directory doesn't exist or can't be read
     return [];
   }
@@ -228,7 +224,7 @@ export async function loadTodos(
     const data = await readFile(filePath, 'utf-8');
     const parsed = JSON.parse(data);
     return TodoListSchema.parse(parsed);
-  } catch (error) {
+  } catch (_error) {
     // File doesn't exist or is invalid
     return null;
   }

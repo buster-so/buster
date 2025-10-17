@@ -1,12 +1,11 @@
-import { createFileRoute, matchByPath, Outlet, redirect } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import last from 'lodash/last';
 import { prefetchGetDatasetMetadata } from '@/api/buster_rest/datasets/queryRequests';
 import { DatasetsIndividualLayout } from '@/controllers/DatasetsControllers/DatasetsIndividualLayout/DatasetsLayout';
 
 export const Route = createFileRoute('/app/_app/datasets/$datasetId')({
-  beforeLoad: async ({ params, location }) => {
-    const isDatasetRoot = matchByPath('', location.pathname, {
-      to: '/app/datasets/$datasetId',
-    });
+  beforeLoad: async ({ params, matches }) => {
+    const isDatasetRoot = last(matches)?.fullPath === Route.fullPath;
 
     if (isDatasetRoot) {
       throw redirect({

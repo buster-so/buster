@@ -1,16 +1,20 @@
 import { createMiddleware } from '@tanstack/react-start';
-import { getWebRequest, setHeaders } from '@tanstack/react-start/server';
+import { getRequest, getResponseHeaders } from '@tanstack/react-start/server';
 import { createSecurityHeaders } from './csp-helper';
 
 export const securityMiddleware = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     try {
       // Check if this is an embed route by examining the request URL
-      const request = getWebRequest();
+      const request = getRequest();
       const url = new URL(request.url);
       const isEmbed = url.pathname.startsWith('/embed');
 
-      setHeaders(createSecurityHeaders(isEmbed));
+      const headers = getResponseHeaders();
+      const securityHeaders = createSecurityHeaders(isEmbed);
+      Object.entries(securityHeaders).forEach(([key, value]) => {
+        headers.set(key, value);
+      });
 
       // Set appropriate cache headers for static assets
       const pathname = url.pathname;
@@ -27,14 +31,10 @@ export const securityMiddleware = createMiddleware({ type: 'function' }).server(
         pathname.endsWith('.eot')
       ) {
         // Static assets with hashed filenames can be cached for 1 year
-        setHeaders({
-          'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
-        });
+        headers.set('Cache-Control', 'public, max-age=31536000, immutable');
       } else if (pathname === '/manifest.json') {
         // Manifest can be cached for a shorter time
-        setHeaders({
-          'Cache-Control': 'public, max-age=86400', // 1 day
-        });
+        headers.set('Cache-Control', 'public, max-age=86400');
       }
     } catch (error) {
       // Ignore headers already sent errors to prevent crashes

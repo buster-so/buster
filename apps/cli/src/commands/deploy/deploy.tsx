@@ -1,7 +1,6 @@
 import { Box, Text } from 'ink';
 import { useEffect, useState } from 'react';
-import { BusterBanner } from '../../components/banner';
-import { Spinner } from '../../components/spinner';
+import { BusterBanner, Spinner } from '../../components';
 import { DeployProgress } from './components/deploy-progress';
 import { DeploySummary } from './components/deploy-summary';
 import { deployHandler, validateDeployOptions } from './deploy-handler';
@@ -65,7 +64,7 @@ export function DeployCommand(props: DeployCommandProps) {
 
   // Always show the banner at the top
   return (
-    <Box flexDirection='column'>
+    <Box flexDirection="column">
       <BusterBanner showSubtitle={false} />
 
       {/* Error state */}
@@ -74,16 +73,16 @@ export function DeployCommand(props: DeployCommandProps) {
           {/* Check if it's a buster.yml not found error */}
           {error?.includes('No buster.yml found') ? (
             <Box paddingX={2}>
-              <Text color='red'>No buster.yml found</Text>
+              <Text color="red">No buster.yml found</Text>
             </Box>
           ) : (
-            <Box flexDirection='column' paddingX={2}>
-              <Text color='red' bold>
+            <Box flexDirection="column" paddingX={2}>
+              <Text color="red" bold>
                 ❌ Deployment Error
               </Text>
-              <Text color='red'>{error}</Text>
+              <Text color="red">{error}</Text>
               <Box marginTop={1}>
-                <Text color='dim'>Please check your configuration and try again.</Text>
+                <Text color="dim">Please check your configuration and try again.</Text>
               </Box>
             </Box>
           )}
@@ -108,7 +107,7 @@ export function DeployCommand(props: DeployCommandProps) {
       {/* Initializing state - show spinner */}
       {status === 'initializing' && (
         <Box paddingX={2}>
-          <Spinner label='Loading configuration...' />
+          <Spinner label="Loading configuration..." />
         </Box>
       )}
     </Box>

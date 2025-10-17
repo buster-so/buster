@@ -1,10 +1,10 @@
 import type { User } from '@buster/database/queries';
 import {
   deleteS3IntegrationById,
+  deleteSecret,
   getS3IntegrationById,
   getUserOrganizationId,
 } from '@buster/database/queries';
-import { deleteSecret } from '@buster/database/queries';
 import type { DeleteS3IntegrationResponse } from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';
 

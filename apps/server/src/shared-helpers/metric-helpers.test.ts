@@ -1,22 +1,22 @@
 import { checkPermission } from '@buster/access-controls';
 import {
-  type MetricFile,
-  type User,
   getAssetsAssociatedWithMetric,
   getMetricFileById,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
+  type MetricFile,
+  type User,
 } from '@buster/database/queries';
 import { type ChartConfigProps, DEFAULT_CHART_CONFIG } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getPubliclyEnabledByUser } from './get-publicly-enabled-by-user';
 import {
-  type MetricAccessOptions,
-  type ProcessedMetricData,
   buildMetricResponse,
   fetchAndProcessMetricData,
+  type MetricAccessOptions,
+  type ProcessedMetricData,
 } from './metric-helpers';
 
 // Mock all dependencies
@@ -102,6 +102,7 @@ describe('metric-helpers', () => {
     deletedAt: null,
     screenshotBucketKey: null,
     savedToLibrary: false,
+    screenshotTakenAt: null,
     ...overrides,
   });
 

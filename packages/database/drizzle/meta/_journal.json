@@ -834,6 +834,27 @@
       "when": 1759949672591,
       "tag": "0119_grey_shatterstar",
       "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1760118019105,
+      "tag": "0120_burly_hellfire_club",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1760118171843,
+      "tag": "0121_stale_slayback",
+      "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1760652736886,
+      "tag": "0122_absurd_sharon_carter",
+      "breakpoints": true
     }
   ]
 }

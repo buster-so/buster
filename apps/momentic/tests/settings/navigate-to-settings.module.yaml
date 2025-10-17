@@ -1,15 +1,23 @@
 fileType: momentic/module
-schemaVersion: 1.0.21
 moduleId: e9a183c5-556a-4621-b640-577e955c8a26
 name: navigate-to-settings
 description: single action to navigate to settings
 enabled: true
+schemaVersion: 1.0.21
 steps:
   - id: b463897f-eeb1-443a-b227-11981455625f
     type: PRESET_ACTION
     command:
-      id: ccf58969-4345-49e9-8db3-a418651bd894
+      id: f2383913-c3c3-484d-86c1-6d86a015ac83
       type: CLICK
       target:
         type: description
-        elementDescriptor: settings icon or element that says settings
+        elementDescriptor: user details in the bottom left corner with name and email
+  - id: 0e7fd790-1880-4d03-88b7-af1e065b3fbb
+    type: PRESET_ACTION
+    command:
+      id: ca63f167-d559-4105-9334-3561745f1ec6
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: "'Settings' in the modal above the user info in left bottom corner. "

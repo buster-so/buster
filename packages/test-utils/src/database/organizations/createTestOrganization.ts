@@ -7,9 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  * @param params - Optional parameters to override defaults
  * @returns The organization ID
  */
-export async function createTestOrganization(params?: {
-  name?: string;
-}): Promise<string> {
+export async function createTestOrganization(params?: { name?: string }): Promise<string> {
   try {
     const organizationId = uuidv4();
     const name = params?.name || `Test Organization ${uuidv4()}`;

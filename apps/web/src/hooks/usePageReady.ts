@@ -36,7 +36,7 @@ export const usePageReady = (options: UsePageReadyOptions = {}) => {
   const {
     delay = 25,
     waitForIdle = true,
-    idleTimeout = 500,
+    idleTimeout = 375,
     forceImmediate = false,
     useTransition: useTransitionFlag = true,
   } = options;

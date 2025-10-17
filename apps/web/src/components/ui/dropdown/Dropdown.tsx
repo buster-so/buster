@@ -356,6 +356,7 @@ const DropdownItem = <
   truncate,
   link,
   linkIcon,
+  className,
 }: IDropdownItem<T, TRouter, TOptions, TFrom> & {
   onSelect?: (value: T) => void;
   onSelectItem: (index: number) => void;
@@ -431,6 +432,7 @@ const DropdownItem = <
         onSelectItem={onSelectItem}
         showIndex={showIndex}
         selectType={selectType}
+        className={className}
       >
         {renderContent()}
       </DropdownSubMenuWrapper>
@@ -486,6 +488,7 @@ interface DropdownSubMenuWrapperProps<T> {
   onSelect?: (value: T) => void;
   onSelectItem: (index: number) => void;
   selectType: DropdownProps<T>['selectType'];
+  className?: string;
 }
 
 const DropdownSubMenuWrapper = <T,>({
@@ -496,6 +499,7 @@ const DropdownSubMenuWrapper = <T,>({
   onSelectItem,
   selectType,
   showIndex,
+  className,
 }: DropdownSubMenuWrapperProps<T>) => {
   const subContentRef = React.useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -528,7 +532,7 @@ const DropdownSubMenuWrapper = <T,>({
         <DropdownMenuSubContent
           ref={subContentRef}
           sideOffset={8}
-          className="max-h-[375px] overflow-y-auto"
+          className={cn('max-h-[375px] overflow-y-auto sub-menu', className)}
         >
           {items?.map((item, index) => (
             <DropdownItemSelector

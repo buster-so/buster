@@ -1,12 +1,11 @@
-import { and, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2 } from '../../schema';
+import { assetSearchV2, users } from '../../schema';
 import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
-import { createPermissionedAssetsSubquery } from './access-control-helpers';
-
 import { AssetTypeSchema } from '../../schema-types/asset';
 import type { TextSearchResultSchema } from '../../schema-types/search';
+import { createPermissionedAssetsSubquery } from './access-control-helpers';
 
 /**
  * Date range filter schema
@@ -59,7 +58,9 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
     let fullSearchString = searchString;
 
     if (searchString) {
-      fullSearchString = `${searchString}*`;
+      // Remove trailing punctuation before adding wildcard to avoid pgroonga query parsing issues
+      const trimmedSearch = searchString.replace(/[.,;:!?'")\]}-]+$/, '').trim();
+      fullSearchString = trimmedSearch ? `${trimmedSearch}*` : searchString;
       filterConditions.push(
         sql`ARRAY[${assetSearchV2.title}, ${assetSearchV2.additionalText}] &@~ ${fullSearchString}`
       );
@@ -94,7 +95,7 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
       ? sql<string>`pgroonga_highlight_html(${assetSearchV2.title}, pgroonga_query_extract_keywords(${fullSearchString}))`
       : assetSearchV2.title;
 
-    const snippetLength = 160;
+    const snippetLength = 50;
     const additionalSnippetSql = fullSearchString
       ? sql<string>`coalesce(
            (pgroonga_snippet_html(${assetSearchV2.additionalText},
@@ -112,16 +113,20 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
         additionalText: additionalSnippetSql,
         updatedAt: assetSearchV2.updatedAt,
         screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+        createdBy: assetSearchV2.createdBy,
+        createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+        createdByAvatarUrl: users.avatarUrl,
       })
       .from(assetSearchV2)
+      .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
       .innerJoin(
         permissionedAssetsSubquery,
         eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
       )
       .where(and(...allConditions))
       .orderBy(
-        sql`pgroonga_score("asset_search_v2".tableoid, "asset_search_v2".ctid) DESC`,
-        assetSearchV2.updatedAt
+        sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
+        desc(assetSearchV2.updatedAt)
       )
       .limit(paginationCheckCount)
       .offset(offset);

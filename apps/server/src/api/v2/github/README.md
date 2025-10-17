@@ -58,9 +58,9 @@ Webhook endpoint for GitHub App installation events.
 ```typescript
 export function createGitHubApp() {
   return new App({
-    appId: process.env.GITHUB_APP_ID!,
+    appId: process.env.GH_APP_ID!,
     privateKey: Buffer.from(
-      process.env.GITHUB_APP_PRIVATE_KEY_BASE64!, 
+      process.env.GH_APP_PRIVATE_KEY_BASE64!, 
       'base64'
     ).toString(),
   });
@@ -76,7 +76,7 @@ export function createGitHubApp() {
 ### Webhook Security (`verify-webhook-signature.ts`)
 - Verifies GitHub webhook signatures using HMAC-SHA256
 - Uses `X-Hub-Signature-256` header
-- Requires `GITHUB_WEBHOOK_SECRET` environment variable
+- Requires `GH_WEBHOOK_SECRET` environment variable
 
 ### Token Storage (`token-storage.ts`)
 - Integrates with Supabase Vault for secure token storage
@@ -134,9 +134,9 @@ Errors are mapped to appropriate HTTP status codes:
 
 Required in root `.env`:
 ```bash
-GITHUB_APP_ID=123456
-GITHUB_APP_PRIVATE_KEY_BASE64=<base64-encoded-private-key>
-GITHUB_WEBHOOK_SECRET=your-webhook-secret
+GH_APP_ID=123456
+GH_APP_PRIVATE_KEY_BASE64=<base64-encoded-private-key>
+GH_WEBHOOK_SECRET=your-webhook-secret
 ```
 
 ## Testing

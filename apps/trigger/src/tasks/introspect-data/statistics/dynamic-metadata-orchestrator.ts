@@ -33,7 +33,7 @@ export class DynamicMetadataOrchestrator {
   private emailAnalyzer: EmailMetadataAnalyzer;
   private jsonAnalyzer: JsonMetadataAnalyzer;
 
-  constructor(private db: DuckDBManager) {
+  constructor(db: DuckDBManager) {
     this.typeDetector = new ColumnTypeDetector(db);
     this.dateTimeAnalyzer = new DateTimeMetadataAnalyzer(db);
     this.numericAnalyzer = new NumericMetadataAnalyzer(db);

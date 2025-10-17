@@ -1,4 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
+import type { User } from '@buster/database/queries';
 import {
   bulkCreateAssetPermissions,
   findUsersByEmails,
@@ -6,13 +7,12 @@ import {
   getUserOrganizationId,
   updateMetric,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { ShareMetricUpdateResponse } from '@buster/server-shared/metrics';
 import { type ShareUpdateRequest, ShareUpdateRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { getMetricHandler } from '../GET';
+import { getMetricHandler } from '../getMetricHandler';
 
 export async function updateMetricShareHandler(
   metricId: string,

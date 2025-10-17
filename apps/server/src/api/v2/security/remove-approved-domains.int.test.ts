@@ -7,8 +7,8 @@ import { removeApprovedDomainsHandler } from './remove-approved-domains';
 import {
   cleanupTestOrganization,
   cleanupTestUser,
-  createTestOrgMemberInDb,
   createTestOrganizationInDb,
+  createTestOrgMemberInDb,
   createTestUserInDb,
   createUserWithoutOrganization,
   getOrganizationFromDb,

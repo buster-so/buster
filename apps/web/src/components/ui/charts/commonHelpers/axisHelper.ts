@@ -9,7 +9,7 @@ export const formatYAxisLabel = (
   axisColumnNames: string[],
   canUseSameFormatter: boolean,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
-  usePercentageModeAxis: boolean,
+  usePercentageModeAxis: false | '100' | 'clamp',
   compactNumbers = true
 ) => {
   if (usePercentageModeAxis) {

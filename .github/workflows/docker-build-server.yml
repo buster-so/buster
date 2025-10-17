@@ -1,3 +1,5 @@
+
+
 name: Build and Push Server Docker Image
 
 on:
@@ -8,7 +10,6 @@ on:
       - 'packages/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docker-build-server.yml'
-      - '.github/workflows/deploy.yml'
 
 # Only one build per branch at a time, queue others
 concurrency:
@@ -18,134 +19,156 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: buster-so/buster-server
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
-  build-and-push:
-    runs-on: blacksmith-8vcpu-ubuntu-2404
-    permissions:
-      contents: read
-      packages: write
-    
+  prepare-metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+      tags: ${{ steps.meta.outputs.tags }}
+      timestamp: ${{ steps.meta.outputs.timestamp }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      - name: Setup Node Environment
-        uses: ./.github/actions/setup-node-env
+
+      - name: Extract metadata and determine tags
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            # For main: use commit SHA and latest
+            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+          else
+            # For all other branches: use staging-SHA and staging
+            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
+          fi
+
+          # Set build timestamp
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    needs: [prepare-metadata]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ["amd64"]
+        include:
+          - platform: amd64
+            runner: blacksmith-8vcpu-ubuntu-2404
+            docker_platform: linux/amd64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          install-filter: "@buster-app/server..."
-          cache-key: docker-build-server
-      
-      - name: Mount Turbo cache sticky disk
-        uses: useblacksmith/stickydisk@v1
+          fetch-depth: 0
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
         with:
-          key: ${{ github.repository }}-turbo-cache-${{ github.ref_name }}
-          path: ./.turbo
-      
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-${{ matrix.platform }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.platform }}-pnpm-
+
       - name: Mount Docker buildkit sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
-          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}
+          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}-${{ matrix.platform }}
           path: /tmp/.buildkit-cache
-      
-      - name: Build with Turbo
-        run: |
-          echo "🔨 Building server with Turbo..."
-          # Build with optimized settings for Docker
-          pnpm turbo run build --filter=@buster-app/server...
-          echo "✅ Build complete!"
-        env:
-          NODE_ENV: production
-          DOCKER_BUILD: true
-          CI: true
-          TURBO_CACHE_DIR: .turbo
-          TURBO_TELEMETRY_DISABLED: 1
-      
-      - name: Build server bundle
-        run: |
-          echo "📦 Creating server bundle with bun..."
-          cd apps/server
-          bun build src/index.ts --outdir ./dist --target bun --external pino-pretty --external @duckdb/node-bindings --external @duckdb/node-bindings-linux-arm64 --external @duckdb/node-bindings-darwin-arm64 --external @duckdb/node-bindings-darwin-x64 --external @duckdb/node-bindings-win32-x64
-          ls -la dist/
-          cd ../..
-      
-      - name: Prepare production dependencies
-        run: |
-          echo "🧹 Preparing production-only dependencies..."
-          # Create a temporary directory for production deps
-          mkdir -p /tmp/prod-deps/apps/server
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml /tmp/prod-deps/
-          cp -r packages /tmp/prod-deps/
-          cp apps/server/package.json /tmp/prod-deps/apps/server/
-          
-          # Install production dependencies only, skip optional dependencies
-          cd /tmp/prod-deps
-          pnpm install --frozen-lockfile --prod --no-optional
-          
-          # Copy back to workspace
-          cd -
-          mkdir -p docker-context
-          cp -r /tmp/prod-deps/node_modules docker-context/
-          cp -r apps/server/dist docker-context/
-          cp apps/server/package.json docker-context/
-      
+
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
-      
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Extract metadata and determine tags
-        id: meta
+
+      - name: Prepare platform-specific tags
+        id: platform-tags
         run: |
-          SHA_SHORT=$(git rev-parse --short=7 HEAD)
-          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
-          
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            # For main: use commit SHA and latest
-            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            # For staging: use staging-SHA and staging
-            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
-          fi
-          
-          # Set build timestamp
-          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-      
+          # Convert comma-separated tags to newline-separated with platform suffix
+          TAGS="${{ needs.prepare-metadata.outputs.tags }}"
+          PLATFORM_TAGS=""
+          for TAG in ${TAGS//,/ }; do
+            if [ -n "$PLATFORM_TAGS" ]; then
+              PLATFORM_TAGS="${PLATFORM_TAGS},"
+            fi
+            PLATFORM_TAGS="${PLATFORM_TAGS}${TAG}-${{ matrix.platform }}"
+          done
+          echo "tags=${PLATFORM_TAGS}" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: useblacksmith/build-push-action@v2
         with:
-          context: ./docker-context
-          file: ./apps/server/Dockerfile.prebuilt
+          context: .
+          file: ./apps/server/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.platform-tags.outputs.tags }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+            org.opencontainers.image.created=${{ needs.prepare-metadata.outputs.timestamp }}
             org.opencontainers.image.ref.name=${{ github.ref_name }}
           build-args: |
-            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
-            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
-          platforms: linux/amd64
+            COMMIT_SHA=${{ needs.prepare-metadata.outputs.sha_short }}
+            BUILD_DATE=${{ needs.prepare-metadata.outputs.timestamp }}
+          secrets: |
+            turbo_token=${{ secrets.TURBO_TOKEN }}
+            turbo_team=${{ vars.TURBO_TEAM }}
+          platforms: ${{ matrix.docker_platform }}
           cache-from: type=local,src=/tmp/.buildkit-cache
           cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
-      
+
+  create-manifest:
+    needs: [prepare-metadata, build-and-push]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          # Parse tags from prepare-metadata output
+          TAGS="${{ needs.prepare-metadata.outputs.tags }}"
+
+          for TAG in ${TAGS//,/ }; do
+            echo "Creating manifest for $TAG"
+            # AMD64 only for all branches
+            docker buildx imagetools create -t $TAG \
+              ${TAG}-amd64
+          done
+
       - name: Output image details
         run: |
           echo "✅ Docker image built and pushed successfully!"
           echo "📦 Image tags:"
-          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
+          echo "${{ needs.prepare-metadata.outputs.tags }}" | tr ',' '\n' | sed 's/^/   - /'
           echo ""
           echo "🔧 To use in Porter:"
           if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.sha_short }}"
+            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.prepare-metadata.outputs.sha_short }}"
           else
-            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ steps.meta.outputs.sha_short }}"
+            echo "   Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ needs.prepare-metadata.outputs.sha_short }}"
           fi

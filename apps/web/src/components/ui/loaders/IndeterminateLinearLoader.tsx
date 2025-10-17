@@ -8,8 +8,6 @@ export const IndeterminateLinearLoader: React.FC<{
   trackColor?: string;
   valueColor?: string;
 }> = React.memo(({ className = '', trackColor, valueColor, style, height = 2 }) => {
-  // const { styles, cx } = useStyles();
-
   return (
     <div
       className={`h-1.5 w-full overflow-hidden bg-gray-200 ${className}`}

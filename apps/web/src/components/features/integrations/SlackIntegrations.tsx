@@ -24,7 +24,7 @@ import LinkSlash from '@/components/ui/icons/NucleoIconOutlined/link-slash';
 import Refresh from '@/components/ui/icons/NucleoIconOutlined/refresh';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { SettingsCards } from '../settings/SettingsCard';
+import { SettingCardContent, SettingsCards } from '../settings/SettingsCard';
 import { IntegrationSkeleton } from './IntegrationSkeleton';
 
 export const SlackIntegrations = React.memo(() => {
@@ -66,26 +66,17 @@ const ConnectSlackCard = React.memo(() => {
   const needsReinstall = slackIntegration?.status === 're_install_required';
 
   return (
-    <div className="flex items-center justify-between gap-x-2">
-      <div className="flex space-x-2">
-        <div className="bg-item-select flex items-center justify-center rounded p-2">
-          <SlackIcon size={16} />
-        </div>
-        <div className="flex flex-col space-y-0.5">
-          <Text>Slack account</Text>
-          <Text variant="secondary" size={'xs'}>
-            Link your Slack account to use Buster from Slack
-          </Text>
-        </div>
-      </div>
-
+    <SettingCardContent
+      title="Slack account"
+      description="Link your Slack account to use Buster from Slack"
+      icon={<SlackIcon size={16} />}
+    >
       {isConnected ? (
         needsReinstall ? (
           <Button
             prefix={<SlackIcon size={16} />}
             onClick={() => initiateSlackOAuth()}
             size={'tall'}
-            className="border-yellow-500 bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
           >
             Re-install Required
           </Button>
@@ -97,7 +88,7 @@ const ConnectSlackCard = React.memo(() => {
           Connect Slack
         </Button>
       )}
-    </div>
+    </SettingCardContent>
   );
 });
 
@@ -170,7 +161,7 @@ const ConnectedSlackChannels = React.memo(() => {
     isLoadingSlackChannels || isLoadingSlackIntegration || isRefetchingSlackChannels;
 
   return (
-    <div className="flex items-center justify-between space-x-4">
+    <div className="flex items-center justify-between space-x-4 group">
       <div className="flex flex-col space-y-0.5">
         <Text>Alerts channel</Text>
         <Text variant="secondary" size={'xs'}>
@@ -184,8 +175,9 @@ const ConnectedSlackChannels = React.memo(() => {
               <Button
                 size={'tall'}
                 variant="ghost"
+                className="group-hover:flex hidden"
                 loading={showLoadingButton}
-                suffix={
+                prefix={
                   !showLoadingButton && (
                     <span className="flex items-center justify-center text-base">
                       <Refresh />

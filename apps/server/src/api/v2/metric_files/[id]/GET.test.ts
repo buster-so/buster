@@ -1,12 +1,12 @@
 import type { User } from '@buster/database/queries';
 import { DEFAULT_CHART_CONFIG } from '@buster/server-shared/metrics';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   buildMetricResponse,
   fetchAndProcessMetricData,
 } from '../../../../shared-helpers/metric-helpers';
-import { getMetricHandler } from './GET';
+import { getMetricHandler } from './getMetricHandler';
 
 // Mock the metric helpers
 vi.mock('../../../../shared-helpers/metric-helpers', () => ({
@@ -174,7 +174,7 @@ describe('getMetricHandler', () => {
       mockFetchAndProcessMetricData.mockRejectedValue(error);
 
       await expect(getMetricHandler({ metricId: 'nonexistent-metric' }, mockUser)).rejects.toThrow(
-        'Metric not found'
+        'Failed to fetch metric'
       );
 
       expect(mockFetchAndProcessMetricData).toHaveBeenCalledWith('nonexistent-metric', mockUser, {
@@ -187,7 +187,7 @@ describe('getMetricHandler', () => {
       mockBuildMetricResponse.mockRejectedValue(error);
 
       await expect(getMetricHandler({ metricId: 'metric-123' }, mockUser)).rejects.toThrow(
-        'Failed to build response'
+        'Failed to fetch metric'
       );
 
       expect(mockFetchAndProcessMetricData).toHaveBeenCalled();

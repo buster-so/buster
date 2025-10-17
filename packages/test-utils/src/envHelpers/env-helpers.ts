@@ -31,8 +31,7 @@ export function withTestEnv<T>(testFn: () => Promise<T>): () => Promise<T> {
   return async () => {
     const originalEnv = { ...process.env };
 
-    // biome-ignore lint/correctness/noUnusedVariables:
-    const env = await setupTestEnvironment();
+    await setupTestEnvironment();
     try {
       return await testFn();
     } finally {

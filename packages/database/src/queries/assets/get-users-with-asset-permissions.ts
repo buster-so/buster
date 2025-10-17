@@ -17,7 +17,7 @@ export const GetUsersWithAssetPermissionsResultSchema = z.object({
   role: AssetPermissionRoleSchema,
   email: z.string(),
   name: z.string().nullable(),
-  avatarUrl: z.string().nullable(),
+  avatar_url: z.string().nullable(),
 });
 
 export type GetUsersWithAssetPermissionsResult = z.infer<
@@ -55,6 +55,6 @@ export async function getUsersWithAssetPermissions(
     role: row.role,
     email: row.email,
     name: row.name,
-    avatarUrl: row.avatarUrl,
+    avatar_url: row.avatarUrl,
   }));
 }

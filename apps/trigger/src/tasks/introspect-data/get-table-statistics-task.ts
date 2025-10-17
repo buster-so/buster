@@ -1,5 +1,5 @@
-import { DataSourceType, classifyError, createAdapter, sampleTable } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
+import { classifyError, createAdapter, DataSourceType, sampleTable } from '@buster/data-source';
 import { getDataSourceCredentials, updateDatasetMetadata } from '@buster/database/queries';
 import type { DatasetMetadata } from '@buster/database/schema-types';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';

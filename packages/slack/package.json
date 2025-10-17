@@ -31,6 +31,7 @@
   "dependencies": {
     "@buster/env-utils": "workspace:*",
     "@slack/web-api": "^6.13.0",
+
     "zod": "catalog:"
   },
   "devDependencies": {

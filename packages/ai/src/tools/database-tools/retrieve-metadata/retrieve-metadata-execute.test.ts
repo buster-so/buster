@@ -35,6 +35,7 @@ describe('retrieve-metadata-execute error handling', () => {
       } as Response);
 
       const result = await executeHandler({
+        dataSourceId: 'test-ds-id',
         database: 'test_db',
         schema: 'public',
         name: 'users',
@@ -42,7 +43,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       expect(result).toEqual(mockResponse);
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/v2/tools/metadata?database=test_db&schema=public&name=users',
+        'http://localhost:3000/api/v2/tools/metadata?dataSourceId=test-ds-id&database=test_db&schema=public&name=users',
         expect.objectContaining({
           method: 'GET',
           headers: {
@@ -64,6 +65,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       await expect(
         executeHandler({
+          dataSourceId: 'test-ds-id',
           database: 'test_db',
           schema: 'public',
           name: 'nonexistent_table',
@@ -78,6 +80,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       await expect(
         executeHandler({
+          dataSourceId: 'test-ds-id',
           database: 'test_db',
           schema: 'public',
           name: 'users',
@@ -97,6 +100,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       await expect(
         executeHandler({
+          dataSourceId: 'test-ds-id',
           database: 'test_db',
           schema: 'restricted',
           name: 'sensitive_table',
@@ -116,6 +120,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       await expect(
         executeHandler({
+          dataSourceId: 'test-ds-id',
           database: 'test_db',
           schema: 'public',
           name: 'users',
@@ -137,6 +142,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       await expect(
         executeHandler({
+          dataSourceId: 'test-ds-id',
           database: 'test_db',
           schema: 'public',
           name: 'users',
@@ -151,6 +157,7 @@ describe('retrieve-metadata-execute error handling', () => {
 
       await expect(
         executeHandler({
+          dataSourceId: 'test-ds-id',
           database: 'test_db',
           schema: 'public',
           name: 'users',

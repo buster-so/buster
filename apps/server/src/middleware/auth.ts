@@ -7,7 +7,12 @@ import { getSupabaseClient } from './supabase';
 export const requireAuth = bearerAuth({
   verifyToken: async (token, c) => {
     try {
-      const { data, error } = await getSupabaseClient().auth.getUser(token); //usually takes about 3 - 7ms
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
+      const supabaseCookieKey = (supabase as unknown as { storageKey: string }).storageKey;
+
+      c.set('supabaseCookieKey', supabaseCookieKey);
+      c.set('accessToken', token);
 
       if (error) {
         // Log specific auth errors to help with debugging
@@ -28,7 +33,7 @@ export const requireAuth = bearerAuth({
       c.set('supabaseUser', data.user);
 
       // Get the corresponding user from your database
-      const busterUser = await getUser({ id: data.user.id });
+      const [busterUser] = await Promise.all([getUser({ id: data.user.id })]);
 
       if (!busterUser) {
         console.warn('Supabase user found but no corresponding database user:', {

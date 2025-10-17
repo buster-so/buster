@@ -1,14 +1,18 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 import { requireAuth } from '../../../middleware/auth';
 import '../../../types/hono.types';
 import { standardErrorHandler } from '../../../utils/response';
 import dashboardByIdRoutes from './[id]';
+import DELETE from './DELETE';
+import GET from './GET';
+import POST from './POST';
 
 const app = new Hono()
   // Apply authentication middleware to all routes
   .use('*', requireAuth)
-  //  /dashboards/:id
+  .route('/', GET)
+  .route('/', POST)
+  .route('/', DELETE)
   .route('/:id', dashboardByIdRoutes)
   .onError(standardErrorHandler);
 

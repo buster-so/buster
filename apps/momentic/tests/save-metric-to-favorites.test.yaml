@@ -1,0 +1,112 @@
+fileType: momentic/test
+id: bfe02fef-22ed-40d4-9874-eca9dfdef543
+name: save-metric-to-favorites
+description: Save a metric to the favorites and confirm it worked
+schemaVersion: 1.0.21
+advanced:
+  viewport:
+    width: 1920
+    height: 1080
+  browserType: Chromium
+retries: 0
+envs:
+  - name: development
+    default: true
+steps:
+  - id: b0f51405-5b33-4297-a0bc-d12fed7e88eb
+    type: MODULE
+    moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
+  - id: 31cb958b-8e95-4b3c-9162-d9bd22b20469
+    type: PRESET_ACTION
+    command:
+      id: 7e4653f4-09ea-40d1-86cb-76e3b2657e74
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Metrics in the left side navigation panel
+  - id: 341f3233-f380-4acb-a00c-7987da78ffc7
+    type: PRESET_ACTION
+    command:
+      id: 2a8b7f81-9b39-4c37-a86a-d1f93d9abca1
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: On div with 'Total Outgoing Inventory' text
+  - id: 67c6dc53-130b-495c-b5f8-17207e93c285
+    type: PRESET_ACTION
+    command:
+      id: 1fd3971d-91a5-491b-88ae-6b780c864935
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Three dot ... above the metric
+  - id: d2f3716f-8a34-4f2b-ab8a-571426b31d76
+    type: PRESET_ACTION
+    command:
+      id: 2d8b55b7-4b12-4a67-af26-46c374f18030
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Add to favorites from the drop down
+  - id: 4ad9618a-bdea-4ad7-8d83-91785e6296be
+    type: PRESET_ACTION
+    command:
+      id: eebf59ea-282f-431c-aa16-81042ad3910e
+      type: AI_ASSERTION
+      assertion: The same title above the metric in the middle of the page or the
+        beginning of the title should exist as the first option under Favorites
+        left navigation Bar.
+  - id: 10b08a0d-065e-436c-b537-31a6f35e8ff8
+    type: PRESET_ACTION
+    command:
+      id: 88ad5705-7ea0-4cdd-8d43-11f10e465b5e
+      loadTimeout: 2
+      type: NAVIGATE
+      url: "{{env.BASE_URL}}/app/home"
+  - id: 3a9cd80c-ceab-4fc4-bb9e-cc119c8b2b03
+    type: PRESET_ACTION
+    command:
+      id: a4f92783-eb8f-41db-a8e0-771f307796d4
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: The first title under Favorites in the navigation bar
+  - id: 7e80c36e-2717-413f-8045-4d68b7da7f10
+    type: PRESET_ACTION
+    command:
+      id: 622a637e-dfb6-4b58-bf6a-9e54b3c5d692
+      type: WAIT_FOR_URL
+      matcher:
+        type: SUBSTRING
+        url: /metrics
+      timeout: 2
+  - id: 4094278b-4ff8-48cf-8c34-ffc71fd462d9
+    type: PRESET_ACTION
+    command:
+      id: 47113c57-80ef-4676-92fc-a7bf18c2a693
+      type: AI_ASSERTION
+      assertion: There should be a metric in the middle of the screen. Either a graph,
+        chart, table, or value.
+  - id: c93fa9b4-9f44-408d-8417-dbf4979069ea
+    type: PRESET_ACTION
+    command:
+      id: f5edce84-7157-4c30-a41d-7ac7350c4c11
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Three dots ... above the metric
+  - id: f88d0644-2b83-4e87-952d-9e95b753c944
+    type: PRESET_ACTION
+    command:
+      id: b277bb43-9557-4066-85aa-1335402f067f
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: Remove from favorites in the dropdown
+  - id: d4f77644-6fca-4351-bea7-f2b89bbf0ae8
+    type: PRESET_ACTION
+    command:
+      id: 73bd7307-ea43-4647-afc7-52e7119d3633
+      type: AI_ASSERTION
+      assertion: Verify the title above the metric is not the first option below
+        Favorites in the left side navigation bar.

@@ -44,7 +44,6 @@ async function collectCoverageFiles() {
             await fs.copyFile(coverageFilePath, destinationFile);
           } catch (_err) {
             // File doesn't exist in this directory, skip
-            // biome-ignore lint/suspicious/noConsoleLog: <explanation>
             console.log(`No coverage.json found in ${match}`);
           }
         }
@@ -55,13 +54,11 @@ async function collectCoverageFiles() {
     const replaceDotPatterns = (str: string) => str.replace(/\.\.\//g, '');
 
     if (directoriesWithCoverage.length > 0) {
-      // biome-ignore lint/suspicious/noConsoleLog: This is a log
       console.log(
         `Found coverage.json in: ${directoriesWithCoverage.map(replaceDotPatterns).join(', ')}`
       );
     }
 
-    // biome-ignore lint/suspicious/noConsoleLog: This is a log
     console.log(`Coverage collected into: ${path.join(process.cwd())}`);
   } catch (error) {
     console.error('Error collecting coverage files:', error);

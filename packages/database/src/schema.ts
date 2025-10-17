@@ -22,6 +22,8 @@ import {
 import {
   AssetPermissionRoleSchema,
   AssetTypeSchema,
+  ChatTypeSchema,
+  type DashboardYml,
   DataSourceOnboardingStatusSchema,
   DatasetTypeSchema,
   DocsTypeSchema,
@@ -110,6 +112,8 @@ export const messageAnalysisModeEnum = pgEnum(
   'message_analysis_mode_enum',
   MessageAnalysisModeSchema.options
 );
+
+export const chatTypeEnum = pgEnum('chat_type_enum', ChatTypeSchema.options);
 
 export const apiKeys = pgTable(
   'api_keys',
@@ -234,6 +238,7 @@ export const collections = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
   },
   (table) => [
     foreignKey({
@@ -715,7 +720,7 @@ export const dashboardFiles = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: varchar().notNull(),
     fileName: varchar('file_name').notNull(),
-    content: jsonb().notNull().default([]),
+    content: jsonb().$type<DashboardYml>().notNull(),
     filter: varchar(),
     organizationId: uuid('organization_id').notNull(),
     createdBy: uuid('created_by').notNull(),
@@ -753,6 +758,7 @@ export const dashboardFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -828,6 +834,7 @@ export const reportFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -871,6 +878,7 @@ export const chats = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     title: text().notNull(),
+    chatType: chatTypeEnum('chat_type').default('analyst').notNull(),
     organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
@@ -901,6 +909,7 @@ export const chats = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -1053,6 +1062,7 @@ export const metricFiles = pgTable(
       mode: 'string',
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
+    screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
     savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
@@ -1912,6 +1922,7 @@ export const assetSearchV2 = pgTable(
     organizationId: uuid('organization_id').notNull(),
     title: text('title').notNull(),
     additionalText: text('additional_text'),
+    createdBy: uuid('created_by').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -1926,6 +1937,11 @@ export const assetSearchV2 = pgTable(
       columns: [table.organizationId],
       foreignColumns: [organizations.id],
       name: 'asset_search_v2_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [users.id],
+      name: 'asset_search_v2_created_by_fkey',
     }).onDelete('cascade'),
     index('pgroonga_search_title_description_index').using(
       'pgroonga',

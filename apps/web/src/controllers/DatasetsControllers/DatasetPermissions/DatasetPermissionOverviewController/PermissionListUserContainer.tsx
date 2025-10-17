@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useMemo } from 'react';
 import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
 import { ListUserItem } from '@/components/features/list/ListUserItem';

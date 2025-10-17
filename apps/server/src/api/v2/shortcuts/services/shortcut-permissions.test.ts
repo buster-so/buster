@@ -2,12 +2,12 @@ import type { User } from '@buster/database/queries';
 import type { Shortcut } from '@buster/server-shared/shortcuts';
 import { describe, expect, it } from 'vitest';
 import {
-  type UserOrganization,
   canChangeSharing,
   canCreateWorkspaceShortcut,
   canDeleteShortcut,
   canModifyShortcut,
   canViewShortcut,
+  type UserOrganization,
 } from './shortcut-permissions';
 
 describe('shortcut-permissions', () => {

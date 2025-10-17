@@ -15,7 +15,7 @@
         "!src/**/*.spec.{ts,tsx,js,jsx}",
         "!src/**/*.stories.{ts,tsx,js,jsx}"
       ],
-      "outputs": [".output/**", ".vercel/**"]
+      "outputs": [".output/**", ".vercel/**", ".dist/**"]
     },
     "build:vercel": {
       "dependsOn": ["^build:vercel", "@buster/server-shared#build"],

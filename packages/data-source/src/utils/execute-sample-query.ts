@@ -1,5 +1,7 @@
 import type { common } from '@buster/server-shared';
+
 type DataResult = common.DataResult;
+
 import { z } from 'zod';
 import { DataSource } from '../data-source';
 import type { Credentials } from '../types/credentials';

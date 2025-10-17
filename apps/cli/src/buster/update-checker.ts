@@ -26,7 +26,9 @@ export function setupUpdateChecker(): void {
               '  ' +
               chalk.bold('Update available!') +
               ' ' +
-              chalk.dim(`${formatVersion(currentVersion)} → ${formatVersion(result.latestVersion)}`) +
+              chalk.dim(
+                `${formatVersion(currentVersion)} → ${formatVersion(result.latestVersion)}`
+              ) +
               '  ' +
               chalk.yellow('│')
           );

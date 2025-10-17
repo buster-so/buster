@@ -5,8 +5,8 @@ import {
 } from '@buster/access-controls';
 import type { ModelMessage } from '@buster/ai';
 import { db } from '@buster/database/connection';
+import type { Chat, Message } from '@buster/database/queries';
 import {
-  type User,
   createAssetPermission,
   createMessage,
   generateAssetMessages,
@@ -14,8 +14,8 @@ import {
   getMessagesForChatWithUserDetails,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
+  type User,
 } from '@buster/database/queries';
-import type { Chat, Message } from '@buster/database/queries';
 import { chats, messages } from '@buster/database/schema';
 import type {
   ChatAssetType,
@@ -207,6 +207,7 @@ export async function buildChatWithMessages(
     permission,
     workspace_sharing: chat.workspaceSharing || 'none',
     workspace_member_count: workspaceMemberCount,
+    screenshot_taken_at: chat.screenshotTakenAt || null,
   };
 }
 

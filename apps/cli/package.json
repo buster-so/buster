@@ -8,10 +8,9 @@
   },
   "scripts": {
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || (tsx scripts/validate-env.ts && pnpm run typecheck)",
-    "build": "bun build src/index.tsx --outdir dist --target bun",
+    "build": "bun run build.ts",
     "build:dry-run": "tsc --noEmit",
-    "build:standalone": "bun build src/index.tsx --compile --outfile dist/buster",
-    "start": "bun run dist/index.js",
+    "dev": "bun run src/index.tsx",
     "typecheck": "tsc --noEmit",
     "lint": "biome check --write",
     "test": "vitest run",
@@ -25,10 +24,11 @@
     "@buster/ai": "workspace:*",
     "@buster/sdk": "workspace:*",
     "@buster/server-shared": "workspace:*",
-    "chalk": "^5.6.0",
-    "commander": "^14.0.0",
+
+    "chalk": "^5.6.2",
+    "commander": "^14.0.1",
     "fast-glob": "^3.3.3",
-    "ink": "^6.2.3",
+    "ink": "^6.3.1",
     "ink-big-text": "^2.0.0",
     "ink-gradient": "^3.0.0",
     "ink-spinner": "^5.0.0",
@@ -36,7 +36,7 @@
     "js-yaml": "catalog:",
     "micromatch": "^4.0.8",
     "react": "catalog:",
-    "semver": "^7.6.3",
+    "semver": "^7.7.3",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -46,11 +46,11 @@
     "@types/js-yaml": "catalog:",
     "@types/micromatch": "^4.0.9",
     "@types/react": "catalog:",
-    "@types/semver": "^7.5.8",
+    "@types/semver": "^7.7.1",
     "ink-testing-library": "^4.0.0",
-    "react-devtools-core": "^6.1.5",
+    "react-devtools-core": "^7.0.0",
     "tsx": "catalog:",
-    "@types/bun": "^1.2.21"
+    "@types/bun": "^1.2.23"
   },
   "engines": {
     "bun": ">=1.0.0"

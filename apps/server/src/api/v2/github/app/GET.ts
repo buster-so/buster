@@ -1,22 +1,12 @@
-import {
-  type User,
-  getActiveGithubIntegration,
-  getUserOrganizationId,
-} from '@buster/database/queries';
+import { getActiveGithubIntegration, type User } from '@buster/database/queries';
+import type { GetGitHubIntegrationResponse } from '@buster/server-shared/github';
+import type { UserOrganizationRole } from '@buster/server-shared/organization';
 import { Hono } from 'hono';
-import { requireAuth } from '../../../../middleware/auth';
+import { requireAuth, requireOrganization } from '../../../../middleware/auth';
 
-interface GetIntegrationResponse {
-  connected: boolean;
-  installationId?: string;
-  githubOrgId?: string;
-  createdAt?: string;
-  status?: string;
-}
-
-const app = new Hono().get('/', requireAuth, async (c) => {
-  const user = c.get('busterUser');
-  const response = await getIntegrationHandler(user);
+const app = new Hono().get('/', requireAuth, requireOrganization, async (c) => {
+  const userOrg = c.get('userOrganizationInfo');
+  const response: GetGitHubIntegrationResponse = await getIntegrationHandler(userOrg);
   return c.json(response);
 });
 
@@ -26,16 +16,10 @@ export default app;
  * Get the current GitHub integration status for the user's organization
  * Returns non-sensitive information about the integration
  */
-export async function getIntegrationHandler(user: User): Promise<GetIntegrationResponse> {
-  // Get user's organization
-  const userOrg = await getUserOrganizationId(user.id);
-  if (!userOrg) {
-    // Return disconnected status if user has no org
-    return {
-      connected: false,
-    };
-  }
-
+async function getIntegrationHandler(userOrg: {
+  organizationId: string;
+  role: UserOrganizationRole;
+}): Promise<GetGitHubIntegrationResponse> {
   try {
     // Get active GitHub integration for the organization
     const integration = await getActiveGithubIntegration(userOrg.organizationId);
@@ -49,10 +33,14 @@ export async function getIntegrationHandler(user: User): Promise<GetIntegrationR
     // Return non-sensitive integration data
     return {
       connected: true,
-      installationId: integration.installationId,
-      githubOrgId: integration.githubOrgId,
-      createdAt: integration.createdAt,
-      status: integration.status,
+      integration: {
+        id: integration.id,
+        github_org_name: integration.githubOrgName || '',
+        github_org_id: integration.githubOrgId,
+        installation_id: integration.installationId,
+        installed_at: integration.createdAt,
+        last_used_at: integration.lastUsedAt,
+      },
     };
   } catch (error) {
     console.error('Failed to get GitHub integration:', error);

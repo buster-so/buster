@@ -8,6 +8,11 @@ export const corsMiddleware = cors({
         return origin;
       }
     : (origin) => {
+        // Handle missing or empty origin (health checks, direct API calls, etc.)
+        if (!origin) {
+          return undefined;
+        }
+
         try {
           const url = new URL(origin);
           const hostname = url.hostname;
@@ -25,14 +30,12 @@ export const corsMiddleware = cors({
             return origin;
           }
 
-          // biome-ignore lint/suspicious/noConsoleLog: we want to log this
           console.log(
             `CORS: Blocked - ${hostname} does not match allowed patterns. Allowed: ${allowedDomains.join(', ')}`
           );
           return undefined;
         } catch (error) {
           // Invalid URL format
-          // biome-ignore lint/suspicious/noConsoleLog: we want to log this
           console.log(`CORS: Blocked - invalid URL format for origin ${origin}:`, error);
           return undefined;
         }

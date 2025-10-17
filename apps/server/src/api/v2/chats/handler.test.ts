@@ -1,5 +1,6 @@
-import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import type { ChatWithMessages } from '@buster/server-shared/chats';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
+import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock dependencies
@@ -64,6 +65,13 @@ describe('createChatHandler', () => {
     avatarUrl: null,
   };
 
+  const mockContext = {
+    get: vi.fn((key: string) => {
+      if (key === 'accessToken') return 'mock-access-token';
+      return undefined;
+    }),
+  } as any;
+
   const mockChat: ChatWithMessages = {
     id: 'chat-123',
     title: 'Test Chat',
@@ -102,6 +110,7 @@ describe('createChatHandler', () => {
     workspace_sharing: 'full_access',
     workspace_member_count: 0,
     individual_permissions: [],
+    screenshot_taken_at: null,
   };
 
   beforeEach(() => {
@@ -120,7 +129,7 @@ describe('createChatHandler', () => {
   });
 
   it('should create a new chat with prompt', async () => {
-    const result = await createChatHandler({ prompt: 'Hello' }, mockUser);
+    const result = await createChatHandler({ prompt: 'Hello' }, mockUser, mockContext);
 
     expect(initializeChat).toHaveBeenCalledWith(
       { prompt: 'Hello', message_analysis_mode: 'auto' },
@@ -128,9 +137,10 @@ describe('createChatHandler', () => {
       '550e8400-e29b-41d4-a716-446655440000'
     );
     expect(tasks.trigger).toHaveBeenCalledWith(
-      'analyst-agent-task',
+      analyst_agent_task_keys.analyst_agent_task,
       {
         message_id: 'msg-123',
+        access_token: 'mock-access-token',
       },
       {
         concurrencyKey: 'chat-123',
@@ -188,7 +198,8 @@ describe('createChatHandler', () => {
 
     const result = await createChatHandler(
       { asset_id: 'asset-123', asset_type: 'metric_file' },
-      mockUser
+      mockUser,
+      mockContext
     );
 
     expect(handleAssetChat).toHaveBeenCalledWith(
@@ -205,7 +216,7 @@ describe('createChatHandler', () => {
   });
 
   it('should not trigger analyst task when no content', async () => {
-    const result = await createChatHandler({}, mockUser).catch((e) => {
+    const result = await createChatHandler({}, mockUser, mockContext).catch((e) => {
       expect(tasks.trigger).not.toHaveBeenCalled();
       expect(e).toBeInstanceOf(ChatError);
     });
@@ -270,7 +281,8 @@ describe('createChatHandler', () => {
 
     const result = await createChatHandler(
       { prompt: 'Hello', asset_id: 'asset-123', asset_type: 'metric_file' },
-      mockUser
+      mockUser,
+      mockContext
     );
 
     // Verify initializeChat was called without prompt (to avoid duplicate message)
@@ -297,9 +309,10 @@ describe('createChatHandler', () => {
       emptyChat
     );
     expect(tasks.trigger).toHaveBeenCalledWith(
-      'analyst-agent-task',
+      analyst_agent_task_keys.analyst_agent_task,
       {
         message_id: 'user-msg-123', // Should use the last message ID (user's prompt)
+        access_token: 'mock-access-token',
       },
       {
         concurrencyKey: 'chat-123',
@@ -364,7 +377,8 @@ describe('createChatHandler', () => {
 
     const result = await createChatHandler(
       { prompt: 'What is this metric?', asset_id: 'asset-123', asset_type: 'metric_file' },
-      mockUser
+      mockUser,
+      mockContext
     );
 
     // Verify message order is correct
@@ -386,8 +400,8 @@ describe('createChatHandler', () => {
 
     // Verify analyst task is triggered with user message ID
     expect(tasks.trigger).toHaveBeenCalledWith(
-      'analyst-agent-task',
-      { message_id: 'user-msg-123' },
+      analyst_agent_task_keys.analyst_agent_task,
+      { message_id: 'user-msg-123', access_token: 'mock-access-token' },
       { concurrencyKey: 'chat-123' }
     );
   });
@@ -396,7 +410,9 @@ describe('createChatHandler', () => {
     vi.mocked(tasks.trigger).mockReset().mockRejectedValue(new Error('Trigger failed'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
+    await expect(
+      createChatHandler({ prompt: 'Hello' }, mockUser, mockContext)
+    ).rejects.toMatchObject({
       code: ChatErrorCode.INTERNAL_ERROR,
       message: 'An unexpected error occurred while creating the chat',
       details: { originalError: 'Trigger failed' },
@@ -414,7 +430,9 @@ describe('createChatHandler', () => {
     };
     vi.mocked(getUserOrganizationId).mockResolvedValue(null);
 
-    await expect(createChatHandler({ prompt: 'Hello' }, userWithoutOrg)).rejects.toMatchObject({
+    await expect(
+      createChatHandler({ prompt: 'Hello' }, userWithoutOrg, mockContext)
+    ).rejects.toMatchObject({
       code: ChatErrorCode.MISSING_ORGANIZATION,
       message: 'User is not associated with an organization',
     });
@@ -424,7 +442,9 @@ describe('createChatHandler', () => {
     const chatError = new ChatError(ChatErrorCode.PERMISSION_DENIED, 'No permission', 403);
     vi.mocked(initializeChat).mockRejectedValue(chatError);
 
-    await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
+    await expect(
+      createChatHandler({ prompt: 'Hello' }, mockUser, mockContext)
+    ).rejects.toMatchObject({
       code: ChatErrorCode.PERMISSION_DENIED,
       message: 'No permission',
       details: undefined,
@@ -435,7 +455,9 @@ describe('createChatHandler', () => {
     vi.mocked(initializeChat).mockRejectedValue(new Error('Database error'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
+    await expect(
+      createChatHandler({ prompt: 'Hello' }, mockUser, mockContext)
+    ).rejects.toMatchObject({
       code: ChatErrorCode.INTERNAL_ERROR,
       message: 'An unexpected error occurred while creating the chat',
       details: { originalError: 'Database error' },
@@ -453,7 +475,7 @@ describe('createChatHandler', () => {
         },
       };
 
-      await createChatHandler(requestWithShortcuts, mockUser);
+      await createChatHandler(requestWithShortcuts, mockUser, mockContext);
 
       expect(updateUserLastUsedShortcuts).toHaveBeenCalledWith({
         userId: mockUser.id,
@@ -469,7 +491,7 @@ describe('createChatHandler', () => {
         },
       };
 
-      await createChatHandler(requestWithEmptyShortcuts, mockUser);
+      await createChatHandler(requestWithEmptyShortcuts, mockUser, mockContext);
 
       expect(updateUserLastUsedShortcuts).not.toHaveBeenCalled();
     });
@@ -480,7 +502,7 @@ describe('createChatHandler', () => {
         metadata: {},
       };
 
-      await createChatHandler(requestWithoutShortcuts, mockUser);
+      await createChatHandler(requestWithoutShortcuts, mockUser, mockContext);
 
       expect(updateUserLastUsedShortcuts).not.toHaveBeenCalled();
     });
@@ -490,7 +512,7 @@ describe('createChatHandler', () => {
         prompt: 'Hello',
       };
 
-      await createChatHandler(requestWithoutMetadata, mockUser);
+      await createChatHandler(requestWithoutMetadata, mockUser, mockContext);
 
       expect(updateUserLastUsedShortcuts).not.toHaveBeenCalled();
     });
@@ -506,7 +528,7 @@ describe('createChatHandler', () => {
       };
 
       // Should not throw, just continue processing
-      const result = await createChatHandler(requestWithShortcuts, mockUser);
+      const result = await createChatHandler(requestWithShortcuts, mockUser, mockContext);
 
       expect(updateUserLastUsedShortcuts).toHaveBeenCalled();
       expect(result).toEqual(mockChat); // Should still return the chat

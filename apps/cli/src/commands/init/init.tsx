@@ -5,7 +5,7 @@ import { Box, Text, useApp, useInput } from 'ink';
 import Spinner from 'ink-spinner';
 import TextInput from 'ink-text-input';
 import { useEffect, useState } from 'react';
-import { BusterBanner } from '../../components/banner';
+import { BusterBanner } from '../../components';
 import { type Credentials, getCredentials, saveCredentials } from '../../utils/credentials';
 
 interface InitProps {
@@ -436,26 +436,26 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
 
   // Always show the banner at the top
   return (
-    <Box flexDirection='column'>
+    <Box flexDirection="column">
       <BusterBanner />
 
       {step === 'check' && (
         <Box paddingX={2}>
           <Text>
-            <Spinner type='dots' /> Checking configuration...
+            <Spinner type="dots" /> Checking configuration...
           </Text>
         </Box>
       )}
 
       {step === 'prompt-auth' && (
-        <Box flexDirection='column' paddingX={2}>
+        <Box flexDirection="column" paddingX={2}>
           <Box marginBottom={1}>
             <Text>Let's get you connected to Buster.</Text>
           </Box>
 
           {error && (
             <Box marginBottom={1}>
-              <Text color='red'>❌ {error}</Text>
+              <Text color="red">❌ {error}</Text>
             </Box>
           )}
 
@@ -470,7 +470,7 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
             <Text>Enter your API key: </Text>
           </Box>
 
-          <TextInput value={apiKeyInput} onChange={setApiKeyInput} mask='*' placeholder='sk_...' />
+          <TextInput value={apiKeyInput} onChange={setApiKeyInput} mask="*" placeholder="sk_..." />
 
           <Box marginTop={1}>
             <Text dimColor>Find your API key at {hostInput}/app/settings/api-keys</Text>
@@ -485,7 +485,7 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
       {step === 'validate' && (
         <Box paddingX={2}>
           <Text>
-            <Spinner type='dots' /> Validating your API key...
+            <Spinner type="dots" /> Validating your API key...
           </Text>
         </Box>
       )}
@@ -493,20 +493,20 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
       {step === 'save' && (
         <Box paddingX={2}>
           <Text>
-            <Spinner type='dots' /> Saving your configuration...
+            <Spinner type="dots" /> Saving your configuration...
           </Text>
         </Box>
       )}
 
       {step === 'prompt-location' && (
-        <Box flexDirection='column' paddingX={2}>
+        <Box flexDirection="column" paddingX={2}>
           <Box marginBottom={1}>
             <Text>Where would you like to create your Buster project?</Text>
           </Box>
 
           {error && (
             <Box marginBottom={1}>
-              <Text color='red'>❌ {error}</Text>
+              <Text color="red">❌ {error}</Text>
             </Box>
           )}
 
@@ -514,8 +514,8 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
             <Text>Project location: </Text>
           </Box>
 
-          <Box borderStyle='single' borderColor='#7C3AED' paddingX={1}>
-            <TextInput value={projectPath} onChange={setProjectPath} placeholder='./' />
+          <Box borderStyle="single" borderColor="#7C3AED" paddingX={1}>
+            <TextInput value={projectPath} onChange={setProjectPath} placeholder="./" />
           </Box>
 
           <Box marginTop={1}>
@@ -531,22 +531,22 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
       {step === 'creating' && (
         <Box paddingX={2}>
           <Text>
-            <Spinner type='dots' /> Creating project structure...
+            <Spinner type="dots" /> Creating project structure...
           </Text>
         </Box>
       )}
 
       {step === 'done' && (
-        <Box flexDirection='column' paddingX={2}>
+        <Box flexDirection="column" paddingX={2}>
           <Box marginBottom={1}>
-            <Text color='green'>✅ Created example project</Text>
+            <Text color="green">✅ Created example project</Text>
           </Box>
 
           <Box marginBottom={1}>
             <Text>Project structure:</Text>
           </Box>
 
-          <Box flexDirection='column' marginLeft={2}>
+          <Box flexDirection="column" marginLeft={2}>
             <Text>📁 {join(resolve(projectPath), 'buster')}/</Text>
             <Text>├── 📄 buster.yml</Text>
             <Text>└── 📁 docs/</Text>
@@ -562,7 +562,7 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
             <Text bold>📚 Next steps:</Text>
           </Box>
 
-          <Box flexDirection='column' marginLeft={2}>
+          <Box flexDirection="column" marginLeft={2}>
             <Text>1. cd {join(resolve(projectPath), 'buster')}</Text>
             <Text>2. Configure buster.yml for your data source</Text>
             <Text>3. Populate docs/ with your documentation files</Text>

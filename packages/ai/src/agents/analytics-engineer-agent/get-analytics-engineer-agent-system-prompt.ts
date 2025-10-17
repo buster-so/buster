@@ -1,5 +1,5 @@
-import analyticsEngineerAgentSubagentPrompt from './analytics-engineer-agent-prompt-subagent.txt';
 import analyticsEngineerAgentPrompt from './analytics-engineer-agent-prompt.txt';
+import analyticsEngineerAgentSubagentPrompt from './analytics-engineer-agent-prompt-subagent.txt';
 
 /**
  * Template parameters for the docs agent prompt

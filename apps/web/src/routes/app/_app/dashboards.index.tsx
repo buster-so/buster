@@ -12,7 +12,7 @@ export const Route = createFileRoute('/app/_app/dashboards/')({
     ],
   }),
   loader: async ({ context }) => {
-    prefetchGetDashboardsList(context.queryClient); //do not wait
+    await prefetchGetDashboardsList(context.queryClient); //do not wait
   },
   component: DashboardListController,
 });

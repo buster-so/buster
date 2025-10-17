@@ -86,7 +86,7 @@ export const useSaveToDashboardDropdownContent = ({
 
   const items: DropdownProps['items'] = useMemo(
     () =>
-      (dashboardsList || [])?.map((dashboard) => {
+      (dashboardsList?.data || [])?.map((dashboard) => {
         return createDropdownItem({
           value: dashboard.id,
           label: dashboard.name || 'New dashboard',

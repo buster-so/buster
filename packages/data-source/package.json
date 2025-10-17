@@ -34,19 +34,20 @@
     "@buster/server-shared": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@google-cloud/bigquery": "^8.1.0",
-    "@google-cloud/storage": "^7.17.0",
-    "@types/pg": "^8.15.4",
+    "@google-cloud/bigquery": "^8.1.1",
+    "@google-cloud/storage": "^7.17.2",
+    "@types/pg": "^8.15.5",
+
     "mssql": "^11.0.1",
-    "mysql2": "^3.14.1",
-    "node-sql-parser": "^5.3.11",
+    "mysql2": "^3.15.2",
+    "node-sql-parser": "^5.3.13",
     "pg": "catalog:",
     "pg-cursor": "^2.15.3",
-    "snowflake-sdk": "^2.1.1",
+    "snowflake-sdk": "^2.3.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/mssql": "^9.1.7",
+    "@types/mssql": "^9.1.8",
     "@types/pg-cursor": "^2.7.2"
   }
 }

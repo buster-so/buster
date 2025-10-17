@@ -7,6 +7,7 @@ import {
   DEFAULT_COLUMN_LABEL_FORMAT,
 } from '@buster/server-shared/metrics';
 import type { GridLineOptions, Scale, ScaleChartOptions } from 'chart.js';
+import clamp from 'lodash/clamp';
 import { useMemo } from 'react';
 import type { DeepPartial } from 'utility-types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -66,18 +67,47 @@ export const useYAxis = ({
     if (y2AxisKeys.length > 0 && minTickValue !== undefined) return DEFAULT_Y2_AXIS_COUNT;
   }, [minTickValue]);
 
+  const yMinValue = useMemo(() => {
+    return yAxisKeys.reduce((min, key) => {
+      const column = columnMetadata?.find((col) => col.name === key);
+      return Math.min(min, Number(column?.min_value ?? 0));
+    }, Infinity);
+  }, [columnMetadata, yAxisKeys]);
+
+  const yMaxValue = useMemo(() => {
+    return yAxisKeys.reduce((max, key) => {
+      const column = columnMetadata?.find((col) => col.name === key);
+      return Math.max(max, Number(column?.max_value ?? 0));
+    }, -Infinity);
+  }, [columnMetadata, yAxisKeys]);
+
   const grid: DeepPartial<GridLineOptions> | undefined = useMemo(() => {
     return {
       display: gridLines,
     } satisfies DeepPartial<GridLineOptions>;
   }, [gridLines]);
 
-  const usePercentageModeAxis = useMemo(() => {
+  const usePercentageModeAxis: false | '100' | 'clamp' = useMemo(() => {
     if (!isSupportedType) return false;
-    if (selectedChartType === 'bar') return barGroupType === 'percentage-stack';
-    if (selectedChartType === 'line') return lineGroupType === 'percentage-stack';
+    if (selectedChartType === 'bar') {
+      if (barGroupType === 'percentage-stack') return '100';
+    }
+    if (selectedChartType === 'line') {
+      if (lineGroupType === 'percentage-stack') return 'clamp';
+    }
+
+    const hasPercentageAxis = yAxisKeys.some((key) => columnLabelFormats[key]?.style === 'percent');
+    if (hasPercentageAxis) return 'clamp';
+
     return false;
-  }, [lineGroupType, selectedChartType, barGroupType, isSupportedType]);
+  }, [
+    lineGroupType,
+    selectedChartType,
+    barGroupType,
+    isSupportedType,
+    columnLabelFormats,
+    yAxisKeys,
+  ]);
 
   const yAxisColumnFormats: Record<string, ColumnLabelFormat> = useMemo(() => {
     if (!isSupportedType) return {};
@@ -143,8 +173,13 @@ export const useYAxis = ({
           count: defaultTickCount,
           includeBounds: true,
         },
-        min: usePercentageModeAxis ? 0 : minTickValue,
-        max: usePercentageModeAxis ? 100 : maxTickValue,
+        min: usePercentageModeAxis ? Math.min(0, yMinValue) : minTickValue,
+        max:
+          usePercentageModeAxis === 'clamp'
+            ? Math.max(100, yMaxValue * 1.05)
+            : usePercentageModeAxis === '100'
+              ? 100
+              : maxTickValue,
         border: {
           display: yAxisShowAxisLabel,
         },
@@ -162,6 +197,7 @@ export const useYAxis = ({
       maxTickValue,
       minTickValue,
       defaultTickCount,
+      yMaxValue,
     ]);
 
   return memoizedYAxisOptions;

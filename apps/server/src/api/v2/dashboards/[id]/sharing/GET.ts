@@ -1,6 +1,6 @@
 import { checkPermission } from '@buster/access-controls';
-import { getDashboardById, listAssetPermissions } from '@buster/database/queries';
 import type { User } from '@buster/database/queries';
+import { getDashboardById, listAssetPermissions } from '@buster/database/queries';
 import type { ShareGetResponse } from '@buster/server-shared/reports';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
