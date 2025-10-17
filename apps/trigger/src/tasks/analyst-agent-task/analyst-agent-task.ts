@@ -486,11 +486,6 @@ export const analystAgentTask: ReturnType<
         }
       );
 
-      // Mark the message as completed
-      await updateMessage(payload.message_id, {
-        isCompleted: true,
-      });
-
       // Wrap workflow execution to capture and log errors before re-throwing
       try {
         await tracedWorkflow();
@@ -512,6 +507,11 @@ export const analystAgentTask: ReturnType<
         // Re-throw to let Trigger handle the retry
         throw workflowError;
       }
+
+      // Mark the message as completed
+      await updateMessage(payload.message_id, {
+        isCompleted: true,
+      });
 
       const totalWorkflowTime = Date.now() - workflowExecutionStart;
 
