@@ -229,4 +229,190 @@ describe('useYAxis', () => {
       expect(result.current?.max).toBe(100);
     });
   });
+
+  describe('percentageModeMax calculation', () => {
+    it('should return 100 when not in percentage mode (usePercentageModeAxis is false)', () => {
+      const props = {
+        ...defaultProps,
+        barGroupType: 'group' as const,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'number' },
+        },
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // When usePercentageModeAxis is false, percentageModeMax returns 100
+      // but max is undefined (maxTickValue which is undefined in this case)
+      expect(result.current?.max).toBeUndefined();
+    });
+
+    it('should return 1 when yMaxValue < 1 with percent format and multiplier 100', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent', multiplier: 100 },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 0.75,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // yMaxValue is 0.75 (< 1), has multiplier 100, so percentageModeMax should be 1
+      // With clamp mode: Math.max(1, 0.75 * 1.05) = 1
+      expect(result.current?.max).toBe(1);
+    });
+
+    it('should return 100 when yMaxValue >= 1 with percent format and multiplier 100', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent', multiplier: 100 },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 1.5,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // yMaxValue is 1.5 (>= 1), so percentageModeMax should be 100
+      // With clamp mode: Math.max(100, 1.5 * 1.05) = 100
+      expect(result.current?.max).toBe(100);
+    });
+  });
+
+  describe('min and max calculation with percentage modes', () => {
+    it('should use Math.min(0, yMinValue) for min when in percentage mode with negative values', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 50,
+            min_value: -20,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // yMinValue is -20, so Math.min(0, -20) = -20
+      expect(result.current?.min).toBe(-20);
+    });
+
+    it('should use 0 for min when in percentage mode with positive yMinValue', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 100,
+            min_value: 10,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // yMinValue is 10, so Math.min(0, 10) = 0
+      expect(result.current?.min).toBe(0);
+    });
+
+    it('should use percentageModeMax for max when usePercentageModeAxis is "100"', () => {
+      const props = {
+        ...defaultProps,
+        barGroupType: 'percentage-stack' as const,
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 85,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // usePercentageModeAxis is "100", so max = percentageModeMax = 100
+      expect(result.current?.max).toBe(100);
+      expect(result.current?.min).toBe(0);
+    });
+
+    it('should use Math.max(percentageModeMax, yMaxValue * 1.05) when usePercentageModeAxis is "clamp"', () => {
+      const props = {
+        ...defaultProps,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'percent' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 150,
+            min_value: 0,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // usePercentageModeAxis is "clamp"
+      // Math.max(100, 150 * 1.05) = Math.max(100, 157.5) = 157.5
+      expect(result.current?.max).toBe(157.5);
+      expect(result.current?.min).toBe(0);
+    });
+
+    it('should use minTickValue and maxTickValue when not in percentage mode', () => {
+      const props = {
+        ...defaultProps,
+        barGroupType: 'group' as const,
+        columnLabelFormats: {
+          value1: { ...DEFAULT_COLUMN_LABEL_FORMAT, style: 'number' },
+        },
+        columnMetadata: [
+          {
+            name: 'value1',
+            max_value: 250,
+            min_value: 50,
+            unique_values: 10,
+            simple_type: 'number',
+            type: 'float',
+          } satisfies ColumnMetaData,
+        ],
+      } as Parameters<typeof useYAxis>[0];
+
+      const { result } = renderHook(() => useYAxis(props));
+      // usePercentageModeAxis is false, so use minTickValue/maxTickValue
+      // These are undefined in this test setup
+      expect(result.current?.min).toBeUndefined();
+      expect(result.current?.max).toBeUndefined();
+    });
+  });
 });
