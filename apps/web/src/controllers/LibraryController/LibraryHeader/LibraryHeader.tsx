@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/typography/Text';
 import { useLibraryLayout } from '@/context/Library/useLibraryLayout';
 import type { LibraryLayout, LibrarySearchParams } from '../schema';
 import { FilterSwitch } from './FilterSwitch';
+import { OrderDropdown } from './OrderDropdown';
 
 export const LibraryHeader: React.FC<{
   layout: LibraryLayout;
@@ -20,7 +21,7 @@ export const LibraryHeader: React.FC<{
       <div className="flex items-center space-x-1">
         <Button variant="ghost" prefix={<Plus />} onClick={() => {}} />
         <Button variant="ghost" prefix={<BarsFilter />} onClick={() => {}} />
-        <Button variant="ghost" prefix={<Sliders3 />} onClick={() => {}} />
+        <OrderDropdown layout={layout} ordering={filters.ordering} groupBy={filters.group_by} />
         <Button variant="ghost" prefix={<Dots />} onClick={() => {}} />
       </div>
     </div>
