@@ -74,14 +74,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-${{ matrix.platform }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.platform }}-pnpm-
-
       - name: Mount Docker buildkit sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
