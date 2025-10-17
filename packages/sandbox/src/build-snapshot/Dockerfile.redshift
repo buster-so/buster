@@ -5,16 +5,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash curl ca-certificates git gh ripgrep tree tar \
  && rm -rf /var/lib/apt/lists/*
 
-# dbt core + requested adapters (Postgres, Redshift, BigQuery, Snowflake, Databricks, SQL Server, MySQL)
+# Install system dependencies for dbt adapters
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    unixodbc-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install latest dbt-core and redshift adapter
 RUN pip install --no-cache-dir \
     dbt-core \
-    dbt-postgres
-    # dbt-redshift \
-    # dbt-bigquery \
-    # dbt-snowflake \
-    # dbt-databricks \
-    # dbt-sqlserver \
-    # dbt-mysql
+    dbt-redshift
 
 # Buster CLI (binary release)
 RUN echo "Downloading buster CLI v0.3.1..." \
@@ -24,8 +25,12 @@ RUN echo "Downloading buster CLI v0.3.1..." \
  && chmod +x /usr/bin/buster \
  && rm /tmp/buster-cli.tar.gz
 
-
- RUN echo "Verifying installation..." \
+# Verify installations
+RUN echo "Verifying buster CLI installation..." \
  && buster --version \
+ && echo "✅ buster CLI installed successfully"
+
+RUN echo "Verifying dbt installation..." \
  && dbt --version \
- && echo "✅ buster & dbt installed successfully"
+ && echo "✅ dbt with redshift adapter installed successfully"
+
