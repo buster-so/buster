@@ -26,7 +26,6 @@ export const OrderDropdown = React.memo(
     groupBy: LibrarySearchParams['group_by'];
     ordering_direction: LibrarySearchParams['ordering_direction'];
   }) => {
-    console.log(ordering_direction);
     return (
       <Popover
         align="end"
@@ -41,7 +40,7 @@ export const OrderDropdown = React.memo(
               <GroupByItem groupBy={groupBy} />
             </div>
           ),
-          [layout, ordering, groupBy]
+          [layout, ordering, groupBy, ordering_direction]
         )}
       >
         <Button variant="ghost" prefix={<Sliders3 />} onClick={() => {}} />
@@ -114,6 +113,21 @@ const LayoutItem = ({ layout }: { layout: LibraryLayout }) => {
   );
 };
 
+const orderByitems: SelectItem<LibrarySearchParams['ordering']>[] = [
+  {
+    label: 'None',
+    value: 'none',
+  },
+  {
+    label: 'Last opened',
+    value: 'last_opened',
+  },
+  {
+    label: 'Created at',
+    value: 'created_at',
+  },
+];
+
 const OrderingItem = ({
   ordering,
   ordering_direction,
@@ -122,26 +136,10 @@ const OrderingItem = ({
   ordering_direction: LibrarySearchParams['ordering_direction'];
 }) => {
   const navigate = useNavigate();
-  const items: SelectItem<LibrarySearchParams['ordering']>[] = [
-    {
-      label: 'None',
-      value: 'none',
-    },
-    {
-      label: 'Last opened',
-      value: 'last_opened',
-    },
-    {
-      label: 'Created at',
-      value: 'created_at',
-    },
-  ];
 
-  const value = items.find((item) => item.value === ordering) || items[0];
+  const value = orderByitems.find((item) => item.value === ordering) || orderByitems[0];
 
   const onClickOrderingDirection = useMemoizedFn(() => {
-    console.log(ordering_direction);
-
     navigate({
       to: '/app/library',
       search: (prev) => {
@@ -152,9 +150,9 @@ const OrderingItem = ({
 
   return (
     <ItemContainer title="Ordering">
-      <div className="flex items-center gap-x-2">
+      <div className={cn('flex items-center gap-x-2')}>
         <Select
-          items={items}
+          items={orderByitems}
           search={false}
           value={value.value}
           onChange={(v) => {
@@ -170,13 +168,8 @@ const OrderingItem = ({
         <Button
           variant="default"
           size={'tall'}
-          prefix={
-            <span
-              className={cn('bg-red-100 border', ordering_direction === 'desc' ? 'rotate-180' : '')}
-            >
-              <Sorting />
-            </span>
-          }
+          className={cn('duration-0', ordering_direction === 'desc' ? 'rotate-180 ' : '')}
+          prefix={<Sorting />}
           onClick={onClickOrderingDirection}
         />
       </div>
@@ -184,6 +177,45 @@ const OrderingItem = ({
   );
 };
 
+const groupByItems: SelectItem<LibrarySearchParams['group_by']>[] = [
+  {
+    label: 'No grouping',
+    value: 'none',
+  },
+  {
+    label: 'Asset type',
+    value: 'asset_type',
+  },
+  {
+    label: 'Owner',
+    value: 'owner',
+  },
+  {
+    label: 'Created at',
+    value: 'created_at',
+  },
+];
+
 const GroupByItem = ({ groupBy }: { groupBy: LibrarySearchParams['group_by'] }) => {
-  return <ItemContainer title="Group by">asdf</ItemContainer>;
+  const navigate = useNavigate();
+
+  const value = groupByItems.find((item) => item.value === groupBy) || groupByItems[0];
+
+  return (
+    <ItemContainer title="Group by">
+      <Select
+        items={groupByItems}
+        search={false}
+        value={value.value}
+        onChange={(v) => {
+          navigate({
+            to: '/app/library',
+            search: (prev) => {
+              return { ...prev, group_by: v };
+            },
+          });
+        }}
+      />
+    </ItemContainer>
+  );
 };
