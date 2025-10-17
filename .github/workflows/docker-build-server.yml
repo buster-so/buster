@@ -114,6 +114,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: useblacksmith/build-push-action@v2
+        timeout-minutes: 20
         with:
           context: .
           file: ./apps/server/Dockerfile

@@ -1,5 +1,5 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { chats, messages, userFavorites, users } from '../../schema';
@@ -39,9 +39,21 @@ export const CreateMessageInputSchema = z.object({
   metadata: z.record(z.any()).optional(),
 });
 
+export const CreateChatWithMessageInputSchema = z.object({
+  chatId: z.string().uuid(),
+  messageId: z.string().uuid(),
+  title: z.string(),
+  content: z.string(),
+  userId: z.string().uuid(),
+  organizationId: z.string().uuid(),
+  messageAnalysisMode: MessageAnalysisModeSchema.optional(),
+  metadata: z.record(z.any()).optional(),
+});
+
 export type CreateChatInput = z.infer<typeof CreateChatInputSchema>;
 export type GetChatInput = z.infer<typeof GetChatInputSchema>;
 export type CreateMessageInput = z.infer<typeof CreateMessageInputSchema>;
+export type CreateChatWithMessageInput = z.infer<typeof CreateChatWithMessageInputSchema>;
 
 /**
  * Create a new chat
@@ -151,6 +163,25 @@ export async function createMessage(input: CreateMessageInput): Promise<Message>
           ],
           metadata: validated.metadata || {},
         })
+        .onConflictDoUpdate({
+          target: [messages.id],
+          set: {
+            requestMessage: validated.content,
+            messageAnalysisMode: validated.messageAnalysisMode,
+            title: validated.content.substring(0, 255),
+            updatedAt: new Date().toISOString(),
+            // Reset completion status when updating
+            isCompleted: false,
+            // Update raw LLM messages with new user message
+            rawLlmMessages: [
+              {
+                role: 'user',
+                content: validated.content,
+              },
+            ],
+            metadata: validated.metadata || {},
+          },
+        })
         .returning();
 
       if (!message) {
@@ -170,6 +201,103 @@ export async function createMessage(input: CreateMessageInput): Promise<Message>
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(`Invalid message input: ${error.errors.map((e) => e.message).join(', ')}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Create a new chat with an initial message in a single transaction
+ * This function handles creating the chat, setting up owner permissions, and creating the first message
+ */
+export async function createChatWithMessage(input: CreateChatWithMessageInput): Promise<{
+  chat: Chat;
+  message: Message;
+}> {
+  try {
+    const validated = CreateChatWithMessageInputSchema.parse(input);
+
+    // Use transaction to ensure atomicity
+    const result = await db.transaction(async (tx) => {
+      // Create chat
+      const [newChat] = await tx
+        .insert(chats)
+        .values({
+          id: validated.chatId,
+          title: validated.title,
+          organizationId: validated.organizationId,
+          createdBy: validated.userId,
+          updatedBy: validated.userId,
+          publiclyAccessible: false,
+        })
+        .returning();
+
+      if (!newChat) {
+        throw new Error('Failed to create chat');
+      }
+
+      // Create owner permission for the user
+      await tx.execute(sql`
+        INSERT INTO asset_permissions (identity_id, identity_type, asset_id, asset_type, role, created_by, created_at, updated_at)
+        VALUES (${validated.userId}, 'user', ${newChat.id}, 'chat', 'owner', ${validated.userId}, NOW(), NOW())
+        ON CONFLICT (identity_id, identity_type, asset_id, asset_type) DO NOTHING
+      `);
+
+      // Create the message with upsert behavior
+      const [newMessage] = await tx
+        .insert(messages)
+        .values({
+          id: validated.messageId,
+          chatId: newChat.id,
+          createdBy: validated.userId,
+          requestMessage: validated.content,
+          messageAnalysisMode: validated.messageAnalysisMode || 'auto',
+          title: validated.content.substring(0, 255),
+          isCompleted: false,
+          responseMessages: [],
+          reasoning: [],
+          rawLlmMessages: [
+            {
+              role: 'user',
+              content: validated.content,
+            },
+          ],
+          metadata: validated.metadata || {},
+        })
+        .onConflictDoUpdate({
+          target: [messages.id],
+          set: {
+            requestMessage: validated.content,
+            messageAnalysisMode: validated.messageAnalysisMode || 'auto',
+            title: validated.content.substring(0, 255),
+            updatedAt: new Date().toISOString(),
+            // Reset completion status when updating
+            isCompleted: false,
+            // Update raw LLM messages with new user message
+            rawLlmMessages: [
+              {
+                role: 'user',
+                content: validated.content,
+              },
+            ],
+            metadata: validated.metadata || {},
+          },
+        })
+        .returning();
+
+      if (!newMessage) {
+        throw new Error('Failed to create message');
+      }
+
+      return { chat: newChat, message: newMessage };
+    });
+
+    return result;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new Error(
+        `Invalid chat with message input: ${error.errors.map((e) => e.message).join(', ')}`
+      );
     }
     throw error;
   }

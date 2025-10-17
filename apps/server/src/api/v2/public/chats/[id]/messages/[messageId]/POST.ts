@@ -1,15 +1,12 @@
 import { checkPermission } from '@buster/access-controls';
-import type { ModelMessage } from '@buster/ai';
-import { db } from '@buster/database/connection';
 import {
-  createAssetPermission,
+  createChatWithMessage,
   createMessage,
   getChatById,
   getMessagesForChatWithUserDetails,
   getUser,
   type User,
 } from '@buster/database/queries';
-import { chats, messages } from '@buster/database/schema';
 import {
   CreateMessageRequestBodySchema,
   CreateMessageRequestParamsSchema,
@@ -117,62 +114,14 @@ app.post(
         return c.json(response);
       }
 
-      // Path 2: Chat doesn't exist - create chat and message in transaction
-      const result = await db.transaction(async (tx) => {
-        // Create chat
-        const [newChat] = await tx
-          .insert(chats)
-          .values({
-            id: chatId,
-            title: prompt.substring(0, 255),
-            organizationId: apiKey.organizationId,
-            createdBy: user.id,
-            updatedBy: user.id,
-            publiclyAccessible: false,
-          })
-          .returning();
-
-        if (!newChat) {
-          throw new Error('Failed to create chat');
-        }
-
-        // Create owner permission for the user
-        await createAssetPermission({
-          identityId: user.id,
-          identityType: 'user',
-          assetId: newChat.id,
-          assetType: 'chat',
-          role: 'owner',
-          createdBy: user.id,
-        });
-
-        // Create the message
-        const [newMessage] = await tx
-          .insert(messages)
-          .values({
-            id: messageId,
-            chatId: newChat.id,
-            createdBy: user.id,
-            requestMessage: prompt,
-            title: prompt.substring(0, 255),
-            isCompleted: false,
-            responseMessages: [],
-            reasoning: [],
-            rawLlmMessages: [
-              {
-                role: 'user',
-                content: prompt,
-              } as ModelMessage,
-            ],
-            metadata: {},
-          })
-          .returning();
-
-        if (!newMessage) {
-          throw new Error('Failed to create message');
-        }
-
-        return { chat: newChat, message: newMessage };
+      // Path 2: Chat doesn't exist - create chat and message using database query
+      const result = await createChatWithMessage({
+        chatId,
+        messageId,
+        title: prompt.substring(0, 255),
+        content: prompt,
+        userId: user.id,
+        organizationId: apiKey.organizationId,
       });
 
       // Build the response with the newly created chat and message
