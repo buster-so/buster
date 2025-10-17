@@ -21,7 +21,12 @@ export const LibraryHeader: React.FC<{
       <div className="flex items-center space-x-1">
         <Button variant="ghost" prefix={<Plus />} onClick={() => {}} />
         <Button variant="ghost" prefix={<BarsFilter />} onClick={() => {}} />
-        <OrderDropdown layout={layout} ordering={filters.ordering} groupBy={filters.group_by} />
+        <OrderDropdown
+          layout={layout}
+          ordering={filters.ordering}
+          groupBy={filters.group_by}
+          ordering_direction={filters.ordering_direction}
+        />
         <Button variant="ghost" prefix={<Dots />} onClick={() => {}} />
       </div>
     </div>

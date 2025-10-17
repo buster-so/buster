@@ -14,7 +14,7 @@ export type LibraryLayout = z.infer<typeof layoutSchema>;
 
 export const searchParamsSchema = z.object({
   q: z.string().optional(),
-  ordering: z.enum(['last_opened', 'created_at']).optional(),
+  ordering: z.enum(['last_opened', 'created_at', 'none']).optional(),
   ordering_direction: z.enum(['asc', 'desc']).optional(),
   start_date: z.string().datetime().optional(),
   end_date: z.string().datetime().optional(),

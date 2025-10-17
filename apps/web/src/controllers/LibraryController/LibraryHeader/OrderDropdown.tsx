@@ -1,12 +1,17 @@
+import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons/Button';
 import { Sliders3 } from '@/components/ui/icons/NucleoIconOutlined';
 import GridLayoutRows from '@/components/ui/icons/NucleoIconOutlined/grid-layout-rows';
+import Sorting from '@/components/ui/icons/NucleoIconOutlined/sorting';
 import UnorderedList from '@/components/ui/icons/NucleoIconOutlined/unordered-list';
 import { Popover } from '@/components/ui/popover';
 import { AppSegmented, createSegmentedItems } from '@/components/ui/segmented';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { Text } from '@/components/ui/typography/Text';
 import { setLibraryLayoutCookie } from '@/context/Library/useLibraryLayout';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { cn } from '@/lib/utils';
 import type { LibraryLayout, LibrarySearchParams } from '../schema';
 
 export const OrderDropdown = React.memo(
@@ -14,11 +19,14 @@ export const OrderDropdown = React.memo(
     layout,
     ordering,
     groupBy,
+    ordering_direction,
   }: {
     layout: LibraryLayout;
     ordering: LibrarySearchParams['ordering'];
     groupBy: LibrarySearchParams['group_by'];
+    ordering_direction: LibrarySearchParams['ordering_direction'];
   }) => {
+    console.log(ordering_direction);
     return (
       <Popover
         align="end"
@@ -29,7 +37,7 @@ export const OrderDropdown = React.memo(
           () => (
             <div className="flex flex-col gap-y-2">
               <LayoutItem layout={layout} />
-              <OrderingItem ordering={ordering} />
+              <OrderingItem ordering={ordering} ordering_direction={ordering_direction} />
               <GroupByItem groupBy={groupBy} />
             </div>
           ),
@@ -44,9 +52,17 @@ export const OrderDropdown = React.memo(
 
 OrderDropdown.displayName = 'OrderDropdown';
 
-const ItemContainer = ({ children, title }: { children: React.ReactNode; title: string }) => {
+const ItemContainer = ({
+  className,
+  children,
+  title,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  title: string;
+}) => {
   return (
-    <div className="grid grid-cols-[110px_1fr] items-center gap-x-2">
+    <div className={cn('grid grid-cols-[110px_1fr] items-center gap-x-2', className)}>
       <Text size={'sm'} variant={'secondary'}>
         {title}
       </Text>
@@ -98,8 +114,74 @@ const LayoutItem = ({ layout }: { layout: LibraryLayout }) => {
   );
 };
 
-const OrderingItem = ({ ordering }: { ordering: LibrarySearchParams['ordering'] }) => {
-  return <ItemContainer title="Ordering">asdf</ItemContainer>;
+const OrderingItem = ({
+  ordering,
+  ordering_direction,
+}: {
+  ordering: LibrarySearchParams['ordering'];
+  ordering_direction: LibrarySearchParams['ordering_direction'];
+}) => {
+  const navigate = useNavigate();
+  const items: SelectItem<LibrarySearchParams['ordering']>[] = [
+    {
+      label: 'None',
+      value: 'none',
+    },
+    {
+      label: 'Last opened',
+      value: 'last_opened',
+    },
+    {
+      label: 'Created at',
+      value: 'created_at',
+    },
+  ];
+
+  const value = items.find((item) => item.value === ordering) || items[0];
+
+  const onClickOrderingDirection = useMemoizedFn(() => {
+    console.log(ordering_direction);
+
+    navigate({
+      to: '/app/library',
+      search: (prev) => {
+        return { ...prev, ordering_direction: prev.ordering_direction === 'asc' ? 'desc' : 'asc' };
+      },
+    });
+  });
+
+  return (
+    <ItemContainer title="Ordering">
+      <div className="flex items-center gap-x-2">
+        <Select
+          items={items}
+          search={false}
+          value={value.value}
+          onChange={(v) => {
+            navigate({
+              to: '/app/library',
+              search: (prev) => {
+                return { ...prev, ordering: v };
+              },
+            });
+          }}
+        />
+
+        <Button
+          variant="default"
+          size={'tall'}
+          prefix={
+            <span
+              className={cn('bg-red-100 border', ordering_direction === 'desc' ? 'rotate-180' : '')}
+            >
+              <Sorting />
+            </span>
+          }
+          onClick={onClickOrderingDirection}
+        />
+      </div>
+    </ItemContainer>
+  );
 };
 
 const GroupByItem = ({ groupBy }: { groupBy: LibrarySearchParams['group_by'] }) => {
