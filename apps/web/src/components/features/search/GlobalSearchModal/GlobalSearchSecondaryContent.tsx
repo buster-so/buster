@@ -13,6 +13,7 @@ import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
 import InfoCircle from '@/components/ui/icons/NucleoIconOutlined/circle-info';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useMount } from '@/hooks/useMount';
 import { useSetTimeout } from '@/hooks/useSetTimeout';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
@@ -44,7 +45,11 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
       {assetType === 'metric_file' ? (
         <MetricScreenshotContainer key={assetId} assetId={assetId} screenshotUrl={screenshotUrl} />
       ) : (
-        <ScreenshotImage screenshotUrl={screenshotUrl} assetType={assetType} />
+        <ScreenshotImage
+          screenshotUrl={screenshotUrl}
+          assetType={assetType}
+          key={`${screenshotUrl}-image`}
+        />
       )}
 
       <MetaContent
@@ -89,11 +94,19 @@ const ScreenshotImage = ({
   assetType: SearchTextData['assetType'];
   className?: string;
 }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isCached, setIsCached] = useState(false);
+  const fallbackImageUrl = getFallback(assetType);
+  const initialImageUrl = !screenshotUrl ? fallbackImageUrl : screenshotUrl;
+
+  // Check if image is already cached synchronously during initialization
+  const checkIfCached = (url: string) => {
+    const img = new Image();
+    img.src = url;
+    return img.complete && img.naturalHeight !== 0;
+  };
+
+  const [isLoaded, setIsLoaded] = useState(() => checkIfCached(initialImageUrl));
   const [hasError, setHasError] = useState(false);
 
-  const fallbackImageUrl = getFallback(assetType);
   const imageUrl = hasError || !screenshotUrl ? fallbackImageUrl : screenshotUrl;
 
   useLayoutEffect(() => {
@@ -104,10 +117,14 @@ const ScreenshotImage = ({
 
     if (img.complete && img.naturalHeight !== 0) {
       // Already cached
-      setIsCached(true);
       setIsLoaded(true);
     } else {
-      img.onload = () => setIsLoaded(true);
+      // Not cached yet, wait for load
+      setIsLoaded(false);
+      img.onload = () => {
+        console.log('loaded', imageUrl);
+        setIsLoaded(true);
+      };
       img.onerror = (e) => {
         console.error('Error loading image', e, imageUrl);
         setHasError(true);
@@ -115,6 +132,8 @@ const ScreenshotImage = ({
       };
     }
   }, [imageUrl]);
+
+  console.log(isLoaded, assetType);
 
   return (
     <div className="bg-background rounded border overflow-hidden w-full relative aspect-video">
@@ -132,7 +151,7 @@ const ScreenshotImage = ({
         alt="Screenshot"
         className={cn('w-full h-full object-cover object-top', className)}
         initial={
-          isCached ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
+          isLoaded ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
         }
         animate={
           isLoaded ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }
@@ -182,6 +201,7 @@ const MetricScreenshotContainer = ({
             screenshotUrl={screenshotUrl}
             assetType={'metric_file'}
             className={cn(canFetchData && 'animate-pulse')}
+            key={`${screenshotUrl}-image`} //force re-render when the assetId changes
           />
         ) : (
           <MetricChartCard

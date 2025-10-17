@@ -31,9 +31,9 @@ export const useSearchInfinite = ({
   | 'includeScreenshots'
   | 'endDate'
   | 'startDate'
+  | 'query'
 > & {
   scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
-  searchQuery: string;
   enabled?: boolean;
   mounted?: boolean;
 }) => {

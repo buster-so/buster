@@ -22,7 +22,10 @@ export const getReportScreenshot = async (args: GetReportScreenshotHandlerArgs) 
         version_number: args.version_number,
       },
     }),
-    callback: takeScreenshot,
+    callback: async (v) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return takeScreenshot(v);
+    },
   });
 
   return screenshotBuffer;
