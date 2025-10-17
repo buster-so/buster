@@ -67,6 +67,13 @@ export const useYAxis = ({
     if (y2AxisKeys.length > 0 && minTickValue !== undefined) return DEFAULT_Y2_AXIS_COUNT;
   }, [minTickValue]);
 
+  const yMinValue = useMemo(() => {
+    return yAxisKeys.reduce((min, key) => {
+      const column = columnMetadata?.find((col) => col.name === key);
+      return Math.min(min, Number(column?.min_value ?? 0));
+    }, Infinity);
+  }, [columnMetadata, yAxisKeys]);
+
   const yMaxValue = useMemo(() => {
     return yAxisKeys.reduce((max, key) => {
       const column = columnMetadata?.find((col) => col.name === key);
@@ -166,7 +173,7 @@ export const useYAxis = ({
           count: defaultTickCount,
           includeBounds: true,
         },
-        min: usePercentageModeAxis ? 0 : minTickValue,
+        min: usePercentageModeAxis ? Math.min(0, yMinValue) : minTickValue,
         max:
           usePercentageModeAxis === 'clamp'
             ? Math.max(100, yMaxValue * 1.05)
