@@ -1,6 +1,6 @@
 import { getMessageStatus } from '@buster/database/queries';
-import { GithubActionDocumentationGetSchema } from '@buster/server-shared/github';
 import type { GithubActionDocumentationStatusResponse } from '@buster/server-shared/github';
+import { GithubActionDocumentationGetSchema } from '@buster/server-shared/github';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 

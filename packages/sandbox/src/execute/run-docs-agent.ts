@@ -8,17 +8,19 @@ const envSchema = z.object({
 });
 
 // Define schema for GitHub context
-const githubContextSchema = z.object({
-  action: z.string().optional().describe('GitHub action type (e.g., opened, synchronize, push)'),
-  after: z.string().optional().describe('Commit SHA after the event'),
-  before: z.string().optional().describe('Commit SHA before the event'),
-  prNumber: z.string().optional().describe('Pull request number'),
-  repo: z.string().optional().describe('Repository name'),
-  repo_url: z.string().optional().describe('Repository URL'),
-  head_branch: z.string().optional().describe('Head branch name'),
-  base_branch: z.string().optional().describe('Base branch name'),
-  commits: z.array(z.string()).optional().describe('Array of commit IDs for push events'),
-}).optional();
+const githubContextSchema = z
+  .object({
+    action: z.string().optional().describe('GitHub action type (e.g., opened, synchronize, push)'),
+    after: z.string().optional().describe('Commit SHA after the event'),
+    before: z.string().optional().describe('Commit SHA before the event'),
+    prNumber: z.string().optional().describe('Pull request number'),
+    repo: z.string().optional().describe('Repository name'),
+    repo_url: z.string().optional().describe('Repository URL'),
+    head_branch: z.string().optional().describe('Head branch name'),
+    base_branch: z.string().optional().describe('Base branch name'),
+    commits: z.array(z.string()).optional().describe('Array of commit IDs for push events'),
+  })
+  .optional();
 
 // Define schema for runDocsAgent parameters
 const runDocsAgentParamsSchema = z.object({
@@ -37,16 +39,8 @@ export type githubContext = z.infer<typeof githubContextSchema>;
 
 export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   // Validate input parameters
-  const { 
-    installationToken, 
-    repoUrl, 
-    branch, 
-    prompt, 
-    apiKey, 
-    chatId, 
-    messageId,
-    context
-  } = runDocsAgentParamsSchema.parse(params);
+  const { installationToken, repoUrl, branch, prompt, apiKey, chatId, messageId, context } =
+    runDocsAgentParamsSchema.parse(params);
 
   // Eventually we will need to find the organization's correct integration and call that snapshot
   const sandbox = await createSandboxFromSnapshot('buster-data-engineer-postgres');
@@ -63,7 +57,10 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
 
   // Create context directory and file
   await sandbox.fs.createFolder(contextPath, '755');
-  await sandbox.fs.uploadFile(Buffer.from(JSON.stringify(context)), `${contextPath}/${contextFileName}`);
+  await sandbox.fs.uploadFile(
+    Buffer.from(JSON.stringify(context)),
+    `${contextPath}/${contextFileName}`
+  );
 
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
@@ -119,19 +116,10 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
 
-
 export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Validate input parameters
-  const { 
-    installationToken, 
-    repoUrl, 
-    branch, 
-    prompt, 
-    apiKey, 
-    chatId, 
-    messageId,
-    context
-  } = runDocsAgentParamsSchema.parse(params);
+  const { installationToken, repoUrl, branch, prompt, apiKey, chatId, messageId, context } =
+    runDocsAgentParamsSchema.parse(params);
 
   // Eventually we will need to find the organization's correct integration and call that snapshot
   const sandbox = await createSandboxFromSnapshot('buster-data-engineer-postgres');
@@ -148,7 +136,10 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
 
   // Create context directory and file
   await sandbox.fs.createFolder(contextPath, '755');
-  await sandbox.fs.uploadFile(Buffer.from(JSON.stringify(context)), `${contextPath}/${contextFileName}`);
+  await sandbox.fs.uploadFile(
+    Buffer.from(JSON.stringify(context)),
+    `${contextPath}/${contextFileName}`
+  );
 
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
@@ -159,33 +150,32 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
     installationToken // password
   );
 
-  const envExportCommands = [
-    `export GITHUB_TOKEN=${installationToken}`,
-    `export BUSTER_API_KEY=${apiKey}`,
-    `export BUSTER_HOST=${env.BUSTER_HOST}`,
-  ];
-
-  await sandbox.process.executeCommand(`gh auth setup-git && git config --global user.email "${busterAppGitEmail}" && git config --global user.name "${busterAppGitUsername}"`,
-    repositoryPath);
+  await sandbox.process.executeCommand(
+    `gh auth setup-git && git config --global user.email "${busterAppGitEmail}" && git config --global user.name "${busterAppGitUsername}"`,
+    repositoryPath
+  );
 
   // Build CLI command with optional parameters
   const cliArgs = [`--prompt "${prompt}"`];
-  // if (chatId) {
-  //   cliArgs.push(`--chat-id "${chatId}"`);
-  // }
-  // if (messageId) {
-  //   cliArgs.push(`--message-id "${messageId}"`);
-  // }
-  // if (context) {
-  //   cliArgs.push(`--contextFilePath "${contextPath}/${contextFileName}"`);
-  // }
+  if (chatId) {
+    cliArgs.push(`--chat-id "${chatId}"`);
+  }
+  if (messageId) {
+    cliArgs.push(`--message-id "${messageId}"`);
+  }
+  if (context) {
+    cliArgs.push(`--contextFilePath "${contextPath}/${contextFileName}"`);
+  }
 
-  const command = await sandbox.process.executeCommand(`cd ${workspacePath} && buster ${cliArgs.join(' ')}`,
-    repositoryPath, {
+  const command = await sandbox.process.executeCommand(
+    `cd ${workspacePath} && buster ${cliArgs.join(' ')}`,
+    repositoryPath,
+    {
       GITHUB_TOKEN: installationToken,
       BUSTER_API_KEY: apiKey,
       BUSTER_HOST: env.BUSTER_HOST,
-    });
+    }
+  );
 
   console.info(command);
 

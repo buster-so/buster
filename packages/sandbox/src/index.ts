@@ -1,6 +1,6 @@
 export type { Sandbox } from '@daytonaio/sdk';
+export type { githubContext, RunDocsAgentParams } from './execute/run-docs-agent';
 export { runDocsAgentAsync, runDocsAgentSync } from './execute/run-docs-agent';
-export type { RunDocsAgentParams, githubContext } from './execute/run-docs-agent';
 export type { CodeRunResponse, RunTypeScriptOptions } from './execute/run-typescript';
 export { runTypescript } from './execute/run-typescript';
 // Export inferred types

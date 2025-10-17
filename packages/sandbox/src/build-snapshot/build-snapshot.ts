@@ -12,7 +12,7 @@
 // // Define the dbt adapters we want to build snapshots for
 // const dbtAdapters = [
 //   'postgres',
-//   'snowflake', 
+//   'snowflake',
 //   'bigquery',
 //   'redshift',
 //   'databricks',
@@ -46,7 +46,7 @@
 //             disk: 10,
 //           },
 //         },
-//         { 
+//         {
 //           onLogs: (log) => console.log(`[${adapter}] ${log}`)
 //         }
 //       );
@@ -60,7 +60,7 @@
 
 //   // Wait for all builds to complete
 //   const results = await Promise.allSettled(buildPromises);
-  
+
 //   // Report results
 //   console.log('\n📊 Build Results:');
 //   results.forEach((result, index) => {

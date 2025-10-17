@@ -28,11 +28,10 @@ const app = new Hono().delete(
       });
 
       return c.json({ message: 'Message marked as completed' }, 200);
-
     } catch (error) {
       console.error('Failed to delete/complete message:', error);
 
-      return c.json({error: 'Failed to complete message. Please try again later.'}, 500);
+      return c.json({ error: 'Failed to complete message. Please try again later.' }, 500);
     }
   }
 );

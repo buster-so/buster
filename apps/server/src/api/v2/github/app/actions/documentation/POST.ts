@@ -1,6 +1,6 @@
 import { createChat, createMessage, getActiveGithubIntegration } from '@buster/database/queries';
 import { generateNewInstallationToken } from '@buster/github';
-import { runDocsAgentAsync, runDocsAgentSync, type githubContext } from '@buster/sandbox';
+import { type githubContext, runDocsAgentAsync, runDocsAgentSync } from '@buster/sandbox';
 import { GithubActionDocumentationPostSchema } from '@buster/server-shared/github';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
@@ -42,7 +42,7 @@ const app = new Hono().post(
       context.action = 'push';
       context.after = eventContext.after;
       context.before = eventContext.before;
-      context.commits = eventContext.commits.map((commit: {id: string}) => commit.id);
+      context.commits = eventContext.commits.map((commit: { id: string }) => commit.id);
       context.head_branch = eventContext.ref.split('/').pop();
       context.base_branch = eventContext.base_ref?.split('/').pop() || context.head_branch;
       context.repo = eventContext.repository.name;
@@ -51,9 +51,12 @@ const app = new Hono().post(
 
     // Validate required fields
     if (!context.repo_url || !context.head_branch) {
-      return c.json({ 
-        error: 'Missing required fields: repo_url and head_branch must be present' 
-      }, 400);
+      return c.json(
+        {
+          error: 'Missing required fields: repo_url and head_branch must be present',
+        },
+        400
+      );
     }
 
     const repositoryUrl = context.repo_url;
@@ -75,8 +78,8 @@ const app = new Hono().post(
     const prompt = `Please take a look at the current pull request or push and update the documentation if needed.`;
 
     const newChat = await createChat({
-      title: context.prNumber 
-        ? `Documentation for PR ${context.prNumber}` 
+      title: context.prNumber
+        ? `Documentation for PR ${context.prNumber}`
         : `Documentation for push in ${context.repo}`,
       chatType: 'data_engineer',
       organizationId: apiKey.organizationId,
