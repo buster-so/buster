@@ -74,12 +74,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Mount Docker buildkit sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}-${{ matrix.platform }}
-          path: /tmp/.buildkit-cache
-
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
 
@@ -124,8 +118,6 @@ jobs:
             turbo_token=${{ secrets.TURBO_TOKEN }}
             turbo_team=${{ vars.TURBO_TEAM }}
           platforms: ${{ matrix.docker_platform }}
-          cache-from: type=local,src=/tmp/.buildkit-cache
-          cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
 
   create-manifest:
     needs: [prepare-metadata, build-and-push]
