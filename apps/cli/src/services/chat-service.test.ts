@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as conversationHistory from '../utils/conversation-history';
 import * as credentials from '../utils/credentials';
 import { runChatAgent } from './chat-service';
@@ -439,6 +439,187 @@ describe('runChatAgent - message updates', () => {
 
       // Logger should still be flushed
       expect(mockFlush).toHaveBeenCalled();
+    });
+  });
+
+  describe('contextFilePath handling', () => {
+    const { existsSync, mkdirSync, rmSync, writeFileSync } = require('node:fs');
+    const { join } = require('node:path');
+
+    const testDir = join(__dirname, '.test-chat-context');
+
+    beforeEach(async () => {
+      // Reset all mocks
+      vi.clearAllMocks();
+
+      // Re-setup the default mock for executeAgent
+      const { executeAgent } = await import('../handlers/agent-handler');
+      vi.mocked(executeAgent).mockResolvedValue({
+        fullStream: (async function* () {
+          yield { type: 'start-step' };
+          yield { type: 'text-delta', text: 'Hello' };
+          yield { type: 'text-end' };
+          yield { type: 'finish-step' };
+        })(),
+      } as any);
+
+      // Create test directory and files
+      if (existsSync(testDir)) {
+        rmSync(testDir, { recursive: true });
+      }
+      mkdirSync(testDir, { recursive: true });
+
+      writeFileSync(join(testDir, 'context.txt'), 'System instructions from file');
+    });
+
+    afterEach(() => {
+      // Clean up test directory
+      if (existsSync(testDir)) {
+        rmSync(testDir, { recursive: true });
+      }
+    });
+
+    it('should prepend system message when contextFilePath is provided', async () => {
+      const { createBusterSDK } = await import('@buster/sdk');
+      const mockCreate = vi.fn().mockResolvedValue({ success: true });
+      const mockUpdate = vi.fn().mockResolvedValue({ success: true });
+      vi.mocked(createBusterSDK).mockReturnValue({
+        messages: { create: mockCreate, update: mockUpdate },
+      } as any);
+
+      const { executeAgent } = await import('../handlers/agent-handler');
+
+      const contextPath = join(testDir, 'context.txt');
+
+      await runChatAgent({
+        chatId: TEST_CHAT_ID,
+        messageId: TEST_MESSAGE_ID,
+        workingDirectory: testDir,
+        messages: [{ role: 'user', content: 'Test prompt' }],
+        contextFilePath: contextPath,
+      });
+
+      // executeAgent should be called with messages including system message at the beginning
+      expect(executeAgent).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+        expect.arrayContaining([
+          expect.objectContaining({ role: 'system', content: 'System instructions from file' }),
+          expect.objectContaining({ role: 'user', content: 'Test prompt' }),
+        ])
+      );
+
+      // Verify order - system message should be first
+      const callArgs = vi.mocked(executeAgent).mock.calls[0];
+      const messages = callArgs?.[2];
+      expect(messages).toBeDefined();
+      expect(messages?.[0]).toEqual({ role: 'system', content: 'System instructions from file' });
+      expect(messages?.[1]).toEqual({ role: 'user', content: 'Test prompt' });
+    });
+
+    it('should work with relative contextFilePath', async () => {
+      const { createBusterSDK } = await import('@buster/sdk');
+      const mockCreate = vi.fn().mockResolvedValue({ success: true });
+      const mockUpdate = vi.fn().mockResolvedValue({ success: true });
+      vi.mocked(createBusterSDK).mockReturnValue({
+        messages: { create: mockCreate, update: mockUpdate },
+      } as any);
+
+      const { executeAgent } = await import('../handlers/agent-handler');
+
+      await runChatAgent({
+        chatId: TEST_CHAT_ID,
+        messageId: TEST_MESSAGE_ID,
+        workingDirectory: testDir,
+        messages: [{ role: 'user', content: 'Test prompt' }],
+        contextFilePath: 'context.txt', // relative path
+      });
+
+      const callArgs = vi.mocked(executeAgent).mock.calls[0];
+      const messages = callArgs?.[2];
+      expect(messages).toBeDefined();
+      expect(messages?.[0]).toEqual({ role: 'system', content: 'System instructions from file' });
+    });
+
+    it('should work without contextFilePath', async () => {
+      const { createBusterSDK } = await import('@buster/sdk');
+      const mockCreate = vi.fn().mockResolvedValue({ success: true });
+      const mockUpdate = vi.fn().mockResolvedValue({ success: true });
+      vi.mocked(createBusterSDK).mockReturnValue({
+        messages: { create: mockCreate, update: mockUpdate },
+      } as any);
+
+      const { executeAgent } = await import('../handlers/agent-handler');
+
+      await runChatAgent({
+        chatId: TEST_CHAT_ID,
+        messageId: TEST_MESSAGE_ID,
+        workingDirectory: testDir,
+        messages: [{ role: 'user', content: 'Test prompt' }],
+      });
+
+      const callArgs = vi.mocked(executeAgent).mock.calls[0];
+      const messages = callArgs?.[2];
+
+      // Should not have system message
+      expect(messages).toBeDefined();
+      const systemMessages = messages?.filter((m: any) => m.role === 'system');
+      expect(systemMessages).toHaveLength(0);
+    });
+
+    it('should prepend system message before existing messages', async () => {
+      const { createBusterSDK } = await import('@buster/sdk');
+      const mockCreate = vi.fn().mockResolvedValue({ success: true });
+      const mockUpdate = vi.fn().mockResolvedValue({ success: true });
+      vi.mocked(createBusterSDK).mockReturnValue({
+        messages: { create: mockCreate, update: mockUpdate },
+      } as any);
+
+      const { executeAgent } = await import('../handlers/agent-handler');
+
+      const contextPath = join(testDir, 'context.txt');
+
+      await runChatAgent({
+        chatId: TEST_CHAT_ID,
+        messageId: TEST_MESSAGE_ID,
+        workingDirectory: testDir,
+        messages: [
+          { role: 'user', content: 'First message' },
+          { role: 'assistant', content: 'First response' },
+          { role: 'user', content: 'Second message' },
+        ],
+        contextFilePath: contextPath,
+      });
+
+      const callArgs = vi.mocked(executeAgent).mock.calls[0];
+      const messages = callArgs?.[2];
+
+      // Should have 4 messages: system + 3 original
+      expect(messages).toBeDefined();
+      expect(messages).toHaveLength(4);
+      expect(messages?.[0]).toEqual({ role: 'system', content: 'System instructions from file' });
+      expect(messages?.[1]).toEqual({ role: 'user', content: 'First message' });
+      expect(messages?.[2]).toEqual({ role: 'assistant', content: 'First response' });
+      expect(messages?.[3]).toEqual({ role: 'user', content: 'Second message' });
+    });
+
+    it('should throw error when context file does not exist', async () => {
+      const { createBusterSDK } = await import('@buster/sdk');
+      const mockCreate = vi.fn().mockResolvedValue({ success: true });
+      const mockUpdate = vi.fn().mockResolvedValue({ success: true });
+      vi.mocked(createBusterSDK).mockReturnValue({
+        messages: { create: mockCreate, update: mockUpdate },
+      } as any);
+
+      await expect(
+        runChatAgent({
+          chatId: TEST_CHAT_ID,
+          messageId: TEST_MESSAGE_ID,
+          workingDirectory: testDir,
+          messages: [{ role: 'user', content: 'Test prompt' }],
+          contextFilePath: 'nonexistent.txt',
+        })
+      ).rejects.toThrow('Context file not found');
     });
   });
 });

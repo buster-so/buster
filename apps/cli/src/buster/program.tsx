@@ -11,6 +11,7 @@ interface RootOptions {
   chatId?: string;
   messageId?: string;
   research?: boolean;
+  contextFilePath?: string;
 }
 
 export const program = commander
@@ -21,7 +22,8 @@ export const program = commander
   .option('--prompt <prompt>', 'Run agent in headless mode with the given prompt')
   .option('--chatId <id>', 'Continue an existing conversation (used with --prompt)')
   .option('--messageId <id>', 'Message ID for tracking (used with --prompt)')
-  .option('--research', 'Run agent in research mode (read-only, no file modifications)');
+  .option('--research', 'Run agent in research mode (read-only, no file modifications)')
+  .option('--contextFilePath <path>', 'Path to context file to include as system message');
 
 setupPreActionHook(program);
 
@@ -41,6 +43,7 @@ program.action(async (options: RootOptions) => {
         ...(options.chatId && { chatId: options.chatId }),
         ...(options.messageId && { messageId: options.messageId }),
         ...(options.research && { isInResearchMode: options.research }),
+        ...(options.contextFilePath && { contextFilePath: options.contextFilePath }),
       });
       console.log(chatId);
       process.exit(0);
