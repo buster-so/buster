@@ -29,7 +29,7 @@ vi.mock('ai', () => {
   };
 });
 
-import { NoSuchToolError, generateText, streamText } from 'ai';
+import { generateText, NoSuchToolError, streamText } from 'ai';
 import { ANALYST_AGENT_NAME, THINK_AND_PREP_AGENT_NAME } from '../../../agents';
 import type { RepairContext } from '../types';
 import { canHandleNoSuchTool, repairWrongToolName } from './re-ask-strategy';

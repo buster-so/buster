@@ -1,9 +1,9 @@
 import type { ToolCallOptions } from 'ai';
 import { describe, expect, test, vi } from 'vitest';
 import {
+  createRespondWithoutAssetCreationTool,
   RespondWithoutAssetCreationInputSchema,
   RespondWithoutAssetCreationOutputSchema,
-  createRespondWithoutAssetCreationTool,
 } from './respond-without-asset-creation-tool';
 
 // Mock braintrust tracing wrapper to a no-op for tests
@@ -172,7 +172,7 @@ describe('Respond Without Asset Creation Tool Integration Tests', () => {
         final_response: `
 Special characters test: !@#$%^&*()_+-=[]{}|;':",./<>?
 Unicode: 你好 🎉 €£¥
-Escaped: \n \t \\ \" \'
+Escaped: \n \t \\ " '
 `,
       };
 

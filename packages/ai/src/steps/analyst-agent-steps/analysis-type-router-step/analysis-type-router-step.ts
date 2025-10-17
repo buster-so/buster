@@ -1,6 +1,6 @@
 import { MessageAnalysisModeSchema } from '@buster/database/schema-types';
-import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
+import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { GPT5Mini } from '../../../llm/gpt-5-mini';

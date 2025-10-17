@@ -15,8 +15,8 @@ import {
   unescapeJsonString,
 } from '../../../../utils/streaming/escape-normalizer';
 import {
-  OptimisticJsonParser,
   getOptimisticValue,
+  OptimisticJsonParser,
 } from '../../../../utils/streaming/optimistic-json-parser';
 import { shouldIncrementVersion } from '../helpers/report-version-helper';
 import { getCachedSnapshot, updateCachedSnapshot } from '../report-snapshot-cache';

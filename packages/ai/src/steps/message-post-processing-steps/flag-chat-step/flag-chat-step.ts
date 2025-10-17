@@ -1,6 +1,6 @@
 import type { PermissionedDataset } from '@buster/access-controls';
-import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
+import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { DEFAULT_ANTHROPIC_OPTIONS } from '../../../llm/providers/gateway';
@@ -141,7 +141,7 @@ Flag the chat if any of these conditions are met:
     - The title and summary should be written using a JSON string format.
 - Example of flagChat response:
     - type: "flagChat"
-    - summary_message: "Nate requested \"recent returns for Retail Ready customers with Canadian shipping addresses\".\n\n- Found no matching records.\n- The conversation history doesn't show a final response was sent. Likely encountered an error."
+    - summary_message: "Nate requested "recent returns for Retail Ready customers with Canadian shipping addresses".\n\n- Found no matching records.\n- The conversation history doesn't show a final response was sent. Likely encountered an error."
     - summary_title: "No Final Response Sent"
 - If no issues, return a noIssuesFound response with a confirmation message.
 </output_format>

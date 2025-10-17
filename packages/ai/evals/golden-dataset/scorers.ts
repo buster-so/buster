@@ -183,10 +183,7 @@ export const executeSqlFollowedByValidTool = ({ output }: { output: any }) => {
 };
 
 //Makes sure the SQL field in the YML uses the block scalar format (|) so that it does not break
-export const allFilesUseYmlBlockScalar = (args: {
-  input: string;
-  output: any;
-}) => {
+export const allFilesUseYmlBlockScalar = (args: { input: string; output: any }) => {
   const { output } = args;
 
   for (const message of output) {

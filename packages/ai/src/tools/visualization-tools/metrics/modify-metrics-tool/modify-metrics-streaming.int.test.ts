@@ -314,7 +314,7 @@ describe('modify-metrics-tool streaming integration', () => {
 
     // Override execute to capture state
     const originalExecute = tool.execute!;
-    // @ts-ignore
+    // @ts-expect-error
     tool.execute = async (input: ModifyMetricsInput, options: any) => {
       // The state should be populated by this point
       const { createModifyMetricsExecute } = await import('./modify-metrics-execute');

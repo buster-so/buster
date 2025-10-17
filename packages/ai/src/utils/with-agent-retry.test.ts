@@ -1,7 +1,6 @@
 import type { ModelMessage } from 'ai';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  type StreamExecutor,
   calculateBackoffDelay,
   composeMiddleware,
   createMockAgent,
@@ -13,6 +12,7 @@ import {
   recoverMessages,
   retryMiddleware,
   retryStream,
+  type StreamExecutor,
   sleep,
   withAgentRetry,
 } from './with-agent-retry';
@@ -23,6 +23,7 @@ vi.mock('@buster/database/queries', () => ({
 }));
 
 import { fetchMessageEntries } from '@buster/database/queries';
+
 const mockFetchMessageEntries = vi.mocked(fetchMessageEntries);
 
 describe('with-agent-retry', () => {

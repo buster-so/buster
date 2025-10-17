@@ -26,8 +26,8 @@ import { MODIFY_METRICS_TOOL_NAME } from '../../tools/visualization-tools/metric
 import { CREATE_REPORTS_TOOL_NAME } from '../../tools/visualization-tools/reports/create-reports-tool/create-reports-tool';
 import { MODIFY_REPORTS_TOOL_NAME } from '../../tools/visualization-tools/reports/modify-reports-tool/modify-reports-tool';
 import { extractUserAndDoneToolMessages } from '../../utils';
-import { withStepRetry } from '../../utils/with-step-retry';
 import type { StepRetryOptions } from '../../utils/with-step-retry';
+import { withStepRetry } from '../../utils/with-step-retry';
 import {
   type AnalystWorkflowOutput,
   type ChartInfo,

@@ -1,8 +1,8 @@
 import { describe, expect, test, vi } from 'vitest';
 import type { SequentialThinkingContext } from './sequential-thinking-tool';
 import {
-  SequentialThinkingInputSchema,
   createSequentialThinkingTool,
+  SequentialThinkingInputSchema,
 } from './sequential-thinking-tool';
 
 vi.mock('braintrust', () => ({
