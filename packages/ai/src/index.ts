@@ -1,5 +1,37 @@
 export type { ModelMessage } from 'ai';
+
+// Observability exports (Braintrust) - selective exports to avoid pulling in dependencies
+export { initLogger, wrapTraced, currentSpan } from './observability';
+export type { Logger } from './observability';
+export { initBraintrustLogger } from './utils/logger';
+
+// Workflow exports - only export main workflow functions and public types
+export { runAnalystWorkflow } from './workflows';
+export type { AnalystWorkflowInput } from './workflows/analyst-agent-workflow/analyst-workflow';
+export type { AnalystWorkflowOutput } from './workflows/analyst-agent-workflow/workflow-output.types';
+export { default as postProcessingWorkflow } from './workflows/message-post-processing-workflow/message-post-processing-workflow';
+export type { PostProcessingWorkflowOutput } from './workflows/message-post-processing-workflow/message-post-processing-workflow';
+
+// Utils exports - selective to avoid pulling in all internal utilities
+export {
+  isOverloadedError,
+  withAgentRetry,
+  retryStream,
+  recoverMessages,
+  executeStreamAttempt,
+  handleFailedAttempt,
+  createRetryExecutor,
+  composeMiddleware,
+  retryMiddleware,
+} from './utils/with-agent-retry';
+export { withStepRetry, createRetryableStep, runStepsWithRetry } from './utils/with-step-retry';
+export type { StepRetryOptions } from './utils/with-step-retry';
+export { extractUserAndDoneToolMessages } from './utils/memory/extract-user-and-done-tool-messages';
+
+// Embeddings exports
 export * from './embeddings';
+
+// Tasks exports
 export * from './tasks';
 // Export tool types for CLI usage
 export type {

@@ -69,3 +69,16 @@ export const AuthDetailsAppInstallationResponseSchema = z.object({
 export type AuthDetailsResponse = z.infer<typeof AuthDetailsAppInstallationResponseSchema>;
 
 export type GetGitHubIntegrationResponse = z.infer<typeof GetGitHubIntegrationResponseSchema>;
+
+// Response schemas for GitHub Action Documentation endpoints
+export const GithubActionDocumentationStatusSchema = z.object({
+  messageId: z.string().describe('Message ID that was requested'),
+  status: z
+    .enum(['Complete', 'Failed', 'InProgress'])
+    .describe('Current status of the documentation generation'),
+  errorReason: z.string().optional().describe('Error reason when status is Failed'),
+});
+
+export type GithubActionDocumentationStatusResponse = z.infer<
+  typeof GithubActionDocumentationStatusSchema
+>;

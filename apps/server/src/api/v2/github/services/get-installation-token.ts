@@ -60,7 +60,7 @@ export async function getInstallationToken(
   // Generate a new token
   console.info(`Generating new token for installation ${installationId}`);
 
-  return await generateNewInstallationToken(installationId, integration.id);
+  return await generateNewInstallationToken(installationId);
 }
 
 /**

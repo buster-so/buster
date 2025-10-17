@@ -86,7 +86,11 @@ export const DEFAULT_ANALYTICS_ENGINEER_OPTIONS = {
   bedrock: {
     cachePoint: { type: 'default' },
     additionalModelRequestFields: {
-      anthropic_beta: ['fine-grained-tool-streaming-2025-05-14'],
+      anthropic_beta: [
+        'fine-grained-tool-streaming-2025-05-14',
+        'interleaved-thinking-2025-05-14',
+        'context-1m-2025-08-07',
+      ],
       reasoning_config: {
         type: 'enabled',
         budget_tokens: 10000, // Adjust as needed
@@ -110,6 +114,9 @@ export const DEFAULT_OPENAI_OPTIONS: OpenAIProviderOptions = {
 const gateway = createGateway({
   ...(process.env.AI_GATEWAY_API_KEY && { apiKey: process.env.AI_GATEWAY_API_KEY }),
 });
+
+// Export raw gateway for use in proxy endpoint (no middleware to avoid double logging)
+export { gateway };
 
 // Export a function that creates wrapped models with Braintrust middleware
 export const gatewayModel = (modelId: string) => {

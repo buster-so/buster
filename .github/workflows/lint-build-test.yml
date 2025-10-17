@@ -95,7 +95,6 @@ jobs:
   # Build job - runs after lint
   build:
     name: Build
-    needs: lint
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
     environment: testing
@@ -126,9 +125,6 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
-
-      - name: Build packages (restore from cache)
-        run: pnpm turbo build
 
       - name: Run all unit tests
         run: pnpm turbo test:unit

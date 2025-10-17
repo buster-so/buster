@@ -30,7 +30,7 @@
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
     "build": "tsc",
     "build:dry-run": "tsc",
-    "start": "tsx scripts/seed.ts",
+    "start": "pnpm db:migrate && tsx scripts/seed.ts",
     "db:init": "echo 'Initializing database...'",
     "db:seed": "tsx scripts/seed.ts",
     "db:dump": "tsx scripts/dump.ts",

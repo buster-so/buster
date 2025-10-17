@@ -54,3 +54,23 @@ export const RefreshInstallationTokenRequestSchema = z.object({
 });
 
 export type RefreshInstallationTokenRequest = z.infer<typeof RefreshInstallationTokenRequestSchema>;
+
+// GitHub Action Documentation Request Schemas
+export const GithubActionDocumentationPostSchema = z.object({
+  prNumber: z.coerce.number().describe('Pull request number'),
+  branchName: z.string().describe('Branch name for the PR'),
+  repositoryUrl: z.string().url().describe('Repository URL'),
+  headSha: z.string().describe('SHA of the head commit'),
+});
+
+export type GithubActionDocumentationPostRequest = z.infer<
+  typeof GithubActionDocumentationPostSchema
+>;
+
+export const GithubActionDocumentationGetSchema = z.object({
+  messageId: z.string().describe('Message ID to retrieve documentation status'),
+});
+
+export type GithubActionDocumentationGetRequest = z.infer<
+  typeof GithubActionDocumentationGetSchema
+>;
