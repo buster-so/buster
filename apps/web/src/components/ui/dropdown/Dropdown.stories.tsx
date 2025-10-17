@@ -636,6 +636,11 @@ export const WithSubMenuAndHundredItems: Story = {
       {
         label: 'Option 1',
         value: '1',
+        onScrollToBottom: () => {
+          console.info(
+            '🎯 Submenu scrolled to bottom! This fires only when entering the 10px zone.'
+          );
+        },
         items: Array.from({ length: 100 }).map((_, index) => ({
           label: `Sub Option ${index}`,
           value: `1-${index + 1}`,
@@ -643,6 +648,24 @@ export const WithSubMenuAndHundredItems: Story = {
         })),
       },
     ],
+  },
+};
+
+// Example with onScrollToBottom on main dropdown
+export const WithScrollToBottomCallback: Story = {
+  args: {
+    children: <Button>Scroll to Bottom Test</Button>,
+    menuHeader: 'Search items...',
+    onScrollToBottom: () => {
+      console.info(
+        '🎯 Main dropdown scrolled to bottom! This fires only when entering the 10px zone.'
+      );
+    },
+    items: Array.from({ length: 100 }).map((_, index) => ({
+      label: `Item ${index + 1}`,
+      value: `item-${index + 1}`,
+      secondaryLabel: `Description for item ${index + 1}`,
+    })),
   },
 };
 
@@ -724,6 +747,9 @@ export const WithSearchableNestedMenu: Story = {
         icon: <PaintRoller />,
         selectType: 'multiple',
         menuHeader: 'Search owners by name or email',
+        onScrollToBottom: () => {
+          console.info('Scrolled to bottom');
+        },
         onSearch: (search) => {
           console.info('Searching owners:', search);
         },

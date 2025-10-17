@@ -8,17 +8,21 @@ export const useRadixDropdownSearch = ({
   onChange: (text: string) => void;
 }) => {
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const isFirstCharacter = (e.target as HTMLInputElement).value.length === 0;
+    const input = e.target as HTMLInputElement;
+    const isFirstCharacter = input.value.length === 0;
 
     // Only prevent default for digit shortcuts when showIndex is true
     if (showIndex && isFirstCharacter && /^Digit[0-9]$/.test(e.code)) {
       e.preventDefault();
       const index = Number.parseInt(e.key, 10);
       onSelectItem?.(index);
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      return;
+    }
+
+    // Handle Arrow Up/Down to navigate to menu items
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       // Find all visible, non-disabled menu items
       // Look for items in the current dropdown scope (could be main menu or submenu)
-      const input = e.target as HTMLInputElement;
       const menuContent = input.closest('[role="menu"]');
 
       if (menuContent) {
@@ -46,9 +50,45 @@ export const useRadixDropdownSearch = ({
           }
         }
       }
-    } else {
-      e.stopPropagation();
+      return;
     }
+
+    // Handle Arrow Left to close submenu and return to parent
+    if (e.key === 'ArrowLeft') {
+      const menuContent = input.closest('[role="menu"]');
+
+      if (menuContent) {
+        // Check if this is a submenu by looking for data-radix-menu-content
+        const subMenuContent = input
+          .closest('[data-radix-collection-item]')
+          ?.closest('[role="menu"]');
+
+        // Find the submenu trigger that opened this menu
+        const subMenuTrigger = menuContent.previousElementSibling;
+
+        if (subMenuTrigger && subMenuTrigger.getAttribute('role') === 'menuitem') {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Close the submenu by focusing its trigger
+          (subMenuTrigger as HTMLElement).focus();
+
+          // Dispatch a click to close the submenu
+          (subMenuTrigger as HTMLElement).click();
+        }
+      }
+      return;
+    }
+
+    // Handle Escape to close menu/submenu
+    if (e.key === 'Escape') {
+      // Let Radix handle the Escape key naturally
+      // Don't stop propagation so it bubbles up to Radix
+      return;
+    }
+
+    // For all other keys, stop propagation to prevent Radix from handling them
+    e.stopPropagation();
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

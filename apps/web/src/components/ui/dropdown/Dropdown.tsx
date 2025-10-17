@@ -46,6 +46,7 @@ export interface DropdownProps<
   disabled?: boolean;
   menuHeaderClassName?: string;
   showEmptyState?: boolean;
+  onScrollToBottom?: () => void;
 }
 
 export type DropdownContentProps<T = string> = Omit<DropdownProps<T>, 'align' | 'side'>;
@@ -54,6 +55,36 @@ const dropdownItemKey = <T,>(item: IDropdownItems<T>[number], index: number): st
   if ((item as DropdownDivider).type === 'divider') return `divider-${index}`;
   if ((item as IDropdownItem<T>).value) return String((item as IDropdownItem<T>).value);
   return `item-${index}`;
+};
+
+/**
+ * Hook to handle scroll-to-bottom detection
+ * Fires callback when user scrolls within threshold distance of bottom
+ * Only fires when entering the zone, not while remaining in it
+ */
+const useScrollToBottom = (
+  onScrollToBottom?: () => void,
+  threshold = 15
+): ((e: React.UIEvent<HTMLDivElement>) => void) => {
+  const isInBottomZoneRef = React.useRef(false);
+
+  const handleScroll = useMemoizedFn((e: React.UIEvent<HTMLDivElement>) => {
+    if (!onScrollToBottom) return;
+
+    const target = e.currentTarget;
+    const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+    const isNowInZone = scrollBottom <= threshold;
+
+    // Only fire when entering the zone (not already in it)
+    if (isNowInZone && !isInBottomZoneRef.current) {
+      onScrollToBottom();
+    }
+
+    // Update the ref to track current state
+    isInBottomZoneRef.current = isNowInZone;
+  });
+
+  return handleScroll;
 };
 
 export const DropdownBase = <T,>({
@@ -78,6 +109,7 @@ export const DropdownBase = <T,>({
   showIndex = false,
   disabled = false,
   showEmptyState = true,
+  onScrollToBottom,
 }: DropdownProps<T>) => {
   return (
     <DropdownMenu
@@ -108,6 +140,7 @@ export const DropdownBase = <T,>({
           footerClassName={footerClassName}
           menuHeaderClassName={menuHeaderClassName}
           showEmptyState={showEmptyState}
+          onScrollToBottom={onScrollToBottom}
         />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -128,6 +161,7 @@ export const DropdownContent = <T,>({
   footerClassName,
   showEmptyState,
   onSelect,
+  onScrollToBottom,
 }: DropdownContentProps<T>) => {
   const { filteredItems, searchText, handleSearchChange } = useDebounceSearch({
     items,
@@ -142,6 +176,8 @@ export const DropdownContent = <T,>({
     },
     debounceTime: 50,
   });
+
+  const handleScroll = useScrollToBottom(onScrollToBottom);
 
   const hasShownItem = useMemo(() => {
     return (
@@ -214,6 +250,7 @@ export const DropdownContent = <T,>({
 
       <div
         className={cn('max-h-[375px] overflow-y-auto', className)}
+        onScroll={handleScroll}
         onWheel={(e) => {
           //this is need to prevent bug when it is inside a dialog or modal
           e.stopPropagation();
@@ -586,7 +623,7 @@ const DropdownSubMenuContent = <T,>({
   showIndex,
   menuHeader,
   onSearch,
-  onScrollToBottom: _onScrollToBottom,
+  onScrollToBottom,
 }: DropdownSubMenuContentProps<T>) => {
   const { filteredItems, searchText, handleSearchChange } = useDebounceSearch({
     items: items || [],
@@ -601,6 +638,8 @@ const DropdownSubMenuContent = <T,>({
     },
     debounceTime: 50,
   });
+
+  const handleScroll = useScrollToBottom(onScrollToBottom);
 
   // Call onSearch callback when search text changes
   useEffect(() => {
@@ -634,6 +673,7 @@ const DropdownSubMenuContent = <T,>({
 
       <div
         className="max-h-[375px] overflow-y-auto"
+        onScroll={handleScroll}
         onWheel={(e) => {
           e.stopPropagation();
         }}
