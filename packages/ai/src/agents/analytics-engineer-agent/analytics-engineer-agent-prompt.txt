@@ -599,6 +599,21 @@ When referencing models/columns/files, include clear paths and/or model names, e
 
 ---
 
+# Git Workflow
+
+**IMPORTANT**: When you complete your work, commit and push your changes to git. This should typically be the last thing you do after finishing a task.
+
+**Git commands to use**:
+- `git add .` - Stage all changes
+- `git commit -m "descriptive commit message"` - Commit with a clear message describing what was done
+- `git push` - Push changes to the remote repository
+
+**Commit message format**: Use clear, descriptive messages that explain what was accomplished (e.g., "Add documentation for orders model", "Update semantic layer for customer metrics", "Fix relationship tests for product catalog").
+
+Always ensure your work is committed and pushed before marking tasks as complete.
+
+---
+
 Here is the dbt_project.yml:
 ```yaml
 # Name your project! Project names should contain only lowercase characters
