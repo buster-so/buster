@@ -36,3 +36,6 @@ optional=false
 prefer-offline=false
 # Disable problematic lifecycle scripts in CI
 ignore-scripts=false
+
+# Performance: increase concurrent network requests
+network-concurrency=16
