@@ -1,0 +1,131 @@
+# dbt Documentation Automation Task
+
+## Initial Setup
+- [ ] Retrieve GitHub diff files from push/PR event
+- [ ] Use TodoWrite to create task list for all changed models
+- [ ] Set working directory to repository root
+
+## Step 1: Analyze Changes
+- [ ] Use Glob to find all `.sql` files in diff
+- [ ] Use Glob to find all `.yml` files in diff
+- [ ] For each changed SQL file:
+  - [ ] ReadFiles to get the SQL content
+  - [ ] Extract model name from filename
+  - [ ] Identify ref() dependencies
+  - [ ] Add to processing queue
+
+## Step 2: Gather Context for Each Model
+For each model in processing queue:
+- [ ] Use Grep to find all references to this model across repo
+- [ ] ReadFiles on existing schema.yml for this model's directory
+- [ ] Parse existing documentation if present
+- [ ] List downstream models that depend on this one
+- [ ] Note which columns are new/modified based on SQL diff
+
+## Step 3: Profile the Data
+For each model:
+- [ ] Run RetrieveMetadata for full table statistics
+- [ ] For each column, note:
+  - [ ] Null percentage
+  - [ ] Distinct count
+  - [ ] Min/max values (if numeric/date)
+  - [ ] Common values (if categorical)
+- [ ] Run ExecuteSql to verify:
+  ```sql
+  -- Check row count
+  SELECT COUNT(*) FROM {{ ref('model_name') }};
+  
+  -- Verify primary key uniqueness
+  SELECT COUNT(*), COUNT(DISTINCT primary_key) FROM {{ ref('model_name') }};
+  
+  -- Sample any new categorical columns
+  SELECT DISTINCT new_column, COUNT(*) 
+  FROM {{ ref('model_name') }} 
+  GROUP BY 1 
+  ORDER BY 2 DESC 
+  LIMIT 20;
+  ```
+
+## Step 4: Validate Relationships
+For suspected foreign keys:
+- [ ] Run ExecuteSql to check coverage:
+  ```sql
+  -- Check relationship coverage
+  SELECT 
+    COUNT(DISTINCT child.fk_column) as child_values,
+    COUNT(DISTINCT parent.pk_column) as parent_values,
+    COUNT(DISTINCT child.fk_column) * 100.0 / COUNT(*) as match_rate
+  FROM {{ ref('child_model') }} child
+  LEFT JOIN {{ ref('parent_model') }} parent 
+    ON child.fk_column = parent.pk_column;
+  ```
+- [ ] Document coverage percentage
+- [ ] Only add relationship test if coverage > 95%
+
+## Step 5: Update schema.yml
+For each model:
+- [ ] Navigate to model's directory
+- [ ] Open or create schema.yml
+- [ ] Update `models:` section:
+  - [ ] Add model description with grain and purpose
+  - [ ] Include row count and update frequency from metadata
+  - [ ] Note key transformations from SQL analysis
+- [ ] For each column:
+  - [ ] Add description with business meaning
+  - [ ] Include null rate and cardinality from metadata
+  - [ ] Add appropriate tests based on profiling
+- [ ] If mart model, add `semantic_models:` section
+- [ ] WriteFiles to save updated schema.yml
+
+## Step 6: Add Tests
+Based on profiling results:
+- [ ] Add `unique` test for primary keys
+- [ ] Add `not_null` test where null rate is 0%
+- [ ] Add `accepted_values` for low-cardinality categoricals
+- [ ] Add `relationships` test for validated foreign keys
+- [ ] Add `dbt_utils.accepted_range` for bounded numerics
+
+## Step 7: Validate Changes
+- [ ] Run `dbt parse` to check YAML syntax
+- [ ] Run `dbt compile -s model_name` for each changed model
+- [ ] Fix any errors and re-validate
+
+## Step 8: Create Changelog
+- [ ] WriteFiles to create `changelog/documentation-<timestamp>.md`:
+  ```markdown
+  ---
+  title: Documentation updates
+  date: YYYY-MM-DD
+  affected_files: [list]
+  ---
+  
+  ## Models Documented
+  - model_name: [rows, columns, tests added]
+  
+  ## Data Insights
+  - [Key patterns discovered]
+  
+  ## Evidence
+  - Metadata timestamps: [list]
+  - SQL validations: [count]
+  ```
+
+## Step 9: Commit Changes
+- [ ] Run `git add -A`
+- [ ] Run `git commit -m "docs: update documentation for changed models"`
+- [ ] Run `git push`
+
+## Step 10: PR Comment
+- [ ] If there is a PR provided then comment on the PR by running command `gh pr comment <pr-number> --body "Your comment text here."`. Comment should include a summary of:
+  - [ ] Models documented
+  - [ ] Tests added
+  - [ ] Key data insights
+  - [ ] Link to changelog
+
+## Completion Checklist
+- [ ] All changed models have documentation
+- [ ] All columns are documented
+- [ ] Tests added based on data profiling
+- [ ] Relationships validated and documented
+- [ ] Changelog created
+- [ ] Changes committed and pushed

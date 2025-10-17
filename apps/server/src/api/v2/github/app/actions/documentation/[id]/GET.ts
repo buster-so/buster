@@ -6,9 +6,9 @@ import { Hono } from 'hono';
 
 const app = new Hono().get(
   '/',
-  zValidator('query', GithubActionDocumentationGetSchema),
+  zValidator('param', GithubActionDocumentationGetSchema),
   async (c) => {
-    const { id: messageId } = c.req.valid('query');
+    const messageId = c.req.valid('param').id;
 
     console.info('Documentation status request received:', {
       messageId,

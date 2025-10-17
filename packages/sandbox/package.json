@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
-    "build": "tsc",
+    "build": "tsc && (cd src && find . -name '*.txt' -exec sh -c 'mkdir -p ../dist/$(dirname {}) && cp {} ../dist/{}' \\;) || true",
     "build:dry-run": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch",

@@ -331,3 +331,13 @@ export async function checkForDuplicateMessages(options: {
     throw new Error(`Failed to check for duplicate messages in chat ${chatId}`);
   }
 }
+
+export async function getMessage(messageId: string): Promise<Message | undefined> {
+  const result = await db
+    .select()
+    .from(messages)
+    .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+    .limit(1);
+
+  return result[0];
+}
