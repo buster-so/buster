@@ -63,7 +63,7 @@ jobs:
             runner: blacksmith-8vcpu-ubuntu-2404
             docker_platform: linux/amd64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 35
+    timeout-minutes: 25
     permissions:
       contents: read
       packages: write
