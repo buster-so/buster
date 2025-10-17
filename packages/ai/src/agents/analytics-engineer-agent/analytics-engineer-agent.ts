@@ -1,6 +1,9 @@
-import { type ModelMessage, stepCountIs, streamText } from 'ai';
 import { currentSpan, wrapTraced } from 'braintrust';
-import { DEFAULT_ANALYTICS_ENGINEER_OPTIONS } from '../../llm/providers/gateway';
+import {  type ModelMessage, stepCountIs, streamText } from 'ai';
+import {
+  DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+
+} from '../../llm/providers/gateway';
 import { Sonnet4 } from '../../llm/sonnet-4';
 import { createAnalyticsEngineerToolset } from './create-analytics-engineer-toolset';
 import {

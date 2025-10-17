@@ -24,7 +24,6 @@ export const Route = createFileRoute('/screenshots/metrics/$metricId/content')({
         id: params.metricId,
         version_number: version_number,
       }),
-      BusterChartDynamic.preload(),
     ]);
     if (!metric || !metricData) {
       throw redirect({

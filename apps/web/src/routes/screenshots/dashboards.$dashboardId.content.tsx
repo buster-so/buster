@@ -23,7 +23,6 @@ export const Route = createFileRoute('/screenshots/dashboards/$dashboardId/conte
         id: params.dashboardId,
         version_number: version_number,
       }),
-      BusterChartDynamic.preload(),
     ]);
 
     if (!dashboard) {
