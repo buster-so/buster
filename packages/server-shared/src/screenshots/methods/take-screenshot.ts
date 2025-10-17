@@ -16,7 +16,7 @@ export const takeScreenshot = async ({
   await Promise.all([
     page.waitForLoadState('networkidle'),
     page.waitForLoadState('load'),
-    new Promise((resolve) => setTimeout(resolve, 200)),
+    new Promise((resolve) => setTimeout(resolve, 350)), //longer than the skeleton loader minimum
   ]);
   await page.waitForLoadState('domcontentloaded');
 
