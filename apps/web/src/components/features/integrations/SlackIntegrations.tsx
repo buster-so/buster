@@ -175,7 +175,7 @@ const ConnectedSlackChannels = React.memo(() => {
               <Button
                 size={'tall'}
                 variant="ghost"
-                className="group-hover:block hidden"
+                className="group-hover:flex hidden"
                 loading={showLoadingButton}
                 prefix={
                   !showLoadingButton && (
