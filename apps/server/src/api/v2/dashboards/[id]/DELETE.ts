@@ -1,5 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
-import { type User, deleteDashboard, getDashboardById } from '@buster/database/queries';
+import { deleteDashboard, getDashboardById, type User } from '@buster/database/queries';
 import {
   DeleteDashboardParamsSchema,
   type DeleteDashboardResponse,

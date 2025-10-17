@@ -52,8 +52,8 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.18.1",
+     "@types/node": "^22.18.1",
+    "@biomejs/biome": "2.2.6",
     "tsx": "catalog:",
     "turbo": "^2.5.8",
     "vitest": "catalog:"

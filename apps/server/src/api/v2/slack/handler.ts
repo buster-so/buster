@@ -14,13 +14,13 @@ import {
 import { SlackChannelService } from '@buster/slack';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import * as slackHelpers from './services/slack-helpers';
 import {
   getActiveIntegration,
   updateDefaultChannel,
   updateDefaultSharingPermissions,
 } from './services/slack-helpers';
-import * as slackHelpers from './services/slack-helpers';
-import { type SlackOAuthService, createSlackOAuthService } from './services/slack-oauth-service';
+import { createSlackOAuthService, type SlackOAuthService } from './services/slack-oauth-service';
 
 export class SlackHandler {
   private slackOAuthService: SlackOAuthService | null = null;

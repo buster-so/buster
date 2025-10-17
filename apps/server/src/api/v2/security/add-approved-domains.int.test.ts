@@ -6,8 +6,8 @@ import { addApprovedDomainsHandler } from './add-approved-domains';
 import {
   cleanupTestOrganization,
   cleanupTestUser,
-  createTestOrgMemberInDb,
   createTestOrganizationInDb,
+  createTestOrgMemberInDb,
   createTestUserInDb,
   createUserWithoutOrganization,
   getOrganizationFromDb,

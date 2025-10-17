@@ -1,4 +1,3 @@
-import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
 import { asc, db, eq } from '@buster/database/connection';
 import { chats, messages, usersToOrganizations } from '@buster/database/schema';
 import {
@@ -14,6 +13,7 @@ import {
   createTestOrganization,
   createTestUser,
 } from '@buster/test-utils';
+import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
 import { zValidator } from '@hono/zod-validator';
 import type { User } from '@supabase/supabase-js';
 import { tasks } from '@trigger.dev/sdk/v3';

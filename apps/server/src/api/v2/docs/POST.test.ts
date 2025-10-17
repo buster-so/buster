@@ -2,7 +2,7 @@ import type { User } from '@buster/database/queries';
 import { getUserOrganizationId, upsertDoc } from '@buster/database/queries';
 import type { CreateDocRequest } from '@buster/server-shared/docs';
 import { HTTPException } from 'hono/http-exception';
-import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { createDocHandler } from './POST';
 
 vi.mock('@buster/database/queries');

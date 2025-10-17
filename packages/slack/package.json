@@ -31,7 +31,7 @@
   "dependencies": {
     "@buster/env-utils": "workspace:*",
     "@slack/web-api": "^6.13.0",
-    "@biomejs/biome": "2.2.6",
+
     "zod": "catalog:"
   },
   "devDependencies": {

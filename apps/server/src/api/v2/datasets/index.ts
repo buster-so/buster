@@ -1,8 +1,8 @@
 import { db } from '@buster/database/connection';
 import {
-  type User,
   getOrganizationDatasets,
   getUserOrganizationsByUserId,
+  type User,
 } from '@buster/database/queries';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';

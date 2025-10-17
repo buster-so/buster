@@ -1,7 +1,7 @@
 import type { User } from '@buster/database/queries';
 import { DEFAULT_CHART_CONFIG } from '@buster/server-shared/metrics';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   buildMetricResponse,
   fetchAndProcessMetricData,

@@ -1,12 +1,11 @@
 import { checkPermission } from '@buster/access-controls';
+import type { User } from '@buster/database/queries';
 import {
   findUsersByEmails,
   getReportFileById,
   removeAssetPermission,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
-import type { ShareDeleteResponse } from '@buster/server-shared/share';
-import type { ShareDeleteRequest } from '@buster/server-shared/share';
+import type { ShareDeleteRequest, ShareDeleteResponse } from '@buster/server-shared/share';
 import { ShareDeleteRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';

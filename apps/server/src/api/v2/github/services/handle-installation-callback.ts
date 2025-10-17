@@ -7,9 +7,9 @@ import {
 } from '@buster/database/queries';
 import type { githubIntegrations } from '@buster/database/schema';
 import {
+  deleteInstallationToken,
   GitHubErrorCode,
   type InstallationCallbackRequest,
-  deleteInstallationToken,
 } from '@buster/github';
 import type { InferSelectModel } from 'drizzle-orm';
 
