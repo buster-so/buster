@@ -33,7 +33,7 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@daytonaio/sdk": "^0.110.2",
-    "@biomejs/biome": "2.2.6",
+
     "zod": "catalog:"
   }
 }

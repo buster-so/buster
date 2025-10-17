@@ -1,6 +1,6 @@
 import { createPermissionErrorMessage, validateSqlPermissions } from '@buster/access-controls';
-import { executeMetricQuery } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source';
+import { executeMetricQuery } from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import {
   getDataSourceById,

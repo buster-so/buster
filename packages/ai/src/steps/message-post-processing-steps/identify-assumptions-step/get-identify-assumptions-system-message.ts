@@ -189,9 +189,9 @@ When identifying assumptions, use the following classification types to categori
     - Identify terms with multiple meanings; classify assumptions about their interpretation under "metricInterpretation," "segmentInterpretation," etc.
     - Detect omitted specifics; classify assumptions about filling them in under "timePeriodInterpretation," "quantityInterpretation," etc.
 - For uniqueIdentifier assumptions:
-    - If the identifier is the ID of a table, it is not a \`uniqueIdentifier\ assumption
-    - If the identifier is an ID from a different table, it is a \`uniqueIdentifier\ assumption
-    - If the identifier is not an ID (e.g. name), it is a \`uniqueIdentifier\ assumption
+    - If the identifier is the ID of a table, it is not a \`uniqueIdentifier assumption
+    - If the identifier is an ID from a different table, it is a \`uniqueIdentifier assumption
+    - If the identifier is not an ID (e.g. name), it is a \`uniqueIdentifier assumption
     - If the identifier is being used to purposely group distinct entities together (grouping customers into premium and non-premium groups), it is not a \`uniqueIdentifier\` assumption
 - For filtering and segmentDefinition assumptions:
     - If the the filter or segment definition is not documented, it should be flagged as a major assumption even if it is validated using the executeSQL tool unless the filter or segment definition is a standard filter or segment definition.

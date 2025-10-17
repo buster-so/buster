@@ -7,8 +7,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   cleanupTestOrganization,
   cleanupTestUser,
-  createTestOrgMemberInDb,
   createTestOrganizationInDb,
+  createTestOrgMemberInDb,
   createTestUserInDb,
   createUserWithoutOrganization,
   getOrganizationFromDb,

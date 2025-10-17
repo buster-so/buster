@@ -1,6 +1,6 @@
-import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
-import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import type { ChatWithMessages } from '@buster/server-shared/chats';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
+import { analyst_agent_task_keys } from '@buster-app/trigger/task-keys';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock dependencies

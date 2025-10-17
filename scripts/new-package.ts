@@ -434,7 +434,7 @@ export {};
 
   // Create biome.json
   const biomeJson = {
-    $schema: "https://biomejs.dev/schemas/1.9.4/schema.json",
+    $schema: "https://biomejs.dev/schemas/2.2.6/schema.json",
     extends: ["../../biome.json"],
     files: {
       include: ["src/**/*", "scripts/**/*"],

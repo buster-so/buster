@@ -1,6 +1,6 @@
 import { updateChat, updateMessage } from '@buster/database/queries';
-import { generateObject } from 'ai';
 import type { ModelMessage } from 'ai';
+import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { Haiku35 } from '../../../llm';

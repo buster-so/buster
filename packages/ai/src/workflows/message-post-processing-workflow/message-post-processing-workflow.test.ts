@@ -1,7 +1,7 @@
 import type { PermissionedDataset } from '@buster/access-controls';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { runMessagePostProcessingWorkflow } from './message-post-processing-workflow';
 import type { PostProcessingWorkflowInput } from './message-post-processing-workflow';
+import { runMessagePostProcessingWorkflow } from './message-post-processing-workflow';
 
 // Helper to create mock datasets
 const mockDatasets: PermissionedDataset[] = [

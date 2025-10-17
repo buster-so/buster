@@ -11,10 +11,10 @@ import { requireAuth } from '../../../middleware/auth';
 import '../../../types/hono.types'; //I added this to fix intermitent type errors. Could probably be removed.
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
-import GET from './GET';
 import chatById from './[id]';
 import { cancelChatHandler } from './cancel-chat';
 import cliChat from './cli';
+import GET from './GET';
 import { createChatHandler } from './handler';
 
 const app = new Hono()

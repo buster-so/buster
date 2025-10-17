@@ -1,4 +1,4 @@
-import { type User, getActiveGithubIntegration } from '@buster/database/queries';
+import { getActiveGithubIntegration, type User } from '@buster/database/queries';
 import type { GetGitHubIntegrationResponse } from '@buster/server-shared/github';
 import type { UserOrganizationRole } from '@buster/server-shared/organization';
 import { Hono } from 'hono';

@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createUpdateClarificationsFileTool } from './update-clarifications-file-tool';
 import type {
   UpdateClarificationsFileToolInput,
   UpdateClarificationsFileToolOutput,
 } from './update-clarifications-file-tool';
+import { createUpdateClarificationsFileTool } from './update-clarifications-file-tool';
 
 describe('updateClarificationsFile', () => {
   let updateClarificationsFileTool: ReturnType<typeof createUpdateClarificationsFileTool>;

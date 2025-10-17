@@ -1,4 +1,5 @@
 import { checkPermission } from '@buster/access-controls';
+import type { User } from '@buster/database/queries';
 import {
   bulkCreateAssetPermissions,
   findUsersByEmails,
@@ -6,7 +7,6 @@ import {
   getUserOrganizationId,
   updateChatSharing,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { GetChatResponse } from '@buster/server-shared/chats';
 import { type ShareUpdateRequest, ShareUpdateRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';

@@ -1,9 +1,9 @@
 import { generateSuggestedMessages } from '@buster/ai';
 import {
-  type User,
   getPermissionedDatasets,
   getUserRecentMessages,
   getUserSuggestedPrompts,
+  type User,
   updateUserSuggestedPrompts,
 } from '@buster/database/queries';
 import {
@@ -11,7 +11,7 @@ import {
   type UserSuggestedPromptsType,
 } from '@buster/database/schema-types';
 import { Hono } from 'hono';
-import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import app from './GET';
 
 // Mock all external dependencies

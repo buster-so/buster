@@ -1,8 +1,8 @@
 import { updateMessageEntries } from '@buster/database/queries';
 import type { ToolCallOptions } from 'ai';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMessageUserClarifyingQuestionTool } from './message-user-clarifying-question';
 import type { MessageUserClarifyingQuestionInput } from './message-user-clarifying-question';
+import { createMessageUserClarifyingQuestionTool } from './message-user-clarifying-question';
 
 // Mock database module
 vi.mock('@buster/database', () => ({

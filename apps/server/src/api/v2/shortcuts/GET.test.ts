@@ -1,4 +1,4 @@
-import { type User, getUserOrganizationId, getUserShortcuts } from '@buster/database/queries';
+import { getUserOrganizationId, getUserShortcuts, type User } from '@buster/database/queries';
 import { HTTPException } from 'hono/http-exception';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { listShortcutsHandler } from './GET';

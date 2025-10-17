@@ -35,10 +35,10 @@ import * as accessControls from '@buster/access-controls';
 import { SlackUserService } from '@buster/slack';
 import { describe, expect, it, vi } from 'vitest';
 import {
-  type SlackAuthenticationResult,
   authenticateSlackUser,
   getUserIdFromAuthResult,
   isAuthSuccessful,
+  type SlackAuthenticationResult,
 } from './slack-authentication';
 import { SlackHelpers } from './slack-helpers';
 

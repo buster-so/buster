@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import GET from './GET';
 import ACTIONS from './actions';
+import GET from './GET';
 import INSTALL from './install';
 import WEBHOOKS from './webhooks';
 

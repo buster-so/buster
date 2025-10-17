@@ -189,7 +189,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.6",
     "@chromatic-com/storybook": "^4.1.1",
     "@storybook/addon-a11y": "^9.1.10",
     "@storybook/addon-docs": "^9.1.10",

@@ -8,11 +8,11 @@ import { z } from 'zod';
 import { requireAuth } from '../../../middleware/auth';
 import '../../../types/hono.types';
 import { HTTPException } from 'hono/http-exception';
-import { listShortcutsHandler } from './GET';
-import { createShortcutHandler } from './POST';
 import { deleteShortcutHandler } from './[id]/DELETE';
 import { getShortcutHandler } from './[id]/GET';
 import { updateShortcutHandler } from './[id]/PUT';
+import { listShortcutsHandler } from './GET';
+import { createShortcutHandler } from './POST';
 
 // Schema for path params
 const shortcutIdParamSchema = z.object({

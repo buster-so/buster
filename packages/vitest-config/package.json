@@ -36,7 +36,7 @@
     "@buster/typescript-config": "workspace:*",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
-    "@biomejs/biome": "2.2.6",
+
     "glob": "^11.0.3",
     "jsdom": "^26.1.0",
     "nyc": "^17.1.0",

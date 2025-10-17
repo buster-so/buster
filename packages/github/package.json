@@ -34,6 +34,7 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@octokit/webhooks": "^14.1.3",
+
     "octokit": "^5.0.3",
     "zod": "catalog:"
   },

@@ -1,10 +1,10 @@
 import { checkPermission } from '@buster/access-controls';
+import type { User } from '@buster/database/queries';
 import {
   bulkCreateAssetPermissions,
   findUsersByEmails,
   getChatById,
 } from '@buster/database/queries';
-import type { User } from '@buster/database/queries';
 import type { SharePostRequest, SharePostResponse } from '@buster/server-shared/share';
 import { SharePostRequestSchema } from '@buster/server-shared/share';
 import { zValidator } from '@hono/zod-validator';

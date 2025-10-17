@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { getSecretByName } from '@buster/database/queries';
-import { deleteSecret } from '@buster/database/queries';
+import { deleteSecret, getSecretByName } from '@buster/database/queries';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   deleteInstallationToken,

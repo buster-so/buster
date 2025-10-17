@@ -10,8 +10,7 @@ import {
 } from '@buster/database/schema';
 import { and, eq, gte, isNotNull, isNull } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { softDeleteMessagesFromPoint } from './chat-helpers';
-import { handleExistingChat } from './chat-helpers';
+import { handleExistingChat, softDeleteMessagesFromPoint } from './chat-helpers';
 
 describe('Chat Message Redo Integration Tests', () => {
   // Test data IDs

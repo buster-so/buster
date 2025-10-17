@@ -16,5 +16,5 @@
  * - Add metadata with currentSpan().log()
  */
 
-export { initLogger, wrapTraced, currentSpan } from 'braintrust';
 export type { Logger } from 'braintrust';
+export { currentSpan, initLogger, wrapTraced } from 'braintrust';
