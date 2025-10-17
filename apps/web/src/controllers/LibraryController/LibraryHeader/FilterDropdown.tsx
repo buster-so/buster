@@ -204,7 +204,7 @@ const useOwnerDropdownItems = ({ owner_ids }: { owner_ids: LibrarySearchParams['
       selectType: 'multiple',
       menuHeader: 'Search owners by name or email',
       onScrollToBottom: () => {},
-      onSearch: (search) => {},
+      onSearch: (_search) => {},
     });
   }, [owner_ids]);
 

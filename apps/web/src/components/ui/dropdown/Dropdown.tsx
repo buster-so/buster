@@ -357,6 +357,9 @@ const DropdownItem = <
   link,
   linkIcon,
   className,
+  menuHeader,
+  onSearch,
+  onScrollToBottom,
 }: IDropdownItem<T, TRouter, TOptions, TFrom> & {
   onSelect?: (value: T) => void;
   onSelectItem: (index: number) => void;
@@ -433,6 +436,11 @@ const DropdownItem = <
         showIndex={showIndex}
         selectType={selectType}
         className={className}
+        parentItem={{
+          menuHeader,
+          onSearch,
+          onScrollToBottom,
+        }}
       >
         {renderContent()}
       </DropdownSubMenuWrapper>
@@ -489,6 +497,11 @@ interface DropdownSubMenuWrapperProps<T> {
   onSelectItem: (index: number) => void;
   selectType: DropdownProps<T>['selectType'];
   className?: string;
+  parentItem?: {
+    menuHeader?: string | React.ReactNode;
+    onSearch?: (search: string) => void;
+    onScrollToBottom?: () => void;
+  };
 }
 
 const DropdownSubMenuWrapper = <T,>({
@@ -500,6 +513,7 @@ const DropdownSubMenuWrapper = <T,>({
   selectType,
   showIndex,
   className,
+  parentItem,
 }: DropdownSubMenuWrapperProps<T>) => {
   const subContentRef = React.useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -532,9 +546,100 @@ const DropdownSubMenuWrapper = <T,>({
         <DropdownMenuSubContent
           ref={subContentRef}
           sideOffset={8}
-          className={cn('max-h-[375px] overflow-y-auto sub-menu', className)}
+          className={cn('sub-menu', className)}
         >
-          {items?.map((item, index) => (
+          <DropdownSubMenuContent
+            items={items}
+            onSelect={onSelect}
+            onSelectItem={onSelectItem}
+            closeOnSelect={closeOnSelect}
+            selectType={selectType}
+            showIndex={showIndex}
+            menuHeader={parentItem?.menuHeader}
+            onSearch={parentItem?.onSearch}
+            onScrollToBottom={parentItem?.onScrollToBottom}
+          />
+        </DropdownMenuSubContent>
+      </DropdownMenuPortal>
+    </DropdownMenuSub>
+  );
+};
+
+interface DropdownSubMenuContentProps<T> {
+  items: IDropdownItems<T> | undefined;
+  onSelect?: (value: T) => void;
+  onSelectItem: (index: number) => void;
+  closeOnSelect: boolean;
+  selectType: DropdownProps<T>['selectType'];
+  showIndex: boolean;
+  menuHeader?: string | React.ReactNode;
+  onSearch?: (search: string) => void;
+  onScrollToBottom?: () => void;
+}
+
+const DropdownSubMenuContent = <T,>({
+  items,
+  onSelect,
+  onSelectItem,
+  closeOnSelect,
+  selectType,
+  showIndex,
+  menuHeader,
+  onSearch,
+  onScrollToBottom: _onScrollToBottom,
+}: DropdownSubMenuContentProps<T>) => {
+  const { filteredItems, searchText, handleSearchChange } = useDebounceSearch({
+    items: items || [],
+    searchPredicate: (item, searchText) => {
+      if ((item as IDropdownItem<T>).value) {
+        const _item = item as IDropdownItem<T>;
+        const searchContent =
+          _item.searchLabel || (typeof _item.label === 'string' ? _item.label : '');
+        return searchContent?.toLowerCase().includes(searchText.toLowerCase());
+      }
+      return true;
+    },
+    debounceTime: 50,
+  });
+
+  // Call onSearch callback when search text changes
+  useEffect(() => {
+    if (onSearch && searchText) {
+      onSearch(searchText);
+    }
+  }, [onSearch, searchText]);
+
+  const hasShownItem = useMemo(() => {
+    return (
+      filteredItems.length > 0 && filteredItems.some((item) => (item as IDropdownItem<T>).value)
+    );
+  }, [filteredItems]);
+
+  return (
+    <>
+      {menuHeader && (
+        <div className="flex flex-col">
+          <div className="p-1">
+            <DropdownMenuHeaderSelector
+              menuHeader={menuHeader}
+              onChange={handleSearchChange}
+              text={searchText}
+              onSelectItem={onSelectItem}
+              showIndex={showIndex}
+            />
+          </div>
+          <div className="bg-border h-[0.5px] w-full" />
+        </div>
+      )}
+
+      <div
+        className="max-h-[375px] overflow-y-auto"
+        onWheel={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        {hasShownItem ? (
+          filteredItems.map((item, index) => (
             <DropdownItemSelector
               key={dropdownItemKey(item, index)}
               item={item}
@@ -545,10 +650,14 @@ const DropdownSubMenuWrapper = <T,>({
               selectType={(item as IDropdownItem<T>).selectType || selectType}
               showIndex={showIndex}
             />
-          ))}
-        </DropdownMenuSubContent>
-      </DropdownMenuPortal>
-    </DropdownMenuSub>
+          ))
+        ) : (
+          <DropdownMenuItem disabled className="text-gray-light text-center">
+            No items found
+          </DropdownMenuItem>
+        )}
+      </div>
+    </>
   );
 };
 
