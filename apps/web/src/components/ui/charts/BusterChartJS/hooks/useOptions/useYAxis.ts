@@ -136,6 +136,16 @@ export const useYAxis = ({
     isSupportedChartForAxisTitles: isSupportedType,
   });
 
+  const percentageModeMax = useMemo(() => {
+    if (!isSupportedType || !usePercentageModeAxis) return 100;
+    const isLessThan1 = yMaxValue < 1;
+    const hasMultiply100 = Object.values(yAxisColumnFormats).some(
+      (format) => format.style === 'percent' && format.multiplier === 100
+    );
+    if (hasMultiply100 && isLessThan1) return 1;
+    return 100;
+  }, [yMaxValue, usePercentageModeAxis, yAxisColumnFormats]);
+
   const tickCallback = useMemoizedFn(function (
     this: Scale,
     value: string | number,
@@ -176,9 +186,9 @@ export const useYAxis = ({
         min: usePercentageModeAxis ? Math.min(0, yMinValue) : minTickValue,
         max:
           usePercentageModeAxis === 'clamp'
-            ? Math.max(100, yMaxValue * 1.05)
+            ? Math.max(percentageModeMax, yMaxValue * 1.05)
             : usePercentageModeAxis === '100'
-              ? 100
+              ? percentageModeMax
               : maxTickValue,
         border: {
           display: yAxisShowAxisLabel,
@@ -186,6 +196,7 @@ export const useYAxis = ({
       } as DeepPartial<ScaleChartOptions<'bar'>['scales']['y']>;
     }, [
       tickCallback,
+      percentageModeMax,
       type,
       title,
       stacked,

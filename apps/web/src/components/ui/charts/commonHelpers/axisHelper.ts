@@ -12,13 +12,24 @@ export const formatYAxisLabel = (
   usePercentageModeAxis: false | '100' | 'clamp',
   compactNumbers = true
 ) => {
+  const firstYAxis = axisColumnNames[0] || '';
+  const columnFormat = columnLabelFormats[firstYAxis];
+
   if (usePercentageModeAxis) {
-    return formatLabel(value, { columnType: 'number', style: 'percent' }, false);
+    return formatLabel(
+      value,
+      {
+        ...columnFormat,
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+        columnType: 'number',
+        style: 'percent',
+      },
+      false
+    );
   }
 
   if (canUseSameFormatter) {
-    const firstYAxis = axisColumnNames[0] || '';
-    const columnFormat = columnLabelFormats[firstYAxis];
     return formatLabel(value, { ...columnFormat, compactNumbers }, false);
   }
 
