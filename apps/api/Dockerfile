@@ -5,11 +5,23 @@ FROM chef AS planner
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-FROM chef AS builder 
+FROM chef AS builder
+ARG CARGO_HOME=/usr/local/cargo
+
+# Copy the recipe and cook dependencies with cache mounts
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN --mount=type=cache,target=${CARGO_HOME}/registry \
+    --mount=type=cache,target=${CARGO_HOME}/git \
+    --mount=type=cache,target=/app/target \
+    cargo chef cook --release --recipe-path recipe.json
+
+# Build the application with cache mounts
 COPY . .
-RUN cargo build --release --bin buster_server
+RUN --mount=type=cache,target=${CARGO_HOME}/registry \
+    --mount=type=cache,target=${CARGO_HOME}/git \
+    --mount=type=cache,target=/app/target \
+    cargo build --release --bin buster_server && \
+    cp /app/target/release/buster_server /app/buster_server
 
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
@@ -34,6 +46,6 @@ RUN update-ca-certificates
 ENV RUST_LOG=warn
 ENV RUST_BACKTRACE=0
 
-COPY --from=builder /app/target/release/buster_server .
+COPY --from=builder /app/buster_server .
 EXPOSE 3001
 ENTRYPOINT ["./buster_server"]

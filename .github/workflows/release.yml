@@ -237,6 +237,12 @@ jobs:
           fi
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
+      - name: Mount Cargo cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-cargo-cache-api-legacy
+          path: ./.cargo-cache
+
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
 
@@ -261,6 +267,10 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
             org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            CARGO_HOME=/github/workspace/.cargo-cache
 
   # -------- CLI BUILD --------
   build-cli:
