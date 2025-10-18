@@ -338,6 +338,8 @@ jobs:
           SKIP_ENV_CHECK: true
           TURBO_CACHE_DIR: .turbo
           TURBO_TELEMETRY_DISABLED: 1
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
       - name: Build standalone CLI binary
         working-directory: ./apps/cli
@@ -435,6 +437,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DB_URL }}
           NODE_TLS_REJECT_UNAUTHORIZED: '0'
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
   # ============================================
   # DEPLOY PHASE - All deploys run in parallel with fail-fast
@@ -507,11 +511,10 @@ jobs:
     needs: [detect-changes, build-api-legacy, all-builds-complete, migrate]
     if: |
       always() &&
-      needs.detect-changes.outputs.environment == 'main' &&
       needs.build-api-legacy.result == 'success' &&
       (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    environment: main
+    environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -529,7 +532,20 @@ jobs:
 
       - name: Set Github tag
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+
+          # Determine the image tag based on environment (must match build-api-legacy tags)
+          if [[ "${ENV}" == "main" ]]; then
+            TAG="${SHA_SHORT}"
+          else
+            TAG="${ENV}-${SHA_SHORT}"
+          fi
+
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          echo "image_tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
 
       - name: Setup porter
         uses: porter-dev/setup-porter@v0.1.0
@@ -537,17 +553,17 @@ jobs:
       - name: Deploy API legacy stack
         timeout-minutes: 30
         run: |
-          echo "🚀 Deploying API legacy to main..."
+          echo "🚀 Deploying API legacy to ${{ steps.vars.outputs.environment }}..."
           exec porter apply
         env:
-          PORTER_APP_NAME: main
+          PORTER_APP_NAME: ${{ steps.vars.outputs.environment }}
           PORTER_CLUSTER: "3155"
           PORTER_DEPLOYMENT_TARGET_ID: 7f44813f-4b0c-4be7-add0-94ebb61256bf
           PORTER_HOST: https://dashboard.porter.run
           PORTER_PR_NUMBER: ${{ github.event.number }}
           PORTER_PROJECT: "9309"
           PORTER_REPO_NAME: ${{ github.event.repository.name }}
-          PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
+          PORTER_TAG: ${{ steps.vars.outputs.image_tag }}
           PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
 
   # -------- TRIGGER.DEV DEPLOYMENT --------
@@ -572,6 +588,8 @@ jobs:
       - name: Deploy to Trigger.dev
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
         run: |
           ENV="${{ needs.detect-changes.outputs.environment }}"
           TRIGGER_ENV=$([[ "${ENV}" == "main" ]] && echo "production" || echo "staging")
@@ -732,12 +750,7 @@ jobs:
           if [[ "${{ needs.deploy-api-legacy.result }}" != "" ]]; then
             echo "- **API Legacy:** ${{ needs.deploy-api-legacy.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            ENV="${{ needs.detect-changes.outputs.environment }}"
-            if [[ "${ENV}" != "main" ]]; then
-              echo "- **API Legacy:** ⏭️ Skipped (only deploys on main branch)" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "- **API Legacy:** ⏭️ Skipped (API build did not run)" >> $GITHUB_STEP_SUMMARY
-            fi
+            echo "- **API Legacy:** ⏭️ Skipped (API build did not run)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.deploy-trigger.result }}" != "" ]]; then
