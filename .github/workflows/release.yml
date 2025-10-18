@@ -394,27 +394,27 @@ jobs:
   build-cli:
     needs: detect-changes
     if: needs.detect-changes.outputs.should_build_cli == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     strategy:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-latest
-            target: linux-x64
+          - target: linux-x64
             artifact_name: buster-cli-linux-x86_64.tar.gz
-            bun_target: linux-x64-modern
-          - os: macos-latest
-            target: darwin-x64
+            bun_target: bun-linux-x64-modern
+            is_windows: false
+          - target: darwin-x64
             artifact_name: buster-cli-darwin-x86_64.tar.gz
-            bun_target: darwin-x64
-          - os: macos-latest
-            target: darwin-arm64
+            bun_target: bun-darwin-x64
+            is_windows: false
+          - target: darwin-arm64
             artifact_name: buster-cli-darwin-arm64.tar.gz
-            bun_target: darwin-arm64
-          - os: windows-2022
-            target: windows-x64
+            bun_target: bun-darwin-arm64
+            is_windows: false
+          - target: windows-x64
             artifact_name: buster-cli-windows-x86_64.zip
-            bun_target: win32-x64
-    runs-on: ${{ matrix.os }}
+            bun_target: bun-windows-x64
+            is_windows: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -461,16 +461,11 @@ jobs:
         working-directory: ./apps/cli
         run: |
           echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
-          # Use the standalone build script (creates standalone binary with DuckDB external config)
-          bun run build:standalone
+          # Use the standalone build script with Bun cross-compilation target
+          bun build --compile --target=${{ matrix.bun_target }} ./src/index.ts --outfile dist/buster-cli
 
-          # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
-          mv dist/buster dist/buster-cli
-
-          # Make binary executable on Unix systems
-          if [[ "${{ runner.os }}" != "Windows" ]]; then
-            chmod +x dist/buster-cli
-          fi
+          # Make binary executable
+          chmod +x dist/buster-cli
 
           # Display binary info
           ls -lah dist/
@@ -479,51 +474,42 @@ jobs:
           NODE_ENV: production
           SKIP_ENV_CHECK: true
 
-      - name: Test binary (Unix)
-        if: runner.os != 'Windows'
+      - name: Test binary (Non-Windows)
+        if: matrix.is_windows == false
         working-directory: ./apps/cli
         run: |
-          echo "🧪 Testing CLI binary..."
-          ./dist/buster-cli --version || echo "Version command not implemented yet"
-          ./dist/buster-cli --help || echo "Help command output"
+          echo "🧪 Testing CLI binary for ${{ matrix.target }}..."
+          # Only test Linux binaries on Linux runner
+          if [[ "${{ matrix.target }}" == "linux-x64" ]]; then
+            ./dist/buster-cli --version || echo "Version command not implemented yet"
+            ./dist/buster-cli --help || echo "Help command output"
+          else
+            echo "Cross-compiled for ${{ matrix.target }}, skipping execution test"
+          fi
 
-      - name: Test binary (Windows)
-        if: runner.os == 'Windows'
-        working-directory: ./apps/cli
-        shell: pwsh
-        run: |
-          echo "🧪 Testing CLI binary..."
-          .\dist\buster-cli.exe --version
-          .\dist\buster-cli.exe --help
-
-      - name: Compress binary (Unix)
-        if: runner.os != 'Windows'
+      - name: Compress binary (Non-Windows)
+        if: matrix.is_windows == false
         working-directory: ./apps/cli
         run: |
           cd dist
           # Rename to just 'buster' for end users
           mv buster-cli buster
           tar czf ${{ matrix.artifact_name }} buster
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            shasum -a 256 ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
-          else
-            sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
-          fi
+          sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           echo "📦 Archive created:"
           ls -lah ${{ matrix.artifact_name }}*
 
       - name: Compress binary (Windows)
-        if: runner.os == 'Windows'
+        if: matrix.is_windows == true
         working-directory: ./apps/cli
-        shell: pwsh
         run: |
           cd dist
           # Rename to just 'buster.exe' for end users
-          Rename-Item -Path "buster-cli.exe" -NewName "buster.exe"
-          Compress-Archive -Path buster.exe -DestinationPath ${{ matrix.artifact_name }}
-          Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }} | Select-Object -ExpandProperty Hash > "${{ matrix.artifact_name }}.sha256"
+          mv buster-cli buster.exe
+          zip ${{ matrix.artifact_name }} buster.exe
+          sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           echo "📦 Archive created:"
-          Get-ChildItem ${{ matrix.artifact_name }}*
+          ls -lah ${{ matrix.artifact_name }}*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -673,7 +659,7 @@ jobs:
       needs.detect-changes.outputs.environment == 'main' &&
       needs.create-api-manifest.result == 'success' &&
       (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
-    runs-on: blacksmith-32vcpu-ubuntu-2204
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: main
     steps:
       - name: Checkout code
@@ -726,7 +712,7 @@ jobs:
       always() &&
       needs.detect-changes.outputs.should_deploy_trigger == 'true' &&
       (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
       - name: Checkout code
@@ -843,7 +829,7 @@ jobs:
     name: Update Homebrew Tap
     needs: release-cli
     if: needs.release-cli.outputs.cli_version != '' && needs.release-cli.outputs.cli_tag_name != ''
-    uses: ./.github/workflows/update-brew-tap.yml
+    uses: ./.github/workflows/archive/update-brew-tap.yml
     with:
       tag: ${{ needs.release-cli.outputs.cli_tag_name }}
       version: ${{ needs.release-cli.outputs.cli_version }}
