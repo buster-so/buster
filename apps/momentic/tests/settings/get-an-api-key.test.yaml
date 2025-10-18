@@ -46,11 +46,12 @@ afterSteps:
   - id: 0998db93-f678-485a-9c60-ed9dc1471e4c
     type: PRESET_ACTION
     command:
-      id: 1bac9c36-45db-49e5-be19-0122f0434a9e
+      id: 04193a17-74d5-4232-bc45-f3c5d15350d5
       type: CLICK
       target:
         type: description
-        elementDescriptor: the new api key created modal
+        elementDescriptor: the close icon button in the top-right of the "New API key
+          created" modal
   - id: 7c9d5ae4-d22a-4509-aee8-45997b9eeab3
     type: PRESET_ACTION
     command:

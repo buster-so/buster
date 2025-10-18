@@ -110,6 +110,56 @@ jobs:
       - name: Build all packages
         run: pnpm turbo build --filter='!@buster-app/api-legacy'
 
+  # Build API Legacy (Rust) - runs in parallel with build job
+  build-api-legacy:
+    name: Build API Legacy
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    timeout-minutes: 15
+    environment: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies and build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/api
+          shared-key: api-legacy-test
+          cache-on-failure: true
+
+      - name: Mount target directory cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-api-legacy-target
+          path: ./apps/api/target
+
+      - name: Mount binary cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-api-legacy-binary
+          path: ./binary-cache
+
+      - name: Build Rust binary
+        working-directory: ./apps/api
+        env:
+          CARGO_INCREMENTAL: 1
+        run: |
+          echo "🔨 Building API Legacy Rust binary..."
+          cargo build --release
+          echo "✅ Build complete"
+          ls -lah target/release/
+
+      - name: Store binary in sticky disk
+        run: |
+          mkdir -p ./binary-cache
+          cp apps/api/target/release/buster_server ./binary-cache/buster_server
+          chmod +x ./binary-cache/buster_server
+          echo "✅ Binary stored in sticky disk"
+          ls -lah ./binary-cache/
+
   # Unit test job - runs after build completes
   unit_test:
     name: Unit Test
@@ -129,21 +179,11 @@ jobs:
       - name: Run all unit tests
         run: pnpm turbo test:unit
 
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage
-          path: |
-            **/coverage/**
-            !**/coverage/tmp/**
-          retention-days: 7
-
   # E2E test job - runs after build completes
   e2e_test:
     name: End-to-End Test
-    needs: build
-    runs-on: blacksmith-32vcpu-ubuntu-2404
+    needs: [build, build-api-legacy]
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     timeout-minutes: 40
     environment: testing
     env:
@@ -159,6 +199,20 @@ jobs:
         with:
           cache-key: lint-build-test
           install-supabase: 'true'
+
+      - name: Mount binary cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-api-legacy-binary
+          path: ./binary-cache
+
+      - name: Restore pre-built API Legacy binary
+        run: |
+          mkdir -p apps/api/target/release
+          cp ./binary-cache/buster_server apps/api/target/release/buster_server
+          chmod +x apps/api/target/release/buster_server
+          echo "✅ Pre-built API Legacy binary ready at apps/api/target/release/buster_server"
+          ls -lah apps/api/target/release/
 
       - name: Pre-pull Docker images
         run: |
