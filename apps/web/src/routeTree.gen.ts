@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ScreenshotsRouteImport } from './routes/screenshots'
 import { Route as HealthcheckRouteImport } from './routes/healthcheck'
 import { Route as EmbedRouteImport } from './routes/embed'
+import { Route as CliRouteImport } from './routes/cli'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -220,6 +221,11 @@ const HealthcheckRoute = HealthcheckRouteImport.update({
 const EmbedRoute = EmbedRouteImport.update({
   id: '/embed',
   path: '/embed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CliRoute = CliRouteImport.update({
+  id: '/cli',
+  path: '/cli',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -1211,6 +1217,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppSettingsRestricted_layoutAdmin_onlyRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/cli': typeof CliRoute
   '/embed': typeof EmbedRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
   '/screenshots': typeof ScreenshotsRouteWithChildren
@@ -1352,6 +1359,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/cli': typeof CliRoute
   '/embed': typeof EmbedRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
   '/screenshots': typeof ScreenshotsRouteWithChildren
@@ -1470,6 +1478,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/cli': typeof CliRoute
   '/embed': typeof EmbedRouteWithChildren
   '/healthcheck': typeof HealthcheckRoute
   '/screenshots': typeof ScreenshotsRouteWithChildren
@@ -1635,6 +1644,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/cli'
     | '/embed'
     | '/healthcheck'
     | '/screenshots'
@@ -1776,6 +1786,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/cli'
     | '/embed'
     | '/healthcheck'
     | '/screenshots'
@@ -1893,6 +1904,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/cli'
     | '/embed'
     | '/healthcheck'
     | '/screenshots'
@@ -2057,6 +2069,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  CliRoute: typeof CliRoute
   EmbedRoute: typeof EmbedRouteWithChildren
   HealthcheckRoute: typeof HealthcheckRoute
   ScreenshotsRoute: typeof ScreenshotsRouteWithChildren
@@ -2084,6 +2097,13 @@ declare module '@tanstack/react-router' {
       path: '/embed'
       fullPath: '/embed'
       preLoaderRoute: typeof EmbedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cli': {
+      id: '/cli'
+      path: '/cli'
+      fullPath: '/cli'
+      preLoaderRoute: typeof CliRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -4222,6 +4242,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  CliRoute: CliRoute,
   EmbedRoute: EmbedRouteWithChildren,
   HealthcheckRoute: HealthcheckRoute,
   ScreenshotsRoute: ScreenshotsRouteWithChildren,
