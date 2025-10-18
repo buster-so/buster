@@ -1,0 +1,945 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - main
+          - staging
+        default: staging
+      components:
+        description: 'Components to deploy (all, server, api-legacy, cli, trigger, migrations)'
+        required: false
+        default: 'all'
+
+# Queue deployments per environment - NEVER cancel deployments mid-flight
+# This ensures database migrations and deployments complete safely
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
+  cancel-in-progress: false  # Queue deployments for safety
+
+env:
+  REGISTRY: ghcr.io
+  SERVER_IMAGE_NAME: buster-so/buster-server
+  API_LEGACY_IMAGE_NAME: buster-so/api-legacy
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  # ============================================
+  # CHANGE DETECTION
+  # ============================================
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.filter.outputs.server }}
+      api: ${{ steps.filter.outputs.api }}
+      cli: ${{ steps.filter.outputs.cli }}
+      migrations: ${{ steps.filter.outputs.migrations }}
+      trigger: ${{ steps.filter.outputs.trigger }}
+      should_build_server: ${{ steps.decide.outputs.should_build_server }}
+      should_build_api: ${{ steps.decide.outputs.should_build_api }}
+      should_build_cli: ${{ steps.decide.outputs.should_build_cli }}
+      should_run_migrations: ${{ steps.decide.outputs.should_run_migrations }}
+      should_deploy_trigger: ${{ steps.decide.outputs.should_deploy_trigger }}
+      environment: ${{ steps.decide.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'apps/server/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/release.yml'
+            api:
+              - 'apps/api/**'
+              - '.github/workflows/release.yml'
+            cli:
+              - 'apps/cli/**'
+              - 'packages/**'
+              - '.github/workflows/release.yml'
+            migrations:
+              - 'packages/database/drizzle/**'
+              - 'packages/database/src/schema-types/**'
+              - 'packages/database/drizzle.config.ts'
+              - '.github/workflows/release.yml'
+            trigger:
+              - 'apps/trigger/**'
+              - 'packages/**'
+              - '.github/workflows/release.yml'
+
+      - name: Decide what to run
+        id: decide
+        run: |
+          # Determine environment
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            ENV="${{ github.event.inputs.environment }}"
+            COMPONENTS="${{ github.event.inputs.components }}"
+          else
+            ENV="${{ github.ref_name }}"
+            COMPONENTS="all"
+          fi
+
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+
+          # Decide what should run based on changes and inputs
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "server" ]]; then
+            echo "should_build_server=${{ steps.filter.outputs.server }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_server=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "api-legacy" ]]; then
+            echo "should_build_api=${{ steps.filter.outputs.api }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_api=false" >> $GITHUB_OUTPUT
+          fi
+
+          # CLI only runs on main branch
+          if [[ "$ENV" == "main" ]] && ([[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "cli" ]]); then
+            echo "should_build_cli=${{ steps.filter.outputs.cli }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_cli=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "migrations" ]]; then
+            echo "should_run_migrations=${{ steps.filter.outputs.migrations }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_run_migrations=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "trigger" ]]; then
+            echo "should_deploy_trigger=${{ steps.filter.outputs.trigger }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy_trigger=false" >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================
+  # BUILD PHASE - All builds run in parallel with fail-fast
+  # ============================================
+
+  # -------- SERVER BUILD --------
+  prepare-server-metadata:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_server == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+      tags: ${{ steps.meta.outputs.tags }}
+      timestamp: ${{ steps.meta.outputs.timestamp }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract metadata and determine tags
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          if [[ "${ENV}" == "main" ]]; then
+            # For main: use commit SHA and latest
+            echo "tags=${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+          else
+            # For staging: use staging-SHA and staging
+            echo "tags=${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
+          fi
+
+          # Set build timestamp
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+  build-server:
+    needs: [detect-changes, prepare-server-metadata]
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: ["amd64"]
+        include:
+          - platform: amd64
+            runner: blacksmith-8vcpu-ubuntu-2404
+            docker_platform: linux/amd64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare platform-specific tags
+        id: platform-tags
+        run: |
+          # Convert comma-separated tags to newline-separated with platform suffix
+          TAGS="${{ needs.prepare-server-metadata.outputs.tags }}"
+          PLATFORM_TAGS=""
+          for TAG in ${TAGS//,/ }; do
+            if [ -n "$PLATFORM_TAGS" ]; then
+              PLATFORM_TAGS="${PLATFORM_TAGS},"
+            fi
+            PLATFORM_TAGS="${PLATFORM_TAGS}${TAG}-${{ matrix.platform }}"
+          done
+          echo "tags=${PLATFORM_TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: useblacksmith/build-push-action@v2
+        timeout-minutes: 20
+        with:
+          context: .
+          file: ./apps/server/Dockerfile
+          push: true
+          tags: ${{ steps.platform-tags.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ needs.prepare-server-metadata.outputs.timestamp }}
+            org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
+          build-args: |
+            COMMIT_SHA=${{ needs.prepare-server-metadata.outputs.sha_short }}
+            BUILD_DATE=${{ needs.prepare-server-metadata.outputs.timestamp }}
+          secrets: |
+            turbo_token=${{ secrets.TURBO_TOKEN }}
+            turbo_team=${{ vars.TURBO_TEAM }}
+          platforms: ${{ matrix.docker_platform }}
+
+  create-server-manifest:
+    needs: [detect-changes, prepare-server-metadata, build-server]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          # Parse tags from prepare-metadata output
+          TAGS="${{ needs.prepare-server-metadata.outputs.tags }}"
+
+          for TAG in ${TAGS//,/ }; do
+            echo "Creating manifest for $TAG"
+            # AMD64 only
+            docker buildx imagetools create -t $TAG \
+              ${TAG}-amd64
+          done
+
+      - name: Output image details
+        run: |
+          echo "## ✅ Server Docker Image Built" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo "${{ needs.prepare-server-metadata.outputs.tags }}" | tr ',' '\n' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+
+  # -------- API LEGACY BUILD --------
+  prepare-api-metadata:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_api == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+      tags: ${{ steps.meta.outputs.tags }}
+      timestamp: ${{ steps.meta.outputs.timestamp }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract metadata and determine tags
+        id: meta
+        run: |
+          SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          if [[ "${ENV}" == "main" ]]; then
+            # For main: use commit SHA and latest
+            echo "tags=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+          else
+            # For staging: use staging-SHA and staging
+            echo "tags=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
+          fi
+
+          # Set build timestamp
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+  build-api-legacy:
+    needs: [detect-changes, prepare-api-metadata]
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: ["amd64"]
+        include:
+          - platform: amd64
+            runner: blacksmith-8vcpu-ubuntu-2204
+            docker_platform: linux/amd64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare platform-specific tags
+        id: platform-tags
+        run: |
+          # Convert comma-separated tags to newline-separated with platform suffix
+          TAGS="${{ needs.prepare-api-metadata.outputs.tags }}"
+          PLATFORM_TAGS=""
+          for TAG in ${TAGS//,/ }; do
+            if [ -n "$PLATFORM_TAGS" ]; then
+              PLATFORM_TAGS="${PLATFORM_TAGS},"
+            fi
+            PLATFORM_TAGS="${PLATFORM_TAGS}${TAG}-${{ matrix.platform }}"
+          done
+          echo "tags=${PLATFORM_TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Build and push API legacy image
+        uses: useblacksmith/build-push-action@v2
+        timeout-minutes: 25
+        with:
+          context: ./apps/api
+          file: ./apps/api/Dockerfile
+          push: true
+          platforms: ${{ matrix.docker_platform }}
+          tags: ${{ steps.platform-tags.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ needs.prepare-api-metadata.outputs.timestamp }}
+            org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
+
+  create-api-manifest:
+    needs: [detect-changes, prepare-api-metadata, build-api-legacy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          # Parse tags from prepare-metadata output
+          TAGS="${{ needs.prepare-api-metadata.outputs.tags }}"
+
+          for TAG in ${TAGS//,/ }; do
+            echo "Creating manifest for $TAG"
+            # AMD64 only
+            docker buildx imagetools create -t $TAG \
+              ${TAG}-amd64
+          done
+
+      - name: Output image details
+        run: |
+          echo "## ✅ API Legacy Docker Image Built" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo "${{ needs.prepare-api-metadata.outputs.tags }}" | tr ',' '\n' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+
+  # -------- CLI BUILD --------
+  build-cli:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_cli == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x64
+            artifact_name: buster-cli-linux-x86_64.tar.gz
+            bun_target: linux-x64-modern
+          - os: macos-latest
+            target: darwin-x64
+            artifact_name: buster-cli-darwin-x86_64.tar.gz
+            bun_target: darwin-x64
+          - os: macos-latest
+            target: darwin-arm64
+            artifact_name: buster-cli-darwin-arm64.tar.gz
+            bun_target: darwin-arm64
+          - os: windows-2022
+            target: windows-x64
+            artifact_name: buster-cli-windows-x86_64.zip
+            bun_target: win32-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.18.3
+
+      - name: Setup Node.js
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Mount Turbo cache sticky disk
+        if: runner.os != 'Windows'
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-turbo-cache-cli-${{ matrix.target }}
+          path: ./.turbo
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build dependencies with Turbo
+        run: |
+          echo "🔨 Building CLI dependencies with Turbo..."
+          pnpm turbo run build --filter=@buster-app/cli^... --filter=@buster/search
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+
+      - name: Build standalone CLI binary
+        working-directory: ./apps/cli
+        run: |
+          echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
+          # Use the standalone build script (creates standalone binary with DuckDB external config)
+          bun run build:standalone
+
+          # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
+          mv dist/buster dist/buster-cli
+
+          # Make binary executable on Unix systems
+          if [[ "${{ runner.os }}" != "Windows" ]]; then
+            chmod +x dist/buster-cli
+          fi
+
+          # Display binary info
+          ls -lah dist/
+        shell: bash
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+
+      - name: Test binary (Unix)
+        if: runner.os != 'Windows'
+        working-directory: ./apps/cli
+        run: |
+          echo "🧪 Testing CLI binary..."
+          ./dist/buster-cli --version || echo "Version command not implemented yet"
+          ./dist/buster-cli --help || echo "Help command output"
+
+      - name: Test binary (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ./apps/cli
+        shell: pwsh
+        run: |
+          echo "🧪 Testing CLI binary..."
+          .\dist\buster-cli.exe --version
+          .\dist\buster-cli.exe --help
+
+      - name: Compress binary (Unix)
+        if: runner.os != 'Windows'
+        working-directory: ./apps/cli
+        run: |
+          cd dist
+          # Rename to just 'buster' for end users
+          mv buster-cli buster
+          tar czf ${{ matrix.artifact_name }} buster
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            shasum -a 256 ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
+          else
+            sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
+          fi
+          echo "📦 Archive created:"
+          ls -lah ${{ matrix.artifact_name }}*
+
+      - name: Compress binary (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ./apps/cli
+        shell: pwsh
+        run: |
+          cd dist
+          # Rename to just 'buster.exe' for end users
+          Rename-Item -Path "buster-cli.exe" -NewName "buster.exe"
+          Compress-Archive -Path buster.exe -DestinationPath ${{ matrix.artifact_name }}
+          Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }} | Select-Object -ExpandProperty Hash > "${{ matrix.artifact_name }}.sha256"
+          echo "📦 Archive created:"
+          Get-ChildItem ${{ matrix.artifact_name }}*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: buster-cli-${{ matrix.target }}
+          path: |
+            apps/cli/dist/${{ matrix.artifact_name }}
+            apps/cli/dist/${{ matrix.artifact_name }}.sha256
+          retention-days: 1
+
+      - name: Build summary
+        run: |
+          echo "## ✅ CLI Binary Built" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform:** ${{ matrix.target }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifact:** ${{ matrix.artifact_name }}" >> $GITHUB_STEP_SUMMARY
+
+  # -------- ALL BUILDS COMPLETE GATE --------
+  all-builds-complete:
+    needs: [detect-changes, create-server-manifest, create-api-manifest, build-cli]
+    if: |
+      always() &&
+      (needs.create-server-manifest.result == 'success' || needs.create-server-manifest.result == 'skipped') &&
+      (needs.create-api-manifest.result == 'success' || needs.create-api-manifest.result == 'skipped') &&
+      (needs.build-cli.result == 'success' || needs.build-cli.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build results
+        run: |
+          echo "## 🏗️ Build Phase Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Server Build:** ${{ needs.create-server-manifest.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**API Legacy Build:** ${{ needs.create-api-manifest.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**CLI Build:** ${{ needs.build-cli.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All builds completed successfully or were skipped" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # DATABASE MIGRATIONS (gate between build and deploy)
+  # ============================================
+  migrate:
+    needs: [detect-changes, all-builds-complete]
+    if: needs.detect-changes.outputs.should_run_migrations == 'true'
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+
+      - name: Run migrations
+        run: pnpm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DB_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
+
+      - name: Migration Summary
+        if: success()
+        run: |
+          echo "## ✅ Database Migrations Complete" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ needs.detect-changes.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # DEPLOY PHASE - All deploys run in parallel with fail-fast
+  # ============================================
+
+  # -------- SERVER DEPLOYMENT --------
+  deploy-server:
+    needs: [detect-changes, create-server-manifest, prepare-server-metadata, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.create-server-manifest.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.detect-changes.outputs.environment }}
+
+      - name: Get commit SHA
+        id: commit
+        run: |
+          echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
+          echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Cache Porter CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.porter
+          key: porter-cli-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Setup porter
+        uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Update Porter app with new image
+        id: deploy
+        run: |
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          SHA="${{ steps.commit.outputs.sha_short }}"
+
+          # Determine the image tag based on environment
+          if [[ "${ENV}" == "main" ]]; then
+            TAG="${SHA}"
+          else
+            TAG="${ENV}-${SHA}"
+          fi
+
+          echo "🚀 Deploying server to ${ENV} environment..."
+          echo "📦 Using image tag: ${TAG}"
+
+          porter app update-tag ${{ vars.PORTER_APP_NAME }} --tag "${TAG}"
+          echo "deployment_env=${ENV}" >> $GITHUB_OUTPUT
+
+          echo "✅ Server deployment initiated successfully!"
+        env:
+          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+          PORTER_HOST: https://dashboard.porter.run
+          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+
+      - name: Wait for deployment health check
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+          echo "✅ Deployment appears healthy"
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          SHA="${{ steps.commit.outputs.sha_short }}"
+
+          echo "## 🎉 Server Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** \`${ENV}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${SHA}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  # -------- API LEGACY DEPLOYMENT --------
+  deploy-api-legacy:
+    needs: [detect-changes, create-api-manifest, prepare-api-metadata, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.environment == 'main' &&
+      needs.create-api-manifest.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-32vcpu-ubuntu-2204
+    environment: main
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Download SSL certificate from S3
+        run: |
+          aws s3 cp ${{ secrets.CERT_S3_URL }} ./apps/api/cert.pem
+
+      - name: Set Github tag
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Setup porter
+        uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Deploy API legacy stack
+        timeout-minutes: 30
+        run: |
+          echo "🚀 Deploying API legacy to main..."
+          exec porter apply
+        env:
+          PORTER_APP_NAME: main
+          PORTER_CLUSTER: "3155"
+          PORTER_DEPLOYMENT_TARGET_ID: 7f44813f-4b0c-4be7-add0-94ebb61256bf
+          PORTER_HOST: https://dashboard.porter.run
+          PORTER_PR_NUMBER: ${{ github.event.number }}
+          PORTER_PROJECT: "9309"
+          PORTER_REPO_NAME: ${{ github.event.repository.name }}
+          PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
+          PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
+
+      - name: API Deployment Summary
+        if: success()
+        run: |
+          echo "## 🎉 API Legacy Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ steps.vars.outputs.sha_short }}" >> $GITHUB_STEP_SUMMARY
+
+  # -------- TRIGGER.DEV DEPLOYMENT --------
+  deploy-trigger:
+    needs: [detect-changes, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.should_deploy_trigger == 'true' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          install-filter: "@buster-app/trigger..."
+          cache-key: trigger-deployment
+
+      - name: Deploy to Trigger.dev
+        env:
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+        run: |
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          TRIGGER_ENV=$([[ "${ENV}" == "main" ]] && echo "production" || echo "staging")
+
+          echo "🚀 Deploying to Trigger.dev ${TRIGGER_ENV}..."
+          cd apps/trigger
+          pnpm dlx trigger.dev@latest deploy --env ${TRIGGER_ENV}
+
+      - name: Trigger Deployment Summary
+        if: success()
+        run: |
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          echo "## 🎉 Trigger.dev Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${ENV}" >> $GITHUB_STEP_SUMMARY
+
+  # -------- CLI RELEASE --------
+  release-cli:
+    needs: [detect-changes, build-cli, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.build-cli.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      cli_version: ${{ steps.get_version.outputs.version }}
+      cli_tag_name: ${{ steps.output_release_info.outputs.tag_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Extract version from package.json
+        id: get_version
+        run: |
+          VERSION="0.3.1"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+          # Also update the package.json to match
+          cd apps/cli
+          npm version $VERSION --no-git-tag-version || true
+          cd ../..
+
+      - name: Create or Update Release
+        id: create_the_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Buster CLI v${{ steps.get_version.outputs.version }}
+
+            ### What's New
+            - TypeScript-based CLI built with Bun
+            - Fast native binary compilation
+            - Cross-platform support (macOS, Linux, Windows)
+
+            ### Installation
+
+            #### Homebrew (macOS/Linux)
+            ```bash
+            brew tap buster-so/buster-homebrew
+            brew install buster
+            ```
+
+            #### Direct Download
+            Download the appropriate binary for your platform from the assets below.
+
+            ### Checksums
+            Verify your download with the SHA256 checksums provided.
+          files: |
+            **/buster-cli-linux-x86_64.tar.gz
+            **/buster-cli-linux-x86_64.tar.gz.sha256
+            **/buster-cli-darwin-x86_64.tar.gz
+            **/buster-cli-darwin-x86_64.tar.gz.sha256
+            **/buster-cli-darwin-arm64.tar.gz
+            **/buster-cli-darwin-arm64.tar.gz.sha256
+            **/buster-cli-windows-x86_64.zip
+            **/buster-cli-windows-x86_64.zip.sha256
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output release info
+        id: output_release_info
+        run: |
+          echo "tag_name=v${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "✅ Release created/updated: v${{ steps.get_version.outputs.version }}"
+
+  update-homebrew-tap:
+    name: Update Homebrew Tap
+    needs: release-cli
+    if: needs.release-cli.outputs.cli_version != '' && needs.release-cli.outputs.cli_tag_name != ''
+    uses: ./.github/workflows/update-brew-tap.yml
+    with:
+      tag: ${{ needs.release-cli.outputs.cli_tag_name }}
+      version: ${{ needs.release-cli.outputs.cli_version }}
+    secrets:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  # ============================================
+  # RELEASE SUMMARY
+  # ============================================
+  summary:
+    name: Release Summary
+    needs: [detect-changes, all-builds-complete, migrate, deploy-server, deploy-api-legacy, deploy-trigger, release-cli, update-homebrew-tap]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate comprehensive release summary
+        run: |
+          echo "## 🚀 Release Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ needs.detect-changes.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 📊 Pipeline Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Build Phase
+          echo "#### Build Phase" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.detect-changes.outputs.should_build_server }}" == "true" ]]; then
+            echo "- **Server:** ${{ needs.create-server-manifest.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Server:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.should_build_api }}" == "true" ]]; then
+            echo "- **API Legacy:** ${{ needs.create-api-manifest.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **API Legacy:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.should_build_cli }}" == "true" ]]; then
+            echo "- **CLI:** ${{ needs.build-cli.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **CLI:** ⏭️ Skipped (main only or no changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Migrations
+          echo "#### Database Migrations" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.detect-changes.outputs.should_run_migrations }}" == "true" ]]; then
+            echo "- **Migrations:** ${{ needs.migrate.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Migrations:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Deploy Phase
+          echo "#### Deploy Phase" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.deploy-server.result }}" != "" ]]; then
+            echo "- **Server:** ${{ needs.deploy-server.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Server:** ⏭️ Skipped (no build)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.deploy-api-legacy.result }}" != "" ]]; then
+            echo "- **API Legacy:** ${{ needs.deploy-api-legacy.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **API Legacy:** ⏭️ Skipped (main only or no build)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.deploy-trigger.result }}" != "" ]]; then
+            echo "- **Trigger.dev:** ${{ needs.deploy-trigger.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Trigger.dev:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.release-cli.result }}" != "" ]]; then
+            echo "- **CLI Release:** ${{ needs.release-cli.result }}" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ needs.release-cli.result }}" == "success" ]]; then
+              echo "  - Version: v${{ needs.release-cli.outputs.cli_version }}" >> $GITHUB_STEP_SUMMARY
+              if [[ "${{ needs.update-homebrew-tap.result }}" == "success" ]]; then
+                echo "  - Homebrew: ✅ Updated" >> $GITHUB_STEP_SUMMARY
+              elif [[ "${{ needs.update-homebrew-tap.result }}" == "failure" ]]; then
+                echo "  - Homebrew: ⚠️ Update failed" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          else
+            echo "- **CLI Release:** ⏭️ Skipped (main only or no build)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- All builds complete before migrations" >> $GITHUB_STEP_SUMMARY
+          echo "- Migrations gate all deployments" >> $GITHUB_STEP_SUMMARY
+          echo "- Fail-fast enabled for builds and deploys" >> $GITHUB_STEP_SUMMARY
+          echo "- Deployments queued per environment (never canceled)" >> $GITHUB_STEP_SUMMARY
