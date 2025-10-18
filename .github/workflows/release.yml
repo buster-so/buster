@@ -825,23 +825,12 @@ jobs:
           echo "tag_name=v${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
           echo "✅ Release created/updated: v${{ steps.get_version.outputs.version }}"
 
-  update-homebrew-tap:
-    name: Update Homebrew Tap
-    needs: release-cli
-    if: needs.release-cli.outputs.cli_version != '' && needs.release-cli.outputs.cli_tag_name != ''
-    uses: ./.github/workflows/update-brew-tap.yml
-    with:
-      tag: ${{ needs.release-cli.outputs.cli_tag_name }}
-      version: ${{ needs.release-cli.outputs.cli_version }}
-    secrets:
-      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-
   # ============================================
   # RELEASE SUMMARY
   # ============================================
   summary:
     name: Release Summary
-    needs: [detect-changes, all-builds-complete, migrate, deploy-server, deploy-api-legacy, deploy-trigger, release-cli, update-homebrew-tap]
+    needs: [detect-changes, all-builds-complete, migrate, deploy-server, deploy-api-legacy, deploy-trigger, release-cli]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -913,11 +902,6 @@ jobs:
             echo "- **CLI Release:** ${{ needs.release-cli.result }}" >> $GITHUB_STEP_SUMMARY
             if [[ "${{ needs.release-cli.result }}" == "success" ]]; then
               echo "  - Version: v${{ needs.release-cli.outputs.cli_version }}" >> $GITHUB_STEP_SUMMARY
-              if [[ "${{ needs.update-homebrew-tap.result }}" == "success" ]]; then
-                echo "  - Homebrew: ✅ Updated" >> $GITHUB_STEP_SUMMARY
-              elif [[ "${{ needs.update-homebrew-tap.result }}" == "failure" ]]; then
-                echo "  - Homebrew: ⚠️ Update failed" >> $GITHUB_STEP_SUMMARY
-              fi
             fi
           else
             echo "- **CLI Release:** ⏭️ Skipped (main only or no build)" >> $GITHUB_STEP_SUMMARY
