@@ -8,7 +8,8 @@
   },
   "scripts": {
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || (tsx scripts/validate-env.ts && pnpm run typecheck)",
-    "build": "bun run build.ts",
+    "build": "bun build src/index.tsx --outfile dist/index.js --target=bun --minify --external @duckdb/node-bindings --external @duckdb/node-api",
+    "build:standalone": "bun run build.ts",
     "build:dry-run": "tsc --noEmit",
     "dev": "bun run src/index.tsx",
     "typecheck": "tsc --noEmit",
