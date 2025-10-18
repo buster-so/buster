@@ -1,21 +1,8 @@
-FROM lukemathwalker/cargo-chef AS chef
+FROM rust:1.83-bookworm AS builder
 WORKDIR /app
-
-FROM chef AS planner
-COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
-
-FROM chef AS builder
 ARG CARGO_HOME=/usr/local/cargo
 
-# Copy the recipe and cook dependencies with cache mounts
-COPY --from=planner /app/recipe.json recipe.json
-RUN --mount=type=cache,target=${CARGO_HOME}/registry \
-    --mount=type=cache,target=${CARGO_HOME}/git \
-    --mount=type=cache,target=/app/target \
-    cargo chef cook --release --recipe-path recipe.json
-
-# Build the application with cache mounts
+# Copy source and build with cache mounts
 COPY . .
 RUN --mount=type=cache,target=${CARGO_HOME}/registry \
     --mount=type=cache,target=${CARGO_HOME}/git \

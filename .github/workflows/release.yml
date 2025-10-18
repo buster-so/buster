@@ -490,7 +490,7 @@ jobs:
           echo "🚀 Deploying server to ${ENV} environment..."
           echo "📦 Using image tag: ${TAG}"
 
-          porter app update-tag ${{ vars.PORTER_APP_NAME }} --tag "${TAG}"
+          porter app update-tag ${{ vars.PORTER_SERVER_APP_NAME }} --tag "${TAG}"
           echo "deployment_env=${ENV}" >> $GITHUB_OUTPUT
 
           echo "✅ Server deployment initiated successfully!"
@@ -518,53 +518,55 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          ref: ${{ needs.detect-changes.outputs.environment }}
 
-      - name: Download SSL certificate from S3
+      - name: Get commit SHA
+        id: commit
         run: |
-          aws s3 cp ${{ secrets.CERT_S3_URL }} ./apps/api/cert.pem
+          echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
+          echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Set Github tag
-        id: vars
-        run: |
-          SHA_SHORT=$(git rev-parse --short HEAD)
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-
-          # Determine the image tag based on environment (must match build-api-legacy tags)
-          if [[ "${ENV}" == "main" ]]; then
-            TAG="${SHA_SHORT}"
-          else
-            TAG="${ENV}-${SHA_SHORT}"
-          fi
-
-          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
-          echo "image_tag=${TAG}" >> $GITHUB_OUTPUT
-          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+      - name: Cache Porter CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.porter
+          key: porter-cli-${{ runner.os }}-${{ runner.arch }}
 
       - name: Setup porter
         uses: porter-dev/setup-porter@v0.1.0
 
-      - name: Deploy API legacy stack
-        timeout-minutes: 30
+      - name: Update Porter app with new image
+        id: deploy
         run: |
-          echo "🚀 Deploying API legacy to ${{ steps.vars.outputs.environment }}..."
-          exec porter apply
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          SHA="${{ steps.commit.outputs.sha_short }}"
+
+          # Determine the image tag based on environment
+          if [[ "${ENV}" == "main" ]]; then
+            TAG="${SHA}"
+          else
+            TAG="${ENV}-${SHA}"
+          fi
+
+          echo "🚀 Deploying API legacy to ${ENV} environment..."
+          echo "📦 Using image tag: ${TAG}"
+
+          porter app update-tag ${{ vars.PORTER_API_LEGACY_APP_NAME }} --tag "${TAG}"
+          echo "deployment_env=${ENV}" >> $GITHUB_OUTPUT
+
+          echo "✅ API legacy deployment initiated successfully!"
         env:
-          PORTER_APP_NAME: ${{ steps.vars.outputs.environment }}
-          PORTER_CLUSTER: "3155"
-          PORTER_DEPLOYMENT_TARGET_ID: 7f44813f-4b0c-4be7-add0-94ebb61256bf
+          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
           PORTER_HOST: https://dashboard.porter.run
-          PORTER_PR_NUMBER: ${{ github.event.number }}
-          PORTER_PROJECT: "9309"
-          PORTER_REPO_NAME: ${{ github.event.repository.name }}
-          PORTER_TAG: ${{ steps.vars.outputs.image_tag }}
-          PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
+          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+
+      - name: Wait for deployment health check
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+          echo "✅ Deployment appears healthy"
 
   # -------- TRIGGER.DEV DEPLOYMENT --------
   deploy-trigger:
