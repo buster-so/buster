@@ -466,12 +466,14 @@ jobs:
           echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Cache Porter CLI
+        id: cache-porter
         uses: actions/cache@v4
         with:
           path: ~/.porter
           key: porter-cli-${{ runner.os }}-${{ runner.arch }}
 
       - name: Setup porter
+        if: steps.cache-porter.outputs.cache-hit != 'true'
         uses: porter-dev/setup-porter@v0.1.0
 
       - name: Update Porter app with new image
@@ -528,12 +530,14 @@ jobs:
           echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Cache Porter CLI
+        id: cache-porter
         uses: actions/cache@v4
         with:
           path: ~/.porter
           key: porter-cli-${{ runner.os }}-${{ runner.arch }}
 
       - name: Setup porter
+        if: steps.cache-porter.outputs.cache-hit != 'true'
         uses: porter-dev/setup-porter@v0.1.0
 
       - name: Update Porter app with new image
