@@ -476,6 +476,10 @@ jobs:
         if: steps.cache-porter.outputs.cache-hit != 'true'
         uses: porter-dev/setup-porter@v0.1.0
 
+      - name: Add Porter to PATH
+        if: steps.cache-porter.outputs.cache-hit == 'true'
+        run: echo "$HOME/.porter" >> $GITHUB_PATH
+
       - name: Update Porter app with new image
         id: deploy
         run: |
@@ -539,6 +543,10 @@ jobs:
       - name: Setup porter
         if: steps.cache-porter.outputs.cache-hit != 'true'
         uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Add Porter to PATH
+        if: steps.cache-porter.outputs.cache-hit == 'true'
+        run: echo "$HOME/.porter" >> $GITHUB_PATH
 
       - name: Update Porter app with new image
         id: deploy
