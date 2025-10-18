@@ -829,7 +829,7 @@ jobs:
     name: Update Homebrew Tap
     needs: release-cli
     if: needs.release-cli.outputs.cli_version != '' && needs.release-cli.outputs.cli_tag_name != ''
-    uses: ./.github/workflows/archive/update-brew-tap.yml
+    uses: ./.github/workflows/update-brew-tap.yml
     with:
       tag: ${{ needs.release-cli.outputs.cli_tag_name }}
       version: ${{ needs.release-cli.outputs.cli_version }}
