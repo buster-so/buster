@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-const GITHUB_RAW_SCRIPT_URL =
+const branch = process.env.GITHUB_REF_NAME || 'main';
+const GITHUB_RAW_SCRIPT_URL = `https://raw.githubusercontent.com/buster-so/buster/${branch}/scripts/install.sh`;
   'https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh';
 
 export const Route = createFileRoute('/cli')({
