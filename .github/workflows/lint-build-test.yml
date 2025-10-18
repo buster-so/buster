@@ -120,19 +120,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Mount Cargo cache sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-cargo-cache-api-legacy-test
-          path: ./.cargo-cache
-
-      - name: Set up Rust cache directory
-        run: |
-          mkdir -p .cargo-cache
-          echo "CARGO_HOME=$(pwd)/.cargo-cache" >> $GITHUB_ENV
-
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies and build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/api
+          shared-key: api-legacy-test
+          cache-on-failure: true
 
       - name: Build Rust binary
         working-directory: ./apps/api
