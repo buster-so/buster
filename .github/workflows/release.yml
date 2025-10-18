@@ -438,14 +438,17 @@ jobs:
         uses: porter-dev/setup-porter@v0.1.0
 
       - name: Deploy to Porter
-        uses: ./.github/actions/deploy-to-porter
-        with:
-          app_name: ${{ vars.PORTER_SERVER_APP_NAME }}
-          image_tag: ${{ needs.detect-changes.outputs.environment == 'main' && needs.build-server.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-server.outputs.sha_short) }}
-          porter_token: ${{ secrets.PORTER_TOKEN }}
-          porter_host: https://dashboard.porter.run
-          porter_project: ${{ vars.PORTER_PROJECT }}
-          porter_cluster: ${{ vars.PORTER_CLUSTER }}
+        run: |
+          TAG="${{ needs.detect-changes.outputs.environment == 'main' && needs.build-server.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-server.outputs.sha_short) }}"
+          echo "🚀 Deploying ${{ vars.PORTER_SERVER_APP_NAME }}..."
+          echo "📦 Using image tag: ${TAG}"
+          porter app update-tag ${{ vars.PORTER_SERVER_APP_NAME }} --tag "${TAG}"
+          echo "✅ Deployment initiated successfully!"
+        env:
+          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+          PORTER_HOST: https://dashboard.porter.run
+          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
 
   # -------- API LEGACY DEPLOYMENT --------
   deploy-api-legacy:
@@ -461,14 +464,17 @@ jobs:
         uses: porter-dev/setup-porter@v0.1.0
 
       - name: Deploy to Porter
-        uses: ./.github/actions/deploy-to-porter
-        with:
-          app_name: ${{ vars.PORTER_API_LEGACY_APP_NAME }}
-          image_tag: ${{ needs.detect-changes.outputs.environment == 'main' && needs.build-api-legacy.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-api-legacy.outputs.sha_short) }}
-          porter_token: ${{ secrets.PORTER_TOKEN }}
-          porter_host: https://dashboard.porter.run
-          porter_project: ${{ vars.PORTER_PROJECT }}
-          porter_cluster: ${{ vars.PORTER_CLUSTER }}
+        run: |
+          TAG="${{ needs.detect-changes.outputs.environment == 'main' && needs.build-api-legacy.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-api-legacy.outputs.sha_short) }}"
+          echo "🚀 Deploying ${{ vars.PORTER_API_LEGACY_APP_NAME }}..."
+          echo "📦 Using image tag: ${TAG}"
+          porter app update-tag ${{ vars.PORTER_API_LEGACY_APP_NAME }} --tag "${TAG}"
+          echo "✅ Deployment initiated successfully!"
+        env:
+          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+          PORTER_HOST: https://dashboard.porter.run
+          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
 
   # -------- TRIGGER.DEV DEPLOYMENT --------
   deploy-trigger:
