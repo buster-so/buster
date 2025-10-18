@@ -32,7 +32,7 @@ export const Route = createFileRoute('/cli')({
             headers: {
               'Content-Type': 'application/x-sh',
               'Content-Disposition': 'attachment; filename="install.sh"',
-              'Cache-Control': 'public, max-age=3600',
+              'Cache-Control': 'public, max-age=300',
             },
           });
         } catch (error) {
