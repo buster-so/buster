@@ -147,8 +147,8 @@ jobs:
       - name: Store binary in sticky disk
         run: |
           mkdir -p ./binary-cache
-          cp apps/api/target/release/api ./binary-cache/api
-          chmod +x ./binary-cache/api
+          cp apps/api/target/release/buster_server ./binary-cache/buster_server
+          chmod +x ./binary-cache/buster_server
           echo "✅ Binary stored in sticky disk"
           ls -lah ./binary-cache/
 
@@ -201,9 +201,9 @@ jobs:
       - name: Restore pre-built API Legacy binary
         run: |
           mkdir -p apps/api/target/release
-          cp ./binary-cache/api apps/api/target/release/api
-          chmod +x apps/api/target/release/api
-          echo "✅ Pre-built API Legacy binary ready"
+          cp ./binary-cache/buster_server apps/api/target/release/buster_server
+          chmod +x apps/api/target/release/buster_server
+          echo "✅ Pre-built API Legacy binary ready at apps/api/target/release/buster_server"
           ls -lah apps/api/target/release/
 
       - name: Pre-pull Docker images
