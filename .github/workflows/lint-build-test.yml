@@ -130,6 +130,12 @@ jobs:
           shared-key: api-legacy-test
           cache-on-failure: true
 
+      - name: Mount target directory cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-api-legacy-target
+          path: ./apps/api/target
+
       - name: Mount binary cache sticky disk
         uses: useblacksmith/stickydisk@v1
         with:
@@ -138,6 +144,8 @@ jobs:
 
       - name: Build Rust binary
         working-directory: ./apps/api
+        env:
+          CARGO_INCREMENTAL: 1
         run: |
           echo "🔨 Building API Legacy Rust binary..."
           cargo build --release
