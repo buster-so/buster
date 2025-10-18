@@ -168,16 +168,6 @@ jobs:
       - name: Run all unit tests
         run: pnpm turbo test:unit
 
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage
-          path: |
-            **/coverage/**
-            !**/coverage/tmp/**
-          retention-days: 7
-
   # E2E test job - runs after build completes
   e2e_test:
     name: End-to-End Test
