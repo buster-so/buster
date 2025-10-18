@@ -447,7 +447,10 @@ jobs:
   # -------- SERVER DEPLOYMENT --------
   deploy-server:
     needs: [detect-changes, build-server, all-builds-complete, migrate]
-    if: needs.build-server.result == 'success'
+    if: |
+      always() &&
+      needs.build-server.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
@@ -506,7 +509,10 @@ jobs:
   # -------- API LEGACY DEPLOYMENT --------
   deploy-api-legacy:
     needs: [detect-changes, build-api-legacy, all-builds-complete, migrate]
-    if: needs.build-api-legacy.result == 'success'
+    if: |
+      always() &&
+      needs.build-api-legacy.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
@@ -565,7 +571,10 @@ jobs:
   # -------- TRIGGER.DEV DEPLOYMENT --------
   deploy-trigger:
     needs: [detect-changes, all-builds-complete, migrate]
-    if: needs.detect-changes.outputs.should_deploy_trigger == 'true'
+    if: |
+      always() &&
+      needs.detect-changes.outputs.should_deploy_trigger == 'true' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-8vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
@@ -594,7 +603,10 @@ jobs:
   # -------- CLI RELEASE --------
   release-cli:
     needs: [detect-changes, build-cli, all-builds-complete, migrate]
-    if: needs.build-cli.result == 'success'
+    if: |
+      always() &&
+      needs.build-cli.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-2vcpu-ubuntu-2404
     permissions:
       contents: write
