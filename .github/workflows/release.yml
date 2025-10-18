@@ -14,7 +14,7 @@ on:
           - staging
         default: staging
       components:
-        description: 'Components to deploy (all, server, api-legacy, cli, trigger, migrations)'
+        description: 'Components to deploy (all, server, web, api-legacy, cli, trigger, migrations)'
         required: false
         default: 'all'
 
@@ -38,12 +38,14 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      server: ${{ steps.filter.outputs.server }}
+      server: ${{ steps.decide.outputs.server }}
+      web: ${{ steps.decide.outputs.web }}
       api: ${{ steps.filter.outputs.api }}
-      cli: ${{ steps.filter.outputs.cli }}
+      cli: ${{ steps.decide.outputs.cli }}
       migrations: ${{ steps.filter.outputs.migrations }}
-      trigger: ${{ steps.filter.outputs.trigger }}
+      trigger: ${{ steps.decide.outputs.trigger }}
       should_build_server: ${{ steps.decide.outputs.should_build_server }}
+      should_build_web: ${{ steps.decide.outputs.should_build_web }}
       should_build_api: ${{ steps.decide.outputs.should_build_api }}
       should_build_cli: ${{ steps.decide.outputs.should_build_cli }}
       should_run_migrations: ${{ steps.decide.outputs.should_run_migrations }}
@@ -55,31 +57,54 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect file changes
+      # Use turbo-changed for Turbo workspace apps
+      - name: Check if server app changed
+        uses: jonnyburger/turbo-changed@v1
+        id: server_changed
+        with:
+          workspace: '@buster-app/server'
+          from: ${{ github.event.before }}
+          to: ${{ github.sha }}
+
+      - name: Check if web app changed
+        uses: jonnyburger/turbo-changed@v1
+        id: web_changed
+        with:
+          workspace: '@buster-app/web'
+          from: ${{ github.event.before }}
+          to: ${{ github.sha }}
+
+      - name: Check if CLI app changed
+        uses: jonnyburger/turbo-changed@v1
+        id: cli_changed
+        with:
+          workspace: '@buster-app/cli'
+          from: ${{ github.event.before }}
+          to: ${{ github.sha }}
+
+      - name: Check if trigger app changed
+        uses: jonnyburger/turbo-changed@v1
+        id: trigger_changed
+        with:
+          workspace: '@buster-app/trigger'
+          from: ${{ github.event.before }}
+          to: ${{ github.sha }}
+
+      # Use path-based detection for non-Turbo components and workflow changes
+      - name: Detect file changes (API, Migrations & Workflow)
         uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            server:
-              - 'apps/server/**'
-              - 'packages/**'
-              - 'pnpm-lock.yaml'
-              - '.github/workflows/release.yml'
             api:
               - 'apps/api/**'
-              - '.github/workflows/release.yml'
-            cli:
-              - 'apps/cli/**'
-              - 'packages/**'
               - '.github/workflows/release.yml'
             migrations:
               - 'packages/database/drizzle/**'
               - 'packages/database/src/schema-types/**'
               - 'packages/database/drizzle.config.ts'
               - '.github/workflows/release.yml'
-            trigger:
-              - 'apps/trigger/**'
-              - 'packages/**'
+            workflow:
               - '.github/workflows/release.yml'
 
       - name: Decide what to run
@@ -96,11 +121,48 @@ jobs:
 
           echo "environment=${ENV}" >> $GITHUB_OUTPUT
 
-          # Decide what should run based on changes and inputs
+          # Combine turbo-changed outputs with workflow changes
+          WORKFLOW_CHANGED="${{ steps.filter.outputs.workflow }}"
+
+          # Server: turbo-changed OR workflow changed
+          SERVER_CHANGED="false"
+          if [[ "${{ steps.server_changed.outputs.changed }}" == "true" ]] || [[ "$WORKFLOW_CHANGED" == "true" ]]; then
+            SERVER_CHANGED="true"
+          fi
+          echo "server=${SERVER_CHANGED}" >> $GITHUB_OUTPUT
+
+          # Web: turbo-changed OR workflow changed
+          WEB_CHANGED="false"
+          if [[ "${{ steps.web_changed.outputs.changed }}" == "true" ]] || [[ "$WORKFLOW_CHANGED" == "true" ]]; then
+            WEB_CHANGED="true"
+          fi
+          echo "web=${WEB_CHANGED}" >> $GITHUB_OUTPUT
+
+          # CLI: turbo-changed OR workflow changed
+          CLI_CHANGED="false"
+          if [[ "${{ steps.cli_changed.outputs.changed }}" == "true" ]] || [[ "$WORKFLOW_CHANGED" == "true" ]]; then
+            CLI_CHANGED="true"
+          fi
+          echo "cli=${CLI_CHANGED}" >> $GITHUB_OUTPUT
+
+          # Trigger: turbo-changed OR workflow changed
+          TRIGGER_CHANGED="false"
+          if [[ "${{ steps.trigger_changed.outputs.changed }}" == "true" ]] || [[ "$WORKFLOW_CHANGED" == "true" ]]; then
+            TRIGGER_CHANGED="true"
+          fi
+          echo "trigger=${TRIGGER_CHANGED}" >> $GITHUB_OUTPUT
+
+          # Decide what should run based on changes and component inputs
           if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "server" ]]; then
-            echo "should_build_server=${{ steps.filter.outputs.server }}" >> $GITHUB_OUTPUT
+            echo "should_build_server=${SERVER_CHANGED}" >> $GITHUB_OUTPUT
           else
             echo "should_build_server=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "web" ]]; then
+            echo "should_build_web=${WEB_CHANGED}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_web=false" >> $GITHUB_OUTPUT
           fi
 
           if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "api-legacy" ]]; then
@@ -111,7 +173,7 @@ jobs:
 
           # CLI only runs on main branch
           if [[ "$ENV" == "main" ]] && ([[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "cli" ]]); then
-            echo "should_build_cli=${{ steps.filter.outputs.cli }}" >> $GITHUB_OUTPUT
+            echo "should_build_cli=${CLI_CHANGED}" >> $GITHUB_OUTPUT
           else
             echo "should_build_cli=false" >> $GITHUB_OUTPUT
           fi
@@ -123,7 +185,7 @@ jobs:
           fi
 
           if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "trigger" ]]; then
-            echo "should_deploy_trigger=${{ steps.filter.outputs.trigger }}" >> $GITHUB_OUTPUT
+            echo "should_deploy_trigger=${TRIGGER_CHANGED}" >> $GITHUB_OUTPUT
           else
             echo "should_deploy_trigger=false" >> $GITHUB_OUTPUT
           fi
