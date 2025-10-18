@@ -110,6 +110,45 @@ jobs:
       - name: Build all packages
         run: pnpm turbo build --filter='!@buster-app/api-legacy'
 
+  # Build API Legacy (Rust) - runs in parallel with build job
+  build-api-legacy:
+    name: Build API Legacy
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    timeout-minutes: 15
+    environment: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Mount Cargo cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-cargo-cache-api-legacy-test
+          path: ./.cargo-cache
+
+      - name: Set up Rust cache directory
+        run: |
+          mkdir -p .cargo-cache
+          echo "CARGO_HOME=$(pwd)/.cargo-cache" >> $GITHUB_ENV
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Rust binary
+        working-directory: ./apps/api
+        run: |
+          echo "🔨 Building API Legacy Rust binary..."
+          cargo build --release
+          echo "✅ Build complete"
+          ls -lah target/release/
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-legacy-binary
+          path: apps/api/target/release/api
+          retention-days: 30
+
   # Unit test job - runs after build completes
   unit_test:
     name: Unit Test
@@ -142,7 +181,7 @@ jobs:
   # E2E test job - runs after build completes
   e2e_test:
     name: End-to-End Test
-    needs: build
+    needs: [build, build-api-legacy]
     runs-on: blacksmith-32vcpu-ubuntu-2404
     timeout-minutes: 40
     environment: testing
@@ -159,6 +198,18 @@ jobs:
         with:
           cache-key: lint-build-test
           install-supabase: 'true'
+
+      - name: Download pre-built API Legacy binary
+        uses: actions/download-artifact@v4
+        with:
+          name: api-legacy-binary
+          path: apps/api/target/release/
+
+      - name: Make binary executable
+        run: |
+          chmod +x apps/api/target/release/api
+          echo "✅ Pre-built API Legacy binary ready"
+          ls -lah apps/api/target/release/
 
       - name: Pre-pull Docker images
         run: |
