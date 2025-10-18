@@ -133,14 +133,18 @@ jobs:
   # ============================================
 
   # -------- SERVER BUILD --------
-  prepare-server-metadata:
+  build-server:
     needs: detect-changes
     if: needs.detect-changes.outputs.should_build_server == 'true'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
     outputs:
-      sha_short: ${{ steps.meta.outputs.sha_short }}
       tags: ${{ steps.meta.outputs.tags }}
-      timestamp: ${{ steps.meta.outputs.timestamp }}
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -151,41 +155,19 @@ jobs:
         id: meta
         run: |
           SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
 
           ENV="${{ needs.detect-changes.outputs.environment }}"
           if [[ "${ENV}" == "main" ]]; then
             # For main: use commit SHA and latest
-            echo "tags=${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+            TAGS="${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest"
           else
             # For staging: use staging-SHA and staging
-            echo "tags=${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
+            TAGS="${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging"
           fi
-
-          # Set build timestamp
-          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-
-  build-server:
-    needs: [detect-changes, prepare-server-metadata]
-    strategy:
-      fail-fast: true
-      matrix:
-        platform: ["amd64"]
-        include:
-          - platform: amd64
-            runner: blacksmith-8vcpu-ubuntu-2404
-            docker_platform: linux/amd64
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 25
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
@@ -197,20 +179,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare platform-specific tags
-        id: platform-tags
-        run: |
-          # Convert comma-separated tags to newline-separated with platform suffix
-          TAGS="${{ needs.prepare-server-metadata.outputs.tags }}"
-          PLATFORM_TAGS=""
-          for TAG in ${TAGS//,/ }; do
-            if [ -n "$PLATFORM_TAGS" ]; then
-              PLATFORM_TAGS="${PLATFORM_TAGS},"
-            fi
-            PLATFORM_TAGS="${PLATFORM_TAGS}${TAG}-${{ matrix.platform }}"
-          done
-          echo "tags=${PLATFORM_TAGS}" >> $GITHUB_OUTPUT
-
       - name: Build and push Docker image
         uses: useblacksmith/build-push-action@v2
         timeout-minutes: 20
@@ -218,61 +186,33 @@ jobs:
           context: .
           file: ./apps/server/Dockerfile
           push: true
-          tags: ${{ steps.platform-tags.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ needs.prepare-server-metadata.outputs.timestamp }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
             org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
           build-args: |
-            COMMIT_SHA=${{ needs.prepare-server-metadata.outputs.sha_short }}
-            BUILD_DATE=${{ needs.prepare-server-metadata.outputs.timestamp }}
+            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
+            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
           secrets: |
             turbo_token=${{ secrets.TURBO_TOKEN }}
             turbo_team=${{ vars.TURBO_TEAM }}
-          platforms: ${{ matrix.docker_platform }}
+          platforms: linux/amd64
 
-  create-server-manifest:
-    needs: [detect-changes, prepare-server-metadata, build-server]
-    runs-on: ubuntu-latest
+  # -------- API LEGACY BUILD --------
+  build-api-legacy:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_api == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and push multi-arch manifest
-        run: |
-          # Parse tags from prepare-metadata output
-          TAGS="${{ needs.prepare-server-metadata.outputs.tags }}"
-
-          for TAG in ${TAGS//,/ }; do
-            echo "Creating manifest for $TAG"
-            # AMD64 only
-            docker buildx imagetools create -t $TAG \
-              ${TAG}-amd64
-          done
-
-      - name: Output image details
-        run: |
-          echo "## ✅ Server Docker Image Built" >> $GITHUB_STEP_SUMMARY
-          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
-          echo "${{ needs.prepare-server-metadata.outputs.tags }}" | tr ',' '\n' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
-
-  # -------- API LEGACY BUILD --------
-  prepare-api-metadata:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.should_build_api == 'true'
-    runs-on: ubuntu-latest
     outputs:
-      sha_short: ${{ steps.meta.outputs.sha_short }}
       tags: ${{ steps.meta.outputs.tags }}
-      timestamp: ${{ steps.meta.outputs.timestamp }}
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -283,44 +223,22 @@ jobs:
         id: meta
         run: |
           SHA_SHORT=$(git rev-parse --short=7 HEAD)
+          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
 
           ENV="${{ needs.detect-changes.outputs.environment }}"
           if [[ "${ENV}" == "main" ]]; then
             # For main: use commit SHA and latest
-            echo "tags=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+            TAGS="${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:latest"
           else
             # For staging: use staging-SHA and staging
-            echo "tags=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging" >> $GITHUB_OUTPUT
+            TAGS="${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging"
           fi
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
-          # Set build timestamp
-          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-
-  build-api-legacy:
-    needs: [detect-changes, prepare-api-metadata]
-    strategy:
-      fail-fast: true
-      matrix:
-        platform: ["amd64"]
-        include:
-          - platform: amd64
-            runner: blacksmith-8vcpu-ubuntu-2204
-            docker_platform: linux/amd64
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -328,20 +246,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Prepare platform-specific tags
-        id: platform-tags
-        run: |
-          # Convert comma-separated tags to newline-separated with platform suffix
-          TAGS="${{ needs.prepare-api-metadata.outputs.tags }}"
-          PLATFORM_TAGS=""
-          for TAG in ${TAGS//,/ }; do
-            if [ -n "$PLATFORM_TAGS" ]; then
-              PLATFORM_TAGS="${PLATFORM_TAGS},"
-            fi
-            PLATFORM_TAGS="${PLATFORM_TAGS}${TAG}-${{ matrix.platform }}"
-          done
-          echo "tags=${PLATFORM_TAGS}" >> $GITHUB_OUTPUT
 
       - name: Build and push API legacy image
         uses: useblacksmith/build-push-action@v2
@@ -350,45 +254,13 @@ jobs:
           context: ./apps/api
           file: ./apps/api/Dockerfile
           push: true
-          platforms: ${{ matrix.docker_platform }}
-          tags: ${{ steps.platform-tags.outputs.tags }}
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ needs.prepare-api-metadata.outputs.timestamp }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
             org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
-
-  create-api-manifest:
-    needs: [detect-changes, prepare-api-metadata, build-api-legacy]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and push multi-arch manifest
-        run: |
-          # Parse tags from prepare-metadata output
-          TAGS="${{ needs.prepare-api-metadata.outputs.tags }}"
-
-          for TAG in ${TAGS//,/ }; do
-            echo "Creating manifest for $TAG"
-            # AMD64 only
-            docker buildx imagetools create -t $TAG \
-              ${TAG}-amd64
-          done
-
-      - name: Output image details
-        run: |
-          echo "## ✅ API Legacy Docker Image Built" >> $GITHUB_STEP_SUMMARY
-          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
-          echo "${{ needs.prepare-api-metadata.outputs.tags }}" | tr ',' '\n' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
 
   # -------- CLI BUILD --------
   build-cli:
@@ -520,31 +392,18 @@ jobs:
             apps/cli/dist/${{ matrix.artifact_name }}.sha256
           retention-days: 1
 
-      - name: Build summary
-        run: |
-          echo "## ✅ CLI Binary Built" >> $GITHUB_STEP_SUMMARY
-          echo "**Platform:** ${{ matrix.target }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifact:** ${{ matrix.artifact_name }}" >> $GITHUB_STEP_SUMMARY
-
   # -------- ALL BUILDS COMPLETE GATE --------
   all-builds-complete:
-    needs: [detect-changes, create-server-manifest, create-api-manifest, build-cli]
+    needs: [detect-changes, build-server, build-api-legacy, build-cli]
     if: |
       always() &&
-      (needs.create-server-manifest.result == 'success' || needs.create-server-manifest.result == 'skipped') &&
-      (needs.create-api-manifest.result == 'success' || needs.create-api-manifest.result == 'skipped') &&
+      (needs.build-server.result == 'success' || needs.build-server.result == 'skipped') &&
+      (needs.build-api-legacy.result == 'success' || needs.build-api-legacy.result == 'skipped') &&
       (needs.build-cli.result == 'success' || needs.build-cli.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Check build results
-        run: |
-          echo "## 🏗️ Build Phase Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Server Build:** ${{ needs.create-server-manifest.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "**API Legacy Build:** ${{ needs.create-api-manifest.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "**CLI Build:** ${{ needs.build-cli.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ All builds completed successfully or were skipped" >> $GITHUB_STEP_SUMMARY
+        run: echo "All builds completed successfully or were skipped"
 
   # ============================================
   # DATABASE MIGRATIONS (gate between build and deploy)
@@ -567,23 +426,16 @@ jobs:
           DATABASE_URL: ${{ secrets.DB_URL }}
           NODE_TLS_REJECT_UNAUTHORIZED: '0'
 
-      - name: Migration Summary
-        if: success()
-        run: |
-          echo "## ✅ Database Migrations Complete" >> $GITHUB_STEP_SUMMARY
-          echo "**Environment:** ${{ needs.detect-changes.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-
   # ============================================
   # DEPLOY PHASE - All deploys run in parallel with fail-fast
   # ============================================
 
   # -------- SERVER DEPLOYMENT --------
   deploy-server:
-    needs: [detect-changes, create-server-manifest, prepare-server-metadata, all-builds-complete, migrate]
+    needs: [detect-changes, build-server, all-builds-complete, migrate]
     if: |
       always() &&
-      needs.create-server-manifest.result == 'success' &&
+      needs.build-server.result == 'success' &&
       (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
@@ -640,24 +492,13 @@ jobs:
           sleep 30
           echo "✅ Deployment appears healthy"
 
-      - name: Deployment summary
-        if: success()
-        run: |
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-          SHA="${{ steps.commit.outputs.sha_short }}"
-
-          echo "## 🎉 Server Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment:** \`${ENV}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit:** \`${SHA}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-
   # -------- API LEGACY DEPLOYMENT --------
   deploy-api-legacy:
-    needs: [detect-changes, create-api-manifest, prepare-api-metadata, all-builds-complete, migrate]
+    needs: [detect-changes, build-api-legacy, all-builds-complete, migrate]
     if: |
       always() &&
       needs.detect-changes.outputs.environment == 'main' &&
-      needs.create-api-manifest.result == 'success' &&
+      needs.build-api-legacy.result == 'success' &&
       (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: main
@@ -699,12 +540,6 @@ jobs:
           PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
           PORTER_TOKEN: ${{ secrets.PORTER_APP_9309_3155 }}
 
-      - name: API Deployment Summary
-        if: success()
-        run: |
-          echo "## 🎉 API Legacy Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ steps.vars.outputs.sha_short }}" >> $GITHUB_STEP_SUMMARY
-
   # -------- TRIGGER.DEV DEPLOYMENT --------
   deploy-trigger:
     needs: [detect-changes, all-builds-complete, migrate]
@@ -734,13 +569,6 @@ jobs:
           echo "🚀 Deploying to Trigger.dev ${TRIGGER_ENV}..."
           cd apps/trigger
           pnpm dlx trigger.dev@latest deploy --env ${TRIGGER_ENV}
-
-      - name: Trigger Deployment Summary
-        if: success()
-        run: |
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-          echo "## 🎉 Trigger.dev Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
-          echo "**Environment:** ${ENV}" >> $GITHUB_STEP_SUMMARY
 
   # -------- CLI RELEASE --------
   release-cli:
@@ -849,21 +677,26 @@ jobs:
           # Build Phase
           echo "#### Build Phase" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.detect-changes.outputs.should_build_server }}" == "true" ]]; then
-            echo "- **Server:** ${{ needs.create-server-manifest.result }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Server:** ${{ needs.build-server.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Server:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Server:** ⏭️ Skipped (no server/package changes)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.detect-changes.outputs.should_build_api }}" == "true" ]]; then
-            echo "- **API Legacy:** ${{ needs.create-api-manifest.result }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **API Legacy:** ${{ needs.build-api-legacy.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **API Legacy:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+            echo "- **API Legacy:** ⏭️ Skipped (no API changes)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.detect-changes.outputs.should_build_cli }}" == "true" ]]; then
             echo "- **CLI:** ${{ needs.build-cli.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **CLI:** ⏭️ Skipped (main only or no changes)" >> $GITHUB_STEP_SUMMARY
+            ENV="${{ needs.detect-changes.outputs.environment }}"
+            if [[ "${ENV}" != "main" ]]; then
+              echo "- **CLI:** ⏭️ Skipped (only builds on main branch)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **CLI:** ⏭️ Skipped (no CLI/package changes)" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -873,7 +706,7 @@ jobs:
           if [[ "${{ needs.detect-changes.outputs.should_run_migrations }}" == "true" ]]; then
             echo "- **Migrations:** ${{ needs.migrate.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Migrations:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Migrations:** ⏭️ Skipped (no database schema changes)" >> $GITHUB_STEP_SUMMARY
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -883,19 +716,24 @@ jobs:
           if [[ "${{ needs.deploy-server.result }}" != "" ]]; then
             echo "- **Server:** ${{ needs.deploy-server.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Server:** ⏭️ Skipped (no build)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Server:** ⏭️ Skipped (server build did not run)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.deploy-api-legacy.result }}" != "" ]]; then
             echo "- **API Legacy:** ${{ needs.deploy-api-legacy.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **API Legacy:** ⏭️ Skipped (main only or no build)" >> $GITHUB_STEP_SUMMARY
+            ENV="${{ needs.detect-changes.outputs.environment }}"
+            if [[ "${ENV}" != "main" ]]; then
+              echo "- **API Legacy:** ⏭️ Skipped (only deploys on main branch)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **API Legacy:** ⏭️ Skipped (API build did not run)" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
           if [[ "${{ needs.deploy-trigger.result }}" != "" ]]; then
             echo "- **Trigger.dev:** ${{ needs.deploy-trigger.result }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Trigger.dev:** ⏭️ Skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Trigger.dev:** ⏭️ Skipped (no trigger/package changes)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [[ "${{ needs.release-cli.result }}" != "" ]]; then
@@ -904,7 +742,12 @@ jobs:
               echo "  - Version: v${{ needs.release-cli.outputs.cli_version }}" >> $GITHUB_STEP_SUMMARY
             fi
           else
-            echo "- **CLI Release:** ⏭️ Skipped (main only or no build)" >> $GITHUB_STEP_SUMMARY
+            ENV="${{ needs.detect-changes.outputs.environment }}"
+            if [[ "${ENV}" != "main" ]]; then
+              echo "- **CLI Release:** ⏭️ Skipped (only releases on main branch)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **CLI Release:** ⏭️ Skipped (CLI build did not run)" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
