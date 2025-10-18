@@ -151,23 +151,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract metadata and determine tags
+      - name: Determine Docker tags
         id: meta
-        run: |
-          SHA_SHORT=$(git rev-parse --short=7 HEAD)
-          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
-          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
-
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-          if [[ "${ENV}" == "main" ]]; then
-            # For main: use commit SHA and latest
-            TAGS="${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest"
-          else
-            # For staging: use staging-SHA and staging
-            TAGS="${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:staging"
-          fi
-          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/determine-docker-tags
+        with:
+          registry: ${{ env.REGISTRY }}
+          image_name: ${{ env.SERVER_IMAGE_NAME }}
+          environment: ${{ needs.detect-changes.outputs.environment }}
 
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
@@ -219,23 +209,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract metadata and determine tags
+      - name: Determine Docker tags
         id: meta
-        run: |
-          SHA_SHORT=$(git rev-parse --short=7 HEAD)
-          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
-          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
-
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-          if [[ "${ENV}" == "main" ]]; then
-            # For main: use commit SHA and latest
-            TAGS="${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:latest"
-          else
-            # For staging: use staging-SHA and staging
-            TAGS="${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging-${SHA_SHORT},${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:staging"
-          fi
-          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/determine-docker-tags
+        with:
+          registry: ${{ env.REGISTRY }}
+          image_name: ${{ env.API_LEGACY_IMAGE_NAME }}
+          environment: ${{ needs.detect-changes.outputs.environment }}
 
       - name: Mount Cargo cache sticky disk
         uses: useblacksmith/stickydisk@v1
@@ -454,63 +434,18 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.detect-changes.outputs.environment }}
-
-      - name: Get commit SHA
-        id: commit
-        run: |
-          echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
-          echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Cache Porter CLI
-        id: cache-porter
-        uses: actions/cache@v4
-        with:
-          path: ~/.porter
-          key: porter-cli-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Setup porter
-        if: steps.cache-porter.outputs.cache-hit != 'true'
+      - name: Setup Porter
         uses: porter-dev/setup-porter@v0.1.0
 
-      - name: Add Porter to PATH
-        if: steps.cache-porter.outputs.cache-hit == 'true'
-        run: echo "$HOME/.porter" >> $GITHUB_PATH
-
-      - name: Update Porter app with new image
-        id: deploy
-        run: |
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-          SHA="${{ steps.commit.outputs.sha_short }}"
-
-          # Determine the image tag based on environment
-          if [[ "${ENV}" == "main" ]]; then
-            TAG="${SHA}"
-          else
-            TAG="${ENV}-${SHA}"
-          fi
-
-          echo "🚀 Deploying server to ${ENV} environment..."
-          echo "📦 Using image tag: ${TAG}"
-
-          porter app update-tag ${{ vars.PORTER_SERVER_APP_NAME }} --tag "${TAG}"
-          echo "deployment_env=${ENV}" >> $GITHUB_OUTPUT
-
-          echo "✅ Server deployment initiated successfully!"
-        env:
-          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
-          PORTER_HOST: https://dashboard.porter.run
-          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
-          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
-
-      - name: Wait for deployment health check
-        run: |
-          echo "⏳ Waiting 30 seconds for deployment to stabilize..."
-          sleep 30
-          echo "✅ Deployment appears healthy"
+      - name: Deploy to Porter
+        uses: ./.github/actions/deploy-to-porter
+        with:
+          app_name: ${{ vars.PORTER_SERVER_APP_NAME }}
+          image_tag: ${{ needs.detect-changes.outputs.environment == 'main' && needs.build-server.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-server.outputs.sha_short) }}
+          porter_token: ${{ secrets.PORTER_TOKEN }}
+          porter_host: https://dashboard.porter.run
+          porter_project: ${{ vars.PORTER_PROJECT }}
+          porter_cluster: ${{ vars.PORTER_CLUSTER }}
 
   # -------- API LEGACY DEPLOYMENT --------
   deploy-api-legacy:
@@ -522,63 +457,18 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.detect-changes.outputs.environment }}
-
-      - name: Get commit SHA
-        id: commit
-        run: |
-          echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
-          echo "sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Cache Porter CLI
-        id: cache-porter
-        uses: actions/cache@v4
-        with:
-          path: ~/.porter
-          key: porter-cli-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Setup porter
-        if: steps.cache-porter.outputs.cache-hit != 'true'
+      - name: Setup Porter
         uses: porter-dev/setup-porter@v0.1.0
 
-      - name: Add Porter to PATH
-        if: steps.cache-porter.outputs.cache-hit == 'true'
-        run: echo "$HOME/.porter" >> $GITHUB_PATH
-
-      - name: Update Porter app with new image
-        id: deploy
-        run: |
-          ENV="${{ needs.detect-changes.outputs.environment }}"
-          SHA="${{ steps.commit.outputs.sha_short }}"
-
-          # Determine the image tag based on environment
-          if [[ "${ENV}" == "main" ]]; then
-            TAG="${SHA}"
-          else
-            TAG="${ENV}-${SHA}"
-          fi
-
-          echo "🚀 Deploying API legacy to ${ENV} environment..."
-          echo "📦 Using image tag: ${TAG}"
-
-          porter app update-tag ${{ vars.PORTER_API_LEGACY_APP_NAME }} --tag "${TAG}"
-          echo "deployment_env=${ENV}" >> $GITHUB_OUTPUT
-
-          echo "✅ API legacy deployment initiated successfully!"
-        env:
-          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
-          PORTER_HOST: https://dashboard.porter.run
-          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
-          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
-
-      - name: Wait for deployment health check
-        run: |
-          echo "⏳ Waiting 30 seconds for deployment to stabilize..."
-          sleep 30
-          echo "✅ Deployment appears healthy"
+      - name: Deploy to Porter
+        uses: ./.github/actions/deploy-to-porter
+        with:
+          app_name: ${{ vars.PORTER_API_LEGACY_APP_NAME }}
+          image_tag: ${{ needs.detect-changes.outputs.environment == 'main' && needs.build-api-legacy.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-api-legacy.outputs.sha_short) }}
+          porter_token: ${{ secrets.PORTER_TOKEN }}
+          porter_host: https://dashboard.porter.run
+          porter_project: ${{ vars.PORTER_PROJECT }}
+          porter_cluster: ${{ vars.PORTER_CLUSTER }}
 
   # -------- TRIGGER.DEV DEPLOYMENT --------
   deploy-trigger:
@@ -638,14 +528,9 @@ jobs:
       - name: Extract version from package.json
         id: get_version
         run: |
-          VERSION="0.3.1"
+          VERSION=$(node -p "require('./apps/cli/package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
-
-          # Also update the package.json to match
-          cd apps/cli
-          npm version $VERSION --no-git-tag-version || true
-          cd ../..
 
       - name: Create or Update Release
         id: create_the_release

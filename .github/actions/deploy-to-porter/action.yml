@@ -1,0 +1,40 @@
+name: 'Deploy to Porter'
+description: 'Deploys an application to Porter with the specified image tag'
+inputs:
+  app_name:
+    description: 'Porter application name'
+    required: true
+  image_tag:
+    description: 'Docker image tag to deploy'
+    required: true
+  porter_token:
+    description: 'Porter authentication token'
+    required: true
+  porter_host:
+    description: 'Porter host URL'
+    required: true
+    default: 'https://dashboard.porter.run'
+  porter_project:
+    description: 'Porter project ID'
+    required: true
+  porter_cluster:
+    description: 'Porter cluster ID'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Update Porter app with new image
+      shell: bash
+      run: |
+        echo "🚀 Deploying ${{ inputs.app_name }}..."
+        echo "📦 Using image tag: ${{ inputs.image_tag }}"
+
+        porter app update-tag ${{ inputs.app_name }} --tag "${{ inputs.image_tag }}"
+
+        echo "✅ Deployment initiated successfully!"
+      env:
+        PORTER_TOKEN: ${{ inputs.porter_token }}
+        PORTER_HOST: ${{ inputs.porter_host }}
+        PORTER_PROJECT: ${{ inputs.porter_project }}
+        PORTER_CLUSTER: ${{ inputs.porter_cluster }}
