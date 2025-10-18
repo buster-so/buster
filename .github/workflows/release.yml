@@ -434,8 +434,19 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
+      - name: Cache Porter CLI
+        id: cache-porter
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/porter
+          key: porter-cli-${{ runner.os }}-v1
+
       - name: Setup Porter
+        if: steps.cache-porter.outputs.cache-hit != 'true'
         uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Verify Porter installation
+        run: porter version
 
       - name: Deploy to Porter
         run: |
@@ -460,8 +471,19 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     environment: ${{ needs.detect-changes.outputs.environment }}
     steps:
+      - name: Cache Porter CLI
+        id: cache-porter
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/porter
+          key: porter-cli-${{ runner.os }}-v1
+
       - name: Setup Porter
+        if: steps.cache-porter.outputs.cache-hit != 'true'
         uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Verify Porter installation
+        run: porter version
 
       - name: Deploy to Porter
         run: |
