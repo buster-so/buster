@@ -130,6 +130,12 @@ jobs:
           shared-key: api-legacy-test
           cache-on-failure: true
 
+      - name: Mount binary cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-api-legacy-binary
+          path: ./binary-cache
+
       - name: Build Rust binary
         working-directory: ./apps/api
         run: |
@@ -138,12 +144,13 @@ jobs:
           echo "✅ Build complete"
           ls -lah target/release/
 
-      - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-legacy-binary
-          path: apps/api/target/release/api
-          retention-days: 30
+      - name: Store binary in sticky disk
+        run: |
+          mkdir -p ./binary-cache
+          cp apps/api/target/release/api ./binary-cache/api
+          chmod +x ./binary-cache/api
+          echo "✅ Binary stored in sticky disk"
+          ls -lah ./binary-cache/
 
   # Unit test job - runs after build completes
   unit_test:
@@ -185,14 +192,16 @@ jobs:
           cache-key: lint-build-test
           install-supabase: 'true'
 
-      - name: Download pre-built API Legacy binary
-        uses: actions/download-artifact@v4
+      - name: Mount binary cache sticky disk
+        uses: useblacksmith/stickydisk@v1
         with:
-          name: api-legacy-binary
-          path: apps/api/target/release/
+          key: ${{ github.repository }}-api-legacy-binary
+          path: ./binary-cache
 
-      - name: Make binary executable
+      - name: Restore pre-built API Legacy binary
         run: |
+          mkdir -p apps/api/target/release
+          cp ./binary-cache/api apps/api/target/release/api
           chmod +x apps/api/target/release/api
           echo "✅ Pre-built API Legacy binary ready"
           ls -lah apps/api/target/release/
