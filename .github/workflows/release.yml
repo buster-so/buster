@@ -325,8 +325,8 @@ jobs:
         working-directory: ./apps/cli
         run: |
           echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
-          # Use the standalone build script (creates standalone binary with DuckDB external config)
-          bun run build:standalone
+          # Use the release build script with target specification
+          bun run build:release
 
           # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
           mv dist/buster dist/buster-cli
@@ -342,6 +342,7 @@ jobs:
         env:
           NODE_ENV: production
           SKIP_ENV_CHECK: true
+          BUN_TARGET: ${{ matrix.bun_target }}
 
       - name: Test binary (Non-Windows)
         if: matrix.is_windows == false
