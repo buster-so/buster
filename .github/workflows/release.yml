@@ -610,7 +610,6 @@ jobs:
             **/buster-cli-windows-x86_64.zip
             **/buster-cli-windows-x86_64.zip.sha256
           draft: false
-          prerelease: false
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
