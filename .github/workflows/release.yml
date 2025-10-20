@@ -325,11 +325,16 @@ jobs:
         working-directory: ./apps/cli
         run: |
           echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
-          # Use the standalone build script with Bun cross-compilation target
-          bun build --compile --target=${{ matrix.bun_target }} ./src/index.ts --outfile dist/buster-cli
+          # Use the standalone build script (creates standalone binary with DuckDB external config)
+          bun run build:standalone
 
-          # Make binary executable
-          chmod +x dist/buster-cli
+          # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
+          mv dist/buster dist/buster-cli
+
+          # Make binary executable on Unix systems
+          if [[ "${{ runner.os }}" != "Windows" ]]; then
+            chmod +x dist/buster-cli
+          fi
 
           # Display binary info
           ls -lah dist/
