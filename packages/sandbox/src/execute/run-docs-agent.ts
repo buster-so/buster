@@ -1,6 +1,9 @@
+import { getDataSourceCredentials, getOrganizationDataSource } from '@buster/database/queries';
 import { z } from 'zod';
 import { createSandboxFromSnapshot } from '../management/create-sandbox';
 import documentationAgentPrompt from './documentation-agent-prompt.txt';
+import type { Sandbox } from '@daytonaio/sdk';
+import { buildProfilesYaml, type Creds } from '../helpers/build-dbt-profiles-yaml';
 
 // Define schema for environment validation
 const envSchema = z.object({
@@ -33,6 +36,7 @@ const runDocsAgentParamsSchema = z.object({
   chatId: z.string().optional().describe('Chat ID for the buster CLI'),
   messageId: z.string().optional().describe('Message ID for the buster CLI'),
   context: githubContextSchema.optional().describe('GitHub context with optional properties'),
+  organizationId: z.string().uuid().describe('Organization ID for the data source'),
 });
 
 export type RunDocsAgentParams = z.infer<typeof runDocsAgentParamsSchema>;
@@ -40,14 +44,33 @@ export type githubContext = z.infer<typeof githubContextSchema>;
 
 export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   // Validate input parameters
-  const { installationToken, repoUrl, branch, prompt, apiKey, chatId, messageId, context } =
-    runDocsAgentParamsSchema.parse(params);
+  const {
+    installationToken,
+    repoUrl,
+    branch,
+    prompt,
+    apiKey,
+    chatId,
+    messageId,
+    context,
+    organizationId,
+  } = runDocsAgentParamsSchema.parse(params);
 
-  // Eventually we will need to find the organization's correct integration and call that snapshot
-  const sandbox = await createSandboxFromSnapshot('buster-data-engineer-postgres');
+  const sandboxSnapshotBaseName = 'buster-data-engineer';
+
+  const dataSourceResult = await getOrganizationDataSource({ organizationId: organizationId });
+  const dataSourceCreds = await getDataSourceCredentials({
+    dataSourceId: dataSourceResult.dataSourceId,
+  }) as Creds;
+
+  const sandboxSnapshotFullName = `${sandboxSnapshotBaseName}-${dataSourceResult.dataSourceSyntax}`;
+  const sandbox = await createSandboxFromSnapshot(sandboxSnapshotFullName);
+
   const workspacePath = `/workspace`;
   const repositoryPath = `${workspacePath}/repository`;
   const contextPath = `${workspacePath}/context`;
+  const profilesPath = `${workspacePath}/profiles`;
+  const profilesFileName = 'profiles.yml';
   const contextFileName = 'context.json';
   const busterAppGitUsername = 'buster-app';
   const busterAppGitEmail = 'buster-app@buster.so';
@@ -72,7 +95,25 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
     installationToken // password
   );
 
+  const profileName = await getProfileName(sandbox, repositoryPath);
+
+  const profileYaml = buildProfilesYaml({
+    profileName,
+    target: 'buster',
+    creds: dataSourceCreds,
+  });
+
+  console.info('[Profile YAML]:', profileYaml);
+  
+  // Create profiles directory and file
+  await sandbox.fs.createFolder(profilesPath, '755');
+  await sandbox.fs.uploadFile(
+    Buffer.from(profileYaml),
+    `${profilesPath}/${profilesFileName}`
+  );
+
   const envExportCommands = [
+    `export DBT_PROFILES_DIR=${profilesPath}`,
     `export GITHUB_TOKEN=${installationToken}`,
     `export BUSTER_API_KEY=${apiKey}`,
     `export BUSTER_HOST=${env.BUSTER_HOST}`,
@@ -85,13 +126,13 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
     command: `${envExportCommands.join(' && ')}`,
   });
 
-  // Install Buster CLI
-  await sandbox.process.executeSessionCommand(sessionName, {
-    command: `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`,
-  });
-  await sandbox.process.executeSessionCommand(sessionName, {
-    command: `buster --version`,
-  });
+  // // Install Buster CLI
+  // await sandbox.process.executeSessionCommand(sessionName, {
+  //   command: `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`,
+  // });
+  // await sandbox.process.executeSessionCommand(sessionName, {
+  //   command: `buster --version`,
+  // });
 
   // Setup Git
   await sandbox.process.executeSessionCommand(sessionName, {
@@ -115,11 +156,11 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
     cliArgs.push(`--contextFilePath "${contextPath}/${contextFileName}"`);
   }
 
-  // Execute Buster CLI command in async mode
-  await sandbox.process.executeSessionCommand(sessionName, {
-    command: `cd ${repositoryPath} && buster ${cliArgs.join(' ')}`,
-    runAsync: true,
-  });
+  // // Execute Buster CLI command in async mode
+  // await sandbox.process.executeSessionCommand(sessionName, {
+  //   command: `cd ${repositoryPath} && buster ${cliArgs.join(' ')}`,
+  //   runAsync: true,
+  // });
 
   // // Use for debugging logs if needed
   // const logs = await sandbox.process.getSessionCommandLogs(
@@ -207,4 +248,23 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   console.info(command);
 
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
+}
+
+async function getProfileName(sandbox: Sandbox, filePath: string): Promise<string> {
+  const profilesFileName = 'dbt_project.yml';
+  let profileName = 'default';
+
+  const matches = await sandbox.fs.findFiles(filePath, 'profile:');
+  for (const match of matches) {
+    if (match.file.includes(profilesFileName)) {
+      const name = match.content.replace('profile:', '').trim();
+      console.info('[Profile Name]:', name);
+      if (name) {
+        profileName = name;
+        break;
+      }
+    }
+  }
+
+  return profileName;
 }

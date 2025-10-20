@@ -29,11 +29,15 @@
     "test:integration": "dotenv -e .env -- vitest run src/**/*.int.test.ts"
   },
   "dependencies": {
+    "@buster/database": "workspace:*",
     "@buster/env-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@daytonaio/sdk": "^0.110.2",
-
+    "js-yaml": "catalog:",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "catalog:"
   }
 }

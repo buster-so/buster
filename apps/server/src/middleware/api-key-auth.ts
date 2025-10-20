@@ -68,9 +68,12 @@ export async function validateApiKeyToken(token: string): Promise<ApiKeyContext>
  */
 export function createApiKeyAuthMiddleware() {
   return async (c: Context, next: Next) => {
+    console.info('here');
     try {
       // Extract Bearer token from Authorization header
+      console.info(c.req.raw.headers, 'headers');
       const token = extractBearerToken(c.req.raw.headers);
+      console.info(token, 'token');
 
       if (!token) {
         return c.json(

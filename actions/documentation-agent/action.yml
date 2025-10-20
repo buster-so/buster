@@ -29,6 +29,19 @@ outputs:
 runs:
   using: 'composite'
   steps:
+      - name: Verify inputs
+        shell: bash
+        run: |
+          echo "::notice::Verifying action inputs..."
+          echo "::debug::API URL input: ${{ inputs.api-url }}"
+          echo "::debug::Timeout input: ${{ inputs.timeout-minutes }}"
+          if [ -z "${{ inputs.api-key }}" ]; then
+            echo "::error::api-key input is empty"
+            exit 1
+          else
+            echo "::notice::api-key input is provided (length: ${#{{ inputs.api-key }}})"
+          fi
+          
       - name: Kick off Buster documentation task
         id: kickoff
         shell: bash
@@ -38,29 +51,48 @@ runs:
         run: |
           set -euo pipefail
 
-          echo "Starting Buster documentation job"
+          echo "::notice::Starting Buster documentation job"
+          echo "::debug::API URL: ${API_URL}"
+          
+          # Check if API key is set (without revealing it)
+          if [ -z "${BUSTER_API_KEY}" ]; then
+            echo "::error::BUSTER_API_KEY is empty or not set"
+            exit 1
+          else
+            echo "::notice::API key is set (length: ${#BUSTER_API_KEY})"
+          fi
 
           # Read the entire GitHub event payload
           EVENT_CONTEXT=$(cat "$GITHUB_EVENT_PATH")
 
           # Make the POST request (-f makes curl exit with error on HTTP errors)
-          RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/github/app/actions/documentation" \
+          echo "::notice::Making request to ${API_URL}/api/v2/github/app/actions/documentation"
+          
+          if ! RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/github/app/actions/documentation" \
             -H "Authorization: Bearer ${BUSTER_API_KEY}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n --argjson eventContext "$EVENT_CONTEXT" '{eventContext: $eventContext}')"
-          )
+          ); then
+            echo "::error::Failed to make POST request to Buster API"
+            echo "::error::This could be due to:"
+            echo "::error::1. Invalid API key"
+            echo "::error::2. Network connectivity issues"
+            echo "::error::3. API endpoint not available"
+            exit 1
+          fi
 
           echo "Response:"
           echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
-          echo "Started Buster documentation job"
+          echo "::notice::Started Buster documentation job"
 
           messageId=$(echo "$RESPONSE" | jq -r '.messageId')
           if [ "$messageId" = "null" ] || [ -z "$messageId" ]; then
-            echo "Error: Failed to extract messageId from response"
+            echo "::error::Failed to extract messageId from response"
             exit 1
           fi
           
+          echo "::notice::Job ID: ${messageId}"
           echo "messageId=$messageId" >> "$GITHUB_OUTPUT"
           echo "status_url=${API_URL}/api/v2/github/app/actions/documentation/${messageId}" >> "$GITHUB_OUTPUT"
 
@@ -82,11 +114,11 @@ runs:
               -H "Authorization: Bearer ${BUSTER_API_KEY}" \
               -H "Accept: application/json")
 
-            echo "Attempt $i - Response:"
+            echo "::debug::Attempt $i - Response:"
             echo "$STATUS_JSON" | jq '.' || echo "$STATUS_JSON"
 
             STATUS=$(echo "$STATUS_JSON" | jq -r '.status')
-            echo "Attempt $i: status=$STATUS" 1>&2
+            echo "::notice::Attempt $i: status=$STATUS"
 
             if [ "$STATUS" = "Complete" ]; then
               echo "result=$(echo "$STATUS_JSON" | jq -c '.')" >> "$GITHUB_OUTPUT"

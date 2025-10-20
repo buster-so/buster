@@ -12,12 +12,12 @@ const envSchema = z.object({
 // Define the dbt adapters we want to build snapshots for
 const dbtAdapters = [
   'postgres',
-  // 'snowflake',
-  // 'bigquery',
-  // 'redshift',
-  // 'databricks',
-  // 'sqlserver',
-  // 'mysql'
+  'snowflake',
+  'bigquery',
+  'redshift',
+  'databricks',
+  'sqlserver',
+  'mysql',
 ];
 
 async function buildSnapshots() {

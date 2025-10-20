@@ -59,6 +59,8 @@ const app = new Hono().post(
       );
     }
 
+    console.info('[Context]:', context);
+
     const repositoryUrl = context.repo_url;
     const branchName = context.head_branch;
 
@@ -100,6 +102,7 @@ const app = new Hono().post(
       chatId: newChat.id,
       messageId: newMessage.id,
       context: context,
+      organizationId: apiKey.organizationId,
     });
 
     return c.json(
