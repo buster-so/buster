@@ -2,6 +2,12 @@ import { readFile } from 'node:fs/promises';
 import yaml from 'js-yaml';
 import type { ZodError, ZodIssue } from 'zod';
 import { type Model, ModelSchema } from '../schemas';
+import { DbtFileSchema } from './dbt-schemas';
+import {
+  transformDbtFileToBusterModels,
+  validateDbtFileForTransformation,
+} from './dbt-to-buster-transformer';
+import { detectFileType } from './file-type-detection';
 
 /**
  * Result of parsing a model file - can contain both successful models and errors
@@ -29,7 +35,7 @@ export async function fileContainsTodo(filePath: string): Promise<boolean> {
 
 /**
  * Parse a YAML model file and return both successful models and validation errors
- * Each file contains exactly one model definition
+ * Supports both Buster format and dbt format files
  * Now collects ALL validation errors instead of failing on first error
  */
 export async function parseModelFile(filePath: string): Promise<ParseModelResult> {
@@ -61,29 +67,133 @@ export async function parseModelFile(filePath: string): Promise<ParseModelResult
       throw new Error(`Invalid YAML structure in ${filePath}`);
     }
 
-    // Parse as single model file (flat structure, no 'models' key)
-    const parseResult = ModelSchema.safeParse(rawData);
-    if (parseResult.success) {
+    // Detect file type (Buster vs dbt)
+    const fileType = detectFileType(rawData);
+
+    if (fileType === 'buster') {
+      // Parse as Buster model file (existing logic)
+      return parseBusterModel(rawData);
+    } else if (fileType === 'dbt') {
+      // Parse as dbt file (new logic)
+      return parseDbtFile(rawData, filePath);
+    } else {
+      // Unknown format
       return {
-        models: [parseResult.data],
-        errors: [],
+        models: [],
+        errors: [
+          {
+            issues: [
+              {
+                code: 'custom',
+                path: [],
+                message:
+                  'Unknown file format. Expected Buster YAML (single model with dimensions/measures) or dbt YAML (with models/semantic_models arrays).',
+              } as ZodIssue,
+            ],
+          },
+        ],
       };
     }
-
-    // Extract and return detailed validation errors with raw data
-    const errors = extractModelValidationErrors(rawData, parseResult.error);
-    // Add raw data to errors for better formatting
-    const errorsWithData = errors.map((e) => ({ ...e, rawData }));
-
-    return {
-      models: [],
-      errors: errorsWithData,
-    };
   } catch (error) {
     if (error instanceof Error) {
       throw new ModelParsingError(`Error reading model file: ${error.message}`, filePath);
     }
     throw new ModelParsingError('Unknown error parsing model file', filePath);
+  }
+}
+
+/**
+ * Parse a Buster format model
+ * Extracted from original parseModelFile logic for clarity
+ */
+function parseBusterModel(rawData: unknown): ParseModelResult {
+  // Parse as single model file (flat structure, no 'models' key)
+  const parseResult = ModelSchema.safeParse(rawData);
+  if (parseResult.success) {
+    return {
+      models: [parseResult.data],
+      errors: [],
+    };
+  }
+
+  // Extract and return detailed validation errors with raw data
+  const errors = extractModelValidationErrors(rawData, parseResult.error);
+  // Add raw data to errors for better formatting
+  const errorsWithData = errors.map((e) => ({ ...e, rawData }));
+
+  return {
+    models: [],
+    errors: errorsWithData,
+  };
+}
+
+/**
+ * Parse a dbt format file
+ * Validates and transforms dbt YAML to Buster models
+ */
+function parseDbtFile(rawData: unknown, filePath: string): ParseModelResult {
+  // Validate against dbt schema
+  const parseResult = DbtFileSchema.safeParse(rawData);
+
+  if (!parseResult.success) {
+    return {
+      models: [],
+      errors: [
+        {
+          issues: parseResult.error.issues,
+          rawData,
+        },
+      ],
+    };
+  }
+
+  // Validate dbt file structure
+  const validation = validateDbtFileForTransformation(parseResult.data);
+  if (!validation.valid) {
+    return {
+      models: [],
+      errors: validation.errors.map((error) => ({
+        issues: [
+          {
+            code: 'custom',
+            path: [],
+            message: error,
+          } as ZodIssue,
+        ],
+      })),
+    };
+  }
+
+  // Log warnings if any
+  if (validation.warnings.length > 0) {
+    console.warn(`Warnings while parsing ${filePath}:`);
+    for (const warning of validation.warnings) {
+      console.warn(`  - ${warning}`);
+    }
+  }
+
+  // Transform dbt to Buster models
+  try {
+    const busterModels = transformDbtFileToBusterModels(parseResult.data);
+    return {
+      models: busterModels,
+      errors: [],
+    };
+  } catch (error) {
+    return {
+      models: [],
+      errors: [
+        {
+          issues: [
+            {
+              code: 'custom',
+              path: [],
+              message: `Failed to transform dbt file to Buster format: ${error instanceof Error ? error.message : String(error)}`,
+            } as ZodIssue,
+          ],
+        },
+      ],
+    };
   }
 }
 
