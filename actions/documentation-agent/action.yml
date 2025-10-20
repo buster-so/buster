@@ -38,8 +38,6 @@ runs:
           if [ -z "${{ inputs.api-key }}" ]; then
             echo "::error::api-key input is empty"
             exit 1
-          else
-            echo "::notice::api-key input is provided (length: ${#{{ inputs.api-key }}})"
           fi
           
       - name: Kick off Buster documentation task
