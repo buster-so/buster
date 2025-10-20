@@ -1,316 +1,174 @@
+import type { Credentials } from '@buster/data-source';
+import { DataSourceType } from '@buster/data-source';
 import { dump as yamlDump } from 'js-yaml';
-import { z } from 'zod';
 
 // Outputs (exact dbt "outputs" object per adapter)
-const PostgresOutputSchema = z.object({
-  type: z.literal('postgres'),
-  host: z.string(),
-  user: z.string(),
-  password: z.string(),
-  port: z.number(),
-  dbname: z.string(),
-  schema: z.string(),
-  threads: z.number(),
-});
-type PostgresOutput = z.infer<typeof PostgresOutputSchema>;
+interface PostgresOutput {
+  type: 'postgres';
+  host: string;
+  user: string;
+  password: string;
+  port: number;
+  dbname: string;
+  schema: string;
+  threads: number;
+}
 
-const SnowflakeOutputSchema = z.object({
-  type: z.literal('snowflake'),
-  account: z.string(),
-  user: z.string(),
+interface SnowflakeOutput {
+  type: 'snowflake';
+  account: string;
+  user: string;
   // one of password or private_key_path will be present
-  password: z.string().optional(),
-  private_key_path: z.string().optional(),
-  role: z.string(),
-  database: z.string(),
-  warehouse: z.string(),
-  schema: z.string(),
-  threads: z.number(),
-  client_session_keep_alive: z.boolean(),
-});
-type SnowflakeOutput = z.infer<typeof SnowflakeOutputSchema>;
+  password?: string;
+  private_key_path?: string;
+  role: string;
+  database: string;
+  warehouse: string;
+  schema: string;
+  threads: number;
+  client_session_keep_alive: boolean;
+}
 
-const BigQueryOutputSchema = z.object({
-  type: z.literal('bigquery'),
-  method: z.union([z.literal('service-account'), z.literal('oauth')]),
-  project: z.string(),
-  dataset: z.string(),
-  keyfile: z.string(),
-  threads: z.number(),
-});
-type BigQueryOutput = z.infer<typeof BigQueryOutputSchema>;
+interface BigQueryOutput {
+  type: 'bigquery';
+  method: 'service-account' | 'oauth';
+  project: string;
+  dataset: string;
+  keyfile: string;
+  threads: number;
+}
 
-const RedshiftOutputSchema = z.object({
-  type: z.literal('redshift'),
-  host: z.string(),
-  user: z.string(),
-  password: z.string(),
-  port: z.number(),
-  dbname: z.string(),
-  schema: z.string(),
-  sslmode: z.string().default('require'),
-  threads: z.number(),
-});
-type RedshiftOutput = z.infer<typeof RedshiftOutputSchema>;
+interface RedshiftOutput {
+  type: 'redshift';
+  host: string;
+  user: string;
+  password: string;
+  port: number;
+  dbname: string;
+  schema: string;
+  sslmode: string;
+  threads: number;
+}
 
-const DatabricksOutputSchema = z.object({
-  type: z.literal('databricks'),
-  host: z.string(),
-  http_path: z.string(),
-  token: z.string(),
-  schema: z.string(),
-  catalog: z.string(),
-  threads: z.number(),
-});
-type DatabricksOutput = z.infer<typeof DatabricksOutputSchema>;
+interface SqlServerOutput {
+  type: 'sqlserver';
+  driver?: string;
+  server: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+  schema?: string;
+  encrypt: boolean;
+  trust_cert: boolean;
+  threads: number;
+}
 
-const SqlServerOutputSchema = z.object({
-  type: z.literal('sqlserver'),
-  driver: z.string(),
-  server: z.string(),
-  port: z.number(),
-  user: z.string(),
-  password: z.string(),
-  database: z.string(),
-  schema: z.string(),
-  encrypt: z.boolean(),
-  trust_cert: z.boolean(),
-  threads: z.number(),
-});
-type SqlServerOutput = z.infer<typeof SqlServerOutputSchema>;
+interface MySqlOutput {
+  type: 'mysql';
+  server: string;
+  user: string;
+  password: string;
+  port: number;
+  database: string;
+  schema: string; // ignored by some adapters but safe
+  threads: number;
+}
 
-const MySqlOutputSchema = z.object({
-  type: z.literal('mysql'),
-  server: z.string(),
-  user: z.string(),
-  password: z.string(),
-  port: z.number(),
-  database: z.string(),
-  schema: z.string(), // ignored by some adapters but safe
-  threads: z.number(),
-});
-type MySqlOutput = z.infer<typeof MySqlOutputSchema>;
-
-/* Map adapter → output type (compile-time) */
-// type Adapter =
-//   | 'postgres'
-//   | 'snowflake'
-//   | 'bigquery'
-//   | 'redshift'
-//   | 'databricks'
-//   | 'sqlserver'
-//   | 'mysql';
-
-
-/* Credentials schemas (runtime validation) */
-const PostgresCredsSchema = z.object({
-  adapter: z.literal('postgres'),
-  host: z.string(),
-  user: z.string(),
-  password: z.string(),
-  dbname: z.string(),
-  port: z.number().optional(),
-  schema: z.string().optional(),
-  threads: z.number().optional(),
-});
-
-const SnowflakeCredsSchemaBase = z.object({
-  adapter: z.literal('snowflake'),
-  account: z.string(),
-  user: z.string(),
-  password: z.string().optional(),
-  private_key_path: z.string().optional(),
-  role: z.string(),
-  database: z.string(),
-  warehouse: z.string(),
-  schema: z.string(),
-  threads: z.number().optional(),
-});
-
-const SnowflakeCredsSchema = SnowflakeCredsSchemaBase.refine(
-  (c) => !!(c.password || c.private_key_path),
-  {
-    message: 'Provide either password or private_key_path for Snowflake',
-  }
-);
-
-const BigQueryCredsSchema = z.object({
-  adapter: z.literal('bigquery'),
-  project: z.string(),
-  dataset: z.string(),
-  keyfile: z.string(),
-  method: z.union([z.literal('service-account'), z.literal('oauth')]).optional(),
-  threads: z.number().optional(),
-});
-
-const RedshiftCredsSchema = z.object({
-  adapter: z.literal('redshift'),
-  host: z.string(),
-  user: z.string(),
-  password: z.string(),
-  dbname: z.string(),
-  port: z.number().optional(),
-  schema: z.string().optional(),
-  sslmode: z.string().optional(),
-  threads: z.number().optional(),
-});
-
-const DatabricksCredsSchema = z.object({
-  adapter: z.literal('databricks'),
-  host: z.string(),
-  http_path: z.string(),
-  token: z.string(),
-  schema: z.string(),
-  catalog: z.string().optional(),
-  threads: z.number().optional(),
-});
-
-const SqlServerCredsSchema = z.object({
-  adapter: z.literal('sqlserver'),
-  server: z.string(),
-  user: z.string(),
-  password: z.string(),
-  database: z.string(),
-  port: z.number().optional(),
-  schema: z.string().optional(),
-  driver: z.string().optional(),
-  encrypt: z.boolean().optional(),
-  trust_cert: z.boolean().optional(),
-  threads: z.number().optional(),
-});
-
-const MySqlCredsSchema = z.object({
-  adapter: z.literal('mysql'),
-  server: z.string(),
-  user: z.string(),
-  password: z.string(),
-  database: z.string(),
-  port: z.number().optional(),
-  schema: z.string().optional(),
-  threads: z.number().optional(),
-});
-
-/* Union schema - using z.union since we have a refined schema */
-const CredsSchema = z.union([
-  PostgresCredsSchema,
-  SnowflakeCredsSchema,
-  BigQueryCredsSchema,
-  RedshiftCredsSchema,
-  DatabricksCredsSchema,
-  SqlServerCredsSchema,
-  MySqlCredsSchema,
-]);
-
-export type Creds = z.infer<typeof CredsSchema>;
-
-/** buildOutput: runtime validation per adapter, typed return per adapter */
+/** buildOutput: type-safe conversion from credentials to dbt output format */
 export function buildOutput(
-  creds: Creds
+  creds: Credentials
 ):
   | PostgresOutput
   | SnowflakeOutput
   | BigQueryOutput
   | RedshiftOutput
-  | DatabricksOutput
   | SqlServerOutput
   | MySqlOutput {
-  // Full union validation once (also narrows for the switch)
-  const parsed = CredsSchema.parse(creds);
-
-  switch (parsed.adapter) {
-    case 'postgres':
+  switch (creds.type) {
+    case DataSourceType.PostgreSQL:
       return {
         type: 'postgres',
-        host: parsed.host,
-        user: parsed.user,
-        password: parsed.password,
-        port: parsed.port ?? 5432,
-        dbname: parsed.dbname,
-        schema: parsed.schema ?? 'public',
-        threads: parsed.threads ?? 4,
+        host: creds.host,
+        user: creds.username,
+        password: creds.password,
+        port: creds.port ?? 5432,
+        dbname: creds.default_database,
+        schema: creds.schema ?? 'public',
+        threads: 4,
       };
 
-    case 'snowflake':
+    case DataSourceType.Snowflake:
       return {
         type: 'snowflake',
-        account: parsed.account,
-        user: parsed.user,
-        ...(parsed.password
-          ? { password: parsed.password }
-          : { private_key_path: parsed.private_key_path }),
-        role: parsed.role,
-        database: parsed.database,
-        warehouse: parsed.warehouse,
-        schema: parsed.schema,
-        threads: parsed.threads ?? 4,
+        account: creds.account_id,
+        user: creds.username,
+        ...(creds.password ? { password: creds.password } : {}),
+        role: creds.role ?? 'PUBLIC',
+        database: creds.default_database,
+        warehouse: creds.warehouse_id,
+        schema: creds.default_schema ?? 'PUBLIC',
+        threads: 4,
         client_session_keep_alive: false,
       };
 
-    case 'bigquery':
+    case DataSourceType.BigQuery:
       return {
         type: 'bigquery',
-        method: parsed.method ?? 'service-account',
-        project: parsed.project,
-        dataset: parsed.dataset,
-        keyfile: parsed.keyfile,
-        threads: parsed.threads ?? 4,
+        method: 'service-account',
+        project: creds.project_id,
+        dataset: creds.default_dataset ?? 'default',
+        // TODO: Actually create a file with required keyfile
+        keyfile:
+          creds.key_file_path ??
+          (typeof creds.service_account_key === 'string'
+            ? creds.service_account_key
+            : JSON.stringify(creds.service_account_key)),
+        threads: 4,
       };
 
-    case 'redshift':
+    case DataSourceType.Redshift:
       return {
         type: 'redshift',
-        host: parsed.host,
-        user: parsed.user,
-        password: parsed.password,
-        port: parsed.port ?? 5439,
-        dbname: parsed.dbname,
-        schema: parsed.schema ?? 'public',
-        sslmode: parsed.sslmode ?? 'prefer',
-        threads: parsed.threads ?? 4,
+        host: creds.host,
+        user: creds.username,
+        password: creds.password,
+        port: creds.port ?? 5439,
+        dbname: creds.default_database,
+        schema: creds.default_schema ?? 'public',
+        sslmode: 'require',
+        threads: 4,
       };
 
-    case 'databricks':
-      return {
-        type: 'databricks',
-        host: parsed.host,
-        http_path: parsed.http_path,
-        token: parsed.token,
-        schema: parsed.schema,
-        catalog: parsed.catalog ?? 'hive_metastore',
-        threads: parsed.threads ?? 4,
-      };
-
-    case 'sqlserver':
+    case DataSourceType.SQLServer:
       return {
         type: 'sqlserver',
-        driver: parsed.driver ?? 'ODBC Driver 18 for SQL Server',
-        server: parsed.server,
-        port: parsed.port ?? 1433,
-        user: parsed.user,
-        password: parsed.password,
-        database: parsed.database,
-        schema: parsed.schema ?? 'dbo',
-        encrypt: parsed.encrypt ?? true,
-        trust_cert: parsed.trust_cert ?? true,
-        threads: parsed.threads ?? 4,
+        server: creds.server,
+        port: creds.port ?? 1433,
+        user: creds.username,
+        password: creds.password,
+        database: creds.default_database,
+        encrypt: creds.encrypt ?? true,
+        trust_cert: creds.trust_server_certificate ?? true,
+        threads: 4,
       };
 
-    case 'mysql':
+    case DataSourceType.MySQL:
       return {
         type: 'mysql',
-        server: parsed.server,
-        user: parsed.user,
-        password: parsed.password,
-        port: parsed.port ?? 3306,
-        database: parsed.database,
-        schema: parsed.schema ?? 'public',
-        threads: parsed.threads ?? 4,
+        server: creds.host,
+        user: creds.username,
+        password: creds.password,
+        port: creds.port ?? 3306,
+        database: creds.default_database,
+        schema: 'public',
+        threads: 4,
       };
 
     default: {
       // Exhaustive check - this should never be reached
-      const _exhaustiveCheck: never = parsed;
-      throw new Error(`Unsupported adapter: ${JSON.stringify(_exhaustiveCheck)}`);
+      const _exhaustiveCheck: never = creds;
+      throw new Error(`Unsupported data source type: ${JSON.stringify(_exhaustiveCheck)}`);
     }
   }
 }
@@ -319,7 +177,7 @@ export function buildOutput(
 export function buildProfilesYaml(args: {
   profileName: string; // must match dbt_project.yml 'profile'
   target: string;
-  creds: Creds;
+  creds: Credentials;
 }): string {
   const { profileName, target, creds } = args;
 
@@ -333,5 +191,5 @@ export function buildProfilesYaml(args: {
     },
   };
 
-  return yamlDump(root, { noRefs: true, sortKeys: true, lineWidth: 120 });
+  return yamlDump(root, { noRefs: true, lineWidth: 120 });
 }

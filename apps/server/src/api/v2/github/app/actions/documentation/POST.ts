@@ -20,10 +20,6 @@ const app = new Hono().post(
     // github context to pass to the agent
     const context: githubContext = {};
 
-    // console.info('Documentation request received:', {
-    //   eventContext,
-    // });
-
     // Needs to be either a pull_request event or a push event.
     if (!eventContext || !(eventContext.pull_request || eventContext.commits)) {
       return c.json({ error: 'Invalid event. Must be a pull_request or push event.' }, 400);
@@ -59,7 +55,7 @@ const app = new Hono().post(
       );
     }
 
-    console.info('[Context]:', context);
+    console.info('Documentation Agent Kicking off with context:', context);
 
     const repositoryUrl = context.repo_url;
     const branchName = context.head_branch;

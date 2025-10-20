@@ -1,9 +1,10 @@
+import type { Credentials } from '@buster/data-source';
 import { getDataSourceCredentials, getOrganizationDataSource } from '@buster/database/queries';
+import type { Sandbox } from '@daytonaio/sdk';
 import { z } from 'zod';
+import { buildProfilesYaml } from '../helpers/build-dbt-profiles-yaml';
 import { createSandboxFromSnapshot } from '../management/create-sandbox';
 import documentationAgentPrompt from './documentation-agent-prompt.txt';
-import type { Sandbox } from '@daytonaio/sdk';
-import { buildProfilesYaml, type Creds } from '../helpers/build-dbt-profiles-yaml';
 
 // Define schema for environment validation
 const envSchema = z.object({
@@ -23,6 +24,7 @@ const githubContextSchema = z
     head_branch: z.string().optional().describe('Head branch name'),
     base_branch: z.string().optional().describe('Base branch name'),
     commits: z.array(z.string()).optional().describe('Array of commit IDs for push events'),
+    dbtProjectFilePath: z.string().optional().describe('Path to the dbt project file'),
   })
   .optional();
 
@@ -57,11 +59,17 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   } = runDocsAgentParamsSchema.parse(params);
 
   const sandboxSnapshotBaseName = 'buster-data-engineer';
+  const sandboxContext = context || {};
 
   const dataSourceResult = await getOrganizationDataSource({ organizationId: organizationId });
-  const dataSourceCreds = await getDataSourceCredentials({
+  const rawDataSourceCredentials = await getDataSourceCredentials({
     dataSourceId: dataSourceResult.dataSourceId,
-  }) as Creds;
+  });
+
+  const credentials = {
+    ...rawDataSourceCredentials,
+    type: dataSourceResult.dataSourceSyntax,
+  } as Credentials;
 
   const sandboxSnapshotFullName = `${sandboxSnapshotBaseName}-${dataSourceResult.dataSourceSyntax}`;
   const sandbox = await createSandboxFromSnapshot(sandboxSnapshotFullName);
@@ -79,13 +87,6 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   // Validate environment
   const env = envSchema.parse(process.env);
 
-  // Create context directory and file
-  await sandbox.fs.createFolder(contextPath, '755');
-  await sandbox.fs.uploadFile(
-    Buffer.from(JSON.stringify(context)),
-    `${contextPath}/${contextFileName}`
-  );
-
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
     repositoryPath, // path
@@ -95,22 +96,22 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
     installationToken // password
   );
 
-  const profileName = await getProfileName(sandbox, repositoryPath);
+  const { profileName, projectFilePath } = await getDbtProjectInfo(sandbox, repositoryPath);
 
-  const profileYaml = buildProfilesYaml({
-    profileName,
-    target: 'buster',
-    creds: dataSourceCreds,
-  });
+  // Only build and write profiles YAML if projectFilePath exists
+  if (projectFilePath) {
+    const profileYaml = buildProfilesYaml({
+      profileName,
+      target: 'buster',
+      creds: credentials,
+    });
 
-  console.info('[Profile YAML]:', profileYaml);
-  
-  // Create profiles directory and file
-  await sandbox.fs.createFolder(profilesPath, '755');
-  await sandbox.fs.uploadFile(
-    Buffer.from(profileYaml),
-    `${profilesPath}/${profilesFileName}`
-  );
+    // Create profiles directory and file
+    await sandbox.fs.createFolder(profilesPath, '755');
+    await sandbox.fs.uploadFile(Buffer.from(profileYaml), `${profilesPath}/${profilesFileName}`);
+
+    sandboxContext.dbtProjectFilePath = projectFilePath;
+  }
 
   const envExportCommands = [
     `export DBT_PROFILES_DIR=${profilesPath}`,
@@ -126,7 +127,7 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
     command: `${envExportCommands.join(' && ')}`,
   });
 
-  // // Install Buster CLI
+  // // TODO:Install Buster CLI here instead of in docker image
   // await sandbox.process.executeSessionCommand(sessionName, {
   //   command: `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`,
   // });
@@ -152,24 +153,31 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   if (messageId) {
     cliArgs.push(`--messageId "${messageId}"`);
   }
-  if (context) {
+  if (Object.keys(sandboxContext).length > 0) {
+    // Create context directory and file
+    await sandbox.fs.createFolder(contextPath, '755');
+    await sandbox.fs.uploadFile(
+      Buffer.from(JSON.stringify(sandboxContext)),
+      `${contextPath}/${contextFileName}`
+    );
+
     cliArgs.push(`--contextFilePath "${contextPath}/${contextFileName}"`);
   }
 
-  // // Execute Buster CLI command in async mode
-  // await sandbox.process.executeSessionCommand(sessionName, {
-  //   command: `cd ${repositoryPath} && buster ${cliArgs.join(' ')}`,
-  //   runAsync: true,
-  // });
+  // Execute Buster CLI command in async mode
+  await sandbox.process.executeSessionCommand(sessionName, {
+    command: `cd ${repositoryPath} && buster ${cliArgs.join(' ')}`,
+    runAsync: true,
+  });
 
   // // Use for debugging logs if needed
   // const logs = await sandbox.process.getSessionCommandLogs(
   //   sessionName,
   //   command.cmdId ?? '',
-  //   (chunk) => console.info('[STDOUT]:', chunk),
-  //   (chunk) => console.error('[STDERR]:', chunk)
+  //   (chunk) => console.info(`[STDOUT]: ${chunk}`),
+  //   (chunk) => console.error(`[STDERR]: ${chunk}`)
   // );
-  // console.info('[SANDBOXLOGS]:', logs);
+  // console.info(`[SANDBOXLOGS]: ${logs}`);
 
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
@@ -250,15 +258,22 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
 
-async function getProfileName(sandbox: Sandbox, filePath: string): Promise<string> {
+export async function getDbtProjectInfo(
+  sandbox: Sandbox,
+  filePath: string
+): Promise<{ profileName: string; projectFilePath: string }> {
   const profilesFileName = 'dbt_project.yml';
   let profileName = 'default';
+  let projectFilePath = '';
 
   const matches = await sandbox.fs.findFiles(filePath, 'profile:');
   for (const match of matches) {
     if (match.file.includes(profilesFileName)) {
-      const name = match.content.replace('profile:', '').trim();
-      console.info('[Profile Name]:', name);
+      projectFilePath = match.file;
+      const name = match.content
+        .replace('profile:', '')
+        .trim()
+        .replace(/^['"]|['"]$/g, '');
       if (name) {
         profileName = name;
         break;
@@ -266,5 +281,5 @@ async function getProfileName(sandbox: Sandbox, filePath: string): Promise<strin
     }
   }
 
-  return profileName;
+  return { profileName, projectFilePath };
 }
