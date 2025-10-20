@@ -79,7 +79,8 @@ function getOrSetApp() {
             repoUrl: payload.repository.html_url,
             branch: branch,
             prompt: commentBody,
-            apiKey: apiKey,
+            apiKey: apiKey.key,
+            organizationId: apiKey.organizationId,
           });
         }
       }
