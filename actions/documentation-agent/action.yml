@@ -49,17 +49,6 @@ runs:
         run: |
           set -euo pipefail
 
-          echo "::notice::Starting Buster documentation job"
-          echo "::debug::API URL: ${API_URL}"
-          
-          # Check if API key is set (without revealing it)
-          if [ -z "${BUSTER_API_KEY}" ]; then
-            echo "::error::BUSTER_API_KEY is empty or not set"
-            exit 1
-          else
-            echo "::notice::API key is set (length: ${#BUSTER_API_KEY})"
-          fi
-
           # Read the entire GitHub event payload
           EVENT_CONTEXT=$(cat "$GITHUB_EVENT_PATH")
 
