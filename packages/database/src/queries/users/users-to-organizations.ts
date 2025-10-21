@@ -27,6 +27,7 @@ const GetUserToOrganizationInputSchema = z.object({
   page_size: z.number().optional().default(250),
   user_name: z.string().optional(),
   email: z.string().optional(),
+  query: z.string().optional(),
   role: z.array(UserOrganizationRoleSchema).optional(),
   status: z.array(UserOrganizationStatusSchema).optional(),
 });
@@ -45,7 +46,7 @@ export const getUserToOrganization = async (
   params: GetUserToOrganizationInput
 ): Promise<PaginatedResponse<OrganizationUser>> => {
   // Validate and destructure input
-  const { userId, page, page_size, user_name, email, role, status } =
+  const { userId, page, page_size, user_name, email, query, role, status } =
     GetUserToOrganizationInputSchema.parse(params);
 
   // Get the user's organization ID
@@ -56,16 +57,23 @@ export const getUserToOrganization = async (
 
   const { organizationId } = userOrg;
 
-  // Combine conditions: base conditions AND (name OR email)
+  // Build search conditions
+  // If query is provided, search both name and email with it
+  // Otherwise, use individual user_name and email filters
+  const searchConditions = query
+    ? or(like(users.name, `%${query}%`), like(users.email, `%${query}%`))
+    : or(
+        user_name ? like(users.name, `%${user_name}%`) : undefined,
+        email ? like(users.email, `%${email}%`) : undefined
+      );
+
+  // Combine conditions: base conditions AND search conditions
   const whereConditions = and(
     eq(usersToOrganizations.organizationId, organizationId),
     isNull(usersToOrganizations.deletedAt),
     role ? inArray(usersToOrganizations.role, role) : undefined,
     status ? inArray(usersToOrganizations.status, status) : undefined,
-    or(
-      user_name ? like(users.name, `%${user_name}%`) : undefined,
-      email ? like(users.email, `%${email}%`) : undefined
-    )
+    searchConditions
   );
 
   const getData = withPagination(

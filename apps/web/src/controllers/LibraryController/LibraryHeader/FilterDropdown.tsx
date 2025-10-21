@@ -1,8 +1,11 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import React, { useMemo } from 'react';
-import { useGetUserToOrganization } from '@/api/buster_rest/users/list';
+import React, { useMemo, useState } from 'react';
+import {
+  useGetUserToOrganization,
+  useGetUserToOrganizationInfinite,
+} from '@/api/buster_rest/users/list';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons/Button';
 import { DateRangePickerContent } from '@/components/ui/date/DateRangePicker';
@@ -17,6 +20,7 @@ import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import { Text } from '@/components/ui/typography/Text';
+import { useDebounce } from '@/hooks/useDebounce';
 import { createDayjsDate, getNow } from '@/lib/date';
 import type { LibrarySearchParams } from '../schema';
 
@@ -33,6 +37,8 @@ export const FilterDropdown = React.memo(
     end_date: LibrarySearchParams['end_date'];
   }) => {
     const navigate = useNavigate();
+
+    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids });
 
     const AssetTypeDropdownItems: IDropdownItem = useMemo(() => {
       return {
@@ -164,8 +170,6 @@ export const FilterDropdown = React.memo(
       });
     }, [start_date, end_date]);
 
-    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids });
-
     const dropdownItems = createDropdownItems([
       OwnerDropdownItems,
       AssetTypeDropdownItems,
@@ -186,9 +190,15 @@ export const FilterDropdown = React.memo(
 );
 
 const useOwnerDropdownItems = ({ owner_ids }: { owner_ids: LibrarySearchParams['owner_ids'] }) => {
-  const users = useGetUserToOrganization({
-    page: 1,
-    page_size: 100,
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, { wait: 75 });
+  const {
+    allResults: users,
+    isFetching,
+    fetchNextPage,
+  } = useGetUserToOrganizationInfinite({
+    page_size: 20,
+    query: debouncedSearch,
   });
 
   const OwnerDropdownItems: IDropdownItem = useMemo(() => {
@@ -196,17 +206,26 @@ const useOwnerDropdownItems = ({ owner_ids }: { owner_ids: LibrarySearchParams['
       label: 'Owner',
       value: 'owner',
       icon: <CircleUser />,
-      items: users.data?.data.map((user) => ({
+      items: users.map((user) => ({
         label: user.name,
         value: user.id,
         icon: <CircleUser />,
+        onClick: () => {
+          console.log('clicked', user);
+        },
       })),
       selectType: 'multiple',
       menuHeader: 'Search owners by name or email',
-      onScrollToBottom: () => {},
-      onSearch: (_search) => {},
+      onScrollToBottom: () => {
+        console.log('scrolled to bottom');
+        fetchNextPage();
+      },
+      onSearch: (search) => {
+        setSearch(search);
+      },
+      isFetchingNextPage: isFetching,
     });
-  }, [owner_ids]);
+  }, [owner_ids, users, isFetching, fetchNextPage]);
 
   return OwnerDropdownItems;
 };

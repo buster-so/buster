@@ -153,3 +153,37 @@ export function useInfiniteScroll<TData, TError = ApiError>(
     allResults,
   };
 }
+
+type UseInfiniteScrollManualResult<TData, TError = ApiError> = UseInfiniteQueryResult<
+  InfiniteData<PaginationResponse<TData>>,
+  TError
+> & {
+  allResults: TData[];
+};
+
+export function useInfiniteScrollManual<TData, TError = ApiError>(
+  options: UseInfiniteScrollOptions<TData, TError>
+): UseInfiniteScrollManualResult<TData, TError> {
+  const { scrollConfig, mounted, ...queryOptions } = options;
+
+  const queryResult = useInfiniteQuery({
+    ...queryOptions,
+    getNextPageParam: (lastPage) => {
+      if ('has_more' in lastPage.pagination) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+  });
+
+  const allResults = useMemo(
+    () => queryResult.data?.pages.flatMap((page) => page.data) ?? [],
+    [queryResult.data]
+  );
+
+  return {
+    ...queryResult,
+    allResults,
+  };
+}

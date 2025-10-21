@@ -55,6 +55,8 @@ export const GetUserToOrganizationRequestSchema = z.object({
   page_size: z.coerce.number().min(1).max(5000).default(25),
   user_name: z.string().optional(),
   email: z.string().optional(),
+  //query is used for searching by name or email
+  query: z.string().optional(),
   //We need this because the frontend sends the roles as a comma-separated string in the query params
   role: createOptionalQueryArrayPreprocessor(UserOrganizationRoleSchema).optional(),
   //We need this because the frontend sends the status as a comma-separated string in the query params

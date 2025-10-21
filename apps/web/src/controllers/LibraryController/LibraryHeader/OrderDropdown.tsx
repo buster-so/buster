@@ -143,7 +143,7 @@ const OrderingItem = ({
     navigate({
       to: '/app/library',
       search: (prev) => {
-        return { ...prev, ordering_direction: prev.ordering_direction === 'asc' ? 'desc' : 'asc' };
+        return { ...prev, ordering_direction: prev.ordering_direction === 'desc' ? 'asc' : 'desc' };
       },
     });
   });

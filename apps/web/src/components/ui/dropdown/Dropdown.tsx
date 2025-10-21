@@ -625,9 +625,15 @@ const DropdownSubMenuContent = <T,>({
   onSearch,
   onScrollToBottom,
 }: DropdownSubMenuContentProps<T>) => {
+  // When onSearch is provided, parent handles filtering - don't filter locally
+  const shouldUseLocalFiltering = !onSearch;
+
   const { filteredItems, searchText, handleSearchChange } = useDebounceSearch({
     items: items || [],
     searchPredicate: (item, searchText) => {
+      // If parent handles filtering, don't filter locally
+      if (!shouldUseLocalFiltering) return true;
+
       if ((item as IDropdownItem<T>).value) {
         const _item = item as IDropdownItem<T>;
         const searchContent =
@@ -643,7 +649,7 @@ const DropdownSubMenuContent = <T,>({
 
   // Call onSearch callback when search text changes
   useEffect(() => {
-    if (onSearch && searchText) {
+    if (onSearch) {
       onSearch(searchText);
     }
   }, [onSearch, searchText]);
