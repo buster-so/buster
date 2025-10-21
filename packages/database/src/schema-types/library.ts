@@ -2,7 +2,7 @@ import z from 'zod';
 import { AssetTypeSchema } from './asset';
 import { type PaginatedResponse, PaginationInputSchema } from './pagination';
 
-export const LibraryAssetTypeSchema = AssetTypeSchema.exclude(['collection']);
+export const LibraryAssetTypeSchema = AssetTypeSchema;
 export type LibraryAssetType = z.infer<typeof LibraryAssetTypeSchema>;
 
 export const LibraryAssetIdentifierSchema = z.object({

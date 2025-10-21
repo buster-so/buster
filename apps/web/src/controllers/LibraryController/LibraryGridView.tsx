@@ -16,37 +16,38 @@ import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
 import type { LibrarySearchParams } from './schema';
 
-const allResults: LibraryAssetListItem[] = Array.from({ length: 100 }, (_, index) => ({
-  asset_id: `asset-${index}`,
-  asset_type: 'dashboard_file',
-  name: `Asset ${index}`,
-  updated_at: new Date().toISOString(),
-  screenshot_url: faker.image.url(),
-  created_at: new Date().toISOString(),
-  created_by: `user-${index}`,
-  created_by_name: `User ${index}`,
-  created_by_email: `user${index}@example.com`,
-  created_by_avatar_url: `https://via.placeholder.com/150?text=User+${index}`,
-}));
+// const allResults: LibraryAssetListItem[] = Array.from({ length: 100 }, (_, index) => ({
+//   asset_id: `asset-${index}`,
+//   asset_type: 'dashboard_file',
+//   name: `Asset ${index}`,
+//   updated_at: new Date().toISOString(),
+//   screenshot_url: faker.image.url(),
+//   created_at: new Date().toISOString(),
+//   created_by: `user-${index}`,
+//   created_by_name: `User ${index}`,
+//   created_by_email: `user${index}@example.com`,
+//   created_by_avatar_url: `https://via.placeholder.com/150?text=User+${index}`,
+// }));
 
 export const LibraryGridView = React.memo(
   ({
-    // allResults,
+    allResults,
     collections,
-    filters,
     isFetchingNextPage,
     className,
+    scrollContainerRef,
   }: {
     allResults: LibraryAssetListItem[];
     collections: BusterCollectionListItem[];
     filters: LibrarySearchParams;
     isFetchingNextPage: boolean;
     className?: string;
+    scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   }) => {
-    const viewportRef = useRef<HTMLDivElement>(null);
-
     // Calculate number of columns based on viewport width
     const [columns, setColumns] = React.useState(3);
+    const hasCollections = collections.length > 0;
+    const hasResults = allResults.length > 0;
 
     React.useEffect(() => {
       const updateColumns = () => {
@@ -70,7 +71,7 @@ export const LibraryGridView = React.memo(
 
     const rowVirtualizer = useVirtualizer({
       count: rowCount,
-      getScrollElement: () => viewportRef.current,
+      getScrollElement: () => scrollContainerRef.current,
       scrollMargin: 0,
       estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
       overscan: 3, // Render 3 extra rows above/below for smooth scrolling
@@ -78,7 +79,7 @@ export const LibraryGridView = React.memo(
 
     return (
       <ScrollArea
-        viewportRef={viewportRef}
+        viewportRef={scrollContainerRef}
         className={'h-full '}
         viewportClassName={cn(
           'pb-12 relative',
@@ -86,42 +87,47 @@ export const LibraryGridView = React.memo(
           className
         )}
       >
-        <LibrarySectionContainer title="Collections" icon={<Folder />}>
-          <LibraryCollectionsScroller collections={collections} />
-        </LibrarySectionContainer>
-        <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
-          <div
-            ref={virtualStartRef}
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: 'relative',
-            }}
-          >
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const startIndex = virtualRow.index * columns;
-              const items = allResults.slice(startIndex, startIndex + columns);
+        {hasCollections && (
+          <LibrarySectionContainer title="Collections" icon={<Folder />}>
+            <LibraryCollectionsScroller collections={collections} />
+          </LibrarySectionContainer>
+        )}
 
-              return (
-                <div
-                  key={virtualRow.key}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                >
-                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
-                    {items.map((asset) => (
-                      <LibraryGridItem key={asset.asset_id} {...asset} />
-                    ))}
+        {hasResults && (
+          <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
+            <div
+              ref={virtualStartRef}
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                position: 'relative',
+              }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const startIndex = virtualRow.index * columns;
+                const items = allResults.slice(startIndex, startIndex + columns);
+
+                return (
+                  <div
+                    key={virtualRow.key}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+                      {items.map((asset) => (
+                        <LibraryGridItem key={asset.asset_id} {...asset} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </LibrarySectionContainer>
+                );
+              })}
+            </div>
+          </LibrarySectionContainer>
+        )}
 
         {isFetchingNextPage && (
           <div className="text-text-tertiary text-center py-4">Loading more...</div>

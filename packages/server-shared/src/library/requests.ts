@@ -34,6 +34,9 @@ export const GetLibraryAssetsRequestQuerySchema = z
         return val;
       }, z.string().uuid().array())
       .optional(),
+    ordering: z.enum(['last_opened', 'created_at', 'none']).optional(),
+    groupBy: z.enum(['asset_type', 'owner', 'created_at', 'none']).optional(),
+    query: z.string().optional(),
   })
   .merge(PaginatedRequestSchema);
 
