@@ -7,7 +7,7 @@ import { Text } from '@/components/ui/typography/Text';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
-import type { LibrarySearchParams } from './schema';
+import type { LibrarySearchParams } from '../schema';
 
 const LibraryGridItem = React.memo(
   ({ asset_id, asset_type, name, updated_at, screenshot_url }: LibraryAssetListItem) => {

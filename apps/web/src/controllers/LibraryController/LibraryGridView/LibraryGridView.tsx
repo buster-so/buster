@@ -18,10 +18,10 @@ import { AssetTypeTranslations } from '@/lib/assets/asset-translations';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
+import { LibraryItemContextMenu } from '../LibraryItemDropdown';
+import type { LibrarySearchParams } from '../schema';
 import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
-import { LibraryItemContextMenu } from './LibraryItemDropdown';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
-import type { LibrarySearchParams } from './schema';
 
 export const LibraryGridView = React.memo(
   ({
