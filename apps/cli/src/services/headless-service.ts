@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { loadConversationFromApi } from '../utils/api-conversation';
 import { readContextFile } from '../utils/context-file';
 import { loadConversation, saveModelMessages } from '../utils/conversation-history';
+import { debugLogger } from '../utils/debug-logger';
 import { getOrCreateSdk } from '../utils/sdk-factory';
 import { getCurrentWorkingDirectory } from '../utils/working-directory';
 import { runChatAgent } from './chat-service';
@@ -60,7 +61,7 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       try {
         sdk = await getOrCreateSdk();
       } catch (error) {
-        console.warn('No SDK available - running without API integration:', error);
+        debugLogger.warn('No SDK available - running without API integration:', error);
       }
     }
 
@@ -122,8 +123,8 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     return chatId;
   } catch (error) {
     // Log error and re-throw with context
-    console.error('Error in headless agent execution:', error);
-    console.error('Context:', {
+    debugLogger.error('Error in headless agent execution:', error);
+    debugLogger.error('Context:', {
       chatId,
       messageId,
       workingDirectory,
