@@ -27,7 +27,6 @@ export const TodoItemSchema = z.object({
 export type TodoItem = z.infer<typeof TodoItemSchema>;
 
 export const AnalyticsEngineerAgentOptionsSchema = z.object({
-  folder_structure: z.string().describe('The file structure of the dbt repository'),
   userId: z.string(),
   chatId: z.string(),
   dataSourceId: z.string(),
@@ -50,6 +49,10 @@ export const AnalyticsEngineerAgentOptionsSchema = z.object({
     .optional()
     .default(false)
     .describe('Flag indicating the agent should only perform read-only operations'),
+  isHeadlessMode: z
+    .boolean()
+    .optional()
+    .describe('Flag indicating the agent is running in headless/CLI mode'),
   abortSignal: z
     .custom<AbortSignal>()
     .optional()

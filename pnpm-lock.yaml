@@ -1277,6 +1277,12 @@ importers:
 
   packages/sandbox:
     dependencies:
+      '@buster/data-source':
+        specifier: workspace:*
+        version: link:../data-source
+      '@buster/database':
+        specifier: workspace:*
+        version: link:../database
       '@buster/env-utils':
         specifier: workspace:*
         version: link:../env-utils
@@ -1289,9 +1295,16 @@ importers:
       '@daytonaio/sdk':
         specifier: ^0.110.2
         version: 0.110.2(ws@8.18.3)
+      js-yaml:
+        specifier: 'catalog:'
+        version: 4.1.0
       zod:
         specifier: 'catalog:'
         version: 3.25.76
+    devDependencies:
+      '@types/js-yaml':
+        specifier: 'catalog:'
+        version: 4.0.9
 
   packages/sdk:
     dependencies:

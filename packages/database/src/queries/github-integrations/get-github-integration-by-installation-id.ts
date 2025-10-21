@@ -22,7 +22,7 @@ export async function getGithubIntegrationByInstallationId(
 
 export async function getApiKeyForInstallationId(
   installationId: number
-): Promise<string | undefined> {
+): Promise<{ key: string; organizationId: string } | undefined> {
   const installationIdString = installationId.toString();
   const [orgId] = await db
     .select({
@@ -39,10 +39,11 @@ export async function getApiKeyForInstallationId(
   const result = await db
     .select({
       key: apiKeys.key,
+      organizationId: apiKeys.organizationId,
     })
     .from(apiKeys)
     .where(and(eq(apiKeys.organizationId, orgId.id), isNull(apiKeys.deletedAt)))
     .limit(1);
 
-  return result[0]?.key;
+  return result[0];
 }

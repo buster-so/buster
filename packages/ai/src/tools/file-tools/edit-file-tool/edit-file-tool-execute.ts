@@ -1,3 +1,4 @@
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { wrapTraced } from 'braintrust';
 import { createTwoFilesPatch } from 'diff';
@@ -549,8 +550,9 @@ function validateFilePath(filePath: string, projectDirectory: string): void {
 export function createEditFileToolExecute(context: EditFileToolContext) {
   return wrapTraced(
     async function execute(input: EditFileToolInput): Promise<EditFileToolOutput> {
-      const { messageId, projectDirectory, onToolEvent } = context;
+      const { messageId, onToolEvent } = context;
       const { filePath, oldString, newString, replaceAll } = input;
+      const projectDirectory = process.cwd();
 
       console.info(`Editing file ${filePath} for message ${messageId}`);
 
@@ -571,9 +573,7 @@ export function createEditFileToolExecute(context: EditFileToolContext) {
         validateFilePath(absolutePath, projectDirectory);
 
         // Check if file exists
-        const file = Bun.file(absolutePath);
-        const stats = await file.stat().catch(() => {});
-        if (!stats) {
+        if (!existsSync(absolutePath)) {
           return {
             success: false,
             filePath: absolutePath,
@@ -581,6 +581,7 @@ export function createEditFileToolExecute(context: EditFileToolContext) {
           };
         }
 
+        const stats = statSync(absolutePath);
         if (stats.isDirectory()) {
           return {
             success: false,
@@ -590,7 +591,7 @@ export function createEditFileToolExecute(context: EditFileToolContext) {
         }
 
         // Read file content
-        const contentOld = await file.text();
+        const contentOld = readFileSync(absolutePath, 'utf8');
 
         // Perform replacement
         const contentNew = replace(contentOld, oldString, newString, replaceAll);
@@ -599,7 +600,7 @@ export function createEditFileToolExecute(context: EditFileToolContext) {
         const diff = trimDiff(createTwoFilesPatch(filePath, filePath, contentOld, contentNew));
 
         // Write the updated content
-        await Bun.write(absolutePath, contentNew);
+        writeFileSync(absolutePath, contentNew, 'utf8');
 
         console.info(`Successfully edited file: ${absolutePath}`);
 

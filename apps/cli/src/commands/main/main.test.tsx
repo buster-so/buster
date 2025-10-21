@@ -22,7 +22,7 @@ describe('Main chat screen', () => {
     const { lastFrame } = render(<Main />);
     const output = lastFrame() ?? '';
 
-    expect(output).toContain('BUSTER v0.3.1');
+    expect(output).toContain('BUSTER v0.3.2');
     expect(output).toContain('Your AI Data Worker.');
     expect(output).toContain('You are standing in an open terminal. An AI awaits your commands.');
     expect(output).toContain('ENTER send');

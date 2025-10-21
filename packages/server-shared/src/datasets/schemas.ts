@@ -33,6 +33,10 @@ export const DimensionSchema = z.object({
   type: z.string().optional(),
   searchable: z.boolean().optional().default(false),
   options: z.array(DimensionOptionSchema).optional().nullable(),
+  time_granularity: z
+    .string()
+    .optional()
+    .describe('Time granularity for time dimensions (e.g., day, week, month)'),
 });
 
 export const MeasureSchema = z.object({

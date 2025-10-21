@@ -124,6 +124,7 @@ export async function updateMessageFields(
     rawLlmMessages?: unknown;
     finalReasoningMessage?: string;
     isCompleted?: boolean;
+    errorReason?: string;
   }
 ): Promise<{ success: boolean }> {
   try {
@@ -140,6 +141,7 @@ export async function updateMessageFields(
       rawLlmMessages?: unknown;
       finalReasoningMessage?: string;
       isCompleted?: boolean;
+      errorReason?: string;
     } = {
       updatedAt: new Date().toISOString(),
     };
@@ -160,6 +162,10 @@ export async function updateMessageFields(
 
     if ('isCompleted' in fields) {
       updateData.isCompleted = fields.isCompleted;
+    }
+
+    if ('errorReason' in fields) {
+      updateData.errorReason = fields.errorReason;
     }
 
     await db
@@ -249,43 +255,20 @@ export async function updateMessage(
 
 /**
  * @param messageId - The ID of the message
- * @returns Object with status and optional errorReason
+ * @returns Object with isCompleted and optional errorReason
  */
-export async function getMessageStatus(messageId: string): Promise<{
-  status: 'Complete' | 'Failed' | 'InProgress';
-  errorReason?: string;
-}> {
-  try {
-    const [message] = await db
-      .select({
-        id: messages.id,
-        isCompleted: messages.isCompleted,
-        createdAt: messages.createdAt,
-      })
-      .from(messages)
-      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
-      .limit(1);
+export async function getMessageStatus(messageId: string) {
+  const [message] = await db
+    .select({
+      id: messages.id,
+      isCompleted: messages.isCompleted,
+      errorReason: messages.errorReason,
+    })
+    .from(messages)
+    .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+    .limit(1);
 
-    if (!message) {
-      console.error(`Message not found: ${messageId}`);
-      return {
-        status: 'Failed',
-        errorReason: 'Message not found',
-      };
-    }
-
-    if (message.isCompleted) {
-      return { status: 'Complete' };
-    }
-
-    return { status: 'InProgress' };
-  } catch (error) {
-    console.error('Failed to get message status:', error);
-    return {
-      status: 'Failed',
-      errorReason: 'Failed to poll for message status. Please try again later.',
-    };
-  }
+  return message;
 }
 
 /**
@@ -330,4 +313,14 @@ export async function checkForDuplicateMessages(options: {
     console.error('Failed to check for duplicate messages:', error);
     throw new Error(`Failed to check for duplicate messages in chat ${chatId}`);
   }
+}
+
+export async function getMessage(messageId: string): Promise<Message | undefined> {
+  const result = await db
+    .select()
+    .from(messages)
+    .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+    .limit(1);
+
+  return result[0];
 }

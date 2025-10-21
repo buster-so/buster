@@ -12,26 +12,10 @@ describe('Docs Agent Instructions', () => {
   });
 
   it('should return a valid prompt string', () => {
-    const folderStructure = `
-- src/
-  - models/
-    - users.yml
-    - orders.yml
-`;
-    const result = getDocsAgentSystemPrompt(folderStructure);
+    const result = getDocsAgentSystemPrompt();
 
     expect(result).toBeDefined();
     expect(typeof result).toBe('string');
     expect(result.length).toBeGreaterThan(1000);
-  });
-
-  it('should throw an error for empty folder structure', () => {
-    expect(() => {
-      getDocsAgentSystemPrompt('');
-    }).toThrow('Folder structure is required');
-
-    expect(() => {
-      getDocsAgentSystemPrompt('   '); // whitespace only
-    }).toThrow('Folder structure is required');
   });
 });

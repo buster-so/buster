@@ -1,0 +1,36 @@
+FROM python:3.12-slim
+
+# System tools you asked for
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash curl ca-certificates git gh ripgrep tree tar \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install system dependencies for dbt adapters
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    unixodbc-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install latest dbt-core and bigquery adapter
+RUN pip install --no-cache-dir \
+    dbt-core \
+    dbt-bigquery
+
+# # Buster CLI (binary release)
+# RUN echo "Downloading buster CLI v0.3.1..." \
+#  && curl -fsSL "https://github.com/buster-so/buster/releases/download/v0.3.1/buster-cli-linux-x86_64.tar.gz" -o /tmp/buster-cli.tar.gz \
+#  && tar -xzf /tmp/buster-cli.tar.gz -C /tmp \
+#  && mv /tmp/buster /usr/bin/buster \
+#  && chmod +x /usr/bin/buster \
+#  && rm /tmp/buster-cli.tar.gz
+
+# # Verify installations
+# RUN echo "Verifying buster CLI installation..." \
+#  && buster --version \
+#  && echo "✅ buster CLI installed successfully"
+
+RUN echo "Verifying dbt installation..." \
+ && dbt --version \
+ && echo "✅ dbt with bigquery adapter installed successfully"
+

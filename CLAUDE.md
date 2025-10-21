@@ -153,8 +153,9 @@ export async function handleCommand(options) {
 - Focus new development on TypeScript patterns
 - Follow patterns in `apps/server` for new API development
 
-## Agent Workflows
-- Use `planner` agent for spec, plan, ticket, research development workflows. 
+## Agent Workflows & Skills
+- **Planning Skill** - Use `.claude/skills/planning/` for complex, multi-step development workflows
+- Use `planner` agent for spec, plan, ticket, research development workflows 
 
 ## Important Reminders
 - Do only what has been asked; nothing more, nothing less

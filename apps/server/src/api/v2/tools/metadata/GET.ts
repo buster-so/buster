@@ -9,6 +9,148 @@ import type {
 import { runs, tasks } from '@trigger.dev/sdk';
 import { HTTPException } from 'hono/http-exception';
 
+// Import machine sizing utilities for optimal resource allocation
+interface SizingInfo {
+  machinePreset:
+    | 'micro'
+    | 'small-1x'
+    | 'small-2x'
+    | 'medium-1x'
+    | 'medium-2x'
+    | 'large-1x'
+    | 'large-2x';
+  avgRowSizeBytes: number;
+  estimatedSampleBytes: number;
+  estimatedMemoryRequired: number;
+  machineSpecs: string;
+}
+
+/**
+ * Calculate the optimal machine size for table statistics collection
+ * This mirrors the logic in apps/trigger/src/tasks/introspect-data/utils/machine-sizing.ts
+ */
+function calculateSizingInfo(
+  rowCount: number,
+  sizeBytes: number | undefined,
+  sampleSize: number
+): SizingInfo {
+  type MachinePreset =
+    | 'micro'
+    | 'small-1x'
+    | 'small-2x'
+    | 'medium-1x'
+    | 'medium-2x'
+    | 'large-1x'
+    | 'large-2x';
+
+  const MACHINE_THRESHOLDS = {
+    SMALL_1X: 250 * 1024 * 1024,
+    SMALL_2X: 500 * 1024 * 1024,
+    MEDIUM_1X: 1 * 1024 * 1024 * 1024,
+    MEDIUM_2X: 2 * 1024 * 1024 * 1024,
+    LARGE_1X: 4 * 1024 * 1024 * 1024,
+  } as const;
+
+  const DUCKDB_OVERHEAD_MULTIPLIER = 10;
+  const SAFETY_BUFFER_MULTIPLIER = 2.0;
+  const DUCKDB_BASE_OVERHEAD_BYTES = 500 * 1024 * 1024;
+
+  function getMachineSpecs(preset: MachinePreset): string {
+    const specs: Record<MachinePreset, string> = {
+      micro: '0.25 vCPU, 0.25GB RAM',
+      'small-1x': '0.5 vCPU, 0.5GB RAM',
+      'small-2x': '1 vCPU, 1GB RAM',
+      'medium-1x': '1 vCPU, 2GB RAM',
+      'medium-2x': '2 vCPU, 4GB RAM',
+      'large-1x': '4 vCPU, 8GB RAM',
+      'large-2x': '8 vCPU, 16GB RAM',
+    };
+    return specs[preset] || 'Unknown';
+  }
+
+  // Default to large-1x if we don't have size information
+  if (!sizeBytes || sizeBytes === 0 || rowCount === 0) {
+    return {
+      machinePreset: 'large-1x',
+      avgRowSizeBytes: 0,
+      estimatedSampleBytes: 0,
+      estimatedMemoryRequired: 0,
+      machineSpecs: getMachineSpecs('large-1x'),
+    };
+  }
+
+  const avgRowSizeBytes = sizeBytes / rowCount;
+  const estimatedSampleBytes = avgRowSizeBytes * sampleSize;
+  const estimatedMemoryRequired =
+    estimatedSampleBytes * DUCKDB_OVERHEAD_MULTIPLIER * SAFETY_BUFFER_MULTIPLIER +
+    DUCKDB_BASE_OVERHEAD_BYTES;
+
+  // Apply minimum thresholds based on sample size
+  let minimumPreset: MachinePreset = 'small-2x';
+
+  if (sampleSize >= 750000) {
+    minimumPreset = 'large-2x';
+  } else if (sampleSize >= 500000) {
+    minimumPreset = 'large-1x';
+  } else if (sampleSize >= 200000) {
+    minimumPreset = 'large-1x';
+  } else if (sampleSize >= 100000) {
+    minimumPreset = 'medium-2x';
+  } else if (sampleSize >= 50000) {
+    minimumPreset = 'medium-1x';
+  }
+
+  // Select machine based on estimated memory requirements
+  let calculatedPreset: MachinePreset;
+
+  if (estimatedMemoryRequired <= MACHINE_THRESHOLDS.SMALL_1X) {
+    calculatedPreset = 'small-1x';
+  } else if (estimatedMemoryRequired <= MACHINE_THRESHOLDS.SMALL_2X) {
+    calculatedPreset = 'small-2x';
+  } else if (estimatedMemoryRequired <= MACHINE_THRESHOLDS.MEDIUM_1X) {
+    calculatedPreset = 'medium-1x';
+  } else if (estimatedMemoryRequired <= MACHINE_THRESHOLDS.MEDIUM_2X) {
+    calculatedPreset = 'medium-2x';
+  } else if (estimatedMemoryRequired <= MACHINE_THRESHOLDS.LARGE_1X) {
+    calculatedPreset = 'large-1x';
+  } else {
+    calculatedPreset = 'large-2x';
+  }
+
+  // Return the larger of the calculated preset and the minimum preset
+  const presetOrder: MachinePreset[] = [
+    'micro',
+    'small-1x',
+    'small-2x',
+    'medium-1x',
+    'medium-2x',
+    'large-1x',
+    'large-2x',
+  ];
+  const minimumIndex = presetOrder.indexOf(minimumPreset);
+  const calculatedIndex = presetOrder.indexOf(calculatedPreset);
+
+  const machinePreset = presetOrder[Math.max(minimumIndex, calculatedIndex)] as MachinePreset;
+
+  return {
+    machinePreset,
+    avgRowSizeBytes,
+    estimatedSampleBytes,
+    estimatedMemoryRequired,
+    machineSpecs: getMachineSpecs(machinePreset),
+  };
+}
+
+function _formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
+}
+
 /**
  * Validates that identifier doesn't contain SQL injection attempts
  * Allows alphanumeric, underscores, hyphens, and dots (for qualified names)
@@ -209,7 +351,14 @@ export async function getMetadataHandler(
               ? 'TEMPORARY_TABLE'
               : 'TABLE';
 
-    // Trigger the get-table-statistics task with idempotency
+    // Calculate optimal machine size based on table statistics
+    const sizingInfo = calculateSizingInfo(
+      quickMetadata.rowCount,
+      quickMetadata.sizeBytes,
+      sampleSize
+    );
+
+    // Trigger the get-table-statistics task with idempotency and optimal machine sizing
     // If the same table is requested within 5 minutes, return existing task
     const handle = await tasks.trigger(
       'get-table-statistics',
@@ -228,6 +377,7 @@ export async function getMetadataHandler(
       {
         idempotencyKey: `metadata-${organizationId}-${dataSourceId}-${database}-${schema}-${name}`,
         idempotencyKeyTTL: '5m', // 5 minutes TTL
+        machine: sizingInfo.machinePreset, // Use calculated machine size for optimal performance
       }
     );
 
@@ -296,9 +446,6 @@ export async function getMetadataHandler(
     if (error instanceof HTTPException) {
       throw error;
     }
-
-    // Log unexpected errors
-    console.error('Unexpected error during metadata retrieval:', error);
 
     throw new HTTPException(500, {
       message: 'An unexpected error occurred during metadata retrieval',

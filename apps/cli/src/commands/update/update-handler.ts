@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import chalk from 'chalk';
 import { checkForUpdate, formatVersion } from '../../utils/version/index';
+import { getVersion } from '../../version';
 import { isInstalledViaHomebrew } from './homebrew-detection';
 import {
   type BinaryInfo,
@@ -16,14 +17,6 @@ import {
 } from './update-schemas';
 
 const GITHUB_RELEASES_URL = 'https://github.com/buster-so/buster/releases/download';
-
-/**
- * Get the current CLI version from package.json
- */
-export function getCurrentVersion(): string {
-  // This will be replaced with the actual version during build
-  return '0.3.1';
-}
 
 /**
  * Determine the binary file name based on platform
@@ -225,7 +218,7 @@ async function replaceBinary(newBinaryPath: string): Promise<void> {
  */
 export async function updateHandler(options: UpdateOptions): Promise<UpdateResult> {
   const validated = UpdateOptionsSchema.parse(options);
-  const currentVersion = getCurrentVersion();
+  const currentVersion = getVersion();
 
   // Check if installed via Homebrew
   const isHomebrew = isInstalledViaHomebrew();

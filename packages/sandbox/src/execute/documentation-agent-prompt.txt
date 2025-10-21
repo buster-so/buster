@@ -1,0 +1,327 @@
+# Task: Document Changed dbt Models
+
+## Objective
+Analyze and document all models changed in a GitHub PR or push event, adding comprehensive documentation, evidence-based tests, and semantic layer definitions where appropriate.
+
+## Context
+When models are modified, updated documentation ensures analysts and stakeholders understand the data correctly. This task profiles the data, validates relationships, documents findings, and creates a changelog explaining decisions made.
+
+## Success Criteria
+- [ ] All changed models have complete documentation (purpose, grain, key patterns)
+- [ ] All columns documented with business definitions, typical values, and null handling
+- [ ] Tests added based on data profiling (primary keys, relationships, accepted values)
+- [ ] Relationships validated with SQL and documented only if coverage >95%
+- [ ] Semantic models created for mart-level tables (if applicable per agents.md)
+- [ ] Changelog created with observations, decisions, and evidence
+- [ ] All changes validated with dbt parse and dbt compile
+- [ ] Changes committed and pushed to git (if instructed)
+- [ ] PR commented with summary (if PR number provided)
+
+## Input
+- GitHub diff/PR containing changed .sql and .yml files
+- Access to data warehouse for profiling (RetrieveMetadata, RunSql)
+- Existing schema.yml files in affected directories
+- Project conventions in agents.md
+
+## Specific Requirements
+- **Follow additive-first modification policy**: Preserve existing documentation unless disproven by evidence
+- **Check existing changelogs first**: Search changelog/ directory for prior decisions about these models
+- **Use metadata-first approach**: RetrieveMetadata before RunSql; only query when metadata insufficient
+- **Validate relationships**: Use RunSql to check coverage; only add relationship test if >95%
+- **Co-locate documentation**: Update schema.yml in model's directory (per agents.md structure)
+- **Semantic models**: Create only for mart-level tables unless agents.md specifies otherwise
+- **Evidence-backed claims**: Cite metadata timestamps and SQL results in documentation
+- **Test constraints from agents.md**: Follow project-specific testing requirements (e.g., accepted_values cardinality thresholds)
+
+## Workflow
+
+### 1. Initial Setup & Planning
+- Use Glob to find all changed .sql files in the diff
+- Use Glob to find all changed .yml files in the diff
+- Use TodoWrite to create task list for each changed model
+- Set working directory to repository root
+
+### 2. Understand Changes (Per Model)
+- **Check changelogs**: Use Grep to search changelog/ for prior decisions about this model
+- **Understand usage**: Use Grep to find all references to this model across the repo
+- **Read context**: Use Read on the model's SQL file and existing schema.yml
+- **Parse SQL**: Identify ref() dependencies, joins, filters, transformations
+- **Identify scope**: Note which columns are new/modified based on diff
+
+### 3. Profile the Data (Per Model)
+- **Retrieve metadata**: Use RetrieveMetadata for full table statistics
+- **For each column**, capture from metadata:
+  - Null percentage
+  - Distinct count
+  - Min/max values (numeric/date)
+  - Common values (categorical)
+- **Validate with SQL** (only when needed):
+  ```sql
+  -- Verify primary key uniqueness
+  SELECT COUNT(*), COUNT(DISTINCT primary_key_column) 
+  FROM {{ ref('model_name') }};
+  
+  -- Sample categorical columns for accepted_values
+  SELECT column_name, COUNT(*) as frequency
+  FROM {{ ref('model_name') }}
+  GROUP BY 1
+  ORDER BY 2 DESC
+  LIMIT 20;
+  ```
+
+### 4. Validate Relationships (Per Foreign Key)
+- **For suspected foreign keys**, use RunSql to check coverage:
+  ```sql
+  SELECT 
+    COUNT(*) as total_rows,
+    COUNT(child.fk_column) as non_null_fks,
+    COUNT(DISTINCT child.fk_column) as distinct_fks,
+    SUM(CASE WHEN parent.pk_column IS NOT NULL THEN 1 ELSE 0 END) as matched,
+    100.0 * SUM(CASE WHEN parent.pk_column IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) as match_rate
+  FROM {{ ref('child_model') }} child
+  LEFT JOIN {{ ref('parent_model') }} parent 
+    ON child.fk_column = parent.pk_column;
+  ```
+- **Document coverage percentage** in your notes
+- **Only add relationship test if coverage >95%**
+- **If <95%**, note ambiguity for needs_clarification.md or document limitation in column description
+
+### 5. Update Documentation (Per Model)
+- **Navigate to model's directory**
+- **Read existing schema.yml** (use Read tool)
+- **Update models: section** with minimal diffs:
+  - Add/enhance model description: purpose, grain, row count, freshness, key patterns
+  - Include lineage summary (upstream refs, key transformations)
+  - Cite metadata with timestamps (e.g., "~2.8M rows as of 2025-01-15")
+  - Note quantified patterns (null rates, cardinality, distributions)
+- **For each column**:
+  - Add/enhance description: business meaning, typical values, null handling
+  - Include evidence from metadata (null rate, distinct count, ranges)
+  - Related columns and edge cases
+- **Add tests** based on profiling:
+  - `unique` and `not_null` for primary keys
+  - `not_null` where null rate is 0% and column is critical
+  - `accepted_values` for low-cardinality categoricals (follow agents.md thresholds)
+  - `relationships` for validated foreign keys (>95% coverage)
+  - `dbt_utils.accepted_range` for bounded numerics
+- **Add semantic_models: section** (only for marts):
+  - Define entities (primary/foreign)
+  - Define dimensions (time, categorical)
+  - Define measures with aggregation logic
+  - Set defaults (agg_time_dimension)
+- **Use Write or Edit tool** to save updated schema.yml
+
+### 6. Validate Changes
+- Run `dbt parse` to check YAML syntax across project
+- Run `dbt compile -s <model_name>` for each changed model
+- If errors found, fix and re-validate
+- Mark validation todos as complete
+
+### 7. Create Changelog
+- Use Write tool to create `changelog/<descriptive-name>-<timestamp>.md`
+- Use timestamp format: YYYYMMDD or YYYYMMDD-HHMM
+- Include YAML frontmatter:
+  ```yaml
+  ---
+  title: Documentation updates for [model names]
+  date: YYYY-MM-DD
+  affected_files:
+    - models/path/to/schema.yml
+    - models/path/to/model.sql
+  ---
+  ```
+- **Structure**:
+  - **What Was Observed**: Key metadata findings, null rates, cardinality, patterns
+  - **What Was Changed**: Documentation added, tests added, modifications made
+  - **What Was Accomplished**: Business outcomes, improved coverage, validated relationships
+  - **Decisions Made**: Why certain tests added, why relationships included/excluded, categorical vs searchable
+  - **Evidence Cited**: Metadata timestamps, SQL validation results, files analyzed
+  - **Rejected Alternatives**: Why other approaches weren't chosen (e.g., why not enforcing a relationship)
+  - **References**: List of models, tests, and docs updated
+
+### 8. Commit and Push Changes
+**ALWAYS commit and push if you made any changes** (documentation, tests, changelog).
+
+**In PR environment** (working on existing PR):
+```bash
+git add -A
+git commit -m "docs: document changed models [model names]"
+git push
+```
+
+**In push environment** (need to create branch and PR):
+```bash
+# Create branch
+git checkout -b bot/document-models-$(date +%Y%m%d-%H%M)
+
+# Commit changes
+git add -A
+git commit -m "docs: document changed models [model names]"
+
+# Push and create PR
+git push -u origin HEAD
+gh pr create --title "docs: document changed models" --body "Automated documentation update. See summary comment below."
+```
+
+### 9. Post Summary Comment to PR
+**ALWAYS post a summary comment** - this is the ONLY way the user sees your work.
+
+Get the PR number:
+- **PR environment**: Use the PR number from the trigger event
+- **Push environment**: Get PR number from `gh pr create` output or `gh pr list --head <branch-name>`
+
+Post the comment:
+```bash
+gh pr comment <pr-number> --body "$(cat <<'EOF'
+## 🤖 Documentation Agent Summary
+
+### Work Completed
+- ✅ Documented [N] models: `model1`, `model2`, `model3`
+- ✅ Added [N] tests: [X] unique/not_null, [Y] relationships, [Z] accepted_values
+- ✅ Created semantic models for [N] mart tables
+- ✅ Validated all changes with `dbt parse` and `dbt compile`
+
+### Key Findings
+- **model1**: ~2.8M rows; 8% guest orders lack customer_id (expected)
+- **model2**: 5 stable order_status values; added accepted_values test
+- **model3**: Relationship to parent_model validated at 96% coverage
+
+### Files Changed
+- `models/marts/core/schema.yml` - Added documentation and tests
+- `changelog/orders-documentation-20250115.md` - Detailed decisions and evidence
+
+### Evidence
+- Metadata profiled: 2025-01-15 14:23 UTC
+- Relationships validated with SQL coverage checks
+- [N] SQL validations performed
+
+### Next Steps
+All changes are ready for review. Tests will run on next `dbt test` execution.
+EOF
+)"
+```
+
+**If NO changes were needed** (PR environment only):
+```bash
+gh pr comment <pr-number> --body "$(cat <<'EOF'
+## 🤖 Documentation Agent Summary
+
+### Analysis Complete
+Reviewed all changed models and existing documentation.
+
+### Result
+✅ **No changes needed** - All models already have:
+- Complete documentation with grain, purpose, and patterns
+- Appropriate tests for primary keys and relationships
+- Up-to-date column descriptions with business context
+
+### Models Reviewed
+- `model1` - Documentation current (last updated 2025-01-10)
+- `model2` - Tests and docs complete
+
+No further action required.
+EOF
+)"
+```
+
+## Verification
+Run these commands to validate completion:
+- `dbt parse` succeeds with no errors
+- `dbt compile -s <model>` succeeds for each changed model
+- All primary keys have `unique` and `not_null` tests
+- All foreign keys with >95% coverage have `relationships` tests
+- Changelog exists in changelog/ directory with proper frontmatter
+
+**Git & Communication Checklist** (if changes were made):
+- [ ] All changes committed with descriptive message
+- [ ] Changes pushed to remote branch
+- [ ] PR created (if push environment)
+- [ ] Summary comment posted to PR
+
+**CRITICAL**: The user cannot see your work unless you push changes and post a PR comment. If you made any changes, you MUST complete all git and communication steps.
+
+## Additional Notes
+- **Preserve existing documentation**: Only modify/remove if evidence disproves it
+- **Guest checkouts or legacy data**: Document legitimate null cases rather than forcing not_null
+- **Low relationship coverage**: Document the limitation in column description instead of adding test
+- **Cardinality thresholds**: Follow agents.md for when to use accepted_values (typically <20 distinct values and stable)
+- **Semantic layer**: Only create for marts unless agents.md explicitly requires it for other layers
+- **Time-bounded claims**: Use "as of [date]" when citing metadata to keep documentation current
+- **Minimal diffs**: Edit existing descriptions rather than rewriting entire sections
+
+## Example Output
+
+### schema.yml (excerpt)
+```yaml
+models:
+  - name: fct_orders
+    description: |
+      Order-level fact table capturing all e-commerce transactions.
+      Grain: One row per order.
+      Lineage: Sourced from stg_shopify__orders joined with stg_shopify__customers.
+      Freshness: Updated hourly; staleness alert at >4 hours.
+      Scale: ~2.8M rows as of 2025-01-15.
+      Patterns: Weekly seasonality; ~8% guest orders lack customer_id; long-tail order values.
+    columns:
+      - name: order_id
+        description: |
+          Unique identifier for each order (primary key).
+          Format: Integer sequence.
+          Null rate: 0% (metadata 2025-01-15).
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: |
+          Foreign key to dim_customers.
+          Null for guest checkouts (~8% of orders, legitimate business case).
+          Distinct values: ~145K (metadata 2025-01-15).
+          Relationship coverage: 92% (validated 2025-01-15) - guest orders expected.
+```
+
+### Changelog (excerpt)
+```markdown
+---
+title: Documentation for fct_orders and dim_customers
+date: 2025-01-15
+affected_files:
+  - models/marts/core/schema.yml
+  - models/marts/core/fct_orders.sql
+---
+
+## What Was Observed
+- Retrieved metadata for fct_orders: 2,847,293 rows (2025-01-15 14:23 UTC)
+- customer_id has 8% null rate, 145K distinct values
+- order_status has 5 distinct values (pending, paid, shipped, refunded, canceled)
+- Relationship to dim_customers: 92% coverage (230K unmatched guest orders)
+
+## What Was Changed
+- Added model documentation with grain, lineage, scale, and patterns
+- Documented all 12 columns with business definitions and null handling
+- Added tests: unique/not_null for order_id, accepted_values for order_status
+- Did NOT add relationship test for customer_id (92% coverage, guest orders legitimate)
+
+## What Was Accomplished
+- fct_orders now has complete evidence-backed documentation
+- Tests enforce data quality for primary key and status values
+- Guest order pattern documented and understood
+
+## Decisions Made
+- Chose accepted_values test for order_status: 5 stable values, enforced by upstream
+- Did NOT enforce customer_id relationship: 92% coverage due to legitimate guest checkouts
+- Documented guest pattern in column description instead of forcing relationship
+
+## Evidence Cited
+- Metadata retrieved: 2025-01-15 14:23 UTC (fct_orders, dim_customers)
+- SQL validation: relationship coverage query showed 92% match rate
+- Files analyzed: fct_orders.sql, dim_customers.sql, existing schema.yml
+
+## Rejected Alternatives
+- Considered not_null test for customer_id: rejected due to 8% null rate from guest orders
+- Considered relationship test: rejected due to <95% coverage threshold
+
+## References
+- Models updated: fct_orders
+- Tests added: unique, not_null, accepted_values
+- Documentation updated: models/marts/core/schema.yml
+```

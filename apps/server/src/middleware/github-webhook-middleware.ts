@@ -5,7 +5,7 @@ import {
 } from '@buster/database/queries';
 import type { App, WebhookEventName } from '@buster/github';
 import { AuthDetailsAppInstallationResponseSchema, createGitHubApp } from '@buster/github';
-import { runDocsAgent } from '@buster/sandbox';
+import { runDocsAgentAsync } from '@buster/sandbox';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -74,12 +74,13 @@ function getOrSetApp() {
               message: 'No API key found for installation id',
             });
           }
-          await runDocsAgent({
+          await runDocsAgentAsync({
             installationToken: authDetails.token,
             repoUrl: payload.repository.html_url,
             branch: branch,
             prompt: commentBody,
-            apiKey: apiKey,
+            apiKey: apiKey.key,
+            organizationId: apiKey.organizationId,
           });
         }
       }
@@ -184,7 +185,6 @@ function getOrSetApp() {
  * Verifies signature and parses payload
  */
 export function githubWebhookMiddleware(): MiddlewareHandler {
-  console.info('webhook middleware was called');
   return async (c: Context, next) => {
     try {
       const githubApp = getOrSetApp();

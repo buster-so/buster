@@ -1,5 +1,6 @@
 export type { Sandbox } from '@daytonaio/sdk';
-export { runDocsAgent } from './execute/run-docs-agent';
+export type { githubContext, RunDocsAgentParams } from './execute/run-docs-agent';
+export { runDocsAgentAsync, runDocsAgentSync } from './execute/run-docs-agent';
 export type { CodeRunResponse, RunTypeScriptOptions } from './execute/run-typescript';
 export { runTypescript } from './execute/run-typescript';
 // Export inferred types
@@ -28,4 +29,5 @@ export {
   uploadSingleFile,
   validatePath,
 } from './filesystem/add-files';
-export { createSandbox } from './management/create-sandbox';
+export { getCommandDetails } from './management/check-command-status';
+export { createSandbox, createSandboxWithBusterCLI } from './management/create-sandbox';

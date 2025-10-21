@@ -309,7 +309,6 @@ const AlreadyHaveAccount: React.FC<{
   const handleToggleClick = () => {
     if (!signUpFlow) {
       // User clicked "Sign up" - redirect to get-started page
-      // window.location.href = 'https://www.buster.so/get-started';
     } else {
       // User clicked "Sign in" - use existing toggle logic
       setErrorMessages([]);

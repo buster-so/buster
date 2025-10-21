@@ -1,7 +1,8 @@
 import { Box, Text } from 'ink';
 import Spinner from 'ink-spinner';
 import { useEffect, useState } from 'react';
-import { getCurrentVersion, updateHandler } from './update-handler';
+import { getVersion } from '../../version';
+import { updateHandler } from './update-handler';
 import type { UpdateOptions } from './update-schemas';
 
 interface UpdateCommandProps extends UpdateOptions {}
@@ -61,7 +62,7 @@ export function UpdateCommand({ check, force, yes }: UpdateCommandProps) {
         </Text>
         <Text> {status === 'checking' ? 'Checking for updates...' : 'Updating Buster CLI...'}</Text>
       </Box>
-      <Text color="dim">Current version: v{getCurrentVersion()}</Text>
+      <Text color="dim">Current version: v{getVersion()}</Text>
     </Box>
   );
 }

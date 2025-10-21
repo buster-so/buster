@@ -1,0 +1,44 @@
+name: 'Determine Docker Tags'
+description: 'Determines Docker image tags based on environment'
+inputs:
+  registry:
+    description: 'Container registry URL'
+    required: true
+  image_name:
+    description: 'Docker image name'
+    required: true
+  environment:
+    description: 'Deployment environment (main or staging)'
+    required: true
+outputs:
+  tags:
+    description: 'Comma-separated Docker image tags'
+    value: ${{ steps.meta.outputs.tags }}
+  sha_short:
+    description: 'Short commit SHA (7 characters)'
+    value: ${{ steps.meta.outputs.sha_short }}
+  timestamp:
+    description: 'Build timestamp in UTC'
+    value: ${{ steps.meta.outputs.timestamp }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Extract metadata and determine tags
+      id: meta
+      shell: bash
+      run: |
+        SHA_SHORT=$(git rev-parse --short=7 HEAD)
+        TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+        echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+
+        ENV="${{ inputs.environment }}"
+        if [[ "${ENV}" == "main" ]]; then
+          # For main: use commit SHA and latest
+          TAGS="${{ inputs.registry }}/${{ inputs.image_name }}:${SHA_SHORT},${{ inputs.registry }}/${{ inputs.image_name }}:latest"
+        else
+          # For staging: use staging-SHA and staging
+          TAGS="${{ inputs.registry }}/${{ inputs.image_name }}:staging-${SHA_SHORT},${{ inputs.registry }}/${{ inputs.image_name }}:staging"
+        fi
+        echo "tags=${TAGS}" >> $GITHUB_OUTPUT

@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
-import { createGrepSearchToolExecute as createGrepToolExecute } from './grep-tool.test';
 import GREP_TOOL_DESCRIPTION from './grep-tool-description.txt';
+import { createGrepSearchToolExecute as createGrepToolExecute } from './grep-tool-execute';
 
 export const GREP_TOOL_NAME = 'grep';
 
@@ -50,7 +50,6 @@ const GrepToolOutputSchema = z.object({
 
 const GrepSearchContextSchema = z.object({
   messageId: z.string().describe('The message ID for database updates'),
-  projectDirectory: z.string().describe('The root directory of the project'),
   onToolEvent: z.any().optional(),
 });
 

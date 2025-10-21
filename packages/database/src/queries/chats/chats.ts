@@ -1,8 +1,8 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { chats, messages, userFavorites, users } from '../../schema';
+import { assetPermissions, chats, messages, userFavorites, users } from '../../schema';
 import { ChatTypeSchema, MessageAnalysisModeSchema } from '../../schema-types';
 
 // Type inference from schema
@@ -46,6 +46,7 @@ export const CreateChatWithMessageInputSchema = z.object({
   content: z.string(),
   userId: z.string().uuid(),
   organizationId: z.string().uuid(),
+  chatType: ChatTypeSchema.optional(),
   messageAnalysisMode: MessageAnalysisModeSchema.optional(),
   metadata: z.record(z.any()).optional(),
 });
@@ -229,6 +230,7 @@ export async function createChatWithMessage(input: CreateChatWithMessageInput): 
           createdBy: validated.userId,
           updatedBy: validated.userId,
           publiclyAccessible: false,
+          chatType: validated.chatType || 'data_engineer',
         })
         .returning();
 
@@ -237,11 +239,18 @@ export async function createChatWithMessage(input: CreateChatWithMessageInput): 
       }
 
       // Create owner permission for the user
-      await tx.execute(sql`
-        INSERT INTO asset_permissions (identity_id, identity_type, asset_id, asset_type, role, created_by, created_at, updated_at)
-        VALUES (${validated.userId}, 'user', ${newChat.id}, 'chat', 'owner', ${validated.userId}, NOW(), NOW())
-        ON CONFLICT (identity_id, identity_type, asset_id, asset_type) DO NOTHING
-      `);
+      await tx
+        .insert(assetPermissions)
+        .values({
+          identityId: validated.userId,
+          identityType: 'user',
+          assetId: newChat.id,
+          assetType: 'chat',
+          role: 'owner',
+          createdBy: validated.userId,
+          updatedBy: validated.userId,
+        })
+        .onConflictDoNothing();
 
       // Create the message with upsert behavior
       const [newMessage] = await tx
@@ -345,7 +354,6 @@ export async function updateChat(
 
     return { success: true };
   } catch (error) {
-    console.error('Failed to update chat fields:', error);
     // Re-throw our specific validation errors
     if (error instanceof Error && error.message.includes('Chat not found')) {
       throw error;

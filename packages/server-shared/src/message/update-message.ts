@@ -14,6 +14,7 @@ export type UpdateMessageRequestParams = z.infer<typeof UpdateMessageRequestPara
 export const UpdateMessageRequestBodySchema = z.object({
   isCompleted: z.boolean().optional().describe('Whether the message is completed'),
   rawLlmMessages: z.unknown().optional().describe('Raw LLM messages from the conversation'),
+  errorReason: z.string().optional().describe('Error reason if message failed during execution'),
 });
 
 export type UpdateMessageRequestBody = z.infer<typeof UpdateMessageRequestBodySchema>;
