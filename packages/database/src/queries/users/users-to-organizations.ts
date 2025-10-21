@@ -1,4 +1,15 @@
-import { and, asc, count, eq, type InferSelectModel, inArray, isNull, like, or } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  eq,
+  type InferSelectModel,
+  inArray,
+  isNull,
+  like,
+  not,
+  or,
+} from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import {
@@ -30,6 +41,7 @@ const GetUserToOrganizationInputSchema = z.object({
   query: z.string().optional(),
   role: z.array(UserOrganizationRoleSchema).optional(),
   status: z.array(UserOrganizationStatusSchema).optional(),
+  force_include_in_search: z.array(z.string()).optional(),
 });
 
 type GetUserToOrganizationInput = z.infer<typeof GetUserToOrganizationInputSchema>;
@@ -46,8 +58,17 @@ export const getUserToOrganization = async (
   params: GetUserToOrganizationInput
 ): Promise<PaginatedResponse<OrganizationUser>> => {
   // Validate and destructure input
-  const { userId, page, page_size, user_name, email, query, role, status } =
-    GetUserToOrganizationInputSchema.parse(params);
+  const {
+    userId,
+    page,
+    page_size,
+    user_name,
+    email,
+    query,
+    role,
+    status,
+    force_include_in_search,
+  } = GetUserToOrganizationInputSchema.parse(params);
 
   // Get the user's organization ID
   const userOrg = await getUserOrganizationId(userId);
@@ -57,57 +78,97 @@ export const getUserToOrganization = async (
 
   const { organizationId } = userOrg;
 
-  // Build search conditions
-  // If query is provided, search both name and email with it
-  // Otherwise, use individual user_name and email filters
-  const searchConditions = query
-    ? or(like(users.name, `%${query}%`), like(users.email, `%${query}%`))
-    : or(
-        user_name ? like(users.name, `%${user_name}%`) : undefined,
-        email ? like(users.email, `%${email}%`) : undefined
-      );
+  try {
+    // Handle forced users if provided
+    let forcedUsers: OrganizationUser[] = [];
+    if (force_include_in_search && force_include_in_search.length > 0) {
+      // Fetch forced users that belong to the organization
+      forcedUsers = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          avatarUrl: users.avatarUrl,
+          role: usersToOrganizations.role,
+          status: usersToOrganizations.status,
+        })
+        .from(users)
+        .innerJoin(usersToOrganizations, eq(users.id, usersToOrganizations.userId))
+        .where(
+          and(
+            eq(usersToOrganizations.organizationId, organizationId),
+            isNull(usersToOrganizations.deletedAt),
+            inArray(users.id, force_include_in_search)
+          )
+        )
+        .orderBy(asc(users.name));
+    }
 
-  // Combine conditions: base conditions AND search conditions
-  const whereConditions = and(
-    eq(usersToOrganizations.organizationId, organizationId),
-    isNull(usersToOrganizations.deletedAt),
-    role ? inArray(usersToOrganizations.role, role) : undefined,
-    status ? inArray(usersToOrganizations.status, status) : undefined,
-    searchConditions
-  );
+    // Build search conditions
+    // If query is provided, search both name and email with it
+    // Otherwise, use individual user_name and email filters
+    const searchConditions = query
+      ? or(like(users.name, `%${query}%`), like(users.email, `%${query}%`))
+      : or(
+          user_name ? like(users.name, `%${user_name}%`) : undefined,
+          email ? like(users.email, `%${email}%`) : undefined
+        );
 
-  const getData = withPagination(
-    db
-      .select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        avatarUrl: users.avatarUrl,
-        role: usersToOrganizations.role,
-        status: usersToOrganizations.status,
-      })
+    // Combine conditions: base conditions AND search conditions
+    // Exclude forced users from regular query to avoid duplicates
+    const whereConditions = and(
+      eq(usersToOrganizations.organizationId, organizationId),
+      isNull(usersToOrganizations.deletedAt),
+      role ? inArray(usersToOrganizations.role, role) : undefined,
+      status ? inArray(usersToOrganizations.status, status) : undefined,
+      searchConditions,
+      force_include_in_search && force_include_in_search.length > 0
+        ? not(inArray(users.id, force_include_in_search))
+        : undefined
+    );
+
+    // Calculate how many regular users we need to fetch
+    // If we have forced users, we need fewer regular users to meet page_size
+    const regularUsersToFetch = Math.max(0, page_size - forcedUsers.length);
+
+    const getData = withPagination(
+      db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          avatarUrl: users.avatarUrl,
+          role: usersToOrganizations.role,
+          status: usersToOrganizations.status,
+        })
+        .from(users)
+        .innerJoin(usersToOrganizations, eq(users.id, usersToOrganizations.userId))
+        .where(whereConditions)
+        .$dynamic(),
+      asc(users.name),
+      page,
+      regularUsersToFetch
+    );
+    const getTotal = db
+      .select({ count: count() })
       .from(users)
       .innerJoin(usersToOrganizations, eq(users.id, usersToOrganizations.userId))
-      .where(whereConditions)
-      .$dynamic(),
-    asc(users.name),
-    page,
-    page_size
-  );
-  const getTotal = db
-    .select({ count: count() })
-    .from(users)
-    .innerJoin(usersToOrganizations, eq(users.id, usersToOrganizations.userId))
-    .where(whereConditions);
+      .where(whereConditions);
 
-  try {
     // Execute data and count queries in parallel
-    const [data, totalResult] = await Promise.all([getData, getTotal]);
+    const [regularData, totalResult] = await Promise.all([getData, getTotal]);
 
-    const total = totalResult[0]?.count ?? 0;
+    const regularTotal = totalResult[0]?.count ?? 0;
+
+    // Combine forced users with regular users
+    // Forced users always come first
+    const combinedData = [...forcedUsers, ...regularData];
+
+    // Total includes both forced and regular users
+    const total = forcedUsers.length + regularTotal;
 
     return createPaginatedResponse({
-      data,
+      data: combinedData,
       page,
       page_size,
       total,

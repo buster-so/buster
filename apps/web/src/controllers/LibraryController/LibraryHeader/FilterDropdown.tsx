@@ -2,7 +2,10 @@ import type { AssetType } from '@buster/server-shared/assets';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
-import { useGetUserToOrganizationInfiniteManual } from '@/api/buster_rest/users/list';
+import {
+  useGetUserToOrganization,
+  useGetUserToOrganizationInfiniteManual,
+} from '@/api/buster_rest/users/list';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons/Button';
 import { DateRangePickerContent } from '@/components/ui/date/DateRangePicker';
@@ -199,6 +202,32 @@ const useOwnerDropdownItems = ({
     query: debouncedSearch,
     mounted: open,
   });
+  const { data: forcedInlucdedUsers } = useGetUserToOrganization(
+    { force_include_in_search: owner_ids, page_size: 1000, page: 1 },
+    { enabled: !!owner_ids?.length && open }
+  );
+
+  const allUsers = useMemo(() => {
+    if (search.length > 0) {
+      return users;
+    }
+
+    // Combine and deduplicate users by id
+    const combined = [...(forcedInlucdedUsers?.data || []), ...users];
+    const deduplicated = Array.from(new Map(combined.map((user) => [user.id, user])).values());
+
+    // Sort: selected users first, then alphabetically by name
+    return deduplicated.sort((a, b) => {
+      const aSelected = owner_ids?.includes(a.id) ?? false;
+      const bSelected = owner_ids?.includes(b.id) ?? false;
+
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+
+      // Both selected or both not selected, sort by name
+      return (a.name || '').localeCompare(b.name || '');
+    });
+  }, [forcedInlucdedUsers?.data, users, owner_ids, !!search]);
 
   const OwnerDropdownItems: IDropdownItem = useMemo(() => {
     const avatarClassName = 'w-6 h-6 rounded-full bg-gray-light/30';
@@ -206,7 +235,7 @@ const useOwnerDropdownItems = ({
       label: 'Owner',
       value: 'owner',
       icon: <CircleUser />,
-      items: users.map((user) => ({
+      items: allUsers.map((user) => ({
         label: (
           <div className="flex gap-1.5 items-center justify-start">
             {user.avatarUrl && (
@@ -246,7 +275,7 @@ const useOwnerDropdownItems = ({
       isFetchingNextPage: isFetching,
       className: 'min-w-[245px]',
     });
-  }, [owner_ids, users, isFetching, fetchNextPage]);
+  }, [owner_ids, allUsers, isFetching, fetchNextPage]);
 
   return OwnerDropdownItems;
 };

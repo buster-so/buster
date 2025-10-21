@@ -63,6 +63,9 @@ export const GetUserToOrganizationRequestSchema = z.object({
   status: createOptionalQueryArrayPreprocessor(UserOrganizationStatusSchema)
     .default(['active'])
     .optional(),
+  //force include in search, this happens if the user is searching for a specific user and they know the id
+  //We need this because the frontend sends the ids as a comma-separated string in the query params
+  force_include_in_search: createOptionalQueryArrayPreprocessor(z.string()).optional(),
 });
 
 export type GetUserToOrganizationRequest = Partial<
