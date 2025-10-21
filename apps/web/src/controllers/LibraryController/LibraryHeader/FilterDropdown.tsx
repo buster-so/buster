@@ -189,7 +189,7 @@ const useOwnerDropdownItems = ({
 }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const debouncedSearch = useDebounce(search, { wait: 75 });
+  const debouncedSearch = useDebounce(search, { wait: 50 });
   const {
     allResults: users,
     isFetching,
@@ -238,6 +238,7 @@ const useOwnerDropdownItems = ({
           });
         },
       })),
+      emptyStateText: 'No owners found',
       selectType: 'multiple',
       menuHeader: 'Search owners by name or email',
       onScrollToBottom: () => fetchNextPage(),

@@ -360,6 +360,7 @@ const DropdownItemSelector = <
 
   return (
     <DropdownItem<T, TRouter, TOptions, TFrom>
+      emptyStateTextParent={emptyStateText}
       closeOnSelect={closeOnSelect}
       onSelect={onSelect}
       onSelectItem={onSelectItem}
@@ -400,7 +401,8 @@ const DropdownItem = <
   linkIcon,
   className,
   menuHeader,
-  emptyStateText,
+  emptyStateTextParent,
+  emptyStateText: emptyStateTextChild,
   onSearch,
   onScrollToBottom,
 }: IDropdownItem<T, TRouter, TOptions, TFrom> & {
@@ -409,7 +411,7 @@ const DropdownItem = <
   closeOnSelect: boolean;
   index: number;
   showIndex: boolean;
-  emptyStateText?: string | React.ReactNode;
+  emptyStateTextParent?: string | React.ReactNode;
 }) => {
   const onClickItem = useMemoizedFn((e: React.MouseEvent<HTMLDivElement> | KeyboardEvent) => {
     if (disabled) return;
@@ -423,7 +425,8 @@ const DropdownItem = <
     enabled: enabledHotKeys,
   });
 
-  const isSubItem = items && items.length > 0;
+  const emptyStateText = emptyStateTextChild || emptyStateTextParent || 'No items found';
+  const isSubItem = (items && items.length > 0) || !!onSearch; //this might be flawed...
   const isSelectable =
     !!selectType && selectType !== 'none' && selectType !== 'single-selectable-link';
 
