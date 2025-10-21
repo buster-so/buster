@@ -1,8 +1,13 @@
 import z from 'zod';
-import { AssetTypeSchema } from './asset';
 import { type PaginatedResponse, PaginationInputSchema } from './pagination';
 
-export const LibraryAssetTypeSchema = AssetTypeSchema;
+// Library assets exclude collections - only assets with savedToLibrary field
+export const LibraryAssetTypeSchema = z.enum([
+  'chat',
+  'metric_file',
+  'dashboard_file',
+  'report_file',
+]);
 export type LibraryAssetType = z.infer<typeof LibraryAssetTypeSchema>;
 
 export const LibraryAssetIdentifierSchema = z.object({
@@ -51,6 +56,10 @@ export const ListPermissionedLibraryAssetsInputSchema = z
     endDate: z.string().datetime().optional(),
     includeCreatedBy: z.string().uuid().array().optional(),
     excludeCreatedBy: z.string().uuid().array().optional(),
+    ordering: z.enum(['last_opened', 'created_at', 'none']).optional(),
+    orderingDirection: z.enum(['asc', 'desc']).optional(),
+    groupBy: z.enum(['asset_type', 'owner', 'created_at', 'none']).optional(),
+    query: z.string().optional(),
   })
   .merge(PaginationInputSchema);
 
@@ -58,4 +67,15 @@ export type ListPermissionedLibraryAssetsInput = z.infer<
   typeof ListPermissionedLibraryAssetsInputSchema
 >;
 
-export type ListPermissionedLibraryAssetsResponse = PaginatedResponse<LibraryAssetListItem>;
+export const GroupedLibraryAssetsResponseSchema = z.object({
+  groups: z.record(z.string(), LibraryAssetListItemSchema.array()),
+  page: z.number(),
+  page_size: z.number(),
+  total: z.number(),
+});
+
+export type GroupedLibraryAssetsResponse = z.infer<typeof GroupedLibraryAssetsResponseSchema>;
+
+export type ListPermissionedLibraryAssetsResponse =
+  | PaginatedResponse<LibraryAssetListItem>
+  | GroupedLibraryAssetsResponse;

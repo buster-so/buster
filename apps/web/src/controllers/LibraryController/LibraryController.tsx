@@ -84,7 +84,7 @@ const useManagedFilters = (
     }
 
     if (asset_types) {
-      filters.assetTypes = asset_types;
+      filters.assetTypes = asset_types.filter((type) => type !== 'collection');
     }
 
     if (ordering) {
@@ -102,6 +102,17 @@ const useManagedFilters = (
     }
     if (q) {
       filters.query = q;
+    }
+    if (ordering_direction) {
+      filters.orderingDirection = ordering_direction;
+    }
+    if (owner_ids?.length) {
+      if (filters.includeCreatedBy?.length) {
+        filters.includeCreatedBy = [...filters.includeCreatedBy, ...owner_ids];
+      } else {
+        filters.includeCreatedBy = owner_ids;
+      }
+      filters.includeCreatedBy = owner_ids;
     }
 
     // biome-ignore lint/complexity/noBannedTypes: This is a temporary fix to satisfy the linter

@@ -1,10 +1,12 @@
 import {
   and,
+  asc,
   count,
   desc,
   eq,
   exists,
   gte,
+  ilike,
   inArray,
   isNull,
   lte,
@@ -44,6 +46,10 @@ export async function listPermissionedLibraryAssets(
     endDate,
     includeCreatedBy,
     excludeCreatedBy,
+    ordering,
+    orderingDirection,
+    groupBy,
+    query,
     page,
     page_size,
   } = ListPermissionedLibraryAssetsInputSchema.parse(input);
@@ -230,6 +236,10 @@ export async function listPermissionedLibraryAssets(
     filters.push(not(inArray(permissionedAssets.createdBy, excludeCreatedBy)));
   }
 
+  if (query) {
+    filters.push(ilike(permissionedAssets.name, `%${query}%`));
+  }
+
   const whereCondition =
     filters.length === 0 ? undefined : filters.length === 1 ? filters[0] : and(...filters);
 
@@ -252,10 +262,25 @@ export async function listPermissionedLibraryAssets(
 
   const filteredAssetQuery = whereCondition ? baseAssetQuery.where(whereCondition) : baseAssetQuery;
 
-  const assetsResult = await filteredAssetQuery
-    .orderBy(desc(permissionedAssets.createdAt))
-    .limit(page_size)
-    .offset(offset);
+  // Determine ordering direction (default to desc for backward compatibility)
+  const direction = orderingDirection === 'asc' ? asc : desc;
+
+  // Apply ordering and execute query
+  let assetsResult;
+  if (ordering === 'last_opened') {
+    assetsResult = await filteredAssetQuery
+      .orderBy(direction(permissionedAssets.updatedAt))
+      .limit(page_size)
+      .offset(offset);
+  } else if (ordering === 'created_at') {
+    assetsResult = await filteredAssetQuery
+      .orderBy(direction(permissionedAssets.createdAt))
+      .limit(page_size)
+      .offset(offset);
+  } else {
+    // No explicit ordering - let database decide
+    assetsResult = await filteredAssetQuery.limit(page_size).offset(offset);
+  }
 
   const baseCountQuery = db.select({ total: count() }).from(permissionedAssets);
   const countResult = await (whereCondition
@@ -275,6 +300,39 @@ export async function listPermissionedLibraryAssets(
     created_by_avatar_url: asset.createdByAvatarUrl,
     screenshot_url: asset.screenshotBucketKey,
   }));
+
+  // Handle groupBy
+  if (groupBy && groupBy !== 'none') {
+    const groups: Record<string, LibraryAssetListItem[]> = {};
+
+    for (const asset of libraryAssets) {
+      let groupKey: string;
+
+      if (groupBy === 'asset_type') {
+        groupKey = asset.asset_type;
+      } else if (groupBy === 'owner') {
+        groupKey = asset.created_by;
+      } else if (groupBy === 'created_at') {
+        // Group by date (YYYY-MM-DD)
+        const datePart = asset.created_at.split('T')[0];
+        groupKey = datePart ?? asset.created_at;
+      } else {
+        groupKey = 'ungrouped';
+      }
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey]!.push(asset);
+    }
+
+    return {
+      groups,
+      page,
+      page_size,
+      total: totalValue,
+    };
+  }
 
   return createPaginatedResponse({
     data: libraryAssets,
