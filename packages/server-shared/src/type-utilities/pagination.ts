@@ -29,8 +29,17 @@ export const SearchPaginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
     pagination: SearchPaginationSchema,
   });
 
+export const GroupedPaginationResponseSchema = <T>(schema: z.ZodType<T>) =>
+  z.object({
+    groups: z.record(z.string(), z.array(schema)),
+    pagination: SearchPaginationSchema,
+  });
+
 export type PaginatedResponse<T> = z.infer<ReturnType<typeof PaginatedResponseSchema<T>>>;
 export type SearchPaginatedResponse<T> = z.infer<
   ReturnType<typeof SearchPaginatedResponseSchema<T>>
+>;
+export type GroupedPaginationResponse<T> = z.infer<
+  ReturnType<typeof GroupedPaginationResponseSchema<T>>
 >;
 export const PaginatedRequestSchema = PaginationInputSchema;

@@ -20,13 +20,14 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
   const { data: collections } = useGetCollectionsList({});
   const managedFilters = useManagedFilters(filtersProps);
 
-  const { scrollContainerRef, allResults, isFetchingNextPage } = useLibraryAssetsInfinite({
-    ...managedFilters,
-    page_size: 45,
-    scrollConfig: {
-      scrollThreshold: 125,
-    },
-  });
+  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage } =
+    useLibraryAssetsInfinite({
+      ...managedFilters,
+      page_size: 45,
+      scrollConfig: {
+        scrollThreshold: 125,
+      },
+    });
 
   return (
     <AppPageLayout
@@ -37,6 +38,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
       {layout === 'grid' && (
         <LibraryGridView
           allResults={allResults}
+          allGroups={allGroups}
           collections={collections}
           filters={filtersProps}
           isFetchingNextPage={isFetchingNextPage}

@@ -10,6 +10,7 @@ import InfoCircle from '@/components/ui/icons/NucleoIconOutlined/circle-info';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useSetTimeout } from '@/hooks/useSetTimeout';
+import { AssetTypeTranslations } from '@/lib/assets/asset-translations';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
@@ -262,14 +263,6 @@ const MetaContent = ({
   );
 };
 
-const Translation: Record<AssetType, string> = {
-  chat: 'Chat',
-  dashboard_file: 'Dashboard',
-  report_file: 'Report',
-  collection: 'Collection',
-  metric_file: 'Metric',
-};
-
 const Ancestors = React.memo(
   ({
     ancestors,
@@ -291,7 +284,7 @@ const Ancestors = React.memo(
         type,
         title,
         id: assetId,
-        secondaryText: Translation[type],
+        secondaryText: AssetTypeTranslations[type],
         isMain: true,
       },
       ...reports.map((r) => ({

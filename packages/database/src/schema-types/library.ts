@@ -1,5 +1,9 @@
 import z from 'zod';
-import { type PaginatedResponse, PaginationInputSchema } from './pagination';
+import {
+  type PaginatedResponse,
+  PaginationInputSchema,
+  SearchPaginationSchema,
+} from './pagination';
 
 // Library assets exclude collections - only assets with savedToLibrary field
 export const LibraryAssetTypeSchema = z.enum([
@@ -69,10 +73,10 @@ export type ListPermissionedLibraryAssetsInput = z.infer<
 
 export const GroupedLibraryAssetsResponseSchema = z.object({
   groups: z.record(z.string(), LibraryAssetListItemSchema.array()),
-  page: z.number(),
-  page_size: z.number(),
-  total: z.number(),
+  pagination: SearchPaginationSchema,
 });
+
+export type GroupedLibraryAssets = z.infer<typeof GroupedLibraryAssetsResponseSchema>['groups'];
 
 export type GroupedLibraryAssetsResponse = z.infer<typeof GroupedLibraryAssetsResponseSchema>;
 

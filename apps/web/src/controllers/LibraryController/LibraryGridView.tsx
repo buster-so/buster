@@ -1,7 +1,7 @@
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import { faker } from '@faker-js/faker';
 import { Link, type LinkProps } from '@tanstack/react-router';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
@@ -9,25 +9,13 @@ import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
+import { AssetTypeTranslations } from '@/lib/assets/asset-translations';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
 import type { LibrarySearchParams } from './schema';
-
-// const allResults: LibraryAssetListItem[] = Array.from({ length: 100 }, (_, index) => ({
-//   asset_id: `asset-${index}`,
-//   asset_type: 'dashboard_file',
-//   name: `Asset ${index}`,
-//   updated_at: new Date().toISOString(),
-//   screenshot_url: faker.image.url(),
-//   created_at: new Date().toISOString(),
-//   created_by: `user-${index}`,
-//   created_by_name: `User ${index}`,
-//   created_by_email: `user${index}@example.com`,
-//   created_by_avatar_url: `https://via.placeholder.com/150?text=User+${index}`,
-// }));
 
 export const LibraryGridView = React.memo(
   ({
@@ -36,7 +24,9 @@ export const LibraryGridView = React.memo(
     isFetchingNextPage,
     className,
     scrollContainerRef,
+    allGroups,
   }: {
+    allGroups: undefined | Record<string, LibraryAssetListItem[]>;
     allResults: LibraryAssetListItem[];
     collections: BusterCollectionListItem[];
     filters: LibrarySearchParams;
@@ -48,6 +38,7 @@ export const LibraryGridView = React.memo(
     const [columns, setColumns] = React.useState(3);
     const hasCollections = collections.length > 0;
     const hasResults = allResults.length > 0;
+    const hasGroups = allGroups !== undefined;
 
     React.useEffect(() => {
       const updateColumns = () => {
@@ -93,41 +84,15 @@ export const LibraryGridView = React.memo(
           </LibrarySectionContainer>
         )}
 
-        {hasResults && (
-          <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
-            <div
-              ref={virtualStartRef}
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-                position: 'relative',
-              }}
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const startIndex = virtualRow.index * columns;
-                const items = allResults.slice(startIndex, startIndex + columns);
-
-                return (
-                  <div
-                    key={virtualRow.key}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                  >
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
-                      {items.map((asset) => (
-                        <LibraryGridItem key={asset.asset_id} {...asset} />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </LibrarySectionContainer>
+        {hasResults && !hasGroups && (
+          <LibraryUngroupedView
+            allResults={allResults}
+            columns={columns}
+            rowVirtualizer={rowVirtualizer}
+            virtualStartRef={virtualStartRef}
+          />
         )}
+        {hasResults && hasGroups && <LibraryGroupedView allGroups={allGroups} />}
 
         {isFetchingNextPage && (
           <div className="text-text-tertiary text-center py-4">Loading more...</div>
@@ -179,3 +144,61 @@ const LibraryGridItem = React.memo(
 );
 
 LibraryGridItem.displayName = 'LibraryGridItem';
+
+const LibraryGroupedView = ({
+  allGroups,
+}: {
+  allGroups: Record<string, LibraryAssetListItem[]>;
+}) => {
+  AssetTypeTranslations;
+
+  return <></>;
+};
+
+const LibraryUngroupedView = ({
+  allResults,
+  columns,
+  rowVirtualizer,
+  virtualStartRef,
+}: {
+  allResults: LibraryAssetListItem[];
+  columns: number;
+  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
+  virtualStartRef: React.RefObject<HTMLDivElement | null>;
+}) => {
+  return (
+    <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
+      <div
+        ref={virtualStartRef}
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const startIndex = virtualRow.index * columns;
+          const items = allResults.slice(startIndex, startIndex + columns);
+
+          return (
+            <div
+              key={virtualRow.key}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+                {items.map((asset) => (
+                  <LibraryGridItem key={asset.asset_id} {...asset} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </LibrarySectionContainer>
+  );
+};

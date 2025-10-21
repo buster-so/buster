@@ -326,11 +326,16 @@ export async function listPermissionedLibraryAssets(
       groups[groupKey]!.push(asset);
     }
 
+    const totalPages = Math.ceil(totalValue / page_size);
+    const hasMore = page < totalPages;
+
     return {
       groups,
-      page,
-      page_size,
-      total: totalValue,
+      pagination: {
+        page,
+        page_size,
+        has_more: hasMore,
+      },
     };
   }
 
