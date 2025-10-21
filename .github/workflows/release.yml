@@ -109,8 +109,8 @@ jobs:
             echo "should_build_api=false" >> $GITHUB_OUTPUT
           fi
 
-          # CLI only runs on main branch
-          if [[ "$ENV" == "main" ]] && ([[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "cli" ]]); then
+          # CLI runs on main and staging branches
+          if ([[ "$ENV" == "main" ]] || [[ "$ENV" == "staging" ]]) && ([[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "cli" ]]); then
             echo "should_build_cli=${{ steps.filter.outputs.cli }}" >> $GITHUB_OUTPUT
           else
             echo "should_build_cli=false" >> $GITHUB_OUTPUT
@@ -325,11 +325,18 @@ jobs:
         working-directory: ./apps/cli
         run: |
           echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
-          # Use the standalone build script with Bun cross-compilation target
-          bun build --compile --target=${{ matrix.bun_target }} ./src/index.ts --outfile dist/buster-cli
+          # Use the release build script with target specification
+          bun run build:release
 
-          # Make binary executable
-          chmod +x dist/buster-cli
+          # Rename output for CI (build outputs 'buster' or 'buster.exe')
+          if [[ "${{ matrix.is_windows }}" == "true" ]]; then
+            # Windows: Bun automatically adds .exe
+            mv dist/buster.exe dist/buster-cli
+          else
+            # Unix: no extension
+            mv dist/buster dist/buster-cli
+            chmod +x dist/buster-cli
+          fi
 
           # Display binary info
           ls -lah dist/
@@ -337,6 +344,7 @@ jobs:
         env:
           NODE_ENV: production
           SKIP_ENV_CHECK: true
+          BUN_TARGET: ${{ matrix.bun_target }}
 
       - name: Test binary (Non-Windows)
         if: matrix.is_windows == false
@@ -356,9 +364,15 @@ jobs:
         working-directory: ./apps/cli
         run: |
           cd dist
-          # Rename to just 'buster' for end users
-          mv buster-cli buster
-          tar czf ${{ matrix.artifact_name }} buster
+          # Rename based on environment
+          if [[ "${{ needs.detect-changes.outputs.environment }}" == "staging" ]]; then
+            mv buster-cli buster-staging
+            BINARY_NAME="buster-staging"
+          else
+            mv buster-cli buster
+            BINARY_NAME="buster"
+          fi
+          tar czf ${{ matrix.artifact_name }} ${BINARY_NAME}
           sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           echo "📦 Archive created:"
           ls -lah ${{ matrix.artifact_name }}*
@@ -368,9 +382,15 @@ jobs:
         working-directory: ./apps/cli
         run: |
           cd dist
-          # Rename to just 'buster.exe' for end users
-          mv buster-cli buster.exe
-          zip ${{ matrix.artifact_name }} buster.exe
+          # Add .exe extension and rename based on environment
+          if [[ "${{ needs.detect-changes.outputs.environment }}" == "staging" ]]; then
+            mv buster-cli buster-staging.exe
+            BINARY_NAME="buster-staging.exe"
+          else
+            mv buster-cli buster.exe
+            BINARY_NAME="buster.exe"
+          fi
+          zip ${{ matrix.artifact_name }} ${BINARY_NAME}
           sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
           echo "📦 Archive created:"
           ls -lah ${{ matrix.artifact_name }}*
@@ -564,8 +584,9 @@ jobs:
         id: create_the_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Release v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.get_version.outputs.version }}${{ needs.detect-changes.outputs.environment == 'staging' && '-staging' || '' }}
+          name: Release v${{ steps.get_version.outputs.version }}${{ needs.detect-changes.outputs.environment == 'staging' && ' (Staging)' || '' }}
+          prerelease: ${{ needs.detect-changes.outputs.environment == 'staging' }}
           body: |
             ## Buster CLI v${{ steps.get_version.outputs.version }}
 
@@ -597,7 +618,6 @@ jobs:
             **/buster-cli-windows-x86_64.zip
             **/buster-cli-windows-x86_64.zip.sha256
           draft: false
-          prerelease: false
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -647,8 +667,8 @@ jobs:
             echo "- **CLI:** ${{ needs.build-cli.result }}" >> $GITHUB_STEP_SUMMARY
           else
             ENV="${{ needs.detect-changes.outputs.environment }}"
-            if [[ "${ENV}" != "main" ]]; then
-              echo "- **CLI:** ⏭️ Skipped (only builds on main branch)" >> $GITHUB_STEP_SUMMARY
+            if [[ "${ENV}" != "main" ]] && [[ "${ENV}" != "staging" ]]; then
+              echo "- **CLI:** ⏭️ Skipped (only builds on main and staging branches)" >> $GITHUB_STEP_SUMMARY
             else
               echo "- **CLI:** ⏭️ Skipped (no CLI/package changes)" >> $GITHUB_STEP_SUMMARY
             fi
@@ -693,8 +713,8 @@ jobs:
             fi
           else
             ENV="${{ needs.detect-changes.outputs.environment }}"
-            if [[ "${ENV}" != "main" ]]; then
-              echo "- **CLI Release:** ⏭️ Skipped (only releases on main branch)" >> $GITHUB_STEP_SUMMARY
+            if [[ "${ENV}" != "main" ]] && [[ "${ENV}" != "staging" ]]; then
+              echo "- **CLI Release:** ⏭️ Skipped (only releases on main and staging branches)" >> $GITHUB_STEP_SUMMARY
             else
               echo "- **CLI Release:** ⏭️ Skipped (CLI build did not run)" >> $GITHUB_STEP_SUMMARY
             fi
