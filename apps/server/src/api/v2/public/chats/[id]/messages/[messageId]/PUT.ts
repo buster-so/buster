@@ -21,14 +21,15 @@ const UpdateMessageParamsSchema = z.object({
 /**
  * PUT /api/v2/public/chats/:id/messages/:messageId
  *
- * Updates a message's isCompleted status and rawLlmMessages
+ * Updates a message's isCompleted status, rawLlmMessages, and errorReason
  * Requires API key authentication via Bearer token
  * User must have can_edit permission on the chat
  *
  * Request body:
  * {
- *   "isCompleted": true,  // optional
- *   "rawLlmMessages": []  // optional
+ *   "isCompleted": true,     // optional
+ *   "rawLlmMessages": [],    // optional
+ *   "errorReason": "error"   // optional
  * }
  */
 app.put(
@@ -89,6 +90,7 @@ app.put(
         ...(updateData.rawLlmMessages !== undefined && {
           rawLlmMessages: updateData.rawLlmMessages,
         }),
+        ...(updateData.errorReason !== undefined && { errorReason: updateData.errorReason }),
       });
 
       if (!result.success) {

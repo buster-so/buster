@@ -167,7 +167,10 @@ describe('run-docs-agent', () => {
 
       // Verify sandbox creation
       const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
-      expect(createSandboxWithBusterCLI).toHaveBeenCalledWith('buster-data-engineer-postgres', 'buster-data-engineer-fallback');
+      expect(createSandboxWithBusterCLI).toHaveBeenCalledWith(
+        'buster-data-engineer-postgres',
+        'buster-data-engineer-fallback'
+      );
 
       // Verify git clone
       expect(mockSandbox.git.clone).toHaveBeenCalledWith(
