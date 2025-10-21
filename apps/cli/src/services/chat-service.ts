@@ -1,5 +1,5 @@
 import { initLogger, type ModelMessage } from '@buster/ai';
-import { createBusterSDK } from '@buster/sdk';
+import type { BusterSDK } from '@buster/sdk';
 import { z } from 'zod';
 import { executeAgent, type ProxyConfig } from '../handlers/agent-handler';
 import { processAgentStream } from '../handlers/stream-handler';
@@ -7,7 +7,7 @@ import type { AgentMessage } from '../types/agent-messages';
 import { getProxyConfig } from '../utils/ai-proxy';
 import { readContextFile } from '../utils/context-file';
 import { saveModelMessages } from '../utils/conversation-history';
-import { getCredentials } from '../utils/credentials';
+import { getOrCreateSdk } from '../utils/sdk-factory';
 
 /**
  * CLI wrapper for agent messages with unique ID for React keys
@@ -35,6 +35,7 @@ export const ChatServiceParamsSchema = z.object({
     .string()
     .optional()
     .describe('Path to context file to include as system message'),
+  sdk: z.custom<BusterSDK>().optional().describe('Optional SDK instance for API operations'),
 });
 
 export type ChatServiceParams = z.infer<typeof ChatServiceParamsSchema>;
@@ -68,6 +69,7 @@ export async function runChatAgent(
     prompt: userPrompt,
     messages: providedMessages,
     contextFilePath,
+    sdk: providedSdk,
   } = validated;
   const { onThinkingStateChange, onMessageUpdate, onError, onAbort } = callbacks;
 
@@ -122,36 +124,41 @@ export async function runChatAgent(
       modelId: 'anthropic/claude-sonnet-4.5',
     };
 
-    // Initialize SDK and create message upfront if credentials available
-    let sdk: ReturnType<typeof createBusterSDK> | null = null;
-    if (messageId) {
-      const credentials = await getCredentials();
-      if (credentials) {
-        sdk = createBusterSDK({
-          apiKey: credentials.apiKey,
-          apiUrl: credentials.apiUrl,
-        });
+    // Use provided SDK or create one (API-first approach)
+    // If SDK is not provided, we'll try to create one but don't fail if credentials missing
+    let sdk: BusterSDK | null = null;
+    if (providedSdk) {
+      sdk = providedSdk;
+    } else {
+      try {
+        sdk = await getOrCreateSdk();
+      } catch (error) {
+        // Log warning but continue - allows CLI to work without credentials
+        console.warn('No SDK available - running without API integration:', error);
+      }
+    }
 
-        // Create message/chat upfront (upsert pattern)
-        // Use provided prompt, or extract from previous messages, or use default
-        const prompt =
-          userPrompt ||
-          (() => {
-            const userMessage = previousMessages.find((m) => m.role === 'user');
-            return userMessage && typeof userMessage.content === 'string'
-              ? userMessage.content
-              : null;
-          })();
+    // Create message upfront if we have SDK
+    if (sdk && messageId) {
+      // Create message/chat upfront (upsert pattern)
+      // Use provided prompt, or extract from previous messages, or use default
+      const prompt =
+        userPrompt ||
+        (() => {
+          const userMessage = previousMessages.find((m) => m.role === 'user');
+          return userMessage && typeof userMessage.content === 'string'
+            ? userMessage.content
+            : null;
+        })();
 
-        if (prompt) {
-          try {
-            await sdk.messages.create(chatId, messageId, {
-              prompt,
-            });
-          } catch (error) {
-            // Log but continue - we'll save locally even if API fails
-            console.warn('Failed to create message in database:', error);
-          }
+      if (prompt) {
+        try {
+          await sdk.messages.create(chatId, messageId, {
+            prompt,
+          });
+        } catch (error) {
+          // Log but continue - we'll save locally even if API fails
+          console.warn('Failed to create message in database:', error);
         }
       }
     }
@@ -184,8 +191,12 @@ export async function runChatAgent(
       currentTurnStartIndex, // Pass the index to stream handler so it only saves current turn
       onSaveMessages: async (messages) => {
         // Note: messages here are already sliced to current turn by stream handler
-        // Save messages to disk
-        await saveModelMessages(chatId, workingDirectory, messages);
+
+        // API-first approach: Only save to disk if SDK is NOT provided
+        // When SDK is provided, we ONLY use API (no local file fallback)
+        if (!providedSdk) {
+          await saveModelMessages(chatId, workingDirectory, messages);
+        }
 
         // Update message in database if we have SDK
         if (sdk && messageId) {
@@ -194,8 +205,13 @@ export async function runChatAgent(
               rawLlmMessages: messages,
             });
           } catch (error) {
-            // Don't fail the entire operation if the API update fails
-            console.warn('Failed to update message in database:', error);
+            // When SDK is provided, we should throw errors (no local fallback)
+            // When SDK was auto-created, just warn (allows graceful degradation)
+            if (providedSdk) {
+              throw error;
+            } else {
+              console.warn('Failed to update message in database:', error);
+            }
           }
         }
       },
@@ -229,6 +245,17 @@ export async function runChatAgent(
         console.warn('Failed to mark message as completed:', error);
       }
     }
+  } catch (error) {
+    // Handle all errors and notify via callback
+    console.error('Error in chat agent execution:', error);
+
+    // Notify error callback if provided
+    if (onError) {
+      onError(error);
+    }
+
+    // Re-throw to allow caller to handle as needed
+    throw error;
   } finally {
     // Flush Braintrust logger to ensure all traces are sent
     await braintrustLogger.flush();

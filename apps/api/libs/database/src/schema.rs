@@ -52,6 +52,10 @@ pub mod sql_types {
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "workspace_sharing_enum"))]
     pub struct WorkspaceSharingEnum;
+
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "chat_type_enum"))]
+    pub struct ChatTypeEnum;
 }
 
 diesel::table! {
@@ -90,6 +94,7 @@ diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::WorkspaceSharingEnum;
     use super::sql_types::AssetTypeEnum;
+    use super::sql_types::ChatTypeEnum;
 
     chats (id) {
         id -> Uuid,
@@ -109,6 +114,7 @@ diesel::table! {
         workspace_sharing -> WorkspaceSharingEnum,
         workspace_sharing_enabled_by -> Nullable<Uuid>,
         workspace_sharing_enabled_at -> Nullable<Timestamptz>,
+        chat_type -> Nullable<ChatTypeEnum>,
     }
 }
 

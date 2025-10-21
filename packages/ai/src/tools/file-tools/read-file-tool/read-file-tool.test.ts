@@ -1,334 +1,490 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ReadFileToolInput } from './read-file-tool';
-import { createReadFileToolExecute } from './read-file-tool-execute';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { materialize } from '@buster/test-utils';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { cleanupTempDir, createTempDir, createTestFile, generateLargeFile } from '../test-utils';
+import type { ReadFileToolContext } from './read-file-tool';
+import { createReadFileTool } from './read-file-tool';
 
-// Mock Bun global
-const mockBunFile = vi.fn();
+describe.sequential('read-file-tool integration tests', () => {
+  let tempDir: string;
+  let originalCwd: string;
+  let tool: ReturnType<typeof createReadFileTool>;
+  let context: ReadFileToolContext;
 
-global.Bun = {
-  file: mockBunFile,
-} as unknown as typeof Bun;
+  beforeAll(async () => {
+    // Save original working directory
+    originalCwd = process.cwd();
 
-describe('createReadFilesToolExecute', () => {
-  const projectDirectory = '/project';
-  const messageId = 'test-message-id';
+    // Create temp directory
+    tempDir = createTempDir('read-file-test-');
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+    // Change to temp directory
+    process.chdir(tempDir);
+
+    // Create context
+    context = {
+      messageId: 'test-message-id',
+      projectDirectory: tempDir,
+      onToolEvent: vi.fn(),
+    };
+
+    // Create tool
+    tool = createReadFileTool(context);
+
+    // Spy on console to suppress logs during tests
     vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  afterEach(() => {
+  afterAll(() => {
+    // Restore original working directory
+    process.chdir(originalCwd);
+    cleanupTempDir(tempDir);
     vi.restoreAllMocks();
   });
 
-  describe('successful file reading', () => {
-    it('should read a single file successfully', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue('export const test = "hello";'),
-      };
-      mockBunFile.mockReturnValue(mockFile);
+  describe('basic file reading', () => {
+    it('should read small text file', async () => {
+      const filePath = join(tempDir, 'small.txt');
+      await createTestFile(filePath, 'Hello World\nLine 2\nLine 3');
 
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'test.ts',
-      };
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
 
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: 'test.ts',
-        content: 'export const test = "hello";',
-        truncated: false,
-        lineTruncated: false,
-        charTruncated: false,
-      });
-
-      expect(mockBunFile).toHaveBeenCalledWith('/project/test.ts');
-      expect(mockFile.exists).toHaveBeenCalled();
-      expect(mockFile.text).toHaveBeenCalled();
-    });
-
-    it('should handle absolute paths correctly', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue('absolute content'),
-      };
-      mockBunFile.mockReturnValue(mockFile);
-
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: '/project/absolute/path.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: '/project/absolute/path.ts',
-        content: 'absolute content',
-        truncated: false,
-        lineTruncated: false,
-        charTruncated: false,
-      });
-    });
-
-    it('should truncate files exceeding 1000 lines', async () => {
-      // Setup
-      const lines = Array.from({ length: 1500 }, (_, i) => `line ${i + 1}`);
-      const fullContent = lines.join('\n');
-      const expectedContent = lines.slice(0, 1000).join('\n');
-
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue(fullContent),
-      };
-      mockBunFile.mockReturnValue(mockFile);
-
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'large-file.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: 'large-file.ts',
-        content: expectedContent,
-        truncated: true,
-        lineTruncated: true,
-        charTruncated: false,
-      });
-    });
-
-    it('should not truncate files with exactly 1000 lines', async () => {
-      // Setup
-      const lines = Array.from({ length: 1000 }, (_, i) => `line ${i + 1}`);
-      const content = lines.join('\n');
-
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue(content),
-      };
-      mockBunFile.mockReturnValue(mockFile);
-
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'exact-file.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: 'exact-file.ts',
-        content,
-        truncated: false,
-        lineTruncated: false,
-        charTruncated: false,
-      });
-    });
-  });
-
-  describe('error handling', () => {
-    it('should handle file not found errors', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(false),
-      };
-      mockBunFile.mockReturnValue(mockFile);
-
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'nonexistent.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'error',
-        file_path: 'nonexistent.ts',
-        error_message: 'File not found',
-      });
-    });
-
-    it('should handle file read errors gracefully', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockRejectedValue(new Error('Permission denied')),
-      };
-      mockBunFile.mockReturnValue(mockFile);
-
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'error.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'error',
-        file_path: 'error.ts',
-        error_message: 'Permission denied',
-      });
-    });
-
-    it('should reject paths outside project directory', async () => {
-      // Setup
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: '../outside/project.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result.status).toBe('error');
-      if (result.status === 'error') {
-        expect(result.error_message).toContain('not in the current working directory');
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toContain('Hello World');
+        expect(result.content).toContain('Line 2');
+        expect(result.content).toContain('Line 3');
+        expect(result.truncated).toBe(false);
+        expect(result.lineTruncated).toBe(false);
+        expect(result.charTruncated).toBe(false);
       }
     });
 
-    it('should reject absolute paths outside project directory', async () => {
-      // Setup
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: '/etc/passwd',
-      };
+    it('should read TypeScript file', async () => {
+      const filePath = join(tempDir, 'code.ts');
+      const content = `export const API_KEY = 'test';
+export function connect() {
+  return db.connect();
+}`;
+      await createTestFile(filePath, content);
 
-      // Execute
-      const result = await execute(input);
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
 
-      // Verify
-      expect(result.status).toBe('error');
-      if (result.status === 'error') {
-        expect(result.error_message).toContain('not in the current working directory');
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toContain('API_KEY');
+        expect(result.content).toContain('export function connect');
+        expect(result.truncated).toBe(false);
+      }
+    });
+
+    it('should read JSON file', async () => {
+      const filePath = join(tempDir, 'config.json');
+      const content = JSON.stringify(
+        {
+          name: 'test-project',
+          version: '1.0.0',
+          dependencies: {
+            react: '^18.0.0',
+          },
+        },
+        null,
+        2
+      );
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toContain('test-project');
+        expect(result.content).toContain('dependencies');
+        expect(result.truncated).toBe(false);
+      }
+    });
+
+    it('should read empty file', async () => {
+      const filePath = join(tempDir, 'empty.txt');
+      await createTestFile(filePath, '');
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toBe('');
+        expect(result.truncated).toBe(false);
+      }
+    });
+  });
+
+  describe('line truncation', () => {
+    it('should truncate files exceeding 1000 lines', async () => {
+      const filePath = join(tempDir, 'large.txt');
+      const content = generateLargeFile(1500);
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        // Count lines in result
+        const lines = result.content.split('\n');
+        expect(lines.length).toBeLessThanOrEqual(1000);
+        expect(result.truncated).toBe(true);
+        expect(result.lineTruncated).toBe(true);
+      }
+    });
+
+    it('should handle exactly 1000 lines without truncation', async () => {
+      const filePath = join(tempDir, 'exactly-1000.txt');
+      const content = generateLargeFile(1000);
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        const lines = result.content.split('\n');
+        expect(lines.length).toBe(1000);
+        expect(result.lineTruncated).toBe(false);
+      }
+    });
+  });
+
+  describe('character truncation', () => {
+    it('should truncate long lines exceeding 2000 characters', async () => {
+      const filePath = join(tempDir, 'long-line.txt');
+      const longLine = 'x'.repeat(3000);
+      await createTestFile(filePath, longLine);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content.length).toBeLessThan(3000);
+        expect(result.truncated).toBe(true);
+        expect(result.charTruncated).toBe(true);
+      }
+    });
+
+    it('should handle total content exceeding 100000 characters', async () => {
+      const filePath = join(tempDir, 'very-large.txt');
+      // Create 1000 lines of 150 characters each = 150,000 chars total
+      const content = generateLargeFile(1000, (n) => 'x'.repeat(150));
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content.length).toBeLessThan(150000);
+        expect(result.truncated).toBe(true);
+        expect(result.charTruncated).toBe(true);
+      }
+    });
+  });
+
+  describe('pagination with offset and limit', () => {
+    it('should read specific range of lines with offset and limit', async () => {
+      const filePath = join(tempDir, 'numbered.txt');
+      const content = generateLargeFile(100);
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        {
+          filePath,
+          offset: 10,
+          limit: 5,
+        },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        const lines = result.content.split('\n');
+        expect(lines.length).toBeLessThanOrEqual(5);
+        // Should start from line 11 (0-indexed offset 10)
+        expect(result.content).toContain('Line 11');
+      }
+    });
+
+    it('should handle offset beyond file length', async () => {
+      const filePath = join(tempDir, 'short.txt');
+      await createTestFile(filePath, 'Line 1\nLine 2\nLine 3');
+
+      const rawResult = await tool.execute!(
+        {
+          filePath,
+          offset: 100,
+          limit: 10,
+        },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toBe('');
       }
     });
   });
 
   describe('path handling', () => {
-    it('should handle nested directory paths', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue('export const Button = () => {};'),
-      };
-      mockBunFile.mockReturnValue(mockFile);
+    it('should handle relative paths', async () => {
+      const filePath = join(tempDir, 'nested/deep/file.txt');
+      await createTestFile(filePath, 'Nested content');
 
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'src/components/Button.tsx',
-      };
+      const relativePath = 'nested/deep/file.txt';
+      const rawResult = await tool.execute!(
+        { filePath: relativePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
 
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: 'src/components/Button.tsx',
-        content: 'export const Button = () => {};',
-        truncated: false,
-        lineTruncated: false,
-        charTruncated: false,
-      });
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toContain('Nested content');
+      }
     });
 
-    it('should normalize paths correctly', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue('utils'),
-      };
-      mockBunFile.mockReturnValue(mockFile);
+    it('should handle absolute paths', async () => {
+      const filePath = join(tempDir, 'absolute.txt');
+      await createTestFile(filePath, 'Absolute path content');
 
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: './src/../lib/utils.ts',
-      };
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
 
-      // Execute
-      const result = await execute(input);
-
-      // Verify
       expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toContain('Absolute path content');
+      }
+    });
+
+    it('should prevent path escape attempts with ../../../', async () => {
+      const rawResult = await tool.execute!(
+        { filePath: '../../../etc/passwd' },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('error');
+      if (result.status === 'error') {
+        expect(result.error_message).toContain('not in the current working directory');
+      }
+    });
+
+    it('should prevent absolute path escape to system files', async () => {
+      const rawResult = await tool.execute!(
+        { filePath: '/etc/passwd' },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('error');
+      if (result.status === 'error') {
+        expect(result.error_message).toContain('not in the current working directory');
+      }
     });
   });
 
-  describe('edge cases', () => {
-    it('should handle empty file content', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue(''),
-      };
-      mockBunFile.mockReturnValue(mockFile);
+  describe('error handling', () => {
+    it('should handle non-existent files', async () => {
+      const rawResult = await tool.execute!(
+        { filePath: join(tempDir, 'does-not-exist.txt') },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
 
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'empty.ts',
-      };
-
-      // Execute
-      const result = await execute(input);
-
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: 'empty.ts',
-        content: '',
-        truncated: false,
-        lineTruncated: false,
-        charTruncated: false,
-      });
+      expect(result.status).toBe('error');
+      if (result.status === 'error') {
+        expect(result.error_message).toContain('not found');
+      }
     });
 
-    it('should handle file with only newlines', async () => {
-      // Setup
-      const mockFile = {
-        exists: vi.fn().mockResolvedValue(true),
-        text: vi.fn().mockResolvedValue('\n\n\n'),
-      };
-      mockBunFile.mockReturnValue(mockFile);
+    it('should handle directory instead of file', async () => {
+      const dirPath = join(tempDir, 'test-directory');
+      const dummyFile = join(dirPath, 'dummy.txt');
+      mkdirSync(dirname(dummyFile), { recursive: true });
+      writeFileSync(dummyFile, 'dummy', 'utf8');
 
-      const execute = createReadFileToolExecute({ messageId, projectDirectory });
-      const input: ReadFileToolInput = {
-        filePath: 'newlines.ts',
-      };
+      const rawResult = await tool.execute!(
+        { filePath: dirPath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
 
-      // Execute
-      const result = await execute(input);
+      // Should error or handle gracefully
+      expect(result.status).toBe('error');
+    });
+  });
 
-      // Verify
-      expect(result).toEqual({
-        status: 'success',
-        file_path: 'newlines.ts',
-        content: '\n\n\n',
-        truncated: false,
-        lineTruncated: false,
-        charTruncated: false,
-      });
+  describe('special characters and encoding', () => {
+    it('should handle Unicode characters', async () => {
+      const filePath = join(tempDir, 'unicode.txt');
+      const content = 'Hello 世界 🌍 Привет';
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toBe(content);
+      }
+    });
+
+    it('should handle newline variations', async () => {
+      const filePath = join(tempDir, 'newlines.txt');
+      const content = 'Line 1\nLine 2\nLine 3';
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toContain('Line 1');
+        expect(result.content).toContain('Line 2');
+        expect(result.content).toContain('Line 3');
+      }
+    });
+
+    it('should handle files with only newlines', async () => {
+      const filePath = join(tempDir, 'only-newlines.txt');
+      const content = '\n\n\n';
+      await createTestFile(filePath, content);
+
+      const rawResult = await tool.execute!(
+        { filePath },
+        {
+          toolCallId: 'test-tool-call',
+          messages: [],
+          abortSignal: new AbortController().signal,
+        }
+      );
+      const result = await materialize(rawResult);
+
+      expect(result.status).toBe('success');
+      if (result.status === 'success') {
+        expect(result.content).toBe(content);
+      }
     });
   });
 });

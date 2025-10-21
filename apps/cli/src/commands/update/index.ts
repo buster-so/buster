@@ -1,5 +1,6 @@
 // Export update command components
 
+export { getVersion } from '../../version';
 export { createUpdateCommand } from './command';
 export {
   getDirectUpdateInstructions,
@@ -7,10 +8,5 @@ export {
   isInstalledViaHomebrew,
 } from './homebrew-detection';
 export { UpdateCommand } from './update';
-export {
-  getBinaryFileName,
-  getBinaryInfo,
-  getCurrentVersion,
-  updateHandler,
-} from './update-handler';
+export { getBinaryFileName, getBinaryInfo, updateHandler } from './update-handler';
 export { type UpdateOptions, UpdateOptionsSchema, type UpdateResult } from './update-schemas';

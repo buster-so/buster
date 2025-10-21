@@ -46,6 +46,7 @@ export const CreateChatWithMessageInputSchema = z.object({
   content: z.string(),
   userId: z.string().uuid(),
   organizationId: z.string().uuid(),
+  chatType: ChatTypeSchema.optional(),
   messageAnalysisMode: MessageAnalysisModeSchema.optional(),
   metadata: z.record(z.any()).optional(),
 });
@@ -229,6 +230,7 @@ export async function createChatWithMessage(input: CreateChatWithMessageInput): 
           createdBy: validated.userId,
           updatedBy: validated.userId,
           publiclyAccessible: false,
+          chatType: validated.chatType || 'data_engineer',
         })
         .returning();
 

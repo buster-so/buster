@@ -21,9 +21,10 @@ export function createAnalyticsEngineerAgent(
     ? getAnalyticsEngineerSubagentSystemPrompt
     : getAnalyticsEngineerAgentSystemPrompt;
 
+  // Main system prompt
   const systemMessage = {
     role: 'system',
-    content: promptFunction(analyticsEngineerAgentOptions.folder_structure),
+    content: promptFunction(),
     providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
   } as ModelMessage;
 

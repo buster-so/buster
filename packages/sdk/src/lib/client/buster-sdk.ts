@@ -1,4 +1,5 @@
 import type { deploy as deployTypes } from '@buster/server-shared';
+import type { GetChatsListRequest, GetChatsListResponseV2 } from '@buster/server-shared/chats';
 import type {
   CreateMessageRequestBodySchema,
   CreateMessageResponse,
@@ -23,6 +24,9 @@ export interface BusterSDK {
     isApiKeyValid: (apiKey?: string) => Promise<boolean>;
   };
   deploy: (request: UnifiedDeployRequest) => Promise<UnifiedDeployResponse>;
+  chats: {
+    list: (params?: GetChatsListRequest) => Promise<GetChatsListResponseV2>;
+  };
   messages: {
     create: (
       chatId: string,
@@ -49,6 +53,22 @@ export function createBusterSDK(config: Partial<SDKConfig>): BusterSDK {
       isApiKeyValid: (apiKey?: string) => isApiKeyValid(validatedConfig, apiKey),
     },
     deploy: (request) => deploy(validatedConfig, request),
+    chats: {
+      list: (params?: GetChatsListRequest) => {
+        // Convert params to string record for HTTP client
+        const queryParams = params
+          ? {
+              ...(params.page_token !== undefined && {
+                page_token: String(params.page_token),
+              }),
+              ...(params.page_size !== undefined && { page_size: String(params.page_size) }),
+              ...(params.chat_type !== undefined && { chat_type: params.chat_type }),
+            }
+          : undefined;
+
+        return get<GetChatsListResponseV2>(validatedConfig, '/public/chats', queryParams);
+      },
+    },
     messages: {
       create: (chatId, messageId, data) =>
         post<CreateMessageResponse>(

@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { getCurrentVersion } from '../commands/update/update-handler';
 import { checkForUpdate, formatVersion } from '../utils/version/index';
+import { getVersion } from '../version';
 
 /**
  * Sets up background update checking for the CLI
@@ -12,7 +12,7 @@ export function setupUpdateChecker(): void {
     return;
   }
 
-  const currentVersion = getCurrentVersion();
+  const currentVersion = getVersion();
 
   checkForUpdate(currentVersion)
     .then((result) => {

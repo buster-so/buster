@@ -10,11 +10,12 @@ import {
   usersToOrganizations,
 } from '../../schema';
 import type { ChatListItem, PaginatedResponse } from '../../schema-types';
-import { createPaginatedResponse, PaginationInputSchema } from '../../schema-types';
+import { ChatTypeSchema, createPaginatedResponse, PaginationInputSchema } from '../../schema-types';
 
 export const ListChatsRequestSchema = z
   .object({
     userId: z.string().uuid(),
+    chatType: ChatTypeSchema.describe('Filter chats by type'),
   })
   .merge(PaginationInputSchema);
 
@@ -120,7 +121,7 @@ function getAccessibleChatIds(userId: string) {
  * Returns a list of chat items with user information and pagination details.
  */
 export async function listChats(params: ListChatsRequest): Promise<ListChatsResponse> {
-  const { userId, page, page_size } = ListChatsRequestSchema.parse(params);
+  const { userId, chatType, page, page_size } = ListChatsRequestSchema.parse(params);
 
   // Calculate offset based on page number
   const offset = (page - 1) * page_size;
@@ -130,7 +131,7 @@ export async function listChats(params: ListChatsRequest): Promise<ListChatsResp
 
   // Where conditions for filtering chats
   const contentFilterConditions = and(
-    eq(chats.chatType, 'analyst'),
+    eq(chats.chatType, chatType),
     isNull(chats.deletedAt),
     ne(chats.title, ''),
     or(

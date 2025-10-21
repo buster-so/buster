@@ -6,6 +6,7 @@ import { getLastLines } from '../../utils/content-preview';
 import { ContentLines } from '../shared/content-lines';
 import { ExpansionHint } from '../shared/expansion-hint';
 import { IndentedContent } from '../shared/indented-content';
+import { ToolBadge } from '../shared/tool-badge';
 
 interface ExecuteMessageProps {
   message: Extract<AgentMessage, { kind: 'bash' | 'grep' | 'ls' }>;
@@ -59,12 +60,7 @@ export function ExecuteMessage({ message }: ExecuteMessageProps) {
   return (
     <Box flexDirection="column" marginBottom={1}>
       {/* EXECUTE badge with actual command in parentheses */}
-      <Box flexDirection="row">
-        <Text bold color="white" backgroundColor={UI_CONSTANTS.TOOL_COLORS.EXECUTE}>
-          EXECUTE
-        </Text>
-        <Text color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}> ({args.command})</Text>
-      </Box>
+      <ToolBadge tool="EXECUTE" filePath={args.command} />
 
       {/* Output lines - always show with indentation */}
       {outputLines.length > 0 && (

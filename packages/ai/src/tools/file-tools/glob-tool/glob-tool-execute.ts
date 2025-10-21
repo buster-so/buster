@@ -72,8 +72,9 @@ async function executeGlob(pattern: string, searchPath: string): Promise<Match[]
 export function createGlobToolExecute(context: GlobToolContext) {
   return wrapTraced(
     async function execute(input: GlobToolInput): Promise<GlobToolOutput> {
-      const { messageId, projectDirectory, onToolEvent } = context;
+      const { messageId, onToolEvent } = context;
       const { pattern, path: inputPath, offset = 0, limit = DEFAULT_LIMIT } = input;
+      const projectDirectory = process.cwd();
 
       if (!pattern) {
         throw new Error('pattern is required');
