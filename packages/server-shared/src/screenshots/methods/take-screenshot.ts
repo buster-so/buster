@@ -42,7 +42,7 @@ export const takeScreenshot = async ({
   return compressed;
 };
 
-const assertBeforeScreenshot = async (page: Page, { fullPath }: { fullPath: string }) => {
+export const assertBeforeScreenshot = async (page: Page, { fullPath }: { fullPath: string }) => {
   // Assert that "INTERNAL SERVER ERROR" does not show up on the page
   const pageContent = await page.content();
   if (pageContent.includes('INTERNAL SERVER ERROR')) {
