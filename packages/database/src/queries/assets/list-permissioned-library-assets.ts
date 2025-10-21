@@ -269,7 +269,7 @@ export async function listPermissionedLibraryAssets(
 
   // Apply ordering and execute query
   const assetsResult = await (async () => {
-    if (ordering === 'last_opened') {
+    if (ordering === 'updated_at') {
       return await filteredAssetQuery
         .orderBy(direction(permissionedAssets.updatedAt))
         .limit(page_size)

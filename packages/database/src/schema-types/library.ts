@@ -60,7 +60,7 @@ export const ListPermissionedLibraryAssetsInputSchema = z
     endDate: z.string().datetime().optional(),
     includeCreatedBy: z.string().uuid().array().optional(),
     excludeCreatedBy: z.string().uuid().array().optional(),
-    ordering: z.enum(['last_opened', 'created_at', 'none']).optional(),
+    ordering: z.enum(['updated_at', 'created_at', 'none']).optional(),
     orderingDirection: z.enum(['asc', 'desc']).optional(),
     groupBy: z.enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none']).optional(),
     query: z.string().optional(),

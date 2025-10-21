@@ -119,8 +119,8 @@ const orderByitems: SelectItem<LibrarySearchParams['ordering']>[] = [
     value: 'none',
   },
   {
-    label: 'Last opened',
-    value: 'last_opened',
+    label: 'Updated at',
+    value: 'updated_at',
   },
   {
     label: 'Created at',
@@ -165,13 +165,15 @@ const OrderingItem = ({
           }}
         />
 
-        <Button
-          variant="default"
-          size={'tall'}
-          className={cn('duration-0', ordering_direction === 'desc' ? 'rotate-180 ' : '')}
-          prefix={<Sorting />}
-          onClick={onClickOrderingDirection}
-        />
+        {ordering_direction && ordering !== 'none' && (
+          <Button
+            variant="default"
+            size={'tall'}
+            className={cn('duration-0', ordering_direction === 'desc' ? 'rotate-180 ' : '')}
+            prefix={<Sorting />}
+            onClick={onClickOrderingDirection}
+          />
+        )}
       </div>
     </ItemContainer>
   );
