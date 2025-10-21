@@ -249,7 +249,9 @@ export async function listPermissionedLibraryAssets(
       assetType: permissionedAssets.assetType,
       name: permissionedAssets.name,
       updatedAt: permissionedAssets.updatedAt,
+      updatedAtDate: sql<string>`DATE(${permissionedAssets.updatedAt})`.as('updated_at_date'),
       createdAt: permissionedAssets.createdAt,
+      createdAtDate: sql<string>`DATE(${permissionedAssets.createdAt})`.as('created_at_date'),
       createdBy: permissionedAssets.createdBy,
       createdByName: users.name,
       createdByEmail: users.email,
@@ -266,21 +268,22 @@ export async function listPermissionedLibraryAssets(
   const direction = orderingDirection === 'asc' ? asc : desc;
 
   // Apply ordering and execute query
-  let assetsResult;
-  if (ordering === 'last_opened') {
-    assetsResult = await filteredAssetQuery
-      .orderBy(direction(permissionedAssets.updatedAt))
-      .limit(page_size)
-      .offset(offset);
-  } else if (ordering === 'created_at') {
-    assetsResult = await filteredAssetQuery
-      .orderBy(direction(permissionedAssets.createdAt))
-      .limit(page_size)
-      .offset(offset);
-  } else {
+  const assetsResult = await (async () => {
+    if (ordering === 'last_opened') {
+      return await filteredAssetQuery
+        .orderBy(direction(permissionedAssets.updatedAt))
+        .limit(page_size)
+        .offset(offset);
+    }
+    if (ordering === 'created_at') {
+      return await filteredAssetQuery
+        .orderBy(direction(permissionedAssets.createdAt))
+        .limit(page_size)
+        .offset(offset);
+    }
     // No explicit ordering - let database decide
-    assetsResult = await filteredAssetQuery.limit(page_size).offset(offset);
-  }
+    return await filteredAssetQuery.limit(page_size).offset(offset);
+  })();
 
   const baseCountQuery = db.select({ total: count() }).from(permissionedAssets);
   const countResult = await (whereCondition
@@ -305,7 +308,13 @@ export async function listPermissionedLibraryAssets(
   if (groupBy && groupBy !== 'none') {
     const groups: Record<string, LibraryAssetListItem[]> = {};
 
-    for (const asset of libraryAssets) {
+    for (let i = 0; i < libraryAssets.length; i++) {
+      const asset = libraryAssets[i];
+      const resultAsset = assetsResult[i];
+      if (!asset || !resultAsset) {
+        continue;
+      }
+
       let groupKey: string;
 
       if (groupBy === 'asset_type') {
@@ -313,17 +322,18 @@ export async function listPermissionedLibraryAssets(
       } else if (groupBy === 'owner') {
         groupKey = asset.created_by;
       } else if (groupBy === 'created_at') {
-        // Group by date (YYYY-MM-DD)
-        const datePart = asset.created_at.split('T')[0];
-        groupKey = datePart ?? asset.created_at;
+        // Use database-computed date (YYYY-MM-DD) for consistent day-based grouping
+        groupKey = resultAsset.createdAtDate;
+      } else if (groupBy === 'updated_at') {
+        // Use database-computed date (YYYY-MM-DD) for consistent day-based grouping
+        groupKey = resultAsset.updatedAtDate;
       } else {
         groupKey = 'ungrouped';
       }
 
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      groups[groupKey]!.push(asset);
+      const groupArray = groups[groupKey] ?? [];
+      groupArray.push(asset);
+      groups[groupKey] = groupArray;
     }
 
     const totalPages = Math.ceil(totalValue / page_size);

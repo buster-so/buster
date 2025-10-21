@@ -190,7 +190,6 @@ const LibraryGroupedView = ({
     return (
       <>
         {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
-          const Icon = assetTypeToIcon(assetType as AssetType);
           const title = items[0].created_by_name ?? items[0].created_by_email;
 
           return (
@@ -213,7 +212,7 @@ const LibraryGroupedView = ({
         })}
       </>
     );
-  } else if (groupBy === 'created_at') {
+  } else if (groupBy === 'created_at' || groupBy === 'updated_at') {
     return (
       <>
         {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
@@ -238,7 +237,7 @@ const LibraryGroupedView = ({
       </>
     );
   } else {
-    const _exhaustiveCheck = groupBy;
+    const _exhaustiveCheck: never | undefined = groupBy;
     console.error('Exhaustive check failed for groupBy', _exhaustiveCheck);
     return null;
   }

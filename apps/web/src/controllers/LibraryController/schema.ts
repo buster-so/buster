@@ -29,7 +29,10 @@ export const searchParamsSchema = z.object({
   owner_ids: z.array(z.string().uuid()).optional(),
   asset_types: z.array(AssetTypeSchema).optional(),
   layout: layoutSchema.optional(),
-  group_by: z.enum(['asset_type', 'owner', 'created_at', 'none']).default('none').optional(),
+  group_by: z
+    .enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none'])
+    .default('none')
+    .optional(),
   filter: z.enum(['all', 'owned_by_me', 'shared_with_me']).default('all').optional(),
 });
 

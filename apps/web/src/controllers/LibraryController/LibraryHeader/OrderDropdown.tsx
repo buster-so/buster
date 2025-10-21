@@ -194,6 +194,10 @@ const groupByItems: SelectItem<LibrarySearchParams['group_by']>[] = [
     label: 'Created at',
     value: 'created_at',
   },
+  {
+    label: 'Updated at',
+    value: 'updated_at',
+  },
 ];
 
 const GroupByItem = ({ groupBy }: { groupBy: LibrarySearchParams['group_by'] }) => {
