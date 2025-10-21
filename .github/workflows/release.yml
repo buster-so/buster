@@ -328,11 +328,13 @@ jobs:
           # Use the release build script with target specification
           bun run build:release
 
-          # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
-          mv dist/buster dist/buster-cli
-
-          # Make binary executable on Unix systems
-          if [[ "${{ runner.os }}" != "Windows" ]]; then
+          # Rename output for CI (build outputs 'buster' or 'buster.exe')
+          if [[ "${{ matrix.is_windows }}" == "true" ]]; then
+            # Windows: Bun automatically adds .exe
+            mv dist/buster.exe dist/buster-cli
+          else
+            # Unix: no extension
+            mv dist/buster dist/buster-cli
             chmod +x dist/buster-cli
           fi
 
@@ -380,7 +382,7 @@ jobs:
         working-directory: ./apps/cli
         run: |
           cd dist
-          # Rename based on environment
+          # Add .exe extension and rename based on environment
           if [[ "${{ needs.detect-changes.outputs.environment }}" == "staging" ]]; then
             mv buster-cli buster-staging.exe
             BINARY_NAME="buster-staging.exe"
