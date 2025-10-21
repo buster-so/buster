@@ -90,7 +90,7 @@ const app = new Hono().post(
     });
 
     // Kick off the documentation agent
-    await runDocsAgentAsync({
+    const docsAgentResult = await runDocsAgentAsync({
       installationToken: installationTokenResult.token,
       repoUrl: repositoryUrl,
       branch: branchName,
@@ -105,6 +105,9 @@ const app = new Hono().post(
       {
         message: 'Kicked off documentation agent',
         messageId: newMessage.id,
+        commandId: docsAgentResult.commandId,
+        sessionId: docsAgentResult.sessionId,
+        sandboxId: docsAgentResult.sandboxId,
       },
       202
     );

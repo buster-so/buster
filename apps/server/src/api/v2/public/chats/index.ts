@@ -4,9 +4,13 @@ import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import { createApiKeyAuthMiddleware } from '../../../../middleware/api-key-auth';
 import { chatById } from './[id]';
+import GET from './GET';
 import { publicChatHandler } from './handler';
 
 const app = new Hono();
+
+// Mount GET route for listing chats
+app.route('/', GET);
 
 /**
  * POST /api/v2/public/chats

@@ -26,6 +26,44 @@ pub enum MessageFeedback {
 }
 
 #[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    diesel::AsExpression,
+    diesel::FromSqlRow,
+    Deserialize,
+    Serialize,
+)]
+#[diesel(sql_type = sql_types::ChatTypeEnum)]
+#[serde(rename_all = "camelCase")]
+pub enum ChatType {
+    Analyst,
+    Developer,
+}
+
+impl ChatType {
+    pub fn to_string(&self) -> &'static str {
+        match *self {
+            ChatType::Analyst => "analyst",
+            ChatType::Developer => "developer",
+        }
+    }
+}
+
+impl FromStr for ChatType {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "analyst" => Ok(ChatType::Analyst),
+            "developer" => Ok(ChatType::Developer),
+            _ => Err("Unrecognized ChatType".into()),
+        }
+    }
+}
+
+#[derive(
     Serialize,
     Deserialize,
     Debug,
@@ -732,6 +770,27 @@ impl FromSql<sql_types::MessageFeedbackEnum, Pg> for MessageFeedback {
             b"positive" => Ok(MessageFeedback::Positive),
             b"negative" => Ok(MessageFeedback::Negative),
             _ => Err("Unrecognized MessageFeedback".into()),
+        }
+    }
+}
+
+// Implementing for ChatType
+impl ToSql<sql_types::ChatTypeEnum, Pg> for ChatType {
+    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
+        match *self {
+            ChatType::Analyst => out.write_all(b"analyst")?,
+            ChatType::Developer => out.write_all(b"developer")?,
+        }
+        Ok(IsNull::No)
+    }
+}
+
+impl FromSql<sql_types::ChatTypeEnum, Pg> for ChatType {
+    fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
+        match bytes.as_bytes() {
+            b"analyst" => Ok(ChatType::Analyst),
+            b"developer" => Ok(ChatType::Developer),
+            _ => Err("Unrecognized ChatType".into()),
         }
     }
 }

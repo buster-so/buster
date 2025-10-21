@@ -63,14 +63,13 @@ export async function createAnalyticsEngineerToolset(
 ): Promise<
   SubagentResearchToolset | MainAgentResearchToolset | SubagentToolset | MainAgentToolset
 > {
-  const { messageId, folder_structure, isInResearchMode, isSubagent, chatId, todosList } =
+  const { messageId, isInResearchMode, isSubagent, chatId, todosList } =
     analyticsEngineerAgentOptions;
 
   // Helper to create task tool (avoids duplication)
   const createTaskToolForAgent = () =>
     createTaskTool({
       messageId,
-      projectDirectory: folder_structure,
       createAgent: ((options: Parameters<AgentFactory>[0]) => {
         return createAnalyticsEngineerAgent({
           ...options,
@@ -86,15 +85,14 @@ export async function createAnalyticsEngineerToolset(
 
   // Build read-only tools (always present)
   const readOnlyTools = {
-    [GREP_TOOL_NAME]: createGrepTool({ messageId, projectDirectory: folder_structure }),
-    [GLOB_TOOL_NAME]: createGlobTool({ messageId, projectDirectory: folder_structure }),
-    [READ_FILE_TOOL_NAME]: createReadFileTool({ messageId, projectDirectory: folder_structure }),
+    [GREP_TOOL_NAME]: createGrepTool({ messageId }),
+    [GLOB_TOOL_NAME]: createGlobTool({ messageId }),
+    [READ_FILE_TOOL_NAME]: createReadFileTool({ messageId }),
     [BASH_TOOL_NAME]: createBashTool({
       messageId,
-      projectDirectory: folder_structure,
       isInResearchMode,
     }),
-    [LS_TOOL_NAME]: createLsTool({ messageId, projectDirectory: folder_structure }),
+    [LS_TOOL_NAME]: createLsTool({ messageId }),
     [RUN_SQL_TOOL_NAME]: createRunSqlTool({
       apiKey: analyticsEngineerAgentOptions.apiKey || process.env.BUSTER_API_KEY || '',
       apiUrl:
@@ -111,7 +109,6 @@ export async function createAnalyticsEngineerToolset(
     }),
     [TODO_WRITE_TOOL_NAME]: createTodoWriteTool({
       chatId,
-      workingDirectory: folder_structure,
       todosList,
     }),
   };
@@ -131,11 +128,10 @@ export async function createAnalyticsEngineerToolset(
 
   // Full mode: add write tools
   const writeTools = {
-    [WRITE_FILE_TOOL_NAME]: createWriteFileTool({ messageId, projectDirectory: folder_structure }),
-    [EDIT_FILE_TOOL_NAME]: createEditFileTool({ messageId, projectDirectory: folder_structure }),
+    [WRITE_FILE_TOOL_NAME]: createWriteFileTool({ messageId }),
+    [EDIT_FILE_TOOL_NAME]: createEditFileTool({ messageId }),
     [MULTI_EDIT_FILE_TOOL_NAME]: createMultiEditFileTool({
       messageId,
-      projectDirectory: folder_structure,
     }),
   };
 

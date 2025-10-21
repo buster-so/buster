@@ -25,8 +25,8 @@
  * - This config tells Bun to skip those platform-specific native modules
  */
 
-import { $ } from 'bun';
 import { parseArgs } from 'node:util';
+import { $ } from 'bun';
 
 const isProd = process.env.NODE_ENV === 'production';
 

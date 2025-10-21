@@ -29,4 +29,5 @@ export {
   uploadSingleFile,
   validatePath,
 } from './filesystem/add-files';
-export { createSandbox } from './management/create-sandbox';
+export { getCommandDetails } from './management/check-command-status';
+export { createSandbox, createSandboxWithBusterCLI } from './management/create-sandbox';

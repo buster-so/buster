@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import { wrapTraced } from 'braintrust';
 import type { BashToolContext, BashToolInput, BashToolOutput } from './bash-tool';
 
@@ -112,7 +113,25 @@ function validateDbtCommand(command: string): { isValid: boolean; error?: string
 }
 
 /**
- * Executes a bash command using Bun.spawn with timeout support
+ * Gets the appropriate shell command array for the current platform
+ * @param command - The command to execute
+ * @returns Array containing shell binary and arguments
+ */
+function getShellCommand(command: string): { shell: string; args: string[] } {
+  const platform = process.platform;
+
+  if (platform === 'win32') {
+    // On Windows, use cmd.exe
+    return { shell: 'cmd.exe', args: ['/c', command] };
+  }
+
+  // On Unix-like systems, use bash or sh
+  // Try common Unix shell paths
+  return { shell: '/bin/bash', args: ['-c', command] };
+}
+
+/**
+ * Executes a bash command using Node.js spawn with timeout support
  * @param command - The bash command to execute
  * @param timeout - Timeout in milliseconds
  * @param projectDirectory - The project directory to execute the command in
@@ -124,35 +143,43 @@ async function executeCommand(
   projectDirectory: string
 ): Promise<BashToolOutput> {
   try {
-    // Create abort controller for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    // Get platform-appropriate shell command
+    const { shell, args } = getShellCommand(command);
 
-    // Execute command using Bun.spawn
-    // Use full path to bash for reliability
-    const proc = Bun.spawn(['/bin/bash', '-c', command], {
+    // Execute command using Node.js spawn
+    const proc = spawn(shell, args, {
       cwd: projectDirectory,
-      stdout: 'pipe',
-      stderr: 'pipe',
-      stdin: 'ignore',
+      timeout,
     });
 
     let stdout = '';
     let stderr = '';
+    let timeoutOccurred = false;
+
+    // Set up timeout
+    const timeoutId = setTimeout(() => {
+      timeoutOccurred = true;
+      proc.kill('SIGTERM');
+    }, timeout);
 
     try {
-      // Read stdout and stderr
-      const [stdoutText, stderrText] = await Promise.all([
-        new Response(proc.stdout).text(),
-        new Response(proc.stderr).text(),
-      ]);
+      // Collect stdout and stderr in parallel to avoid deadlocks
+      const stdoutChunks: Buffer[] = [];
+      const stderrChunks: Buffer[] = [];
 
-      stdout = stdoutText;
-      stderr = stderrText;
+      proc.stdout.on('data', (chunk) => stdoutChunks.push(chunk));
+      proc.stderr.on('data', (chunk) => stderrChunks.push(chunk));
 
       // Wait for process to exit
-      const exitCode = await proc.exited;
+      const exitCode = await new Promise<number>((resolve) => {
+        proc.on('close', (code) => resolve(code || 0));
+      });
+
       clearTimeout(timeoutId);
+
+      // Convert chunks to strings
+      stdout = Buffer.concat(stdoutChunks).toString('utf8');
+      stderr = Buffer.concat(stderrChunks).toString('utf8');
 
       // Truncate output if it exceeds max length
       if (stdout.length > MAX_OUTPUT_LENGTH) {
@@ -185,8 +212,8 @@ async function executeCommand(
       clearTimeout(timeoutId);
       proc.kill();
 
-      // Check if it was aborted (timeout)
-      if (controller.signal.aborted) {
+      // Check if it was a timeout
+      if (timeoutOccurred) {
         return {
           command,
           stdout: '',
@@ -222,8 +249,9 @@ async function executeCommand(
 export function createBashToolExecute(context: BashToolContext) {
   return wrapTraced(
     async function execute(input: BashToolInput): Promise<BashToolOutput> {
-      const { messageId, projectDirectory, isInResearchMode, onToolEvent } = context;
+      const { messageId, isInResearchMode, onToolEvent } = context;
       const { command, timeout } = input;
+      const projectDirectory = process.cwd();
 
       console.info(`Executing bash command for message ${messageId}: ${command}`);
 

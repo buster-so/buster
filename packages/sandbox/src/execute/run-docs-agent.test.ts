@@ -15,6 +15,7 @@ vi.mock('../helpers/build-dbt-profiles-yaml', () => ({
 
 vi.mock('../management/create-sandbox', () => ({
   createSandboxFromSnapshot: vi.fn(),
+  createSandboxWithBusterCLI: vi.fn(),
 }));
 
 vi.mock('./documentation-agent-prompt.txt', () => ({
@@ -113,8 +114,8 @@ describe('run-docs-agent', () => {
         password: 'test_pass',
       });
 
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      vi.mocked(createSandboxFromSnapshot).mockResolvedValue(mockSandbox);
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      vi.mocked(createSandboxWithBusterCLI).mockResolvedValue(mockSandbox);
 
       const { buildProfilesYaml } = await import('../helpers/build-dbt-profiles-yaml');
       vi.mocked(buildProfilesYaml).mockReturnValue('mock-profiles-yaml-content');
@@ -144,8 +145,8 @@ describe('run-docs-agent', () => {
       });
 
       // Mock sandbox creation
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      vi.mocked(createSandboxFromSnapshot).mockResolvedValue(mockSandbox);
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      vi.mocked(createSandboxWithBusterCLI).mockResolvedValue(mockSandbox);
 
       // Mock profiles YAML builder
       const { buildProfilesYaml } = await import('../helpers/build-dbt-profiles-yaml');
@@ -165,8 +166,11 @@ describe('run-docs-agent', () => {
       await runDocsAgentAsync(validParams);
 
       // Verify sandbox creation
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      expect(createSandboxFromSnapshot).toHaveBeenCalledWith('buster-data-engineer-postgres');
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      expect(createSandboxWithBusterCLI).toHaveBeenCalledWith(
+        'buster-data-engineer-postgres',
+        'buster-data-engineer-fallback'
+      );
 
       // Verify git clone
       expect(mockSandbox.git.clone).toHaveBeenCalledWith(
@@ -490,8 +494,8 @@ describe('run-docs-agent', () => {
       });
 
       // Mock sandbox creation
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      vi.mocked(createSandboxFromSnapshot).mockResolvedValue(mockSandbox);
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      vi.mocked(createSandboxWithBusterCLI).mockResolvedValue(mockSandbox);
     });
 
     it('should handle git clone failures', async () => {
@@ -501,8 +505,8 @@ describe('run-docs-agent', () => {
     });
 
     it('should handle sandbox creation failures', async () => {
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      vi.mocked(createSandboxFromSnapshot).mockRejectedValue(new Error('Sandbox creation failed'));
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      vi.mocked(createSandboxWithBusterCLI).mockRejectedValue(new Error('Sandbox creation failed'));
 
       await expect(runDocsAgentAsync(validParams)).rejects.toThrow('Sandbox creation failed');
     });

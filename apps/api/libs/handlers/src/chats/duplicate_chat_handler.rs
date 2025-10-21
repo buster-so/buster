@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::chats::get_chat_handler::get_chat_handler;
 use crate::chats::types::ChatWithMessages;
-use database::enums::{AssetPermissionRole, AssetType, IdentityType, WorkspaceSharing};
+use database::enums::{AssetPermissionRole, AssetType, ChatType, IdentityType, WorkspaceSharing};
 use database::helpers::chats::fetch_chat_with_permission;
 use database::models::{AssetPermission, Chat, Message, MessageToFile};
 use database::pool::get_pg_pool;
@@ -87,6 +87,7 @@ pub async fn duplicate_chat_handler(
         workspace_sharing: WorkspaceSharing::None,
         workspace_sharing_enabled_at: None,
         workspace_sharing_enabled_by: None,
+        chat_type: Some(ChatType::Analyst),
     };
 
     // Insert the new chat record

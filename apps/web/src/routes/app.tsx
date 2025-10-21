@@ -4,7 +4,7 @@ import { getAppLayout } from '@/api/server-functions/getAppLayout';
 import { isDev } from '@/config/dev';
 import { AppProviders } from '@/context/Providers';
 import { getSupabaseSession } from '@/integrations/supabase/getSupabaseUserClient';
-import { BUSTER_SIGN_UP_URL } from '../config/externalRoutes';
+import { BUSTER_GETTING_STARTED_URL } from '../config/externalRoutes';
 
 export const Route = createFileRoute('/app')({
   context: ({ context }) => ({ ...context, getAppLayout }),
@@ -42,7 +42,7 @@ export const Route = createFileRoute('/app')({
 
     if (!user?.organizations?.[0]?.id && !isDev) {
       throw redirect({
-        href: BUSTER_SIGN_UP_URL,
+        href: BUSTER_GETTING_STARTED_URL,
         replace: true,
         reloadDocument: true,
         statusCode: 307,

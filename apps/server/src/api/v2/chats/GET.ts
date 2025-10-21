@@ -7,9 +7,13 @@ const app = new Hono().get('/', zValidator('query', GetChatsRequestSchemaV2), as
   const user = c.get('busterUser');
   const queryParams = c.req.valid('query');
 
+  // Transform request params to database params
+  // Web app defaults to 'analyst' chat type
   const listChatsParams = {
     userId: user.id,
-    ...queryParams,
+    chatType: 'analyst' as const,
+    page: queryParams.page ?? 1,
+    page_size: queryParams.page_size ?? 250,
   };
 
   const paginatedChats: GetChatsListResponseV2 = await listChats(listChatsParams);

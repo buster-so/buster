@@ -1,6 +1,7 @@
 import { arch, platform } from 'node:os';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getBinaryFileName, getBinaryInfo, getCurrentVersion } from './update-handler';
+import { getVersion } from '../../version';
+import { getBinaryFileName, getBinaryInfo } from './update-handler';
 
 // Mock os module
 vi.mock('node:os', () => ({
@@ -15,9 +16,13 @@ describe('update-handler', () => {
     vi.clearAllMocks();
   });
 
-  describe('getCurrentVersion', () => {
-    it('should return the current version', () => {
-      expect(getCurrentVersion()).toBe('0.3.1');
+  describe('getVersion', () => {
+    it('should return a valid semver version string', () => {
+      const version = getVersion();
+      expect(version).toBeTruthy();
+      expect(typeof version).toBe('string');
+      // Verify it matches semver pattern (e.g., "1.2.3" or "1.2.3-beta.1")
+      expect(version).toMatch(/^\d+\.\d+\.\d+/);
     });
   });
 

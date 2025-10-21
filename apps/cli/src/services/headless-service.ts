@@ -1,8 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import type { ModelMessage } from '@buster/ai';
+import type { BusterSDK } from '@buster/sdk';
 import { z } from 'zod';
+import { loadConversationFromApi } from '../utils/api-conversation';
 import { readContextFile } from '../utils/context-file';
 import { loadConversation, saveModelMessages } from '../utils/conversation-history';
+import { getOrCreateSdk } from '../utils/sdk-factory';
+import { getCurrentWorkingDirectory } from '../utils/working-directory';
 import { runChatAgent } from './chat-service';
 
 /**
@@ -12,12 +16,16 @@ export const HeadlessServiceParamsSchema = z.object({
   prompt: z.string().min(1).describe('User prompt to send to the agent'),
   chatId: z.string().uuid().optional().describe('Existing chat session ID to resume'),
   messageId: z.string().uuid().optional().describe('Message ID for tracking'),
-  workingDirectory: z.string().default(process.cwd()).describe('Working directory path'),
+  workingDirectory: z
+    .string()
+    .default(getCurrentWorkingDirectory())
+    .describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
   contextFilePath: z
     .string()
     .optional()
     .describe('Path to context file to include as system message'),
+  sdk: z.custom<BusterSDK>().optional().describe('Optional SDK instance for API operations'),
 });
 
 export type HeadlessServiceParams = z.infer<typeof HeadlessServiceParamsSchema>;
@@ -35,6 +43,7 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     workingDirectory,
     isInResearchMode,
     contextFilePath,
+    sdk: providedSdk,
   } = validated;
 
   // Use provided chatId or generate new one
@@ -42,48 +51,108 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
   // Use provided messageId or generate new one
   const messageId = providedMessageId || randomUUID();
 
-  // Load existing conversation or start fresh
-  const conversation = await loadConversation(chatId, workingDirectory);
-  const existingMessages: ModelMessage[] = conversation
-    ? (conversation.modelMessages as ModelMessage[])
-    : [];
+  // Declare SDK outside try block so it's accessible in catch
+  let sdk: BusterSDK | null = null;
 
-  // Prepare messages array
-  const messages: ModelMessage[] = [];
+  try {
+    // Get or create SDK (API-first approach)
+    if (providedSdk) {
+      sdk = providedSdk;
+    } else {
+      try {
+        sdk = await getOrCreateSdk();
+      } catch (error) {
+        console.warn('No SDK available - running without API integration:', error);
+      }
+    }
 
-  // Add context file as system message if provided
-  if (contextFilePath) {
-    const contextContent = readContextFile(contextFilePath, workingDirectory);
-    messages.push({
-      role: 'system',
-      content: contextContent,
+    // Load existing conversation from API or local files
+    let existingMessages: ModelMessage[] = [];
+    if (sdk && providedChatId) {
+      // API-first: Load from API when SDK is available and chatId is provided
+      const conversation = await loadConversationFromApi(providedChatId, sdk);
+      if (conversation) {
+        existingMessages = conversation.modelMessages as ModelMessage[];
+      }
+    } else if (!sdk) {
+      // Fallback to local files when SDK is not available
+      const conversation = await loadConversation(chatId, workingDirectory);
+      existingMessages = conversation ? (conversation.modelMessages as ModelMessage[]) : [];
+    }
+
+    // Prepare messages array
+    const messages: ModelMessage[] = [];
+
+    // Add context file as system message if provided
+    if (contextFilePath) {
+      const contextContent = readContextFile(contextFilePath, workingDirectory);
+      messages.push({
+        role: 'system',
+        content: contextContent,
+      });
+    }
+
+    // Add existing conversation messages
+    messages.push(...existingMessages);
+
+    // Add user message
+    const userMessage: ModelMessage = {
+      role: 'user',
+      content: prompt,
+    };
+    messages.push(userMessage);
+
+    const updatedMessages = messages;
+
+    // API-first: Only save to local files if SDK is NOT provided
+    if (!providedSdk) {
+      await saveModelMessages(chatId, workingDirectory, updatedMessages);
+    }
+
+    // Run agent with SDK
+    await runChatAgent({
+      chatId,
+      messageId,
+      workingDirectory,
+      isInResearchMode,
+      isHeadlessMode: true, // Enable headless mode for git communication rules
+      prompt, // Pass prompt for database message creation
+      messages: updatedMessages, // Pass all messages including new user message
+      sdk: sdk || undefined, // Pass SDK to chat agent
     });
+
+    return chatId;
+  } catch (error) {
+    // Log error and re-throw with context
+    console.error('Error in headless agent execution:', error);
+    console.error('Context:', {
+      chatId,
+      messageId,
+      workingDirectory,
+      prompt: prompt.slice(0, 100),
+    });
+
+    // Capture error details for database
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Update message with error information if we have SDK
+    if (sdk && messageId) {
+      try {
+        await sdk.messages.update(chatId, messageId, {
+          isCompleted: true,
+          errorReason: errorMessage,
+        });
+      } catch (updateError) {
+        // When SDK is provided, we should log errors
+        // When SDK was auto-created, just warn (allows graceful degradation)
+        if (providedSdk) {
+          console.error('Failed to save error to database:', updateError);
+        } else {
+          console.warn('Failed to save error to database:', updateError);
+        }
+      }
+    }
+
+    throw error;
   }
-
-  // Add existing conversation messages
-  messages.push(...existingMessages);
-
-  // Add user message
-  const userMessage: ModelMessage = {
-    role: 'user',
-    content: prompt,
-  };
-  messages.push(userMessage);
-
-  const updatedMessages = messages;
-
-  // Save messages with user message
-  await saveModelMessages(chatId, workingDirectory, updatedMessages);
-
-  // Run agent with silent callbacks
-  await runChatAgent({
-    chatId,
-    messageId,
-    workingDirectory,
-    isInResearchMode,
-    prompt, // Pass prompt for database message creation
-    messages: updatedMessages, // Pass all messages including new user message
-  });
-
-  return chatId;
 }

@@ -5,7 +5,11 @@ import { createWriteFileToolExecute } from './write-file-tool-execute';
 export const WRITE_FILE_TOOL_NAME = 'write';
 
 const FileCreateParamsSchema = z.object({
-  path: z.string().describe('The relative or absolute path to create the file at'),
+  path: z
+    .string()
+    .describe(
+      'The file path (relative like "folder/file.txt" or absolute like "/path/to/file.txt"). Must be a simple path without newlines or special characters.'
+    ),
   content: z.string().describe('The content to write to the file'),
 });
 
@@ -31,7 +35,6 @@ const WriteFileToolOutputSchema = z.object({
 
 const WriteFileToolContextSchema = z.object({
   messageId: z.string().describe('The message ID for database updates'),
-  projectDirectory: z.string().describe('The root directory of the project'),
   onToolEvent: z.any().optional().describe('Callback for tool events'),
 });
 

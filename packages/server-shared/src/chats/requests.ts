@@ -1,10 +1,14 @@
+import { ChatTypeSchema } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { PaginatedRequestSchema } from '../type-utilities';
 
+export type ChatType = z.infer<typeof ChatTypeSchema>;
+
 // Pagination parameters for chat list
 export const GetChatsListRequestSchema = z.object({
-  page_token: z.number().optional().default(0),
-  page_size: z.number().optional().default(1000),
+  page_token: z.number().optional(),
+  page_size: z.number().optional(),
+  chat_type: ChatTypeSchema.optional().describe('Filter chats by type (analyst or data_engineer)'),
 });
 
 export type GetChatsListRequest = z.infer<typeof GetChatsListRequestSchema>;

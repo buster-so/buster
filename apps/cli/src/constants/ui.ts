@@ -12,10 +12,10 @@ export const UI_CONSTANTS = {
     USER_PROMPT: '#a855f7',
   },
   TOOL_COLORS: {
-    EXECUTE: 'orange',
-    WRITE: 'magenta',
-    READ: 'blue',
-    UPDATE: 'cyan',
+    EXECUTE: '#d97706', // Amber/orange - good contrast with white
+    WRITE: '#c026d3', // Fuchsia - good contrast with white
+    READ: '#2563eb', // Blue - good contrast with white
+    UPDATE: '#0891b2', // Cyan - good contrast with white
   },
   LINE_LIMITS: {
     DEFAULT_PREVIEW: 5,
