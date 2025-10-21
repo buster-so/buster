@@ -204,14 +204,42 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
 
 export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Validate input parameters
-  const { installationToken, repoUrl, branch, prompt, apiKey, chatId, messageId, context } =
-    runDocsAgentParamsSchema.parse(params);
+  const {
+    installationToken,
+    repoUrl,
+    branch,
+    prompt,
+    apiKey,
+    chatId,
+    messageId,
+    context,
+    organizationId,
+  } = runDocsAgentParamsSchema.parse(params);
 
-  // Eventually we will need to find the organization's correct integration and call that snapshot
-  const sandbox = await createSandboxFromSnapshot('buster-data-engineer-postgres');
+  const sandboxSnapshotBaseName = 'buster-data-engineer';
+  const sandboxContext = context || {};
+
+  const dataSourceResult = await getOrganizationDataSource({ organizationId: organizationId });
+  const rawDataSourceCredentials = await getDataSourceCredentials({
+    dataSourceId: dataSourceResult.dataSourceId,
+  });
+
+  const credentials = {
+    ...rawDataSourceCredentials,
+    type: dataSourceResult.dataSourceSyntax,
+  } as Credentials;
+
+  const sandboxSnapshotFullName = `${sandboxSnapshotBaseName}-${dataSourceResult.dataSourceSyntax}`;
+  const sandbox = await createSandboxWithBusterCLI(
+    sandboxSnapshotFullName,
+    `${sandboxSnapshotBaseName}-fallback`
+  );
+
   const workspacePath = `/workspace`;
   const repositoryPath = `${workspacePath}/repository`;
   const contextPath = `${workspacePath}/context`;
+  const profilesPath = `${workspacePath}/profiles`;
+  const profilesFileName = 'profiles.yml';
   const contextFileName = 'context.json';
   const busterAppGitUsername = 'buster-app';
   const busterAppGitEmail = 'buster-app@buster.so';
@@ -220,12 +248,12 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Validate environment
   const env = envSchema.parse(process.env);
 
-  // Create context directory and file
-  await sandbox.fs.createFolder(contextPath, '755');
-  await sandbox.fs.uploadFile(
-    Buffer.from(JSON.stringify(context)),
-    `${contextPath}/${contextFileName}`
-  );
+  const envVars: Record<string, string> = {
+    GITHUB_TOKEN: installationToken,
+    BUSTER_API_KEY: apiKey,
+    BUSTER_HOST: env.BUSTER_HOST,
+    PATH: '$HOME/.local/bin:$PATH',
+  };
 
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
@@ -235,42 +263,67 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
     env.GH_APP_ID, // username
     installationToken // password
   );
-  // Install Buster CLI
 
-  await sandbox.process.executeCommand(
-    `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`,
-    repositoryPath
-  );
-  await sandbox.process.executeCommand(`buster --version`, repositoryPath);
+  const { profileName, projectFilePath } = await getDbtProjectInfo(sandbox, repositoryPath);
 
+  // Only build and write profiles YAML if projectFilePath exists
+  if (projectFilePath) {
+    try {
+      const profileYaml = buildProfilesYaml({
+        profileName,
+        target: 'buster',
+        creds: credentials,
+      });
+
+      // Create profiles directory and file
+      await sandbox.fs.createFolder(profilesPath, '755');
+      await sandbox.fs.uploadFile(Buffer.from(profileYaml), `${profilesPath}/${profilesFileName}`);
+
+      // Add context and env variable for dbt project and profiles
+      sandboxContext.dbtProjectFilePath = projectFilePath;
+      envVars.DBT_PROFILES_DIR = profilesPath;
+    } catch (error) {
+      console.error('Failed to build or write profiles YAML, continuing without profiles:', error);
+      // Continue with the execution without dbt profiles
+    }
+  }
+
+  // Setup Git
   await sandbox.process.executeCommand(
     `gh auth setup-git && git config --global user.email "${busterAppGitEmail}" && git config --global user.name "${busterAppGitUsername}"`,
     repositoryPath,
-    {
-      GITHUB_TOKEN: installationToken,
-    }
+    envVars
   );
 
   // Build CLI command with optional parameters
-  const cliArgs = [`--prompt "${prompt}"`];
+  const cliArgs = [];
+  if (prompt) {
+    cliArgs.push(`--prompt "${prompt}"`);
+  } else {
+    cliArgs.push(`--prompt "${documentationAgentPrompt}"`);
+  }
   if (chatId) {
     cliArgs.push(`--chatId "${chatId}"`);
   }
   if (messageId) {
     cliArgs.push(`--messageId "${messageId}"`);
   }
-  if (context) {
+  if (Object.keys(sandboxContext).length > 0) {
+    // Create context directory and file
+    await sandbox.fs.createFolder(contextPath, '755');
+    await sandbox.fs.uploadFile(
+      Buffer.from(JSON.stringify(sandboxContext)),
+      `${contextPath}/${contextFileName}`
+    );
+
     cliArgs.push(`--contextFilePath "${contextPath}/${contextFileName}"`);
   }
 
+  // Execute Buster CLI command synchronously
   const command = await sandbox.process.executeCommand(
     `buster ${cliArgs.join(' ')}`,
     repositoryPath,
-    {
-      GITHUB_TOKEN: installationToken,
-      BUSTER_API_KEY: apiKey,
-      BUSTER_HOST: env.BUSTER_HOST,
-    }
+    envVars
   );
 
   console.info(command);
