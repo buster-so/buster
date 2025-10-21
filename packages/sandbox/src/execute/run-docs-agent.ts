@@ -159,7 +159,7 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
   // Build CLI command with optional parameters
   const cliArgs = [];
   cliArgs.push(`--prompt "$(cat ${promptFilePath})"`);
-  
+
   if (chatId) {
     cliArgs.push(`--chatId "${chatId}"`);
   }
@@ -304,7 +304,7 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Build CLI command with optional parameters
   const cliArgs = [];
   cliArgs.push(`--prompt "$(cat ${promptFilePath})"`);
-  
+
   if (chatId) {
     cliArgs.push(`--chatId "${chatId}"`);
   }
@@ -324,12 +324,7 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
 
   // Execute Buster CLI command synchronously
   const command = `export PATH="$HOME/.local/bin:$PATH" && buster ${cliArgs.join(' ')}`;
-  console.log(command);
-  const commandExecution = await sandbox.process.executeCommand(
-    command,
-    repositoryPath,
-    envVars
-  );
+  const commandExecution = await sandbox.process.executeCommand(command, repositoryPath, envVars);
 
   console.info(commandExecution);
 
