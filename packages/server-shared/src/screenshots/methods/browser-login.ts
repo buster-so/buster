@@ -13,11 +13,13 @@ type BrowserParamsBase<T> = {
     width,
     height,
     type,
+    fullPath,
   }: {
     page: Page;
     browser: Browser;
     width: number;
     height: number;
+    fullPath: string;
     type: 'png' | 'webp';
   }) => Promise<T>;
 };
@@ -158,6 +160,7 @@ export const browserLogin = async <T = Buffer<ArrayBufferLike>>({
       browser,
       width,
       height,
+      fullPath,
       type: type || DEFAULT_SCREENSHOT_CONFIG.type,
     });
 
