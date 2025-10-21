@@ -27,27 +27,8 @@ export async function getProxyConfig(): Promise<ProxyConfig> {
     );
   }
 
-  // Check for AI proxy-specific URL (highest priority)
-  const proxyUrl = process.env.BUSTER_AI_PROXY_URL;
-
-  if (proxyUrl) {
-    return ProxyConfigSchema.parse({
-      baseURL: proxyUrl,
-      apiKey: creds.apiKey,
-    });
-  }
-
-  // Fall back to regular API URL from credentials
-  if (creds.apiUrl) {
-    return ProxyConfigSchema.parse({
-      baseURL: creds.apiUrl,
-      apiKey: creds.apiKey,
-    });
-  }
-
-  // Default to localhost for development
   return ProxyConfigSchema.parse({
-    baseURL: 'http://localhost:3002',
+    baseURL: creds.apiUrl,
     apiKey: creds.apiKey,
   });
 }

@@ -18,6 +18,23 @@ const CREDENTIALS_DIR = join(homedir(), '.buster');
 const CREDENTIALS_FILE = join(CREDENTIALS_DIR, 'credentials.json');
 
 /**
+ * Normalizes a URL by ensuring it has a protocol
+ * @param url - The URL to normalize
+ * @returns The normalized URL with https:// if no protocol was present
+ */
+function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+
+  // If it already has a protocol, return as-is
+  if (trimmed.match(/^https?:\/\//i)) {
+    return trimmed;
+  }
+
+  // Add https:// prefix
+  return `https://${trimmed}`;
+}
+
+/**
  * Ensures the credentials directory exists
  */
 async function ensureCredentialsDir(): Promise<void> {
@@ -35,8 +52,14 @@ async function ensureCredentialsDir(): Promise<void> {
  */
 export async function saveCredentials(credentials: Credentials): Promise<void> {
   try {
+    // Normalize the API URL before validation
+    const normalizedCredentials = {
+      ...credentials,
+      apiUrl: normalizeUrl(credentials.apiUrl),
+    };
+
     // Validate credentials
-    const validated = credentialsSchema.parse(credentials);
+    const validated = credentialsSchema.parse(normalizedCredentials);
 
     // Ensure directory exists
     await ensureCredentialsDir();
@@ -94,7 +117,7 @@ export async function getCredentials(): Promise<Credentials | null> {
   if (envApiKey) {
     return {
       apiKey: envApiKey,
-      apiUrl: envApiUrl || DEFAULT_API_URL,
+      apiUrl: normalizeUrl(envApiUrl || DEFAULT_API_URL),
     };
   }
 
@@ -104,7 +127,7 @@ export async function getCredentials(): Promise<Credentials | null> {
     // Apply env overrides if present
     return {
       apiKey: saved.apiKey,
-      apiUrl: envApiUrl || saved.apiUrl,
+      apiUrl: normalizeUrl(envApiUrl || saved.apiUrl),
     };
   }
 
