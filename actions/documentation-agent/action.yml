@@ -16,7 +16,7 @@ inputs:
   timeout-minutes:
     description: 'Maximum time to wait for job completion (in minutes)'
     required: false
-    default: '10'
+    default: '15'
 
 outputs:
   message-id:
