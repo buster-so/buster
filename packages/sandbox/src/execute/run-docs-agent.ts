@@ -3,7 +3,10 @@ import { getDataSourceCredentials, getOrganizationDataSource } from '@buster/dat
 import type { Sandbox } from '@daytonaio/sdk';
 import { z } from 'zod';
 import { buildProfilesYaml } from '../helpers/build-dbt-profiles-yaml';
-import { createSandboxFromSnapshot } from '../management/create-sandbox';
+import {
+  createSandboxFromSnapshot,
+  createSandboxWithBusterCLI,
+} from '../management/create-sandbox';
 import documentationAgentPrompt from './documentation-agent-prompt.txt';
 
 // Define schema for environment validation
@@ -41,10 +44,16 @@ const runDocsAgentParamsSchema = z.object({
   organizationId: z.string().uuid().describe('Organization ID for the data source'),
 });
 
+export interface DocsAgentResult {
+  commandId: string;
+  sessionId: string;
+  sandboxId: string;
+}
+
 export type RunDocsAgentParams = z.infer<typeof runDocsAgentParamsSchema>;
 export type githubContext = z.infer<typeof githubContextSchema>;
 
-export async function runDocsAgentAsync(params: RunDocsAgentParams) {
+export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<DocsAgentResult> {
   // Validate input parameters
   const {
     installationToken,
@@ -72,7 +81,10 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   } as Credentials;
 
   const sandboxSnapshotFullName = `${sandboxSnapshotBaseName}-${dataSourceResult.dataSourceSyntax}`;
-  const sandbox = await createSandboxFromSnapshot(sandboxSnapshotFullName);
+  const sandbox = await createSandboxWithBusterCLI(
+    sandboxSnapshotFullName,
+    `${sandboxSnapshotBaseName}-fallback`
+  );
 
   const workspacePath = `/workspace`;
   const repositoryPath = `${workspacePath}/repository`;
@@ -87,6 +99,13 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   // Validate environment
   const env = envSchema.parse(process.env);
 
+  const envExportCommands = [
+    `export GITHUB_TOKEN=${installationToken}`,
+    `export BUSTER_API_KEY=${apiKey}`,
+    `export BUSTER_HOST=${env.BUSTER_HOST}`,
+    'export PATH="$HOME/.local/bin:$PATH"',
+  ];
+
   await sandbox.git.clone(
     repoUrl, // url "https://github.com/buster-so/buster.git"
     repositoryPath, // path
@@ -100,25 +119,25 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
 
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
-    const profileYaml = buildProfilesYaml({
-      profileName,
-      target: 'buster',
-      creds: credentials,
-    });
+    try {
+      const profileYaml = buildProfilesYaml({
+        profileName,
+        target: 'buster',
+        creds: credentials,
+      });
 
-    // Create profiles directory and file
-    await sandbox.fs.createFolder(profilesPath, '755');
-    await sandbox.fs.uploadFile(Buffer.from(profileYaml), `${profilesPath}/${profilesFileName}`);
+      // Create profiles directory and file
+      await sandbox.fs.createFolder(profilesPath, '755');
+      await sandbox.fs.uploadFile(Buffer.from(profileYaml), `${profilesPath}/${profilesFileName}`);
 
-    sandboxContext.dbtProjectFilePath = projectFilePath;
+      // Add context and env variable for dbt project and profiles
+      sandboxContext.dbtProjectFilePath = projectFilePath;
+      envExportCommands.push(`export DBT_PROFILES_DIR=${profilesPath}`);
+    } catch (error) {
+      console.error('Failed to build or write profiles YAML, continuing without profiles:', error);
+      // Continue with the execution without dbt profiles
+    }
   }
-
-  const envExportCommands = [
-    `export DBT_PROFILES_DIR=${profilesPath}`,
-    `export GITHUB_TOKEN=${installationToken}`,
-    `export BUSTER_API_KEY=${apiKey}`,
-    `export BUSTER_HOST=${env.BUSTER_HOST}`,
-  ];
 
   await sandbox.process.createSession(sessionName);
 
@@ -126,14 +145,6 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   await sandbox.process.executeSessionCommand(sessionName, {
     command: `${envExportCommands.join(' && ')}`,
   });
-
-  // // TODO:Install Buster CLI here instead of in docker image
-  // await sandbox.process.executeSessionCommand(sessionName, {
-  //   command: `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`,
-  // });
-  // await sandbox.process.executeSessionCommand(sessionName, {
-  //   command: `buster --version`,
-  // });
 
   // Setup Git
   await sandbox.process.executeSessionCommand(sessionName, {
@@ -165,21 +176,30 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams) {
   }
 
   // Execute Buster CLI command in async mode
-  await sandbox.process.executeSessionCommand(sessionName, {
+  const busterCommand = await sandbox.process.executeSessionCommand(sessionName, {
     command: `cd ${repositoryPath} && buster ${cliArgs.join(' ')}`,
     runAsync: true,
   });
 
+  if (!busterCommand.cmdId) {
+    throw new Error('Failed to execute Buster CLI command');
+  }
+
   // // Use for debugging logs if needed
   // const logs = await sandbox.process.getSessionCommandLogs(
   //   sessionName,
-  //   command.cmdId ?? '',
+  //   busterCommand.cmdId ?? '',
   //   (chunk) => console.info(`[STDOUT]: ${chunk}`),
   //   (chunk) => console.error(`[STDERR]: ${chunk}`)
   // );
   // console.info(`[SANDBOXLOGS]: ${logs}`);
 
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
+  return {
+    commandId: busterCommand.cmdId,
+    sessionId: sessionName,
+    sandboxId: sandbox.id,
+  };
 }
 
 export async function runDocsAgentSync(params: RunDocsAgentParams) {

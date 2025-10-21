@@ -17,18 +17,18 @@ RUN pip install --no-cache-dir \
     dbt-core \
     dbt-bigquery
 
-# Buster CLI (binary release)
-RUN echo "Downloading buster CLI v0.3.1..." \
- && curl -fsSL "https://github.com/buster-so/buster/releases/download/v0.3.1/buster-cli-linux-x86_64.tar.gz" -o /tmp/buster-cli.tar.gz \
- && tar -xzf /tmp/buster-cli.tar.gz -C /tmp \
- && mv /tmp/buster /usr/bin/buster \
- && chmod +x /usr/bin/buster \
- && rm /tmp/buster-cli.tar.gz
+# # Buster CLI (binary release)
+# RUN echo "Downloading buster CLI v0.3.1..." \
+#  && curl -fsSL "https://github.com/buster-so/buster/releases/download/v0.3.1/buster-cli-linux-x86_64.tar.gz" -o /tmp/buster-cli.tar.gz \
+#  && tar -xzf /tmp/buster-cli.tar.gz -C /tmp \
+#  && mv /tmp/buster /usr/bin/buster \
+#  && chmod +x /usr/bin/buster \
+#  && rm /tmp/buster-cli.tar.gz
 
-# Verify installations
-RUN echo "Verifying buster CLI installation..." \
- && buster --version \
- && echo "✅ buster CLI installed successfully"
+# # Verify installations
+# RUN echo "Verifying buster CLI installation..." \
+#  && buster --version \
+#  && echo "✅ buster CLI installed successfully"
 
 RUN echo "Verifying dbt installation..." \
  && dbt --version \

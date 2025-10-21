@@ -16,7 +16,7 @@ inputs:
   timeout-minutes:
     description: 'Maximum time to wait for job completion (in minutes)'
     required: false
-    default: '10'
+    default: '15'
 
 outputs:
   message-id:
@@ -53,9 +53,9 @@ runs:
           EVENT_CONTEXT=$(cat "$GITHUB_EVENT_PATH")
 
           # Make the POST request (-f makes curl exit with error on HTTP errors)
-          echo "::notice::Making request to ${API_URL}/api/v2/github/app/actions/documentation"
+          echo "::notice::Making request to ${API_URL}/api/v2/public/github/actions/documentation"
           
-          if ! RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/github/app/actions/documentation" \
+          if ! RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/public/github/actions/documentation" \
             -H "Authorization: Bearer ${BUSTER_API_KEY}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n --argjson eventContext "$EVENT_CONTEXT" '{eventContext: $eventContext}')"
@@ -74,6 +74,10 @@ runs:
           echo "::notice::Started Buster documentation job"
 
           messageId=$(echo "$RESPONSE" | jq -r '.messageId')
+          commandId=$(echo "$RESPONSE" | jq -r '.commandId')
+          sessionId=$(echo "$RESPONSE" | jq -r '.sessionId')
+          sandboxId=$(echo "$RESPONSE" | jq -r '.sandboxId')
+          
           if [ "$messageId" = "null" ] || [ -z "$messageId" ]; then
             echo "::error::Failed to extract messageId from response"
             exit 1
@@ -81,7 +85,17 @@ runs:
           
           echo "::notice::Job ID: ${messageId}"
           echo "messageId=$messageId" >> "$GITHUB_OUTPUT"
-          echo "status_url=${API_URL}/api/v2/github/app/actions/documentation/${messageId}" >> "$GITHUB_OUTPUT"
+          
+          # Build status URL with query parameters if they exist
+          STATUS_URL="${API_URL}/api/v2/public/github/actions/documentation/${messageId}"
+          if [ "$commandId" != "null" ] && [ -n "$commandId" ] && [ "$sessionId" != "null" ] && [ -n "$sessionId" ] && [ "$sandboxId" != "null" ] && [ -n "$sandboxId" ]; then
+            STATUS_URL="${STATUS_URL}?commandId=${commandId}&sessionId=${sessionId}&sandboxId=${sandboxId}"
+            echo "::notice::Status URL with sandbox details: ${STATUS_URL}"
+          else
+            echo "::notice::Status URL (basic): ${STATUS_URL}"
+          fi
+          
+          echo "status_url=${STATUS_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Poll for Buster job to complete
         id: wait

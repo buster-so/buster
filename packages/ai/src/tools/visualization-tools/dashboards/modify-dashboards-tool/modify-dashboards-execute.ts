@@ -349,7 +349,7 @@ const modifyDashboardFiles = wrapTraced(
             await tx
               .update(dashboardFiles)
               .set({
-                content: sp.dashboard as Record<string, unknown>,
+                content: sp.dashboard,
                 updatedAt: sp.dashboardFile.updated_at,
                 versionHistory: updatedVersionHistory,
                 name: sp.dashboard.name,
