@@ -82,3 +82,9 @@ export const GithubActionDocumentationStatusSchema = z.object({
 export type GithubActionDocumentationStatusResponse = z.infer<
   typeof GithubActionDocumentationStatusSchema
 >;
+
+export const AppInstallResponseSchema = z.object({
+  redirectUrl: z.string(),
+});
+
+export type AppInstallResponse = z.infer<typeof AppInstallResponseSchema>;
