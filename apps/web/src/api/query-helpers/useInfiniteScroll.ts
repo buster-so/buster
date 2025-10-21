@@ -137,6 +137,7 @@ export function useInfiniteScroll<TData, TError = ApiError>(
       const { scrollTop, scrollHeight, clientHeight } = container;
       // Trigger when user is within scrollThreshold pixels of the bottom
       if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
+        console.log('fetching next page');
         if (hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }

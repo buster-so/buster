@@ -10,18 +10,12 @@ import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import type { LibrarySearchParams } from './schema';
 
-export const LibraryGridItems = ({ filters }: { filters: LibrarySearchParams }) => {
-  const { scrollContainerRef, allResults, isLoading, hasNextPage, isFetchingNextPage } =
-    useLibraryAssetsInfinite({
-      ...filters,
-      page_size: 60,
-      scrollConfig: {
-        scrollThreshold: 100,
-      },
-    });
-
-  console.log(allResults);
-
+export const LibraryGridItems = ({
+  allResults,
+}: {
+  filters: LibrarySearchParams;
+  allResults: LibraryAssetListItem[];
+}) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
       {allResults.map((asset) => (
@@ -45,9 +39,9 @@ const LibraryGridItem = ({
   }) as LinkProps;
 
   return (
-    <Link {...link} preload={false} reloadDocument className="h-full">
+    <Link {...link} preload={false} className="h-full">
       <div className="group border rounded cursor-pointer hover:shadow hover:bg-item-hover-active overflow-hidden h-full flex flex-col">
-        <div className="px-2.5 flex-1 pt-1.5 bg-item-select min-h-[105px] max-h-[185px] overflow-hidden">
+        <div className="px-2.5 flex-1 pt-1.5 bg-item-select min-h-[125px] max-h-[125px] overflow-hidden">
           <img
             src={imageUrl}
             alt={name}
