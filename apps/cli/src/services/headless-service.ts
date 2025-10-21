@@ -51,9 +51,11 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
   // Use provided messageId or generate new one
   const messageId = providedMessageId || randomUUID();
 
+  // Declare SDK outside try block so it's accessible in catch
+  let sdk: BusterSDK | null = null;
+
   try {
     // Get or create SDK (API-first approach)
-    let sdk: BusterSDK | null = null;
     if (providedSdk) {
       sdk = providedSdk;
     } else {
@@ -129,6 +131,28 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       workingDirectory,
       prompt: prompt.slice(0, 100),
     });
+
+    // Capture error details for database
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Update message with error information if we have SDK
+    if (sdk && messageId) {
+      try {
+        await sdk.messages.update(chatId, messageId, {
+          isCompleted: true,
+          errorReason: errorMessage,
+        });
+      } catch (updateError) {
+        // When SDK is provided, we should log errors
+        // When SDK was auto-created, just warn (allows graceful degradation)
+        if (providedSdk) {
+          console.error('Failed to save error to database:', updateError);
+        } else {
+          console.warn('Failed to save error to database:', updateError);
+        }
+      }
+    }
+
     throw error;
   }
 }

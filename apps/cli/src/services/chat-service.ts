@@ -93,6 +93,9 @@ export async function runChatAgent(
     projectName: environment,
   });
 
+  // Declare SDK outside try block so it's accessible in catch
+  let sdk: BusterSDK | null = null;
+
   try {
     // Use provided messages (caller is responsible for loading conversation and adding user message)
     let previousMessages: ModelMessage[] = (providedMessages as ModelMessage[]) || [];
@@ -128,7 +131,6 @@ export async function runChatAgent(
 
     // Use provided SDK or create one (API-first approach)
     // If SDK is not provided, we'll try to create one but don't fail if credentials missing
-    let sdk: BusterSDK | null = null;
     if (providedSdk) {
       sdk = providedSdk;
     } else {
@@ -251,6 +253,28 @@ export async function runChatAgent(
   } catch (error) {
     // Handle all errors and notify via callback
     console.error('Error in chat agent execution:', error);
+
+    // Capture error details for database
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Update message with error information if we have SDK
+    if (sdk && messageId) {
+      try {
+        await sdk.messages.update(chatId, messageId, {
+          isCompleted: true,
+          errorReason: errorMessage,
+        });
+      } catch (updateError) {
+        // When SDK is provided, we should throw errors (no local fallback)
+        // When SDK was auto-created, just warn (allows graceful degradation)
+        if (providedSdk) {
+          console.error('Failed to save error to database:', updateError);
+          // Don't throw here - we want to preserve the original error
+        } else {
+          console.warn('Failed to save error to database:', updateError);
+        }
+      }
+    }
 
     // Notify error callback if provided
     if (onError) {
