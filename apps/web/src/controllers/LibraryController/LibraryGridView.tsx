@@ -165,82 +165,66 @@ const LibraryGroupedView = ({
         scrollContainerRef={scrollContainerRef}
       />
     );
-  } else if (groupBy === 'asset_type') {
-    return (
-      <>
-        {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
-          const Icon = assetTypeToIcon(assetType as AssetType);
-          const title = AssetTypeTranslations[assetType as AssetType];
-
-          return (
-            <LibraryGroupSection
-              key={assetType}
-              title={title}
-              icon={<Icon />}
-              items={items}
-              columns={columns}
-              scrollContainerRef={scrollContainerRef}
-              className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
-            />
-          );
-        })}
-      </>
-    );
-  } else if (groupBy === 'owner') {
-    return (
-      <>
-        {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
-          const title = items[0].created_by_name ?? items[0].created_by_email;
-
-          return (
-            <LibraryGroupSection
-              key={assetType}
-              title={title}
-              icon={
-                <Avatar
-                  size={16}
-                  image={items[0].created_by_avatar_url}
-                  name={items[0].created_by_name}
-                />
-              }
-              items={items}
-              columns={columns}
-              scrollContainerRef={scrollContainerRef}
-              className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
-            />
-          );
-        })}
-      </>
-    );
-  } else if (groupBy === 'created_at' || groupBy === 'updated_at') {
-    return (
-      <>
-        {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
-          const Icon = Calendar;
-          const title = formatDate({
-            date: items[0].created_at,
-            format: 'MMM D, YYYY',
-          });
-
-          return (
-            <LibraryGroupSection
-              key={assetType}
-              title={title}
-              icon={<Icon />}
-              items={items}
-              columns={columns}
-              scrollContainerRef={scrollContainerRef}
-              className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
-            />
-          );
-        })}
-      </>
-    );
-  } else {
-    const _exhaustiveCheck: never | undefined = groupBy;
-    console.error('Exhaustive check failed for groupBy', _exhaustiveCheck);
-    return null;
   }
+
+  const getGroupMetadata = (
+    groupKey: string,
+    items: LibraryAssetListItem[]
+  ): { title: string; icon: React.ReactNode } => {
+    if (groupBy === 'asset_type') {
+      const Icon = assetTypeToIcon(groupKey as AssetType);
+      return {
+        title: AssetTypeTranslations[groupKey as AssetType],
+        icon: <Icon />,
+      };
+    }
+
+    if (groupBy === 'owner') {
+      const firstItem = items[0];
+      return {
+        title: firstItem.created_by_name ?? firstItem.created_by_email,
+        icon: (
+          <Avatar
+            size={16}
+            image={firstItem.created_by_avatar_url}
+            name={firstItem.created_by_name}
+          />
+        ),
+      };
+    }
+
+    if (groupBy === 'created_at' || groupBy === 'updated_at') {
+      const dateField = groupBy === 'created_at' ? items[0].created_at : items[0].updated_at;
+      return {
+        title: formatDate({ date: dateField, format: 'MMM D, YYYY' }),
+        icon: <Calendar />,
+      };
+    }
+
+    const _exhaustiveCheck: never = groupBy;
+    console.error('Exhaustive check failed for groupBy', _exhaustiveCheck);
+    return { title: 'Unknown', icon: null };
+  };
+
+  return (
+    <>
+      {Object.entries(allGroups).map(([groupKey, items], groupIndex) => {
+        const { title, icon } = getGroupMetadata(groupKey, items);
+
+        return (
+          <LibraryGroupSection
+            key={groupKey}
+            title={title}
+            icon={icon}
+            items={items}
+            columns={columns}
+            scrollContainerRef={scrollContainerRef}
+            className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
+          />
+        );
+      })}
+    </>
+  );
 };
 
 const LibraryGroupSection = ({
