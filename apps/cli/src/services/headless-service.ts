@@ -42,48 +42,60 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
   // Use provided messageId or generate new one
   const messageId = providedMessageId || randomUUID();
 
-  // Load existing conversation or start fresh
-  const conversation = await loadConversation(chatId, workingDirectory);
-  const existingMessages: ModelMessage[] = conversation
-    ? (conversation.modelMessages as ModelMessage[])
-    : [];
+  try {
+    // Load existing conversation or start fresh
+    const conversation = await loadConversation(chatId, workingDirectory);
+    const existingMessages: ModelMessage[] = conversation
+      ? (conversation.modelMessages as ModelMessage[])
+      : [];
 
-  // Prepare messages array
-  const messages: ModelMessage[] = [];
+    // Prepare messages array
+    const messages: ModelMessage[] = [];
 
-  // Add context file as system message if provided
-  if (contextFilePath) {
-    const contextContent = readContextFile(contextFilePath, workingDirectory);
-    messages.push({
-      role: 'system',
-      content: contextContent,
+    // Add context file as system message if provided
+    if (contextFilePath) {
+      const contextContent = readContextFile(contextFilePath, workingDirectory);
+      messages.push({
+        role: 'system',
+        content: contextContent,
+      });
+    }
+
+    // Add existing conversation messages
+    messages.push(...existingMessages);
+
+    // Add user message
+    const userMessage: ModelMessage = {
+      role: 'user',
+      content: prompt,
+    };
+    messages.push(userMessage);
+
+    const updatedMessages = messages;
+
+    // Save messages with user message
+    await saveModelMessages(chatId, workingDirectory, updatedMessages);
+
+    // Run agent with silent callbacks
+    await runChatAgent({
+      chatId,
+      messageId,
+      workingDirectory,
+      isInResearchMode,
+      prompt, // Pass prompt for database message creation
+      messages: updatedMessages, // Pass all messages including new user message
     });
+
+    return chatId;
+  } catch (error) {
+    // Log error and re-throw with context
+    console.error('Error in headless agent execution:', error);
+    console.error('Context:', {
+      chatId,
+      messageId,
+      workingDirectory,
+      prompt: prompt.slice(0, 100),
+    });
+    throw error;
   }
-
-  // Add existing conversation messages
-  messages.push(...existingMessages);
-
-  // Add user message
-  const userMessage: ModelMessage = {
-    role: 'user',
-    content: prompt,
-  };
-  messages.push(userMessage);
-
-  const updatedMessages = messages;
-
-  // Save messages with user message
-  await saveModelMessages(chatId, workingDirectory, updatedMessages);
-
-  // Run agent with silent callbacks
-  await runChatAgent({
-    chatId,
-    messageId,
-    workingDirectory,
-    isInResearchMode,
-    prompt, // Pass prompt for database message creation
-    messages: updatedMessages, // Pass all messages including new user message
-  });
-
-  return chatId;
 }

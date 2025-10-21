@@ -229,6 +229,17 @@ export async function runChatAgent(
         console.warn('Failed to mark message as completed:', error);
       }
     }
+  } catch (error) {
+    // Handle all errors and notify via callback
+    console.error('Error in chat agent execution:', error);
+
+    // Notify error callback if provided
+    if (onError) {
+      onError(error);
+    }
+
+    // Re-throw to allow caller to handle as needed
+    throw error;
   } finally {
     // Flush Braintrust logger to ensure all traces are sent
     await braintrustLogger.flush();

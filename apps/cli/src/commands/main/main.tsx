@@ -121,7 +121,9 @@ export function Main() {
     }
 
     const chatId = getCurrentChatId();
+    const messageId = crypto.randomUUID();
     const cwd = workingDirectory.current;
+    let updatedModelMessages: ModelMessage[] = [];
 
     try {
       // Load existing model messages from API
@@ -132,7 +134,7 @@ export function Main() {
         role: 'user',
         content: trimmed,
       };
-      const updatedModelMessages = [...existingModelMessages, userMessage];
+      updatedModelMessages = [...existingModelMessages, userMessage];
 
       // Update UI state immediately
       handleMessageUpdate(updatedModelMessages);
@@ -152,6 +154,7 @@ export function Main() {
       await runChatAgent(
         {
           chatId,
+          messageId,
           workingDirectory: cwd,
           abortSignal: abortController.signal,
           prompt: trimmed, // Pass the user prompt for database creation
@@ -178,8 +181,30 @@ export function Main() {
         // Agent was aborted, just clear thinking state
         setIsThinking(false);
       } else {
-        // Re-throw other errors
-        throw error;
+        // Handle all other errors - log and display to user
+        console.error('Error in agent execution:', error);
+
+        // Create error message to add to conversation
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorContent = `**Error:** An error occurred during agent execution:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\nPlease try again or contact support if the issue persists.`;
+
+        // Add error as assistant message so user sees it in the UI
+        const errorModelMessage: ModelMessage = {
+          role: 'assistant',
+          content: errorContent,
+        };
+
+        const messagesWithError = [...updatedModelMessages, errorModelMessage];
+        handleMessageUpdate(messagesWithError);
+
+        // Save error state to disk
+        try {
+          await saveModelMessages(chatId, cwd, messagesWithError);
+        } catch (saveError) {
+          console.error('Failed to save error state:', saveError);
+        }
+
+        setIsThinking(false);
       }
     } finally {
       // Clean up abort controller
