@@ -1,9 +1,11 @@
+import type { AssetType } from '@buster/server-shared/assets';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import { faker } from '@faker-js/faker';
 import { Link, type LinkProps } from '@tanstack/react-router';
 import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
+import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
@@ -54,20 +56,6 @@ export const LibraryGridView = React.memo(
       return () => window.removeEventListener('resize', updateColumns);
     }, []);
 
-    // Calculate rows needed for grid
-    const rowCount = Math.ceil(allResults.length / columns);
-
-    // Ref to measure offset from collections section
-    const virtualStartRef = useRef<HTMLDivElement>(null);
-
-    const rowVirtualizer = useVirtualizer({
-      count: rowCount,
-      getScrollElement: () => scrollContainerRef.current,
-      scrollMargin: 0,
-      estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
-      overscan: 3, // Render 3 extra rows above/below for smooth scrolling
-    });
-
     return (
       <ScrollArea
         viewportRef={scrollContainerRef}
@@ -85,12 +73,7 @@ export const LibraryGridView = React.memo(
         )}
 
         {hasResults && !hasGroups && (
-          <LibraryUngroupedView
-            allResults={allResults}
-            columns={columns}
-            rowVirtualizer={rowVirtualizer}
-            virtualStartRef={virtualStartRef}
-          />
+          <LibraryUngroupedView allResults={allResults} columns={columns} />
         )}
         {hasResults && hasGroups && <LibraryGroupedView allGroups={allGroups} />}
 
@@ -150,22 +133,60 @@ const LibraryGroupedView = ({
 }: {
   allGroups: Record<string, LibraryAssetListItem[]>;
 }) => {
-  AssetTypeTranslations;
+  const itemsWithHeaders = Object.entries(allGroups).flatMap(([assetType, items]) => {
+    const Icon = assetTypeToIcon(assetType as AssetType);
+    const title = AssetTypeTranslations[assetType as AssetType];
+    const newItems: (
+      | { type: 'header'; title: string; icon: React.ReactNode }
+      | ({ type: 'item' } & LibraryAssetListItem)
+    )[] = [
+      {
+        type: 'header',
+        title,
+        icon: <Icon />,
+      },
+    ];
 
-  return <></>;
+    for (const item of items) {
+      newItems.push({
+        type: 'item',
+        ...item,
+      });
+    }
+
+    return newItems;
+  });
+
+  return (
+    <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
+      TODO
+    </LibrarySectionContainer>
+  );
 };
 
 const LibraryUngroupedView = ({
   allResults,
   columns,
-  rowVirtualizer,
-  virtualStartRef,
+  scrollContainerRef,
 }: {
   allResults: LibraryAssetListItem[];
   columns: number;
-  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
-  virtualStartRef: React.RefObject<HTMLDivElement | null>;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
 }) => {
+  // Calculate rows needed for grid
+  const rowCount = Math.ceil(allResults.length / columns);
+
+  // Ref to measure offset from collections section
+  const virtualStartRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollContainerRef.current,
+    scrollMargin: 0,
+    estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
+    overscan: 3, // Render 3 extra rows above/below for smooth scrolling
+  });
+
   return (
     <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
       <div
