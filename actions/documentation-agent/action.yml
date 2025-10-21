@@ -53,9 +53,9 @@ runs:
           EVENT_CONTEXT=$(cat "$GITHUB_EVENT_PATH")
 
           # Make the POST request (-f makes curl exit with error on HTTP errors)
-          echo "::notice::Making request to ${API_URL}/api/v2/github/app/actions/documentation"
+          echo "::notice::Making request to ${API_URL}/api/v2/public/github/actions/documentation"
           
-          if ! RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/github/app/actions/documentation" \
+          if ! RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/public/github/actions/documentation" \
             -H "Authorization: Bearer ${BUSTER_API_KEY}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n --argjson eventContext "$EVENT_CONTEXT" '{eventContext: $eventContext}')"
@@ -81,7 +81,7 @@ runs:
           
           echo "::notice::Job ID: ${messageId}"
           echo "messageId=$messageId" >> "$GITHUB_OUTPUT"
-          echo "status_url=${API_URL}/api/v2/github/app/actions/documentation/${messageId}" >> "$GITHUB_OUTPUT"
+          echo "status_url=${API_URL}/api/v2/public/github/actions/documentation/${messageId}" >> "$GITHUB_OUTPUT"
 
       - name: Poll for Buster job to complete
         id: wait

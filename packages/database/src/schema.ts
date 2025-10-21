@@ -629,6 +629,7 @@ export const messages = pgTable(
     postProcessingMessage: jsonb('post_processing_message'),
     triggerRunId: text('trigger_run_id'),
     metadata: jsonb().$type<MessageMetadata>().default({}).notNull(),
+    errorReason: text('error_reason'),
   },
   (table) => [
     index('messages_chat_id_idx').using('btree', table.chatId.asc().nullsLast().op('uuid_ops')),

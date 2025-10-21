@@ -249,43 +249,20 @@ export async function updateMessage(
 
 /**
  * @param messageId - The ID of the message
- * @returns Object with status and optional errorReason
+ * @returns Object with isCompleted and optional errorReason
  */
-export async function getMessageStatus(messageId: string): Promise<{
-  status: 'Complete' | 'Failed' | 'InProgress';
-  errorReason?: string;
-}> {
-  try {
-    const [message] = await db
-      .select({
-        id: messages.id,
-        isCompleted: messages.isCompleted,
-        createdAt: messages.createdAt,
-      })
-      .from(messages)
-      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
-      .limit(1);
+export async function getMessageStatus(messageId: string) {
+  const [message] = await db
+    .select({
+      id: messages.id,
+      isCompleted: messages.isCompleted,
+      errorReason: messages.errorReason,
+    })
+    .from(messages)
+    .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+    .limit(1);
 
-    if (!message) {
-      console.error(`Message not found: ${messageId}`);
-      return {
-        status: 'Failed',
-        errorReason: 'Message not found',
-      };
-    }
-
-    if (message.isCompleted) {
-      return { status: 'Complete' };
-    }
-
-    return { status: 'InProgress' };
-  } catch (error) {
-    console.error('Failed to get message status:', error);
-    return {
-      status: 'Failed',
-      errorReason: 'Failed to poll for message status. Please try again later.',
-    };
-  }
+  return message;
 }
 
 /**

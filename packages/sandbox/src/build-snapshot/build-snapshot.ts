@@ -15,7 +15,6 @@ const dbtAdapters = [
   'snowflake',
   'bigquery',
   'redshift',
-  'databricks',
   'sqlserver',
   'mysql',
 ];
@@ -39,7 +38,6 @@ async function buildSnapshots() {
         {
           name: snapshotName,
           image,
-          // All resource parameters are optional:
           resources: {
             cpu: 4,
             memory: 8,
