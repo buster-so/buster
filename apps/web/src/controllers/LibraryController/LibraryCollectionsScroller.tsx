@@ -2,7 +2,15 @@ import { Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
+import { useDeleteCollection } from '@/api/buster_rest/collections';
 import { Avatar } from '@/components/ui/avatar';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import { Trash } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
 import { formatDate } from '@/lib/date';
 import { cn } from '@/lib/utils';
@@ -97,25 +105,52 @@ LibraryCollectionsScroller.displayName = 'LibraryCollectionsScroller';
 
 const CollectionCard = React.memo(({ id, name, last_edited, owner }: BusterCollectionListItem) => {
   return (
-    <Link to="/app/collections/$collectionId" params={{ collectionId: id }}>
-      <div
-        className={cn(
-          'flex flex-col gap-y-2 h-21 min-w-36 w-36 border rounded py-2.5 px-3 justify-between',
-          'cursor-pointer hover:bg-item-hover'
-        )}
-      >
-        <Text variant={'default'} className="line-clamp-2" size={'base'}>
-          {name}
-        </Text>
-        <div className="flex items-center space-x-1">
-          <Avatar image={owner?.avatar_url || undefined} name={owner?.name} size={12} />
-          <Text variant={'tertiary'} size={'xs'}>
-            {formatDate({ date: last_edited, format: 'MMM D' })}
+    <CollectionCardContextMenu id={id}>
+      <Link to="/app/collections/$collectionId" params={{ collectionId: id }}>
+        <div
+          className={cn(
+            'flex flex-col gap-y-2 h-21 min-w-36 w-36 border rounded py-2.5 px-3 justify-between',
+            'cursor-pointer hover:bg-item-hover'
+          )}
+        >
+          <Text variant={'default'} className="line-clamp-2" size={'base'}>
+            {name}
           </Text>
+          <div className="flex items-center space-x-1">
+            <Avatar image={owner?.avatar_url || undefined} name={owner?.name} size={12} />
+            <Text variant={'tertiary'} size={'xs'}>
+              {formatDate({ date: last_edited, format: 'MMM D' })}
+            </Text>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </CollectionCardContextMenu>
   );
 });
 
 CollectionCard.displayName = 'CollectionCard';
+
+const CollectionCardContextMenu = React.memo(
+  ({
+    id,
+    children,
+  }: Pick<BusterCollectionListItem, 'id'> & {
+    children: React.ReactNode;
+  }) => {
+    const { mutateAsync: onDeleteCollection } = useDeleteCollection();
+
+    return (
+      <ContextMenu modal={false}>
+        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+        <ContextMenuContent className="p-1 border rounded">
+          <ContextMenuItem
+            icon={<Trash />}
+            onClick={() => onDeleteCollection({ id, useConfirmModal: false })}
+          >
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  }
+);
