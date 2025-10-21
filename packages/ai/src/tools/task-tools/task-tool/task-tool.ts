@@ -57,7 +57,6 @@ export type TaskToolOutput = z.infer<typeof TaskToolOutputSchema>;
 // Custom context type with proper typing
 export interface TaskToolContext {
   messageId: string;
-  projectDirectory: string;
   createAgent: AgentFactory;
 }
 

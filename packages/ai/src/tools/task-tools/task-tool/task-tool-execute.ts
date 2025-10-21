@@ -10,15 +10,13 @@ import type { TaskToolContext, TaskToolInput, TaskToolOutput } from './task-tool
 export function createTaskToolExecute(context: TaskToolContext) {
   return wrapTraced(
     async function execute(input: TaskToolInput): Promise<TaskToolOutput> {
-      const { projectDirectory, createAgent } = context;
-      const { description, prompt } = input;
-
-      console.info(`Starting task: ${description}`);
+      const { createAgent } = context;
+      const { prompt } = input;
 
       try {
         // Create a new agent instance for the task
         const taskAgent = createAgent({
-          folder_structure: projectDirectory,
+          folder_structure: '',
           userId: 'task',
           chatId: randomUUID(),
           dataSourceId: '',
@@ -48,21 +46,16 @@ export function createTaskToolExecute(context: TaskToolContext) {
         }
 
         // Generate a summary from the final response
-        const summary = fullResponse || 'Task completed';
-
-        console.info(`Task completed successfully: ${description}`);
+        const _summary = fullResponse || 'Task completed'
 
         return {
           status: 'success',
-          summary: summary.substring(0, 2000), // Limit summary length
+          summary: _summary,
         };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`Task error (${description}):`, errorMessage);
-
         return {
           status: 'error',
-          error_message: errorMessage,
+          error_message: error instanceof Error ? error.message : 'Unknown error',
         };
       }
     },
