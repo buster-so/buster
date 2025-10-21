@@ -1,457 +1,40 @@
-import type { ModelMessage } from '@buster/ai';
+import {
+  BASH_TOOL_NAME,
+  type BashToolInput,
+  EDIT_FILE_TOOL_NAME,
+  type EditFileToolInput,
+  GREP_TOOL_NAME,
+  type GrepToolInput,
+  IDLE_TOOL_NAME,
+  type IdleInput,
+  LS_TOOL_NAME,
+  type LsToolInput,
+  type ModelMessage,
+  READ_FILE_TOOL_NAME,
+  type ReadFileToolInput,
+  TASK_TOOL_NAME,
+  WRITE_FILE_TOOL_NAME,
+  type WriteFileToolInput,
+} from '@buster/ai';
 import type { CliAgentMessage } from '../services';
 import type { AgentMessage } from '../types/agent-messages';
+import type { MessageContent } from './content-schemas';
+
+// All the old type guards and functions have been removed
+// The new implementation uses AI SDK v5 content arrays directly
 
 /**
- * Tool name constants - single source of truth for tool name strings
- */
-const TOOL_NAMES = {
-  READ_FILE: 'readFileTool',
-  WRITE_FILE: 'writeFileTool',
-  EDIT_FILE: 'editFileTool',
-  MULTI_EDIT_FILE: 'multiEditFileTool',
-  BASH: 'bashTool',
-  GREP: 'grepTool',
-  LS: 'lsTool',
-  TASK: 'taskTool',
-  IDLE: 'idleTool',
-} as const;
-
-/**
- * Type guards for tool arguments and results
- */
-
-// Read file tool types
-interface ReadFileArgs {
-  filePath: string;
-}
-
-interface ReadFileResult {
-  status: 'success' | 'error';
-  file_path: string;
-  content?: string;
-  truncated?: boolean;
-  error_message?: string;
-}
-
-function isReadFileArgs(args: unknown): args is ReadFileArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'filePath' in args &&
-    typeof (args as ReadFileArgs).filePath === 'string'
-  );
-}
-
-function isReadFileResult(result: unknown): result is ReadFileResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'status' in result &&
-    'file_path' in result &&
-    ((result as ReadFileResult).status === 'success' ||
-      (result as ReadFileResult).status === 'error')
-  );
-}
-
-// Write file tool types
-interface WriteFileArgs {
-  files: Array<{ path: string; content: string }>;
-}
-
-interface WriteFileResult {
-  results: Array<{ status: 'success' | 'error'; filePath: string; errorMessage?: string }>;
-}
-
-function isWriteFileArgs(args: unknown): args is WriteFileArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'files' in args &&
-    Array.isArray((args as WriteFileArgs).files)
-  );
-}
-
-function isWriteFileResult(result: unknown): result is WriteFileResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'results' in result &&
-    Array.isArray((result as WriteFileResult).results)
-  );
-}
-
-// Edit file tool types
-interface EditFileArgs {
-  filePath: string;
-  oldString?: string;
-  newString?: string;
-  edits?: Array<{ oldString: string; newString: string }>;
-}
-
-interface EditFileResult {
-  success: boolean;
-  filePath: string;
-  diff?: string;
-  finalDiff?: string;
-  message?: string;
-  errorMessage?: string;
-}
-
-function isEditFileArgs(args: unknown): args is EditFileArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'filePath' in args &&
-    typeof (args as EditFileArgs).filePath === 'string'
-  );
-}
-
-function isEditFileResult(result: unknown): result is EditFileResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'success' in result &&
-    'filePath' in result &&
-    typeof (result as EditFileResult).success === 'boolean'
-  );
-}
-
-// Bash tool types
-interface BashArgs {
-  command: string;
-  description?: string;
-}
-
-interface BashResult {
-  stdout?: string;
-  stderr?: string;
-  exitCode: number;
-  success: boolean;
-}
-
-function isBashArgs(args: unknown): args is BashArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'command' in args &&
-    typeof (args as BashArgs).command === 'string'
-  );
-}
-
-function isBashResult(result: unknown): result is BashResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'exitCode' in result &&
-    'success' in result &&
-    typeof (result as BashResult).exitCode === 'number' &&
-    typeof (result as BashResult).success === 'boolean'
-  );
-}
-
-// Grep tool types
-interface GrepArgs {
-  pattern: string;
-  glob?: string;
-  command: string;
-}
-
-interface GrepResult {
-  matches: Array<{ path: string; lineNum: number; lineText: string }>;
-  totalMatches: number;
-  truncated: boolean;
-}
-
-function isGrepArgs(args: unknown): args is GrepArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'pattern' in args &&
-    'command' in args &&
-    typeof (args as GrepArgs).pattern === 'string' &&
-    typeof (args as GrepArgs).command === 'string'
-  );
-}
-
-function isGrepResult(result: unknown): result is GrepResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'matches' in result &&
-    'totalMatches' in result &&
-    'truncated' in result &&
-    Array.isArray((result as GrepResult).matches)
-  );
-}
-
-// Ls tool types
-interface LsArgs {
-  path?: string;
-  command: string;
-  depth?: number;
-}
-
-interface LsResult {
-  output: string;
-  success: boolean;
-  count: number;
-  truncated: boolean;
-  errorMessage?: string;
-}
-
-function isLsArgs(args: unknown): args is LsArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'command' in args &&
-    typeof (args as LsArgs).command === 'string'
-  );
-}
-
-function isLsResult(result: unknown): result is LsResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'output' in result &&
-    'success' in result &&
-    'count' in result &&
-    'truncated' in result
-  );
-}
-
-// Task tool types
-interface TaskArgs {
-  instructions: string;
-}
-
-interface TaskResult {
-  status: 'success' | 'error';
-  summary?: string;
-  messages?: AgentMessage[];
-  error_message?: string;
-}
-
-function isTaskArgs(args: unknown): args is TaskArgs {
-  return (
-    typeof args === 'object' &&
-    args !== null &&
-    'instructions' in args &&
-    typeof (args as TaskArgs).instructions === 'string'
-  );
-}
-
-function isTaskResult(result: unknown): result is TaskResult {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'status' in result &&
-    ((result as TaskResult).status === 'success' || (result as TaskResult).status === 'error')
-  );
-}
-
-// Idle tool types
-interface IdleArgs {
-  final_response?: string;
-}
-
-function isIdleArgs(args: unknown): args is IdleArgs {
-  return typeof args === 'object' && args !== null;
-}
-
-/**
- * Tool invocation type from ModelMessage
- */
-interface ToolInvocation {
-  state: 'call' | 'result';
-  toolCallId: string;
-  toolName: string;
-  args: unknown;
-  result?: unknown;
-}
-
-/**
- * Type guard for tool invocations
- */
-function isToolInvocation(inv: unknown): inv is ToolInvocation {
-  return (
-    typeof inv === 'object' &&
-    inv !== null &&
-    'state' in inv &&
-    'toolCallId' in inv &&
-    'toolName' in inv &&
-    'args' in inv &&
-    ((inv as ToolInvocation).state === 'call' || (inv as ToolInvocation).state === 'result')
-  );
-}
-
-/**
- * Transform a single tool invocation to an AgentMessage
- * Only returns messages for completed tool invocations (state === 'result')
- */
-function transformToolInvocation(invocation: ToolInvocation): AgentMessage | null {
-  // Only show completed tool invocations
-  if (invocation.state !== 'result') {
-    return null;
-  }
-
-  const toolName = invocation.toolName;
-  const args = invocation.args;
-  const result = invocation.result;
-
-  switch (toolName) {
-    case TOOL_NAMES.READ_FILE:
-      if (!isReadFileArgs(args)) {
-        console.warn('Invalid read file args:', args);
-        return null;
-      }
-      if (!isReadFileResult(result)) {
-        console.warn('Invalid read file result:', result);
-        return null;
-      }
-      return {
-        kind: 'read',
-        event: 'complete',
-        args,
-        result,
-      };
-
-    case TOOL_NAMES.WRITE_FILE:
-      if (!isWriteFileArgs(args)) {
-        console.warn('Invalid write file args:', args);
-        return null;
-      }
-      if (!isWriteFileResult(result)) {
-        console.warn('Invalid write file result:', result);
-        return null;
-      }
-      return {
-        kind: 'write',
-        event: 'complete',
-        args,
-        result,
-      };
-
-    case TOOL_NAMES.EDIT_FILE:
-    case TOOL_NAMES.MULTI_EDIT_FILE:
-      if (!isEditFileArgs(args)) {
-        console.warn('Invalid edit file args:', args);
-        return null;
-      }
-      if (!isEditFileResult(result)) {
-        console.warn('Invalid edit file result:', result);
-        return null;
-      }
-      return {
-        kind: 'edit',
-        event: 'complete',
-        args,
-        result,
-      };
-
-    case TOOL_NAMES.BASH:
-      if (!isBashArgs(args)) {
-        console.warn('Invalid bash args:', args);
-        return null;
-      }
-      if (!isBashResult(result)) {
-        console.warn('Invalid bash result:', result);
-        return null;
-      }
-      return {
-        kind: 'bash',
-        event: 'complete',
-        args,
-        result,
-      };
-
-    case TOOL_NAMES.GREP:
-      if (!isGrepArgs(args)) {
-        console.warn('Invalid grep args:', args);
-        return null;
-      }
-      if (!isGrepResult(result)) {
-        console.warn('Invalid grep result:', result);
-        return null;
-      }
-      return {
-        kind: 'grep',
-        event: 'complete',
-        args,
-        result,
-      };
-
-    case TOOL_NAMES.LS:
-      if (!isLsArgs(args)) {
-        console.warn('Invalid ls args:', args);
-        return null;
-      }
-      if (!isLsResult(result)) {
-        console.warn('Invalid ls result:', result);
-        return null;
-      }
-      return {
-        kind: 'ls',
-        event: 'complete',
-        args,
-        result,
-      };
-
-    case TOOL_NAMES.TASK: {
-      if (!isTaskArgs(args)) {
-        console.warn('Invalid task args:', args);
-        return null;
-      }
-      if (!isTaskResult(result)) {
-        console.warn('Invalid task result:', result);
-        return null;
-      }
-      const nestedMessages = result.messages?.filter(
-        (message): message is Exclude<AgentMessage, { kind: 'user' } | { kind: 'text-delta' }> =>
-          message.kind !== 'user' && message.kind !== 'text-delta'
-      );
-
-      // Destructure to separate messages from other properties
-      const { messages: _, ...resultWithoutMessages } = result;
-
-      return {
-        kind: 'task',
-        event: 'complete',
-        args,
-        result: nestedMessages
-          ? {
-              ...resultWithoutMessages,
-              messages: nestedMessages,
-            }
-          : resultWithoutMessages,
-      };
-    }
-
-    case TOOL_NAMES.IDLE:
-      if (!isIdleArgs(args)) {
-        console.warn('Invalid idle args:', args);
-        return null;
-      }
-      return {
-        kind: 'idle',
-        args,
-      };
-
-    default:
-      // Unknown tool - skip silently
-      return null;
-  }
-}
-
-/**
- * Transforms AI SDK ModelMessage array to CLI display format
- * Extracts user messages, tool calls, and tool results for display
+ * Transforms AI SDK v5 ModelMessage array to CLI display format
+ * Handles content arrays with tool-call, tool-result, text, and reasoning objects
  *
  * This is the main export - converts ModelMessage[] (source of truth) to CliAgentMessage[] for UI
  */
 export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAgentMessage[] {
   const uiMessages: CliAgentMessage[] = [];
   let messageId = 0;
+
+  // Track tool calls for matching with results
+  const toolCallMap = new Map<string, { toolName: string; input: unknown; messageIndex: number }>();
 
   // Guard against invalid input
   if (!modelMessages || !Array.isArray(modelMessages)) {
@@ -467,40 +50,103 @@ export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAg
         continue;
       }
 
-      // User messages - simple conversion
+      // User messages - handle string or content array
       if (msg.role === 'user') {
+        let content: string;
+        if (typeof msg.content === 'string') {
+          content = msg.content;
+        } else if (Array.isArray(msg.content)) {
+          // Extract text from content array - cast to unknown first to handle AI SDK types
+          const textContent = (msg.content as unknown as MessageContent[]).find(
+            (c) => c.type === 'text'
+          ) as { type: 'text'; text: string } | undefined;
+          content = textContent?.text || '';
+        } else {
+          content = JSON.stringify(msg.content);
+        }
+
         uiMessages.push({
           id: ++messageId,
           message: {
             kind: 'user',
-            content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
+            content,
           },
         });
         continue;
       }
 
-      // Assistant messages - extract tool invocations
-      if (msg.role === 'assistant') {
-        // Handle tool invocations if present
-        if ('toolInvocations' in msg && Array.isArray(msg.toolInvocations)) {
-          for (const invocation of msg.toolInvocations) {
-            if (!isToolInvocation(invocation)) {
-              console.warn('Invalid tool invocation:', invocation);
-              continue;
-            }
+      // Assistant messages - process content array
+      if (msg.role === 'assistant' && Array.isArray(msg.content)) {
+        // Collect text content for concatenation
+        let textContent = '';
 
-            const agentMessage = transformToolInvocation(invocation);
+        for (const content of msg.content as MessageContent[]) {
+          if (content.type === 'text') {
+            // Accumulate text content
+            textContent += content.text;
+          } else if (content.type === 'tool-call') {
+            // Create 'start' event message for tool call
+            const agentMessage = createToolStartMessage(content.toolName, content.input);
             if (agentMessage) {
+              const msgIndex = uiMessages.length;
               uiMessages.push({
                 id: ++messageId,
                 message: agentMessage,
               });
+
+              // Store for later matching with result
+              toolCallMap.set(content.toolCallId, {
+                toolName: content.toolName,
+                input: content.input,
+                messageIndex: msgIndex,
+              });
+            }
+          }
+          // Skip reasoning content (internal to model)
+        }
+
+        // Add accumulated text content if any
+        if (textContent.trim()) {
+          uiMessages.push({
+            id: ++messageId,
+            message: {
+              kind: 'text-delta',
+              content: textContent,
+            },
+          });
+        }
+      }
+
+      // Tool result messages - match with tool calls
+      if (msg.role === 'tool' && Array.isArray(msg.content)) {
+        for (const content of msg.content as MessageContent[]) {
+          if (content.type === 'tool-result') {
+            const toolCall = toolCallMap.get(content.toolCallId);
+            if (!toolCall) {
+              console.warn('Tool result without matching call:', content.toolCallId);
+              continue;
+            }
+
+            // Parse output
+            let output: unknown;
+            try {
+              output = JSON.parse(content.output.value);
+            } catch {
+              output = content.output.value;
+            }
+
+            // Update the corresponding 'start' message to 'complete'
+            const startMessage = uiMessages[toolCall.messageIndex];
+            if (startMessage) {
+              startMessage.message = {
+                ...startMessage.message,
+                event: 'complete',
+                result: output,
+              } as AgentMessage;
             }
           }
         }
       }
-
-      // Skip system messages and other message types
     }
   } catch (error) {
     console.error('Error transforming messages:', error);
@@ -509,4 +155,93 @@ export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAg
   }
 
   return uiMessages;
+}
+
+/**
+ * Creates a 'start' event message for a tool call
+ * Maps tool names to their corresponding AgentMessage kinds with proper types
+ */
+function createToolStartMessage(toolName: string, input: unknown): AgentMessage | null {
+  // Map known tool names to message kinds with proper input types
+  switch (toolName) {
+    case READ_FILE_TOOL_NAME:
+      return {
+        kind: 'read',
+        event: 'start',
+        args: input as ReadFileToolInput,
+      };
+
+    case WRITE_FILE_TOOL_NAME:
+      return {
+        kind: 'write',
+        event: 'start',
+        args: input as WriteFileToolInput,
+      };
+
+    case EDIT_FILE_TOOL_NAME:
+      return {
+        kind: 'edit',
+        event: 'start',
+        args: input as EditFileToolInput,
+      };
+
+    case BASH_TOOL_NAME:
+      return {
+        kind: 'bash',
+        event: 'start',
+        args: input as BashToolInput,
+      };
+
+    case GREP_TOOL_NAME: {
+      const grepInput = input as GrepToolInput;
+      // Generate command string for display
+      let command = `grep ${grepInput.pattern}`;
+      if (grepInput.path) command += ` ${grepInput.path}`;
+      if (grepInput.glob) command += ` --glob ${grepInput.glob}`;
+      // Only include defined optional properties to match AgentMessage type
+      return {
+        kind: 'grep',
+        event: 'start',
+        args: {
+          pattern: grepInput.pattern,
+          ...(grepInput.glob !== undefined && { glob: grepInput.glob }),
+          command,
+        },
+      };
+    }
+
+    case LS_TOOL_NAME: {
+      const lsInput = input as LsToolInput;
+      // Generate command string for display
+      const command = `ls ${lsInput.path || '.'}`;
+      // Only include defined optional properties to match AgentMessage type
+      return {
+        kind: 'ls',
+        event: 'start',
+        args: {
+          ...(lsInput.path !== undefined && { path: lsInput.path }),
+          command,
+        },
+      };
+    }
+
+    case TASK_TOOL_NAME:
+      return {
+        kind: 'task',
+        event: 'start',
+        // Task tool input structure based on the actual tool
+        args: input as { instructions: string; description?: string },
+      };
+
+    case IDLE_TOOL_NAME:
+      return {
+        kind: 'idle',
+        args: input as IdleInput,
+      };
+
+    default:
+      // Unknown tool - skip silently
+      console.warn('Unknown tool name:', toolName);
+      return null;
+  }
 }

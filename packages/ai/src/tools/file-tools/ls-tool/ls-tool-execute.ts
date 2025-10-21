@@ -176,7 +176,8 @@ function renderDir(
 export function createLsToolExecute(context: LsToolContext) {
   return wrapTraced(
     async function execute(input: LsToolInput): Promise<LsToolOutput> {
-      const { messageId, projectDirectory, onToolEvent } = context;
+      const { messageId, onToolEvent } = context;
+      const projectDirectory = process.cwd();
       const searchPath = path.resolve(projectDirectory, input.path || projectDirectory);
       const offset = input.offset ?? 0;
       const limit = input.limit ?? DEFAULT_LIMIT;
@@ -225,13 +226,13 @@ export function createLsToolExecute(context: LsToolContext) {
         // List files
         const allFiles: string[] = [];
         const unexpandedDirs = new Set<string>();
-        // Collect offset + limit files to ensure we get enough after applying offset
+        // Collect offset + limit + 1 files to detect if there are more files (for truncation)
         await listFilesRecursive(
           searchPath,
           searchPath,
           ignorePatterns,
           allFiles,
-          offset + limit,
+          offset + limit + 1,
           0,
           maxDepth,
           unexpandedDirs
@@ -266,7 +267,8 @@ export function createLsToolExecute(context: LsToolContext) {
         // Render directory tree
         const output = `${searchPath}/\n${renderDir('.', 0, dirs, filesByDir, unexpandedDirs)}`;
 
-        const truncated = endIndex < totalFiles;
+        // If we collected more files than requested, there are more available
+        const truncated = totalFiles > offset + limit;
 
         console.info(
           `Listed ${files.length} file(s) in ${searchPath}${truncated ? ' (truncated)' : ''}`

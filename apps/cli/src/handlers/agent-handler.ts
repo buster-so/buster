@@ -49,7 +49,6 @@ export async function createConfiguredAgent(params: AgentHandlerParams, proxyCon
 
   // Create the analytics engineer agent with proxy model
   const agent = createAnalyticsEngineerAgent({
-    folder_structure: validated.workingDirectory,
     userId: validated.userId,
     chatId: validated.chatId,
     dataSourceId: validated.dataSourceId,

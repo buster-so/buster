@@ -16,13 +16,13 @@ import { ExpansionContext } from '../../hooks/use-expansion';
 import type { CliAgentMessage } from '../../services';
 import { runChatAgent } from '../../services';
 import type { Conversation } from '../../utils/conversation-history';
-import { saveModelMessages } from '../../utils/conversation-history';
-import { loadConversation } from '../../utils/load-conversation-from-api';
+import { getOrCreateSdk } from '../../utils/sdk-factory';
 import { getCurrentChatId, initNewSession, setSessionChatId } from '../../utils/session';
 import { getSetting } from '../../utils/settings';
 import type { SlashCommand } from '../../utils/slash-commands';
 import { transformModelMessagesToUI } from '../../utils/transform-messages';
 import type { VimMode } from '../../utils/vim-mode';
+import { getCurrentWorkingDirectory } from '../../utils/working-directory';
 
 type AppMode = 'Planning' | 'Auto-accept' | 'None';
 
@@ -36,6 +36,7 @@ export function Main() {
   const [input, setInput] = useState('');
   const [_history, setHistory] = useState<ChatHistoryEntry[]>([]);
   const [messages, setMessages] = useState<CliAgentMessage[]>([]);
+  const [modelMessages, setModelMessages] = useState<ModelMessage[]>([]); // Raw messages from API
   const historyCounter = useRef(0);
   const messageCounter = useRef(0);
   const [vimEnabled, setVimEnabled] = useState(() => getSetting('vimMode'));
@@ -47,12 +48,16 @@ export function Main() {
   const [sessionInitialized, setSessionInitialized] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
-  const workingDirectory = useRef(process.cwd());
+  const workingDirectory = useRef(getCurrentWorkingDirectory());
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream
-  const handleMessageUpdate = useCallback((modelMessages: ModelMessage[]) => {
-    const transformedMessages = transformModelMessagesToUI(modelMessages);
+  const handleMessageUpdate = useCallback((newModelMessages: ModelMessage[]) => {
+    // Store raw ModelMessage array (from API - no transformation needed)
+    setModelMessages(newModelMessages);
+
+    // Transform for UI display
+    const transformedMessages = transformModelMessagesToUI(newModelMessages);
 
     // Update message counter to highest ID
     if (transformedMessages.length > 0) {
@@ -121,18 +126,19 @@ export function Main() {
     }
 
     const chatId = getCurrentChatId();
+    const messageId = crypto.randomUUID();
     const cwd = workingDirectory.current;
+    let updatedModelMessages: ModelMessage[] = [];
 
     try {
-      // Load existing model messages from API
-      const conversation = await loadConversation(chatId, cwd);
-
-      const existingModelMessages = conversation?.modelMessages || [];
+      // Use raw ModelMessage array directly (from API - already in correct format)
+      // For new sessions, this starts as empty array
+      // For resumed sessions, this contains messages loaded from API
       const userMessage: ModelMessage = {
         role: 'user',
         content: trimmed,
       };
-      const updatedModelMessages = [...existingModelMessages, userMessage];
+      updatedModelMessages = [...modelMessages, userMessage];
 
       // Update UI state immediately
       handleMessageUpdate(updatedModelMessages);
@@ -141,21 +147,28 @@ export function Main() {
       setInput('');
       setIsThinking(true);
 
-      // Save to disk
-      await saveModelMessages(chatId, cwd, updatedModelMessages);
+      // Get or create SDK for API-first approach
+      let sdk = null;
+      try {
+        sdk = await getOrCreateSdk();
+      } catch (error) {
+        console.warn('No SDK available - some features may be limited:', error);
+      }
 
       // Create AbortController for this agent execution
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 
-      // Run agent with callback for message updates
+      // Run agent with callback for message updates (API-first, no local file saves)
       await runChatAgent(
         {
           chatId,
+          messageId,
           workingDirectory: cwd,
           abortSignal: abortController.signal,
           prompt: trimmed, // Pass the user prompt for database creation
           messages: updatedModelMessages, // Pass all messages including new user message
+          sdk: sdk || undefined, // Pass SDK for API-first approach
         },
         {
           onThinkingStateChange: (thinking) => {
@@ -178,15 +191,32 @@ export function Main() {
         // Agent was aborted, just clear thinking state
         setIsThinking(false);
       } else {
-        // Re-throw other errors
-        throw error;
+        // Handle all other errors - log and display to user
+        console.error('Error in agent execution:', error);
+
+        // Create error message to add to conversation
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorContent = `**Error:** An error occurred during agent execution:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\nPlease try again or contact support if the issue persists.`;
+
+        // Add error as assistant message so user sees it in the UI
+        const errorModelMessage: ModelMessage = {
+          role: 'assistant',
+          content: errorContent,
+        };
+
+        const messagesWithError = [...updatedModelMessages, errorModelMessage];
+        handleMessageUpdate(messagesWithError);
+
+        // Note: Error state is shown in UI but not saved
+        // API-first approach - messages are saved during agent execution
+        setIsThinking(false);
       }
     } finally {
       // Clean up abort controller
       abortControllerRef.current = null;
       setIsThinking(false);
     }
-  }, [input, sessionInitialized, handleMessageUpdate]);
+  }, [input, sessionInitialized, modelMessages, handleMessageUpdate]);
 
   const handleResumeConversation = useCallback(
     async (conversation: Conversation) => {

@@ -19,7 +19,6 @@ const TodoWriteToolInputSchema = z.object({
 
 const TodoWriteToolContextSchema = z.object({
   chatId: z.string().describe('The chat/conversation ID to associate todos with'),
-  workingDirectory: z.string().describe('The working directory for the chat'),
   todosList: z
     .array(TodoItemSchema)
     .default([])

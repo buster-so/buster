@@ -1,3 +1,4 @@
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { wrapTraced } from 'braintrust';
 import { createTwoFilesPatch } from 'diff';
@@ -67,8 +68,9 @@ function trimDiff(diff: string): string {
 export function createMultiEditFileToolExecute(context: MultiEditFileToolContext) {
   return wrapTraced(
     async function execute(input: MultiEditFileToolInput): Promise<MultiEditFileToolOutput> {
-      const { messageId, projectDirectory, onToolEvent } = context;
+      const { messageId, onToolEvent } = context;
       const { filePath, edits } = input;
+      const projectDirectory = process.cwd();
 
       console.info(`Applying ${edits.length} edit(s) to ${filePath} for message ${messageId}`);
 
@@ -89,25 +91,33 @@ export function createMultiEditFileToolExecute(context: MultiEditFileToolContext
         validateFilePath(absolutePath, projectDirectory);
 
         // Check if file exists and read original content
-        const file = Bun.file(absolutePath);
-        const stats = await file.stat().catch(() => {});
-
         let contentOriginal = '';
         let isNewFile = false;
 
-        if (!stats) {
-          // File doesn't exist - we'll create it with the first edit
+        if (!existsSync(absolutePath)) {
+          // File doesn't exist - check if we're creating a new file
+          // Only allow creation if first edit has empty oldString
+          if (edits.length > 0 && edits[0]?.oldString !== '') {
+            return {
+              success: false,
+              filePath: absolutePath,
+              editResults: [],
+              errorMessage: `File ${filePath} not found. Cannot replace text in non-existent file.`,
+            };
+          }
           console.info(`File does not exist, will be created: ${absolutePath}`);
           isNewFile = true;
-        } else if (stats.isDirectory()) {
-          return {
-            success: false,
-            filePath: absolutePath,
-            editResults: [],
-            errorMessage: `Path is a directory, not a file: ${filePath}`,
-          };
         } else {
-          contentOriginal = await file.text();
+          const stats = statSync(absolutePath);
+          if (stats.isDirectory()) {
+            return {
+              success: false,
+              filePath: absolutePath,
+              editResults: [],
+              errorMessage: `Path is a directory, not a file: ${filePath}`,
+            };
+          }
+          contentOriginal = readFileSync(absolutePath, 'utf8');
         }
 
         // Track results for each edit
@@ -179,7 +189,7 @@ export function createMultiEditFileToolExecute(context: MultiEditFileToolContext
         }
 
         // All edits succeeded - write the file
-        await Bun.write(absolutePath, currentContent);
+        writeFileSync(absolutePath, currentContent, 'utf8');
 
         // Generate final diff
         const finalDiff = trimDiff(

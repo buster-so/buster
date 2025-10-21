@@ -6,7 +6,8 @@
     "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
     "jsx": "react-jsx",
     "types": ["bun", "node"],
-    "lib": ["ES2021", "DOM"]
+    "lib": ["ES2021", "DOM"],
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"],

@@ -118,7 +118,15 @@ export async function processAgentStream(
           callbacks.currentTurnStartIndex !== undefined
             ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
             : accumulatorState.messages;
-        await onSaveMessages?.(messagesToSave);
+
+        try {
+          await onSaveMessages?.(messagesToSave);
+        } catch (error) {
+          // Log save error but don't stop stream processing
+          console.error('Error saving messages during finish-step:', error);
+          // Notify via error callback
+          onError?.(error);
+        }
       }
 
       if (part.type === 'error') {
@@ -129,7 +137,12 @@ export async function processAgentStream(
           callbacks.currentTurnStartIndex !== undefined
             ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
             : accumulatorState.messages;
-        await onSaveMessages?.(messagesToSave);
+
+        try {
+          await onSaveMessages?.(messagesToSave);
+        } catch (saveError) {
+          console.error('Error saving messages during error handling:', saveError);
+        }
       }
 
       if (part.type === 'abort') {
@@ -140,9 +153,34 @@ export async function processAgentStream(
           callbacks.currentTurnStartIndex !== undefined
             ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
             : accumulatorState.messages;
-        await onSaveMessages?.(messagesToSave);
+
+        try {
+          await onSaveMessages?.(messagesToSave);
+        } catch (saveError) {
+          console.error('Error saving messages during abort:', saveError);
+        }
       }
     }
+  } catch (error) {
+    // Handle stream iteration errors
+    console.error('Error processing agent stream:', error);
+
+    // Notify error callback
+    onError?.(error);
+
+    // Try to save messages up to the point of failure
+    try {
+      const messagesToSave =
+        callbacks.currentTurnStartIndex !== undefined
+          ? accumulatorState.messages.slice(callbacks.currentTurnStartIndex)
+          : accumulatorState.messages;
+      await onSaveMessages?.(messagesToSave);
+    } catch (saveError) {
+      console.error('Error saving messages after stream failure:', saveError);
+    }
+
+    // Re-throw to propagate error to caller
+    throw error;
   } finally {
     onThinkingStateChange?.(false);
   }

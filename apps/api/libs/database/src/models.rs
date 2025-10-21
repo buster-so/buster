@@ -148,6 +148,7 @@ pub struct Chat {
     pub workspace_sharing: WorkspaceSharing,
     pub workspace_sharing_enabled_by: Option<Uuid>,
     pub workspace_sharing_enabled_at: Option<DateTime<Utc>>,
+    pub chat_type: Option<ChatType>,
 }
 
 #[derive(Queryable, Insertable, Associations, Debug)]

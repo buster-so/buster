@@ -1,12 +1,15 @@
-import { Box, Text, useApp, useInput } from 'ink';
+import type { BusterSDK } from '@buster/sdk';
+import { Box, Text, useInput } from 'ink';
 import { useEffect, useState } from 'react';
+import { listConversationsFromApi, loadConversationFromApi } from '../../utils/api-conversation';
 import type { Conversation } from '../../utils/conversation-history';
-import { listConversations, loadConversation } from '../../utils/conversation-history';
+import { getOrCreateSdk } from '../../utils/sdk-factory';
 
 interface HistoryBrowserProps {
   workingDirectory: string;
   onSelect: (conversation: Conversation) => void;
   onCancel: () => void;
+  sdk?: BusterSDK; // Optional SDK for API operations
 }
 
 interface ConversationListItem {
@@ -39,56 +42,65 @@ function getRelativeTime(dateString: string): string {
   return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
 }
 
-export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: HistoryBrowserProps) {
+export function HistoryBrowser({
+  workingDirectory,
+  onSelect,
+  onCancel,
+  sdk: providedSdk,
+}: HistoryBrowserProps) {
   const [conversations, setConversations] = useState<ConversationListItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadConversations = async () => {
       try {
-        const convos = await listConversations(workingDirectory);
+        // Get or create SDK for API-first approach
+        let sdk = providedSdk;
+        if (!sdk) {
+          try {
+            sdk = await getOrCreateSdk();
+          } catch {
+            setError('Unable to connect to API. Please check your credentials.');
+            setLoading(false);
+            return;
+          }
+        }
 
-        // Load each conversation to get the first user message as title
-        const items: ConversationListItem[] = await Promise.all(
-          convos.map(async (convo) => {
-            const fullConvo = await loadConversation(convo.chatId, workingDirectory);
+        // Load conversations from API
+        const convos = await listConversationsFromApi(sdk);
 
-            // Find first user message for title
-            let title = 'Untitled conversation';
-            if (fullConvo?.modelMessages) {
-              const firstUserMsg = fullConvo.modelMessages.find((msg) => msg.role === 'user');
-              if (firstUserMsg && firstUserMsg.role === 'user') {
-                // Truncate to first line and max 60 chars
-                const content =
-                  typeof firstUserMsg.content === 'string'
-                    ? firstUserMsg.content.split('\n')[0] || 'Untitled conversation'
-                    : 'Complex message';
-                title = content.length > 60 ? `${content.slice(0, 57)}...` : content;
-              }
-            }
+        // Map API response to ConversationListItem format
+        const items: ConversationListItem[] = convos.map((convo) => {
+          // Use chat name or first 60 chars as title
+          const title = convo.name
+            ? convo.name.length > 60
+              ? `${convo.name.slice(0, 57)}...`
+              : convo.name
+            : 'Untitled conversation';
 
-            return {
-              chatId: convo.chatId,
-              title,
-              createdAt: convo.createdAt,
-              updatedAt: convo.updatedAt,
-              messageCount: convo.messageCount,
-              relativeTime: getRelativeTime(convo.updatedAt),
-            };
-          })
-        );
+          return {
+            chatId: convo.chatId,
+            title,
+            createdAt: convo.createdAt,
+            updatedAt: convo.updatedAt,
+            messageCount: 0, // API doesn't provide count, set to 0
+            relativeTime: getRelativeTime(convo.updatedAt),
+          };
+        });
 
         setConversations(items);
       } catch (error) {
         console.error('Failed to load conversations:', error);
+        setError('Failed to load conversations from API');
       } finally {
         setLoading(false);
       }
     };
 
     loadConversations();
-  }, [workingDirectory]);
+  }, [workingDirectory, providedSdk]);
 
   useInput((_input, key) => {
     if (key.escape) {
@@ -103,11 +115,29 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
     } else if (key.return && conversations.length > 0) {
       const selected = conversations[selectedIndex];
       if (selected) {
-        loadConversation(selected.chatId, workingDirectory).then((convo) => {
-          if (convo) {
-            onSelect(convo);
+        // Load conversation from API
+        (async () => {
+          try {
+            let sdk = providedSdk;
+            if (!sdk) {
+              sdk = await getOrCreateSdk();
+            }
+
+            const apiConvo = await loadConversationFromApi(selected.chatId, sdk);
+            if (apiConvo) {
+              // Enrich API conversation with required fields for Conversation type
+              const fullConvo: Conversation = {
+                ...apiConvo,
+                workingDirectory,
+                createdAt: selected.createdAt,
+                updatedAt: selected.updatedAt,
+              };
+              onSelect(fullConvo);
+            }
+          } catch (error) {
+            console.error('Failed to load conversation:', error);
           }
-        });
+        })();
       }
     }
   });
@@ -119,7 +149,23 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
           Resume Session
         </Text>
         <Box marginTop={1}>
-          <Text dimColor>Loading conversations...</Text>
+          <Text dimColor>Loading conversations from API...</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box flexDirection="column" paddingX={1} paddingY={1}>
+        <Text color="#c4b5fd" bold>
+          Resume Session
+        </Text>
+        <Box marginTop={1}>
+          <Text color="red">{error}</Text>
+        </Box>
+        <Box marginTop={1}>
+          <Text dimColor>Esc to go back</Text>
         </Box>
       </Box>
     );
@@ -132,7 +178,7 @@ export function HistoryBrowser({ workingDirectory, onSelect, onCancel }: History
           Resume Session
         </Text>
         <Box marginTop={1}>
-          <Text dimColor>No previous conversations found.</Text>
+          <Text dimColor>No previous conversations found in API.</Text>
         </Box>
         <Box marginTop={1}>
           <Text dimColor>Esc to go back</Text>
