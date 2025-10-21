@@ -2,7 +2,7 @@ import type { AssetType } from '@buster/server-shared/assets';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import { faker } from '@faker-js/faker';
 import { Link, type LinkProps } from '@tanstack/react-router';
-import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
@@ -13,6 +13,7 @@ import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
+import { useMounted } from '@/hooks/useMount';
 import { AssetTypeTranslations } from '@/lib/assets/asset-translations';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
@@ -26,6 +27,8 @@ export const LibraryGridView = React.memo(
     allResults,
     collections,
     isFetchingNextPage,
+    isLoading,
+    isPending,
     className,
     filters,
     scrollContainerRef,
@@ -36,6 +39,8 @@ export const LibraryGridView = React.memo(
     collections: BusterCollectionListItem[];
     filters: LibrarySearchParams;
     isFetchingNextPage: boolean;
+    isLoading: boolean;
+    isPending: boolean;
     className?: string;
     scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   }) => {
@@ -45,6 +50,7 @@ export const LibraryGridView = React.memo(
     const hasResults = allResults.length > 0;
     const hasGroups = allGroups !== undefined;
     const groupBy = filters.group_by;
+    const isInitialLoading = (isLoading || isPending) && !hasResults;
 
     React.useEffect(() => {
       const updateColumns = () => {
@@ -62,6 +68,7 @@ export const LibraryGridView = React.memo(
 
     return (
       <ScrollArea
+        key={hasGroups ? 'grouped' : 'ungrouped'}
         viewportRef={scrollContainerRef}
         className={'h-full '}
         viewportClassName={cn(
@@ -76,14 +83,16 @@ export const LibraryGridView = React.memo(
           </LibrarySectionContainer>
         )}
 
-        {hasResults && !hasGroups && (
+        {isInitialLoading && <div className="text-text-tertiary text-center py-8">Loading...</div>}
+
+        {!isInitialLoading && !hasGroups && (
           <LibraryUngroupedView
             allResults={allResults}
             columns={columns}
             scrollContainerRef={scrollContainerRef}
           />
         )}
-        {hasResults && hasGroups && (
+        {!isInitialLoading && hasGroups && (
           <LibraryGroupedView
             allGroups={allGroups}
             columns={columns}
@@ -243,6 +252,7 @@ const LibraryGroupSection = ({
   className?: string;
 }) => {
   const virtualStartRef = useRef<HTMLDivElement>(null);
+  const _mounted = useMounted(); //keep this because we tanstack virtualizer need to trigger reflow
 
   // Calculate rows needed for grid
   const rowCount = Math.ceil(items.length / columns);
@@ -306,6 +316,7 @@ const LibraryUngroupedView = ({
 
   // Ref to measure offset from collections section
   const virtualStartRef = useRef<HTMLDivElement>(null);
+  const _mounted = useMounted(); //keep this because we tanstack virtualizer need to trigger reflow
 
   const rowVirtualizer = useVirtualizer({
     count: rowCount,

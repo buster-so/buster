@@ -20,7 +20,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
   const { data: collections } = useGetCollectionsList({});
   const managedFilters = useManagedFilters(filtersProps);
 
-  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage } =
+  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isLoading, isPending } =
     useLibraryAssetsInfinite({
       ...managedFilters,
       page_size: 45,
@@ -42,6 +42,8 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
           collections={collections}
           filters={filtersProps}
           isFetchingNextPage={isFetchingNextPage}
+          isLoading={isLoading}
+          isPending={isPending}
           scrollContainerRef={scrollContainerRef}
         />
       )}
