@@ -221,7 +221,7 @@ describe('run-docs-agent', () => {
       const cliCalls = vi.mocked(mockSandbox.process.executeSessionCommand).mock.calls;
       const cliCall = cliCalls.find((call) => call[1].command.includes('buster '));
       expect(cliCall).toBeDefined();
-      expect(cliCall![1].command).toContain('--prompt "Default documentation agent prompt"');
+      expect(cliCall![1].command).toContain('--prompt "$(cat /workspace/prompt.md)"');
     });
 
     it('should handle optional parameters correctly', async () => {
@@ -360,7 +360,6 @@ describe('run-docs-agent', () => {
             GITHUB_TOKEN: validParams.installationToken,
             BUSTER_API_KEY: validParams.apiKey,
             BUSTER_HOST: 'https://test.buster.so',
-            PATH: '$HOME/.local/bin:$PATH',
           })
         );
       } else {
