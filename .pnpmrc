@@ -25,8 +25,17 @@ registry=https://registry.npmjs.org/
 side-effects-cache=true
 
 # Network reliability settings to prevent install hangs
-network-timeout=120000
+network-timeout=60000
 fetch-retries=1
 fetch-retry-mintimeout=10000
 fetch-retry-maxtimeout=30000
-fetch-timeout=120000
+fetch-timeout=60000
+
+# Prevent hanging on optional dependencies and scripts
+optional=false
+prefer-offline=false
+# Disable problematic lifecycle scripts in CI
+ignore-scripts=false
+
+# Performance: increase concurrent network requests
+network-concurrency=16

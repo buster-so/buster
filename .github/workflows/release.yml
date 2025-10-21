@@ -1,0 +1,728 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - main
+          - staging
+        default: staging
+      components:
+        description: 'Components to deploy (all, server, api-legacy, cli, trigger, migrations)'
+        required: false
+        default: 'all'
+
+# Queue deployments per environment - NEVER cancel deployments mid-flight
+# This ensures database migrations and deployments complete safely
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
+  cancel-in-progress: false  # Queue deployments for safety
+
+env:
+  REGISTRY: ghcr.io
+  SERVER_IMAGE_NAME: buster-so/buster-server
+  API_LEGACY_IMAGE_NAME: buster-so/api-legacy
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  # ============================================
+  # CHANGE DETECTION
+  # ============================================
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.filter.outputs.server }}
+      api: ${{ steps.filter.outputs.api }}
+      cli: ${{ steps.filter.outputs.cli }}
+      migrations: ${{ steps.filter.outputs.migrations }}
+      trigger: ${{ steps.filter.outputs.trigger }}
+      should_build_server: ${{ steps.decide.outputs.should_build_server }}
+      should_build_api: ${{ steps.decide.outputs.should_build_api }}
+      should_build_cli: ${{ steps.decide.outputs.should_build_cli }}
+      should_run_migrations: ${{ steps.decide.outputs.should_run_migrations }}
+      should_deploy_trigger: ${{ steps.decide.outputs.should_deploy_trigger }}
+      environment: ${{ steps.decide.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'apps/server/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/release.yml'
+            api:
+              - 'apps/api/**'
+              - '.github/workflows/release.yml'
+            cli:
+              - 'apps/cli/**'
+              - 'packages/**'
+              - '.github/workflows/release.yml'
+            migrations:
+              - 'packages/database/drizzle/**'
+              - 'packages/database/src/schema-types/**'
+              - 'packages/database/drizzle.config.ts'
+              - '.github/workflows/release.yml'
+            trigger:
+              - 'apps/trigger/**'
+              - 'packages/**'
+              - '.github/workflows/release.yml'
+
+      - name: Decide what to run
+        id: decide
+        run: |
+          # Determine environment
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            ENV="${{ github.event.inputs.environment }}"
+            COMPONENTS="${{ github.event.inputs.components }}"
+          else
+            ENV="${{ github.ref_name }}"
+            COMPONENTS="all"
+          fi
+
+          echo "environment=${ENV}" >> $GITHUB_OUTPUT
+
+          # Decide what should run based on changes and inputs
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "server" ]]; then
+            echo "should_build_server=${{ steps.filter.outputs.server }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_server=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "api-legacy" ]]; then
+            echo "should_build_api=${{ steps.filter.outputs.api }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_api=false" >> $GITHUB_OUTPUT
+          fi
+
+          # CLI runs on main and staging branches
+          if ([[ "$ENV" == "main" ]] || [[ "$ENV" == "staging" ]]) && ([[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "cli" ]]); then
+            echo "should_build_cli=${{ steps.filter.outputs.cli }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_build_cli=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "migrations" ]]; then
+            echo "should_run_migrations=${{ steps.filter.outputs.migrations }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_run_migrations=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$COMPONENTS" == "all" ]] || [[ "$COMPONENTS" == "trigger" ]]; then
+            echo "should_deploy_trigger=${{ steps.filter.outputs.trigger }}" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy_trigger=false" >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================
+  # BUILD PHASE - All builds run in parallel with fail-fast
+  # ============================================
+
+  # -------- SERVER BUILD --------
+  build-server:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_server == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Docker tags
+        id: meta
+        uses: ./.github/actions/determine-docker-tags
+        with:
+          registry: ${{ env.REGISTRY }}
+          image_name: ${{ env.SERVER_IMAGE_NAME }}
+          environment: ${{ needs.detect-changes.outputs.environment }}
+
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: useblacksmith/build-push-action@v2
+        timeout-minutes: 20
+        with:
+          context: .
+          file: ./apps/server/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+            org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
+          build-args: |
+            COMMIT_SHA=${{ steps.meta.outputs.sha_short }}
+            BUILD_DATE=${{ steps.meta.outputs.timestamp }}
+          secrets: |
+            turbo_token=${{ secrets.TURBO_TOKEN }}
+            turbo_team=${{ vars.TURBO_TEAM }}
+          platforms: linux/amd64
+
+  # -------- API LEGACY BUILD --------
+  build-api-legacy:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_api == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2204
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Docker tags
+        id: meta
+        uses: ./.github/actions/determine-docker-tags
+        with:
+          registry: ${{ env.REGISTRY }}
+          image_name: ${{ env.API_LEGACY_IMAGE_NAME }}
+          environment: ${{ needs.detect-changes.outputs.environment }}
+
+      - name: Mount Cargo cache sticky disk
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-cargo-cache-api-legacy
+          path: ./.cargo-cache
+
+      - name: Set up Docker Builder
+        uses: useblacksmith/setup-docker-builder@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API legacy image
+        uses: useblacksmith/build-push-action@v2
+        timeout-minutes: 25
+        with:
+          context: ./apps/api
+          file: ./apps/api/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.timestamp }}
+            org.opencontainers.image.ref.name=${{ needs.detect-changes.outputs.environment }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.API_LEGACY_IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            CARGO_HOME=/github/workspace/.cargo-cache
+
+  # -------- CLI BUILD --------
+  build-cli:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should_build_cli == 'true'
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - target: linux-x64
+            artifact_name: buster-cli-linux-x86_64.tar.gz
+            bun_target: bun-linux-x64-modern
+            is_windows: false
+          - target: darwin-x64
+            artifact_name: buster-cli-darwin-x86_64.tar.gz
+            bun_target: bun-darwin-x64
+            is_windows: false
+          - target: darwin-arm64
+            artifact_name: buster-cli-darwin-arm64.tar.gz
+            bun_target: bun-darwin-arm64
+            is_windows: false
+          - target: windows-x64
+            artifact_name: buster-cli-windows-x86_64.zip
+            bun_target: bun-windows-x64
+            is_windows: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.18.3
+
+      - name: Setup Node.js
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Mount Turbo cache sticky disk
+        if: runner.os != 'Windows'
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-turbo-cache-cli-${{ matrix.target }}
+          path: ./.turbo
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build dependencies with Turbo
+        run: |
+          echo "🔨 Building CLI dependencies with Turbo..."
+          pnpm turbo run build --filter=@buster-app/cli^... --filter=@buster/search
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+          TURBO_CACHE_DIR: .turbo
+          TURBO_TELEMETRY_DISABLED: 1
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+      - name: Build standalone CLI binary
+        working-directory: ./apps/cli
+        run: |
+          echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
+          # Use the release build script with target specification
+          bun run build:release
+
+          # Rename output for CI (build outputs 'buster' or 'buster.exe')
+          if [[ "${{ matrix.is_windows }}" == "true" ]]; then
+            # Windows: Bun automatically adds .exe
+            mv dist/buster.exe dist/buster-cli
+          else
+            # Unix: no extension
+            mv dist/buster dist/buster-cli
+            chmod +x dist/buster-cli
+          fi
+
+          # Display binary info
+          ls -lah dist/
+        shell: bash
+        env:
+          NODE_ENV: production
+          SKIP_ENV_CHECK: true
+          BUN_TARGET: ${{ matrix.bun_target }}
+
+      - name: Test binary (Non-Windows)
+        if: matrix.is_windows == false
+        working-directory: ./apps/cli
+        run: |
+          echo "🧪 Testing CLI binary for ${{ matrix.target }}..."
+          # Only test Linux binaries on Linux runner
+          if [[ "${{ matrix.target }}" == "linux-x64" ]]; then
+            ./dist/buster-cli --version || echo "Version command not implemented yet"
+            ./dist/buster-cli --help || echo "Help command output"
+          else
+            echo "Cross-compiled for ${{ matrix.target }}, skipping execution test"
+          fi
+
+      - name: Compress binary (Non-Windows)
+        if: matrix.is_windows == false
+        working-directory: ./apps/cli
+        run: |
+          cd dist
+          # Rename based on environment
+          if [[ "${{ needs.detect-changes.outputs.environment }}" == "staging" ]]; then
+            mv buster-cli buster-staging
+            BINARY_NAME="buster-staging"
+          else
+            mv buster-cli buster
+            BINARY_NAME="buster"
+          fi
+          tar czf ${{ matrix.artifact_name }} ${BINARY_NAME}
+          sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
+          echo "📦 Archive created:"
+          ls -lah ${{ matrix.artifact_name }}*
+
+      - name: Compress binary (Windows)
+        if: matrix.is_windows == true
+        working-directory: ./apps/cli
+        run: |
+          cd dist
+          # Add .exe extension and rename based on environment
+          if [[ "${{ needs.detect-changes.outputs.environment }}" == "staging" ]]; then
+            mv buster-cli buster-staging.exe
+            BINARY_NAME="buster-staging.exe"
+          else
+            mv buster-cli buster.exe
+            BINARY_NAME="buster.exe"
+          fi
+          zip ${{ matrix.artifact_name }} ${BINARY_NAME}
+          sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
+          echo "📦 Archive created:"
+          ls -lah ${{ matrix.artifact_name }}*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: buster-cli-${{ matrix.target }}
+          path: |
+            apps/cli/dist/${{ matrix.artifact_name }}
+            apps/cli/dist/${{ matrix.artifact_name }}.sha256
+          retention-days: 1
+
+  # -------- ALL BUILDS COMPLETE GATE --------
+  all-builds-complete:
+    needs: [detect-changes, build-server, build-api-legacy, build-cli]
+    if: |
+      always() &&
+      (needs.build-server.result == 'success' || needs.build-server.result == 'skipped') &&
+      (needs.build-api-legacy.result == 'success' || needs.build-api-legacy.result == 'skipped') &&
+      (needs.build-cli.result == 'success' || needs.build-cli.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build results
+        run: echo "All builds completed successfully or were skipped"
+
+  # ============================================
+  # DATABASE MIGRATIONS (gate between build and deploy)
+  # ============================================
+  migrate:
+    needs: [detect-changes, all-builds-complete]
+    if: needs.detect-changes.outputs.should_run_migrations == 'true'
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+
+      - name: Run migrations
+        run: pnpm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DB_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+  # ============================================
+  # DEPLOY PHASE - All deploys run in parallel with fail-fast
+  # ============================================
+
+  # -------- SERVER DEPLOYMENT --------
+  deploy-server:
+    needs: [detect-changes, build-server, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.build-server.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Cache Porter CLI
+        id: cache-porter
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/porter
+          key: porter-cli-${{ runner.os }}-v1
+
+      - name: Setup Porter
+        if: steps.cache-porter.outputs.cache-hit != 'true'
+        uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Verify Porter installation
+        run: porter version
+
+      - name: Deploy to Porter
+        run: |
+          TAG="${{ needs.detect-changes.outputs.environment == 'main' && needs.build-server.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-server.outputs.sha_short) }}"
+          echo "🚀 Deploying ${{ vars.PORTER_SERVER_APP_NAME }}..."
+          echo "📦 Using image tag: ${TAG}"
+          porter app update-tag ${{ vars.PORTER_SERVER_APP_NAME }} --tag "${TAG}"
+          echo "✅ Deployment initiated successfully!"
+        env:
+          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+          PORTER_HOST: https://dashboard.porter.run
+          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+
+  # -------- API LEGACY DEPLOYMENT --------
+  deploy-api-legacy:
+    needs: [detect-changes, build-api-legacy, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.build-api-legacy.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Cache Porter CLI
+        id: cache-porter
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/porter
+          key: porter-cli-${{ runner.os }}-v1
+
+      - name: Setup Porter
+        if: steps.cache-porter.outputs.cache-hit != 'true'
+        uses: porter-dev/setup-porter@v0.1.0
+
+      - name: Verify Porter installation
+        run: porter version
+
+      - name: Deploy to Porter
+        run: |
+          TAG="${{ needs.detect-changes.outputs.environment == 'main' && needs.build-api-legacy.outputs.sha_short || format('{0}-{1}', needs.detect-changes.outputs.environment, needs.build-api-legacy.outputs.sha_short) }}"
+          echo "🚀 Deploying ${{ vars.PORTER_API_LEGACY_APP_NAME }}..."
+          echo "📦 Using image tag: ${TAG}"
+          porter app update-tag ${{ vars.PORTER_API_LEGACY_APP_NAME }} --tag "${TAG}"
+          echo "✅ Deployment initiated successfully!"
+        env:
+          PORTER_TOKEN: ${{ secrets.PORTER_TOKEN }}
+          PORTER_HOST: https://dashboard.porter.run
+          PORTER_PROJECT: ${{ vars.PORTER_PROJECT }}
+          PORTER_CLUSTER: ${{ vars.PORTER_CLUSTER }}
+
+  # -------- TRIGGER.DEV DEPLOYMENT --------
+  deploy-trigger:
+    needs: [detect-changes, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.should_deploy_trigger == 'true' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    environment: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
+        with:
+          install-filter: "@buster-app/trigger..."
+          cache-key: trigger-deployment
+
+      - name: Deploy to Trigger.dev
+        env:
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+        run: |
+          ENV="${{ needs.detect-changes.outputs.environment }}"
+          TRIGGER_ENV=$([[ "${ENV}" == "main" ]] && echo "production" || echo "staging")
+
+          echo "🚀 Deploying to Trigger.dev ${TRIGGER_ENV}..."
+          cd apps/trigger
+          pnpm dlx trigger.dev@latest deploy --env ${TRIGGER_ENV}
+
+  # -------- CLI RELEASE --------
+  release-cli:
+    needs: [detect-changes, build-cli, all-builds-complete, migrate]
+    if: |
+      always() &&
+      needs.build-cli.result == 'success' &&
+      (needs.migrate.result == 'success' || needs.migrate.result == 'skipped')
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      packages: write
+    outputs:
+      cli_version: ${{ steps.get_version.outputs.version }}
+      cli_tag_name: ${{ steps.output_release_info.outputs.tag_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Extract version from package.json
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./apps/cli/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Create or Update Release
+        id: create_the_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}${{ needs.detect-changes.outputs.environment == 'staging' && '-staging' || '' }}
+          name: Release v${{ steps.get_version.outputs.version }}${{ needs.detect-changes.outputs.environment == 'staging' && ' (Staging)' || '' }}
+          prerelease: ${{ needs.detect-changes.outputs.environment == 'staging' }}
+          body: |
+            ## Buster CLI v${{ steps.get_version.outputs.version }}
+
+            ### What's New
+            - TypeScript-based CLI built with Bun
+            - Fast native binary compilation
+            - Cross-platform support (macOS, Linux, Windows)
+
+            ### Installation
+
+            #### Homebrew (macOS/Linux)
+            ```bash
+            brew tap buster-so/buster-homebrew
+            brew install buster
+            ```
+
+            #### Direct Download
+            Download the appropriate binary for your platform from the assets below.
+
+            ### Checksums
+            Verify your download with the SHA256 checksums provided.
+          files: |
+            **/buster-cli-linux-x86_64.tar.gz
+            **/buster-cli-linux-x86_64.tar.gz.sha256
+            **/buster-cli-darwin-x86_64.tar.gz
+            **/buster-cli-darwin-x86_64.tar.gz.sha256
+            **/buster-cli-darwin-arm64.tar.gz
+            **/buster-cli-darwin-arm64.tar.gz.sha256
+            **/buster-cli-windows-x86_64.zip
+            **/buster-cli-windows-x86_64.zip.sha256
+          draft: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output release info
+        id: output_release_info
+        run: |
+          echo "tag_name=v${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "✅ Release created/updated: v${{ steps.get_version.outputs.version }}"
+
+  # ============================================
+  # RELEASE SUMMARY
+  # ============================================
+  summary:
+    name: Release Summary
+    needs: [detect-changes, all-builds-complete, migrate, deploy-server, deploy-api-legacy, deploy-trigger, release-cli]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate comprehensive release summary
+        run: |
+          echo "## 🚀 Release Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ needs.detect-changes.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 📊 Pipeline Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Build Phase
+          echo "#### Build Phase" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.detect-changes.outputs.should_build_server }}" == "true" ]]; then
+            echo "- **Server:** ${{ needs.build-server.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Server:** ⏭️ Skipped (no server/package changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.should_build_api }}" == "true" ]]; then
+            echo "- **API Legacy:** ${{ needs.build-api-legacy.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **API Legacy:** ⏭️ Skipped (no API changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.should_build_cli }}" == "true" ]]; then
+            echo "- **CLI:** ${{ needs.build-cli.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            ENV="${{ needs.detect-changes.outputs.environment }}"
+            if [[ "${ENV}" != "main" ]] && [[ "${ENV}" != "staging" ]]; then
+              echo "- **CLI:** ⏭️ Skipped (only builds on main and staging branches)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **CLI:** ⏭️ Skipped (no CLI/package changes)" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Migrations
+          echo "#### Database Migrations" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.detect-changes.outputs.should_run_migrations }}" == "true" ]]; then
+            echo "- **Migrations:** ${{ needs.migrate.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Migrations:** ⏭️ Skipped (no database schema changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Deploy Phase
+          echo "#### Deploy Phase" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.deploy-server.result }}" != "" ]]; then
+            echo "- **Server:** ${{ needs.deploy-server.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Server:** ⏭️ Skipped (server build did not run)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.deploy-api-legacy.result }}" != "" ]]; then
+            echo "- **API Legacy:** ${{ needs.deploy-api-legacy.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **API Legacy:** ⏭️ Skipped (API build did not run)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.deploy-trigger.result }}" != "" ]]; then
+            echo "- **Trigger.dev:** ${{ needs.deploy-trigger.result }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Trigger.dev:** ⏭️ Skipped (no trigger/package changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.release-cli.result }}" != "" ]]; then
+            echo "- **CLI Release:** ${{ needs.release-cli.result }}" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ needs.release-cli.result }}" == "success" ]]; then
+              echo "  - Version: v${{ needs.release-cli.outputs.cli_version }}" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            ENV="${{ needs.detect-changes.outputs.environment }}"
+            if [[ "${ENV}" != "main" ]] && [[ "${ENV}" != "staging" ]]; then
+              echo "- **CLI Release:** ⏭️ Skipped (only releases on main and staging branches)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **CLI Release:** ⏭️ Skipped (CLI build did not run)" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- All builds complete before migrations" >> $GITHUB_STEP_SUMMARY
+          echo "- Migrations gate all deployments" >> $GITHUB_STEP_SUMMARY
+          echo "- Fail-fast enabled for builds and deploys" >> $GITHUB_STEP_SUMMARY
+          echo "- Deployments queued per environment (never canceled)" >> $GITHUB_STEP_SUMMARY

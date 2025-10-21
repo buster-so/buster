@@ -57,10 +57,8 @@ export type RefreshInstallationTokenRequest = z.infer<typeof RefreshInstallation
 
 // GitHub Action Documentation Request Schemas
 export const GithubActionDocumentationPostSchema = z.object({
-  prNumber: z.coerce.number().describe('Pull request number'),
-  branchName: z.string().describe('Branch name for the PR'),
-  repositoryUrl: z.string().url().describe('Repository URL'),
-  headSha: z.string().describe('SHA of the head commit'),
+  // Could be multiple different events
+  eventContext: z.record(z.string(), z.any()).describe('Event context from GitHub Action'),
 });
 
 export type GithubActionDocumentationPostRequest = z.infer<
@@ -68,7 +66,7 @@ export type GithubActionDocumentationPostRequest = z.infer<
 >;
 
 export const GithubActionDocumentationGetSchema = z.object({
-  messageId: z.string().describe('Message ID to retrieve documentation status'),
+  id: z.string().describe('Message ID to retrieve documentation status'),
 });
 
 export type GithubActionDocumentationGetRequest = z.infer<

@@ -302,26 +302,32 @@ describe('parsing', () => {
       expect(result.models[0]?.measures).toHaveLength(1);
     });
 
-    it('should only parse single model files (no models key)', async () => {
-      // Files with 'models' key should be rejected
-      const multiModel = {
+    it('should parse dbt files with models array', async () => {
+      // Files with 'models' key are now treated as dbt format
+      const dbtFile = {
+        version: 2,
         models: [
           {
             name: 'users',
-            dimensions: [{ name: 'id', searchable: false }],
-            measures: [],
+            columns: [
+              { name: 'id', description: 'User ID' },
+              { name: 'email', description: 'User email' },
+            ],
           },
         ],
       };
 
-      const filePath = join(testDir, 'models.yml');
-      await writeFile(filePath, yaml.dump(multiModel));
+      const filePath = join(testDir, 'dbt-models.yml');
+      await writeFile(filePath, yaml.dump(dbtFile));
 
       const result = await parseModelFile(filePath);
 
-      // Should fail to parse because it has a 'models' key
-      expect(result.models).toHaveLength(0);
-      expect(result.errors.length).toBeGreaterThan(0);
+      // Should successfully parse as dbt file
+      expect(result.models).toHaveLength(1);
+      expect(result.errors).toHaveLength(0);
+      expect(result.models[0]?.name).toBe('users');
+      // Columns should be transformed to dimensions
+      expect(result.models[0]?.dimensions.length).toBeGreaterThan(0);
     });
 
     it('should throw ModelParsingError for invalid YAML', async () => {
@@ -335,8 +341,8 @@ describe('parsing', () => {
 
     it('should return validation errors for invalid model structure', async () => {
       const invalidModel = {
-        // Missing required 'name' field
-        dimensions: 'not an array',
+        name: 'invalid_model', // Has name so it's detected as Buster format
+        dimensions: 'not an array', // But dimensions is invalid
       };
 
       const filePath = join(testDir, 'invalid-model.yml');
@@ -350,7 +356,7 @@ describe('parsing', () => {
 
       // Check that we get specific validation issues
       const allIssues = result.errors.flatMap((e) => formatZodIssues(e.issues));
-      expect(allIssues.some((issue) => issue.includes('name'))).toBe(true);
+      expect(allIssues.some((issue) => issue.includes('dimensions'))).toBe(true);
     });
 
     it('should return multiple validation errors for multiple invalid fields', async () => {
@@ -921,6 +927,191 @@ dimensions:
       expect(result.models).toHaveLength(1);
       expect(result.errors).toHaveLength(0);
       expect(result.models[0]?.name).toBe('test_model');
+    });
+  });
+
+  describe('parseModelFile - end-to-end dbt YAML parsing', () => {
+    it('should parse actual dbt YAML with top-level column options (dash array format)', async () => {
+      // This test uses the EXACT YAML format that the user provided
+      const testFile = join(testDir, 'real-dbt-product.yml');
+      const yamlContent = `
+version: 2
+models:
+  - name: product
+    columns:
+      - name: color
+        description: Product color attribute for bikes, frames, and certain accessories.
+        options:
+          - Black
+          - Silver
+          - Red
+          - Blue
+          - Green
+          - Yellow
+          - Purple
+          - Orange
+          - Brown
+        searchable: true
+
+semantic_models:
+  - name: product_semantic
+    model: ref('product')
+    entities: []
+    dimensions:
+      - name: color
+        type: categorical
+        description: Product color attribute; 49% null (components without color, by design).
+    measures: []
+`;
+      await writeFile(testFile, yamlContent);
+
+      const result = await parseModelFile(testFile);
+
+      expect(result.models).toHaveLength(1);
+      expect(result.errors).toHaveLength(0);
+
+      const model = result.models[0];
+      expect(model?.name).toBe('product');
+
+      // Should have 1 dimension (color merged from column + semantic)
+      expect(model?.dimensions).toHaveLength(1);
+
+      const colorDim = model?.dimensions[0];
+      expect(colorDim?.name).toBe('color');
+
+      // Should preserve searchable from column (top-level field)
+      expect(colorDim?.searchable).toBe(true);
+
+      // Should preserve options from column (top-level field with YAML dash format)
+      expect(colorDim?.options).toBeDefined();
+      expect(colorDim?.options).toEqual([
+        'Black',
+        'Silver',
+        'Red',
+        'Blue',
+        'Green',
+        'Yellow',
+        'Purple',
+        'Orange',
+        'Brown',
+      ]);
+
+      // Should use type from semantic dimension (categorical normalized to string)
+      expect(colorDim?.type).toBe('string');
+
+      // Should use column description (precedence)
+      expect(colorDim?.description).toBe(
+        'Product color attribute for bikes, frames, and certain accessories.'
+      );
+
+      // Should NOT appear as a measure
+      expect(model?.measures).toHaveLength(0);
+    });
+
+    it('should parse dbt YAML with config.meta.options format', async () => {
+      const testFile = join(testDir, 'dbt-product-meta.yml');
+      const yamlContent = `
+version: 2
+models:
+  - name: product
+    columns:
+      - name: color
+        description: Product color
+        config:
+          meta:
+            options:
+              - Red
+              - Blue
+              - Green
+            searchable: true
+
+semantic_models:
+  - name: product_semantic
+    model: ref('product')
+    entities: []
+    dimensions:
+      - name: color
+        type: categorical
+    measures: []
+`;
+      await writeFile(testFile, yamlContent);
+
+      const result = await parseModelFile(testFile);
+
+      expect(result.models).toHaveLength(1);
+      expect(result.errors).toHaveLength(0);
+
+      const model = result.models[0];
+      const colorDim = model?.dimensions[0];
+
+      // Should preserve options from config.meta
+      expect(colorDim?.options).toEqual(['Red', 'Blue', 'Green']);
+      expect(colorDim?.searchable).toBe(true);
+      expect(colorDim?.type).toBe('string'); // categorical normalized to string
+    });
+
+    it('should handle multiple columns with various types correctly', async () => {
+      const testFile = join(testDir, 'dbt-product-full.yml');
+      const yamlContent = `
+version: 2
+models:
+  - name: product
+    columns:
+      - name: color
+        description: Product color
+        options:
+          - Black
+          - Silver
+          - Red
+        searchable: true
+      - name: makeFlag
+        description: Boolean make flag
+        data_type: boolean
+      - name: listPrice
+        description: List price in USD
+        data_type: decimal
+      - name: standardCost
+        description: Standard cost in USD
+        data_type: decimal
+
+semantic_models:
+  - name: product_semantic
+    model: ref('product')
+    entities: []
+    dimensions:
+      - name: color
+        type: categorical
+      - name: makeFlag
+        type: categorical
+    measures: []
+`;
+      await writeFile(testFile, yamlContent);
+
+      const result = await parseModelFile(testFile);
+
+      expect(result.models).toHaveLength(1);
+      expect(result.errors).toHaveLength(0);
+
+      const model = result.models[0];
+
+      // Should have 2 dimensions (color and makeFlag from semantic model)
+      expect(model?.dimensions).toHaveLength(2);
+      expect(model?.dimensions.map((d) => d.name)).toContain('color');
+      expect(model?.dimensions.map((d) => d.name)).toContain('makeFlag');
+
+      // Color should have options preserved
+      const colorDim = model?.dimensions.find((d) => d.name === 'color');
+      expect(colorDim?.options).toEqual(['Black', 'Silver', 'Red']);
+      expect(colorDim?.searchable).toBe(true);
+
+      // Should have 2 measures (listPrice and standardCost - NOT in semantic dimensions)
+      expect(model?.measures).toHaveLength(2);
+      expect(model?.measures.map((m) => m.name)).toContain('listPrice');
+      expect(model?.measures.map((m) => m.name)).toContain('standardCost');
+
+      // color and makeFlag should NOT appear as measures
+      expect(model?.measures.map((m) => m.name)).not.toContain('color');
+      expect(model?.measures.map((m) => m.name)).not.toContain('makeFlag');
     });
   });
 

@@ -8,7 +8,7 @@ const app = new Hono().get(
   '/',
   zValidator('query', GithubActionDocumentationGetSchema),
   async (c) => {
-    const { messageId } = c.req.valid('query');
+    const { id: messageId } = c.req.valid('query');
 
     console.info('Documentation status request received:', {
       messageId,

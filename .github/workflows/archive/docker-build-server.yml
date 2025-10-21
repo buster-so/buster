@@ -63,7 +63,7 @@ jobs:
             runner: blacksmith-8vcpu-ubuntu-2404
             docker_platform: linux/amd64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 35
+    timeout-minutes: 25
     permissions:
       contents: read
       packages: write
@@ -73,20 +73,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-${{ matrix.platform }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.platform }}-pnpm-
-
-      - name: Mount Docker buildkit sticky disk
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-buildkit-cache-${{ github.ref_name }}-${{ matrix.platform }}
-          path: /tmp/.buildkit-cache
 
       - name: Set up Docker Builder
         uses: useblacksmith/setup-docker-builder@v1
@@ -132,8 +118,6 @@ jobs:
             turbo_token=${{ secrets.TURBO_TOKEN }}
             turbo_team=${{ vars.TURBO_TEAM }}
           platforms: ${{ matrix.docker_platform }}
-          cache-from: type=local,src=/tmp/.buildkit-cache
-          cache-to: type=local,dest=/tmp/.buildkit-cache,mode=max
 
   create-manifest:
     needs: [prepare-metadata, build-and-push]

@@ -84,8 +84,8 @@ jobs:
         working-directory: ./apps/cli
         run: |
           echo "📦 Building standalone CLI binary for ${{ matrix.target }}..."
-          # Use the main build script (creates standalone binary with DuckDB external config)
-          bun run build
+          # Use the standalone build script (creates standalone binary with DuckDB external config)
+          bun run build:standalone
 
           # Rename output for CI (build outputs 'buster', CI expects 'buster-cli')
           mv dist/buster dist/buster-cli

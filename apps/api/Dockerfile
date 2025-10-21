@@ -1,15 +1,14 @@
-FROM lukemathwalker/cargo-chef AS chef
+FROM rust:1.85-bookworm AS builder
 WORKDIR /app
+ARG CARGO_HOME=/usr/local/cargo
 
-FROM chef AS planner
+# Copy source and build with cache mounts
 COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
-
-FROM chef AS builder 
-COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json
-COPY . .
-RUN cargo build --release --bin buster_server
+RUN --mount=type=cache,target=${CARGO_HOME}/registry \
+    --mount=type=cache,target=${CARGO_HOME}/git \
+    --mount=type=cache,target=/app/target \
+    cargo build --release --bin buster_server && \
+    cp /app/target/release/buster_server /app/buster_server
 
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
@@ -34,6 +33,6 @@ RUN update-ca-certificates
 ENV RUST_LOG=warn
 ENV RUST_BACKTRACE=0
 
-COPY --from=builder /app/target/release/buster_server .
+COPY --from=builder /app/buster_server .
 EXPOSE 3001
 ENTRYPOINT ["./buster_server"]

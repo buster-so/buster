@@ -1,0 +1,156 @@
+name: 'Buster Documentation Agent'
+description: 'Automatically update documentation using Buster AI'
+author: 'Buster'
+branding:
+  icon: 'file-text'
+  color: 'blue'
+
+inputs:
+  api-key:
+    description: 'Buster API key for authentication'
+    required: true
+  api-url:
+    description: 'Buster API base URL'
+    required: false
+    default: 'https://api2.buster.so'
+  timeout-minutes:
+    description: 'Maximum time to wait for job completion (in minutes)'
+    required: false
+    default: '10'
+
+outputs:
+  message-id:
+    description: 'The ID of the documentation job that was started'
+    value: ${{ steps.kickoff.outputs.messageId }}
+  result:
+    description: 'The final result of the documentation job'
+    value: ${{ steps.wait.outputs.result }}
+
+runs:
+  using: 'composite'
+  steps:
+      - name: Verify inputs
+        shell: bash
+        run: |
+          echo "::notice::Verifying action inputs..."
+          echo "::debug::API URL input: ${{ inputs.api-url }}"
+          echo "::debug::Timeout input: ${{ inputs.timeout-minutes }}"
+          if [ -z "${{ inputs.api-key }}" ]; then
+            echo "::error::api-key input is empty"
+            exit 1
+          fi
+          
+      - name: Kick off Buster documentation task
+        id: kickoff
+        shell: bash
+        env:
+          BUSTER_API_KEY: ${{ inputs.api-key }}
+          API_URL: ${{ inputs.api-url }}
+        run: |
+          set -euo pipefail
+
+          # Read the entire GitHub event payload
+          EVENT_CONTEXT=$(cat "$GITHUB_EVENT_PATH")
+
+          # Make the POST request (-f makes curl exit with error on HTTP errors)
+          echo "::notice::Making request to ${API_URL}/api/v2/github/app/actions/documentation"
+          
+          if ! RESPONSE=$(curl -sSf -X POST "${API_URL}/api/v2/github/app/actions/documentation" \
+            -H "Authorization: Bearer ${BUSTER_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --argjson eventContext "$EVENT_CONTEXT" '{eventContext: $eventContext}')"
+          ); then
+            echo "::error::Failed to make POST request to Buster API"
+            echo "::error::This could be due to:"
+            echo "::error::1. Invalid API key"
+            echo "::error::2. Network connectivity issues"
+            echo "::error::3. API endpoint not available"
+            exit 1
+          fi
+
+          echo "Response:"
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+
+          echo "::notice::Started Buster documentation job"
+
+          messageId=$(echo "$RESPONSE" | jq -r '.messageId')
+          if [ "$messageId" = "null" ] || [ -z "$messageId" ]; then
+            echo "::error::Failed to extract messageId from response"
+            exit 1
+          fi
+          
+          echo "::notice::Job ID: ${messageId}"
+          echo "messageId=$messageId" >> "$GITHUB_OUTPUT"
+          echo "status_url=${API_URL}/api/v2/github/app/actions/documentation/${messageId}" >> "$GITHUB_OUTPUT"
+
+      - name: Poll for Buster job to complete
+        id: wait
+        shell: bash
+        env:
+          STATUS_URL: ${{ steps.kickoff.outputs.status_url }}
+          BUSTER_API_KEY: ${{ inputs.api-key }}
+          TIMEOUT_MINUTES: ${{ inputs.timeout-minutes }}
+        run: |
+          set -euo pipefail
+          ATTEMPTS=$((TIMEOUT_MINUTES * 6))  # 6 attempts per minute (10 second intervals)
+          SLEEP=10
+
+          for i in $(seq 1 $ATTEMPTS); do
+            # Make the GET request (--fail makes curl exit with error on HTTP errors)
+            STATUS_JSON=$(curl -sSf -X GET "$STATUS_URL" \
+              -H "Authorization: Bearer ${BUSTER_API_KEY}" \
+              -H "Accept: application/json")
+
+            echo "::debug::Attempt $i - Response:"
+            echo "$STATUS_JSON" | jq '.' || echo "$STATUS_JSON"
+
+            STATUS=$(echo "$STATUS_JSON" | jq -r '.status')
+            echo "::notice::Attempt $i: status=$STATUS"
+
+            if [ "$STATUS" = "Complete" ]; then
+              echo "result=$(echo "$STATUS_JSON" | jq -c '.')" >> "$GITHUB_OUTPUT"
+              exit 0
+            elif [ "$STATUS" = "Failed" ]; then
+              echo "Buster job Failed:"
+              echo "$STATUS_JSON" | jq .
+              exit 1
+            fi
+            sleep $SLEEP
+          done
+
+          echo "Timed out waiting for Buster job."
+          exit 1
+
+      - name: Show result summary and cleanup
+        if: always() && steps.kickoff.outputs.messageId != ''
+        shell: bash
+        env:
+          STATUS_URL: ${{ steps.kickoff.outputs.status_url }}
+          BUSTER_API_KEY: ${{ inputs.api-key }}
+          WAIT_CONCLUSION: ${{ steps.wait.conclusion }}
+        run: |
+          echo "Buster result:"
+          echo '${{ steps.wait.outputs.result }}' | jq . || echo "No result available"
+          
+          # If the wait step didn't succeed (failed, cancelled, skipped, or timed out), cleanup
+          if [ "$WAIT_CONCLUSION" != "success" ]; then
+            echo "Wait step did not complete successfully (conclusion: $WAIT_CONCLUSION)"
+            echo "Sending DELETE request to cleanup the job..."
+            
+            # Use --fail-with-body to get response even on HTTP errors for cleanup
+            if RESPONSE=$(curl -sSf -X DELETE "$STATUS_URL" \
+              -H "Authorization: Bearer ${BUSTER_API_KEY}" \
+              -H "Accept: application/json"); then
+              echo "Successfully cleaned up the job"
+              echo "Response:"
+              echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+            else
+              echo "Warning: Failed to cleanup job"
+            fi
+          else
+            echo "Job completed successfully, no cleanup needed"
+          fi
+
+
+
+          
