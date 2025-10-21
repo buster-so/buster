@@ -23,6 +23,7 @@ import { getSetting } from '../../utils/settings';
 import type { SlashCommand } from '../../utils/slash-commands';
 import { transformModelMessagesToUI } from '../../utils/transform-messages';
 import type { VimMode } from '../../utils/vim-mode';
+import { getCurrentWorkingDirectory } from '../../utils/working-directory';
 
 type AppMode = 'Planning' | 'Auto-accept' | 'None';
 
@@ -47,7 +48,7 @@ export function Main() {
   const [sessionInitialized, setSessionInitialized] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
-  const workingDirectory = useRef(process.cwd());
+  const workingDirectory = useRef(getCurrentWorkingDirectory());
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream

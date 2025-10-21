@@ -21,9 +21,19 @@ export function createAnalyticsEngineerAgent(
     ? getAnalyticsEngineerSubagentSystemPrompt
     : getAnalyticsEngineerAgentSystemPrompt;
 
+  // Main system prompt (for subagents, this includes folder_structure in the template)
   const systemMessage = {
     role: 'system',
     content: promptFunction(analyticsEngineerAgentOptions.folder_structure),
+    providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+  } as ModelMessage;
+
+  // Working directory context as separate system message
+  // For main agent: provides project structure context
+  // For subagent: folder_structure is already in the prompt template, so this is redundant but harmless
+  const workingDirectoryMessage = {
+    role: 'system',
+    content: analyticsEngineerAgentOptions.folder_structure,
     providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
   } as ModelMessage;
 
@@ -51,7 +61,7 @@ export function createAnalyticsEngineerAgent(
               'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07,interleaved-thinking-2025-05-14',
           },
           tools: toolSet,
-          messages: [systemMessage, ...messages],
+          messages: [systemMessage, workingDirectoryMessage, ...messages],
           stopWhen: STOP_CONDITIONS,
           maxOutputTokens: 64000,
           // temperature: 0,

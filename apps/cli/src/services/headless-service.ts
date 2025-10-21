@@ -3,6 +3,7 @@ import type { ModelMessage } from '@buster/ai';
 import { z } from 'zod';
 import { readContextFile } from '../utils/context-file';
 import { loadConversation, saveModelMessages } from '../utils/conversation-history';
+import { getCurrentWorkingDirectory } from '../utils/working-directory';
 import { runChatAgent } from './chat-service';
 
 /**
@@ -12,7 +13,10 @@ export const HeadlessServiceParamsSchema = z.object({
   prompt: z.string().min(1).describe('User prompt to send to the agent'),
   chatId: z.string().uuid().optional().describe('Existing chat session ID to resume'),
   messageId: z.string().uuid().optional().describe('Message ID for tracking'),
-  workingDirectory: z.string().default(process.cwd()).describe('Working directory path'),
+  workingDirectory: z
+    .string()
+    .default(getCurrentWorkingDirectory())
+    .describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
   contextFilePath: z
     .string()
