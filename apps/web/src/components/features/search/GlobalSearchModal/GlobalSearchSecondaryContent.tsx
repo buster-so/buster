@@ -122,7 +122,6 @@ const ScreenshotImage = ({
       // Not cached yet, wait for load
       setIsLoaded(false);
       img.onload = () => {
-        console.log('loaded', imageUrl);
         setIsLoaded(true);
       };
       img.onerror = (e) => {

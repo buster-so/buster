@@ -36,6 +36,7 @@ export const LibraryAssetListItemSchema = z.object({
   created_by_name: z.string().nullable(),
   created_by_email: z.string(),
   created_by_avatar_url: z.string().nullable(),
+  screenshot_url: z.string().nullable(),
 });
 
 export type LibraryAssetListItem = z.infer<typeof LibraryAssetListItemSchema>;

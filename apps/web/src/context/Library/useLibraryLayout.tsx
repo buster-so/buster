@@ -12,8 +12,11 @@ export const useLibraryLayout = ({ initialLayout }: { initialLayout?: LibraryLay
 };
 
 export const setLibraryLayoutCookie = (layout: LibraryLayout) => {
-  Cookies.set(LAYOUT_COOKIE_NAME, JSON.stringify({ value: layout }), {
-    path: '/',
-    maxAge: 180 * 60 * 24 * 30, // 180 days
-  });
+  try {
+    Cookies.set(LAYOUT_COOKIE_NAME, JSON.stringify({ value: layout }), {
+      expires: 180, // 180 days
+    });
+  } catch (error) {
+    console.error('Error setting library layout cookie', error);
+  }
 };

@@ -6,8 +6,16 @@ export const wrappedLayoutSchema = z
   .string()
   .transform((val) => {
     if (!val) return 'grid';
-    const parsedFromCookie = JSON.parse(val) as { value: LibraryLayout };
-    return layoutSchema.catch('grid').parse(parsedFromCookie.value);
+    try {
+      const stringValue = layoutSchema.safeParse(val);
+      if (stringValue.success) {
+        return stringValue.data;
+      }
+      const parsedFromCookie = JSON.parse(val) as { value: LibraryLayout };
+      return layoutSchema.catch('grid').parse(parsedFromCookie.value);
+    } catch (error) {
+      return 'grid';
+    }
   })
   .default('grid');
 export type LibraryLayout = z.infer<typeof layoutSchema>;

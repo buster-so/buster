@@ -11,9 +11,9 @@ import {
 export const Route = createFileRoute('/app/_app/library/')({
   component: RouteComponent,
   validateSearch: searchParamsSchema,
-  beforeLoad: async () => {
+  beforeLoad: async ({ search }) => {
     const libraryLayout: LibraryLayout = await getCookie({ data: LAYOUT_COOKIE_NAME }).then((v) =>
-      wrappedLayoutSchema.parse(v)
+      wrappedLayoutSchema.parse(search.layout ?? v)
     );
     return { libraryLayout };
   },
