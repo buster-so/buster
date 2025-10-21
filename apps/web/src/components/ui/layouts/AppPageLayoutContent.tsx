@@ -9,8 +9,9 @@ export const AppPageLayoutContent: React.FC<
     scrollable?: boolean;
     id?: string;
     viewportRef?: React.RefObject<HTMLDivElement | null>;
+    scrollContainerStyle?: React.CSSProperties;
   }>
-> = ({ viewportRef, className = '', children, scrollable = true, id }) => {
+> = ({ viewportRef, scrollContainerStyle, className = '', children, scrollable = true, id }) => {
   const Selector = scrollable ? ScrollArea : 'main';
   const ChildSelector = scrollable ? 'main' : React.Fragment;
 
@@ -23,6 +24,7 @@ export const AppPageLayoutContent: React.FC<
         className
       )}
       viewportRef={viewportRef}
+      style={scrollContainerStyle}
     >
       <ChildSelector>{children}</ChildSelector>
     </Selector>

@@ -3,6 +3,8 @@ import React from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
 import { LibraryGridItems } from './LibraryGridItems';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
@@ -14,14 +16,16 @@ export const LibraryGridView = React.memo(
     collections,
     filters,
     isFetchingNextPage,
+    className,
   }: {
     allResults: LibraryAssetListItem[];
     collections: BusterCollectionListItem[];
     filters: LibrarySearchParams;
     isFetchingNextPage: boolean;
+    className?: string;
   }) => {
     return (
-      <React.Fragment>
+      <ScrollArea className={'h-full '} viewportClassName={cn('pb-12', className)}>
         <LibrarySectionContainer title="Collections" icon={<Folder />}>
           <LibraryCollectionsScroller collections={collections} />
         </LibrarySectionContainer>
@@ -32,7 +36,7 @@ export const LibraryGridView = React.memo(
         {isFetchingNextPage && (
           <div className="text-text-tertiary text-center py-0">Loading more...</div>
         )}
-      </React.Fragment>
+      </ScrollArea>
     );
   }
 );
