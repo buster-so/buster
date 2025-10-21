@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, appendFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
@@ -48,7 +48,7 @@ function writeToLog(message: string): void {
 
   try {
     appendFileSync(LOG_FILE, logMessage);
-  } catch (error) {
+  } catch {
     // Silently fail - we don't want logging errors to break the app
   }
 }
@@ -110,12 +110,14 @@ export const debugLogger = {
    * Log an error message
    */
   error(...args: unknown[]): void {
-    const message = args.map((arg) => {
-      if (arg instanceof Error) {
-        return formatError(arg);
-      }
-      return formatValue(arg);
-    }).join(' ');
+    const message = args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          return formatError(arg);
+        }
+        return formatValue(arg);
+      })
+      .join(' ');
     writeToLog(`[ERROR] ${message}`);
   },
 

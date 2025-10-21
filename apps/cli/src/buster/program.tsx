@@ -2,9 +2,9 @@ import { program as commander } from 'commander';
 import { render } from 'ink';
 import { Main } from '../commands/main/main';
 import { runHeadlessAgent } from '../services';
+import { enableDebugLogging } from '../utils/debug-logger';
 import { getVersion } from '../version';
 import { setupPreActionHook } from './hooks';
-import { enableDebugLogging } from '../utils/debug-logger';
 
 interface RootOptions {
   cwd?: string;

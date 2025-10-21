@@ -3,6 +3,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
 import { debugLogger } from './debug-logger';
+
 // Credentials schema
 const credentialsSchema = z.object({
   apiKey: z.string().min(1),

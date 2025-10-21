@@ -3,6 +3,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
 import { debugLogger } from './debug-logger';
+
 // Settings schema with vim mode configuration
 const SettingsSchema = z.object({
   vimMode: z.boolean().default(false).describe('Enable vim keybindings in the chat input'),

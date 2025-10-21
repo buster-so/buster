@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { Glob } from 'bun';
 import micromatch from 'micromatch';
 import { debugLogger } from './debug-logger';
+
 interface FileSearchOptions {
   cwd?: string;
   maxResults?: number;
