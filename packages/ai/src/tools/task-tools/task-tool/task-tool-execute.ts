@@ -46,7 +46,7 @@ export function createTaskToolExecute(context: TaskToolContext) {
         }
 
         // Generate a summary from the final response
-        const _summary = fullResponse || 'Task completed'
+        const _summary = fullResponse || 'Task completed';
 
         return {
           status: 'success',
