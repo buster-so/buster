@@ -1,8 +1,6 @@
 import type {
   GetLibraryAssetsRequestQuery,
-  GroupedLibraryAssets,
   LibraryAssetListItem,
-  LibraryGetResponse,
 } from '@buster/server-shared/library';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { libraryQueryKeys } from '@/api/query_keys/library';
@@ -23,7 +21,7 @@ export const useLibraryAssetsInfinite = ({
   scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
 }) => {
   return useInfiniteScroll<LibraryAssetListItem>({
-    queryKey: ['library', 'assets', 'infinite', params] as const,
+    queryKey: ['library', 'get', 'list-infinite', params] as const,
     staleTime: 1000 * 40, // 40 seconds
     queryFn: ({ pageParam = 1 }) => {
       return getLibraryAssets({ ...params, page: pageParam });

@@ -22,7 +22,9 @@ export const useDeleteLibraryAssets = () => {
     onSuccess: () => {
       const queryKey = libraryQueryKeys
         .libraryGetList({ page: 1, page_size: 10 })
-        .queryKey.slice(0, 3);
+        .queryKey.slice(0, 2);
+      console.log(queryKey);
+
       queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
     },
   });

@@ -19,6 +19,7 @@ import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
+import { LibraryItemContextMenu } from './LibraryItemDropdown';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
 import type { LibrarySearchParams } from './schema';
 
@@ -110,15 +111,16 @@ export const LibraryGridView = React.memo(
   }
 );
 
-const LibraryGridItem = React.memo(
-  ({ asset_id, asset_type, name, updated_at, screenshot_url }: LibraryAssetListItem) => {
-    const imageUrl = screenshot_url ?? getScreenshotSkeleton(asset_type);
-    const link = createSimpleAssetRoute({
-      asset_type,
-      id: asset_id,
-    }) as LinkProps;
+const LibraryGridItem = React.memo((props: LibraryAssetListItem) => {
+  const { asset_id, asset_type, name, updated_at, screenshot_url } = props;
+  const imageUrl = screenshot_url ?? getScreenshotSkeleton(asset_type);
+  const link = createSimpleAssetRoute({
+    asset_type,
+    id: asset_id,
+  }) as LinkProps;
 
-    return (
+  return (
+    <LibraryItemContextMenu {...props}>
       <Link {...link} preload={false} className="h-full">
         <div className="group border rounded cursor-pointer hover:shadow hover:bg-item-hover-active overflow-hidden h-full flex flex-col">
           <div
@@ -147,9 +149,9 @@ const LibraryGridItem = React.memo(
           </div>
         </div>
       </Link>
-    );
-  }
-);
+    </LibraryItemContextMenu>
+  );
+});
 
 LibraryGridItem.displayName = 'LibraryGridItem';
 

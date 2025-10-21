@@ -9,18 +9,6 @@ import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import type { LibrarySearchParams } from './schema';
 
-export const LibraryGridItems = React.memo(
-  ({ allResults }: { filters: LibrarySearchParams; allResults: LibraryAssetListItem[] }) => {
-    return (
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {allResults.map((asset) => (
-          <LibraryGridItem key={asset.asset_id} {...asset} />
-        ))}
-      </div>
-    );
-  }
-);
-
 const LibraryGridItem = React.memo(
   ({ asset_id, asset_type, name, updated_at, screenshot_url }: LibraryAssetListItem) => {
     const imageUrl = screenshot_url ?? getScreenshotSkeleton(asset_type);

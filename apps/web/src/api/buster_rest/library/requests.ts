@@ -18,6 +18,6 @@ export const postLibraryAssets = async (assets: LibraryPostRequestBody) => {
 
 export const deleteLibraryAssets = async (assets: LibraryDeleteRequestBody) => {
   return mainApiV2
-    .delete<LibraryDeleteResponse>('/library', { params: assets })
+    .delete<LibraryDeleteResponse>('/library', { data: assets })
     .then((res) => res.data);
 };
