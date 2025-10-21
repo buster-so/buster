@@ -2,10 +2,7 @@ import type { AssetType } from '@buster/server-shared/assets';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
-import {
-  useGetUserToOrganization,
-  useGetUserToOrganizationInfinite,
-} from '@/api/buster_rest/users/list';
+import { useGetUserToOrganizationInfiniteManual } from '@/api/buster_rest/users/list';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons/Button';
 import { DateRangePickerContent } from '@/components/ui/date/DateRangePicker';
@@ -19,9 +16,9 @@ import { Calendar } from '@/components/ui/icons';
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
-import { Text } from '@/components/ui/typography/Text';
 import { useDebounce } from '@/hooks/useDebounce';
-import { createDayjsDate, getNow } from '@/lib/date';
+import { cn } from '@/lib/classMerge';
+import { getNow } from '@/lib/date';
 import type { LibrarySearchParams } from '../schema';
 
 export const FilterDropdown = React.memo(
@@ -37,8 +34,9 @@ export const FilterDropdown = React.memo(
     end_date: LibrarySearchParams['end_date'];
   }) => {
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
-    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids });
+    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids, open });
 
     const AssetTypeDropdownItems: IDropdownItem = useMemo(() => {
       return {
@@ -77,29 +75,21 @@ export const FilterDropdown = React.memo(
           ...item,
           selected: asset_types?.includes(item.value as AssetType),
           onClick: () => {
-            if (asset_types?.includes(item.value as AssetType)) {
-              navigate({
-                to: '/app/library',
-                search: (prev) => {
-                  const newAssetTypes = prev.asset_types?.filter(
-                    (v) => v !== (item.value as AssetType)
-                  );
-                  const hasAssetTypes = newAssetTypes && newAssetTypes.length > 0;
-                  return {
-                    ...prev,
-                    asset_types: hasAssetTypes ? newAssetTypes : undefined,
-                  };
-                },
-              });
-            } else {
-              navigate({
-                to: '/app/library',
-                search: (prev) => ({
+            navigate({
+              to: '/app/library',
+              search: (prev) => {
+                const isSelected = asset_types?.includes(item.value as AssetType);
+                const newAssetTypes = isSelected
+                  ? prev.asset_types?.filter((v) => v !== (item.value as AssetType))
+                  : [...(prev.asset_types || []), item.value as AssetType];
+                const hasAssetTypes = newAssetTypes && newAssetTypes.length > 0;
+
+                return {
                   ...prev,
-                  asset_types: [...(prev.asset_types || []), item.value as AssetType],
-                }),
-              });
-            }
+                  asset_types: hasAssetTypes ? newAssetTypes : undefined,
+                };
+              },
+            });
           },
         })) as IDropdownItem<AssetType>['items'],
       };
@@ -182,6 +172,7 @@ export const FilterDropdown = React.memo(
         align="end"
         side="bottom"
         menuHeader={<div className="px-2.5 py-1.5 text-text-tertiary">Filters...</div>}
+        onOpenChange={setOpen}
       >
         <Button variant="ghost" prefix={<BarsFilter />} />
       </Dropdown>
@@ -189,41 +180,70 @@ export const FilterDropdown = React.memo(
   }
 );
 
-const useOwnerDropdownItems = ({ owner_ids }: { owner_ids: LibrarySearchParams['owner_ids'] }) => {
+const useOwnerDropdownItems = ({
+  owner_ids,
+  open,
+}: {
+  owner_ids: LibrarySearchParams['owner_ids'];
+  open: boolean;
+}) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, { wait: 75 });
   const {
     allResults: users,
     isFetching,
     fetchNextPage,
-  } = useGetUserToOrganizationInfinite({
+  } = useGetUserToOrganizationInfiniteManual({
     page_size: 20,
     query: debouncedSearch,
+    mounted: open,
   });
 
   const OwnerDropdownItems: IDropdownItem = useMemo(() => {
+    const avatarClassName = 'w-6 h-6 rounded-full bg-gray-light/30';
     return createDropdownItem({
       label: 'Owner',
       value: 'owner',
       icon: <CircleUser />,
       items: users.map((user) => ({
-        label: user.name,
+        label: (
+          <div className="flex gap-1.5 items-center justify-start">
+            {user.avatarUrl && (
+              <img src={user.avatarUrl} alt={user.name || user.email} className={avatarClassName} />
+            )}
+            {!user.avatarUrl && <div className={cn(avatarClassName)} />}
+            <div className="flex flex-col gap-0">
+              <div className="text-text-default">{user.name}</div>
+              <div className="text-text-secondary">{user.email}</div>
+            </div>
+          </div>
+        ),
         value: user.id,
-        icon: <CircleUser />,
+        selected: owner_ids?.includes(user.id),
         onClick: () => {
-          console.log('clicked', user);
+          navigate({
+            to: '/app/library',
+            search: (prev) => {
+              const isSelected = prev.owner_ids?.includes(user.id);
+              const owner_ids = isSelected
+                ? prev.owner_ids?.filter((v) => v !== user.id) || []
+                : [...(prev.owner_ids || []), user.id];
+              const hasOwnerIds = owner_ids && owner_ids.length > 0;
+              return {
+                ...prev,
+                owner_ids: hasOwnerIds ? owner_ids : undefined,
+              };
+            },
+          });
         },
       })),
       selectType: 'multiple',
       menuHeader: 'Search owners by name or email',
-      onScrollToBottom: () => {
-        console.log('scrolled to bottom');
-        fetchNextPage();
-      },
-      onSearch: (search) => {
-        setSearch(search);
-      },
+      onScrollToBottom: () => fetchNextPage(),
+      onSearch: setSearch,
       isFetchingNextPage: isFetching,
+      className: 'min-w-[245px]',
     });
   }, [owner_ids, users, isFetching, fetchNextPage]);
 

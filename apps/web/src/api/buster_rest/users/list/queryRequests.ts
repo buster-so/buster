@@ -1,10 +1,5 @@
 import type { GetUserToOrganizationResponse, OrganizationUser } from '@buster/server-shared/user';
-import {
-  keepPreviousData,
-  type UseQueryOptions,
-  useInfiniteQuery,
-  useQuery,
-} from '@tanstack/react-query';
+import { keepPreviousData, type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { userQueryKeys } from '@/api/query_keys/users';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { useInfiniteScrollManual } from '@/api/query-helpers/useInfiniteScroll';
@@ -44,13 +39,17 @@ export const useGetUserToOrganizationInfinite = ({
   });
 };
 
-export const useGetUserToOrganizationInfiniteManual = (
-  params: Omit<Parameters<typeof getUserToOrganization>[0], 'page'> & {}
-) => {
+export const useGetUserToOrganizationInfiniteManual = ({
+  mounted,
+  ...params
+}: Omit<Parameters<typeof getUserToOrganization>[0], 'page'> & {
+  mounted?: boolean;
+}) => {
   return useInfiniteScrollManual<OrganizationUser>({
     queryKey: ['users', 'list', 'infinite', params] as const,
     staleTime: 1000 * 40, // 40 seconds
     queryFn: ({ pageParam = 1 }) => getUserToOrganization({ ...params, page: pageParam }),
     placeholderData: keepPreviousData,
+    enabled: mounted ?? true,
   });
 };

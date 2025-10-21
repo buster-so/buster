@@ -249,7 +249,7 @@ export const DropdownContent = <T,>({
       )}
 
       <div
-        className={cn('max-h-[375px] overflow-y-auto', className)}
+        className={cn('max-h-[395px] overflow-y-auto', className)}
         onScroll={handleScroll}
         onWheel={(e) => {
           //this is need to prevent bug when it is inside a dialog or modal
@@ -274,6 +274,7 @@ export const DropdownContent = <T,>({
                   onSelectItem={onSelectItem}
                   closeOnSelect={(item as IDropdownItem<T>).closeOnSelect !== false}
                   showIndex={showIndex}
+                  emptyStateText={emptyStateText}
                 />
               );
             })}
@@ -296,6 +297,7 @@ export const DropdownContent = <T,>({
                   onSelectItem={onSelectItem}
                   closeOnSelect={(item as IDropdownItem<T>).closeOnSelect !== false}
                   showIndex={showIndex}
+                  emptyStateText={emptyStateText}
                 />
               );
             })}
@@ -331,6 +333,7 @@ const DropdownItemSelector = <
   closeOnSelect,
   selectType,
   showIndex,
+  emptyStateText,
 }: {
   item: IDropdownItems<T, TRouter, TOptions, TFrom>[number];
   index: number;
@@ -340,6 +343,7 @@ const DropdownItemSelector = <
   closeOnSelect: boolean;
   showIndex: boolean;
   selectType: DropdownProps<T>['selectType'];
+  emptyStateText?: string | React.ReactNode;
 }) => {
   if ((item as DropdownDivider).type === 'divider') {
     return <DropdownMenuSeparator />;
@@ -362,6 +366,7 @@ const DropdownItemSelector = <
       selectType={selectType}
       index={index}
       showIndex={showIndex}
+      emptyStateText={emptyStateText}
       {...item}
     />
   );
@@ -395,6 +400,7 @@ const DropdownItem = <
   linkIcon,
   className,
   menuHeader,
+  emptyStateText,
   onSearch,
   onScrollToBottom,
 }: IDropdownItem<T, TRouter, TOptions, TFrom> & {
@@ -403,6 +409,7 @@ const DropdownItem = <
   closeOnSelect: boolean;
   index: number;
   showIndex: boolean;
+  emptyStateText?: string | React.ReactNode;
 }) => {
   const onClickItem = useMemoizedFn((e: React.MouseEvent<HTMLDivElement> | KeyboardEvent) => {
     if (disabled) return;
@@ -467,6 +474,7 @@ const DropdownItem = <
     return (
       <DropdownSubMenuWrapper
         items={items}
+        emptyStateText={emptyStateText}
         closeOnSelect={closeOnSelect}
         onSelect={onSelect}
         onSelectItem={onSelectItem}
@@ -526,6 +534,7 @@ const DropdownItem = <
 };
 
 interface DropdownSubMenuWrapperProps<T> {
+  emptyStateText?: string | React.ReactNode;
   items: IDropdownItems<T> | undefined;
   children: React.ReactNode;
   closeOnSelect: boolean;
@@ -551,6 +560,7 @@ const DropdownSubMenuWrapper = <T,>({
   showIndex,
   className,
   parentItem,
+  emptyStateText,
 }: DropdownSubMenuWrapperProps<T>) => {
   const subContentRef = React.useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -586,6 +596,7 @@ const DropdownSubMenuWrapper = <T,>({
           className={cn('sub-menu', className)}
         >
           <DropdownSubMenuContent
+            emptyStateText={emptyStateText}
             items={items}
             onSelect={onSelect}
             onSelectItem={onSelectItem}
@@ -603,6 +614,7 @@ const DropdownSubMenuWrapper = <T,>({
 };
 
 interface DropdownSubMenuContentProps<T> {
+  emptyStateText?: string | React.ReactNode;
   items: IDropdownItems<T> | undefined;
   onSelect?: (value: T) => void;
   onSelectItem: (index: number) => void;
@@ -624,6 +636,7 @@ const DropdownSubMenuContent = <T,>({
   menuHeader,
   onSearch,
   onScrollToBottom,
+  emptyStateText,
 }: DropdownSubMenuContentProps<T>) => {
   // When onSearch is provided, parent handles filtering - don't filter locally
   const shouldUseLocalFiltering = !onSearch;
@@ -656,7 +669,8 @@ const DropdownSubMenuContent = <T,>({
 
   const hasShownItem = useMemo(() => {
     return (
-      filteredItems.length > 0 && filteredItems.some((item) => (item as IDropdownItem<T>).value)
+      filteredItems.length > 0 &&
+      filteredItems.some((item) => (item as IDropdownItem<T>).value || React.isValidElement(item))
     );
   }, [filteredItems]);
 
@@ -678,7 +692,7 @@ const DropdownSubMenuContent = <T,>({
       )}
 
       <div
-        className="max-h-[375px] overflow-y-auto"
+        className="max-h-[395px] overflow-y-auto"
         onScroll={handleScroll}
         onWheel={(e) => {
           e.stopPropagation();
@@ -695,11 +709,12 @@ const DropdownSubMenuContent = <T,>({
               closeOnSelect={closeOnSelect}
               selectType={(item as IDropdownItem<T>).selectType || selectType}
               showIndex={showIndex}
+              emptyStateText={emptyStateText}
             />
           ))
         ) : (
           <DropdownMenuItem disabled className="text-gray-light text-center">
-            No items found
+            {emptyStateText}
           </DropdownMenuItem>
         )}
       </div>
