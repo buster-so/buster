@@ -50,24 +50,32 @@ if (target) {
   console.log(`📦 Target: ${target}`);
 }
 
-// Build command parts
-const buildCmd = [
-  'bun build src/index.tsx',
+// Build command - use Bun.spawn for better control with dynamic args
+const args = [
+  'build',
+  'src/index.tsx',
   '--compile',
-  target ? `--target=${target}` : '',
-  '--outfile dist/buster',
-  '--external @duckdb/node-bindings',
-  '--external @duckdb/node-api',
-  `--define import.meta.env.PROD=${isProd ? 'true' : 'false'}`,
-]
-  .filter(Boolean)
-  .join(' ');
+  ...(target ? [`--target=${target}`] : []),
+  '--outfile',
+  'dist/buster',
+  '--external',
+  '@duckdb/node-bindings',
+  '--external',
+  '@duckdb/node-api',
+  '--define',
+  `import.meta.env.PROD=${isProd ? 'true' : 'false'}`,
+];
 
-const result = await $`${buildCmd}`.nothrow();
+const proc = Bun.spawn(['bun', ...args], {
+  stdout: 'inherit',
+  stderr: 'inherit',
+});
 
-if (result.exitCode !== 0) {
+const exitCode = await proc.exited;
+
+if (exitCode !== 0) {
   console.error('❌ Build failed');
-  process.exit(result.exitCode);
+  process.exit(exitCode);
 }
 
 console.log('✅ Build complete: dist/buster');
