@@ -7,15 +7,19 @@ export const LibrarySectionContainer = ({
   title,
   icon,
   className,
+  ref,
+  style,
 }: {
   children: React.ReactNode;
   title: string;
   description?: string;
   icon: React.ReactNode;
   className?: string;
+  ref?: React.RefObject<HTMLDivElement>;
+  style?: React.CSSProperties;
 }) => {
   return (
-    <div className={cn('flex flex-col gap-y-3', className)}>
+    <div ref={ref} style={style} className={cn('flex flex-col gap-y-3', className)}>
       <div className="flex items-center space-x-1 mx-2">
         <span className="text-text-secondary">{icon}</span>
         <Text variant={'secondary'} size={'sm'}>

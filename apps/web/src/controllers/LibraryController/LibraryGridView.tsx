@@ -1,4 +1,5 @@
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
+import { faker } from '@faker-js/faker';
 import { Link, type LinkProps } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
@@ -15,9 +16,22 @@ import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
 import type { LibrarySearchParams } from './schema';
 
+const allResults: LibraryAssetListItem[] = Array.from({ length: 100 }, (_, index) => ({
+  asset_id: `asset-${index}`,
+  asset_type: 'dashboard_file',
+  name: `Asset ${index}`,
+  updated_at: new Date().toISOString(),
+  screenshot_url: faker.image.url(),
+  created_at: new Date().toISOString(),
+  created_by: `user-${index}`,
+  created_by_name: `User ${index}`,
+  created_by_email: `user${index}@example.com`,
+  created_by_avatar_url: `https://via.placeholder.com/150?text=User+${index}`,
+}));
+
 export const LibraryGridView = React.memo(
   ({
-    allResults,
+    // allResults,
     collections,
     filters,
     isFetchingNextPage,
@@ -31,12 +45,35 @@ export const LibraryGridView = React.memo(
   }) => {
     const viewportRef = useRef<HTMLDivElement>(null);
 
+    // Calculate number of columns based on viewport width
+    const [columns, setColumns] = React.useState(3);
+
+    React.useEffect(() => {
+      const updateColumns = () => {
+        if (window.innerWidth >= 1024) {
+          setColumns(3);
+        } else {
+          setColumns(2);
+        }
+      };
+
+      updateColumns();
+      window.addEventListener('resize', updateColumns);
+      return () => window.removeEventListener('resize', updateColumns);
+    }, []);
+
+    // Calculate rows needed for grid
+    const rowCount = Math.ceil(allResults.length / columns);
+
+    // Ref to measure offset from collections section
+    const virtualStartRef = useRef<HTMLDivElement>(null);
+
     const rowVirtualizer = useVirtualizer({
-      count: allResults.length,
+      count: rowCount,
       getScrollElement: () => viewportRef.current,
-      lanes: 1,
-      estimateSize: () => 200, // Height of card + gap
-      overscan: 1, // Render 5 extra items above/below for smooth scrolling
+      scrollMargin: 0,
+      estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
+      overscan: 3, // Render 3 extra rows above/below for smooth scrolling
     });
 
     return (
@@ -54,29 +91,32 @@ export const LibraryGridView = React.memo(
         </LibrarySectionContainer>
         <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
           <div
+            ref={virtualStartRef}
             style={{
               height: `${rowVirtualizer.getTotalSize()}px`,
               position: 'relative',
             }}
           >
-            {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-              const asset = allResults[virtualItem.index];
-              if (!asset) return null;
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const startIndex = virtualRow.index * columns;
+              const items = allResults.slice(startIndex, startIndex + columns);
 
               return (
                 <div
-                  key={virtualItem.key}
+                  key={virtualRow.key}
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
-                    height: `${virtualItem.size}px`,
-                    transform: `translateY(${virtualItem.start}px)`,
+                    transform: `translateY(${virtualRow.start}px)`,
                   }}
-                  className="pb-4"
                 >
-                  <LibraryGridItem {...asset} />
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+                    {items.map((asset) => (
+                      <LibraryGridItem key={asset.asset_id} {...asset} />
+                    ))}
+                  </div>
                 </div>
               );
             })}
@@ -102,14 +142,19 @@ const LibraryGridItem = React.memo(
     return (
       <Link {...link} preload={false} className="h-full">
         <div className="group border rounded cursor-pointer hover:shadow hover:bg-item-hover-active overflow-hidden h-full flex flex-col">
-          <div className="px-2.5 flex-1 pt-1.5 bg-item-select min-h-[125px] max-h-[125px] overflow-hidden">
+          <div
+            className={cn(
+              'px-2.5 flex-1 pt-1.5 bg-item-select overflow-hidden',
+              'max-h-[125px] min-h-[125px] h-[125px] '
+            )}
+          >
             <img
               src={imageUrl}
               alt={name}
               className={cn('w-full h-full object-contain object-left rounded-t-sm bg-background')}
             />
           </div>
-          <div className="px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover">
+          <div className="h-[60px] px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center">
             <Text>{name}</Text>
             <div className="flex items-center space-x-1 text-xs text-text-tertiary">
               <Clock />
