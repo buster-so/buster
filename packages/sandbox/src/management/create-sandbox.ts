@@ -57,7 +57,7 @@ export async function createSandboxWithBusterCLI(
     await sandbox.process.executeCommand(
       `curl -fsSL https://raw.githubusercontent.com/buster-so/buster/main/scripts/install.sh | bash`
     );
-    await sandbox.process.executeCommand(`export PATH="$HOME/.local/bin:$PATH" &&buster --version`);
+    await sandbox.process.executeCommand(`export PATH="$HOME/.local/bin:$PATH" && buster --version`);
   } catch (error) {
     console.error('Failed to install Buster CLI', error);
     if (fallbackSnapshot) {
