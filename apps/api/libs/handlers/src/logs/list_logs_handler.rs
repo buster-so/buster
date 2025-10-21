@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use database::enums::ChatType;
 use database::pool::get_pg_pool;
 use diesel::prelude::*;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl};
@@ -81,6 +82,7 @@ pub async fn list_logs_handler(
         .filter(chats::organization_id.eq(organization_id))
         .filter(chats::title.ne("")) // Filter out empty titles
         .filter(chats::title.ne(" ")) // Filter out single space
+        .filter(chats::chat_type.eq(Some(ChatType::Analyst)))
         .filter(
             diesel::dsl::exists(
                 messages::table

@@ -73,7 +73,7 @@ function buildTree(
         lines.push(...subLines);
       }
     });
-  } catch (error) {
+  } catch {
     // Skip directories we can't read (permissions, etc.)
   }
 

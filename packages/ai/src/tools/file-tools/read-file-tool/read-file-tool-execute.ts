@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { wrapTraced } from 'braintrust';
 import type { ReadFileToolContext, ReadFileToolInput, ReadFileToolOutput } from './read-file-tool';
@@ -34,8 +35,9 @@ function validateFilePath(filePath: string, projectDirectory: string): void {
 export function createReadFileToolExecute(context: ReadFileToolContext) {
   return wrapTraced(
     async function execute(input: ReadFileToolInput): Promise<ReadFileToolOutput> {
-      const { messageId, projectDirectory, onToolEvent } = context;
+      const { messageId, onToolEvent } = context;
       const { filePath, offset = 0, limit = DEFAULT_LIMIT } = input;
+      const projectDirectory = process.cwd();
 
       console.info(
         `Reading file ${filePath} (offset: ${offset}, limit: ${limit}) for message ${messageId}`
@@ -58,8 +60,7 @@ export function createReadFileToolExecute(context: ReadFileToolContext) {
         validateFilePath(absolutePath, projectDirectory);
 
         // Check if file exists
-        const file = Bun.file(absolutePath);
-        if (!(await file.exists())) {
+        if (!existsSync(absolutePath)) {
           console.error(`File not found: ${filePath}`);
           return {
             status: 'error',
@@ -69,7 +70,7 @@ export function createReadFileToolExecute(context: ReadFileToolContext) {
         }
 
         // Read the file content
-        const content = await file.text();
+        const content = readFileSync(absolutePath, 'utf8');
         const lines = content.split('\n');
 
         // Apply offset and limit

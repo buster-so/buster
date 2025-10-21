@@ -3,7 +3,6 @@ import type { ModelMessage } from '@buster/ai';
 import { createAnalyticsEngineerAgent } from '@buster/ai/agents/analytics-engineer-agent/analytics-engineer-agent';
 import { proxyModel } from '@buster/ai/llm/providers/proxy-model';
 import { z } from 'zod';
-import { formatWorkingDirectoryContext } from '../utils/working-directory';
 
 /**
  * Configuration for the proxy model connection
@@ -50,7 +49,6 @@ export async function createConfiguredAgent(params: AgentHandlerParams, proxyCon
 
   // Create the analytics engineer agent with proxy model
   const agent = createAnalyticsEngineerAgent({
-    folder_structure: formatWorkingDirectoryContext(validated.workingDirectory),
     userId: validated.userId,
     chatId: validated.chatId,
     dataSourceId: validated.dataSourceId,

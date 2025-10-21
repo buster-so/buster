@@ -14,8 +14,222 @@ vi.mock('../utils/conversation-history', () => ({
   saveModelMessages: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../utils/api-conversation', () => ({
+  loadConversationFromApi: vi.fn(),
+}));
+
+vi.mock('../utils/sdk-factory', () => ({
+  getOrCreateSdk: vi.fn(),
+}));
+
 const TEST_CHAT_ID = '123e4567-e89b-12d3-a456-426614174000';
 const TEST_MESSAGE_ID = '123e4567-e89b-12d3-a456-426614174001';
+
+describe('runHeadlessAgent - API-first refactoring', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+  });
+
+  it('should create new chat when no chatId provided', async () => {
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    const mockSdk = {
+      messages: {
+        create: vi.fn().mockResolvedValue({ success: true }),
+        update: vi.fn().mockResolvedValue({ success: true }),
+      },
+    };
+    vi.mocked(getOrCreateSdk).mockResolvedValue(mockSdk as any);
+
+    const chatId = await runHeadlessAgent({
+      prompt: 'Test prompt',
+      workingDirectory: '/tmp/test',
+      sdk: mockSdk as any,
+    });
+
+    // Should generate new chatId
+    expect(chatId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+
+    // Should not load from API (no existing conversation)
+    const { loadConversationFromApi } = await import('../utils/api-conversation');
+    expect(loadConversationFromApi).not.toHaveBeenCalled();
+
+    // Should NOT save to local files when SDK is provided
+    expect(conversationHistory.saveModelMessages).not.toHaveBeenCalled();
+  });
+
+  it('should resume existing chat when chatId provided', async () => {
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    const { loadConversationFromApi } = await import('../utils/api-conversation');
+
+    const mockSdk = {
+      messages: {
+        create: vi.fn().mockResolvedValue({ success: true }),
+        update: vi.fn().mockResolvedValue({ success: true }),
+        getRawMessages: vi.fn().mockResolvedValue({
+          success: true,
+          chatId: TEST_CHAT_ID,
+          rawLlmMessages: [
+            { role: 'user', content: 'Previous message' },
+            { role: 'assistant', content: 'Previous response' },
+          ],
+        }),
+      },
+    };
+
+    vi.mocked(getOrCreateSdk).mockResolvedValue(mockSdk as any);
+    vi.mocked(loadConversationFromApi).mockResolvedValue({
+      chatId: TEST_CHAT_ID,
+      modelMessages: [
+        { role: 'user', content: 'Previous message' },
+        { role: 'assistant', content: 'Previous response' },
+      ],
+    });
+
+    const chatId = await runHeadlessAgent({
+      prompt: 'Continue conversation',
+      workingDirectory: '/tmp/test',
+      chatId: TEST_CHAT_ID,
+      sdk: mockSdk as any,
+    });
+
+    // Should return provided chatId
+    expect(chatId).toBe(TEST_CHAT_ID);
+
+    // Should load from API
+    expect(loadConversationFromApi).toHaveBeenCalledWith(TEST_CHAT_ID, mockSdk);
+
+    // Should NOT save to local files
+    expect(conversationHistory.saveModelMessages).not.toHaveBeenCalled();
+
+    // Should pass conversation to runChatAgent
+    const { runChatAgent } = await import('./chat-service');
+    expect(runChatAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chatId: TEST_CHAT_ID,
+        messages: expect.arrayContaining([
+          { role: 'user', content: 'Previous message' },
+          { role: 'assistant', content: 'Previous response' },
+          { role: 'user', content: 'Continue conversation' },
+        ]),
+        sdk: mockSdk,
+      })
+    );
+  });
+
+  it('should use provided messageId', async () => {
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    const mockSdk = {
+      messages: {
+        create: vi.fn().mockResolvedValue({ success: true }),
+        update: vi.fn().mockResolvedValue({ success: true }),
+      },
+    };
+    vi.mocked(getOrCreateSdk).mockResolvedValue(mockSdk as any);
+
+    await runHeadlessAgent({
+      prompt: 'Test',
+      workingDirectory: '/tmp/test',
+      chatId: TEST_CHAT_ID,
+      messageId: TEST_MESSAGE_ID,
+      sdk: mockSdk as any,
+    });
+
+    // Should pass messageId to runChatAgent
+    const { runChatAgent } = await import('./chat-service');
+    expect(runChatAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chatId: TEST_CHAT_ID,
+        messageId: TEST_MESSAGE_ID,
+      })
+    );
+  });
+
+  it('should NOT save to local files when SDK is provided', async () => {
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    const mockSdk = {
+      messages: {
+        create: vi.fn().mockResolvedValue({ success: true }),
+        update: vi.fn().mockResolvedValue({ success: true }),
+      },
+    };
+    vi.mocked(getOrCreateSdk).mockResolvedValue(mockSdk as any);
+
+    await runHeadlessAgent({
+      prompt: 'Test prompt',
+      workingDirectory: '/tmp/test',
+      chatId: TEST_CHAT_ID,
+      sdk: mockSdk as any,
+    });
+
+    // Should NOT call saveModelMessages
+    expect(conversationHistory.saveModelMessages).not.toHaveBeenCalled();
+
+    // Should NOT call loadConversation from local files
+    expect(conversationHistory.loadConversation).not.toHaveBeenCalled();
+  });
+
+  it('should use SDK from factory when not provided', async () => {
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    const mockSdk = {
+      messages: {
+        create: vi.fn().mockResolvedValue({ success: true }),
+        update: vi.fn().mockResolvedValue({ success: true }),
+      },
+    };
+    vi.mocked(getOrCreateSdk).mockResolvedValue(mockSdk as any);
+
+    await runHeadlessAgent({
+      prompt: 'Test prompt',
+      workingDirectory: '/tmp/test',
+    });
+
+    // Should call getOrCreateSdk
+    expect(getOrCreateSdk).toHaveBeenCalled();
+
+    // Should pass SDK to runChatAgent
+    const { runChatAgent } = await import('./chat-service');
+    expect(runChatAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sdk: mockSdk,
+      })
+    );
+  });
+
+  it('should handle API conversation not found gracefully', async () => {
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    const { loadConversationFromApi } = await import('../utils/api-conversation');
+
+    const mockSdk = {
+      messages: {
+        create: vi.fn().mockResolvedValue({ success: true }),
+        update: vi.fn().mockResolvedValue({ success: true }),
+      },
+    };
+
+    vi.mocked(getOrCreateSdk).mockResolvedValue(mockSdk as any);
+    vi.mocked(loadConversationFromApi).mockResolvedValue(null);
+
+    // Should not throw
+    const chatId = await runHeadlessAgent({
+      prompt: 'Test',
+      workingDirectory: '/tmp/test',
+      chatId: TEST_CHAT_ID,
+      sdk: mockSdk as any,
+    });
+
+    // Should still use the provided chatId
+    expect(chatId).toBe(TEST_CHAT_ID);
+
+    // Should start with empty conversation
+    const { runChatAgent } = await import('./chat-service');
+    expect(runChatAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chatId: TEST_CHAT_ID,
+        messages: [{ role: 'user', content: 'Test' }],
+      })
+    );
+  });
+});
 
 describe('runHeadlessAgent - contextFilePath handling', () => {
   const testDir = join(__dirname, '.test-headless');
@@ -42,11 +256,16 @@ describe('runHeadlessAgent - contextFilePath handling', () => {
     }
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     // Setup default mock - no existing conversation
     vi.mocked(conversationHistory.loadConversation).mockResolvedValue(null);
+
+    // Mock getOrCreateSdk to return null for these legacy tests
+    // (they should fall back to local file behavior)
+    const { getOrCreateSdk } = await import('../utils/sdk-factory');
+    vi.mocked(getOrCreateSdk).mockRejectedValue(new Error('No credentials'));
   });
 
   describe('without contextFilePath', () => {

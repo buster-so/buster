@@ -16,8 +16,7 @@ import { ExpansionContext } from '../../hooks/use-expansion';
 import type { CliAgentMessage } from '../../services';
 import { runChatAgent } from '../../services';
 import type { Conversation } from '../../utils/conversation-history';
-import { saveModelMessages } from '../../utils/conversation-history';
-import { loadConversation } from '../../utils/load-conversation-from-api';
+import { getOrCreateSdk } from '../../utils/sdk-factory';
 import { getCurrentChatId, initNewSession, setSessionChatId } from '../../utils/session';
 import { getSetting } from '../../utils/settings';
 import type { SlashCommand } from '../../utils/slash-commands';
@@ -37,6 +36,7 @@ export function Main() {
   const [input, setInput] = useState('');
   const [_history, setHistory] = useState<ChatHistoryEntry[]>([]);
   const [messages, setMessages] = useState<CliAgentMessage[]>([]);
+  const [modelMessages, setModelMessages] = useState<ModelMessage[]>([]); // Raw messages from API
   const historyCounter = useRef(0);
   const messageCounter = useRef(0);
   const [vimEnabled, setVimEnabled] = useState(() => getSetting('vimMode'));
@@ -52,8 +52,12 @@ export function Main() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Callback to update messages from agent stream
-  const handleMessageUpdate = useCallback((modelMessages: ModelMessage[]) => {
-    const transformedMessages = transformModelMessagesToUI(modelMessages);
+  const handleMessageUpdate = useCallback((newModelMessages: ModelMessage[]) => {
+    // Store raw ModelMessage array (from API - no transformation needed)
+    setModelMessages(newModelMessages);
+
+    // Transform for UI display
+    const transformedMessages = transformModelMessagesToUI(newModelMessages);
 
     // Update message counter to highest ID
     if (transformedMessages.length > 0) {
@@ -127,15 +131,14 @@ export function Main() {
     let updatedModelMessages: ModelMessage[] = [];
 
     try {
-      // Load existing model messages from API
-      const conversation = await loadConversation(chatId, cwd);
-
-      const existingModelMessages = conversation?.modelMessages || [];
+      // Use raw ModelMessage array directly (from API - already in correct format)
+      // For new sessions, this starts as empty array
+      // For resumed sessions, this contains messages loaded from API
       const userMessage: ModelMessage = {
         role: 'user',
         content: trimmed,
       };
-      updatedModelMessages = [...existingModelMessages, userMessage];
+      updatedModelMessages = [...modelMessages, userMessage];
 
       // Update UI state immediately
       handleMessageUpdate(updatedModelMessages);
@@ -144,14 +147,19 @@ export function Main() {
       setInput('');
       setIsThinking(true);
 
-      // Save to disk
-      await saveModelMessages(chatId, cwd, updatedModelMessages);
+      // Get or create SDK for API-first approach
+      let sdk = null;
+      try {
+        sdk = await getOrCreateSdk();
+      } catch (error) {
+        console.warn('No SDK available - some features may be limited:', error);
+      }
 
       // Create AbortController for this agent execution
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 
-      // Run agent with callback for message updates
+      // Run agent with callback for message updates (API-first, no local file saves)
       await runChatAgent(
         {
           chatId,
@@ -160,6 +168,7 @@ export function Main() {
           abortSignal: abortController.signal,
           prompt: trimmed, // Pass the user prompt for database creation
           messages: updatedModelMessages, // Pass all messages including new user message
+          sdk: sdk || undefined, // Pass SDK for API-first approach
         },
         {
           onThinkingStateChange: (thinking) => {
@@ -198,13 +207,8 @@ export function Main() {
         const messagesWithError = [...updatedModelMessages, errorModelMessage];
         handleMessageUpdate(messagesWithError);
 
-        // Save error state to disk
-        try {
-          await saveModelMessages(chatId, cwd, messagesWithError);
-        } catch (saveError) {
-          console.error('Failed to save error state:', saveError);
-        }
-
+        // Note: Error state is shown in UI but not saved
+        // API-first approach - messages are saved during agent execution
         setIsThinking(false);
       }
     } finally {
@@ -212,7 +216,7 @@ export function Main() {
       abortControllerRef.current = null;
       setIsThinking(false);
     }
-  }, [input, sessionInitialized, handleMessageUpdate]);
+  }, [input, sessionInitialized, modelMessages, handleMessageUpdate]);
 
   const handleResumeConversation = useCallback(
     async (conversation: Conversation) => {

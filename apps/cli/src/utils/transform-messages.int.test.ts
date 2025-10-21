@@ -70,7 +70,11 @@ describe('transformModelMessagesToUI - Real API Integration', () => {
       (m) => m.message.kind === 'read' && m.message.event === 'complete'
     );
     expect(readComplete).toBeDefined();
-    if (readComplete && readComplete.message.kind === 'read' && readComplete.message.event === 'complete') {
+    if (
+      readComplete &&
+      readComplete.message.kind === 'read' &&
+      readComplete.message.event === 'complete'
+    ) {
       expect(readComplete.message.result?.file_path).toContain('main.tsx');
     }
 
@@ -148,7 +152,11 @@ describe('transformModelMessagesToUI - Real API Integration', () => {
       (m) => m.message.kind === 'task' && m.message.event === 'complete'
     );
     expect(taskComplete).toBeDefined();
-    if (taskComplete && taskComplete.message.kind === 'task' && taskComplete.message.event === 'complete') {
+    if (
+      taskComplete &&
+      taskComplete.message.kind === 'task' &&
+      taskComplete.message.event === 'complete'
+    ) {
       expect(taskComplete.message.result?.status).toBe('success');
       expect(taskComplete.message.result?.messages).toBeInstanceOf(Array);
       expect(taskComplete.message.result?.messages).toHaveLength(1);
@@ -259,10 +267,18 @@ describe('transformModelMessagesToUI - Real API Integration', () => {
     // Two read tool calls, both should be complete
     const readMessages = result.filter((m) => m.message.kind === 'read');
     expect(readMessages).toHaveLength(2);
-    if (readMessages[0] && readMessages[0].message.kind === 'read' && readMessages[0].message.event === 'complete') {
+    if (
+      readMessages[0] &&
+      readMessages[0].message.kind === 'read' &&
+      readMessages[0].message.event === 'complete'
+    ) {
       expect(readMessages[0].message.result?.file_path).toBe('file1.ts');
     }
-    if (readMessages[1] && readMessages[1].message.kind === 'read' && readMessages[1].message.event === 'complete') {
+    if (
+      readMessages[1] &&
+      readMessages[1].message.kind === 'read' &&
+      readMessages[1].message.event === 'complete'
+    ) {
       expect(readMessages[1].message.result?.file_path).toBe('file2.ts');
     }
 

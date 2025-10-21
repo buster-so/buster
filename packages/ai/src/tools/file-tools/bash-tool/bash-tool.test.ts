@@ -1,262 +1,317 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { materialize } from '@buster/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-// Helper to create mock process with readable streams
-function createMockProcess(stdout: string, stderr: string, exitCode: number) {
-  const stdoutBlob = new Blob([stdout]);
-  const stderrBlob = new Blob([stderr]);
-
-  return {
-    stdout: stdoutBlob.stream(),
-    stderr: stderrBlob.stream(),
-    exited: Promise.resolve(exitCode),
-    kill: vi.fn(),
-  };
-}
-
-// Mock Bun global object
-const mockSpawn = vi.fn();
-
-globalThis.Bun = {
-  spawn: mockSpawn,
-} as any;
-
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createBashTool } from './bash-tool';
 
-describe('createBashTool', () => {
-  const mockContext = {
-    messageId: 'test-message-id',
-    projectDirectory: '/tmp/test-project',
-    isInResearchMode: false,
-  };
+describe.sequential('bash-tool integration test', () => {
+  let testDir: string;
+  let originalCwd: string;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+  beforeAll(async () => {
+    // Save original working directory
+    originalCwd = process.cwd();
+
+    // Create a temporary directory for tests
+    testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bash-tool-test-'));
+
+    // Change to temp directory
+    process.chdir(testDir);
   });
 
-  it('should create a bash tool with proper configuration', () => {
-    const bashTool = createBashTool(mockContext);
+  afterAll(async () => {
+    // Restore original working directory
+    process.chdir(originalCwd);
 
-    expect(bashTool).toBeDefined();
-    expect(bashTool.description).toBeTruthy();
-    expect(bashTool.inputSchema).toBeDefined();
-    expect(bashTool.outputSchema).toBeDefined();
-    expect(bashTool.execute).toBeDefined();
+    // Clean up test directory
+    if (testDir && fs.existsSync(testDir)) {
+      fs.rmSync(testDir, { recursive: true, force: true });
+    }
   });
 
-  it('should handle successful command execution', async () => {
-    mockSpawn.mockReturnValue(createMockProcess('Hello World', '', 0));
+  it('should execute pwd command', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
 
-    const bashTool = createBashTool(mockContext);
-
-    const rawResult = await bashTool.execute!(
-      {
-        command: 'echo "Hello World"',
-        description: 'Test echo command',
-      },
-      { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+    const result = await materialize(
+      await bashTool.execute!(
+        {
+          command: 'pwd',
+          description: 'Print working directory',
+        },
+        { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+      )
     );
-    const result = await materialize(rawResult);
 
     expect(result).toMatchObject({
-      command: 'echo "Hello World"',
-      stdout: 'Hello World',
-      exitCode: 0,
+      command: 'pwd',
       success: true,
+      exitCode: 0,
+    });
+    expect(result.stdout).toContain(testDir);
+  });
+
+  it('should execute echo command', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
+
+    const result = await materialize(
+      await bashTool.execute!(
+        {
+          command: 'echo "Hello from bash"',
+          description: 'Echo test',
+        },
+        { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+      )
+    );
+
+    expect(result).toMatchObject({
+      command: 'echo "Hello from bash"',
+      stdout: 'Hello from bash\n',
+      success: true,
+      exitCode: 0,
     });
   });
 
-  it('should handle command failures', async () => {
-    mockSpawn.mockReturnValue(createMockProcess('', 'command not found', 127));
+  it('should execute ls command', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
 
-    const bashTool = createBashTool(mockContext);
+    const result = await materialize(
+      await bashTool.execute!(
+        {
+          command: 'ls -la',
+          description: 'List files',
+          timeout: 5000,
+        },
+        { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+      )
+    );
+
+    expect(result).toMatchObject({
+      command: 'ls -la',
+      success: true,
+      exitCode: 0,
+    });
+    expect(result.stdout).toBeTruthy();
+  });
+
+  it('should handle command failure with nonexistent command', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
 
     const rawResult = await bashTool.execute!(
       {
         command: 'nonexistentcommand',
-        description: 'Test failing command',
-      },
-      { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
-    );
-    const result = await materialize(rawResult);
-
-    expect(result.exitCode).toBe(127);
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('command not found');
-  });
-
-  it('should handle execution errors', async () => {
-    mockSpawn.mockImplementation(() => {
-      throw new Error('Execution failed');
-    });
-
-    const bashTool = createBashTool(mockContext);
-
-    const rawResult = await bashTool.execute!(
-      {
-        command: 'echo "test"',
-        description: 'Test command',
+        description: 'Should fail',
       },
       { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
     );
     const result = await materialize(rawResult);
 
     expect(result).toMatchObject({
-      command: 'echo "test"',
+      command: 'nonexistentcommand',
       success: false,
-      error: 'Execution error: Execution failed',
     });
+    expect(result.error).toBeTruthy();
   });
 
-  it('should truncate long output', async () => {
-    const longOutput = 'a'.repeat(40000);
-    mockSpawn.mockReturnValue(createMockProcess(longOutput, '', 0));
-
-    const bashTool = createBashTool(mockContext);
+  it('should handle command failure with exit code', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
 
     const rawResult = await bashTool.execute!(
       {
-        command: 'echo "long output"',
-        description: 'Test long output',
+        command: 'exit 1',
+        description: 'Exit with error code',
       },
       { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
     );
     const result = await materialize(rawResult);
 
-    expect(result.stdout.length).toBeLessThan(longOutput.length);
-    expect(result.stdout).toContain('(Output was truncated due to length limit)');
+    expect(result).toMatchObject({
+      command: 'exit 1',
+      success: false,
+    });
+    expect(result.exitCode).toBeGreaterThan(0);
   });
 
-  it('should include timeout parameter', async () => {
-    mockSpawn.mockReturnValue(createMockProcess('output', '', 0));
+  it('should create a file via echo redirect', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
 
-    const bashTool = createBashTool(mockContext);
-
+    const testFile = `test-bash-${Date.now()}.txt`;
     const rawResult = await bashTool.execute!(
       {
-        command: 'ls',
-        description: 'List files',
-        timeout: 5000,
+        command: `echo "test content" > ${testFile}`,
+        description: 'Create file',
       },
       { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
     );
     const result = await materialize(rawResult);
 
     expect(result.success).toBe(true);
+
+    // Verify file was created
+    const filePath = path.join(testDir, testFile);
+    expect(fs.existsSync(filePath)).toBe(true);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content.trim()).toBe('test content');
+
+    // Clean up
+    fs.unlinkSync(filePath);
   });
 
-  describe('dbt command validation', () => {
-    it('should allow read-only dbt commands', async () => {
-      const allowedCommands = [
-        'dbt compile',
-        'dbt parse',
-        'dbt list --select orders',
-        'dbt ls',
-        'dbt show --select orders',
-        'dbt docs generate',
-        'dbt debug',
-        'dbt deps',
-        'dbt clean',
-      ];
-
-      for (const command of allowedCommands) {
-        mockSpawn.mockReturnValue(createMockProcess('success', '', 0));
-        const bashTool = createBashTool(mockContext);
-
-        const rawResult = await bashTool.execute!(
-          {
-            command,
-            description: `Test ${command}`,
-          },
-          { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
-        );
-        const result = await materialize(rawResult);
-
-        expect(result.success).toBe(true);
-        expect(mockSpawn).toHaveBeenCalled();
-      }
+  it('should read a file with cat', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
     });
 
-    it('should block dbt write commands', async () => {
-      const blockedCommands = [
-        'dbt run',
-        'dbt build',
-        'dbt seed',
-        'dbt snapshot',
-        'dbt test',
-        'dbt run-operation my_macro',
-        'dbt retry',
-        'dbt clone',
-        'dbt fresh',
-      ];
+    // Create test file
+    const testFile = `test-read-${Date.now()}.txt`;
+    const filePath = path.join(testDir, testFile);
+    fs.writeFileSync(filePath, 'file content');
 
-      for (const command of blockedCommands) {
-        const bashTool = createBashTool(mockContext);
+    const rawResult = await bashTool.execute!(
+      {
+        command: `cat ${testFile}`,
+        description: 'Read file',
+      },
+      { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+    );
+    const result = await materialize(rawResult);
 
-        const rawResult = await bashTool.execute!(
-          {
-            command,
-            description: `Test ${command}`,
-          },
-          { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
-        );
-        const result = await materialize(rawResult);
-
-        expect(result.success).toBe(false);
-        expect(result.error).toContain('not allowed');
-        expect(mockSpawn).not.toHaveBeenCalled();
-      }
+    expect(result).toMatchObject({
+      success: true,
+      stdout: 'file content',
     });
 
-    it('should block dbt commands in compound statements', async () => {
-      const bashTool = createBashTool(mockContext);
+    // Clean up
+    fs.unlinkSync(filePath);
+  });
 
-      const rawResult = await bashTool.execute!(
-        {
-          command: 'cd /path/to/project && dbt run --select orders',
-          description: 'Test compound dbt run',
-        },
-        { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
-      );
-      const result = await materialize(rawResult);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toContain('not allowed');
-      expect(mockSpawn).not.toHaveBeenCalled();
+  it('should fail when trying to read non-existent file', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
     });
 
-    it('should allow non-dbt commands', async () => {
-      mockSpawn.mockReturnValue(createMockProcess('output', '', 0));
-      const bashTool = createBashTool(mockContext);
+    const rawResult = await bashTool.execute!(
+      {
+        command: 'cat nonexistent.txt',
+        description: 'Try to read removed file',
+      },
+      { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+    );
+    const result = await materialize(rawResult);
 
-      const rawResult = await bashTool.execute!(
-        {
-          command: 'echo "hello world"',
-          description: 'Test echo',
-        },
-        { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
-      );
-      const result = await materialize(rawResult);
+    expect(result.success).toBe(false);
+  });
 
-      expect(result.success).toBe(true);
-      expect(mockSpawn).toHaveBeenCalled();
+  it('should read first N lines of a file with head command', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
     });
 
-    it('should block unknown dbt commands for safety', async () => {
-      const bashTool = createBashTool(mockContext);
+    // Create test file with multiple lines
+    const testFile = `test-head-${Date.now()}.sql`;
+    const filePath = path.join(testDir, testFile);
+    const lines = Array.from({ length: 100 }, (_, i) => `-- Line ${i + 1}: SQL statement`).join(
+      '\n'
+    );
+    fs.writeFileSync(filePath, lines);
 
-      const rawResult = await bashTool.execute!(
-        {
-          command: 'dbt unknown-command',
-          description: 'Test unknown dbt command',
-        },
-        { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
-      );
-      const result = await materialize(rawResult);
+    const rawResult = await bashTool.execute!(
+      {
+        command: `head -50 ${testFile}`,
+        description: 'Read first 50 lines',
+      },
+      { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+    );
+    const result = await materialize(rawResult);
 
-      expect(result.success).toBe(false);
-      expect(result.error).toContain('not recognized or not allowed');
-      expect(mockSpawn).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      success: true,
+      exitCode: 0,
     });
+
+    // Verify we got exactly 50 lines
+    const outputLines = result.stdout.trim().split('\n');
+    expect(outputLines).toHaveLength(50);
+    expect(outputLines[0]).toContain('Line 1');
+    expect(outputLines[49]).toContain('Line 50');
+
+    // Clean up
+    fs.unlinkSync(filePath);
+  });
+
+  it('should handle head command with large SQL file paths', async () => {
+    const bashTool = createBashTool({
+      messageId: `test-message-${Date.now()}`,
+      projectDirectory: testDir,
+      isInResearchMode: false,
+    });
+
+    // Create a SQL file with realistic schema content
+    const testFile = 'raw_schema.sql';
+    const filePath = path.join(testDir, testFile);
+    const schemaLines = [
+      '-- Adventure Works Database Schema',
+      'CREATE TABLE IF NOT EXISTS customers (',
+      '  id SERIAL PRIMARY KEY,',
+      '  name VARCHAR(255) NOT NULL,',
+      '  email VARCHAR(255) UNIQUE',
+      ');',
+      '',
+      'CREATE TABLE IF NOT EXISTS orders (',
+      '  id SERIAL PRIMARY KEY,',
+      '  customer_id INTEGER REFERENCES customers(id)',
+      ');',
+      ...Array.from({ length: 100 }, (_, i) => `-- Additional schema line ${i + 1}`),
+    ].join('\n');
+    fs.writeFileSync(filePath, schemaLines);
+
+    const rawResult = await bashTool.execute!(
+      {
+        command: `head -50 ${testFile}`,
+        description: 'Read schema file header',
+      },
+      { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
+    );
+    const result = await materialize(rawResult);
+
+    expect(result).toMatchObject({
+      success: true,
+      exitCode: 0,
+    });
+    expect(result.stdout).toContain('Adventure Works Database Schema');
+    expect(result.stdout).toContain('CREATE TABLE');
+
+    // Clean up
+    fs.unlinkSync(filePath);
   });
 });

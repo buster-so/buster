@@ -23,7 +23,7 @@ use agents::{
 use anyhow::{anyhow, Result};
 use chrono::Utc;
 use database::{
-    enums::{AssetPermissionRole, AssetType, IdentityType},
+    enums::{AssetPermissionRole, AssetType, IdentityType, ChatType},
     models::{AssetPermission, Chat, Message, MessageToFile},
     pool::get_pg_pool,
     schema::{
@@ -2933,6 +2933,7 @@ async fn initialize_chat(
             workspace_sharing: WorkspaceSharing::None,
             workspace_sharing_enabled_at: None,
             workspace_sharing_enabled_by: None,
+            chat_type: Some(ChatType::Analyst),
         };
 
         // Create initial message using the *new* message ID

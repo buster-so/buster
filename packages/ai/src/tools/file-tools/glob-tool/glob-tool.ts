@@ -40,7 +40,6 @@ const GlobToolOutputSchema = z.object({
 
 const GlobToolContextSchema = z.object({
   messageId: z.string().describe('The message ID for database updates'),
-  projectDirectory: z.string().describe('The root directory of the project'),
   onToolEvent: z.any().optional(),
 });
 

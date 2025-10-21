@@ -1,8 +1,8 @@
 import { program as commander } from 'commander';
 import { render } from 'ink';
 import { Main } from '../commands/main/main';
-import { getCurrentVersion } from '../commands/update/update-handler';
 import { runHeadlessAgent } from '../services';
+import { getVersion } from '../version';
 import { setupPreActionHook } from './hooks';
 
 interface RootOptions {
@@ -17,7 +17,7 @@ interface RootOptions {
 export const program = commander
   .name('buster')
   .description('Buster CLI - AI-powered data analytics platform')
-  .version(getCurrentVersion())
+  .version(getVersion())
   .option('--cwd <path>', 'Set working directory for the CLI')
   .option('--prompt <prompt>', 'Run agent in headless mode with the given prompt')
   .option('--chatId <id>', 'Continue an existing conversation (used with --prompt)')
