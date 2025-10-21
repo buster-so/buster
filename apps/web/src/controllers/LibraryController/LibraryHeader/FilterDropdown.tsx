@@ -16,7 +16,8 @@ import { Calendar } from '@/components/ui/icons';
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
-import { getNow } from '@/lib/date';
+import { Text } from '@/components/ui/typography/Text';
+import { createDayjsDate, getNow } from '@/lib/date';
 import type { LibrarySearchParams } from '../schema';
 
 export const FilterDropdown = React.memo(
