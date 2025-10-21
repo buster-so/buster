@@ -480,7 +480,9 @@ describe('runHeadlessAgent - contextFilePath handling', () => {
         messageId: TEST_MESSAGE_ID,
         workingDirectory: testDir,
         isInResearchMode: undefined,
+        isHeadlessMode: true,
         prompt: 'Test prompt',
+        sdk: undefined,
         messages: [
           { role: 'system', content: 'System context from file' },
           { role: 'user', content: 'Test prompt' },

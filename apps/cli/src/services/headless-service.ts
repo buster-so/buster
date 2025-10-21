@@ -113,6 +113,7 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       messageId,
       workingDirectory,
       isInResearchMode,
+      isHeadlessMode: true, // Enable headless mode for git communication rules
       prompt, // Pass prompt for database message creation
       messages: updatedMessages, // Pass all messages including new user message
       sdk: sdk || undefined, // Pass SDK to chat agent
