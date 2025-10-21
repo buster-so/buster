@@ -24,13 +24,16 @@ export function generateDirectoryTree(workingDirectory: string): string {
   } catch (error) {
     // Fallback to ls -R if tree is not available
     try {
-      const lsOutput = execSync(`find "${workingDirectory}" -maxdepth 3 -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/dist/*' -not -path '*/build/*' | head -200`, {
-        encoding: 'utf-8',
-        maxBuffer: 1024 * 1024,
-        timeout: 5000,
-      });
+      const lsOutput = execSync(
+        `find "${workingDirectory}" -maxdepth 3 -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/dist/*' -not -path '*/build/*' | head -200`,
+        {
+          encoding: 'utf-8',
+          maxBuffer: 1024 * 1024,
+          timeout: 5000,
+        }
+      );
       return `Directory listing (limited to depth 3):\n${lsOutput.trim()}`;
-    } catch (fallbackError) {
+    } catch (_fallbackError) {
       return `Unable to generate directory tree: ${error instanceof Error ? error.message : String(error)}`;
     }
   }

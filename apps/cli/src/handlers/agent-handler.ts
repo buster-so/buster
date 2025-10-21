@@ -26,6 +26,7 @@ export const AgentHandlerParamsSchema = z.object({
   organizationId: z.string().default('cli').describe('Organization identifier'),
   dataSourceId: z.string().default('').describe('Data source identifier'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
+  isHeadlessMode: z.boolean().optional().describe('Flag indicating headless mode'),
   abortSignal: z.instanceof(AbortSignal).optional().describe('Abort controller signal'),
 });
 
@@ -60,6 +61,7 @@ export async function createConfiguredAgent(params: AgentHandlerParams, proxyCon
     apiKey: validatedProxy.apiKey,
     apiUrl: validatedProxy.baseURL,
     isInResearchMode: validated.isInResearchMode || false,
+    isHeadlessMode: validated.isHeadlessMode || false,
   });
 
   return agent;

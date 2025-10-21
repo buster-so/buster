@@ -139,19 +139,90 @@ When models are modified, updated documentation ensures analysts and stakeholder
   - **Rejected Alternatives**: Why other approaches weren't chosen (e.g., why not enforcing a relationship)
   - **References**: List of models, tests, and docs updated
 
-### 8. Commit Changes (If Instructed)
-- Run `git add -A`
-- Run `git commit -m "docs: document changed models [model names]"`
-- Run `git push`
+### 8. Commit and Push Changes
+**ALWAYS commit and push if you made any changes** (documentation, tests, changelog).
 
-### 9. Comment on PR (If PR Number Provided)
-- Use bash to run: `gh pr comment <pr-number> --body "..."`
-- **Comment should include**:
-  - Models documented (with row counts)
-  - Tests added (unique, not_null, relationships, accepted_values, ranges)
-  - Key data insights (patterns, null rates, relationship coverage)
-  - Link to changelog file
-  - Summary of semantic models added (if applicable)
+**In PR environment** (working on existing PR):
+```bash
+git add -A
+git commit -m "docs: document changed models [model names]"
+git push
+```
+
+**In push environment** (need to create branch and PR):
+```bash
+# Create branch
+git checkout -b bot/document-models-$(date +%Y%m%d-%H%M)
+
+# Commit changes
+git add -A
+git commit -m "docs: document changed models [model names]"
+
+# Push and create PR
+git push -u origin HEAD
+gh pr create --title "docs: document changed models" --body "Automated documentation update. See summary comment below."
+```
+
+### 9. Post Summary Comment to PR
+**ALWAYS post a summary comment** - this is the ONLY way the user sees your work.
+
+Get the PR number:
+- **PR environment**: Use the PR number from the trigger event
+- **Push environment**: Get PR number from `gh pr create` output or `gh pr list --head <branch-name>`
+
+Post the comment:
+```bash
+gh pr comment <pr-number> --body "$(cat <<'EOF'
+## 🤖 Documentation Agent Summary
+
+### Work Completed
+- ✅ Documented [N] models: `model1`, `model2`, `model3`
+- ✅ Added [N] tests: [X] unique/not_null, [Y] relationships, [Z] accepted_values
+- ✅ Created semantic models for [N] mart tables
+- ✅ Validated all changes with `dbt parse` and `dbt compile`
+
+### Key Findings
+- **model1**: ~2.8M rows; 8% guest orders lack customer_id (expected)
+- **model2**: 5 stable order_status values; added accepted_values test
+- **model3**: Relationship to parent_model validated at 96% coverage
+
+### Files Changed
+- `models/marts/core/schema.yml` - Added documentation and tests
+- `changelog/orders-documentation-20250115.md` - Detailed decisions and evidence
+
+### Evidence
+- Metadata profiled: 2025-01-15 14:23 UTC
+- Relationships validated with SQL coverage checks
+- [N] SQL validations performed
+
+### Next Steps
+All changes are ready for review. Tests will run on next `dbt test` execution.
+EOF
+)"
+```
+
+**If NO changes were needed** (PR environment only):
+```bash
+gh pr comment <pr-number> --body "$(cat <<'EOF'
+## 🤖 Documentation Agent Summary
+
+### Analysis Complete
+Reviewed all changed models and existing documentation.
+
+### Result
+✅ **No changes needed** - All models already have:
+- Complete documentation with grain, purpose, and patterns
+- Appropriate tests for primary keys and relationships
+- Up-to-date column descriptions with business context
+
+### Models Reviewed
+- `model1` - Documentation current (last updated 2025-01-10)
+- `model2` - Tests and docs complete
+
+No further action required.
+EOF
+)"
+```
 
 ## Verification
 Run these commands to validate completion:
@@ -160,8 +231,14 @@ Run these commands to validate completion:
 - All primary keys have `unique` and `not_null` tests
 - All foreign keys with >95% coverage have `relationships` tests
 - Changelog exists in changelog/ directory with proper frontmatter
-- Git commit shows changed schema.yml files
-- PR has comment with summary (if PR provided)
+
+**Git & Communication Checklist** (if changes were made):
+- [ ] All changes committed with descriptive message
+- [ ] Changes pushed to remote branch
+- [ ] PR created (if push environment)
+- [ ] Summary comment posted to PR
+
+**CRITICAL**: The user cannot see your work unless you push changes and post a PR comment. If you made any changes, you MUST complete all git and communication steps.
 
 ## Additional Notes
 - **Preserve existing documentation**: Only modify/remove if evidence disproves it

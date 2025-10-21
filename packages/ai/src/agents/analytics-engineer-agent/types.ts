@@ -49,6 +49,10 @@ export const AnalyticsEngineerAgentOptionsSchema = z.object({
     .optional()
     .default(false)
     .describe('Flag indicating the agent should only perform read-only operations'),
+  isHeadlessMode: z
+    .boolean()
+    .optional()
+    .describe('Flag indicating the agent is running in headless/CLI mode'),
   abortSignal: z
     .custom<AbortSignal>()
     .optional()

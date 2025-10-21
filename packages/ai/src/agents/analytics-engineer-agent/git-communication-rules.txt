@@ -1,0 +1,230 @@
+# Git & Communication Rules Module
+
+## Critical Context: User Visibility
+
+**IMPORTANT**: In GitHub Actions/CI environments, the user CANNOT see your regular conversational output. The only way to communicate with the user is through PR comments using the `gh` CLI.
+
+## Communication Strategy
+
+### In PR Environments (Pull Request Trigger)
+- **User sees**: ONLY comments posted to the PR via `gh pr comment`
+- **User does NOT see**: Your thinking, tool calls, or regular output
+- **Communication rule**: Post comments to the PR to communicate progress and results
+
+**Comment guidelines:**
+- Post a **final summary comment** at the end of your work highlighting what was accomplished
+- Only post intermediate comments if explicitly instructed in the task (e.g., "comment after each model")
+- Keep comments concise, scannable, and actionable
+- Include links to changed files, changelogs, or relevant documentation
+- Use markdown formatting for readability (headers, lists, code blocks)
+
+**If no changes are needed:**
+- Still post a comment explaining that no changes were required and why
+- Example: "Reviewed all changed models - documentation is already complete and up-to-date. No changes needed."
+
+### In Push Environments (Push Trigger)
+- **User sees**: PR comments on the PR you create
+- **Workflow**:
+  1. Create a new branch from the pushed commit
+  2. Make your changes on that branch
+  3. Commit and push changes
+  4. Create a PR from your branch to the base branch
+  5. Post summary comment on the newly created PR
+
+**If no changes are needed:**
+- Do not create a branch or PR
+- No further action required
+
+## Git Workflow Rules
+
+### Always Work in Branches
+**NEVER commit directly to main/master or the base branch.**
+
+- **In PR environment**: You're already on a branch (the PR's head branch) - work there
+- **In push environment**: Create a new branch before making any changes
+
+### Branch Naming
+Use descriptive branch names that indicate the work:
+- Format: `bot/<description>-<timestamp>`
+- Examples:
+  - `bot/document-orders-model-20250115`
+  - `bot/add-tests-customers-20250115`
+  - `bot/fix-relationships-20250115-1423`
+
+### Commit Discipline
+- **Always commit when you make changes**
+- Use clear, descriptive commit messages following conventional commits:
+  - `docs: add documentation for orders model`
+  - `test: add relationship tests for customer foreign keys`
+  - `fix: correct null handling in customer_id documentation`
+  - `chore: update changelog for orders documentation`
+- Commit related changes together (e.g., schema.yml + changelog in one commit)
+
+### Always Push Changes
+**CRITICAL**: After committing, ALWAYS push your changes to the remote.
+
+```bash
+git push origin <branch-name>
+```
+
+- In PR environments: `git push` (already tracking remote branch)
+- In push environments: `git push -u origin <new-branch-name>` (set upstream)
+
+**Never leave uncommitted or unpushed changes.** The user cannot see your work unless it's pushed.
+
+## Complete Workflows
+
+### PR Trigger Workflow
+```
+1. Agent starts (already on PR branch)
+2. TodoWrite: Plan the work
+3. Execute the work (understand → profile → document → test)
+4. Commit changes: git add -A && git commit -m "docs: ..."
+5. Push changes: git push
+6. Post summary comment: gh pr comment <pr-number> --body "..."
+```
+
+### Push Trigger Workflow (Changes Needed)
+```
+1. Agent starts (on main/base branch)
+2. Create branch: git checkout -b bot/<description>-<timestamp>
+3. TodoWrite: Plan the work
+4. Execute the work (understand → profile → document → test)
+5. Commit changes: git add -A && git commit -m "docs: ..."
+6. Push branch: git push -u origin <branch-name>
+7. Create PR: gh pr create --title "..." --body "..."
+8. Post summary comment: gh pr comment <pr-number> --body "..."
+```
+
+### Push Trigger Workflow (No Changes Needed)
+```
+1. Agent starts (on main/base branch)
+2. Analyze changes (metadata, grep, read)
+3. Determine no work needed
+4. Exit (no branch, no PR, no comment)
+```
+
+## PR Comment Format
+
+### Final Summary Comment Template
+```markdown
+## 🤖 Documentation Agent Summary
+
+### Work Completed
+- ✅ Documented [N] models: `model1`, `model2`, `model3`
+- ✅ Added [N] tests: [X] unique/not_null, [Y] relationships, [Z] accepted_values
+- ✅ Created semantic models for [N] mart tables
+- ✅ Validated all changes with `dbt parse` and `dbt compile`
+
+### Key Findings
+- **model1**: ~2.8M rows; 8% guest orders lack customer_id (expected)
+- **model2**: 5 stable order_status values; added accepted_values test
+- **model3**: Relationship to parent_model validated at 96% coverage
+
+### Files Changed
+- `models/marts/core/schema.yml` - Added documentation and tests
+- `changelog/orders-documentation-20250115.md` - [View changelog](#)
+
+### Evidence
+- Metadata profiled: 2025-01-15 14:23 UTC
+- Relationships validated with SQL coverage checks
+- [N] SQL validations performed
+
+### Next Steps
+All changes are ready for review. Tests will run on next `dbt test` execution.
+```
+
+### No Changes Needed Comment Template
+```markdown
+## 🤖 Documentation Agent Summary
+
+### Analysis Complete
+Reviewed all changed models and existing documentation.
+
+### Result
+✅ **No changes needed** - All models already have:
+- Complete documentation with grain, purpose, and patterns
+- Appropriate tests for primary keys and relationships
+- Up-to-date column descriptions with business context
+
+### Models Reviewed
+- `model1` - Documentation current (last updated 2025-01-10)
+- `model2` - Tests and docs complete
+- `model3` - No structural changes requiring updates
+
+No further action required.
+```
+
+## Error Handling & Communication
+
+### If Work Fails
+Post a comment explaining what went wrong:
+```markdown
+## 🤖 Documentation Agent - Issues Encountered
+
+### ⚠️ Could Not Complete Work
+
+**Issue**: `dbt parse` failed due to YAML syntax error in schema.yml
+
+**Details**:
+```
+[error output]
+```
+
+**Attempted Fix**: [what you tried]
+
+**Status**: Changes have been pushed but require manual review.
+
+**Files Affected**:
+- `models/marts/core/schema.yml` (line 42)
+
+Please review the syntax error and I can retry once fixed.
+```
+
+### If Unable to Profile Data
+```markdown
+## 🤖 Documentation Agent - Partial Completion
+
+### ✅ Completed
+- Model documentation added based on SQL analysis
+- Primary key tests added
+
+### ⚠️ Could Not Complete
+- Data profiling via RetrieveMetadata (connection timeout)
+- Relationship validation (unable to query warehouse)
+
+### Recommendation
+Manually run metadata profiling and add:
+- Null rate statistics to column descriptions
+- Relationship coverage validation for foreign keys
+
+Changes have been pushed for review.
+```
+
+## Rules Summary Checklist
+
+Before finishing any task in a GitHub Actions environment:
+
+- [ ] **Branch**: Working on a branch (not main/master)?
+- [ ] **Commit**: All changes committed with clear message?
+- [ ] **Push**: Changes pushed to remote?
+- [ ] **PR**: PR created (if push trigger and changes made)?
+- [ ] **Comment**: Final summary comment posted to PR?
+- [ ] **Content**: Comment includes what was done, evidence, and files changed?
+
+**If any checkbox is unchecked, you have not completed the task.**
+
+## Common Mistakes to Avoid
+
+❌ **DON'T**: Make changes and forget to push
+❌ **DON'T**: Push changes without posting a comment
+❌ **DON'T**: Try to "tell the user" through regular output (they can't see it)
+❌ **DON'T**: Commit to main/master directly
+❌ **DON'T**: Create a PR without commenting on it
+❌ **DON'T**: Exit without posting a comment when working on a PR (even if no changes)
+
+✅ **DO**: Always work in a branch
+✅ **DO**: Always commit and push changes
+✅ **DO**: Always post PR comments as your ONLY communication
+✅ **DO**: Post a comment even when no changes are needed (in PR environments)
+✅ **DO**: Include evidence, file links, and next steps in comments

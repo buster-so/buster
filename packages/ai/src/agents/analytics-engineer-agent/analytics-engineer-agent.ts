@@ -3,12 +3,13 @@ import { currentSpan, wrapTraced } from 'braintrust';
 import { DEFAULT_ANALYTICS_ENGINEER_OPTIONS } from '../../llm/providers/gateway';
 import { Sonnet4 } from '../../llm/sonnet-4';
 import { createAnalyticsEngineerToolset } from './create-analytics-engineer-toolset';
+import { createWorkingDirectoryContext } from './generate-directory-tree';
 import {
   getDocsAgentSystemPrompt as getAnalyticsEngineerAgentSystemPrompt,
   getAnalyticsEngineerSubagentSystemPrompt,
 } from './get-analytics-engineer-agent-system-prompt';
-import { createWorkingDirectoryContext } from './generate-directory-tree';
 import { readAgentsMd } from './read-agents-md';
+import { readGitCommunicationRules } from './read-git-communication-rules';
 import type { AnalyticsEngineerAgentOptions, AnalyticsEngineerAgentStreamOptions } from './types';
 
 export const ANALYST_ENGINEER_AGENT_NAME = 'analyticsEngineerAgent';
@@ -34,11 +35,11 @@ export function createAnalyticsEngineerAgent(
   // Automatically get current working directory and generate tree structure
   const workingDirectoryContextMessage = analyticsEngineerAgentOptions.isSubagent
     ? null
-    : {
+    : ({
         role: 'system',
         content: createWorkingDirectoryContext(process.cwd()),
         providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
-      } as ModelMessage;
+      } as ModelMessage);
 
   async function stream({ messages }: AnalyticsEngineerAgentStreamOptions) {
     const toolSet = await createAnalyticsEngineerToolset(analyticsEngineerAgentOptions);
@@ -53,11 +54,24 @@ export function createAnalyticsEngineerAgent(
         } as ModelMessage)
       : null;
 
+    // Read git communication rules when in headless mode
+    const gitCommunicationRulesContent = analyticsEngineerAgentOptions.isHeadlessMode
+      ? await readGitCommunicationRules()
+      : null;
+    const gitCommunicationRulesMessage = gitCommunicationRulesContent
+      ? ({
+          role: 'system',
+          content: gitCommunicationRulesContent,
+          providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+        } as ModelMessage)
+      : null;
+
     // Build messages array with system messages and working directory context
     const allMessages = [
       systemMessage,
       ...(workingDirectoryContextMessage ? [workingDirectoryContextMessage] : []),
       ...(agentsMdMessage ? [agentsMdMessage] : []),
+      ...(gitCommunicationRulesMessage ? [gitCommunicationRulesMessage] : []),
       ...messages,
     ];
 

@@ -25,6 +25,7 @@ export const ChatServiceParamsSchema = z.object({
   messageId: z.string().uuid().optional().describe('Message ID for tracking'),
   workingDirectory: z.string().describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
+  isHeadlessMode: z.boolean().optional().describe('Flag indicating headless mode'),
   abortSignal: z.instanceof(AbortSignal).optional().describe('Abort controller signal'),
   prompt: z.string().optional().describe('User prompt (for creating message in database)'),
   messages: z
@@ -65,6 +66,7 @@ export async function runChatAgent(
     messageId: providedMessageId,
     workingDirectory,
     isInResearchMode,
+    isHeadlessMode,
     abortSignal,
     prompt: userPrompt,
     messages: providedMessages,
@@ -173,6 +175,7 @@ export async function runChatAgent(
         organizationId: 'cli',
         dataSourceId: '',
         isInResearchMode,
+        isHeadlessMode,
         abortSignal,
       },
       proxyConfig,
