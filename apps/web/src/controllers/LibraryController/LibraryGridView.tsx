@@ -73,9 +73,19 @@ export const LibraryGridView = React.memo(
         )}
 
         {hasResults && !hasGroups && (
-          <LibraryUngroupedView allResults={allResults} columns={columns} />
+          <LibraryUngroupedView
+            allResults={allResults}
+            columns={columns}
+            scrollContainerRef={scrollContainerRef}
+          />
         )}
-        {hasResults && hasGroups && <LibraryGroupedView allGroups={allGroups} />}
+        {hasResults && hasGroups && (
+          <LibraryGroupedView
+            allGroups={allGroups}
+            columns={columns}
+            scrollContainerRef={scrollContainerRef}
+          />
+        )}
 
         {isFetchingNextPage && (
           <div className="text-text-tertiary text-center py-4">Loading more...</div>
@@ -130,36 +140,96 @@ LibraryGridItem.displayName = 'LibraryGridItem';
 
 const LibraryGroupedView = ({
   allGroups,
+  columns,
+  scrollContainerRef,
 }: {
   allGroups: Record<string, LibraryAssetListItem[]>;
+  columns: number;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
 }) => {
-  const itemsWithHeaders = Object.entries(allGroups).flatMap(([assetType, items]) => {
-    const Icon = assetTypeToIcon(assetType as AssetType);
-    const title = AssetTypeTranslations[assetType as AssetType];
-    const newItems: (
-      | { type: 'header'; title: string; icon: React.ReactNode }
-      | ({ type: 'item' } & LibraryAssetListItem)
-    )[] = [
-      {
-        type: 'header',
-        title,
-        icon: <Icon />,
-      },
-    ];
+  return (
+    <>
+      {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
+        const Icon = assetTypeToIcon(assetType as AssetType);
+        const title = AssetTypeTranslations[assetType as AssetType];
 
-    for (const item of items) {
-      newItems.push({
-        type: 'item',
-        ...item,
-      });
-    }
+        return (
+          <LibraryGroupSection
+            key={assetType}
+            title={title}
+            icon={<Icon />}
+            items={items}
+            columns={columns}
+            scrollContainerRef={scrollContainerRef}
+            className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
+          />
+        );
+      })}
+    </>
+  );
+};
 
-    return newItems;
+const LibraryGroupSection = ({
+  title,
+  icon,
+  items,
+  columns,
+  scrollContainerRef,
+  className,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  items: LibraryAssetListItem[];
+  columns: number;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  className?: string;
+}) => {
+  const virtualStartRef = useRef<HTMLDivElement>(null);
+
+  // Calculate rows needed for grid
+  const rowCount = Math.ceil(items.length / columns);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollContainerRef.current,
+    scrollMargin: 0,
+    estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
+    overscan: 3,
   });
 
   return (
-    <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
-      TODO
+    <LibrarySectionContainer title={title} icon={icon} className={className}>
+      <div
+        ref={virtualStartRef}
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const startIndex = virtualRow.index * columns;
+          const rowItems = items.slice(startIndex, startIndex + columns);
+
+          return (
+            <div
+              key={virtualRow.key}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+                {rowItems.map((asset) => (
+                  <LibraryGridItem key={asset.asset_id} {...asset} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </LibrarySectionContainer>
   );
 };
