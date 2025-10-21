@@ -6,20 +6,16 @@ import { Link, type LinkProps, useRouter } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useLayoutEffect, useState } from 'react';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
-import SkeletonSearchChat from '@/assets/png/skeleton-screenshot-chat.png';
-import SkeletonSearchDashboard from '@/assets/png/skeleton-screenshot-dashboard.png';
-import SkeletonSearchMetric from '@/assets/png/skeleton-screenshot-metric.png';
-import SkeletonSearchReport from '@/assets/png/skeleton-screenshot-report.png';
 import InfoCircle from '@/components/ui/icons/NucleoIconOutlined/circle-info';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { Tooltip } from '@/components/ui/tooltip';
-import { useMount } from '@/hooks/useMount';
 import { useSetTimeout } from '@/hooks/useSetTimeout';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import { ASSET_ICONS } from '../../icons/assetIcons';
 import { MetricChartCard } from '../../metrics/MetricChartCard';
+import { getScreenshotSkeleton } from '../../Skeletons/get-screenshot-skeleton';
 
 export type GlobalSearchSecondaryContentProps = {
   selectedItem: SearchTextData;
@@ -67,24 +63,6 @@ export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContent
   );
 };
 
-function getFallback(assetType: SearchTextData['assetType']) {
-  if (assetType === 'metric_file') {
-    return SkeletonSearchMetric;
-  } else if (assetType === 'chat') {
-    return SkeletonSearchChat;
-  } else if (assetType === 'dashboard_file') {
-    return SkeletonSearchDashboard;
-  } else if (assetType === 'report_file') {
-    return SkeletonSearchReport;
-  } else if (assetType === 'collection') {
-    return SkeletonSearchMetric;
-  } else {
-    const _exhaustiveCheck: never = assetType;
-    console.warn('Exhaustive check', _exhaustiveCheck);
-    return SkeletonSearchMetric;
-  }
-}
-
 const ScreenshotImage = ({
   screenshotUrl,
   assetType,
@@ -94,7 +72,7 @@ const ScreenshotImage = ({
   assetType: SearchTextData['assetType'];
   className?: string;
 }) => {
-  const fallbackImageUrl = getFallback(assetType);
+  const fallbackImageUrl = getScreenshotSkeleton(assetType);
   const initialImageUrl = !screenshotUrl ? fallbackImageUrl : screenshotUrl;
 
   // Check if image is already cached synchronously during initialization

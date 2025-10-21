@@ -22,7 +22,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, l
       header={<LibraryHeader layout={layout} filters={filters} />}
       contentContainerId="library-content"
     >
-      <div className="mt-10 sm:px-[max(84px,calc(50%-350px))] px-[max(24px,calc(50%-350px))] flex flex-col gap-y-10.5">
+      <div className="mt-10 sm:px-[max(84px,calc(10%-150px))] px-[max(24px,calc(50%-350px))] flex flex-col gap-y-10.5">
         {layout === 'grid' && (
           <React.Fragment>
             <LibrarySectionContainer title="Collections" icon={<Folder />}>

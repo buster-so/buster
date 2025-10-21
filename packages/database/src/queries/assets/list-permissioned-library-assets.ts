@@ -59,6 +59,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: reportFiles.updatedAt,
       createdBy: reportFiles.createdBy,
       organizationId: reportFiles.organizationId,
+      screenshotBucketKey: reportFiles.screenshotBucketKey,
     })
     .from(reportFiles)
     .where(
@@ -95,6 +96,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: metricFiles.updatedAt,
       createdBy: metricFiles.createdBy,
       organizationId: metricFiles.organizationId,
+      screenshotBucketKey: metricFiles.screenshotBucketKey,
     })
     .from(metricFiles)
     .where(
@@ -131,6 +133,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: dashboardFiles.updatedAt,
       createdBy: dashboardFiles.createdBy,
       organizationId: dashboardFiles.organizationId,
+      screenshotBucketKey: dashboardFiles.screenshotBucketKey,
     })
     .from(dashboardFiles)
     .where(
@@ -167,6 +170,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: chats.updatedAt,
       createdBy: chats.createdBy,
       organizationId: chats.organizationId,
+      screenshotBucketKey: chats.screenshotBucketKey,
     })
     .from(chats)
     .where(
@@ -240,6 +244,8 @@ export async function listPermissionedLibraryAssets(
       createdByName: users.name,
       createdByEmail: users.email,
       createdByAvatarUrl: users.avatarUrl,
+      screenshotBucketKey: permissionedAssets.screenshotBucketKey,
+      organizationId: permissionedAssets.organizationId,
     })
     .from(permissionedAssets)
     .innerJoin(users, eq(permissionedAssets.createdBy, users.id));
@@ -267,6 +273,7 @@ export async function listPermissionedLibraryAssets(
     created_by_name: asset.createdByName,
     created_by_email: asset.createdByEmail,
     created_by_avatar_url: asset.createdByAvatarUrl,
+    screenshot_url: asset.screenshotBucketKey,
   }));
 
   return createPaginatedResponse({
