@@ -7,6 +7,8 @@ import React, { useRef } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
+import { Avatar } from '@/components/ui/avatar';
+import { Calendar } from '@/components/ui/icons';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -25,6 +27,7 @@ export const LibraryGridView = React.memo(
     collections,
     isFetchingNextPage,
     className,
+    filters,
     scrollContainerRef,
     allGroups,
   }: {
@@ -41,6 +44,7 @@ export const LibraryGridView = React.memo(
     const hasCollections = collections.length > 0;
     const hasResults = allResults.length > 0;
     const hasGroups = allGroups !== undefined;
+    const groupBy = filters.group_by;
 
     React.useEffect(() => {
       const updateColumns = () => {
@@ -84,6 +88,8 @@ export const LibraryGridView = React.memo(
             allGroups={allGroups}
             columns={columns}
             scrollContainerRef={scrollContainerRef}
+            groupBy={groupBy}
+            allResults={allResults}
           />
         )}
 
@@ -142,31 +148,100 @@ const LibraryGroupedView = ({
   allGroups,
   columns,
   scrollContainerRef,
+  groupBy,
+  allResults,
 }: {
   allGroups: Record<string, LibraryAssetListItem[]>;
   columns: number;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  groupBy: LibrarySearchParams['group_by'];
+  allResults: LibraryAssetListItem[];
 }) => {
-  return (
-    <>
-      {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
-        const Icon = assetTypeToIcon(assetType as AssetType);
-        const title = AssetTypeTranslations[assetType as AssetType];
+  if (groupBy === 'none' || !groupBy) {
+    return (
+      <LibraryUngroupedView
+        allResults={allResults}
+        columns={columns}
+        scrollContainerRef={scrollContainerRef}
+      />
+    );
+  } else if (groupBy === 'asset_type') {
+    return (
+      <>
+        {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
+          const Icon = assetTypeToIcon(assetType as AssetType);
+          const title = AssetTypeTranslations[assetType as AssetType];
 
-        return (
-          <LibraryGroupSection
-            key={assetType}
-            title={title}
-            icon={<Icon />}
-            items={items}
-            columns={columns}
-            scrollContainerRef={scrollContainerRef}
-            className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
-          />
-        );
-      })}
-    </>
-  );
+          return (
+            <LibraryGroupSection
+              key={assetType}
+              title={title}
+              icon={<Icon />}
+              items={items}
+              columns={columns}
+              scrollContainerRef={scrollContainerRef}
+              className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
+            />
+          );
+        })}
+      </>
+    );
+  } else if (groupBy === 'owner') {
+    return (
+      <>
+        {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
+          const Icon = assetTypeToIcon(assetType as AssetType);
+          const title = items[0].created_by_name ?? items[0].created_by_email;
+
+          return (
+            <LibraryGroupSection
+              key={assetType}
+              title={title}
+              icon={
+                <Avatar
+                  size={16}
+                  image={items[0].created_by_avatar_url}
+                  name={items[0].created_by_name}
+                />
+              }
+              items={items}
+              columns={columns}
+              scrollContainerRef={scrollContainerRef}
+              className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
+            />
+          );
+        })}
+      </>
+    );
+  } else if (groupBy === 'created_at') {
+    return (
+      <>
+        {Object.entries(allGroups).map(([assetType, items], groupIndex) => {
+          const Icon = Calendar;
+          const title = formatDate({
+            date: items[0].created_at,
+            format: 'MMM D, YYYY',
+          });
+
+          return (
+            <LibraryGroupSection
+              key={assetType}
+              title={title}
+              icon={<Icon />}
+              items={items}
+              columns={columns}
+              scrollContainerRef={scrollContainerRef}
+              className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
+            />
+          );
+        })}
+      </>
+    );
+  } else {
+    const _exhaustiveCheck = groupBy;
+    console.error('Exhaustive check failed for groupBy', _exhaustiveCheck);
+    return null;
+  }
 };
 
 const LibraryGroupSection = ({
