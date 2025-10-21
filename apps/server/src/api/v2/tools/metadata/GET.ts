@@ -12,13 +12,13 @@ import { HTTPException } from 'hono/http-exception';
 // Import machine sizing utilities for optimal resource allocation
 interface SizingInfo {
   machinePreset:
-  | 'micro'
-  | 'small-1x'
-  | 'small-2x'
-  | 'medium-1x'
-  | 'medium-2x'
-  | 'large-1x'
-  | 'large-2x';
+    | 'micro'
+    | 'small-1x'
+    | 'small-2x'
+    | 'medium-1x'
+    | 'medium-2x'
+    | 'large-1x'
+    | 'large-2x';
   avgRowSizeBytes: number;
   estimatedSampleBytes: number;
   estimatedMemoryRequired: number;

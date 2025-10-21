@@ -317,7 +317,7 @@ const createDashboardFiles = wrapTraced(
                 id: sp.dashboardFile.id,
                 name: sp.dashboardFile.name,
                 fileName: sp.dashboardFile.name,
-                content: sp.dashboardFile.content, // This now contains the full DashboardYml
+                content: sp.dashboard,
                 filter: null,
                 organizationId,
                 createdBy: userId,
@@ -338,7 +338,7 @@ const createDashboardFiles = wrapTraced(
               id: sp.dashboardFile.id,
               name: sp.dashboardFile.name,
               fileName: originalFile.name,
-              content: sp.dashboardFile.content, // This now contains the full DashboardYml
+              content: sp.dashboard,
               filter: null,
               organizationId,
               createdBy: userId,

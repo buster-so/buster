@@ -37,7 +37,7 @@ const app = new Hono().delete(
       if (commandId && sessionId && sandboxId) {
         try {
           const command = await getCommandDetails({ commandId, sessionId, sandboxId });
-          
+
           // If command has a non-zero exit code, capture the error
           if (command.exitCode !== undefined && command.exitCode !== 0) {
             errorReason = command.stderr || 'Command failed with non-zero exit code';
