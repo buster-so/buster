@@ -151,13 +151,15 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
     command: `gh auth setup-git && git config --global user.email "${busterAppGitEmail}" && git config --global user.name "${busterAppGitUsername}"`,
   });
 
+  // Write prompt to file to avoid shell interpretation issues with backticks and substitution
+  const promptContent = prompt || documentationAgentPrompt;
+  const promptFilePath = `${workspacePath}/prompt.md`;
+  await sandbox.fs.uploadFile(Buffer.from(promptContent), promptFilePath);
+
   // Build CLI command with optional parameters
   const cliArgs = [];
-  if (prompt) {
-    cliArgs.push(`--prompt "${prompt}"`);
-  } else {
-    cliArgs.push(`--prompt "${documentationAgentPrompt}"`);
-  }
+  cliArgs.push(`--prompt "$(cat ${promptFilePath})"`);
+  
   if (chatId) {
     cliArgs.push(`--chatId "${chatId}"`);
   }
@@ -252,7 +254,6 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
     GITHUB_TOKEN: installationToken,
     BUSTER_API_KEY: apiKey,
     BUSTER_HOST: env.BUSTER_HOST,
-    PATH: '$HOME/.local/bin:$PATH',
   };
 
   await sandbox.git.clone(
@@ -295,13 +296,15 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
     envVars
   );
 
+  // Write prompt to file to avoid shell interpretation issues with backticks and substitution
+  const promptContent = prompt || documentationAgentPrompt;
+  const promptFilePath = `${workspacePath}/prompt.md`;
+  await sandbox.fs.uploadFile(Buffer.from(promptContent), promptFilePath);
+
   // Build CLI command with optional parameters
   const cliArgs = [];
-  if (prompt) {
-    cliArgs.push(`--prompt "${prompt}"`);
-  } else {
-    cliArgs.push(`--prompt "${documentationAgentPrompt}"`);
-  }
+  cliArgs.push(`--prompt "$(cat ${promptFilePath})"`);
+  
   if (chatId) {
     cliArgs.push(`--chatId "${chatId}"`);
   }
@@ -320,13 +323,15 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   }
 
   // Execute Buster CLI command synchronously
-  const command = await sandbox.process.executeCommand(
-    `buster ${cliArgs.join(' ')}`,
+  const command = `export PATH="$HOME/.local/bin:$PATH" && buster ${cliArgs.join(' ')}`;
+  console.log(command);
+  const commandExecution = await sandbox.process.executeCommand(
+    command,
     repositoryPath,
     envVars
   );
 
-  console.info(command);
+  console.info(commandExecution);
 
   console.info('[Daytona Sandbox Started]', { sessionId: sessionName, sandboxId: sandbox.id });
 }
