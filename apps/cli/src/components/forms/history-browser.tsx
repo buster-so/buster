@@ -3,6 +3,7 @@ import { Box, Text, useInput } from 'ink';
 import { useEffect, useState } from 'react';
 import { listConversationsFromApi, loadConversationFromApi } from '../../utils/api-conversation';
 import type { Conversation } from '../../utils/conversation-history';
+import { debugLogger } from '../../utils/debug-logger';
 import { getOrCreateSdk } from '../../utils/sdk-factory';
 
 interface HistoryBrowserProps {
@@ -92,7 +93,7 @@ export function HistoryBrowser({
 
         setConversations(items);
       } catch (error) {
-        console.error('Failed to load conversations:', error);
+        debugLogger.error('Failed to load conversations:', error);
         setError('Failed to load conversations from API');
       } finally {
         setLoading(false);
@@ -135,7 +136,7 @@ export function HistoryBrowser({
               onSelect(fullConvo);
             }
           } catch (error) {
-            console.error('Failed to load conversation:', error);
+            debugLogger.error('Failed to load conversation:', error);
           }
         })();
       }

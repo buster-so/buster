@@ -1,4 +1,5 @@
 import type { ModelMessage } from '@buster/ai';
+import { debugLogger } from '../utils/debug-logger';
 import {
   addReasoningContent,
   addTextContent,
@@ -123,7 +124,7 @@ export async function processAgentStream(
           await onSaveMessages?.(messagesToSave);
         } catch (error) {
           // Log save error but don't stop stream processing
-          console.error('Error saving messages during finish-step:', error);
+          debugLogger.error('Error saving messages during finish-step:', error);
           // Notify via error callback
           onError?.(error);
         }
@@ -141,7 +142,7 @@ export async function processAgentStream(
         try {
           await onSaveMessages?.(messagesToSave);
         } catch (saveError) {
-          console.error('Error saving messages during error handling:', saveError);
+          debugLogger.error('Error saving messages during error handling:', saveError);
         }
       }
 
@@ -157,13 +158,13 @@ export async function processAgentStream(
         try {
           await onSaveMessages?.(messagesToSave);
         } catch (saveError) {
-          console.error('Error saving messages during abort:', saveError);
+          debugLogger.error('Error saving messages during abort:', saveError);
         }
       }
     }
   } catch (error) {
     // Handle stream iteration errors
-    console.error('Error processing agent stream:', error);
+    debugLogger.error('Error processing agent stream:', error);
 
     // Notify error callback
     onError?.(error);
@@ -176,7 +177,7 @@ export async function processAgentStream(
           : accumulatorState.messages;
       await onSaveMessages?.(messagesToSave);
     } catch (saveError) {
-      console.error('Error saving messages after stream failure:', saveError);
+      debugLogger.error('Error saving messages after stream failure:', saveError);
     }
 
     // Re-throw to propagate error to caller
