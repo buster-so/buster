@@ -1,5 +1,6 @@
 import { Box, Text } from 'ink';
 import { useEffect, useState } from 'react';
+import { debugLogger } from '../../utils/debug-logger';
 import type { FileSearchResult } from '../../utils/file-search';
 import { searchFiles } from '../../utils/file-search';
 import type { SlashCommand } from '../../utils/slash-commands';
@@ -79,7 +80,7 @@ export function ChatInput({
           });
         })
         .catch((error) => {
-          console.error('File search failed:', error);
+          debugLogger.error('File search failed:', error);
           setSearchResults([]);
         });
     } else {

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { loadConversationFromApi } from '../utils/api-conversation';
 import { readContextFile } from '../utils/context-file';
 import { loadConversation, saveModelMessages } from '../utils/conversation-history';
+import { debugLogger } from '../utils/debug-logger';
 import { getOrCreateSdk } from '../utils/sdk-factory';
 import { getCurrentWorkingDirectory } from '../utils/working-directory';
 import { runChatAgent } from './chat-service';
@@ -51,16 +52,18 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
   // Use provided messageId or generate new one
   const messageId = providedMessageId || randomUUID();
 
+  // Declare SDK outside try block so it's accessible in catch
+  let sdk: BusterSDK | null = null;
+
   try {
     // Get or create SDK (API-first approach)
-    let sdk: BusterSDK | null = null;
     if (providedSdk) {
       sdk = providedSdk;
     } else {
       try {
         sdk = await getOrCreateSdk();
       } catch (error) {
-        console.warn('No SDK available - running without API integration:', error);
+        debugLogger.warn('No SDK available - running without API integration:', error);
       }
     }
 
@@ -113,6 +116,7 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       messageId,
       workingDirectory,
       isInResearchMode,
+      isHeadlessMode: true, // Enable headless mode for git communication rules
       prompt, // Pass prompt for database message creation
       messages: updatedMessages, // Pass all messages including new user message
       sdk: sdk || undefined, // Pass SDK to chat agent
@@ -121,13 +125,35 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     return chatId;
   } catch (error) {
     // Log error and re-throw with context
-    console.error('Error in headless agent execution:', error);
-    console.error('Context:', {
+    debugLogger.error('Error in headless agent execution:', error);
+    debugLogger.error('Context:', {
       chatId,
       messageId,
       workingDirectory,
       prompt: prompt.slice(0, 100),
     });
+
+    // Capture error details for database
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Update message with error information if we have SDK
+    if (sdk && messageId) {
+      try {
+        await sdk.messages.update(chatId, messageId, {
+          isCompleted: true,
+          errorReason: errorMessage,
+        });
+      } catch (updateError) {
+        // When SDK is provided, we should log errors
+        // When SDK was auto-created, just warn (allows graceful degradation)
+        if (providedSdk) {
+          console.error('Failed to save error to database:', updateError);
+        } else {
+          console.warn('Failed to save error to database:', updateError);
+        }
+      }
+    }
+
     throw error;
   }
 }

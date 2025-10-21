@@ -7,6 +7,7 @@ import type { AgentMessage } from '../types/agent-messages';
 import { getProxyConfig } from '../utils/ai-proxy';
 import { readContextFile } from '../utils/context-file';
 import { saveModelMessages } from '../utils/conversation-history';
+import { debugLogger } from '../utils/debug-logger';
 import { getOrCreateSdk } from '../utils/sdk-factory';
 
 /**
@@ -25,6 +26,7 @@ export const ChatServiceParamsSchema = z.object({
   messageId: z.string().uuid().optional().describe('Message ID for tracking'),
   workingDirectory: z.string().describe('Working directory path'),
   isInResearchMode: z.boolean().optional().describe('Research mode flag'),
+  isHeadlessMode: z.boolean().optional().describe('Flag indicating headless mode'),
   abortSignal: z.instanceof(AbortSignal).optional().describe('Abort controller signal'),
   prompt: z.string().optional().describe('User prompt (for creating message in database)'),
   messages: z
@@ -65,6 +67,7 @@ export async function runChatAgent(
     messageId: providedMessageId,
     workingDirectory,
     isInResearchMode,
+    isHeadlessMode,
     abortSignal,
     prompt: userPrompt,
     messages: providedMessages,
@@ -90,6 +93,9 @@ export async function runChatAgent(
     apiKey: braintrustApiKey,
     projectName: environment,
   });
+
+  // Declare SDK outside try block so it's accessible in catch
+  let sdk: BusterSDK | null = null;
 
   try {
     // Use provided messages (caller is responsible for loading conversation and adding user message)
@@ -126,7 +132,6 @@ export async function runChatAgent(
 
     // Use provided SDK or create one (API-first approach)
     // If SDK is not provided, we'll try to create one but don't fail if credentials missing
-    let sdk: BusterSDK | null = null;
     if (providedSdk) {
       sdk = providedSdk;
     } else {
@@ -134,7 +139,7 @@ export async function runChatAgent(
         sdk = await getOrCreateSdk();
       } catch (error) {
         // Log warning but continue - allows CLI to work without credentials
-        console.warn('No SDK available - running without API integration:', error);
+        debugLogger.warn('No SDK available - running without API integration:', error);
       }
     }
 
@@ -158,7 +163,7 @@ export async function runChatAgent(
           });
         } catch (error) {
           // Log but continue - we'll save locally even if API fails
-          console.warn('Failed to create message in database:', error);
+          debugLogger.warn('Failed to create message in database:', error);
         }
       }
     }
@@ -173,6 +178,7 @@ export async function runChatAgent(
         organizationId: 'cli',
         dataSourceId: '',
         isInResearchMode,
+        isHeadlessMode,
         abortSignal,
       },
       proxyConfig,
@@ -210,7 +216,7 @@ export async function runChatAgent(
             if (providedSdk) {
               throw error;
             } else {
-              console.warn('Failed to update message in database:', error);
+              debugLogger.warn('Failed to update message in database:', error);
             }
           }
         }
@@ -242,12 +248,34 @@ export async function runChatAgent(
           isCompleted: true,
         });
       } catch (error) {
-        console.warn('Failed to mark message as completed:', error);
+        debugLogger.warn('Failed to mark message as completed:', error);
       }
     }
   } catch (error) {
     // Handle all errors and notify via callback
-    console.error('Error in chat agent execution:', error);
+    debugLogger.error('Error in chat agent execution:', error);
+
+    // Capture error details for database
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Update message with error information if we have SDK
+    if (sdk && messageId) {
+      try {
+        await sdk.messages.update(chatId, messageId, {
+          isCompleted: true,
+          errorReason: errorMessage,
+        });
+      } catch (updateError) {
+        // When SDK is provided, we should throw errors (no local fallback)
+        // When SDK was auto-created, just warn (allows graceful degradation)
+        if (providedSdk) {
+          console.error('Failed to save error to database:', updateError);
+          // Don't throw here - we want to preserve the original error
+        } else {
+          console.warn('Failed to save error to database:', updateError);
+        }
+      }
+    }
 
     // Notify error callback if provided
     if (onError) {

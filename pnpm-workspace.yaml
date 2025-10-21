@@ -23,7 +23,7 @@ catalog:
   ai: ^5.0.6
   axios: ^1.12.2
   dayjs: ^1.11.18
-  dotenv: ^17.2.2
+  dotenv: ^16.4.7
   drizzle-orm: ^0.44.5
   hono: ^4.9.7
   js-yaml: 4.1.0

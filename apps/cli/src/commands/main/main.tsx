@@ -16,6 +16,7 @@ import { ExpansionContext } from '../../hooks/use-expansion';
 import type { CliAgentMessage } from '../../services';
 import { runChatAgent } from '../../services';
 import type { Conversation } from '../../utils/conversation-history';
+import { debugLogger } from '../../utils/debug-logger';
 import { getOrCreateSdk } from '../../utils/sdk-factory';
 import { getCurrentChatId, initNewSession, setSessionChatId } from '../../utils/session';
 import { getSetting } from '../../utils/settings';
@@ -78,7 +79,7 @@ export function Main() {
         initNewSession();
         setSessionInitialized(true);
       } catch (error) {
-        console.error('Failed to initialize session:', error);
+        debugLogger.error('Failed to initialize session:', error);
         setSessionInitialized(true); // Continue anyway
       }
     };
@@ -152,7 +153,7 @@ export function Main() {
       try {
         sdk = await getOrCreateSdk();
       } catch (error) {
-        console.warn('No SDK available - some features may be limited:', error);
+        debugLogger.warn('No SDK available - some features may be limited:', error);
       }
 
       // Create AbortController for this agent execution
@@ -176,11 +177,11 @@ export function Main() {
           },
           onMessageUpdate: handleMessageUpdate,
           onError: (error) => {
-            console.error('Agent stream error:', error);
+            debugLogger.error('Agent stream error:', error);
             setIsThinking(false);
           },
           onAbort: () => {
-            console.warn('Agent stream aborted');
+            debugLogger.warn('Agent stream aborted');
             setIsThinking(false);
           },
         }
@@ -192,7 +193,7 @@ export function Main() {
         setIsThinking(false);
       } else {
         // Handle all other errors - log and display to user
-        console.error('Error in agent execution:', error);
+        debugLogger.error('Error in agent execution:', error);
 
         // Create error message to add to conversation
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -229,7 +230,7 @@ export function Main() {
 
         setShowHistory(false);
       } catch (error) {
-        console.error('Failed to resume conversation:', error);
+        debugLogger.error('Failed to resume conversation:', error);
         setShowHistory(false);
       }
     },

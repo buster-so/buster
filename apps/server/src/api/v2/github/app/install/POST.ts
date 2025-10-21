@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { getUserOrganizationId } from '@buster/database/queries';
+import type { AppInstallResponse } from '@buster/server-shared/github';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { requireAuth } from '../../../../../middleware/auth';
@@ -8,13 +9,13 @@ import { storeInstallationState } from '../../services/installation-state';
 const app = new Hono().post('/', requireAuth, async (c) => {
   const user = c.get('busterUser');
   console.info('Github app/install received');
-  const response = await appInstallHandler(user.id);
+  const response: AppInstallResponse = await appInstallHandler(user.id);
   return c.json(response);
 });
 
 export default app;
 
-export async function appInstallHandler(userId: string): Promise<{ redirectUrl: string }> {
+export async function appInstallHandler(userId: string): Promise<AppInstallResponse> {
   // Get user's organization
   const userOrg = await getUserOrganizationId(userId);
   if (!userOrg) {

@@ -7,6 +7,7 @@ import TextInput from 'ink-text-input';
 import { useEffect, useState } from 'react';
 import { BusterBanner } from '../../components';
 import { type Credentials, getCredentials, saveCredentials } from '../../utils/credentials';
+import { debugLogger } from '../../utils/debug-logger';
 
 interface InitProps {
   apiKey?: string;
@@ -401,7 +402,7 @@ export function InitCommand({ apiKey, host, local, path: providedPath }: InitPro
           setStep('prompt-location');
         })
         .catch((err: Error) => {
-          console.error('Failed to save credentials:', err.message);
+          debugLogger.error('Failed to save credentials:', err.message);
           setStep('prompt-location');
         });
     }

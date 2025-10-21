@@ -2,6 +2,7 @@ import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
+import { debugLogger } from './debug-logger';
 
 // Credentials schema
 const credentialsSchema = z.object({
@@ -23,7 +24,7 @@ async function ensureCredentialsDir(): Promise<void> {
   try {
     await mkdir(CREDENTIALS_DIR, { recursive: true, mode: 0o700 });
   } catch (error) {
-    console.error('Failed to create credentials directory:', error);
+    debugLogger.error('Failed to create credentials directory:', error);
     throw new Error('Unable to create credentials directory');
   }
 }
@@ -46,7 +47,7 @@ export async function saveCredentials(credentials: Credentials): Promise<void> {
     if (error instanceof z.ZodError) {
       throw new Error(`Invalid credentials: ${error.errors.map((e) => e.message).join(', ')}`);
     }
-    console.error('Failed to save credentials:', error);
+    debugLogger.error('Failed to save credentials:', error);
     throw new Error('Unable to save credentials');
   }
 }
@@ -75,7 +76,7 @@ export async function deleteCredentials(): Promise<void> {
   } catch (error) {
     // Ignore if file doesn't exist
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.error('Failed to delete credentials:', error);
+      debugLogger.error('Failed to delete credentials:', error);
       throw new Error('Unable to delete credentials');
     }
   }

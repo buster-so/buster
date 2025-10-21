@@ -19,7 +19,7 @@ import {
 import type { CliAgentMessage } from '../services';
 import type { AgentMessage } from '../types/agent-messages';
 import type { MessageContent } from './content-schemas';
-
+import { debugLogger } from './debug-logger';
 // All the old type guards and functions have been removed
 // The new implementation uses AI SDK v5 content arrays directly
 
@@ -38,7 +38,7 @@ export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAg
 
   // Guard against invalid input
   if (!modelMessages || !Array.isArray(modelMessages)) {
-    console.error('transformModelMessagesToUI received invalid input:', modelMessages);
+    debugLogger.error('transformModelMessagesToUI received invalid input:', modelMessages);
     return [];
   }
 
@@ -46,7 +46,7 @@ export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAg
     for (const msg of modelMessages) {
       // Skip invalid messages
       if (!msg || !msg.role) {
-        console.warn('Skipping message without role:', msg);
+        debugLogger.warn('Skipping message without role:', msg);
         continue;
       }
 
@@ -123,7 +123,7 @@ export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAg
           if (content.type === 'tool-result') {
             const toolCall = toolCallMap.get(content.toolCallId);
             if (!toolCall) {
-              console.warn('Tool result without matching call:', content.toolCallId);
+              debugLogger.warn('Tool result without matching call:', content.toolCallId);
               continue;
             }
 
@@ -149,8 +149,8 @@ export function transformModelMessagesToUI(modelMessages: ModelMessage[]): CliAg
       }
     }
   } catch (error) {
-    console.error('Error transforming messages:', error);
-    console.error('Messages:', JSON.stringify(modelMessages, null, 2));
+    debugLogger.error('Error transforming messages:', error);
+    debugLogger.error('Messages:', JSON.stringify(modelMessages, null, 2));
     throw error;
   }
 
@@ -241,7 +241,7 @@ function createToolStartMessage(toolName: string, input: unknown): AgentMessage 
 
     default:
       // Unknown tool - skip silently
-      console.warn('Unknown tool name:', toolName);
+      debugLogger.warn('Unknown tool name:', toolName);
       return null;
   }
 }
