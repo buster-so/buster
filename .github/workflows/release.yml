@@ -286,7 +286,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10.18.3
+          version: 10.19.0
 
       - name: Setup Node.js
         uses: useblacksmith/setup-node@v5
