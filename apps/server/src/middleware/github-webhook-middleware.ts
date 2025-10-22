@@ -44,9 +44,15 @@ function getOrSetApp() {
       const commentBody = payload.comment.body;
       console.info(`Issue comment created by ${username} in ${owner}/${repo}#${issue_number}`);
 
-      if (commentBody.startsWith('Buster!')) {
+      // Check if the sender is a bot - skip processing if so
+      if (payload.comment?.user?.type === 'Bot') {
+        console.info(`Ignoring comment from bot ${username} in ${owner}/${repo}#${issue_number}`);
+        return;
+      }
+
+      if (commentBody.includes('@buster-agent')) {
         if (payload.issue.pull_request) {
-          const responseBody = 'I will kick off the docs agent now!';
+          const responseBody = 'Kicking off buster agent with your request!';
           octokit.rest.issues.createComment({
             owner,
             repo,

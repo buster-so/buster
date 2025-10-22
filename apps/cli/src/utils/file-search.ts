@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { Glob } from 'bun';
 import micromatch from 'micromatch';
+import { debugLogger } from './debug-logger';
 
 interface FileSearchOptions {
   cwd?: string;
@@ -72,7 +73,7 @@ class FileSearcher {
         const gitignorePatterns = this.parseGitignore(content);
         patterns.push(...gitignorePatterns);
       } catch (error) {
-        console.error('Failed to read .gitignore:', error);
+        debugLogger.error('Failed to read .gitignore:', error);
       }
     }
 

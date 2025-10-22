@@ -50,6 +50,17 @@ vi.mock('../utils/sdk-factory', () => ({
   clearCachedSdk: vi.fn(),
 }));
 
+vi.mock('../utils/debug-logger', () => ({
+  debugLogger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+  enableDebugLogging: vi.fn(),
+  isDebugEnabled: vi.fn(),
+}));
+
 // Test UUIDs
 const TEST_CHAT_ID = '123e4567-e89b-12d3-a456-426614174000';
 const TEST_MESSAGE_ID = '123e4567-e89b-12d3-a456-426614174001';
@@ -134,7 +145,7 @@ describe('runChatAgent - API-first refactoring', () => {
       messages: { create: mockCreate, update: mockUpdate },
     };
 
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { debugLogger } = await import('../utils/debug-logger');
 
     // Should not throw, should continue execution
     await runChatAgent({
@@ -146,13 +157,11 @@ describe('runChatAgent - API-first refactoring', () => {
     });
 
     // Should log warning but NOT save to local files
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
+    expect(debugLogger.warn).toHaveBeenCalledWith(
       'Failed to create message in database:',
       expect.any(Error)
     );
     expect(conversationHistory.saveModelMessages).not.toHaveBeenCalled();
-
-    consoleWarnSpy.mockRestore();
   });
 });
 
@@ -218,7 +227,7 @@ describe('runChatAgent - message updates', () => {
       const { getOrCreateSdk } = await import('../utils/sdk-factory');
       vi.mocked(getOrCreateSdk).mockRejectedValue(new Error('No credentials'));
 
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { debugLogger } = await import('../utils/debug-logger');
 
       // Should not throw
       await expect(
@@ -231,12 +240,10 @@ describe('runChatAgent - message updates', () => {
       ).resolves.not.toThrow();
 
       // Should log warning
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect(debugLogger.warn).toHaveBeenCalledWith(
         'No SDK available - running without API integration:',
         expect.any(Error)
       );
-
-      consoleWarnSpy.mockRestore();
     });
   });
 
@@ -280,7 +287,7 @@ describe('runChatAgent - message updates', () => {
         messages: { create: mockCreate, update: mockUpdate },
       } as any);
 
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { debugLogger } = await import('../utils/debug-logger');
 
       await runChatAgent({
         chatId: TEST_CHAT_ID,
@@ -293,12 +300,10 @@ describe('runChatAgent - message updates', () => {
       expect(conversationHistory.saveModelMessages).toHaveBeenCalled();
 
       // Should have logged warning for create failure
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect(debugLogger.warn).toHaveBeenCalledWith(
         'Failed to create message in database:',
         expect.any(Error)
       );
-
-      consoleWarnSpy.mockRestore();
     });
 
     it('should call SDK create and update with auto-generated messageId when not provided', async () => {
@@ -405,7 +410,7 @@ describe('runChatAgent - message updates', () => {
         messages: { create: mockCreate, update: mockUpdate },
       } as any);
 
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { debugLogger } = await import('../utils/debug-logger');
 
       // Should not throw
       await expect(
@@ -418,12 +423,10 @@ describe('runChatAgent - message updates', () => {
       ).resolves.not.toThrow();
 
       // Should have logged warning for completion marking failure
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect(debugLogger.warn).toHaveBeenCalledWith(
         'Failed to mark message as completed:',
         expect.any(Error)
       );
-
-      consoleWarnSpy.mockRestore();
     });
   });
 

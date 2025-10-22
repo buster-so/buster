@@ -92,7 +92,7 @@ export function transformEntitiesToRelationships(
  */
 function transformEntityToRelationship(
   entity: DbtEntity,
-  currentModelName: string,
+  _currentModelName: string,
   allModels: DbtModel[],
   allSemanticModels: DbtSemanticModel[]
 ): Relationship {
@@ -213,7 +213,7 @@ export function findPrimaryKey(model: DbtModel, semanticModels: DbtSemanticModel
 
   if (semanticModel) {
     const primaryEntity = semanticModel.entities.find((e) => e.type === 'primary');
-    if (primaryEntity && primaryEntity.expr) {
+    if (primaryEntity?.expr) {
       return primaryEntity.expr;
     }
   }

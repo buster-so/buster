@@ -7,6 +7,7 @@ import type { AgentMessage } from '../types/agent-messages';
 import { getProxyConfig } from '../utils/ai-proxy';
 import { readContextFile } from '../utils/context-file';
 import { saveModelMessages } from '../utils/conversation-history';
+import { debugLogger } from '../utils/debug-logger';
 import { getOrCreateSdk } from '../utils/sdk-factory';
 
 /**
@@ -138,7 +139,7 @@ export async function runChatAgent(
         sdk = await getOrCreateSdk();
       } catch (error) {
         // Log warning but continue - allows CLI to work without credentials
-        console.warn('No SDK available - running without API integration:', error);
+        debugLogger.warn('No SDK available - running without API integration:', error);
       }
     }
 
@@ -162,7 +163,7 @@ export async function runChatAgent(
           });
         } catch (error) {
           // Log but continue - we'll save locally even if API fails
-          console.warn('Failed to create message in database:', error);
+          debugLogger.warn('Failed to create message in database:', error);
         }
       }
     }
@@ -215,7 +216,7 @@ export async function runChatAgent(
             if (providedSdk) {
               throw error;
             } else {
-              console.warn('Failed to update message in database:', error);
+              debugLogger.warn('Failed to update message in database:', error);
             }
           }
         }
@@ -247,12 +248,12 @@ export async function runChatAgent(
           isCompleted: true,
         });
       } catch (error) {
-        console.warn('Failed to mark message as completed:', error);
+        debugLogger.warn('Failed to mark message as completed:', error);
       }
     }
   } catch (error) {
     // Handle all errors and notify via callback
-    console.error('Error in chat agent execution:', error);
+    debugLogger.error('Error in chat agent execution:', error);
 
     // Capture error details for database
     const errorMessage = error instanceof Error ? error.message : String(error);
