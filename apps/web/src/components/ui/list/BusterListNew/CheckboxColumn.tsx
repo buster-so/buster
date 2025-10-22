@@ -30,6 +30,7 @@ export const CheckboxColumn: React.FC<{
       className={cn(
         className,
         'flex h-full items-center justify-center pr-1 pl-1 group-hover:opacity-100',
+        'group-hover:visible invisible',
         showBox ? 'visible! opacity-100' : ''
       )}
     >

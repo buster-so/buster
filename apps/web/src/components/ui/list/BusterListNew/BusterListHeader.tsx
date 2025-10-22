@@ -33,14 +33,6 @@ export const BusterListHeader = <T = unknown>({
   const showGlobalCheckbox =
     globalCheckStatus === 'indeterminate' || globalCheckStatus === 'checked';
 
-  console.log(
-    showCheckboxColumn,
-    showGlobalCheckbox,
-    globalCheckStatus,
-    selectedRowKeys,
-    rowsLength
-  );
-
   return (
     <div
       className={cn(
@@ -58,11 +50,12 @@ export const BusterListHeader = <T = unknown>({
         <CheckboxColumn
           checkStatus={globalCheckStatus}
           onChange={onGlobalSelectChange}
-          className={cn({
-            'visible!': showGlobalCheckbox,
-            'invisible!': rowsLength === 0,
-            'pointer-events-none invisible!': !showSelectAll,
-          })}
+          className={cn(
+            showSelectAll
+              ? 'hover:visible invisible group-hover:visible'
+              : 'pointer-events-none invisible!',
+            showGlobalCheckbox && 'visible'
+          )}
         />
       )}
 

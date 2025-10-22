@@ -28,7 +28,7 @@ const meta: Meta<typeof BusterList> = {
   },
   decorators: [
     (Story) => (
-      <div className="bg-background w-full min-w-[500px] h-[400px] overflow-hidden">
+      <div className="bg-background w-full min-w-[500px] h-[400px]">
         <Story />
       </div>
     ),
@@ -61,7 +61,7 @@ const sampleColumns: BusterListColumn<SampleData>[] = [
   {
     dataIndex: 'role',
     title: 'Role',
-    width: 150,
+
     render: (value: string) => (
       <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
         {value}

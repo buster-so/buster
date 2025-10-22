@@ -87,7 +87,7 @@ function BusterListInner<T = unknown>(
   }, [rows]);
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       {showHeader && (
         <BusterListHeader
           columns={columns}
@@ -98,7 +98,7 @@ function BusterListInner<T = unknown>(
           onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
         />
       )}
-      <div ref={parentRef} className="overflow-y-auto overflow-x-hidden h-full w-full">
+      <div ref={parentRef} className="overflow-y-auto overflow-x-hidden flex-1 w-full">
         <div
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`,
