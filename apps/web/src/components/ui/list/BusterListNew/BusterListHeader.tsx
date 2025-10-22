@@ -37,9 +37,7 @@ export const BusterListHeader = <T = unknown>({
     <div
       className={cn(
         'group border-border flex items-center justify-start border-b pr-6',
-        {
-          'pl-3.5': !onGlobalSelectChange,
-        },
+        !onGlobalSelectChange && 'pl-3.5',
         rowClassName
       )}
       style={{

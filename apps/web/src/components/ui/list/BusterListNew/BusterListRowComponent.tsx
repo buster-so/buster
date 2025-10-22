@@ -7,12 +7,13 @@ const BusterListRowComponentBase = <T = unknown>({
   data,
   dataTestId,
   rowClassName,
+  hideLastRowBorder,
   onSelectSectionChange,
 }: BusterListRowItem<T> &
-  Pick<BusterListProps<T>, 'rowClassName'> & {
+  Pick<BusterListProps<T>, 'rowClassName' | 'hideLastRowBorder'> & {
     onSelectSectionChange?: (v: boolean, id: string) => void;
   }) => {
-  return <div className={cn('h-12 border-b')}>row</div>;
+  return <div className={cn('h-full border-b', hideLastRowBorder && 'border-b-0!')}>row</div>;
 };
 
 export const BusterListRowComponent = React.memo(BusterListRowComponentBase);

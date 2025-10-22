@@ -13,7 +13,6 @@ export interface BusterListProps<T = unknown> {
   selectedRowKeys?: Set<string>;
   contextMenu?: ContextMenuProps;
   showSelectAll?: boolean;
-  useRowClickSelectChange?: boolean;
   rowClassName?: string;
   className?: string;
   infiniteScrollConfig?: InfiniteScrollConfig;
@@ -69,7 +68,7 @@ export type BusterListRow<T = unknown> =
 export type BusterListRowItems<T = unknown> = BusterListRow<T>[];
 
 export interface InfiniteScrollConfig {
-  onScrollEnd?: () => void;
+  onScrollEnd: () => void;
   scrollEndThreshold?: number;
   loadingNewContent?: React.ReactNode;
 }

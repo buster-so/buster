@@ -1,7 +1,8 @@
 import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual';
 import type React from 'react';
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { cn } from '@/lib/utils';
 import { BusterListHeader } from './BusterListHeader';
 import { BusterListRowComponent } from './BusterListRowComponent';
 import { BusterListRowSection } from './BusterListRowSection';
@@ -23,7 +24,6 @@ function BusterListInner<T = unknown>(
     selectedRowKeys,
     contextMenu,
     showSelectAll,
-    useRowClickSelectChange,
     rowClassName,
     className,
     hideLastRowBorder,
@@ -36,7 +36,7 @@ function BusterListInner<T = unknown>(
     count: rows.length,
     getScrollElement: () => parentRef.current,
     estimateSize: (i) => (rows[i].type === 'row' ? HEIGHT_OF_ROW : HEIGHT_OF_SECTION_ROW),
-    overscan: 5,
+    overscan: 0,
   });
 
   const onSelectSectionChange = useMemoizedFn((v: boolean, id: string) => {
@@ -86,8 +86,17 @@ function BusterListInner<T = unknown>(
     return idsPerSection;
   }, [rows]);
 
+  useEffect(() => {
+    if (!infiniteScrollConfig) return;
+    const { onScrollEnd, scrollEndThreshold = 50, loadingNewContent } = infiniteScrollConfig;
+  }, [infiniteScrollConfig]);
+
+  if (emptyState && rows.length === 0) {
+    return <div className={cn('h-full flex flex-col', className)}>{emptyState}</div>;
+  }
+
   return (
-    <div className="h-full flex flex-col">
+    <div className={cn('h-full flex flex-col', className)}>
       {showHeader && (
         <BusterListHeader
           columns={columns}
@@ -115,6 +124,7 @@ function BusterListInner<T = unknown>(
               selectedRowKeys={selectedRowKeys}
               onSelectChange={onSelectChange}
               onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
+              hideLastRowBorder={hideLastRowBorder}
               key={virtualRow.key}
             />
           ))}
@@ -136,11 +146,15 @@ const BusterListRowSelector = <T = unknown>({
   size,
   idsPerSection,
   onSelectSectionChange,
+  hideLastRowBorder,
   ...rest
 }: VirtualItem & {
   idsPerSection: Map<string, Set<string>>;
   onSelectSectionChange: ((v: boolean, id: string) => void) | undefined;
-} & Pick<BusterListProps<T>, 'selectedRowKeys' | 'onSelectChange' | 'rows' | 'columns'>) => {
+} & Pick<
+    BusterListProps<T>,
+    'selectedRowKeys' | 'onSelectChange' | 'rows' | 'columns' | 'hideLastRowBorder'
+  >) => {
   const selectedRow = rows[index];
   const isSection = selectedRow.type === 'section';
 
@@ -158,7 +172,7 @@ const BusterListRowSelector = <T = unknown>({
           onSelectSectionChange={onSelectSectionChange}
         />
       ) : (
-        <BusterListRowComponent {...rest} {...selectedRow} />
+        <BusterListRowComponent {...rest} {...selectedRow} hideLastRowBorder={hideLastRowBorder} />
       )}
     </div>
   );

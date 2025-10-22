@@ -38,15 +38,14 @@ const BusterListRowSectionBase = <T = unknown>({
     return 'indeterminate';
   }, [selectedRowKeys, idsPerSection, id]);
 
-  const onChange = (v: boolean, e: React.MouseEvent) => {
+  const onChange = (v: boolean, _e: React.MouseEvent) => {
     onSelectSectionChange?.(v, id);
   };
 
   return (
     <div
       className={cn(
-        'h-8',
-        'bg-item-select group flex items-center',
+        'h-full bg-item-select group flex items-center',
         onSelectSectionChange ? 'hover:bg-item-hover-active' : 'pl-3.5',
         rowClassName
       )}
