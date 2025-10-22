@@ -5,11 +5,17 @@ import {
 } from '@buster/database/queries';
 import type { App, WebhookEventName } from '@buster/github';
 import { AuthDetailsAppInstallationResponseSchema, createGitHubApp } from '@buster/github';
+import type { GithubContext } from '@buster/sandbox';
 import { runDocsAgentAsync } from '@buster/sandbox';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { z } from 'zod';
 
 let githubApp: App | undefined;
+
+const GithubAppNameSchema = z.object({
+  GH_APP_NAME: z.string(),
+});
 
 function getOrSetApp() {
   if (!githubApp) {
@@ -39,32 +45,38 @@ function getOrSetApp() {
     githubApp.webhooks.on('issue_comment.created', async ({ octokit, payload }) => {
       const owner = payload.repository.owner.login;
       const repo = payload.repository.name;
-      const issue_number = payload.issue.number;
+      const repoUrl = payload.repository.html_url;
+      const issueNumber = payload.issue.number;
       const username = payload.comment?.user?.login;
       const commentBody = payload.comment.body;
-      console.info(`Issue comment created by ${username} in ${owner}/${repo}#${issue_number}`);
+      const env = GithubAppNameSchema.parse(process.env);
+      const appMention = `@${env.GH_APP_NAME}`;
+      console.info(`Issue comment created by ${username} in ${owner}/${repo}#${issueNumber}`);
 
       // Check if the sender is a bot - skip processing if so
       if (payload.comment?.user?.type === 'Bot') {
-        console.info(`Ignoring comment from bot ${username} in ${owner}/${repo}#${issue_number}`);
+        console.info(`Ignoring comment from bot ${username} in ${owner}/${repo}#${issueNumber}`);
         return;
       }
 
-      if (commentBody.includes('@buster-agent')) {
+      if (commentBody.includes(appMention)) {
         if (payload.issue.pull_request) {
           const responseBody = 'Kicking off buster agent with your request!';
           octokit.rest.issues.createComment({
             owner,
             repo,
-            issue_number,
+            issue_number: issueNumber,
             body: responseBody,
           });
           const pull_request = await octokit.rest.pulls.get({
             owner,
             repo,
-            pull_number: issue_number,
+            pull_number: issueNumber,
           });
-          const branch = pull_request.data.head.ref;
+
+          const headBranch = pull_request.data.head.ref;
+          const baseBranch = pull_request.data.base.ref;
+
           const authResult = await octokit.auth({ type: 'installation' });
           const result = AuthDetailsAppInstallationResponseSchema.safeParse(authResult);
           if (!result.success) {
@@ -80,13 +92,24 @@ function getOrSetApp() {
               message: 'No API key found for installation id',
             });
           }
+
+          const context: GithubContext = {
+            action: 'comment',
+            prNumber: issueNumber.toString(),
+            repo,
+            repo_url: repoUrl,
+            head_branch: headBranch,
+            base_branch: baseBranch,
+          };
+
           await runDocsAgentAsync({
             installationToken: authDetails.token,
             repoUrl: payload.repository.html_url,
-            branch: branch,
+            branch: headBranch,
             prompt: commentBody,
             apiKey: apiKey.key,
             organizationId: apiKey.organizationId,
+            context,
           });
         }
       }

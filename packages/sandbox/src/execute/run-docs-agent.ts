@@ -51,7 +51,7 @@ export interface DocsAgentResult {
 }
 
 export type RunDocsAgentParams = z.infer<typeof runDocsAgentParamsSchema>;
-export type githubContext = z.infer<typeof githubContextSchema>;
+export type GithubContext = z.infer<typeof githubContextSchema>;
 
 export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<DocsAgentResult> {
   // Validate input parameters
@@ -69,6 +69,8 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
 
   const sandboxSnapshotBaseName = 'buster-data-engineer';
   const sandboxContext = context || {};
+  console.info('sandboxContext', sandboxContext);
+  console.info('context', context);
 
   const dataSourceResult = await getOrganizationDataSource({ organizationId: organizationId });
   const rawDataSourceCredentials = await getDataSourceCredentials({

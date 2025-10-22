@@ -12,6 +12,7 @@
       { "path": "../packages/slack" },
       { "path": "../packages/search" },
       { "path": "../packages/web-tools" },
+      { "path": "../packages/sandbox" },
     ],
     "settings": {
     },
