@@ -98,9 +98,19 @@ export const Default: Story = {
     rows: sampleRows,
     showHeader: true,
   },
-  render: (args) => (
-    <div style={{ height: '400px', width: '800px' }}>
-      <BusterList {...args} />
-    </div>
-  ),
+  render: (args) => {
+    const [selectedRowKeys, setSelectedRowKeys] = React.useState<Set<string>>(new Set());
+    return (
+      <div style={{ height: '400px', width: '800px' }}>
+        <BusterList
+          {...args}
+          selectedRowKeys={selectedRowKeys}
+          onSelectChange={(v) => {
+            console.log(v);
+            setSelectedRowKeys(v);
+          }}
+        />
+      </div>
+    );
+  },
 };

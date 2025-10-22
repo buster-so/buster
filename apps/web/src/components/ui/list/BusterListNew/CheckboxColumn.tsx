@@ -9,7 +9,8 @@ export const CheckboxColumn: React.FC<{
   checkStatus: CheckboxStatus;
   onChange: (v: boolean, e: React.MouseEvent) => void;
   className?: string;
-}> = React.memo(({ checkStatus, onChange, className = '' }) => {
+  disabled?: boolean;
+}> = React.memo(({ checkStatus, onChange, className = '', disabled = false }) => {
   const showBox = checkStatus === 'checked'; //|| checkStatus === 'indeterminate';
 
   const onClickStopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -35,6 +36,7 @@ export const CheckboxColumn: React.FC<{
       <Checkbox
         checked={checkStatus === 'checked'}
         indeterminate={checkStatus === 'indeterminate'}
+        disabled={disabled}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual';
 import type React from 'react';
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { BusterListRowComponent } from './BusterListRowComponent';
 import { BusterListRowSection } from './BusterListRowSection';
 import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
@@ -37,6 +38,21 @@ function BusterListInner<T = unknown>(
     overscan: 5,
   });
 
+  const onSelectSectionChange = useMemoizedFn((v: boolean, id: string) => {
+    console.log('onSelectSectionChange', v, id);
+    if (!onSelectChange) return;
+
+    const selectedSectionIds = idsPerSection.get(id);
+    if (!selectedSectionIds) {
+      console.warn('Selected section ids not found', id);
+      return;
+    }
+    const newSelectedRowKeys = v
+      ? new Set([...selectedRowKeys, ...selectedSectionIds])
+      : new Set(selectedRowKeys.filter((d) => !selectedSectionIds.has(d)));
+    onSelectChange?.(newSelectedRowKeys);
+  });
+
   useImperativeHandle(ref, () => ({
     scrollTo: (id: string) => {
       // TODO: Implement scroll to functionality
@@ -46,19 +62,15 @@ function BusterListInner<T = unknown>(
 
   const idsPerSection: Map<string, Set<string>> = useMemo(() => {
     const idsPerSection = new Map<string, Set<string>>();
-    let currentSectionId: string | undefined;
-    rows.forEach((row) => {
+    let currentSection: Set<string> | undefined;
+    for (const row of rows) {
       if (row.type === 'section') {
-        idsPerSection.set(row.id, new Set());
-        currentSectionId = row.id;
+        currentSection = new Set();
+        idsPerSection.set(row.id, currentSection);
+      } else if (row.type === 'row' && currentSection) {
+        currentSection.add(row.id);
       }
-      if (row.type === 'row' && currentSectionId) {
-        const section = idsPerSection.get(currentSectionId);
-        if (section) {
-          section.add(row.id);
-        }
-      }
-    });
+    }
     return idsPerSection;
   }, [rows]);
 
@@ -76,6 +88,10 @@ function BusterListInner<T = unknown>(
             {...virtualRow}
             rows={rows}
             columns={columns}
+            idsPerSection={idsPerSection}
+            selectedRowKeys={selectedRowKeys}
+            onSelectChange={onSelectChange}
+            onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
             key={virtualRow.key}
           />
         ))}
@@ -90,12 +106,17 @@ export const BusterList = forwardRef(BusterListInner) as unknown as <T = unknown
 
 const BusterListRowSelector = <T = unknown>({
   index,
-  size,
   start,
   rows,
   columns,
+  size,
+  idsPerSection,
+  onSelectSectionChange,
   ...rest
-}: VirtualItem & { rows: BusterListRow<T>[]; columns: BusterListColumn<T>[] }) => {
+}: VirtualItem & {
+  idsPerSection: Map<string, Set<string>>;
+  onSelectSectionChange: ((v: boolean, id: string) => void) | undefined;
+} & Pick<BusterListProps<T>, 'selectedRowKeys' | 'onSelectChange' | 'rows' | 'columns'>) => {
   const selectedRow = rows[index];
   const isSection = selectedRow.type === 'section';
 
@@ -103,12 +124,17 @@ const BusterListRowSelector = <T = unknown>({
     <div
       key={index}
       className="absolute top-0 left-0 w-full h-full"
-      style={{ transform: `translateY(${start}px)` }}
+      style={{ transform: `translateY(${start}px)`, height: `${size}px` }}
     >
       {isSection ? (
-        <BusterListRowSection {...selectedRow} />
+        <BusterListRowSection
+          {...rest}
+          {...selectedRow}
+          idsPerSection={idsPerSection}
+          onSelectSectionChange={onSelectSectionChange}
+        />
       ) : (
-        <BusterListRowComponent {...selectedRow} />
+        <BusterListRowComponent {...rest} {...selectedRow} />
       )}
     </div>
   );

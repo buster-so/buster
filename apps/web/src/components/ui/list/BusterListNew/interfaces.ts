@@ -7,10 +7,10 @@ export interface BusterListProps<T = unknown> {
   columns: BusterListColumn<T>[];
   hideLastRowBorder?: boolean;
   rows: BusterListRowItems<T>;
-  onSelectChange?: (selectedRowKeys: string[]) => void;
+  onSelectChange?: (selectedRowKeys: Set<string>) => void;
   emptyState?: undefined | React.ReactNode | string;
   showHeader?: boolean;
-  selectedRowKeys?: Map<string, boolean>;
+  selectedRowKeys?: Set<string>;
   contextMenu?: ContextMenuProps;
   showSelectAll?: boolean;
   useRowClickSelectChange?: boolean;
