@@ -2,7 +2,7 @@ import type {
   GetLibraryAssetsRequestQuery,
   LibraryAssetListItem,
 } from '@buster/server-shared/library';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, type QueryClient, useQuery } from '@tanstack/react-query';
 import { libraryQueryKeys } from '@/api/query_keys/library';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { getLibraryAssets } from './requests';
@@ -28,5 +28,26 @@ export const useLibraryAssetsInfinite = ({
     },
     placeholderData: keepPreviousData,
     scrollConfig,
+  });
+};
+
+export const prefetchGetLibraryAssets = async (
+  queryClient: QueryClient,
+  filters: GetLibraryAssetsRequestQuery
+) => {
+  await queryClient.prefetchQuery({
+    ...libraryQueryKeys.libraryGetList(filters),
+    queryFn: () => getLibraryAssets(filters),
+  });
+};
+
+export const prefetchGetLibraryAssetsInfinite = async (
+  queryClient: QueryClient,
+  filters: Omit<GetLibraryAssetsRequestQuery, 'page'>
+) => {
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ['library', 'get', 'list-infinite', filters] as const,
+    queryFn: () => getLibraryAssets({ ...filters, page: 1 }),
+    initialPageParam: 1,
   });
 };

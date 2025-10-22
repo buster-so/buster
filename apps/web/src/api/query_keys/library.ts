@@ -2,7 +2,7 @@ import type {
   GetLibraryAssetsRequestQuery,
   LibraryGetResponse,
 } from '@buster/server-shared/library';
-import { queryOptions } from '@tanstack/react-query';
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 
 export const libraryQueryKeys = {
   libraryGetList: (filters: GetLibraryAssetsRequestQuery) =>

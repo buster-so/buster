@@ -1,6 +1,9 @@
 import type { BusterCollectionListItem } from '@buster/server-shared/collections';
-import type { LibraryAssetListItem } from '@buster/server-shared/library';
+import type { LibraryAssetListItem, LibraryAssetType } from '@buster/server-shared/library';
 import React, { useMemo } from 'react';
+import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
+import { Avatar } from '@/components/ui/avatar';
+import { EmptyStateList, ListEmptyStateWithButton } from '@/components/ui/list';
 import type {
   BusterListColumn,
   BusterListRow,
@@ -24,27 +27,45 @@ type LibraryListItems = Pick<
   | 'created_by_name'
   | 'created_by_email'
   | 'created_by_avatar_url'
->;
+> & {
+  asset_type: LibraryAssetType;
+};
 
 const columns: BusterListColumn<LibraryListItems>[] = [
   {
     dataIndex: 'name',
     title: 'Name',
+    render: (v, record) => {
+      const Icon = assetTypeToIcon(record.asset_type || 'collection');
+      return (
+        <span className="flex gap-1.5 items-center">
+          <span className="text-icon-color">
+            <Icon />
+          </span>
+          <span>{v}</span>
+        </span>
+      );
+    },
   },
   {
     dataIndex: 'created_at',
     title: 'Created at',
+    width: 145,
     render: (v: string) => formatDate({ date: v, format: 'lll' }),
   },
   {
     dataIndex: 'updated_at',
     title: 'Updated at',
+    width: 145,
     render: (v: string) => formatDate({ date: v, format: 'lll' }),
   },
   {
-    dataIndex: 'created_by_name',
-    title: 'Created by',
-    render: (v, record) => v || record.created_by_email,
+    dataIndex: 'created_by_avatar_url',
+    title: 'Owner',
+    width: 50,
+    render: (v, record) => {
+      return <Avatar image={v} name={record.created_by_name} size={18} />;
+    },
   },
 ];
 
@@ -61,6 +82,7 @@ export const LibraryListView = ({
   const { group_by } = filters;
 
   const collectionRows: BusterListRow<LibraryListItems>[] = useMemo(() => {
+    if (collections.length === 0) return [];
     const collectionItems = collections.map((collection) => {
       return createLibraryListItem({
         type: 'row',
@@ -87,7 +109,9 @@ export const LibraryListView = ({
   }, [collections]);
 
   const rows: BusterListRow<LibraryListItems>[] = useMemo(() => {
-    const items: BusterListRow<LibraryListItems>[] = collectionRows;
+    const items: BusterListRow<LibraryListItems>[] = [...collectionRows];
+
+    if (allResults.length === 0) return items;
 
     if (group_by === 'asset_type') {
     } else if (group_by === 'owner') {
@@ -131,10 +155,26 @@ export const LibraryListView = ({
 
   return (
     <BusterList
-      scrollContainerRef={scrollContainerRef}
-      rows={rows}
+      scrollParentRef={scrollContainerRef}
+      rows={[]}
       columns={columns}
       infiniteScrollConfig={infiniteScrollConfig}
+      hideLastRowBorder={false}
+      showSelectAll={true}
+      showHeader={true}
+      emptyState={useMemo(
+        () => (
+          <ListEmptyStateWithButton
+            title="No library items found"
+            description="You don’t have any library items. As soon as you do add some, they will start to  appear here."
+            buttonText="Add item"
+            onClick={() => {
+              alert('new chat');
+            }}
+          />
+        ),
+        []
+      )}
     />
   );
 };
