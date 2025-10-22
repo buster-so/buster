@@ -69,8 +69,6 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
 
   const sandboxSnapshotBaseName = 'buster-data-engineer';
   const sandboxContext = context || {};
-  console.info('sandboxContext', sandboxContext);
-  console.info('context', context);
 
   const dataSourceResult = await getOrganizationDataSource({ organizationId: organizationId });
   const rawDataSourceCredentials = await getDataSourceCredentials({
