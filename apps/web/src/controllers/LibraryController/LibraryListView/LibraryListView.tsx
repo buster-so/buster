@@ -1,9 +1,10 @@
+import type { AssetType } from '@buster/server-shared/assets';
 import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { LibraryAssetListItem, LibraryAssetType } from '@buster/server-shared/library';
 import React, { useMemo } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';
-import { EmptyStateList, ListEmptyStateWithButton } from '@/components/ui/list';
+import { ListEmptyStateWithButton } from '@/components/ui/list';
 import type {
   BusterListColumn,
   BusterListRow,
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/list/BusterListNew';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
+import { getGroupMetadata } from '../grouping-meta-helpers';
 import type { LibraryViewProps } from '../library.types';
 
 type LibraryListItems = Pick<
@@ -28,7 +30,7 @@ type LibraryListItems = Pick<
   | 'created_by_email'
   | 'created_by_avatar_url'
 > & {
-  asset_type: LibraryAssetType;
+  asset_type: AssetType;
 };
 
 const columns: BusterListColumn<LibraryListItems>[] = [
@@ -87,7 +89,7 @@ export const LibraryListView = ({
       return createLibraryListItem({
         type: 'row',
         id: collection.id,
-        data: collection,
+        data: { ...collection, asset_type: 'collection' as const },
         link: {
           to: '/app/collections/$collectionId',
           params: {
@@ -113,17 +115,47 @@ export const LibraryListView = ({
 
     if (allResults.length === 0) return items;
 
-    if (group_by === 'asset_type') {
-    } else if (group_by === 'owner') {
-    } else if (group_by === 'created_at') {
-    } else if (group_by === 'updated_at') {
+    if (
+      group_by === 'asset_type' ||
+      group_by === 'owner' ||
+      group_by === 'created_at' ||
+      group_by === 'updated_at'
+    ) {
+      if (!allGroups) return items;
+      Object.entries(allGroups).forEach(([groupKey, groupItems]) => {
+        const { title, icon } = getGroupMetadata(groupKey, groupItems, group_by);
+        items.push({
+          type: 'section',
+          id: groupKey,
+          title: (
+            <span className="flex gap-1.5 items-center">
+              <span className="text-icon-color">{icon}</span>
+              <span>{title}</span>
+            </span>
+          ),
+          secondaryTitle: String(groupItems.length),
+        } satisfies BusterListSectionRow);
+        items.push(
+          ...groupItems.map((item) =>
+            createLibraryListItem({
+              type: 'row',
+              id: item.asset_id,
+              data: item,
+              link: createSimpleAssetRoute({
+                asset_type: item.asset_type,
+                id: item.asset_id,
+              }),
+            })
+          )
+        );
+      });
     } else {
       const _exhaustiveCheck: never | undefined | 'none' = group_by;
       items.push({
         type: 'section',
         id: 'library-assets',
         title: 'Assets',
-        secondaryTitle: String(items.length),
+        secondaryTitle: String(allResults.length),
       } satisfies BusterListSectionRow);
       items.push(
         ...allResults.map((result) => {
@@ -156,7 +188,7 @@ export const LibraryListView = ({
   return (
     <BusterList
       scrollParentRef={scrollContainerRef}
-      rows={[]}
+      rows={rows}
       columns={columns}
       infiniteScrollConfig={infiniteScrollConfig}
       hideLastRowBorder={false}

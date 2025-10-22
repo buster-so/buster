@@ -1,5 +1,5 @@
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import type { LibrarySearchParams } from './schema';
 
 export type LibraryViewProps = {

@@ -24,7 +24,7 @@ const LibraryGridItem = React.memo(
             <img
               src={imageUrl}
               alt={name}
-              className={cn('w-full h-full object-contain object-left rounded-t-sm bg-background')}
+              className={cn('w-full h-full object-contain object-top rounded-t-sm bg-background')}
             />
           </div>
           <div className="px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover">

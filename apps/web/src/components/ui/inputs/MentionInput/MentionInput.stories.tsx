@@ -1,4 +1,4 @@
-import type { Shortcut } from '@buster/server-shared';
+import type { Shortcut } from '@buster/server-shared/shortcuts';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useRef, useState } from 'react';

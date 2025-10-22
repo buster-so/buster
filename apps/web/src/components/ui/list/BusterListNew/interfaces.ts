@@ -52,7 +52,7 @@ export type BusterListRowItem<
 export interface BusterListSectionRow {
   id: string;
   type: 'section';
-  title: string;
+  title: string | React.ReactNode;
   secondaryTitle?: string;
   disableSection?: boolean;
 }

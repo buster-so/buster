@@ -2,7 +2,7 @@ import type {
   GroupedPaginationResponse,
   PaginatedResponse,
   SearchPaginatedResponse,
-} from '@buster/server-shared';
+} from '@buster/server-shared/type-utilities';
 import type {
   InfiniteData,
   QueryKey,

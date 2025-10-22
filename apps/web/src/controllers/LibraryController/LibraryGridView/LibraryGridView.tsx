@@ -1,23 +1,17 @@
-import type { AssetType } from '@buster/server-shared/assets';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
-import { faker } from '@faker-js/faker';
 import { Link, type LinkProps } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
-import { Avatar } from '@/components/ui/avatar';
-import { Calendar } from '@/components/ui/icons';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
 import { useMounted } from '@/hooks/useMount';
-import { AssetTypeTranslations } from '@/lib/assets/asset-translations';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
+import { getGroupMetadata } from '../grouping-meta-helpers';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
 import type { LibraryViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
@@ -45,7 +39,11 @@ export const LibraryGridView = React.memo(
 
     React.useEffect(() => {
       const updateColumns = () => {
-        if (window.innerWidth >= 1024) {
+        if (window.innerWidth >= 1650) {
+          setColumns(5);
+        } else if (window.innerWidth >= 1500) {
+          setColumns(4);
+        } else if (window.innerWidth >= 900) {
           setColumns(3);
         } else {
           setColumns(2);
@@ -56,6 +54,8 @@ export const LibraryGridView = React.memo(
       window.addEventListener('resize', updateColumns);
       return () => window.removeEventListener('resize', updateColumns);
     }, []);
+
+    console.log(columns);
 
     return (
       <ScrollArea
@@ -122,7 +122,7 @@ const LibraryGridItem = React.memo((props: LibraryAssetListItem) => {
             <img
               src={imageUrl}
               alt={name}
-              className={cn('w-full h-full object-contain object-left rounded-t-sm bg-background')}
+              className={cn('w-full h-full object-contain object-top rounded-t-sm bg-background')}
             />
           </div>
           <div className="h-[60px] px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center">
@@ -168,49 +168,10 @@ const LibraryGroupedView = ({
     );
   }
 
-  const getGroupMetadata = (
-    groupKey: string,
-    items: LibraryAssetListItem[]
-  ): { title: string; icon: React.ReactNode } => {
-    if (groupBy === 'asset_type') {
-      const Icon = assetTypeToIcon(groupKey as AssetType);
-      return {
-        title: AssetTypeTranslations[groupKey as AssetType],
-        icon: <Icon />,
-      };
-    }
-
-    if (groupBy === 'owner') {
-      const firstItem = items[0];
-      return {
-        title: firstItem.created_by_name ?? firstItem.created_by_email,
-        icon: (
-          <Avatar
-            size={16}
-            image={firstItem.created_by_avatar_url}
-            name={firstItem.created_by_name}
-          />
-        ),
-      };
-    }
-
-    if (groupBy === 'created_at' || groupBy === 'updated_at') {
-      const dateField = groupBy === 'created_at' ? items[0].created_at : items[0].updated_at;
-      return {
-        title: formatDate({ date: dateField, format: 'MMM D, YYYY' }),
-        icon: <Calendar />,
-      };
-    }
-
-    const _exhaustiveCheck: never = groupBy;
-    console.error('Exhaustive check failed for groupBy', _exhaustiveCheck);
-    return { title: 'Unknown', icon: null };
-  };
-
   return (
     <>
       {Object.entries(allGroups).map(([groupKey, items], groupIndex) => {
-        const { title, icon } = getGroupMetadata(groupKey, items);
+        const { title, icon } = getGroupMetadata(groupKey, items, groupBy);
 
         return (
           <LibraryGroupSection
@@ -281,7 +242,7 @@ const LibraryGroupSection = ({
                 transform: `translateY(${virtualRow.start}px)`,
               }}
             >
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4">
                 {rowItems.map((asset) => (
                   <LibraryGridItem key={asset.asset_id} {...asset} />
                 ))}
@@ -342,7 +303,10 @@ const LibraryUngroupedView = ({
                 transform: `translateY(${virtualRow.start}px)`,
               }}
             >
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+              <div
+                className="grid gap-4 pb-4"
+                style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+              >
                 {items.map((asset) => (
                   <LibraryGridItem key={asset.asset_id} {...asset} />
                 ))}
