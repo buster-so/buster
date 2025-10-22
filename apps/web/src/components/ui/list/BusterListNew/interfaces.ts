@@ -16,6 +16,7 @@ export interface BusterListProps<T = unknown> {
   rowClassName?: string;
   className?: string;
   infiniteScrollConfig?: InfiniteScrollConfig;
+  useRowClickSelectChange?: boolean;
 }
 
 export type BusterListColumn<T = unknown> = {
@@ -30,12 +31,6 @@ export type BusterListColumn<T = unknown> = {
     ellipsis?: boolean;
   };
 }[keyof T];
-
-export type BusterListRowLink<
-  TRouter extends RegisteredRouter = RegisteredRouter,
-  TOptions = Record<string, unknown>,
-  TFrom extends string = string,
-> = {};
 
 export type BusterListRowItem<
   T = unknown,

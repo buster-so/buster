@@ -7,6 +7,7 @@ import type {
   BusterListRow,
   BusterListRowItem,
   BusterListSectionRow,
+  InfiniteScrollConfig,
 } from './interfaces';
 
 const meta: Meta<typeof BusterList> = {
@@ -22,7 +23,6 @@ const meta: Meta<typeof BusterList> = {
     selectedRowKeys: { control: 'object' },
     showHeader: { control: 'boolean' },
     showSelectAll: { control: 'boolean' },
-    useRowClickSelectChange: { control: 'boolean' },
     rowClassName: { control: 'text' },
     hideLastRowBorder: { control: 'boolean' },
   },
@@ -99,9 +99,50 @@ export const Default: Story = {
     showHeader: true,
   },
   render: (args) => {
+    const [rows, setRows] = React.useState<BusterListRow<SampleData>[]>(sampleRows);
     const [selectedRowKeys, setSelectedRowKeys] = React.useState<Set<string>>(new Set());
+    const [showLoading, setShowLoading] = React.useState(false);
+
+    const addRows = React.useCallback(() => {
+      setRows((rows) => [
+        ...rows,
+        ...Array.from({ length: 15 }, (_, i) => {
+          return {
+            type: 'row' as const,
+            id: (rows.length + i).toString(),
+            data: {
+              name: faker.person.fullName(),
+              email: faker.internet.email(),
+              role: faker.helpers.arrayElement(['Admin', 'Editor', 'Viewer']),
+            },
+          };
+        }),
+      ]);
+    }, []);
+
+    const infiniteScrollConfig: InfiniteScrollConfig = React.useMemo(
+      () => ({
+        onScrollEnd: () => {
+          setShowLoading(true);
+          setTimeout(() => {
+            addRows();
+            setShowLoading(false);
+          }, 1000);
+        },
+        scrollEndThreshold: 50,
+        loadingNewContent: showLoading ? <div>Loading...</div> : undefined,
+      }),
+      [showLoading]
+    );
+
     return (
-      <BusterList {...args} selectedRowKeys={selectedRowKeys} onSelectChange={setSelectedRowKeys} />
+      <BusterList
+        {...args}
+        selectedRowKeys={selectedRowKeys}
+        onSelectChange={setSelectedRowKeys}
+        infiniteScrollConfig={infiniteScrollConfig}
+        rows={rows}
+      />
     );
   },
 };

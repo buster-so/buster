@@ -67,8 +67,6 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root
     },
     ref
   ) => {
-    if (indeterminate) console.log('indeterminate', checked, indeterminate);
-
     const checkedState = indeterminate ? 'indeterminate' : (checked ?? false);
     const checkedVariant = indeterminate ? 'indeterminate' : checked;
 

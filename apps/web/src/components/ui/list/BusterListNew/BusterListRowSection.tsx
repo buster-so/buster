@@ -52,7 +52,12 @@ const BusterListRowSectionBase = <T = unknown>({
       data-testid={`buster-list-row-section-${id}`}
     >
       {onSelectSectionChange && (
-        <CheckboxColumn disabled={disableSection} checkStatus={checkStatus} onChange={onChange} />
+        <CheckboxColumn
+          className={cn(checkStatus === 'checked' ? 'visible' : '')}
+          disabled={disableSection}
+          checkStatus={checkStatus}
+          onChange={onChange}
+        />
       )}
 
       <div className={cn('flex items-center space-x-2 pl-[0px] leading-none')}>
