@@ -25,7 +25,7 @@ catalog:
   dayjs: ^1.11.18
   dotenv: ^16.4.7
   drizzle-orm: ^0.44.5
-  hono: ^4.9.7
+  hono: ^4.10.2
   js-yaml: 4.1.0
   lodash-es: ^4.17.21
   pg: ^8.16.3

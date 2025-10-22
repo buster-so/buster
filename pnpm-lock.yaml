@@ -46,8 +46,8 @@ catalogs:
       specifier: ^0.44.5
       version: 0.44.5
     hono:
-      specifier: ^4.9.7
-      version: 4.9.7
+      specifier: ^4.10.2
+      version: 4.10.2
     js-yaml:
       specifier: 4.1.0
       version: 4.1.0
@@ -290,7 +290,7 @@ importers:
         version: 1.0.12
       '@hono/zod-validator':
         specifier: ^0.7.4
-        version: 0.7.4(hono@4.9.7)(zod@3.25.76)
+        version: 0.7.4(hono@4.10.2)(zod@3.25.76)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.57.4
@@ -308,10 +308,10 @@ importers:
         version: 0.44.5(@opentelemetry/api@1.9.0)(@types/pg@8.15.5)(bun-types@1.2.23(@types/react@19.1.13))(mysql2@3.15.2)(pg@8.16.3)(postgres@3.4.7)
       hono:
         specifier: 'catalog:'
-        version: 4.9.7
+        version: 4.10.2
       hono-pino:
         specifier: ^0.10.3
-        version: 0.10.3(hono@4.9.7)(pino@9.10.0)
+        version: 0.10.3(hono@4.10.2)(pino@9.10.0)
       js-yaml:
         specifier: 'catalog:'
         version: 4.1.0
@@ -8793,8 +8793,8 @@ packages:
       hono: '>=4.0.0'
       pino: '>=7.1.0'
 
-  hono@4.9.7:
-    resolution: {integrity: sha512-t4Te6ERzIaC48W3x4hJmBwgNlLhmiEdEE5ViYb02ffw4ignHNHa5IBtPjmbKstmtKa8X6C35iWwK4HaqvrzG9w==}
+  hono@4.10.2:
+    resolution: {integrity: sha512-p6fyzl+mQo6uhESLxbF5WlBOAJMDh36PljwlKtP5V1v09NxlqGru3ShK+4wKhSuhuYf8qxMmrivHOa/M7q0sMg==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -15157,9 +15157,9 @@ snapshots:
     dependencies:
       '@hapi/hoek': 9.3.0
 
-  '@hono/zod-validator@0.7.4(hono@4.9.7)(zod@3.25.76)':
+  '@hono/zod-validator@0.7.4(hono@4.10.2)(zod@3.25.76)':
     dependencies:
-      hono: 4.9.7
+      hono: 4.10.2
       zod: 3.25.76
 
   '@humanwhocodes/config-array@0.13.0':
@@ -19621,7 +19621,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.14
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.1)(@vitest/browser@3.2.4)(@vitest/ui@3.2.4)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.1)(msw@2.11.5(@types/node@22.18.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/browser@3.2.4)(@vitest/ui@3.2.4)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -22011,13 +22011,13 @@ snapshots:
     dependencies:
       parse-passwd: 1.0.0
 
-  hono-pino@0.10.3(hono@4.9.7)(pino@9.10.0):
+  hono-pino@0.10.3(hono@4.10.2)(pino@9.10.0):
     dependencies:
       defu: 6.1.4
-      hono: 4.9.7
+      hono: 4.10.2
       pino: 9.10.0
 
-  hono@4.9.7: {}
+  hono@4.10.2: {}
 
   hookable@5.5.3: {}
 
