@@ -21,7 +21,7 @@ import {
   type IDropdownItem,
   type IDropdownItems,
 } from '@/components/ui/dropdown';
-import { Dots, History, PenSparkle, ShareRight, Star } from '@/components/ui/icons';
+import { Dots, History, PenSparkle, Star } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import {
   ArrowUpRight,
@@ -34,7 +34,6 @@ import {
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
-import { useReportPageExport } from '@/context/Reports/useReportPageExport';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { useIsMac } from '@/hooks/usePlatform';
 import { useEditorContext } from '@/layouts/AssetContainer/ReportAssetContainer';
@@ -61,9 +60,9 @@ export const ReportThreeDotMenu = React.memo(
     // const duplicateReport = useDuplicateReportSelectMenu({ reportId }); TODO: EITHER Implement backend or remove feature
     // const verificationItem = useReportVerificationSelectMenu(); // Hidden - not supported yet
     const refreshReportItem = useRefreshReportSelectMenu({ reportId });
-    const { dropdownItem: downloadPdfItem, exportPdfContainer } = useDownloadPdfSelectMenu({
-      reportId,
-    });
+    // const { dropdownItem: downloadPdfItem, exportPdfContainer } = useDownloadPdfSelectMenu({
+    //   reportId,
+    // });
     const { data: permission } = useGetReport(
       { id: reportId },
       { select: useCallback((x: GetReportResponse) => x.permission, []) }
@@ -86,7 +85,7 @@ export const ReportThreeDotMenu = React.memo(
         { type: 'divider' },
         isEditor && refreshReportItem,
         // duplicateReport, TODO: EITHER Implement backend or remove feature
-        downloadPdfItem,
+        //  downloadPdfItem,
       ].filter(Boolean) as IDropdownItems;
     }, [
       chatId,
@@ -102,7 +101,7 @@ export const ReportThreeDotMenu = React.memo(
       isEditor,
       refreshReportItem,
       // duplicateReport, TODO: EITHER Implement backend or remove feature
-      downloadPdfItem,
+      //  downloadPdfItem,
     ]);
 
     return (
@@ -110,7 +109,7 @@ export const ReportThreeDotMenu = React.memo(
         <Dropdown items={items} side="bottom" align="end" contentClassName="max-h-fit" modal>
           <Button prefix={<Dots />} variant="ghost" data-testid="three-dot-menu-button" />
         </Dropdown>
-        {exportPdfContainer}
+        {/* {exportPdfContainer} */}
       </>
     );
   }
@@ -331,44 +330,6 @@ const useRefreshReportSelectMenu = ({ reportId }: { reportId: string }): IDropdo
 //     [onClick]
 //   );
 // };
-
-// Download as PDF
-const useDownloadPdfSelectMenu = ({
-  reportId,
-}: {
-  reportId: string;
-}): {
-  dropdownItem: IDropdownItem;
-  exportPdfContainer: React.ReactNode;
-} => {
-  const { openErrorMessage } = useBusterNotifications();
-  const { data: reportName } = useGetReport({ id: reportId }, { select: stableReportNameSelector });
-  const { exportReportAsPDF, cancelExport, ExportContainer } = useReportPageExport({
-    reportId,
-    reportName: reportName || '',
-  });
-
-  const onClick = async () => {
-    try {
-      await exportReportAsPDF();
-    } catch (error) {
-      console.error(error);
-      openErrorMessage('Failed to export report as PDF');
-    }
-  };
-
-  return useMemo(() => {
-    return {
-      dropdownItem: {
-        label: 'Download as PDF',
-        value: 'download-pdf',
-        icon: <Download4 />,
-        onClick,
-      },
-      exportPdfContainer: ExportContainer,
-    };
-  }, [reportId, exportReportAsPDF, cancelExport, ExportContainer]);
-};
 
 const useUndoRedo = (): IDropdownItems => {
   const { editor } = useEditorContext();
