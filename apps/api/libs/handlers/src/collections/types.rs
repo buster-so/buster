@@ -42,9 +42,12 @@ pub struct ListCollectionsCollection {
     pub id: Uuid,
     pub name: String,
     pub description: String,
-    pub last_edited: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
-    pub owner: ListCollectionsUser,
+    pub created_by: Uuid,
+    pub created_by_name: Option<String>,
+    pub created_by_email: String,
+    pub created_by_avatar_url: Option<String>,
     pub is_shared: bool,
     // TODO implement member
 }

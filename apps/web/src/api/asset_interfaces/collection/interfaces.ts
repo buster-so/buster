@@ -7,11 +7,10 @@ export type BusterCollectionListItem = {
   updated_at: string;
   created_at: string;
   sharing: BusterCollectionSharing;
-  owner: {
-    avatar_url: string | null;
-    id: string;
-    name: string;
-  };
+  created_by: string;
+  created_by_name: string | null;
+  created_by_email: string;
+  created_by_avatar_url: string | null;
   member: [];
 };
 
@@ -21,11 +20,6 @@ export type BusterCollection = {
   type: string;
   last_opened: string;
   created_at: string;
-  owner: {
-    avatar_url: string | null;
-    id: string;
-    name: string;
-  };
   assets: null | BusterCollectionItemAsset[];
   created_by: string;
   deleted_at: null;

@@ -213,18 +213,15 @@ async fn get_permissioned_collections(
             continue;
         }
 
-        let owner = ListCollectionsUser {
-            id: creator_id,
-            name: creator_name.unwrap_or(email),
-            avatar_url: creator_avatar_url,
-        };
-
         let collection = ListCollectionsCollection {
             id,
             name,
-            last_edited: updated_at,
+            updated_at,
             created_at,
-            owner,
+            created_by: creator_id,
+            created_by_name: creator_name,
+            created_by_email: email,
+            created_by_avatar_url: creator_avatar_url,
             description: "".to_string(),
             is_shared: creator_id != user.id, // Mark as shared if the user is not the creator
         };
@@ -260,18 +257,15 @@ async fn get_permissioned_collections(
             continue;
         }
 
-        let owner = ListCollectionsUser {
-            id: creator_id,
-            name: creator_name.unwrap_or(email),
-            avatar_url: creator_avatar_url,
-        };
-
         let collection = ListCollectionsCollection {
             id,
             name,
-            last_edited: updated_at,
+            updated_at,
             created_at,
-            owner,
+            created_by: creator_id,
+            created_by_name: creator_name,
+            created_by_email: email,
+            created_by_avatar_url: creator_avatar_url,
             description: "".to_string(),
             is_shared: true, // Always true for workspace-shared collections
         };
@@ -280,7 +274,7 @@ async fn get_permissioned_collections(
     }
 
     // Sort all collections by updated_at descending
-    collections.sort_by(|a, b| b.last_edited.cmp(&a.last_edited));
+    collections.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
     
     // Apply pagination
     let paginated_collections: Vec<ListCollectionsCollection> = collections.into_iter()

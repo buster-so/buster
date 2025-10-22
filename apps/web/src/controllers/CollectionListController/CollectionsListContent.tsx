@@ -71,7 +71,7 @@ const columns: BusterListColumn<BusterCollectionListItem>[] = [
     },
   },
   {
-    dataIndex: 'last_edited',
+    dataIndex: 'updated_at',
     title: 'Last edited',
     width: 150,
     render: (v) => formatDate({ date: v, format: 'lll' }),
@@ -83,11 +83,17 @@ const columns: BusterListColumn<BusterCollectionListItem>[] = [
     render: (v) => makeHumanReadble(v || 'private'),
   },
   {
-    dataIndex: 'owner',
+    dataIndex: 'created_by_avatar_url',
     title: 'Owner',
     width: 50,
-    render: (owner: BusterCollectionListItem['owner']) => {
-      return <Avatar image={owner?.avatar_url || undefined} name={owner?.name} size={18} />;
+    render: (_v, record: BusterCollectionListItem) => {
+      return (
+        <Avatar
+          image={record.created_by_avatar_url || undefined}
+          name={record.created_by_name || undefined}
+          size={18}
+        />
+      );
     },
   },
 ];

@@ -1,14 +1,28 @@
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import React, { useMemo } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import { BusterList } from '@/components/ui/list';
 import type { BusterListColumn, BusterListRow } from '@/components/ui/list/BusterListNew';
-import { type BusterListSectionRow, createListItem } from '@/components/ui/list/BusterListNew';
+import {
+  BusterList,
+  type BusterListSectionRow,
+  createListItem,
+} from '@/components/ui/list/BusterListNew';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import type { LibraryViewProps } from '../library.types';
 
-const columns: BusterListColumn<LibraryAssetListItem | BusterCollectionListItem>[] = [
+type LibraryListItems = Pick<
+  LibraryAssetListItem | BusterCollectionListItem,
+  | 'name'
+  | 'created_at'
+  | 'updated_at'
+  | 'created_by'
+  | 'created_by_name'
+  | 'created_by_email'
+  | 'created_by_avatar_url'
+>;
+
+const columns: BusterListColumn<LibraryListItems>[] = [
   {
     dataIndex: 'name',
     title: 'Name',
@@ -16,22 +30,21 @@ const columns: BusterListColumn<LibraryAssetListItem | BusterCollectionListItem>
   {
     dataIndex: 'created_at',
     title: 'Created at',
-    render: (v) => formatDate({ date: v, format: 'lll' }),
+    render: (v: string) => formatDate({ date: v, format: 'lll' }),
   },
   {
     dataIndex: 'updated_at',
     title: 'Updated at',
-    render: (v) => formatDate({ date: v, format: 'lll' }),
+    render: (v: string) => formatDate({ date: v, format: 'lll' }),
   },
   {
-    dataIndex: 'created_by',
+    dataIndex: 'created_by_name',
     title: 'Created by',
-    render: (v) => v,
+    render: (v, record) => v || record.created_by_email,
   },
 ];
 
-const createLibraryAssetListItem = createListItem<LibraryAssetListItem>();
-const createCollectionListItem = createListItem<BusterCollectionListItem>();
+const createLibraryListItem = createListItem<LibraryListItems>();
 
 export const LibraryListView = ({
   allResults,
@@ -44,9 +57,9 @@ export const LibraryListView = ({
   const { group_by } = filters;
   console.log({ collections, allResults });
 
-  const collectionRows: BusterListRow<BusterCollectionListItem>[] = useMemo(() => {
+  const collectionRows: BusterListRow<LibraryListItems>[] = useMemo(() => {
     const collectionItems = collections.map((collection) => {
-      return createCollectionListItem({
+      return createLibraryListItem({
         type: 'row',
         id: collection.id,
         data: collection,
@@ -70,8 +83,8 @@ export const LibraryListView = ({
     ];
   }, [collections]);
 
-  const rows: BusterListRow<LibraryAssetListItem | BusterCollectionListItem>[] = useMemo(() => {
-    const items: BusterListRow<LibraryAssetListItem | BusterCollectionListItem>[] = collectionRows;
+  const rows: BusterListRow<LibraryListItems>[] = useMemo(() => {
+    const items: BusterListRow<LibraryListItems>[] = collectionRows;
 
     if (group_by === 'asset_type') {
     } else if (group_by === 'owner') {
@@ -87,7 +100,7 @@ export const LibraryListView = ({
       } satisfies BusterListSectionRow);
       items.push(
         ...allResults.map((result) => {
-          return createLibraryAssetListItem({
+          return createLibraryListItem({
             type: 'row',
             id: result.asset_id,
             data: result,

@@ -103,30 +103,36 @@ export const LibraryCollectionsScroller = React.memo(
 
 LibraryCollectionsScroller.displayName = 'LibraryCollectionsScroller';
 
-const CollectionCard = React.memo(({ id, name, updated_at, owner }: BusterCollectionListItem) => {
-  return (
-    <CollectionCardContextMenu id={id}>
-      <Link to="/app/collections/$collectionId" params={{ collectionId: id }}>
-        <div
-          className={cn(
-            'flex flex-col gap-y-2 h-21 min-w-36 w-36 border rounded py-2.5 px-3 justify-between',
-            'cursor-pointer hover:bg-item-hover'
-          )}
-        >
-          <Text variant={'default'} className="line-clamp-2" size={'base'}>
-            {name}
-          </Text>
-          <div className="flex items-center space-x-1">
-            <Avatar image={owner?.avatar_url || undefined} name={owner?.name} size={12} />
-            <Text variant={'tertiary'} size={'xs'}>
-              {formatDate({ date: updated_at, format: 'MMM D' })}
+const CollectionCard = React.memo(
+  ({ id, name, updated_at, created_by_avatar_url, created_by_name }: BusterCollectionListItem) => {
+    return (
+      <CollectionCardContextMenu id={id}>
+        <Link to="/app/collections/$collectionId" params={{ collectionId: id }}>
+          <div
+            className={cn(
+              'flex flex-col gap-y-2 h-21 min-w-36 w-36 border rounded py-2.5 px-3 justify-between',
+              'cursor-pointer hover:bg-item-hover'
+            )}
+          >
+            <Text variant={'default'} className="line-clamp-2" size={'base'}>
+              {name}
             </Text>
+            <div className="flex items-center space-x-1">
+              <Avatar
+                image={created_by_avatar_url || undefined}
+                name={created_by_name || undefined}
+                size={12}
+              />
+              <Text variant={'tertiary'} size={'xs'}>
+                {formatDate({ date: updated_at, format: 'MMM D' })}
+              </Text>
+            </div>
           </div>
-        </div>
-      </Link>
-    </CollectionCardContextMenu>
-  );
-});
+        </Link>
+      </CollectionCardContextMenu>
+    );
+  }
+);
 
 CollectionCard.displayName = 'CollectionCard';
 
