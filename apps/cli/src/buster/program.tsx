@@ -2,6 +2,7 @@ import { program as commander } from 'commander';
 import { render } from 'ink';
 import { Main } from '../commands/main/main';
 import { runHeadlessAgent } from '../services';
+import { enableDebugLogging } from '../utils/debug-logger';
 import { getVersion } from '../version';
 import { setupPreActionHook } from './hooks';
 
@@ -12,6 +13,7 @@ interface RootOptions {
   messageId?: string;
   research?: boolean;
   contextFilePath?: string;
+  debug?: boolean;
 }
 
 export const program = commander
@@ -23,12 +25,18 @@ export const program = commander
   .option('--chatId <id>', 'Continue an existing conversation (used with --prompt)')
   .option('--messageId <id>', 'Message ID for tracking (used with --prompt)')
   .option('--research', 'Run agent in research mode (read-only, no file modifications)')
-  .option('--contextFilePath <path>', 'Path to context file to include as system message');
+  .option('--contextFilePath <path>', 'Path to context file to include as system message')
+  .option('--debug', 'Enable debug logging to ~/.buster/logs/debug.log');
 
 setupPreActionHook(program);
 
 // Root action - runs when no subcommand is specified
 program.action(async (options: RootOptions) => {
+  // Enable debug logging if requested
+  if (options.debug) {
+    enableDebugLogging();
+  }
+
   // Change working directory if specified
   if (options.cwd) {
     process.chdir(options.cwd);

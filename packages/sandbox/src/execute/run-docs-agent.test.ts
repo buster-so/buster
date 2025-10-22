@@ -42,6 +42,7 @@ describe('run-docs-agent', () => {
         createSession: vi.fn().mockResolvedValue(undefined),
         executeSessionCommand: vi.fn().mockResolvedValue({ cmdId: 'test-cmd-id' }),
         executeCommand: vi.fn().mockResolvedValue({ cmdId: 'test-cmd-id', output: 'success' }),
+        getSessionCommandLogs: vi.fn().mockResolvedValue('mock logs'),
       },
     } as any;
 
@@ -220,7 +221,7 @@ describe('run-docs-agent', () => {
       const cliCalls = vi.mocked(mockSandbox.process.executeSessionCommand).mock.calls;
       const cliCall = cliCalls.find((call) => call[1].command.includes('buster '));
       expect(cliCall).toBeDefined();
-      expect(cliCall![1].command).toContain('--prompt "Default documentation agent prompt"');
+      expect(cliCall![1].command).toContain('--prompt "$(cat /workspace/prompt.md)"');
     });
 
     it('should handle optional parameters correctly', async () => {
@@ -264,17 +265,49 @@ describe('run-docs-agent', () => {
 
   describe('runDocsAgentSync', () => {
     beforeEach(async () => {
+      // Mock database queries
+      const { getOrganizationDataSource, getDataSourceCredentials } = await import(
+        '@buster/database/queries'
+      );
+      vi.mocked(getOrganizationDataSource).mockResolvedValue({
+        dataSourceId: 'test-datasource-id',
+        dataSourceSyntax: 'postgres',
+      });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue({
+        host: 'localhost',
+        port: 5432,
+        database: 'test_db',
+        username: 'test_user',
+        password: 'test_pass',
+      });
+
       // Mock sandbox creation
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      vi.mocked(createSandboxFromSnapshot).mockResolvedValue(mockSandbox);
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      vi.mocked(createSandboxWithBusterCLI).mockResolvedValue(mockSandbox);
+
+      // Mock profiles YAML builder
+      const { buildProfilesYaml } = await import('../helpers/build-dbt-profiles-yaml');
+      vi.mocked(buildProfilesYaml).mockReturnValue('mock-profiles-yaml-content');
     });
 
     it('should successfully run docs agent synchronously', async () => {
+      // Mock dbt project file discovery
+      vi.mocked(mockSandbox.fs.findFiles).mockResolvedValue([
+        {
+          file: '/workspace/repository/dbt_project.yml',
+          content: 'profile: my_project',
+          line: 1,
+        },
+      ]);
+
       await runDocsAgentSync(validParams);
 
-      // Verify sandbox creation with hardcoded snapshot
-      const { createSandboxFromSnapshot } = await import('../management/create-sandbox');
-      expect(createSandboxFromSnapshot).toHaveBeenCalledWith('buster-data-engineer-postgres');
+      // Verify sandbox creation with dynamic snapshot selection
+      const { createSandboxWithBusterCLI } = await import('../management/create-sandbox');
+      expect(createSandboxWithBusterCLI).toHaveBeenCalledWith(
+        'buster-data-engineer-postgres',
+        'buster-data-engineer-fallback'
+      );
 
       // Verify git clone
       expect(mockSandbox.git.clone).toHaveBeenCalledWith(
@@ -286,18 +319,17 @@ describe('run-docs-agent', () => {
         validParams.installationToken
       );
 
-      // Verify CLI installation and execution
-      expect(mockSandbox.process.executeCommand).toHaveBeenCalledWith(
-        expect.stringContaining('curl -fsSL'),
-        '/workspace/repository'
-      );
-      expect(mockSandbox.process.executeCommand).toHaveBeenCalledWith(
-        'buster --version',
-        '/workspace/repository'
+      // Verify profiles YAML creation
+      expect(mockSandbox.fs.createFolder).toHaveBeenCalledWith('/workspace/profiles', '755');
+      expect(mockSandbox.fs.uploadFile).toHaveBeenCalledWith(
+        Buffer.from('mock-profiles-yaml-content'),
+        '/workspace/profiles/profiles.yml'
       );
     });
 
     it('should create context file in sync mode', async () => {
+      vi.mocked(mockSandbox.fs.findFiles).mockResolvedValue([]);
+
       await runDocsAgentSync(validParams);
 
       // Verify context directory and file creation
@@ -309,23 +341,27 @@ describe('run-docs-agent', () => {
     });
 
     it('should execute buster CLI with correct environment variables', async () => {
+      vi.mocked(mockSandbox.fs.findFiles).mockResolvedValue([]);
+
       await runDocsAgentSync(validParams);
 
-      // Find the main buster CLI execution call (not the version check)
+      // Find the main buster CLI execution call
       const executeCommandCalls = vi.mocked(mockSandbox.process.executeCommand).mock.calls;
       const busterCall = executeCommandCalls.find(
-        (call) => call[0].includes('buster ') && !call[0].includes('--version')
+        (call) => call[0].includes('buster ') && call[0].includes('--prompt')
       );
 
       expect(busterCall).toBeDefined();
 
       // The environment variables should be in the third parameter (index 2)
       if (busterCall && busterCall.length > 2 && busterCall[2]) {
-        expect(busterCall[2]).toEqual({
-          GITHUB_TOKEN: validParams.installationToken,
-          BUSTER_API_KEY: validParams.apiKey,
-          BUSTER_HOST: 'https://test.buster.so',
-        });
+        expect(busterCall[2]).toEqual(
+          expect.objectContaining({
+            GITHUB_TOKEN: validParams.installationToken,
+            BUSTER_API_KEY: validParams.apiKey,
+            BUSTER_HOST: 'https://test.buster.so',
+          })
+        );
       } else {
         // If no env vars are passed, that's also valid - just verify the call was made
         expect(busterCall).toBeDefined();

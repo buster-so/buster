@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
+import { debugLogger } from './debug-logger';
 
 // Settings schema with vim mode configuration
 const SettingsSchema = z.object({
@@ -37,7 +38,7 @@ export function loadSettings(): Settings {
       return SettingsSchema.parse(parsed);
     }
   } catch (error) {
-    console.error('Failed to load settings, using defaults:', error);
+    debugLogger.error('Failed to load settings, using defaults:', error);
   }
 
   // Return defaults if file doesn't exist or parsing fails
@@ -55,7 +56,7 @@ export function saveSettings(settings: Partial<Settings>): Settings {
   try {
     writeFileSync(SETTINGS_PATH, JSON.stringify(validated, null, 2));
   } catch (error) {
-    console.error('Failed to save settings:', error);
+    debugLogger.error('Failed to save settings:', error);
   }
 
   return validated;

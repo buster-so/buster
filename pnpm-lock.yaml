@@ -40,8 +40,8 @@ catalogs:
       specifier: ^1.11.18
       version: 1.11.18
     dotenv:
-      specifier: ^17.2.2
-      version: 17.2.2
+      specifier: ^16.4.7
+      version: 16.6.1
     drizzle-orm:
       specifier: ^0.44.5
       version: 0.44.5
@@ -91,7 +91,7 @@ importers:
     dependencies:
       dotenv:
         specifier: 'catalog:'
-        version: 17.2.2
+        version: 16.6.1
       dotenv-cli:
         specifier: ^10.0.0
         version: 10.0.0
@@ -1242,7 +1242,7 @@ importers:
         version: link:../typescript-config
       dotenv:
         specifier: 'catalog:'
-        version: 17.2.2
+        version: 16.6.1
 
   packages/github:
     dependencies:

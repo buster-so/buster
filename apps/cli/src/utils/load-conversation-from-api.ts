@@ -3,7 +3,7 @@ import { createBusterSDK } from '@buster/sdk';
 import type { Conversation } from './conversation-history';
 import { loadConversation as loadConversationFromDisk } from './conversation-history';
 import { getCredentials } from './credentials';
-
+import { debugLogger } from './debug-logger';
 /**
  * Loads a conversation from the API first, falling back to local disk
  * This is the primary way to load conversations when resuming a chat
@@ -40,7 +40,7 @@ export async function loadConversation(
     }
   } catch (error) {
     // Log error and fall through to disk load
-    console.warn('Failed to load conversation from API, falling back to disk:', error);
+    debugLogger.warn('Failed to load conversation from API, falling back to disk:', error);
   }
 
   // Fall back to loading from disk

@@ -2,6 +2,7 @@ import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
+import { debugLogger } from './debug-logger';
 
 // Credentials schema
 const credentialsSchema = z.object({
@@ -17,13 +18,30 @@ const CREDENTIALS_DIR = join(homedir(), '.buster');
 const CREDENTIALS_FILE = join(CREDENTIALS_DIR, 'credentials.json');
 
 /**
+ * Normalizes a URL by ensuring it has a protocol
+ * @param url - The URL to normalize
+ * @returns The normalized URL with https:// if no protocol was present
+ */
+function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+
+  // If it already has a protocol, return as-is
+  if (trimmed.match(/^https?:\/\//i)) {
+    return trimmed;
+  }
+
+  // Add https:// prefix
+  return `https://${trimmed}`;
+}
+
+/**
  * Ensures the credentials directory exists
  */
 async function ensureCredentialsDir(): Promise<void> {
   try {
     await mkdir(CREDENTIALS_DIR, { recursive: true, mode: 0o700 });
   } catch (error) {
-    console.error('Failed to create credentials directory:', error);
+    debugLogger.error('Failed to create credentials directory:', error);
     throw new Error('Unable to create credentials directory');
   }
 }
@@ -34,8 +52,14 @@ async function ensureCredentialsDir(): Promise<void> {
  */
 export async function saveCredentials(credentials: Credentials): Promise<void> {
   try {
+    // Normalize the API URL before validation
+    const normalizedCredentials = {
+      ...credentials,
+      apiUrl: normalizeUrl(credentials.apiUrl),
+    };
+
     // Validate credentials
-    const validated = credentialsSchema.parse(credentials);
+    const validated = credentialsSchema.parse(normalizedCredentials);
 
     // Ensure directory exists
     await ensureCredentialsDir();
@@ -46,7 +70,7 @@ export async function saveCredentials(credentials: Credentials): Promise<void> {
     if (error instanceof z.ZodError) {
       throw new Error(`Invalid credentials: ${error.errors.map((e) => e.message).join(', ')}`);
     }
-    console.error('Failed to save credentials:', error);
+    debugLogger.error('Failed to save credentials:', error);
     throw new Error('Unable to save credentials');
   }
 }
@@ -75,7 +99,7 @@ export async function deleteCredentials(): Promise<void> {
   } catch (error) {
     // Ignore if file doesn't exist
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.error('Failed to delete credentials:', error);
+      debugLogger.error('Failed to delete credentials:', error);
       throw new Error('Unable to delete credentials');
     }
   }
@@ -93,7 +117,7 @@ export async function getCredentials(): Promise<Credentials | null> {
   if (envApiKey) {
     return {
       apiKey: envApiKey,
-      apiUrl: envApiUrl || DEFAULT_API_URL,
+      apiUrl: normalizeUrl(envApiUrl || DEFAULT_API_URL),
     };
   }
 
@@ -103,7 +127,7 @@ export async function getCredentials(): Promise<Credentials | null> {
     // Apply env overrides if present
     return {
       apiKey: saved.apiKey,
-      apiUrl: envApiUrl || saved.apiUrl,
+      apiUrl: normalizeUrl(envApiUrl || saved.apiUrl),
     };
   }
 
