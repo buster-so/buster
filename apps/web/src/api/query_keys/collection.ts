@@ -1,14 +1,17 @@
+import type { BusterCollection, GetCollectionsResponse } from '@buster/server-shared/collections';
 import { queryOptions } from '@tanstack/react-query';
-import type { BusterCollection, BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import type { collectionsGetList as collectionsGetListRequest } from '@/api/buster_rest/collections/requests';
 
 const collectionsGetList = (
-  filters?: Omit<Parameters<typeof collectionsGetListRequest>[0], 'page_token' | 'page_size'>
+  filters?: Omit<Parameters<typeof collectionsGetListRequest>[0], 'page' | 'page_size'>
 ) =>
-  queryOptions<BusterCollectionListItem[]>({
-    queryKey: ['collections', 'list', filters || { page_token: 0, page_size: 3500 }] as const,
+  queryOptions<GetCollectionsResponse>({
+    queryKey: ['collections', 'list', filters || { page: 1, page_size: 3500 }] as const,
     staleTime: 60 * 1000,
-    initialData: [],
+    initialData: {
+      data: [],
+      pagination: { page: 1, page_size: 3500, has_more: false },
+    },
     initialDataUpdatedAt: 0,
   });
 

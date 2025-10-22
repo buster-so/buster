@@ -1,21 +1,21 @@
 import {
+  type InfinitePaginationMetadata,
+  InfinitePaginationSchema,
   PaginationInputSchema,
   type PaginationMetadata,
   PaginationSchema,
-  type SearchPaginationMetadata,
-  SearchPaginationSchema,
 } from '@buster/database/schema-types';
 import { z } from 'zod';
 
 export {
+  type InfinitePaginationMetadata,
+  InfinitePaginationSchema,
   type PaginationMetadata,
   PaginationSchema,
-  type SearchPaginationMetadata,
-  SearchPaginationSchema,
 } from '@buster/database/schema-types';
 
 export type Pagination = PaginationMetadata;
-export type SearchPagination = SearchPaginationMetadata;
+export type SearchPagination = InfinitePaginationMetadata;
 
 export const PaginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
   z.object({
@@ -26,13 +26,13 @@ export const PaginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
 export const SearchPaginatedResponseSchema = <T>(schema: z.ZodType<T>) =>
   z.object({
     data: z.array(schema),
-    pagination: SearchPaginationSchema,
+    pagination: InfinitePaginationSchema,
   });
 
 export const GroupedPaginationResponseSchema = <T>(schema: z.ZodType<T>) =>
   z.object({
     groups: z.record(z.string(), z.array(schema)),
-    pagination: SearchPaginationSchema,
+    pagination: InfinitePaginationSchema,
   });
 
 export type PaginatedResponse<T> = z.infer<ReturnType<typeof PaginatedResponseSchema<T>>>;

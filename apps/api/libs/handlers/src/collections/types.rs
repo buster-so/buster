@@ -52,6 +52,19 @@ pub struct ListCollectionsCollection {
     // TODO implement member
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CollectionPagination {
+    pub page: i64,
+    pub page_size: i64,
+    pub has_more: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ListCollectionsResponse {
+    pub data: Vec<ListCollectionsCollection>,
+    pub pagination: CollectionPagination,
+}
+
 // Get collection types
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GetCollectionRequest {

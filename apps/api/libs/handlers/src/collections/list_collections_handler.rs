@@ -15,7 +15,8 @@ use tracing;
 use uuid::Uuid;
 
 use crate::collections::types::{
-    ListCollectionsCollection, ListCollectionsRequest, ListCollectionsUser,
+    CollectionPagination, ListCollectionsCollection, ListCollectionsRequest,
+    ListCollectionsResponse, ListCollectionsUser,
 };
 
 /// Handler for listing collections with pagination and filtering
@@ -25,17 +26,17 @@ use crate::collections::types::{
 /// * `req` - The request containing pagination and filtering options
 ///
 /// # Returns
-/// * `Result<Vec<ListCollectionsCollection>>` - A list of collections the user has access to
+/// * `Result<ListCollectionsResponse>` - A paginated list of collections with metadata
 pub async fn list_collections_handler(
     user: &AuthenticatedUser,
     req: ListCollectionsRequest,
-) -> Result<Vec<ListCollectionsCollection>> {
-    let page = req.page.unwrap_or(0);
+) -> Result<ListCollectionsResponse> {
+    let page = req.page.unwrap_or(1);
     let page_size = req.page_size.unwrap_or(25);
 
-    let list_of_collections = get_permissioned_collections(user, page, page_size, req).await?;
+    let response = get_permissioned_collections(user, page, page_size, req).await?;
 
-    Ok(list_of_collections)
+    Ok(response)
 }
 
 /// Get collections that the user has permission to access
@@ -47,13 +48,13 @@ pub async fn list_collections_handler(
 /// * `req` - The request containing filtering options
 ///
 /// # Returns
-/// * `Result<Vec<ListCollectionsCollection>>` - A list of collections the user has access to
+/// * `Result<ListCollectionsResponse>` - A paginated response with collections and metadata
 async fn get_permissioned_collections(
     user: &AuthenticatedUser,
     page: i64,
     page_size: i64,
     req: ListCollectionsRequest,
-) -> Result<Vec<ListCollectionsCollection>> {
+) -> Result<ListCollectionsResponse> {
     let mut conn = match get_pg_pool().get().await {
         Ok(conn) => conn,
         Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
@@ -275,12 +276,27 @@ async fn get_permissioned_collections(
 
     // Sort all collections by updated_at descending
     collections.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
-    
+
+    // Calculate pagination metadata
+    let total = collections.len() as i64;
+    let start_idx = ((page - 1) * page_size) as usize;
+    let end_idx = (start_idx + page_size as usize).min(collections.len());
+    let has_more = end_idx < collections.len();
+
     // Apply pagination
     let paginated_collections: Vec<ListCollectionsCollection> = collections.into_iter()
-        .skip((page * page_size) as usize)
+        .skip(start_idx)
         .take(page_size as usize)
         .collect();
 
-    Ok(paginated_collections)
+    let response = ListCollectionsResponse {
+        data: paginated_collections,
+        pagination: CollectionPagination {
+            page,
+            page_size,
+            has_more,
+        },
+    };
+
+    Ok(response)
 }

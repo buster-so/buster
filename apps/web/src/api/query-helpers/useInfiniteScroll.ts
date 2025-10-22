@@ -184,7 +184,6 @@ export function useInfiniteScroll<TData, TError = ApiError>(
       const { scrollTop, scrollHeight, clientHeight } = container;
       // Trigger when user is within scrollThreshold pixels of the bottom
       if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
-        console.log('fetching next page');
         if (hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
@@ -220,10 +219,8 @@ type UseInfiniteScrollManualResult<TData, TError = ApiError> = UseInfiniteQueryR
 };
 
 export function useInfiniteScrollManual<TData, TError = ApiError>(
-  options: UseInfiniteScrollOptions<TData, TError>
+  queryOptions: UseInfiniteScrollOptions<TData, TError>
 ): UseInfiniteScrollManualResult<TData, TError> {
-  const { scrollConfig, mounted, ...queryOptions } = options;
-
   const queryResult = useInfiniteQuery({
     ...queryOptions,
     getNextPageParam: (lastPage) => {

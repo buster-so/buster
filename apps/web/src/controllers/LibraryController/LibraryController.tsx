@@ -34,7 +34,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
   const libraryViewProps: LibraryViewProps = {
     allResults,
     allGroups,
-    collections,
+    collections: collections?.data || [],
     filters: filtersProps,
     isFetchingNextPage,
     scrollContainerRef,

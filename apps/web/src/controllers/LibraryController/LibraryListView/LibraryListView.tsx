@@ -1,7 +1,11 @@
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import React, { useMemo } from 'react';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import type { BusterListColumn, BusterListRow } from '@/components/ui/list/BusterListNew';
+import type {
+  BusterListColumn,
+  BusterListRow,
+  InfiniteScrollConfig,
+} from '@/components/ui/list/BusterListNew';
 import {
   BusterList,
   type BusterListSectionRow,
@@ -55,7 +59,6 @@ export const LibraryListView = ({
   allGroups,
 }: LibraryViewProps) => {
   const { group_by } = filters;
-  console.log({ collections, allResults });
 
   const collectionRows: BusterListRow<LibraryListItems>[] = useMemo(() => {
     const collectionItems = collections.map((collection) => {
@@ -116,5 +119,22 @@ export const LibraryListView = ({
     return items;
   }, [allResults, allGroups, collectionRows, group_by]);
 
-  return <BusterList rows={rows} columns={columns} />;
+  const infiniteScrollConfig: InfiniteScrollConfig | undefined = useMemo(
+    () =>
+      isFetchingNextPage
+        ? {
+            loadingNewContent: <div>Loading...</div>,
+          }
+        : undefined,
+    [isFetchingNextPage]
+  );
+
+  return (
+    <BusterList
+      scrollContainerRef={scrollContainerRef}
+      rows={rows}
+      columns={columns}
+      infiniteScrollConfig={infiniteScrollConfig}
+    />
+  );
 };

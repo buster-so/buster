@@ -23,7 +23,7 @@ export const AppPageLayoutContent: React.FC<
         'relative', //added this to error boundary components
         className
       )}
-      viewportRef={viewportRef}
+      viewportRef={scrollable ? viewportRef : undefined}
       style={scrollContainerStyle}
     >
       <ChildSelector>{children}</ChildSelector>

@@ -1,8 +1,8 @@
 import z from 'zod';
 import {
+  InfinitePaginationSchema,
   type PaginatedResponse,
   PaginationInputSchema,
-  SearchPaginationSchema,
 } from './pagination';
 
 // Library assets exclude collections - only assets with savedToLibrary field
@@ -73,7 +73,7 @@ export type ListPermissionedLibraryAssetsInput = z.infer<
 
 export const GroupedLibraryAssetsResponseSchema = z.object({
   groups: z.record(z.string(), LibraryAssetListItemSchema.array()),
-  pagination: SearchPaginationSchema,
+  pagination: InfinitePaginationSchema,
 });
 
 export type GroupedLibraryAssets = z.infer<typeof GroupedLibraryAssetsResponseSchema>['groups'];
