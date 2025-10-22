@@ -6,7 +6,7 @@ import { WIDTH_OF_CHECKBOX_COLUMN } from './config';
 export type CheckboxStatus = 'checked' | 'unchecked' | 'indeterminate';
 
 export const CheckboxColumn: React.FC<{
-  checkStatus: CheckboxStatus;
+  checkStatus: CheckboxStatus | undefined;
   onChange: (v: boolean, e: React.MouseEvent) => void;
   className?: string;
   disabled?: boolean;
@@ -29,8 +29,8 @@ export const CheckboxColumn: React.FC<{
       }}
       className={cn(
         className,
-        'flex h-full items-center justify-center pr-1 pl-1 opacity-0 group-hover:opacity-100',
-        showBox ? 'opacity-100' : ''
+        'flex h-full items-center justify-center pr-1 pl-1 group-hover:opacity-100',
+        showBox ? 'visible! opacity-100' : ''
       )}
     >
       <Checkbox

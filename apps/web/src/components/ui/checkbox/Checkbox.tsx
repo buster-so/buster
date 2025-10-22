@@ -67,6 +67,7 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root
     },
     ref
   ) => {
+    if (indeterminate) console.log('indeterminate', checked, indeterminate);
     return (
       <CheckboxPrimitive.Root
         ref={ref}
@@ -79,7 +80,7 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root
           className={cn('absolute inset-0 flex items-center justify-center')}
         >
           <div className="text-background flex">
-            {checked === 'indeterminate' ? <Minus /> : <Check />}
+            {checked === 'indeterminate' || indeterminate ? <Minus /> : <Check />}
           </div>
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>

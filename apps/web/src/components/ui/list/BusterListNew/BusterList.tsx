@@ -2,6 +2,7 @@ import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual';
 import type React from 'react';
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { BusterListHeader } from './BusterListHeader';
 import { BusterListRowComponent } from './BusterListRowComponent';
 import { BusterListRowSection } from './BusterListRowSection';
 import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
@@ -39,7 +40,6 @@ function BusterListInner<T = unknown>(
   });
 
   const onSelectSectionChange = useMemoizedFn((v: boolean, id: string) => {
-    console.log('onSelectSectionChange', v, id);
     if (!onSelectChange) return;
 
     const selectedSectionIds = idsPerSection.get(id);
@@ -47,10 +47,22 @@ function BusterListInner<T = unknown>(
       console.warn('Selected section ids not found', id);
       return;
     }
+
+    const currentSelection = selectedRowKeys || new Set<string>();
+
     const newSelectedRowKeys = v
-      ? new Set([...selectedRowKeys, ...selectedSectionIds])
-      : new Set(selectedRowKeys.filter((d) => !selectedSectionIds.has(d)));
-    onSelectChange?.(newSelectedRowKeys);
+      ? new Set([...currentSelection, ...selectedSectionIds])
+      : new Set([...currentSelection].filter((d) => !selectedSectionIds.has(d)));
+
+    onSelectChange(newSelectedRowKeys);
+  });
+
+  const onGlobalSelectChange = useMemoizedFn((v: boolean) => {
+    if (!onSelectChange) return;
+    const allIdsAreSelected = rows.length === selectedRowKeys?.size;
+    const selectedSet = !allIdsAreSelected ? new Set(rows.map((row) => row.id)) : new Set<string>();
+    console.log(selectedSet, rows.length);
+    onSelectChange(selectedSet);
   });
 
   useImperativeHandle(ref, () => ({
@@ -75,26 +87,38 @@ function BusterListInner<T = unknown>(
   }, [rows]);
 
   return (
-    <div ref={parentRef} className="overflow-y-auto overflow-x-hidden h-full w-full">
-      <div
-        style={{
-          height: `${rowVirtualizer.getTotalSize()}px`,
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-          <BusterListRowSelector
-            {...virtualRow}
-            rows={rows}
-            columns={columns}
-            idsPerSection={idsPerSection}
-            selectedRowKeys={selectedRowKeys}
-            onSelectChange={onSelectChange}
-            onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
-            key={virtualRow.key}
-          />
-        ))}
+    <div>
+      {showHeader && (
+        <BusterListHeader
+          columns={columns}
+          rowClassName={rowClassName}
+          showSelectAll={showSelectAll}
+          rowsLength={rows.length}
+          selectedRowKeys={selectedRowKeys}
+          onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
+        />
+      )}
+      <div ref={parentRef} className="overflow-y-auto overflow-x-hidden h-full w-full">
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+            <BusterListRowSelector
+              {...virtualRow}
+              rows={rows}
+              columns={columns}
+              idsPerSection={idsPerSection}
+              selectedRowKeys={selectedRowKeys}
+              onSelectChange={onSelectChange}
+              onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
+              key={virtualRow.key}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

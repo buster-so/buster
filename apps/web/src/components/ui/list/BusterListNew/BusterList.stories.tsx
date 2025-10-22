@@ -28,7 +28,7 @@ const meta: Meta<typeof BusterList> = {
   },
   decorators: [
     (Story) => (
-      <div className="bg-background w-full min-w-[500px]">
+      <div className="bg-background w-full min-w-[500px] h-[400px] overflow-hidden">
         <Story />
       </div>
     ),
@@ -101,16 +101,7 @@ export const Default: Story = {
   render: (args) => {
     const [selectedRowKeys, setSelectedRowKeys] = React.useState<Set<string>>(new Set());
     return (
-      <div style={{ height: '400px', width: '800px' }}>
-        <BusterList
-          {...args}
-          selectedRowKeys={selectedRowKeys}
-          onSelectChange={(v) => {
-            console.log(v);
-            setSelectedRowKeys(v);
-          }}
-        />
-      </div>
+      <BusterList {...args} selectedRowKeys={selectedRowKeys} onSelectChange={setSelectedRowKeys} />
     );
   },
 };

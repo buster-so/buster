@@ -42,8 +42,6 @@ const BusterListRowSectionBase = <T = unknown>({
     onSelectSectionChange?.(v, id);
   };
 
-  console.log();
-
   return (
     <div
       className={cn(
