@@ -44,31 +44,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node-env
         with:
-          version: 10.19.0
-
-      - name: Setup Node.js
-        uses: useblacksmith/setup-node@v5
-        with:
-          node-version: 22
-          cache: 'pnpm'
-
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Mount Turbo cache sticky disk
-        if: runner.os != 'Windows'
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-turbo-cache-cli-${{ matrix.target }}
-          path: ./.turbo
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          stickydisk-key: ${{ github.repository }}-turbo-cache-cli-${{ matrix.target }}
 
       - name: Build dependencies with Turbo
         run: |

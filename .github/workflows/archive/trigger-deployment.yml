@@ -22,7 +22,8 @@ jobs:
         with:
           install-filter: "@buster-app/trigger..."
           cache-key: trigger-deployment
-        
+          stickydisk-key: ${{ github.repository }}-turbo-trigger-deploy
+
       - name: 🚀 Deploy to ${{ github.ref_name == 'main' && 'Production' || 'Staging' }}
         env:
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
