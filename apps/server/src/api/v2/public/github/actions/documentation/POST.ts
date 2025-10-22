@@ -1,6 +1,6 @@
 import { createChat, createMessage, getActiveGithubIntegration } from '@buster/database/queries';
 import { generateNewInstallationToken } from '@buster/github';
-import { type githubContext, runDocsAgentAsync, runDocsAgentSync } from '@buster/sandbox';
+import { type GithubContext, runDocsAgentAsync, runDocsAgentSync } from '@buster/sandbox';
 import { GithubActionDocumentationPostSchema } from '@buster/server-shared/github';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
@@ -18,7 +18,7 @@ const app = new Hono().post(
     }
 
     // github context to pass to the agent
-    const context: githubContext = {};
+    const context: GithubContext = {};
 
     // Needs to be either a pull_request event or a push event.
     if (!eventContext || !(eventContext.pull_request || eventContext.commits)) {
