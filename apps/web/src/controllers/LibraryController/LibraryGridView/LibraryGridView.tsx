@@ -19,6 +19,7 @@ import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
+import type { LibraryViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
 import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
@@ -28,30 +29,19 @@ export const LibraryGridView = React.memo(
     allResults,
     collections,
     isFetchingNextPage,
-    isLoading,
-    isPending,
+    isInitialLoading: isInitialLoadingProp,
     className,
     filters,
     scrollContainerRef,
     allGroups,
-  }: {
-    allGroups: undefined | Record<string, LibraryAssetListItem[]>;
-    allResults: LibraryAssetListItem[];
-    collections: BusterCollectionListItem[];
-    filters: LibrarySearchParams;
-    isFetchingNextPage: boolean;
-    isLoading: boolean;
-    isPending: boolean;
-    className?: string;
-    scrollContainerRef: React.RefObject<HTMLDivElement | null>;
-  }) => {
+  }: LibraryViewProps) => {
     // Calculate number of columns based on viewport width
     const [columns, setColumns] = React.useState(3);
     const hasCollections = collections.length > 0;
     const hasResults = allResults.length > 0;
     const hasGroups = allGroups !== undefined;
     const groupBy = filters.group_by;
-    const isInitialLoading = (isLoading || isPending) && !hasResults;
+    const isInitialLoading = isInitialLoadingProp && !hasResults;
 
     React.useEffect(() => {
       const updateColumns = () => {

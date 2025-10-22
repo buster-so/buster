@@ -6,6 +6,8 @@ import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
 import { LibraryGridView } from './LibraryGridView';
 import { LibraryHeader } from './LibraryHeader';
+import { LibraryListView } from './LibraryListView';
+import type { LibraryViewProps } from './library.types';
 import type { LibraryLayout, LibrarySearchParams } from './schema';
 
 export type LibraryControllerProps = {
@@ -20,7 +22,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
   const { data: collections } = useGetCollectionsList({});
   const managedFilters = useManagedFilters(filtersProps);
 
-  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isLoading, isPending } =
+  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
     useLibraryAssetsInfinite({
       ...managedFilters,
       page_size: 45,
@@ -29,25 +31,24 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
       },
     });
 
+  const libraryViewProps: LibraryViewProps = {
+    allResults,
+    allGroups,
+    collections,
+    filters: filtersProps,
+    isFetchingNextPage,
+    scrollContainerRef,
+    isInitialLoading: isFetched,
+  };
+
   return (
     <AppPageLayout
       header={<LibraryHeader layout={layout} filters={filtersProps} />}
       contentContainerId="library-content"
       scrollable={false}
     >
-      {layout === 'grid' && (
-        <LibraryGridView
-          allResults={allResults}
-          allGroups={allGroups}
-          collections={collections}
-          filters={filtersProps}
-          isFetchingNextPage={isFetchingNextPage}
-          isLoading={isLoading}
-          isPending={isPending}
-          scrollContainerRef={scrollContainerRef}
-        />
-      )}
-      {layout === 'list' && <span>asdf</span>}
+      {layout === 'grid' && <LibraryGridView {...libraryViewProps} />}
+      {layout === 'list' && <LibraryListView {...libraryViewProps} />}
     </AppPageLayout>
   );
 };

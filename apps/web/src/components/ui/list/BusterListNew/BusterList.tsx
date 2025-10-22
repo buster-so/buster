@@ -25,13 +25,31 @@ function BusterListBase<T = unknown>(
     className,
     hideLastRowBorder,
     infiniteScrollConfig,
+    scrollParentRef: externalScrollParentRef,
   }: BusterListProps<T>,
   ref: React.Ref<BusterListImperativeHandle>
 ) {
-  const scrollParentRef = useRef<HTMLDivElement>(null);
+  const internalScrollParentRef = useRef<HTMLDivElement>(null);
+
+  // Callback ref to merge internal and external refs
+  const mergedScrollRef = (node: HTMLDivElement | null) => {
+    // Always update internal ref
+    internalScrollParentRef.current = node;
+
+    // Update external ref if provided
+    if (externalScrollParentRef) {
+      if (typeof externalScrollParentRef === 'function') {
+        externalScrollParentRef(node);
+      } else {
+        // It's a RefObject
+        (externalScrollParentRef as { current: HTMLDivElement | null }).current = node;
+      }
+    }
+  };
+
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => scrollParentRef.current,
+    getScrollElement: () => internalScrollParentRef.current,
     estimateSize: (i) => (rows[i].type === 'row' ? HEIGHT_OF_ROW : HEIGHT_OF_SECTION_ROW),
     overscan: 0,
   });
@@ -99,7 +117,7 @@ function BusterListBase<T = unknown>(
   }, [contextMenu]);
 
   useInfiniteScroll({
-    scrollElementRef: scrollParentRef,
+    scrollElementRef: internalScrollParentRef,
     infiniteScrollConfig,
   });
 
@@ -120,7 +138,7 @@ function BusterListBase<T = unknown>(
         />
       )}
       <WrapperNode {...wrapperNodeProps}>
-        <div ref={scrollParentRef} className="overflow-y-auto overflow-x-hidden flex-1 w-full">
+        <div ref={mergedScrollRef} className="overflow-y-auto overflow-x-hidden flex-1 w-full">
           <div
             style={{
               height: `${rowVirtualizer.getTotalSize()}px`,

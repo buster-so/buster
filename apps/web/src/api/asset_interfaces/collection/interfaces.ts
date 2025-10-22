@@ -4,7 +4,7 @@ export type BusterCollectionListItem = {
   id: string;
   name: string;
   description: string;
-  last_edited: string;
+  updated_at: string;
   created_at: string;
   sharing: BusterCollectionSharing;
   owner: {

@@ -17,6 +17,7 @@ export interface BusterListProps<T = unknown> {
   className?: string;
   infiniteScrollConfig?: InfiniteScrollConfig;
   useRowClickSelectChange?: boolean;
+  scrollParentRef?: React.Ref<HTMLDivElement>;
 }
 
 export type BusterListColumn<T = unknown> = {
@@ -63,8 +64,9 @@ export type BusterListRow<T = unknown> =
 export type BusterListRowItems<T = unknown> = BusterListRow<T>[];
 
 export interface InfiniteScrollConfig {
-  onScrollEnd: () => void;
+  onScrollEnd?: () => void;
   scrollEndThreshold?: number;
+  //you can just pass a loading spinner component here without any props
   loadingNewContent?: React.ReactNode;
 }
 

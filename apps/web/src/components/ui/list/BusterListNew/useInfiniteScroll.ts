@@ -13,8 +13,8 @@ export function useInfiniteScroll({
   const hasTriggeredScrollEnd = useRef(false);
 
   useEffect(() => {
-    if (!infiniteScrollConfig) return;
-    const { onScrollEnd, scrollEndThreshold = 50, loadingNewContent } = infiniteScrollConfig;
+    if (!infiniteScrollConfig?.onScrollEnd) return;
+    const { onScrollEnd, scrollEndThreshold = 50 } = infiniteScrollConfig;
     const scrollElement = scrollElementRef.current;
 
     if (!scrollElement) return;

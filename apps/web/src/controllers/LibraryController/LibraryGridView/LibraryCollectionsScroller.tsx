@@ -103,7 +103,7 @@ export const LibraryCollectionsScroller = React.memo(
 
 LibraryCollectionsScroller.displayName = 'LibraryCollectionsScroller';
 
-const CollectionCard = React.memo(({ id, name, last_edited, owner }: BusterCollectionListItem) => {
+const CollectionCard = React.memo(({ id, name, updated_at, owner }: BusterCollectionListItem) => {
   return (
     <CollectionCardContextMenu id={id}>
       <Link to="/app/collections/$collectionId" params={{ collectionId: id }}>
@@ -119,7 +119,7 @@ const CollectionCard = React.memo(({ id, name, last_edited, owner }: BusterColle
           <div className="flex items-center space-x-1">
             <Avatar image={owner?.avatar_url || undefined} name={owner?.name} size={12} />
             <Text variant={'tertiary'} size={'xs'}>
-              {formatDate({ date: last_edited, format: 'MMM D' })}
+              {formatDate({ date: updated_at, format: 'MMM D' })}
             </Text>
           </div>
         </div>
