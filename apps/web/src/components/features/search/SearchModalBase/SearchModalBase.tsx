@@ -33,13 +33,13 @@ type SearchModalNavigateProps = {
 
 type SearchModalSelectSingleProps = {
   mode: 'select-single';
-  onSelect: (item: SearchTextData) => void | Promise<void>;
+  onSelect: (item: string | null) => void | Promise<void>;
   selectedItem: string;
 };
 
 type SearchModalSelectMultipleProps = {
   mode: 'select-multiple';
-  onSelect: (items: SearchTextData[]) => void | Promise<void>;
+  onSelect: (items: Set<string>) => void | Promise<void>;
   selectedItems: Set<string>;
 };
 
@@ -50,18 +50,20 @@ type SearchModalBaseProps = (
 ) &
   SearchModalBaseContentProps;
 
-export const SearchModalBase = ({
-  value,
-  items,
-  onChangeValue,
-  loading = false,
-  scrollContainerRef,
-  isOpen,
-  mode,
-  filterContent,
-  onClose,
-  onSelect,
-}: SearchModalBaseProps) => {
+export const SearchModalBase = (props: SearchModalBaseProps) => {
+  const {
+    value,
+    items,
+    onChangeValue,
+    loading = false,
+    scrollContainerRef,
+    isOpen,
+    mode,
+    filterContent,
+    onClose,
+    onSelect,
+  } = props;
+
   const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
@@ -72,6 +74,33 @@ export const SearchModalBase = ({
   //   setViewedItem(null);
   //   onChangeValue('');
   // };
+
+  const onSelectItem = useMemoizedFn(async (item: SearchTextData) => {
+    if (mode === 'navigate') {
+      const link = createSimpleAssetRoute({
+        asset_type: item.assetType,
+        id: item.assetId,
+      }) as Parameters<typeof navigate>[0];
+      await navigate({ ...link, reloadDocument: true });
+      return;
+    }
+
+    if (mode === 'select-single') {
+      const newItem = item.assetId === props.selectedItem ? null : item.assetId;
+      await onSelect?.(newItem);
+      return;
+    }
+
+    if (mode === 'select-multiple') {
+      const newItems = new Set(props.selectedItems);
+      newItems.has(item.assetId) ? newItems.delete(item.assetId) : newItems.add(item.assetId);
+      await onSelect(newItems);
+      return;
+    }
+
+    const _exhaustiveCheck: never = mode;
+    throw new Error(`Invalid mode: ${_exhaustiveCheck}`);
+  });
 
   const searchItems: SearchItems[] = useMemo(() => {
     const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
@@ -89,16 +118,7 @@ export const SearchModalBase = ({
               dangerouslySetInnerHTML={{ __html: item.additionalText }}
             />
           ) : undefined,
-        onSelect: async () => {
-          //  await onSelect?.(item);
-          if (mode === 'navigate') {
-            const link = createSimpleAssetRoute({
-              asset_type: item.assetType,
-              id: item.assetId,
-            }) as Parameters<typeof navigate>[0];
-            await navigate({ ...link, reloadDocument: true });
-          }
-        },
+        onSelect: async () => onSelectItem(item),
       };
     };
 
@@ -138,7 +158,7 @@ export const SearchModalBase = ({
             },
           },
         ],
-        display: true,
+        display: mode === 'navigate',
       },
       ...Object.entries(todayAndYesterday).map<SearchItemGroup & { display: boolean }>(
         ([key, value]) => ({

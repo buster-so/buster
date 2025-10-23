@@ -1,9 +1,12 @@
 import React from 'react';
+import {
+  LibrarySearchModal,
+  toggleLibrarySearch,
+} from '@/components/features/search/LibrarySearchModal';
 import { Button } from '@/components/ui/buttons/Button';
 import { Dots, Plus, Sliders3 } from '@/components/ui/icons';
-import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
+import { Tooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography/Text';
-import { useLibraryLayout } from '@/context/Library/useLibraryLayout';
 import type { LibraryLayout, LibrarySearchParams } from '../schema';
 import { FilterDropdown } from './FilterDropdown';
 import { FilterSwitch } from './FilterSwitch';
@@ -20,7 +23,7 @@ export const LibraryHeader: React.FC<{
         <FilterSwitch filter={filters.filter} />
       </div>
       <div className="flex items-center space-x-1">
-        <Button variant="ghost" prefix={<Plus />} onClick={() => {}} />
+        <OpenLibrarySearchModalButton />
         <FilterDropdown
           owner_ids={filters.owner_ids}
           asset_types={filters.asset_types}
@@ -38,3 +41,20 @@ export const LibraryHeader: React.FC<{
     </div>
   );
 });
+
+const OpenLibrarySearchModalButton = () => {
+  return (
+    <React.Fragment>
+      <Tooltip title="Add to library">
+        <Button
+          variant="ghost"
+          prefix={<Plus />}
+          onClick={() => {
+            toggleLibrarySearch(true);
+          }}
+        />
+      </Tooltip>
+      <LibrarySearchModal />
+    </React.Fragment>
+  );
+};

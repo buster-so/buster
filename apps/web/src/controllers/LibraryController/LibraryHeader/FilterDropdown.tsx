@@ -20,6 +20,7 @@ import { Calendar } from '@/components/ui/icons';
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
+import { Tooltip } from '@/components/ui/tooltip';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/classMerge';
 import { getNow } from '@/lib/date';
@@ -173,7 +174,9 @@ export const FilterDropdown = React.memo(
         menuHeader={<div className="px-2.5 py-1.5 text-text-tertiary">Filters...</div>}
         onOpenChange={setOpen}
       >
-        <Button variant="ghost" prefix={<BarsFilter />} />
+        <Tooltip title="Filters">
+          <Button variant="ghost" prefix={<BarsFilter />} />
+        </Tooltip>
       </Dropdown>
     );
   }

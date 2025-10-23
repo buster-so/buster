@@ -2,14 +2,10 @@ import React, { useState } from 'react';
 import { SearchModalBase } from '../SearchModalBase/SearchModalBase';
 import { useLibrarySearchStore } from './library-store';
 
-export const LibrarySearchModal = () => {
+export const LibrarySearchModal = React.memo(() => {
   const { isOpen, onCloseLibrarySearch, value, setLibrarySearchValue } = useLibrarySearchStore();
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-
-  const handleSelect = (item: Set<string>) => {
-    setSelectedItems(() => item);
-  };
 
   return (
     <SearchModalBase
@@ -22,9 +18,9 @@ export const LibrarySearchModal = () => {
       selectedItems={selectedItems}
       loading={true}
       filterContent={null}
-      onSelect={(items) => {
-        items.size;
-      }}
+      onSelect={setSelectedItems}
     />
   );
-};
+});
+
+LibrarySearchModal.displayName = 'LibrarySearchModal';

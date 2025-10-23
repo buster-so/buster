@@ -8,6 +8,7 @@ import UnorderedList from '@/components/ui/icons/NucleoIconOutlined/unordered-li
 import { Popover } from '@/components/ui/popover';
 import { AppSegmented, createSegmentedItems } from '@/components/ui/segmented';
 import { Select, type SelectItem } from '@/components/ui/select';
+import { Tooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography/Text';
 import { setLibraryLayoutCookie } from '@/context/Library/useLibraryLayout';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -43,7 +44,9 @@ export const OrderDropdown = React.memo(
           [layout, ordering, groupBy, ordering_direction]
         )}
       >
-        <Button variant="ghost" prefix={<Sliders3 />} onClick={() => {}} />
+        <Tooltip title="View, group and sort">
+          <Button variant="ghost" prefix={<Sliders3 />} onClick={() => {}} />
+        </Tooltip>
       </Popover>
     );
   }
