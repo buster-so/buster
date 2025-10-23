@@ -1,5 +1,4 @@
-import type { AssetType } from '@buster/server-shared/assets';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDeleteLibraryAssets, usePostLibraryAssets } from '@/api/buster_rest/library';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import type {
@@ -20,8 +19,42 @@ export const LibrarySearchModal = React.memo(() => {
 
   const { isOpen, onCloseLibrarySearch } = useLibrarySearchStore();
 
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const fullSelectedItems = useRef<Set<{ assetId: string; assetType: AssetType }>>(new Set());
+  // Track items to add (were NOT in library, user selected them)
+  const [itemsToAdd, setItemsToAdd] = useState<Set<string>>(new Set());
+  // Track items to remove (were IN library, user unselected them)
+  const [itemsToRemove, setItemsToRemove] = useState<Set<string>>(new Set());
+
+  // Handle item selection - route to appropriate Set based on library status
+  const handleSelectItem = useMemoizedFn((itemKey: string, wasInLibrary: boolean) => {
+    if (wasInLibrary) {
+      // Item was in library, toggle in "remove" Set
+      setItemsToRemove((prev) => {
+        const next = new Set(prev);
+        next.has(itemKey) ? next.delete(itemKey) : next.add(itemKey);
+        return next;
+      });
+    } else {
+      // Item was NOT in library, toggle in "add" Set
+      setItemsToAdd((prev) => {
+        const next = new Set(prev);
+        next.has(itemKey) ? next.delete(itemKey) : next.add(itemKey);
+        return next;
+      });
+    }
+  });
+
+  // Check if item should appear selected
+  const isItemSelected = useCallback(
+    (itemKey: string) => {
+      // Selected if: (in library AND not marked for removal) OR marked for addition
+      // But we don't track "in library" state here, so we check the Sets
+      // Item is selected if it's in itemsToAdd OR not in itemsToRemove
+      // Wait, this logic needs to consider the item's actual library state...
+      // Actually, the `selected` prop already handles `addedToLibrary`, so we just need to check our Sets
+      return itemsToAdd.has(itemKey) || itemsToRemove.has(itemKey);
+    },
+    [itemsToAdd, itemsToRemove]
+  );
 
   const {
     selectedDateRange,
@@ -47,51 +80,60 @@ export const LibrarySearchModal = React.memo(() => {
     },
   });
 
+  const onSubmit = useMemoizedFn(() => {
+    // Parse composite keys back to { assetId, assetType } objects
+    const assetsToAddParsed = Array.from(itemsToAdd).map((key) => parseSelectionKey(key));
+    const assetsToRemoveParsed = Array.from(itemsToRemove).map((key) => parseSelectionKey(key));
+
+    // Execute both operations
+    if (assetsToAddParsed.length > 0) {
+      postLibraryAssets(assetsToAddParsed);
+    }
+
+    if (assetsToRemoveParsed.length > 0) {
+      removeLibraryAssets(assetsToRemoveParsed);
+    }
+
+    // Reset state after submission
+    setItemsToAdd(new Set());
+    setItemsToRemove(new Set());
+    onCloseLibrarySearch();
+  });
+
   const footerConfig = React.useMemo<SearchModalContentProps['footerConfig']>(
     () => ({
       tertiaryButton: {
         children: 'Clear selection',
-        disabled: selectedItems.size === 0,
+        disabled: itemsToAdd.size === 0 && itemsToRemove.size === 0,
         variant: 'ghost',
         onClick: () => {
-          setSelectedItems(new Set());
+          setItemsToAdd(new Set());
+          setItemsToRemove(new Set());
         },
       },
       secondaryButton: {
         children: 'Cancel',
         variant: 'ghost',
-        onClick: () => {
-          onCloseLibrarySearch();
-        },
+        onClick: onCloseLibrarySearch,
       },
       primaryButton: {
         children: 'Update library',
         variant: 'default',
         loading: isPostingLibraryAssets || isRemovingLibraryAssets,
-        onClick: () => {
-          // Parse composite keys back to { assetId, assetType } objects
-          const assetsToAdd = Array.from(selectedItems).map((key) => parseSelectionKey(key));
-
-          postLibraryAssets(assetsToAdd);
-
-          // If you need to track removals, you'd do similar:
-          // const assetsToRemove = Array.from(itemsToRemove).map((key) => parseSelectionKey(key));
-          // removeLibraryAssets(assetsToRemove);
-        },
+        disabled: itemsToAdd.size === 0 && itemsToRemove.size === 0,
+        onClick: onSubmit,
       },
     }),
     [
-      !!selectedItems.size,
+      itemsToAdd.size,
+      itemsToRemove.size,
       onCloseLibrarySearch,
-      setSelectedItems,
       isPostingLibraryAssets,
       isRemovingLibraryAssets,
+      postLibraryAssets,
+      removeLibraryAssets,
     ]
   );
-
-  const handleSelect = useMemoizedFn((items: Set<string>) => {
-    setSelectedItems(items);
-  });
 
   return (
     <SearchModalBase
@@ -101,10 +143,10 @@ export const LibrarySearchModal = React.memo(() => {
       value={searchQuery}
       onChangeValue={setSearchQuery}
       items={allResults}
-      selectedItems={selectedItems}
+      onSelect={handleSelectItem}
+      isItemSelected={isItemSelected}
       loading={isFetchingNextPage || !isFetched}
       filterContent={null}
-      onSelect={handleSelect}
       scrollContainerRef={scrollContainerRef}
       footerConfig={footerConfig}
     />

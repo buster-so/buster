@@ -6,10 +6,11 @@ export const usePostLibraryAssets = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: postLibraryAssets,
+    onMutate: () => {},
     onSuccess: () => {
       const queryKey = libraryQueryKeys
         .libraryGetList({ page: 1, page_size: 10 })
-        .queryKey.slice(0, 3);
+        .queryKey.slice(0, 2);
       queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
     },
   });
@@ -23,8 +24,6 @@ export const useDeleteLibraryAssets = () => {
       const queryKey = libraryQueryKeys
         .libraryGetList({ page: 1, page_size: 10 })
         .queryKey.slice(0, 2);
-      console.log(queryKey);
-
       queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
     },
   });

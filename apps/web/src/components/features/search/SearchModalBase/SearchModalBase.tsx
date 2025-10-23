@@ -41,8 +41,8 @@ type SearchModalSelectSingleProps = {
 
 type SearchModalSelectMultipleProps = {
   mode: 'select-multiple';
-  onSelect: (items: Set<string>) => void | Promise<void>;
-  selectedItems: Set<string>;
+  onSelect: (itemKey: string, wasInLibrary: boolean) => void | Promise<void>;
+  isItemSelected: (itemKey: string) => boolean;
 };
 
 type SearchModalBaseProps = (
@@ -71,7 +71,6 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
     mode,
     filterContent,
     onClose,
-    onSelect,
     footerConfig,
   } = props;
 
@@ -88,6 +87,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
   const onSelectItem = useMemoizedFn(async (item: SearchTextData) => {
     if (mode === 'navigate') {
+      await props.onSelect?.(item);
       const link = createSimpleAssetRoute({
         asset_type: item.assetType,
         id: item.assetId,
@@ -98,15 +98,13 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
     if (mode === 'select-single') {
       const newItem = item.assetId === props.selectedItem ? null : item.assetId;
-      await onSelect?.(newItem ? { assetId: newItem, assetType: item.assetType } : null);
+      await props.onSelect?.(newItem ? { assetId: newItem, assetType: item.assetType } : null);
       return;
     }
 
     if (mode === 'select-multiple') {
-      const newItems = new Set(props.selectedItems);
       const itemKey = createSelectionKey(item.assetId, item.assetType);
-      newItems.has(itemKey) ? newItems.delete(itemKey) : newItems.add(itemKey);
-      await onSelect?.(newItems);
+      await props.onSelect(itemKey, item.addedToLibrary ?? false);
       return;
     }
 
@@ -114,35 +112,40 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
     throw new Error(`Invalid mode: ${_exhaustiveCheck}`);
   });
 
-  const fallbackCheckSelected = useCallback(
-    (itemId: string, assetType: AssetType) => {
-      return () => {
-        if (mode === 'navigate') {
-          return false;
+  const getSelected = useCallback(
+    (item: SearchTextData): boolean => {
+      // Handle select-multiple mode with library tracking
+      if (mode === 'select-multiple') {
+        const itemKey = createSelectionKey(item.assetId, item.assetType);
+        const hasPendingChange = props.isItemSelected(itemKey);
+
+        // If item was in library: show selected unless marked for removal
+        if (item.addedToLibrary) {
+          return !hasPendingChange; // invert: pending means removing
         }
 
-        if (mode === 'select-single') {
-          return itemId === props.selectedItem;
-        }
+        // If item wasn't in library: show selected if marked for addition
+        return hasPendingChange;
+      }
 
-        if (mode === 'select-multiple') {
-          const itemKey = createSelectionKey(itemId, assetType);
-          return props.selectedItems.has(itemKey);
-        }
+      // Handle select-single mode
+      if (mode === 'select-single') {
+        return item.assetId === props.selectedItem;
+      }
 
-        const _exhaustiveCheck: never = mode;
-        throw new Error(`Invalid mode: ${_exhaustiveCheck}`);
-      };
+      // Navigate mode or items with addedToLibrary flag
+      return item.addedToLibrary || false;
     },
     [
       mode,
       (props as SearchModalSelectSingleProps).selectedItem,
-      (props as SearchModalSelectMultipleProps).selectedItems,
+      (props as SearchModalSelectMultipleProps).isItemSelected,
     ]
   );
 
   const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
     const Icon = assetTypeToIcon(item.assetType);
+
     return {
       label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
       icon: <Icon />,
@@ -157,7 +160,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
           />
         ) : undefined,
       onSelect: async () => onSelectItem(item),
-      selected: item.addedToLibrary || fallbackCheckSelected(item.assetId, item.assetType),
+      selected: getSelected(item),
     };
   };
 
@@ -208,7 +211,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
         })
       ),
     ].filter((x) => x.display !== false) as SearchItems[];
-  }, [items, openSecondaryContent, fallbackCheckSelected, onSelectItem, mode]);
+  }, [items, openSecondaryContent, getSelected, onSelectItem, mode]);
 
   const onViewSearchItem = useMemoizedFn((item: SearchItem) => {
     const foundItem = items.find((x) => x.assetId === item.value);

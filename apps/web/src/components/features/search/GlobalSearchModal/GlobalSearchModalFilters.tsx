@@ -15,7 +15,7 @@ import { SEARCH_INPUT_ID } from '@/components/ui/search/SearchModal/SearchInput'
 import { Tooltip } from '@/components/ui/tooltip';
 import { getNow } from '@/lib/date';
 import { ASSET_ICONS } from '../../icons/assetIcons';
-import type { FiltersParams, OnSetFiltersParams } from './GlobalSearchModal';
+import type { FiltersParams, OnSetFiltersParams } from '../useCommonSearch';
 
 export const GlobalSearchModalFilters = React.memo(
   ({
