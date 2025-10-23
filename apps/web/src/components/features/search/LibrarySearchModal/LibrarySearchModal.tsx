@@ -7,7 +7,7 @@ import type {
   SearchMode,
 } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { SearchModalBase } from '../SearchModalBase/SearchModalBase';
+import { parseSelectionKey, SearchModalBase } from '../SearchModalBase/SearchModalBase';
 import { useCommonSearch } from '../useCommonSearch';
 import { useLibrarySearchStore } from './library-store';
 
@@ -20,9 +20,8 @@ export const LibrarySearchModal = React.memo(() => {
 
   const { isOpen, onCloseLibrarySearch } = useLibrarySearchStore();
 
-  const [selectedItems, setSelectedItems] = useState<
-    Set<{ assetId: string; assetType: AssetType }>
-  >(new Set());
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const fullSelectedItems = useRef<Set<{ assetId: string; assetType: AssetType }>>(new Set());
 
   const {
     selectedDateRange,
@@ -70,12 +69,14 @@ export const LibrarySearchModal = React.memo(() => {
         variant: 'default',
         loading: isPostingLibraryAssets || isRemovingLibraryAssets,
         onClick: () => {
-          // postLibraryAssets({
-          //  // assets: Array.from(selectedItems),
-          // });
-          // removeLibraryAssets({
-          //   assets: Array.from(itemsToRemove.current),
-          // });
+          // Parse composite keys back to { assetId, assetType } objects
+          const assetsToAdd = Array.from(selectedItems).map((key) => parseSelectionKey(key));
+
+          postLibraryAssets(assetsToAdd);
+
+          // If you need to track removals, you'd do similar:
+          // const assetsToRemove = Array.from(itemsToRemove).map((key) => parseSelectionKey(key));
+          // removeLibraryAssets(assetsToRemove);
         },
       },
     }),
@@ -88,7 +89,7 @@ export const LibrarySearchModal = React.memo(() => {
     ]
   );
 
-  const handleSelect = useMemoizedFn((items: Set<{ assetId: string; assetType: AssetType }>) => {
+  const handleSelect = useMemoizedFn((items: Set<string>) => {
     setSelectedItems(items);
   });
 

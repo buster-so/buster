@@ -41,16 +41,8 @@ type SearchModalSelectSingleProps = {
 
 type SearchModalSelectMultipleProps = {
   mode: 'select-multiple';
-  onSelect: (
-    items: Set<{
-      assetId: string;
-      assetType: AssetType;
-    }>
-  ) => void | Promise<void>;
-  selectedItems: Set<{
-    assetId: string;
-    assetType: AssetType;
-  }>;
+  onSelect: (items: Set<string>) => void | Promise<void>;
+  selectedItems: Set<string>;
 };
 
 type SearchModalBaseProps = (
@@ -59,6 +51,14 @@ type SearchModalBaseProps = (
   | SearchModalSelectMultipleProps
 ) &
   SearchModalBaseContentProps;
+
+// Helper functions for composite keys
+const createSelectionKey = (assetId: string, assetType: AssetType) => `${assetId}:${assetType}`;
+
+export const parseSelectionKey = (key: string): { assetId: string; assetType: AssetType } => {
+  const [assetId, assetType] = key.split(':', 2);
+  return { assetId, assetType: assetType as AssetType };
+};
 
 export const SearchModalBase = (props: SearchModalBaseProps) => {
   const {
@@ -104,9 +104,8 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
     if (mode === 'select-multiple') {
       const newItems = new Set(props.selectedItems);
-      newItems.has({ assetId: item.assetId, assetType: item.assetType })
-        ? newItems.delete({ assetId: item.assetId, assetType: item.assetType })
-        : newItems.add({ assetId: item.assetId, assetType: item.assetType });
+      const itemKey = createSelectionKey(item.assetId, item.assetType);
+      newItems.has(itemKey) ? newItems.delete(itemKey) : newItems.add(itemKey);
       await onSelect?.(newItems);
       return;
     }
@@ -127,8 +126,8 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
         }
 
         if (mode === 'select-multiple') {
-          console.log('selectedItems', props.selectedItems, { assetId: itemId, assetType });
-          return props.selectedItems.has({ assetId: itemId, assetType });
+          const itemKey = createSelectionKey(itemId, assetType);
+          return props.selectedItems.has(itemKey);
         }
 
         const _exhaustiveCheck: never = mode;
