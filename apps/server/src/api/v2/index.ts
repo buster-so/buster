@@ -26,6 +26,7 @@ import supportRoutes from './support';
 import titleRoutes from './title';
 import { tools } from './tools';
 import userRoutes from './users';
+import sharingRoutes from './sharing';
 
 const app = new Hono()
   .route('/auth', authRoutes)
@@ -53,6 +54,7 @@ const app = new Hono()
   .route('/s3-integrations', s3IntegrationsRoutes)
   .route('/search', searchRoutes)
   .route('/public', publicRoutes)
-  .route('/dashboards', dashboardRoutes);
+  .route('/dashboards', dashboardRoutes)
+  .route('/sharing', sharingRoutes);
 
 export default app;
