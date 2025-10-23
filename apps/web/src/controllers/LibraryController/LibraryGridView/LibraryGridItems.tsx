@@ -27,7 +27,7 @@ const LibraryGridItem = React.memo(
               className={cn('w-full h-full object-contain object-top rounded-t-sm bg-background')}
             />
           </div>
-          <div className="px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover">
+          <div className="px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover bg-background">
             <Text>{name}</Text>
             <div className="flex items-center space-x-1 text-xs text-text-tertiary">
               <Clock />

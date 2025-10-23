@@ -280,7 +280,7 @@ const LibraryUngroupedView = ({
   });
 
   return (
-    <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
+    <LibrarySectionContainer title="Recently visited" icon={<Clock />} className="mt-11">
       <div
         ref={virtualStartRef}
         style={{

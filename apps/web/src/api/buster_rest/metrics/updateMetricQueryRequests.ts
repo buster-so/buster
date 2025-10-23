@@ -1,8 +1,8 @@
+import type { BusterCollection } from '@buster/server-shared/collections';
 import { type QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import last from 'lodash/last';
 import { create } from 'mutative';
-import type { BusterCollection } from '@/api/asset_interfaces/collection';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { metricsQueryKeys } from '@/api/query_keys/metric';

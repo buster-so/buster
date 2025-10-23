@@ -1,6 +1,7 @@
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import React, { useMemo, useState } from 'react';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces';
 import { FavoriteStar } from '@/components/features/favorites';
+import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator';
 import { NewCollectionModal } from '@/components/features/modals/NewCollectionModal';
 import { Avatar } from '@/components/ui/avatar';
 import {
@@ -77,10 +78,10 @@ const columns: BusterListColumn<BusterCollectionListItem>[] = [
     render: (v) => formatDate({ date: v, format: 'lll' }),
   },
   {
-    dataIndex: 'sharing',
+    dataIndex: 'is_shared',
     title: 'Sharing',
-    width: 55,
-    render: (v) => makeHumanReadble(v || 'private'),
+    width: 65,
+    render: (v) => getShareStatus({ is_shared: v }),
   },
   {
     dataIndex: 'created_by_avatar_url',
