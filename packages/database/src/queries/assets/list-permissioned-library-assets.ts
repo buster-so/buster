@@ -170,7 +170,17 @@ export async function listPermissionedLibraryAssets(
     return await filteredAssetQuery.limit(page_size).offset(offset);
   })();
 
-  const baseCountQuery = db.select({ total: count() }).from(permissionedAssets);
+  const baseCountQuery = db.select({ total: count() })
+  .from(permissionedAssets)
+  .innerJoin(
+    userLibrary,
+    and(
+      eq(userLibrary.assetId, permissionedAssets.assetId),
+      eq(userLibrary.assetType, permissionedAssets.assetType),
+      eq(userLibrary.userId, userId),
+      isNull(userLibrary.deletedAt)
+    )
+  );
   const countResult = await (whereCondition
     ? baseCountQuery.where(whereCondition)
     : baseCountQuery);
