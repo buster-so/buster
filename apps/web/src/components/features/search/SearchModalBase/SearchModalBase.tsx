@@ -1,5 +1,4 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing */
-
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
@@ -16,35 +15,58 @@ import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { timeFromNow } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { assetTypeToIcon } from '../../icons/assetIcons';
-import type { FiltersParams, OnSetFiltersParams } from './GlobalSearchModal';
-import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
-import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
-import { useGlobalSearchStore } from './global-search-store';
+import { SearchModalSecondaryContent } from './SearchModalSecondaryContent';
 
-export type GlobalSearchModalBaseProps<M = unknown, T extends string = string> = Pick<
+export type SearchModalBaseContentProps<M = unknown, T extends string = string> = Pick<
   NonNullable<SearchModalProps<M, T>>,
-  'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'openSecondaryContent'
+  'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'filterContent'
 > & {
   items: SearchTextResponse['data'];
-  filtersParams: FiltersParams;
-  onSetFilters: OnSetFiltersParams;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
-export const GlobalSearchModalBase = ({
+type SearchModalNavigateProps = {
+  mode: 'navigate';
+  onSelect?: (item: SearchTextData) => void | Promise<void>;
+};
+
+type SearchModalSelectSingleProps = {
+  mode: 'select-single';
+  onSelect: (item: SearchTextData) => void | Promise<void>;
+  selectedItem: string;
+};
+
+type SearchModalSelectMultipleProps = {
+  mode: 'select-multiple';
+  onSelect: (items: SearchTextData[]) => void | Promise<void>;
+  selectedItems: Set<string>;
+};
+
+type SearchModalBaseProps = (
+  | SearchModalNavigateProps
+  | SearchModalSelectSingleProps
+  | SearchModalSelectMultipleProps
+) &
+  SearchModalBaseContentProps;
+
+export const SearchModalBase = ({
   value,
   items,
   onChangeValue,
   loading = false,
-  openSecondaryContent,
   scrollContainerRef,
-  filtersParams,
-  onSetFilters,
-}: GlobalSearchModalBaseProps) => {
-  const { isOpen, onClose } = useGlobalSearchStore();
+  isOpen,
+  mode,
+  filterContent,
+  onClose,
+  onSelect,
+}: SearchModalBaseProps) => {
   const navigate = useNavigate();
   const [viewedItem, setViewedItem] = useState<SearchTextData | null>(null);
 
   const showBottomLoading = items.length >= 20;
+  const openSecondaryContent = !!value;
 
   // const resetModal = () => {
   //   setViewedItem(null);
@@ -68,11 +90,14 @@ export const GlobalSearchModalBase = ({
             />
           ) : undefined,
         onSelect: async () => {
-          const link = createSimpleAssetRoute({
-            asset_type: item.assetType,
-            id: item.assetId,
-          }) as Parameters<typeof navigate>[0];
-          await navigate({ ...link, reloadDocument: true });
+          //  await onSelect?.(item);
+          if (mode === 'navigate') {
+            const link = createSimpleAssetRoute({
+              asset_type: item.assetType,
+              id: item.assetId,
+            }) as Parameters<typeof navigate>[0];
+            await navigate({ ...link, reloadDocument: true });
+          }
         },
       };
     };
@@ -147,13 +172,10 @@ export const GlobalSearchModalBase = ({
       scrollContainerRef={scrollContainerRef}
       openSecondaryContent={openSecondaryContent && !!viewedItem}
       shouldFilter={false}
+      filterContent={filterContent}
       secondaryContent={useMemo(() => {
-        return viewedItem ? <GlobalSearchSecondaryContent selectedItem={viewedItem} /> : null;
+        return viewedItem ? <SearchModalSecondaryContent selectedItem={viewedItem} /> : null;
       }, [viewedItem])}
-      filterContent={useMemo(
-        () => <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />,
-        [filtersParams, onSetFilters]
-      )}
     />
   );
 };

@@ -1,11 +1,11 @@
 import type { SearchTextData } from '@buster/server-shared/search';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { GlobalSearchSecondaryContent } from './GlobalSearchSecondaryContent';
+import { SearchModalSecondaryContent } from './SearchModalSecondaryContent';
 
-const meta: Meta<typeof GlobalSearchSecondaryContent> = {
-  title: 'Features/Search/GlobalSearchSecondaryContent',
-  component: GlobalSearchSecondaryContent,
+const meta: Meta<typeof SearchModalSecondaryContent> = {
+  title: 'Features/Search/SearchModalSecondaryContent',
+  component: SearchModalSecondaryContent,
   parameters: {
     layout: 'centered',
   },

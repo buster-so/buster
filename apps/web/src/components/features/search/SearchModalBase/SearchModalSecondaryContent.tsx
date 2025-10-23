@@ -18,11 +18,11 @@ import { ASSET_ICONS } from '../../icons/assetIcons';
 import { MetricChartCard } from '../../metrics/MetricChartCard';
 import { getScreenshotSkeleton } from '../../Skeletons/get-screenshot-skeleton';
 
-export type GlobalSearchSecondaryContentProps = {
+export type SearchModalSecondaryContentProps = {
   selectedItem: SearchTextData;
 };
 
-export const GlobalSearchSecondaryContent: React.FC<GlobalSearchSecondaryContentProps> = ({
+export const SearchModalSecondaryContent: React.FC<SearchModalSecondaryContentProps> = ({
   selectedItem,
 }) => {
   const {
@@ -110,8 +110,6 @@ const ScreenshotImage = ({
       };
     }
   }, [imageUrl]);
-
-  console.log(isLoaded, assetType);
 
   return (
     <div className="bg-background rounded border overflow-hidden w-full relative aspect-video">

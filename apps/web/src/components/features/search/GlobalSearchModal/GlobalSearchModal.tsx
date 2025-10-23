@@ -1,9 +1,11 @@
 import type { AssetType } from '@buster/server-shared/assets';
+import isEmpty from 'lodash/isEmpty';
 import type React from 'react';
 import { useMemo, useState } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import { useDebounce } from '@/hooks/useDebounce';
-import { GlobalSearchModalBase } from './GlobalSearchModalBase';
+import { SearchModalBase } from '../SearchModalBase/SearchModalBase';
+import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
 import { useGlobalSearchStore } from './global-search-store';
 
 export const GlobalSearchModal = () => {
@@ -13,11 +15,10 @@ export const GlobalSearchModal = () => {
     from: Date;
     to: Date;
   } | null>(null);
-  const { isOpen } = useGlobalSearchStore();
+  const { isOpen, onClose } = useGlobalSearchStore();
 
   const debouncedSearchQuery = useDebounce(searchQuery, { wait: 100 });
   const hasQuery = searchQuery.length > 0;
-  const openSecondaryContent = hasQuery;
 
   const onSetFilters: OnSetFiltersParams = useMemo(
     () => ({
@@ -59,16 +60,24 @@ export const GlobalSearchModal = () => {
     mounted: isOpen,
   });
 
+  const filterContent = useMemo(() => {
+    const hasFilters =
+      Object.values(filtersParams).some((x) => !isEmpty(x)) && !isEmpty(searchQuery);
+    if (!hasFilters) return null;
+    return <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />;
+  }, [filtersParams, onSetFilters]);
+
   return (
-    <GlobalSearchModalBase
+    <SearchModalBase
       value={searchQuery}
       items={allResults}
       onChangeValue={setSearchQuery}
       loading={isFetching}
       scrollContainerRef={scrollContainerRef}
-      openSecondaryContent={openSecondaryContent}
-      onSetFilters={onSetFilters}
-      filtersParams={filtersParams}
+      isOpen={isOpen}
+      onClose={onClose}
+      mode="navigate"
+      filterContent={filterContent}
     />
   );
 };
