@@ -7,7 +7,7 @@ import { libraryQueryKeys } from '@/api/query_keys/library';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { getLibraryAssets } from './requests';
 
-const DEFAULT_PAGE_SIZE = 45;
+const DEFAULT_PAGE_SIZE = 250;
 
 export const useGetLibraryAssets = (filters: GetLibraryAssetsRequestQuery) => {
   return useQuery({

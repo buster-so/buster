@@ -4,7 +4,7 @@ import {
   toggleLibrarySearch,
 } from '@/components/features/search/LibrarySearchModal';
 import { Button } from '@/components/ui/buttons/Button';
-import { Dots, Plus, Sliders3 } from '@/components/ui/icons';
+import { Dots, Plus } from '@/components/ui/icons';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography/Text';
 import type { LibraryLayout, LibrarySearchParams } from '../schema';

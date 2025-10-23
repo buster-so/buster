@@ -5,6 +5,7 @@ import React, { useRef } from 'react';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
+import { ListEmptyStateWithButton } from '@/components/ui/list/ListEmptyStateWithButton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
 import { useMounted } from '@/hooks/useMount';
@@ -12,6 +13,7 @@ import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 import { getGroupMetadata } from '../grouping-meta-helpers';
+import { LibraryEmptyView } from '../LibraryEmptyView';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
 import type { LibraryViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
@@ -36,6 +38,7 @@ export const LibraryGridView = React.memo(
     const hasGroups = allGroups !== undefined;
     const groupBy = filters.group_by;
     const isInitialLoading = isInitialLoadingProp && !hasResults;
+    const hasItems = allResults.length > 0;
 
     React.useEffect(() => {
       const updateColumns = () => {
@@ -75,6 +78,7 @@ export const LibraryGridView = React.memo(
         {isInitialLoading && <div className="text-text-tertiary text-center py-8">Loading...</div>}
 
         {!isInitialLoading &&
+          hasItems &&
           (hasGroups ? (
             <LibraryGroupedView
               allGroups={allGroups}
@@ -90,6 +94,8 @@ export const LibraryGridView = React.memo(
               scrollContainerRef={scrollContainerRef}
             />
           ))}
+
+        {!isInitialLoading && !hasItems && <LibraryEmptyView />}
 
         {isFetchingNextPage && (
           <div className="text-text-tertiary text-center py-4">Loading more...</div>

@@ -19,7 +19,13 @@ import { SearchModalSecondaryContent } from './SearchModalSecondaryContent';
 
 export type SearchModalBaseContentProps<M = unknown, T extends string = string> = Pick<
   NonNullable<SearchModalProps<M, T>>,
-  'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'filterContent' | 'footerConfig'
+  | 'value'
+  | 'onChangeValue'
+  | 'loading'
+  | 'scrollContainerRef'
+  | 'filterContent'
+  | 'footerConfig'
+  | 'selectedItems'
 > & {
   items: SearchTextResponse['data'];
   isOpen: boolean;
@@ -63,6 +69,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
     onClose,
     onSelect,
     footerConfig,
+    selectedItems,
   } = props;
 
   const navigate = useNavigate();
@@ -125,7 +132,6 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
     if (openSecondaryContent) {
       const allItems: SearchItem[] = items.map((item) => makeItem(item, true));
-
       return [
         {
           type: 'group',
@@ -196,6 +202,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
       filterContent={filterContent}
       mode={mode}
       footerConfig={footerConfig}
+      selectedItems={selectedItems}
       secondaryContent={useMemo(() => {
         return viewedItem ? <SearchModalSecondaryContent selectedItem={viewedItem} /> : null;
       }, [viewedItem])}

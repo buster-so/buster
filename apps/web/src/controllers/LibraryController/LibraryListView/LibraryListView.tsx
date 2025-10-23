@@ -18,6 +18,7 @@ import {
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { getGroupMetadata } from '../grouping-meta-helpers';
+import { LibraryEmptyView } from '../LibraryEmptyView';
 import type { LibraryViewProps } from '../library.types';
 
 type LibraryListItems = Pick<
@@ -194,19 +195,7 @@ export const LibraryListView = ({
       hideLastRowBorder={false}
       showSelectAll={true}
       showHeader={true}
-      emptyState={useMemo(
-        () => (
-          <ListEmptyStateWithButton
-            title="No library items found"
-            description="You don’t have any library items. As soon as you do add some, they will start to  appear here."
-            buttonText="Add item"
-            onClick={() => {
-              alert('new chat');
-            }}
-          />
-        ),
-        []
-      )}
+      emptyState={useMemo(() => <LibraryEmptyView />, [])}
     />
   );
 };

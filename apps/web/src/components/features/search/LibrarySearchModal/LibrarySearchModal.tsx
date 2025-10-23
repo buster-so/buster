@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import type { SearchModalContentProps } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -9,11 +9,18 @@ export const LibrarySearchModal = React.memo(() => {
   const { isOpen, onCloseLibrarySearch, value, setLibrarySearchValue } = useLibrarySearchStore();
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const itemsToAdd = useRef<Set<string>>(new Set());
+  const itemsToRemove = useRef<Set<string>>(new Set());
 
   const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({
-    page_size: 20,
+    page_size: 25,
     enabled: isOpen,
     mounted: isOpen,
+    includeAssetAncestors: true,
+    includeScreenshots: true,
+    scrollConfig: {
+      scrollThreshold: 55,
+    },
   });
 
   const footerConfig = React.useMemo<SearchModalContentProps['footerConfig']>(
@@ -34,15 +41,31 @@ export const LibrarySearchModal = React.memo(() => {
         },
       },
       primaryButton: {
-        children: 'Add to library',
+        children: 'Update library',
         variant: 'default',
         onClick: () => {
-          alert('TODO: Add to library');
+          alert('TODO: Update library');
         },
       },
     }),
     [!!selectedItems.size, onCloseLibrarySearch, setSelectedItems]
   );
+
+  const handleSelect = useMemoizedFn((items: Set<string>) => {
+    items.forEach((item) => {
+      if (itemsToAdd.current.has(item)) {
+        itemsToAdd.current.delete(item);
+      } else {
+        itemsToAdd.current.add(item);
+      }
+      if (itemsToRemove.current.has(item)) {
+        itemsToRemove.current.delete(item);
+      } else {
+        itemsToRemove.current.add(item);
+      }
+    });
+    setSelectedItems(items);
+  });
 
   return (
     <SearchModalBase
@@ -55,7 +78,7 @@ export const LibrarySearchModal = React.memo(() => {
       selectedItems={selectedItems}
       loading={isFetchingNextPage || !isFetched}
       filterContent={null}
-      onSelect={setSelectedItems}
+      onSelect={handleSelect}
       scrollContainerRef={scrollContainerRef}
       footerConfig={footerConfig}
     />

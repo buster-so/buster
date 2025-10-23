@@ -29,6 +29,7 @@ export const SearchModalContent = <M, T extends string>({
   scrollContainerRef,
   showBottomLoading = false,
   mode,
+  selectedItems,
   footerConfig,
 }: SearchModalContentProps<M, T>) => {
   const { focusedValue, setFocusedValue } = useViewSearchItem({
@@ -84,6 +85,7 @@ export const SearchModalContent = <M, T extends string>({
         scrollContainerRef={scrollContainerRef}
         showBottomLoading={showBottomLoading}
         mode={mode}
+        selectedItems={selectedItems}
       />
 
       <SearchEmptyState emptyState={emptyState} />

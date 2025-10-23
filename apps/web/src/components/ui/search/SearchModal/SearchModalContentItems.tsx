@@ -47,6 +47,7 @@ export const SearchModalContentItems = <M, T extends string>({
           item={item}
           onSelectGlobal={onSelectGlobal}
           mode={mode}
+          selectedItems={selectedItems}
         />
       ))}
 
@@ -72,19 +73,35 @@ const ItemsSelecter = <M, T extends string>({
   item,
   onSelectGlobal,
   mode,
+  selectedItems,
 }: {
   item: SearchItems<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
   mode: SearchMode;
-  selected: boolean | undefined;
+  selectedItems?: Set<string>;
 }) => {
   const type = item.type;
   if (type === 'item') {
-    return <SearchItemComponent {...item} onSelectGlobal={onSelectGlobal} mode={mode} />;
+    const isSelected = selectedItems?.has(item.value) ?? false;
+    return (
+      <SearchItemComponent
+        {...item}
+        onSelectGlobal={onSelectGlobal}
+        mode={mode}
+        selected={isSelected}
+      />
+    );
   }
 
   if (type === 'group') {
-    return <SearchItemGroupComponent item={item} onSelectGlobal={onSelectGlobal} mode={mode} />;
+    return (
+      <SearchItemGroupComponent
+        item={item}
+        onSelectGlobal={onSelectGlobal}
+        mode={mode}
+        selectedItems={selectedItems}
+      />
+    );
   }
 
   if (type === 'seperator') {
@@ -97,11 +114,11 @@ const ItemsSelecter = <M, T extends string>({
 };
 
 const SearchItemComponent = <M, T extends string>(
-  item: SearchItem<M, T> & CommonProps<M, T> & { mode: SearchMode; selected: boolean | undefined }
+  item: SearchItem<M, T> & CommonProps<M, T> & { mode: SearchMode; selected: boolean }
 ) => {
   const {
     value,
-    selected = false,
+    selected,
     label,
     secondaryLabel,
     tertiaryLabel,
@@ -183,10 +200,12 @@ const SearchItemGroupComponent = <M, T extends string>({
   item,
   onSelectGlobal,
   mode,
+  selectedItems,
 }: {
   item: SearchItemGroup<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
   mode: SearchMode;
+  selectedItems?: Set<string>;
 }) => {
   const { className, items, label } = item;
   return (
@@ -204,6 +223,7 @@ const SearchItemGroupComponent = <M, T extends string>({
           item={item}
           onSelectGlobal={onSelectGlobal}
           mode={mode}
+          selectedItems={selectedItems}
         />
       ))}
     </Command.Group>

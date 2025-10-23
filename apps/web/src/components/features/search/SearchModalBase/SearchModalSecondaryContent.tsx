@@ -361,7 +361,7 @@ const AncestorContainer = ({ isMain, type, title, secondaryText, id }: AncestorO
     }) as LinkProps;
 
     return (
-      <Link {...link} preload={false} reloadDocument>
+      <Link {...link} reloadDocument>
         {children}
       </Link>
     );
@@ -376,7 +376,7 @@ const AncestorContainer = ({ isMain, type, title, secondaryText, id }: AncestorO
           }}
           className={cn(
             'flex gap-1 items-center text-gray-light first:text-gray-dark hover:text-gray-dark',
-            !isMain && router && 'cursor-pointer hover:text-foreground hover:underline',
+            router && 'cursor-pointer hover:text-foreground hover:underline',
             'text-xs h-3.5 overflow-hidden '
           )}
         >
