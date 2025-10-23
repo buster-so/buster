@@ -53,6 +53,7 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
   mode: SearchMode;
   //TODO: type this a little better
+  selectedItems?: Set<string>;
   footerConfig?: {
     secondaryButton?: ButtonProps;
     primaryButton?: ButtonProps;

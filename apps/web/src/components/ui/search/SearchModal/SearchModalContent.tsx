@@ -83,10 +83,15 @@ export const SearchModalContent = <M, T extends string>({
         onSelectGlobal={onSelectGlobal}
         scrollContainerRef={scrollContainerRef}
         showBottomLoading={showBottomLoading}
+        mode={mode}
       />
 
       <SearchEmptyState emptyState={emptyState} />
-      <SearchFooter {...footerConfig} />
+      <SearchFooter
+        primaryButton={footerConfig?.primaryButton}
+        secondaryButton={footerConfig?.secondaryButton}
+        tertiaryButton={footerConfig?.tertiaryButton}
+      />
     </Command>
   );
 };

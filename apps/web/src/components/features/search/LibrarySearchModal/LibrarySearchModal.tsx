@@ -19,7 +19,7 @@ export const LibrarySearchModal = React.memo(() => {
   const footerConfig = React.useMemo<SearchModalContentProps['footerConfig']>(
     () => ({
       tertiaryButton: {
-        children: 'Select',
+        children: 'Clear selection',
         disabled: selectedItems.size === 0,
         variant: 'ghost',
         onClick: () => {
@@ -41,10 +41,8 @@ export const LibrarySearchModal = React.memo(() => {
         },
       },
     }),
-    [selectedItems.size, onCloseLibrarySearch, setSelectedItems]
+    [!!selectedItems.size, onCloseLibrarySearch, setSelectedItems]
   );
-
-  console.log('footerConfig', footerConfig);
 
   return (
     <SearchModalBase

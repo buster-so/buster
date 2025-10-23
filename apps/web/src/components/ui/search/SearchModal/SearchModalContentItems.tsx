@@ -6,12 +6,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRef } from 'react';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '../../checkbox';
 import type {
   SearchItem,
   SearchItemGroup,
   SearchItemSeperator,
   SearchItems,
   SearchModalContentProps,
+  SearchMode,
 } from './search-modal.types';
 
 type CommonProps<M, T extends string> = {
@@ -24,9 +26,11 @@ export const SearchModalContentItems = <M, T extends string>({
   onSelectGlobal,
   scrollContainerRef,
   showBottomLoading,
+  mode,
+  selectedItems,
 }: Pick<
   SearchModalContentProps<M, T>,
-  'scrollContainerRef' | 'loading' | 'searchItems' | 'showBottomLoading'
+  'scrollContainerRef' | 'loading' | 'searchItems' | 'showBottomLoading' | 'mode' | 'selectedItems'
 > &
   CommonProps<M, T>) => {
   return (
@@ -42,6 +46,7 @@ export const SearchModalContentItems = <M, T extends string>({
           key={keyExtractor(item, index)}
           item={item}
           onSelectGlobal={onSelectGlobal}
+          mode={mode}
         />
       ))}
 
@@ -66,17 +71,20 @@ const keyExtractor = <M, T extends string>(item: SearchItems<M, T>, index: numbe
 const ItemsSelecter = <M, T extends string>({
   item,
   onSelectGlobal,
+  mode,
 }: {
   item: SearchItems<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
+  mode: SearchMode;
+  selected: boolean | undefined;
 }) => {
   const type = item.type;
   if (type === 'item') {
-    return <SearchItemComponent {...item} onSelectGlobal={onSelectGlobal} />;
+    return <SearchItemComponent {...item} onSelectGlobal={onSelectGlobal} mode={mode} />;
   }
 
   if (type === 'group') {
-    return <SearchItemGroupComponent item={item} onSelectGlobal={onSelectGlobal} />;
+    return <SearchItemGroupComponent item={item} onSelectGlobal={onSelectGlobal} mode={mode} />;
   }
 
   if (type === 'seperator') {
@@ -88,9 +96,22 @@ const ItemsSelecter = <M, T extends string>({
   return null;
 };
 
-const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & CommonProps<M, T>) => {
-  const { value, label, secondaryLabel, tertiaryLabel, icon, disabled, onSelectGlobal } = item;
+const SearchItemComponent = <M, T extends string>(
+  item: SearchItem<M, T> & CommonProps<M, T> & { mode: SearchMode; selected: boolean | undefined }
+) => {
+  const {
+    value,
+    selected = false,
+    label,
+    secondaryLabel,
+    tertiaryLabel,
+    icon,
+    disabled,
+    onSelectGlobal,
+    mode,
+  } = item;
   const containerRef = useRef<HTMLDivElement>(null);
+  const isSelectMode = mode === 'select-single' || mode === 'select-multiple';
 
   return (
     <Command.Item
@@ -105,6 +126,12 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
       disabled={disabled}
       onSelect={() => onSelectGlobal(item)}
     >
+      {isSelectMode && (
+        <div>
+          <Checkbox checked={selected} onCheckedChange={() => onSelectGlobal(item)} />
+        </div>
+      )}
+
       {icon && (
         <span
           className={cn(
@@ -155,9 +182,11 @@ const SearchItemComponent = <M, T extends string>(item: SearchItem<M, T> & Commo
 const SearchItemGroupComponent = <M, T extends string>({
   item,
   onSelectGlobal,
+  mode,
 }: {
   item: SearchItemGroup<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
+  mode: SearchMode;
 }) => {
   const { className, items, label } = item;
   return (
@@ -174,6 +203,7 @@ const SearchItemGroupComponent = <M, T extends string>({
           key={keyExtractor(item, index)}
           item={item}
           onSelectGlobal={onSelectGlobal}
+          mode={mode}
         />
       ))}
     </Command.Group>

@@ -10,8 +10,6 @@ export const SearchFooter = React.memo(
   (props: NonNullable<SearchModalContentProps['footerConfig'] | undefined>) => {
     const hasFooterConfig = !isEmpty(props);
 
-    console.log('props', props);
-
     const footerItems = !hasFooterConfig
       ? [
           {
