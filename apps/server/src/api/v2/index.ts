@@ -19,6 +19,7 @@ import reportsRoutes from './reports';
 import s3IntegrationsRoutes from './s3-integrations';
 import searchRoutes from './search';
 import securityRoutes from './security';
+import sharingRoutes from './sharing';
 import shortcutsRoutes from './shortcuts';
 import slackRoutes from './slack';
 import sqlRoutes from './sql';
@@ -26,7 +27,6 @@ import supportRoutes from './support';
 import titleRoutes from './title';
 import { tools } from './tools';
 import userRoutes from './users';
-import sharingRoutes from './sharing';
 
 const app = new Hono()
   .route('/auth', authRoutes)
