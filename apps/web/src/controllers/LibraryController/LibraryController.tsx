@@ -38,7 +38,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
     filters: filtersProps,
     isFetchingNextPage,
     scrollContainerRef,
-    isInitialLoading: isFetched,
+    isInitialLoading: !isFetched,
   };
 
   return (

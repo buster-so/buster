@@ -1,34 +1,89 @@
+import isEmpty from 'lodash/isEmpty';
 import React from 'react';
 import ArrowsOppositeDirectionY from '@/components/ui/icons/NucleoIconOutlined/arrows-opposite-direction-y';
 import CommandIcon from '@/components/ui/icons/NucleoIconOutlined/command';
 import ReturnKey from '@/components/ui/icons/NucleoIconOutlined/return-key';
+import { Button, type ButtonProps } from '../../buttons';
+import type { SearchModalContentProps } from './search-modal.types';
 
-export const SearchFooter: React.FC = React.memo(() => {
-  const footerItems = [
-    {
-      text: 'Select',
-      icons: [<ArrowsOppositeDirectionY key="arrows-opposite-direction-y" />],
-    },
-    {
-      text: 'Open',
-      icons: [<ReturnKey key="return-key" />],
-    },
-    {
-      text: 'Open in new tab',
-      icons: [<CommandIcon key="command-icon" />, <ReturnKey key="return-key" />],
-    },
-  ];
+export const SearchFooter = React.memo(
+  (props: NonNullable<SearchModalContentProps['footerConfig'] | undefined>) => {
+    const hasFooterConfig = !isEmpty(props);
 
-  return (
-    <div className="flex space-x-4.5 border-t min-h-12 items-center px-6">
-      {footerItems.map((item, index) => (
-        <FooterItem key={index} text={item.text} icons={item.icons} />
-      ))}
-    </div>
-  );
-});
+    console.log('props', props);
 
-const FooterItem = ({ text, icons }: { text: string; icons: React.ReactNode[] }) => {
+    const footerItems = !hasFooterConfig
+      ? [
+          {
+            type: 'div' as const,
+            text: 'Select',
+            icons: [<ArrowsOppositeDirectionY key="arrows-opposite-direction-y" />],
+          },
+          {
+            type: 'div' as const,
+            text: 'Open',
+            icons: [<ReturnKey key="return-key" />],
+          },
+          {
+            type: 'div' as const,
+            text: 'Open in new tab',
+            icons: [<CommandIcon key="command-icon" />, <ReturnKey key="return-key" />],
+          },
+        ]
+      : ([
+          {
+            type: 'button' as const,
+            side: 'left',
+            ...props?.tertiaryButton,
+          },
+          {
+            type: 'button' as const,
+            side: 'right',
+            ...props?.secondaryButton,
+          },
+          {
+            type: 'button' as const,
+            side: 'right',
+            ...props?.primaryButton,
+          },
+        ].filter((v) => !!v.children) as React.ComponentProps<typeof FooterItem>[]);
+
+    console.log('footerItems', footerItems);
+
+    return (
+      <div className="flex space-x-4.5 border-t min-h-12 items-center px-6">
+        {footerItems.map((item, index) => (
+          <FooterItem key={index} {...item} />
+        ))}
+      </div>
+    );
+  }
+);
+
+const FooterItem = (
+  props:
+    | {
+        text: string;
+        icons: React.ReactNode[];
+        type: 'div';
+      }
+    | (ButtonProps & {
+        type: 'button';
+        side?: 'left' | 'right';
+      })
+) => {
+  const { type } = props;
+  if (type === 'button') {
+    const { onClick, disabled, ...buttonProps } = props;
+    return (
+      <Button type="button" variant={'ghost'} onClick={onClick} disabled={disabled}>
+        {buttonProps.children}
+      </Button>
+    );
+  }
+
+  const { text, icons } = props;
+
   return (
     <div className="text-xs text-gray-light space-x-1 flex items-center justify-between hover:text-foreground transition-all duration-100">
       <div className="flex items-center space-x-0.5">

@@ -74,22 +74,22 @@ export const LibraryGridView = React.memo(
 
         {isInitialLoading && <div className="text-text-tertiary text-center py-8">Loading...</div>}
 
-        {!isInitialLoading && !hasGroups && (
-          <LibraryUngroupedView
-            allResults={allResults}
-            columns={columns}
-            scrollContainerRef={scrollContainerRef}
-          />
-        )}
-        {!isInitialLoading && hasGroups && (
-          <LibraryGroupedView
-            allGroups={allGroups}
-            columns={columns}
-            scrollContainerRef={scrollContainerRef}
-            groupBy={groupBy}
-            allResults={allResults}
-          />
-        )}
+        {!isInitialLoading &&
+          (hasGroups ? (
+            <LibraryGroupedView
+              allGroups={allGroups}
+              columns={columns}
+              scrollContainerRef={scrollContainerRef}
+              groupBy={groupBy}
+              allResults={allResults}
+            />
+          ) : (
+            <LibraryUngroupedView
+              allResults={allResults}
+              columns={columns}
+              scrollContainerRef={scrollContainerRef}
+            />
+          ))}
 
         {isFetchingNextPage && (
           <div className="text-text-tertiary text-center py-4">Loading more...</div>
