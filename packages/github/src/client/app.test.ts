@@ -1,10 +1,21 @@
-import { App } from 'octokit';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createGitHubApp, getGitHubAppCredentials } from './app';
 
+// Mock App instance that can be configured per-test
+let mockAppInstance: any;
+let mockAppConstructor: any;
+
 // Mock the octokit module
 vi.mock('octokit', () => ({
-  App: vi.fn(),
+  App: class {
+    constructor(config: any) {
+      mockAppConstructor = config;
+      if (mockAppInstance === 'throw') {
+        throw new Error('Failed to create app');
+      }
+      Object.assign(this, mockAppInstance);
+    }
+  },
 }));
 
 describe('github-app', () => {
@@ -109,21 +120,20 @@ describe('github-app', () => {
       ).toString('base64');
       process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
-      const mockApp = { octokit: {} };
-      (App as any).mockImplementation(() => mockApp);
+      mockAppInstance = { octokit: {} };
 
       // Act
       const app = createGitHubApp();
 
       // Assert
-      expect(App).toHaveBeenCalledWith({
+      expect(mockAppConstructor).toEqual({
         appId: 123456,
         privateKey: '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----',
         webhooks: {
           secret: 'webhook-secret',
         },
       });
-      expect(app).toBe(mockApp);
+      expect(app).toMatchObject(mockAppInstance);
     });
 
     it('should throw error when App creation fails', () => {
@@ -134,9 +144,7 @@ describe('github-app', () => {
       ).toString('base64');
       process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
-      (App as any).mockImplementation(() => {
-        throw new Error('Failed to create app');
-      });
+      mockAppInstance = 'throw';
 
       // Act & Assert
       expect(() => createGitHubApp()).toThrow('Failed to create GitHub App: Failed to create app');
