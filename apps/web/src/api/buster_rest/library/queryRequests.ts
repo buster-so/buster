@@ -7,6 +7,8 @@ import { libraryQueryKeys } from '@/api/query_keys/library';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { getLibraryAssets } from './requests';
 
+const DEFAULT_PAGE_SIZE = 45;
+
 export const useGetLibraryAssets = (filters: GetLibraryAssetsRequestQuery) => {
   return useQuery({
     ...libraryQueryKeys.libraryGetList(filters),
@@ -18,7 +20,7 @@ export const useLibraryAssetsInfinite = ({
   scrollConfig,
   mounted = true,
   enabled = true,
-  page_size = 45,
+  page_size = DEFAULT_PAGE_SIZE,
   ...params
 }: Omit<GetLibraryAssetsRequestQuery, 'page' | 'page_size'> & {
   page_size?: number;
@@ -51,11 +53,14 @@ export const prefetchGetLibraryAssets = async (
 
 export const prefetchGetLibraryAssetsInfinite = async (
   queryClient: QueryClient,
-  filters: Omit<GetLibraryAssetsRequestQuery, 'page'>
+  filters: Omit<GetLibraryAssetsRequestQuery, 'page' | 'page_size'> & {
+    page_size?: number;
+  }
 ) => {
   await queryClient.prefetchInfiniteQuery({
     queryKey: ['library', 'get', 'list-infinite', filters] as const,
-    queryFn: () => getLibraryAssets({ ...filters, page: 1 }),
+    queryFn: () =>
+      getLibraryAssets({ ...filters, page_size: filters.page_size ?? DEFAULT_PAGE_SIZE, page: 1 }),
     initialPageParam: 1,
   });
 };

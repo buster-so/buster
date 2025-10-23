@@ -1,7 +1,10 @@
 import type { useLibraryAssetsInfinite } from '@/api/buster_rest/library';
 import type { LibrarySearchParams } from './schema';
 
-export const computeLibraryFilters = (filtersProps: LibrarySearchParams, userId: string) => {
+export const computeLibraryFilters = (
+  filtersProps: LibrarySearchParams,
+  userId: string
+): LibrarySearchParams => {
   const {
     asset_types,
     ordering,
