@@ -1,7 +1,7 @@
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import { Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useDeleteCollection } from '@/api/buster_rest/collections';
 import { Avatar } from '@/components/ui/avatar';
 import {
@@ -111,7 +111,7 @@ const CollectionCard = React.memo(
           <div
             className={cn(
               'flex flex-col gap-y-2 h-21 min-w-36 w-36 border rounded py-2.5 px-3 justify-between',
-              'cursor-pointer hover:bg-item-hover'
+              'cursor-pointer hover:bg-item-hover bg-background'
             )}
           >
             <Text variant={'default'} className="line-clamp-2" size={'base'}>

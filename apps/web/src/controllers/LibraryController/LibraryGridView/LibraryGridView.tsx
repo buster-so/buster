@@ -55,8 +55,6 @@ export const LibraryGridView = React.memo(
       return () => window.removeEventListener('resize', updateColumns);
     }, []);
 
-    console.log(columns);
-
     return (
       <ScrollArea
         key={hasGroups ? 'grouped' : 'ungrouped'}
@@ -125,7 +123,7 @@ const LibraryGridItem = React.memo((props: LibraryAssetListItem) => {
               className={cn('w-full h-full object-contain object-top rounded-t-sm bg-background')}
             />
           </div>
-          <div className="h-[60px] px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center">
+          <div className="h-[60px] px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center bg-background">
             <Text>{name}</Text>
             <div className="flex items-center space-x-1 text-xs text-text-tertiary">
               <Clock />
@@ -280,7 +278,7 @@ const LibraryUngroupedView = ({
   });
 
   return (
-    <LibrarySectionContainer title="Recently visisted" icon={<Clock />} className="mt-11">
+    <LibrarySectionContainer title="Recently visited" icon={<Clock />} className="mt-11">
       <div
         ref={virtualStartRef}
         style={{
