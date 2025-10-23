@@ -47,7 +47,9 @@ describe('assertBeforeScreenshot', () => {
     } as unknown as Page;
 
     await expect(
-      assertBeforeScreenshot(mockPage, { fullPath: 'https://example.com//screenshots/metrics/123/content' })
+      assertBeforeScreenshot(mockPage, {
+        fullPath: 'https://example.com//screenshots/metrics/123/content',
+      })
     ).resolves.not.toThrow();
   });
 

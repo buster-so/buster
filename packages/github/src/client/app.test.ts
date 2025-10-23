@@ -1,10 +1,22 @@
+/** biome-ignore-all lint/correctness/noConstructorReturn: octokit is a class-based mock */
 import { App } from 'octokit';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createGitHubApp, getGitHubAppCredentials } from './app';
 
-// Mock the octokit module
+// Mock the octokit module with class-based mock
+let mockAppInstance: any;
+let mockAppConstructor: any;
+let mockAppSpy: any;
 vi.mock('octokit', () => ({
-  App: vi.fn(),
+  App: class {
+    constructor(...args: any[]) {
+      mockAppSpy(...args);
+      if (mockAppConstructor) {
+        return mockAppConstructor(...args);
+      }
+      return mockAppInstance;
+    }
+  },
 }));
 
 describe('github-app', () => {
@@ -14,6 +26,11 @@ describe('github-app', () => {
     // Reset environment variables
     process.env = { ...originalEnv };
     vi.clearAllMocks();
+
+    // Reset mock to default
+    mockAppInstance = { octokit: {} };
+    mockAppConstructor = null;
+    mockAppSpy = vi.fn();
   });
 
   afterEach(() => {
@@ -110,13 +127,13 @@ describe('github-app', () => {
       process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
       const mockApp = { octokit: {} };
-      (App as any).mockImplementation(() => mockApp);
+      mockAppInstance = mockApp;
 
       // Act
       const app = createGitHubApp();
 
       // Assert
-      expect(App).toHaveBeenCalledWith({
+      expect(mockAppSpy).toHaveBeenCalledWith({
         appId: 123456,
         privateKey: '-----BEGIN RSA PRIVATE KEY-----\ntest-key\n-----END RSA PRIVATE KEY-----',
         webhooks: {
@@ -134,9 +151,9 @@ describe('github-app', () => {
       ).toString('base64');
       process.env.GH_WEBHOOK_SECRET = 'webhook-secret';
 
-      (App as any).mockImplementation(() => {
+      mockAppConstructor = () => {
         throw new Error('Failed to create app');
-      });
+      };
 
       // Act & Assert
       expect(() => createGitHubApp()).toThrow('Failed to create GitHub App: Failed to create app');

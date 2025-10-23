@@ -33,7 +33,7 @@ vi.mock('@buster/database/schema', () => ({
 
 import * as accessControls from '@buster/access-controls';
 import { SlackUserService } from '@buster/slack';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   authenticateSlackUser,
   getUserIdFromAuthResult,
@@ -42,12 +42,25 @@ import {
 } from './slack-authentication';
 import { SlackHelpers } from './slack-helpers';
 
+// Mock SlackUserService with class-based mock
+let mockSlackUserServiceInstance: any;
+vi.mock('@buster/slack', () => ({
+  SlackUserService: class {
+    isBot = (...args: any[]) => mockSlackUserServiceInstance.isBot(...args);
+    isDeleted = (...args: any[]) => mockSlackUserServiceInstance.isDeleted(...args);
+    getUserInfo = (...args: any[]) => mockSlackUserServiceInstance.getUserInfo(...args);
+  },
+}));
+
 // Mock dependencies
 vi.mock('@buster/access-controls');
-vi.mock('@buster/slack');
 vi.mock('./slack-helpers');
 
 describe('slack-authentication', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   describe('authenticateSlackUser', () => {
     it('should return authorized for existing active user', async () => {
       const mockIntegration = {
@@ -75,7 +88,7 @@ describe('slack-authentication', () => {
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
       vi.mocked(SlackHelpers.getUserByEmail).mockResolvedValue(mockUser as any);
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(false),
         isDeleted: vi.fn().mockResolvedValue(false),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -87,7 +100,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       vi.mocked(accessControls.checkUserInOrganization).mockResolvedValue({
         userId: 'user-123',
@@ -106,9 +118,12 @@ describe('slack-authentication', () => {
         organization: mockOrg,
       });
 
-      expect(mockSlackUserService.isBot).toHaveBeenCalledWith('slack-token', 'U123456');
-      expect(mockSlackUserService.isDeleted).toHaveBeenCalledWith('slack-token', 'U123456');
-      expect(mockSlackUserService.getUserInfo).toHaveBeenCalledWith('slack-token', 'U123456');
+      expect(mockSlackUserServiceInstance.isBot).toHaveBeenCalledWith('slack-token', 'U123456');
+      expect(mockSlackUserServiceInstance.isDeleted).toHaveBeenCalledWith('slack-token', 'U123456');
+      expect(mockSlackUserServiceInstance.getUserInfo).toHaveBeenCalledWith(
+        'slack-token',
+        'U123456'
+      );
       expect(vi.mocked(SlackHelpers.getUserByEmail)).toHaveBeenCalledWith('john@example.com');
       expect(vi.mocked(accessControls.checkUserInOrganization)).toHaveBeenCalledWith(
         'user-123',
@@ -129,7 +144,7 @@ describe('slack-authentication', () => {
       );
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(true),
         isDeleted: vi.fn().mockResolvedValue(false),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -141,7 +156,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       const result = await authenticateSlackUser('U123456', 'T123456');
 
@@ -164,7 +178,7 @@ describe('slack-authentication', () => {
       );
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(false),
         isDeleted: vi.fn().mockResolvedValue(true),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -176,7 +190,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       const result = await authenticateSlackUser('U123456', 'T123456');
 
@@ -206,7 +219,7 @@ describe('slack-authentication', () => {
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
       vi.mocked(SlackHelpers.getUserByEmail).mockResolvedValue(mockUser as any);
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(false),
         isDeleted: vi.fn().mockResolvedValue(false),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -218,7 +231,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       vi.mocked(accessControls.checkUserInOrganization).mockResolvedValue({
         userId: 'user-123',
@@ -262,7 +274,7 @@ describe('slack-authentication', () => {
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
       vi.mocked(SlackHelpers.getUserByEmail).mockResolvedValue(null); // No existing user
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(false),
         isDeleted: vi.fn().mockResolvedValue(false),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -274,7 +286,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       vi.mocked(accessControls.getOrganizationWithDefaults).mockResolvedValue(mockOrg as any);
       vi.mocked(accessControls.checkEmailDomainForOrganization).mockResolvedValue(true);
@@ -331,7 +342,7 @@ describe('slack-authentication', () => {
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
       vi.mocked(SlackHelpers.getUserByEmail).mockResolvedValue(mockExistingUser as any);
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(false),
         isDeleted: vi.fn().mockResolvedValue(false),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -343,7 +354,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       vi.mocked(accessControls.checkUserInOrganization).mockResolvedValue(null); // Not in org
       vi.mocked(accessControls.getOrganizationWithDefaults).mockResolvedValue(mockOrg as any);
@@ -388,7 +398,7 @@ describe('slack-authentication', () => {
       vi.mocked(SlackHelpers.getAccessToken).mockResolvedValue('slack-token');
       vi.mocked(SlackHelpers.getUserByEmail).mockResolvedValue(null); // No existing user
 
-      const mockSlackUserService = {
+      mockSlackUserServiceInstance = {
         isBot: vi.fn().mockResolvedValue(false),
         isDeleted: vi.fn().mockResolvedValue(false),
         getUserInfo: vi.fn().mockResolvedValue({
@@ -400,7 +410,6 @@ describe('slack-authentication', () => {
           },
         }),
       };
-      vi.mocked(SlackUserService).mockImplementation(() => mockSlackUserService as any);
 
       vi.mocked(accessControls.getOrganizationWithDefaults).mockResolvedValue(mockOrg as any);
       vi.mocked(accessControls.checkEmailDomainForOrganization).mockResolvedValue(false);

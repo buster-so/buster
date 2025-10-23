@@ -39,11 +39,14 @@ import * as slackHelpers from './slack-helpers';
 
 // Mock dependencies
 vi.mock('./slack-helpers');
+
+// Mock SlackAuthService with class-based mock
+let mockSlackAuthServiceInstance: any;
 vi.mock('@buster/slack', () => ({
-  SlackAuthService: vi.fn().mockImplementation(() => ({
-    generateAuthUrl: vi.fn(),
-    handleCallback: vi.fn(),
-  })),
+  SlackAuthService: class {
+    generateAuthUrl = (...args: any[]) => mockSlackAuthServiceInstance.generateAuthUrl(...args);
+    handleCallback = (...args: any[]) => mockSlackAuthServiceInstance.handleCallback(...args);
+  },
 }));
 
 // Mock environment variables before importing
@@ -63,6 +66,13 @@ describe('SlackOAuthService', () => {
     vi.stubEnv('SLACK_CLIENT_ID', 'test-client-id');
     vi.stubEnv('SLACK_CLIENT_SECRET', 'test-client-secret');
     vi.stubEnv('SERVER_URL', 'https://test.com');
+
+    // Set up default mock implementation
+    mockSlackAuthServiceInstance = {
+      generateAuthUrl: vi.fn(),
+      handleCallback: vi.fn(),
+    };
+
     service = new SlackOAuthService();
   });
 
@@ -95,14 +105,11 @@ describe('SlackOAuthService', () => {
       vi.mocked(slackHelpers.getActiveIntegration).mockResolvedValue(null);
       vi.mocked(slackHelpers.createPendingIntegration).mockResolvedValue('integration-123');
 
-      // Mock the slackAuth instance
-      const mockGenerateAuthUrl = vi.fn().mockResolvedValue({
+      // Configure the mock to return the auth URL and state
+      mockSlackAuthServiceInstance.generateAuthUrl.mockResolvedValue({
         authUrl: mockAuthUrl,
         state: 'mocked-state-1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
       });
-      (service as any).slackAuth = {
-        generateAuthUrl: mockGenerateAuthUrl,
-      };
 
       const result = await service.initiateOAuth({
         organizationId: 'org-123',
@@ -129,7 +136,7 @@ describe('SlackOAuthService', () => {
         }),
       });
 
-      expect(mockGenerateAuthUrl).toHaveBeenCalledWith(
+      expect(mockSlackAuthServiceInstance.generateAuthUrl).toHaveBeenCalledWith(
         expect.objectContaining({
           returnUrl: '/dashboard',
           source: 'settings',

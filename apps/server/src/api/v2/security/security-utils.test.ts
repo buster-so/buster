@@ -536,15 +536,17 @@ describe('security-utils', () => {
         } as any); // For dataset validation
 
       // Mock transaction
+      const insertChain = {
+        values: vi.fn().mockReturnThis(),
+        onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
+      };
+
       const mockTx = {
         update: vi.fn().mockReturnValue({
           set: vi.fn().mockReturnThis(),
           where: vi.fn().mockResolvedValue(undefined),
         }),
-        insert: vi.fn().mockReturnValue({
-          values: vi.fn().mockReturnThis(),
-          onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
-        }),
+        insert: vi.fn().mockReturnValue(insertChain),
       };
 
       vi.mocked(db.transaction).mockImplementation(async (callback) => {
@@ -559,9 +561,8 @@ describe('security-utils', () => {
 
       // Verify the insert was called with values
       expect(mockTx.insert).toHaveBeenCalled();
-      const insertMock = vi.mocked(mockTx.insert);
-      expect(insertMock().values).toHaveBeenCalled();
-      expect(insertMock().values().onConflictDoUpdate).toHaveBeenCalled();
+      expect(insertChain.values).toHaveBeenCalled();
+      expect(insertChain.onConflictDoUpdate).toHaveBeenCalled();
     });
   });
 });

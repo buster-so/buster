@@ -10,18 +10,23 @@ interface MockFirecrawlApp {
 }
 
 // Mock the FirecrawlApp
-vi.mock('@mendable/firecrawl-js', () => {
-  return {
-    default: vi.fn().mockImplementation(
-      (): MockFirecrawlApp => ({
-        deepResearch: vi.fn(),
-        checkDeepResearchStatus: vi.fn(),
-        scrapeUrl: vi.fn(),
-        search: vi.fn(),
-      })
-    ),
-  };
-});
+let mockFirecrawlAppInstance: any;
+vi.mock('@mendable/firecrawl-js', () => ({
+  default: class {
+    get deepResearch() {
+      return mockFirecrawlAppInstance.deepResearch;
+    }
+    get checkDeepResearchStatus() {
+      return mockFirecrawlAppInstance.checkDeepResearchStatus;
+    }
+    get scrapeUrl() {
+      return mockFirecrawlAppInstance.scrapeUrl;
+    }
+    get search() {
+      return mockFirecrawlAppInstance.search;
+    }
+  },
+}));
 
 describe('FirecrawlService', () => {
   let service: FirecrawlService;
@@ -30,6 +35,14 @@ describe('FirecrawlService', () => {
     vi.clearAllMocks();
     // Set API key for tests
     process.env.FIRECRAWL_API_KEY = 'test-api-key';
+
+    // Reset mock instance
+    mockFirecrawlAppInstance = {
+      deepResearch: vi.fn(),
+      checkDeepResearchStatus: vi.fn(),
+      scrapeUrl: vi.fn(),
+      search: vi.fn(),
+    };
   });
 
   it('should create service with API key from environment', () => {

@@ -18,10 +18,12 @@ vi.mock('@buster/database/queries', () => ({
   getSecretByName: vi.fn(),
 }));
 
+// Mock SlackMessagingService with class-based mock
+let mockSlackMessagingServiceInstance: any;
 vi.mock('@buster/slack', () => ({
-  SlackMessagingService: vi.fn(() => ({
-    sendMessage: vi.fn(),
-  })),
+  SlackMessagingService: class {
+    sendMessage = (...args: any[]) => mockSlackMessagingServiceInstance.sendMessage(...args);
+  },
   isEventCallback: vi.fn(),
   isAppMentionEvent: vi.fn(),
   isMessageImEvent: vi.fn(),
@@ -323,13 +325,9 @@ describe('eventsHandler - Unauthorized Users', () => {
     } as any);
 
     // Mock messaging service
-    const mockSendMessage = vi.fn().mockResolvedValue({ ok: true, ts: '1234567890.123456' });
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    mockSlackMessagingServiceInstance = {
+      sendMessage: vi.fn().mockResolvedValue({ ok: true, ts: '1234567890.123456' }),
+    };
 
     const payload = {
       type: 'event_callback' as const,
@@ -354,10 +352,14 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     expect(authenticateSlackUser).toHaveBeenCalledWith('U123456', 'T123456');
     expect(getSecretByName).toHaveBeenCalledWith('vault-key-123');
-    expect(mockSendMessage).toHaveBeenCalledWith('xoxb-test-token', 'C123456', {
-      text: 'Sorry, you are unauthorized to chat with Buster. Please contact your Workspace Administrator for access.',
-      thread_ts: '1234567890.123456',
-    });
+    expect(mockSlackMessagingServiceInstance.sendMessage).toHaveBeenCalledWith(
+      'xoxb-test-token',
+      'C123456',
+      {
+        text: 'Sorry, you are unauthorized to chat with Buster. Please contact your Workspace Administrator for access.',
+        thread_ts: '1234567890.123456',
+      }
+    );
   });
 
   it('should send unauthorized message in thread for DM unauthorized users', async () => {
@@ -390,13 +392,9 @@ describe('eventsHandler - Unauthorized Users', () => {
     } as any);
 
     // Mock messaging service
-    const mockSendMessage = vi.fn().mockResolvedValue({ ok: true, ts: '1234567890.123456' });
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    mockSlackMessagingServiceInstance = {
+      sendMessage: vi.fn().mockResolvedValue({ ok: true, ts: '1234567890.123456' }),
+    };
 
     const payload = {
       type: 'event_callback' as const,
@@ -423,10 +421,14 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     expect(authenticateSlackUser).toHaveBeenCalledWith('U123456', 'T123456');
     expect(getSecretByName).toHaveBeenCalledWith('vault-key-123');
-    expect(mockSendMessage).toHaveBeenCalledWith('xoxb-test-token', 'D123456', {
-      text: 'Sorry, you are unauthorized to chat with Buster. Please contact your Workspace Administrator for access.',
-      thread_ts: '1234567890.111111', // Should use the existing thread_ts
-    });
+    expect(mockSlackMessagingServiceInstance.sendMessage).toHaveBeenCalledWith(
+      'xoxb-test-token',
+      'D123456',
+      {
+        text: 'Sorry, you are unauthorized to chat with Buster. Please contact your Workspace Administrator for access.',
+        thread_ts: '1234567890.111111', // Should use the existing thread_ts
+      }
+    );
   });
 
   it('should handle failure to send unauthorized message gracefully', async () => {
@@ -459,13 +461,9 @@ describe('eventsHandler - Unauthorized Users', () => {
     } as any);
 
     // Mock messaging service to throw error
-    const mockSendMessage = vi.fn().mockRejectedValue(new Error('Slack API error'));
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    mockSlackMessagingServiceInstance = {
+      sendMessage: vi.fn().mockRejectedValue(new Error('Slack API error')),
+    };
 
     const payload = {
       type: 'event_callback' as const,
@@ -490,7 +488,7 @@ describe('eventsHandler - Unauthorized Users', () => {
     );
 
     expect(authenticateSlackUser).toHaveBeenCalledWith('U123456', 'T123456');
-    expect(mockSendMessage).toHaveBeenCalled();
+    expect(mockSlackMessagingServiceInstance.sendMessage).toHaveBeenCalled();
   });
 
   it('should handle case when no access token is available for unauthorized message', async () => {
@@ -518,13 +516,9 @@ describe('eventsHandler - Unauthorized Users', () => {
     } as any);
 
     // Mock messaging service (shouldn't be called)
-    const mockSendMessage = vi.fn();
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    mockSlackMessagingServiceInstance = {
+      sendMessage: vi.fn(),
+    };
 
     const payload = {
       type: 'event_callback' as const,
@@ -550,6 +544,6 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     expect(authenticateSlackUser).toHaveBeenCalledWith('U123456', 'T123456');
     expect(getSecretByName).not.toHaveBeenCalled();
-    expect(mockSendMessage).not.toHaveBeenCalled();
+    expect(mockSlackMessagingServiceInstance.sendMessage).not.toHaveBeenCalled();
   });
 });
