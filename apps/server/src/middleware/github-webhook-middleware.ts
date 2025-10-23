@@ -1,13 +1,9 @@
-import {
-  getApiKeyForInstallationId,
-  getGithubIntegrationByInstallationId,
-  updateGithubIntegration,
-} from '@buster/database/queries';
+import { getApiKeyForInstallationId } from '@buster/database/queries';
 import type { App, WebhookEventName } from '@buster/github';
 import { createGitHubApp } from '@buster/github';
-import { AuthDetailsAppInstallationResponseSchema } from '@buster/server-shared';
 import type { GithubContext } from '@buster/sandbox';
 import { runDocsAgentAsync } from '@buster/sandbox';
+import { AuthDetailsAppInstallationResponseSchema } from '@buster/server-shared';
 import type { Context, MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
@@ -117,7 +113,7 @@ function getOrSetApp() {
       }
     });
 
-    githubApp.webhooks.on('installation', async ({payload}) => {
+    githubApp.webhooks.on('installation', async ({ payload }) => {
       await handleInstallationCallback(payload);
     });
   }

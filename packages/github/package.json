@@ -38,7 +38,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@octokit/webhooks-types": "^7.6.1",
     "tsx": "catalog:"
   }
 }

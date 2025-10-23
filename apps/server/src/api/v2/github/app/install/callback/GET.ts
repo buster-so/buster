@@ -1,8 +1,7 @@
-import { getUserOrganizationId } from '@buster/database/queries';
+import { createGithubIntegration, getGithubIntegrationByInstallationId, updateGithubIntegration } from '@buster/database/queries';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { handleInstallationCallback } from '../../../services/handle-installation-callback';
 import { retrieveInstallationState } from '../../../services/installation-state';
 
 // Define request schemas
@@ -55,6 +54,7 @@ export async function githubInstallationCallbackHandler(
 ): Promise<AuthCallbackResult> {
   // Get base URL from environment
   const baseUrl = process.env.BUSTER_URL || '';
+  const installationId = `${request.installation_id}`;
 
   // Handle user cancellation
   if (request.error === 'access_denied') {
@@ -98,35 +98,49 @@ export async function githubInstallationCallbackHandler(
     };
   }
 
-  // // Create the installation callback payload
-  // const callbackPayload = {
-  //   action: 'created' as const,
-  //   installation: {
-  //     id: Number.isNaN(Number(request.installation_id))
-  //       ? 0
-  //       : Number.parseInt(request.installation_id, 10),
-  //     account: {
-  //       // These will be updated when the webhook arrives with full details
-  //       login: 'pending_webhook_update',
-  //       id: 0
-  //     },
-  //   },
-  // };
-
   try {
-    // const result = await handleInstallationCallback({
-    //   payload: callbackPayload,
-    //   organizationId: stateData.organizationId,
-    //   userId: stateData.userId,
-    // });
+    // Check if integration already exists
+    const existing = await getGithubIntegrationByInstallationId(installationId);
+
+    if (existing && existing.deletedAt === null) {
+      console.info(`GitHub integration already exists for installation ${installationId}`);
+
+      // Update existing integration to ensure it's active
+      const updated = await updateGithubIntegration(existing.id, {
+        status: 'active',
+      });
+
+      if (!updated) {
+        throw new Error(`Failed to update integration for installation ${installationId}`);
+      }
+
+      return {
+        redirectUrl: `${baseUrl}/app/settings/integrations?status=success`
+      };
+    } else if (existing) {
+      return {
+        redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
+      };
+    }
+
+    // Create new integration
+    const integration = await createGithubIntegration({
+      installationId: installationId,
+      appId: process.env.GITHUB_APP_ID ?? '0',
+      githubOrgId: 'unknown',
+      githubOrgName: 'pending_webhook_update',
+      organizationId: stateData.organizationId,
+      userId: stateData.userId,
+      status: 'pending',
+    });
+
+    if (!integration) {
+      throw new Error(`Failed to create integration for installation ${installationId}`);
+    }
 
     console.info(`GitHub App installed successfully for org ${stateData.organizationId}`);
 
-    // Include the GitHub org name if available
-    // const orgParam = result.githubOrgName ? `&org=${encodeURIComponent(result.githubOrgName)}` : '';
-
     return {
-      // TODO: FIX
       redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
     };
   } catch (error) {

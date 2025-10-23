@@ -2009,37 +2009,49 @@ export const userLibrary = pgTable(
   ]
 );
 
-export const automationTasks = pgTable("automation_tasks", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  organizationId: uuid("organization_id").notNull(),
-  integrationId: uuid("integration_id").notNull(),
-  agentType: text("agent_type").notNull(),
-  runEvent: text("run_event").notNull(),
-  modelingRepository: text("modeling_repository"),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true, mode: 'string' }),
-}, (table) => [
-  foreignKey({
-    columns: [table.organizationId],
-    foreignColumns: [organizations.id],
-    name: 'automation_tasks_organization_id_fkey',
-  }).onDelete('cascade'),
-  foreignKey({
-    columns: [table.integrationId],
-    foreignColumns: [githubIntegrations.id],
-    name: 'automation_tasks_integration_id_fkey',
-  }).onDelete('cascade'),
-]);
+export const automationTasks = pgTable(
+  'automation_tasks',
+  {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    integrationId: uuid('integration_id').notNull(),
+    agentType: text('agent_type').notNull(),
+    runEvent: text('run_event').notNull(),
+    modelingRepository: text('modeling_repository'),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'automation_tasks_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.integrationId],
+      foreignColumns: [githubIntegrations.id],
+      name: 'automation_tasks_integration_id_fkey',
+    }).onDelete('cascade'),
+  ]
+);
 
-export const automationTaskRepositories = pgTable("automation_task_repositories", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  taskId: uuid("task_id").notNull(),
-  repository: text("repository").notNull(),
-}, (table) => [
-  foreignKey({
-    columns: [table.taskId],
-    foreignColumns: [automationTasks.id],
-    name: 'automation_task_repositories_task_id_fkey',
-  }).onDelete('cascade'),
-]);
+export const automationTaskRepositories = pgTable(
+  'automation_task_repositories',
+  {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    taskId: uuid('task_id').notNull(),
+    repository: text('repository').notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.taskId],
+      foreignColumns: [automationTasks.id],
+      name: 'automation_task_repositories_task_id_fkey',
+    }).onDelete('cascade'),
+  ]
+);

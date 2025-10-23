@@ -4,7 +4,7 @@ import {
   updateGithubIntegration,
 } from '@buster/database/queries';
 import type { githubIntegrations } from '@buster/database/schema';
-import type { AnyInstallationEvent } from '@buster/github';
+import type { InstallationWebhookEvents } from '@buster/github';
 import type { InferSelectModel } from 'drizzle-orm';
 
 type GitHubIntegration = InferSelectModel<typeof githubIntegrations>;
@@ -14,7 +14,7 @@ type GitHubIntegration = InferSelectModel<typeof githubIntegrations>;
  * Processes different actions: created, deleted, suspend, unsuspend
  */
 export async function handleInstallationCallback(
-  payload: AnyInstallationEvent,
+  payload: InstallationWebhookEvents,
   organizationId?: string,
   userId?: string
 ): Promise<GitHubIntegration> {
@@ -41,7 +41,9 @@ export async function handleInstallationCallback(
         });
 
         if (!updated) {
-          throw new Error(`Failed to delete integration for installation ${payload.installation.id}`);
+          throw new Error(
+            `Failed to delete integration for installation ${payload.installation.id}`
+          );
         }
 
         return updated;
@@ -53,7 +55,9 @@ export async function handleInstallationCallback(
         });
 
         if (!updated) {
-          throw new Error(`Failed to suspend integration for installation ${payload.installation.id}`);
+          throw new Error(
+            `Failed to suspend integration for installation ${payload.installation.id}`
+          );
         }
 
         return updated;
@@ -65,7 +69,9 @@ export async function handleInstallationCallback(
         });
 
         if (!updated) {
-          throw new Error(`Failed to unsuspend integration for installation ${payload.installation.id}`);
+          throw new Error(
+            `Failed to unsuspend integration for installation ${payload.installation.id}`
+          );
         }
 
         return updated;
@@ -83,12 +89,21 @@ export async function handleInstallationCallback(
  * Handle new GitHub App installation
  */
 async function handleInstallationCreated(params: {
-  installation: AnyInstallationEvent['installation'];
-  repositories?: AnyInstallationEvent['repositories'];
+  installation: InstallationWebhookEvents['installation'];
+  repositories?: InstallationWebhookEvents['repositories'];
   organizationId?: string | undefined;
   userId?: string | undefined;
 }): Promise<GitHubIntegration> {
   const { installation, organizationId, userId } = params;
+
+  let githubOrgName = 'Unknown Account';
+  if (installation.account) {
+    if ('login' in installation.account) {
+      githubOrgName = installation.account.login;
+    } else if ('name' in installation.account) {
+      githubOrgName = installation.account.name;
+    }
+  }
 
   // Check if integration already exists
   const existing = await getGithubIntegrationByInstallationId(installation.id.toString());
@@ -99,8 +114,8 @@ async function handleInstallationCreated(params: {
     // Update existing integration to ensure it's active
     const updated = await updateGithubIntegration(existing.id, {
       status: 'active',
-      githubOrgName: installation.account.login,
-      githubOrgId: installation.account.id.toString(),
+      githubOrgName,
+      githubOrgId: installation.account?.id.toString() ?? '0',
       // TODO: Add accessible repositories
       // accessibleRepositories: repositories,
       permissions: installation.permissions,
@@ -121,8 +136,8 @@ async function handleInstallationCreated(params: {
   const integration = await createGithubIntegration({
     installationId: installation.id.toString(),
     appId: installation.app_id.toString(),
-    githubOrgId: installation.account.id.toString(),
-    githubOrgName: installation.account.login,
+    githubOrgId: installation.account?.id.toString() ?? '0',
+    githubOrgName,
     // accessibleRepositories: repositories,
     permissions: installation.permissions,
     organizationId,

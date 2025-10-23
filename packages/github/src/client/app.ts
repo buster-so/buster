@@ -13,9 +13,7 @@ export function getGitHubAppCredentials(): {
   const webhookSecret = process.env.GH_WEBHOOK_SECRET;
 
   if (!appId) {
-    throw new Error(
-      'GH_APP_ID environment variable is not set'
-    );
+    throw new Error('GH_APP_ID environment variable is not set');
   }
 
   if (!privateKeyBase64) {
@@ -66,6 +64,8 @@ export function createGitHubApp(): App {
       },
     });
   } catch (error) {
-    throw new Error(`Failed to create GitHub App: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create GitHub App: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

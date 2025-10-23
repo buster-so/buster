@@ -24,7 +24,8 @@ export async function updateGithubIntegration(
   if (data.githubOrgName !== undefined) updateData.githubOrgName = data.githubOrgName;
   if (data.githubOrgId !== undefined) updateData.githubOrgId = data.githubOrgId;
   if (data.permissions !== undefined) updateData.repositoryPermissions = data.permissions;
-  if (data.accessibleRepositories !== undefined) updateData.accessibleRepositories = data.accessibleRepositories;
+  if (data.accessibleRepositories !== undefined)
+    updateData.accessibleRepositories = data.accessibleRepositories;
   if (data.status !== undefined) updateData.status = data.status;
   if (data.deletedAt !== undefined) updateData.deletedAt = data.deletedAt;
 
