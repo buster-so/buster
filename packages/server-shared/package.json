@@ -125,6 +125,7 @@
   "scripts": {
     "build": "tsc --build",
     "build:dry-run": "tsc --build",
+    "postinstall": "playwright install --with-deps chromium",
     "dev": "tsc --watch",
     "dev:fast": "tsc --watch",
     "lint": "biome check --write",
