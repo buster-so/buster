@@ -1,22 +1,14 @@
 import z from 'zod';
+import { AssetTypeSchema } from './asset';
 import {
   InfinitePaginationSchema,
   type PaginatedResponse,
   PaginationInputSchema,
 } from './pagination';
 
-// Library assets exclude collections - only assets with savedToLibrary field
-export const LibraryAssetTypeSchema = z.enum([
-  'chat',
-  'metric_file',
-  'dashboard_file',
-  'report_file',
-]);
-export type LibraryAssetType = z.infer<typeof LibraryAssetTypeSchema>;
-
 export const LibraryAssetIdentifierSchema = z.object({
   assetId: z.string().uuid(),
-  assetType: LibraryAssetTypeSchema,
+  assetType: AssetTypeSchema,
 });
 export type LibraryAssetIdentifier = z.infer<typeof LibraryAssetIdentifierSchema>;
 
@@ -37,7 +29,7 @@ export type BulkUpdateLibraryFieldResponse = z.infer<typeof BulkUpdateLibraryFie
 
 export const LibraryAssetListItemSchema = z.object({
   asset_id: z.string().uuid(),
-  asset_type: LibraryAssetTypeSchema,
+  asset_type: AssetTypeSchema,
   name: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -54,7 +46,7 @@ export const ListPermissionedLibraryAssetsInputSchema = z
   .object({
     organizationId: z.string().uuid(),
     userId: z.string().uuid(),
-    assetTypes: LibraryAssetTypeSchema.array().min(1).optional(),
+    assetTypes: AssetTypeSchema.array().min(1).optional(),
     createdById: z.string().uuid().optional(),
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
@@ -64,6 +56,7 @@ export const ListPermissionedLibraryAssetsInputSchema = z
     orderingDirection: z.enum(['asc', 'desc']).optional(),
     groupBy: z.enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none']).optional(),
     query: z.string().optional(),
+    includeAssetChildren: z.boolean().optional(),
   })
   .merge(PaginationInputSchema);
 

@@ -1,5 +1,4 @@
 import type { AssetType } from '@buster/server-shared/assets';
-import type { LibraryAssetType } from '@buster/server-shared/library';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
@@ -52,22 +51,22 @@ export const FilterDropdown = React.memo(
         items: [
           {
             label: 'Chats',
-            value: 'chat' satisfies LibraryAssetType,
+            value: 'chat' satisfies AssetType,
             icon: <ASSET_ICONS.chats />,
           },
           {
             label: 'Reports',
-            value: 'report_file' satisfies LibraryAssetType,
+            value: 'report_file' satisfies AssetType,
             icon: <ASSET_ICONS.reports />,
           },
           {
             label: 'Dashboards',
-            value: 'dashboard_file' satisfies LibraryAssetType,
+            value: 'dashboard_file' satisfies AssetType,
             icon: <ASSET_ICONS.dashboards />,
           },
           {
             label: 'Charts',
-            value: 'metric_file' satisfies LibraryAssetType,
+            value: 'metric_file' satisfies AssetType,
             selected: asset_types?.includes('metric_file'),
             icon: <ASSET_ICONS.metrics />,
           },
