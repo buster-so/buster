@@ -52,8 +52,9 @@ export const useFollowUpChatInputFlow = ({
       !currentMessageId ||
       submittingCooldown.current ||
       isSubmittingChat
-    )
+    ) {
       return;
+    }
 
     const trimmedInputValue = inputValue.trim();
 

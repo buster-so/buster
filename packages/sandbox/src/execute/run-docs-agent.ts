@@ -51,7 +51,7 @@ export interface DocsAgentResult {
 }
 
 export type RunDocsAgentParams = z.infer<typeof runDocsAgentParamsSchema>;
-export type githubContext = z.infer<typeof githubContextSchema>;
+export type GithubContext = z.infer<typeof githubContextSchema>;
 
 export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<DocsAgentResult> {
   // Validate input parameters

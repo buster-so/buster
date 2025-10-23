@@ -19,6 +19,7 @@ const favoritesGetList = queryOptions<UserFavoriteResponse>({
   queryKey: ['myself', 'list', 'favorites'] as const,
   staleTime: 1000 * 60 * 15, // 15 minutes,
   initialData: [],
+  initialDataUpdatedAt: 0, //this must be here so that prefetching works
   retry: () => false, //used to silence the retry error
 });
 
