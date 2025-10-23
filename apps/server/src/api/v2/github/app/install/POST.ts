@@ -24,16 +24,6 @@ export async function appInstallHandler(userId: string): Promise<AppInstallRespo
     });
   }
 
-  // Generate a secure state parameter
-  const state = randomBytes(32).toString('hex');
-
-  // Store the state with user/org context (expires in 10 minutes)
-  await storeInstallationState(state, {
-    userId: userId,
-    organizationId: userOrg.organizationId,
-    createdAt: new Date().toISOString(),
-  });
-
   // Get GitHub App ID from environment
   const appId = process.env.GH_APP_ID;
   if (!appId) {
@@ -49,6 +39,16 @@ export async function appInstallHandler(userId: string): Promise<AppInstallRespo
       message: 'GitHub App name not configured',
     });
   }
+
+  // Generate a secure state parameter
+  const state = randomBytes(32).toString('hex');
+
+  // Store the state with user/org context (expires in 10 minutes)
+  await storeInstallationState(state, {
+    userId: userId,
+    organizationId: userOrg.organizationId,
+    createdAt: new Date().toISOString(),
+  });
 
   // GitHub will redirect to the Setup URL or Callback URL configured in the app settings
   // We pass the state as a parameter that GitHub will preserve

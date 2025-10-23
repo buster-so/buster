@@ -1683,29 +1683,13 @@ export const githubIntegrations = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     organizationId: uuid('organization_id').notNull(),
     userId: uuid('user_id').notNull(),
-
     installationId: varchar('installation_id', { length: 255 }).notNull(),
     appId: varchar('app_id', { length: 255 }),
-
     githubOrgId: varchar('github_org_id', { length: 255 }).notNull(),
     githubOrgName: varchar('github_org_name', { length: 255 }),
-
-    tokenVaultKey: varchar('token_vault_key', { length: 255 }).unique(),
-    webhookSecretVaultKey: varchar('webhook_secret_vault_key', { length: 255 }),
-
-    repositoryPermissions: jsonb('repository_permissions').default({}),
-
+    permissions: jsonb('permissions').default({}),
+    accessibleRepositories: jsonb('accessible_repositories').default({}),
     status: githubIntegrationStatusEnum().default('pending').notNull(),
-    installedAt: timestamp('installed_at', {
-      withTimezone: true,
-      mode: 'string',
-    }),
-    lastUsedAt: timestamp('last_used_at', {
-      withTimezone: true,
-      mode: 'string',
-    }),
-
-    // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -1736,10 +1720,6 @@ export const githubIntegrations = pgTable(
     index('idx_github_integrations_installation_id').using(
       'btree',
       table.installationId.asc().nullsLast().op('text_ops')
-    ),
-    index('idx_github_integrations_github_org_id').using(
-      'btree',
-      table.githubOrgId.asc().nullsLast().op('text_ops')
     ),
   ]
 );
@@ -2005,3 +1985,38 @@ export const logsWriteBackConfigs = pgTable(
     ),
   ]
 );
+
+export const automationTasks = pgTable("automation_tasks", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  organizationId: uuid("organization_id").notNull(),
+  integrationId: uuid("integration_id").notNull(),
+  agentType: text("agent_type").notNull(),
+  runEvent: text("run_event").notNull(),
+  modelingRepository: text("modeling_repository"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true, mode: 'string' }),
+}, (table) => [
+  foreignKey({
+    columns: [table.organizationId],
+    foreignColumns: [organizations.id],
+    name: 'automation_tasks_organization_id_fkey',
+  }).onDelete('cascade'),
+  foreignKey({
+    columns: [table.integrationId],
+    foreignColumns: [githubIntegrations.id],
+    name: 'automation_tasks_integration_id_fkey',
+  }).onDelete('cascade'),
+]);
+
+export const automationTaskRepositories = pgTable("automation_task_repositories", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  taskId: uuid("task_id").notNull(),
+  repository: text("repository").notNull(),
+}, (table) => [
+  foreignKey({
+    columns: [table.taskId],
+    foreignColumns: [automationTasks.id],
+    name: 'automation_task_repositories_task_id_fkey',
+  }).onDelete('cascade'),
+]);

@@ -1,25 +1,5 @@
 import { z } from 'zod';
 
-// GitHub Error Response
-export const GitHubErrorResponseSchema = z.object({
-  error: z.string(),
-  message: z.string().optional(),
-  documentation_url: z.string().optional(),
-  status: z.number().optional(),
-});
-
-export type GitHubErrorResponse = z.infer<typeof GitHubErrorResponseSchema>;
-
-// Response after successfully handling installation callback
-export const InstallationCallbackResponseSchema = z.object({
-  success: z.boolean(),
-  integrationId: z.string().uuid(),
-  message: z.string().optional(),
-});
-
-export type InstallationCallbackResponse = z.infer<typeof InstallationCallbackResponseSchema>;
-
-// Response containing installation access token
 export const InstallationTokenResponseSchema = z.object({
   token: z.string(),
   expires_at: z.string().datetime(), // ISO 8601 date string
@@ -39,22 +19,6 @@ export const InstallationTokenResponseSchema = z.object({
 
 export type InstallationTokenResponse = z.infer<typeof InstallationTokenResponseSchema>;
 
-// Response for checking GitHub integration status
-export const GetGitHubIntegrationResponseSchema = z.object({
-  connected: z.boolean(),
-  status: z.enum(['pending', 'active', 'suspended', 'revoked']).optional(),
-  integration: z
-    .object({
-      id: z.string().uuid(),
-      github_org_name: z.string(),
-      github_org_id: z.string(),
-      installation_id: z.string(),
-      installed_at: z.string().datetime(),
-      last_used_at: z.string().datetime().nullable().optional(),
-    })
-    .optional(),
-});
-
 export const AuthDetailsAppInstallationResponseSchema = z.object({
   type: z.literal('token'),
   tokenType: z.literal('installation'),
@@ -67,8 +31,6 @@ export const AuthDetailsAppInstallationResponseSchema = z.object({
 });
 
 export type AuthDetailsResponse = z.infer<typeof AuthDetailsAppInstallationResponseSchema>;
-
-export type GetGitHubIntegrationResponse = z.infer<typeof GetGitHubIntegrationResponseSchema>;
 
 // Response schemas for GitHub Action Documentation endpoints
 export const GithubActionDocumentationStatusSchema = z.object({
@@ -88,3 +50,20 @@ export const AppInstallResponseSchema = z.object({
 });
 
 export type AppInstallResponse = z.infer<typeof AppInstallResponseSchema>;
+
+export const GetGitHubIntegrationResponseSchema = z.object({
+  connected: z.boolean(),
+  status: z.enum(['pending', 'active', 'suspended', 'revoked']).optional(),
+  integration: z
+    .object({
+      id: z.string().uuid(),
+      github_org_name: z.string(),
+      github_org_id: z.string(),
+      installation_id: z.string(),
+      installed_at: z.string().datetime(),
+      status: z.enum(['pending', 'active', 'suspended', 'revoked']),
+    })
+    .optional(),
+});
+
+export type GetGitHubIntegrationResponse = z.infer<typeof GetGitHubIntegrationResponseSchema>;

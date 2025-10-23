@@ -11,10 +11,8 @@ export async function updateGithubIntegration(
     githubOrgName?: string;
     githubOrgId?: string;
     permissions?: Record<string, string>;
-    tokenVaultKey?: string;
-    webhookSecretVaultKey?: string;
+    accessibleRepositories?: Record<string, string>;
     status?: 'pending' | 'active' | 'suspended' | 'revoked';
-    lastUsedAt?: string;
     deletedAt?: string;
   }
 ) {
@@ -26,11 +24,8 @@ export async function updateGithubIntegration(
   if (data.githubOrgName !== undefined) updateData.githubOrgName = data.githubOrgName;
   if (data.githubOrgId !== undefined) updateData.githubOrgId = data.githubOrgId;
   if (data.permissions !== undefined) updateData.repositoryPermissions = data.permissions;
-  if (data.tokenVaultKey !== undefined) updateData.tokenVaultKey = data.tokenVaultKey;
-  if (data.webhookSecretVaultKey !== undefined)
-    updateData.webhookSecretVaultKey = data.webhookSecretVaultKey;
+  if (data.accessibleRepositories !== undefined) updateData.accessibleRepositories = data.accessibleRepositories;
   if (data.status !== undefined) updateData.status = data.status;
-  if (data.lastUsedAt !== undefined) updateData.lastUsedAt = data.lastUsedAt;
   if (data.deletedAt !== undefined) updateData.deletedAt = data.deletedAt;
 
   const [updated] = await db

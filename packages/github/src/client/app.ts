@@ -1,5 +1,3 @@
-import type { GitHubOperationError } from '@buster/server-shared/github';
-import { GitHubErrorCode } from '@buster/server-shared/github';
 import { App } from 'octokit';
 
 /**
@@ -15,24 +13,17 @@ export function getGitHubAppCredentials(): {
   const webhookSecret = process.env.GH_WEBHOOK_SECRET;
 
   if (!appId) {
-    throw createGitHubError(
-      GitHubErrorCode.APP_CONFIGURATION_ERROR,
+    throw new Error(
       'GH_APP_ID environment variable is not set'
     );
   }
 
   if (!privateKeyBase64) {
-    throw createGitHubError(
-      GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GH_APP_PRIVATE_KEY_BASE64 environment variable is not set'
-    );
+    throw new Error('GH_APP_PRIVATE_KEY_BASE64 environment variable is not set');
   }
 
   if (!webhookSecret) {
-    throw createGitHubError(
-      GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'GH_WEBHOOK_SECRET environment variable is not set'
-    );
+    throw new Error('GH_WEBHOOK_SECRET environment variable is not set');
   }
 
   // Decode the private key from base64
@@ -45,18 +36,12 @@ export function getGitHubAppCredentials(): {
     }
     privateKey = Buffer.from(trimmedBase64, 'base64').toString('utf-8');
   } catch (_error) {
-    throw createGitHubError(
-      GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'Failed to decode GH_APP_PRIVATE_KEY_BASE64: Invalid base64 encoding'
-    );
+    throw new Error('Failed to decode GH_APP_PRIVATE_KEY_BASE64: Invalid base64 encoding');
   }
 
   // Validate the private key format (support both RSA and PKCS#8 formats)
   if (!privateKey.includes('BEGIN RSA PRIVATE KEY') && !privateKey.includes('BEGIN PRIVATE KEY')) {
-    throw createGitHubError(
-      GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      'Invalid GitHub App private key format. Expected PEM-encoded private key'
-    );
+    throw new Error('Invalid GitHub App private key format. Expected PEM-encoded private key');
   }
 
   return {
@@ -81,18 +66,6 @@ export function createGitHubApp(): App {
       },
     });
   } catch (error) {
-    throw createGitHubError(
-      GitHubErrorCode.APP_CONFIGURATION_ERROR,
-      `Failed to create GitHub App: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+    throw new Error(`Failed to create GitHub App: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-}
-
-/**
- * Create a GitHub operation error
- */
-function createGitHubError(code: GitHubErrorCode, message: string): Error {
-  const error = new Error(message) as Error & GitHubOperationError;
-  error.code = code;
-  return error;
 }

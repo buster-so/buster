@@ -34,11 +34,11 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@octokit/webhooks": "^14.1.3",
-
-    "octokit": "^5.0.3",
+    "octokit": "^5.0.4",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@octokit/webhooks-types": "^7.6.1",
     "tsx": "catalog:"
   }
 }

@@ -7,11 +7,12 @@ import { githubIntegrations } from '../../schema';
 export async function createGithubIntegration(data: {
   organizationId: string;
   userId: string;
+  appId: string;
   githubOrgId: string;
   installationId: string;
   githubOrgName?: string;
-  tokenVaultKey?: string;
-  webhookSecretVaultKey?: string;
+  accessibleRepositories?: string[];
+  permissions?: Record<string, string>;
   status?: 'pending' | 'active' | 'suspended' | 'revoked';
 }) {
   const [integration] = await db
@@ -19,13 +20,14 @@ export async function createGithubIntegration(data: {
     .values({
       organizationId: data.organizationId,
       userId: data.userId,
+      appId: data.appId,
       githubOrgId: data.githubOrgId,
       installationId: data.installationId,
       githubOrgName: data.githubOrgName,
-      tokenVaultKey: data.tokenVaultKey,
-      webhookSecretVaultKey: data.webhookSecretVaultKey,
+      accessibleRepositories: data.accessibleRepositories,
+      permissions: data.permissions,
       status: data.status || 'pending',
-      installedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     })
     .returning();
 

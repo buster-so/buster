@@ -39,7 +39,7 @@ async function getIntegrationHandler(userOrg: {
         github_org_id: integration.githubOrgId,
         installation_id: integration.installationId,
         installed_at: integration.createdAt,
-        last_used_at: integration.lastUsedAt,
+        status: integration.status,
       },
     };
   } catch (error) {

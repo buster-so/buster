@@ -98,43 +98,36 @@ export async function githubInstallationCallbackHandler(
     };
   }
 
-  // Verify the user still has access to the organization
-  const userOrg = await getUserOrganizationId(stateData.userId);
-  if (!userOrg || userOrg.organizationId !== stateData.organizationId) {
-    return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=unauthorized`,
-    };
-  }
-
-  // Create the installation callback payload
-  const callbackPayload = {
-    action: 'created' as const,
-    installation: {
-      id: Number.isNaN(Number(request.installation_id))
-        ? 0
-        : Number.parseInt(request.installation_id, 10),
-      account: {
-        // These will be updated when the webhook arrives with full details
-        id: 0,
-        login: 'pending_webhook_update',
-      },
-    },
-  };
+  // // Create the installation callback payload
+  // const callbackPayload = {
+  //   action: 'created' as const,
+  //   installation: {
+  //     id: Number.isNaN(Number(request.installation_id))
+  //       ? 0
+  //       : Number.parseInt(request.installation_id, 10),
+  //     account: {
+  //       // These will be updated when the webhook arrives with full details
+  //       login: 'pending_webhook_update',
+  //       id: 0
+  //     },
+  //   },
+  // };
 
   try {
-    const result = await handleInstallationCallback({
-      payload: callbackPayload,
-      organizationId: stateData.organizationId,
-      userId: stateData.userId,
-    });
+    // const result = await handleInstallationCallback({
+    //   payload: callbackPayload,
+    //   organizationId: stateData.organizationId,
+    //   userId: stateData.userId,
+    // });
 
     console.info(`GitHub App installed successfully for org ${stateData.organizationId}`);
 
     // Include the GitHub org name if available
-    const orgParam = result.githubOrgName ? `&org=${encodeURIComponent(result.githubOrgName)}` : '';
+    // const orgParam = result.githubOrgName ? `&org=${encodeURIComponent(result.githubOrgName)}` : '';
 
     return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=success${orgParam}`,
+      // TODO: FIX
+      redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
     };
   } catch (error) {
     console.error('Failed to complete installation:', error);

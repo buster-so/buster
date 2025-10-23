@@ -101,14 +101,3 @@ export async function retrieveInstallationState(state: string): Promise<Installa
     return null;
   }
 }
-
-/**
- * Clean up expired App states
- * This should be called periodically to clean up old states
- */
-export async function cleanupExpiredStates(): Promise<void> {
-  // This would need to be implemented with a query that finds all github_oauth_state_* secrets
-  // and checks their description for expiry time
-  // For now, states are cleaned up on retrieval if expired
-  console.info('Cleanup of expired OAuth states would happen here');
-}
