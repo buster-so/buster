@@ -1,26 +1,14 @@
 import { and, db, eq, isNull } from '../../connection';
-import { chats, dashboardFiles, metricFiles, reportFiles } from '../../schema';
+import { userLibrary } from '../../schema';
 import type {
   BulkUpdateLibraryFieldInput,
   BulkUpdateLibraryFieldResponse,
   LibraryAssetType,
 } from '../../schema-types';
 
-type LibraryAssetTable =
-  | typeof chats
-  | typeof dashboardFiles
-  | typeof metricFiles
-  | typeof reportFiles;
-
-export const libraryAssetTableMap: Record<LibraryAssetType, LibraryAssetTable> = {
-  chat: chats,
-  dashboard_file: dashboardFiles,
-  metric_file: metricFiles,
-  report_file: reportFiles,
-};
-
 export async function bulkUpdateLibraryField(
   input: BulkUpdateLibraryFieldInput,
+  userId: string,
   savedToLibrary: boolean
 ): Promise<BulkUpdateLibraryFieldResponse> {
   const failedItems: BulkUpdateLibraryFieldResponse['failedItems'] = [];
@@ -28,7 +16,7 @@ export async function bulkUpdateLibraryField(
   const promises: Promise<void>[] = [];
 
   for (const asset of input) {
-    promises.push(updateAssetLibraryField(asset.assetId, asset.assetType, savedToLibrary));
+    promises.push(updateAssetLibraryField(asset.assetId, asset.assetType, userId, savedToLibrary));
   }
   const results = await Promise.allSettled(promises);
 
@@ -60,15 +48,43 @@ export async function bulkUpdateLibraryField(
 async function updateAssetLibraryField(
   assetId: string,
   assetType: LibraryAssetType,
+  userId: string,
   savedToLibrary: boolean
 ): Promise<void> {
-  const table = libraryAssetTableMap[assetType];
-
-  await db
-    .update(table)
-    .set({
-      savedToLibrary,
-      updatedAt: new Date().toISOString(),
-    })
-    .where(and(eq(table.id, assetId), isNull(table.deletedAt)));
+  if (savedToLibrary) {
+    // Add to library: insert or update the userLibrary entry
+    await db
+      .insert(userLibrary)
+      .values({
+        userId,
+        assetId,
+        assetType,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        deletedAt: null,
+      })
+      .onConflictDoUpdate({
+        target: [userLibrary.userId, userLibrary.assetType, userLibrary.assetId],
+        set: {
+          deletedAt: null,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+  } else {
+    // Remove from library: soft delete the userLibrary entry
+    await db
+      .update(userLibrary)
+      .set({
+        deletedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(
+        and(
+          eq(userLibrary.userId, userId),
+          eq(userLibrary.assetId, assetId),
+          eq(userLibrary.assetType, assetType),
+          isNull(userLibrary.deletedAt)
+        )
+      );
+  }
 }

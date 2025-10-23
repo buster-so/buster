@@ -21,6 +21,7 @@ import {
   dashboardFiles,
   metricFiles,
   reportFiles,
+  userLibrary,
   users,
 } from '../../schema';
 import {
@@ -61,10 +62,18 @@ export async function listPermissionedLibraryAssets(
       organizationId: reportFiles.organizationId,
     })
     .from(reportFiles)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, reportFiles.id),
+        eq(userLibrary.assetType, 'report_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(reportFiles.organizationId, organizationId),
-        eq(reportFiles.savedToLibrary, true),
         isNull(reportFiles.deletedAt),
         or(
           ne(reportFiles.workspaceSharing, 'none'),
@@ -97,10 +106,18 @@ export async function listPermissionedLibraryAssets(
       organizationId: metricFiles.organizationId,
     })
     .from(metricFiles)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, metricFiles.id),
+        eq(userLibrary.assetType, 'metric_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(metricFiles.organizationId, organizationId),
-        eq(metricFiles.savedToLibrary, true),
         isNull(metricFiles.deletedAt),
         or(
           ne(metricFiles.workspaceSharing, 'none'),
@@ -133,10 +150,18 @@ export async function listPermissionedLibraryAssets(
       organizationId: dashboardFiles.organizationId,
     })
     .from(dashboardFiles)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, dashboardFiles.id),
+        eq(userLibrary.assetType, 'dashboard_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(dashboardFiles.organizationId, organizationId),
-        eq(dashboardFiles.savedToLibrary, true),
         isNull(dashboardFiles.deletedAt),
         or(
           ne(dashboardFiles.workspaceSharing, 'none'),
@@ -169,10 +194,18 @@ export async function listPermissionedLibraryAssets(
       organizationId: chats.organizationId,
     })
     .from(chats)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, chats.id),
+        eq(userLibrary.assetType, 'chat'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(chats.organizationId, organizationId),
-        eq(chats.savedToLibrary, true),
         isNull(chats.deletedAt),
         or(
           ne(chats.workspaceSharing, 'none'),
