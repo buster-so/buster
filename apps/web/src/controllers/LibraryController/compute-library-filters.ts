@@ -15,9 +15,7 @@ export const computeLibraryFilters = (filtersProps: LibrarySearchParams, userId:
     group_by,
     ...rest
   } = filtersProps;
-  const filters: Omit<Parameters<typeof useLibraryAssetsInfinite>[0], 'scrollConfig'> = {
-    page_size: 45,
-  };
+  const filters: Omit<Parameters<typeof useLibraryAssetsInfinite>[0], 'scrollConfig'> = {};
 
   if (filter === 'all') {
     filters.includeCreatedBy = owner_ids;

@@ -16,18 +16,26 @@ export const useGetLibraryAssets = (filters: GetLibraryAssetsRequestQuery) => {
 
 export const useLibraryAssetsInfinite = ({
   scrollConfig,
+  mounted = true,
+  enabled = true,
+  page_size = 45,
   ...params
-}: Omit<GetLibraryAssetsRequestQuery, 'page'> & {
+}: Omit<GetLibraryAssetsRequestQuery, 'page' | 'page_size'> & {
+  page_size?: number;
   scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
+  mounted?: boolean;
+  enabled?: boolean;
 }) => {
   return useInfiniteScroll<LibraryAssetListItem>({
     queryKey: ['library', 'get', 'list-infinite', params] as const,
     staleTime: 1000 * 40, // 40 seconds
     queryFn: ({ pageParam = 1 }) => {
-      return getLibraryAssets({ ...params, page: pageParam });
+      return getLibraryAssets({ ...params, page_size, page: pageParam });
     },
     placeholderData: keepPreviousData,
     scrollConfig,
+    mounted,
+    enabled,
   });
 };
 
