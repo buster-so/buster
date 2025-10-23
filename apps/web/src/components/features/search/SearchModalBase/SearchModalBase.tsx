@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing */
+
+import type { AssetType } from '@buster/server-shared/assets';
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
@@ -33,14 +35,22 @@ type SearchModalNavigateProps = {
 
 type SearchModalSelectSingleProps = {
   mode: 'select-single';
-  onSelect: (item: string | null) => void | Promise<void>;
+  onSelect: (item: { assetId: string; assetType: AssetType } | null) => void | Promise<void>;
   selectedItem: string;
 };
 
 type SearchModalSelectMultipleProps = {
   mode: 'select-multiple';
-  onSelect: (items: Set<string>) => void | Promise<void>;
-  selectedItems: Set<string>;
+  onSelect: (
+    items: Set<{
+      assetId: string;
+      assetType: AssetType;
+    }>
+  ) => void | Promise<void>;
+  selectedItems: Set<{
+    assetId: string;
+    assetType: AssetType;
+  }>;
 };
 
 type SearchModalBaseProps = (
@@ -88,14 +98,16 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
     if (mode === 'select-single') {
       const newItem = item.assetId === props.selectedItem ? null : item.assetId;
-      await onSelect?.(newItem);
+      await onSelect?.(newItem ? { assetId: newItem, assetType: item.assetType } : null);
       return;
     }
 
     if (mode === 'select-multiple') {
       const newItems = new Set(props.selectedItems);
-      newItems.has(item.assetId) ? newItems.delete(item.assetId) : newItems.add(item.assetId);
-      await onSelect(newItems);
+      newItems.has({ assetId: item.assetId, assetType: item.assetType })
+        ? newItems.delete({ assetId: item.assetId, assetType: item.assetType })
+        : newItems.add({ assetId: item.assetId, assetType: item.assetType });
+      await onSelect?.(newItems);
       return;
     }
 
@@ -104,7 +116,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
   });
 
   const fallbackCheckSelected = useCallback(
-    (itemId: string) => {
+    (itemId: string, assetType: AssetType) => {
       return () => {
         if (mode === 'navigate') {
           return false;
@@ -115,7 +127,8 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
         }
 
         if (mode === 'select-multiple') {
-          return props.selectedItems.has(itemId);
+          console.log('selectedItems', props.selectedItems, { assetId: itemId, assetType });
+          return props.selectedItems.has({ assetId: itemId, assetType });
         }
 
         const _exhaustiveCheck: never = mode;
@@ -145,7 +158,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
           />
         ) : undefined,
       onSelect: async () => onSelectItem(item),
-      selected: item.addedToLibrary || fallbackCheckSelected(item.assetId),
+      selected: item.addedToLibrary || fallbackCheckSelected(item.assetId, item.assetType),
     };
   };
 

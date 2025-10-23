@@ -2,17 +2,13 @@ import { Store, useStore } from '@tanstack/react-store';
 
 export const librarySearchStore = new Store({
   isOpen: false,
-  value: '',
 });
 
 const stableIsOpen = (x: typeof librarySearchStore.state) => x.isOpen;
-const stableValue = (x: typeof librarySearchStore.state) => x.value;
-
 export const useLibrarySearchStore = () => {
   const isOpen = useStore(librarySearchStore, stableIsOpen);
-  const value = useStore(librarySearchStore, stableValue);
 
-  return { isOpen, value, onCloseLibrarySearch, toggleLibrarySearch, setLibrarySearchValue };
+  return { isOpen, onCloseLibrarySearch, toggleLibrarySearch };
 };
 
 export const toggleLibrarySearch = (v?: boolean) => {
