@@ -1,9 +1,9 @@
 import { and, db, eq, isNull } from '../../connection';
 import { userLibrary } from '../../schema';
 import type {
+  AssetType,
   BulkUpdateLibraryFieldInput,
   BulkUpdateLibraryFieldResponse,
-  LibraryAssetType,
 } from '../../schema-types';
 
 export async function bulkUpdateLibraryField(
@@ -47,7 +47,7 @@ export async function bulkUpdateLibraryField(
 
 async function updateAssetLibraryField(
   assetId: string,
-  assetType: LibraryAssetType,
+  assetType: AssetType,
   userId: string,
   savedToLibrary: boolean
 ): Promise<void> {
