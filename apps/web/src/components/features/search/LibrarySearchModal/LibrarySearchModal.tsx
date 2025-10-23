@@ -52,18 +52,7 @@ export const LibrarySearchModal = React.memo(() => {
   );
 
   const handleSelect = useMemoizedFn((items: Set<string>) => {
-    items.forEach((item) => {
-      if (itemsToAdd.current.has(item)) {
-        itemsToAdd.current.delete(item);
-      } else {
-        itemsToAdd.current.add(item);
-      }
-      if (itemsToRemove.current.has(item)) {
-        itemsToRemove.current.delete(item);
-      } else {
-        itemsToRemove.current.add(item);
-      }
-    });
+    console.log(items);
     setSelectedItems(items);
   });
 

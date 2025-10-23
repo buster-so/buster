@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: I know what I'm doing */
 import type { SearchTextData, SearchTextResponse } from '@buster/server-shared/search';
 import { useNavigate } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Plus } from '@/components/ui/icons';
 import { createChatRecord } from '@/components/ui/list/createChatRecord';
 import { SearchModal } from '@/components/ui/search/SearchModal';
@@ -19,13 +19,7 @@ import { SearchModalSecondaryContent } from './SearchModalSecondaryContent';
 
 export type SearchModalBaseContentProps<M = unknown, T extends string = string> = Pick<
   NonNullable<SearchModalProps<M, T>>,
-  | 'value'
-  | 'onChangeValue'
-  | 'loading'
-  | 'scrollContainerRef'
-  | 'filterContent'
-  | 'footerConfig'
-  | 'selectedItems'
+  'value' | 'onChangeValue' | 'loading' | 'scrollContainerRef' | 'filterContent' | 'footerConfig'
 > & {
   items: SearchTextResponse['data'];
   isOpen: boolean;
@@ -69,7 +63,6 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
     onClose,
     onSelect,
     footerConfig,
-    selectedItems,
   } = props;
 
   const navigate = useNavigate();
@@ -110,26 +103,53 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
     throw new Error(`Invalid mode: ${_exhaustiveCheck}`);
   });
 
-  const searchItems: SearchItems[] = useMemo(() => {
-    const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
-      const Icon = assetTypeToIcon(item.assetType);
-      return {
-        label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
-        icon: <Icon />,
-        value: item.assetId,
-        type: 'item',
-        tertiaryLabel: timeFromNow(item.updatedAt),
-        secondaryLabel:
-          makeSecondary && item.additionalText ? (
-            <span
-              className="line-clamp-1"
-              dangerouslySetInnerHTML={{ __html: item.additionalText }}
-            />
-          ) : undefined,
-        onSelect: async () => onSelectItem(item),
-      };
-    };
+  const fallbackCheckSelected = useCallback(
+    (itemId: string) => {
+      return () => {
+        if (mode === 'navigate') {
+          return false;
+        }
 
+        if (mode === 'select-single') {
+          return itemId === props.selectedItem;
+        }
+
+        if (mode === 'select-multiple') {
+          return props.selectedItems.has(itemId);
+        }
+
+        const _exhaustiveCheck: never = mode;
+        throw new Error(`Invalid mode: ${_exhaustiveCheck}`);
+      };
+    },
+    [
+      mode,
+      (props as SearchModalSelectSingleProps).selectedItem,
+      (props as SearchModalSelectMultipleProps).selectedItems,
+    ]
+  );
+
+  const makeItem = (item: SearchTextData, makeSecondary?: boolean): SearchItem => {
+    const Icon = assetTypeToIcon(item.assetType);
+    return {
+      label: <span dangerouslySetInnerHTML={{ __html: item.title }} />,
+      icon: <Icon />,
+      value: item.assetId,
+      type: 'item',
+      tertiaryLabel: timeFromNow(item.updatedAt),
+      secondaryLabel:
+        makeSecondary && item.additionalText ? (
+          <span
+            className="line-clamp-1"
+            dangerouslySetInnerHTML={{ __html: item.additionalText }}
+          />
+        ) : undefined,
+      onSelect: async () => onSelectItem(item),
+      selected: item.addedToLibrary || fallbackCheckSelected(item.assetId),
+    };
+  };
+
+  const searchItems: SearchItems[] = useMemo(() => {
     if (openSecondaryContent) {
       const allItems: SearchItem[] = items.map((item) => makeItem(item, true));
       return [
@@ -176,7 +196,7 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
         })
       ),
     ].filter((x) => x.display !== false) as SearchItems[];
-  }, [items, openSecondaryContent]);
+  }, [items, openSecondaryContent, fallbackCheckSelected, onSelectItem, mode]);
 
   const onViewSearchItem = useMemoizedFn((item: SearchItem) => {
     const foundItem = items.find((x) => x.assetId === item.value);
@@ -202,7 +222,6 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
       filterContent={filterContent}
       mode={mode}
       footerConfig={footerConfig}
-      selectedItems={selectedItems}
       secondaryContent={useMemo(() => {
         return viewedItem ? <SearchModalSecondaryContent selectedItem={viewedItem} /> : null;
       }, [viewedItem])}

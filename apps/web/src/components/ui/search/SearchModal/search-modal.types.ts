@@ -13,6 +13,7 @@ export type SearchItem<M = unknown, T extends string = string> = {
   loading?: boolean;
   disabled?: boolean;
   type: 'item';
+  selected?: boolean | ((itemId: T) => boolean);
 };
 
 export type SearchItemGroup<M = unknown, T extends string = string> = {
@@ -53,7 +54,6 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
   mode: SearchMode;
   //TODO: type this a little better
-  selectedItems?: Set<string>;
   footerConfig?: {
     secondaryButton?: ButtonProps;
     primaryButton?: ButtonProps;

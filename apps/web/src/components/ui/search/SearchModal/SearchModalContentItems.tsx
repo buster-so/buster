@@ -27,10 +27,9 @@ export const SearchModalContentItems = <M, T extends string>({
   scrollContainerRef,
   showBottomLoading,
   mode,
-  selectedItems,
 }: Pick<
   SearchModalContentProps<M, T>,
-  'scrollContainerRef' | 'loading' | 'searchItems' | 'showBottomLoading' | 'mode' | 'selectedItems'
+  'scrollContainerRef' | 'loading' | 'searchItems' | 'showBottomLoading' | 'mode'
 > &
   CommonProps<M, T>) => {
   return (
@@ -47,7 +46,6 @@ export const SearchModalContentItems = <M, T extends string>({
           item={item}
           onSelectGlobal={onSelectGlobal}
           mode={mode}
-          selectedItems={selectedItems}
         />
       ))}
 
@@ -73,35 +71,18 @@ const ItemsSelecter = <M, T extends string>({
   item,
   onSelectGlobal,
   mode,
-  selectedItems,
 }: {
   item: SearchItems<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
   mode: SearchMode;
-  selectedItems?: Set<string>;
 }) => {
   const type = item.type;
   if (type === 'item') {
-    const isSelected = selectedItems?.has(item.value) ?? false;
-    return (
-      <SearchItemComponent
-        {...item}
-        onSelectGlobal={onSelectGlobal}
-        mode={mode}
-        selected={isSelected}
-      />
-    );
+    return <SearchItemComponent {...item} onSelectGlobal={onSelectGlobal} mode={mode} />;
   }
 
   if (type === 'group') {
-    return (
-      <SearchItemGroupComponent
-        item={item}
-        onSelectGlobal={onSelectGlobal}
-        mode={mode}
-        selectedItems={selectedItems}
-      />
-    );
+    return <SearchItemGroupComponent item={item} onSelectGlobal={onSelectGlobal} mode={mode} />;
   }
 
   if (type === 'seperator') {
@@ -114,7 +95,7 @@ const ItemsSelecter = <M, T extends string>({
 };
 
 const SearchItemComponent = <M, T extends string>(
-  item: SearchItem<M, T> & CommonProps<M, T> & { mode: SearchMode; selected: boolean }
+  item: SearchItem<M, T> & CommonProps<M, T> & { mode: SearchMode }
 ) => {
   const {
     value,
@@ -144,9 +125,10 @@ const SearchItemComponent = <M, T extends string>(
       onSelect={() => onSelectGlobal(item)}
     >
       {isSelectMode && (
-        <div>
-          <Checkbox checked={selected} onCheckedChange={() => onSelectGlobal(item)} />
-        </div>
+        <Checkbox
+          checked={typeof selected === 'function' ? selected(value) : selected}
+          onCheckedChange={() => onSelectGlobal(item)}
+        />
       )}
 
       {icon && (
@@ -200,12 +182,10 @@ const SearchItemGroupComponent = <M, T extends string>({
   item,
   onSelectGlobal,
   mode,
-  selectedItems,
 }: {
   item: SearchItemGroup<M, T>;
   onSelectGlobal: (d: SearchItem<M, T>) => void;
   mode: SearchMode;
-  selectedItems?: Set<string>;
 }) => {
   const { className, items, label } = item;
   return (
@@ -223,7 +203,6 @@ const SearchItemGroupComponent = <M, T extends string>({
           item={item}
           onSelectGlobal={onSelectGlobal}
           mode={mode}
-          selectedItems={selectedItems}
         />
       ))}
     </Command.Group>

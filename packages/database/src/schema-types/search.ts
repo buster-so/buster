@@ -11,4 +11,5 @@ export const TextSearchResultSchema = z.object({
   createdBy: z.string().uuid(),
   createdByName: z.string(),
   createdByAvatarUrl: z.string().nullable(),
+  addedToLibrary: z.boolean(),
 });
