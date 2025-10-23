@@ -20,15 +20,22 @@ import { db } from '../../connection';
 import {
   assetPermissions,
   chats,
+  collections,
+  collectionsToAssets,
   dashboardFiles,
+  messages,
+  messagesToFiles,
   metricFiles,
+  metricFilesToDashboardFiles,
+  metricFilesToReportFiles,
   reportFiles,
+  userLibrary,
   users,
 } from '../../schema';
 import {
+  type AssetType,
   createPaginatedResponse,
   type LibraryAssetListItem,
-  type LibraryAssetType,
   type ListPermissionedLibraryAssetsInput,
   ListPermissionedLibraryAssetsInputSchema,
   type ListPermissionedLibraryAssetsResponse,
@@ -52,6 +59,7 @@ export async function listPermissionedLibraryAssets(
     query,
     page,
     page_size,
+    includeAssetChildren,
   } = ListPermissionedLibraryAssetsInputSchema.parse(input);
 
   const offset = (page - 1) * page_size;
@@ -68,10 +76,18 @@ export async function listPermissionedLibraryAssets(
       screenshotBucketKey: reportFiles.screenshotBucketKey,
     })
     .from(reportFiles)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, reportFiles.id),
+        eq(userLibrary.assetType, 'report_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(reportFiles.organizationId, organizationId),
-        eq(reportFiles.savedToLibrary, true),
         isNull(reportFiles.deletedAt),
         or(
           ne(reportFiles.workspaceSharing, 'none'),
@@ -105,10 +121,18 @@ export async function listPermissionedLibraryAssets(
       screenshotBucketKey: metricFiles.screenshotBucketKey,
     })
     .from(metricFiles)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, metricFiles.id),
+        eq(userLibrary.assetType, 'metric_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(metricFiles.organizationId, organizationId),
-        eq(metricFiles.savedToLibrary, true),
         isNull(metricFiles.deletedAt),
         or(
           ne(metricFiles.workspaceSharing, 'none'),
@@ -142,10 +166,18 @@ export async function listPermissionedLibraryAssets(
       screenshotBucketKey: dashboardFiles.screenshotBucketKey,
     })
     .from(dashboardFiles)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, dashboardFiles.id),
+        eq(userLibrary.assetType, 'dashboard_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(dashboardFiles.organizationId, organizationId),
-        eq(dashboardFiles.savedToLibrary, true),
         isNull(dashboardFiles.deletedAt),
         or(
           ne(dashboardFiles.workspaceSharing, 'none'),
@@ -179,10 +211,18 @@ export async function listPermissionedLibraryAssets(
       screenshotBucketKey: chats.screenshotBucketKey,
     })
     .from(chats)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, chats.id),
+        eq(userLibrary.assetType, 'chat'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
     .where(
       and(
         eq(chats.organizationId, organizationId),
-        eq(chats.savedToLibrary, true),
         isNull(chats.deletedAt),
         or(
           ne(chats.workspaceSharing, 'none'),
@@ -204,11 +244,579 @@ export async function listPermissionedLibraryAssets(
       )
     );
 
-  const permissionedAssets = permissionedReportFiles
+  const permissionedCollections = db
+    .select({
+      assetId: collections.id,
+      assetType: sql`'collection'::asset_type_enum`.as('assetType'),
+      name: collections.name,
+      createdAt: collections.createdAt,
+      updatedAt: collections.updatedAt,
+      createdBy: collections.createdBy,
+      organizationId: collections.organizationId,
+      screenshotBucketKey: collections.screenshotBucketKey,
+    })
+    .from(collections)
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, collections.id),
+        eq(userLibrary.assetType, 'collection'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(collections.organizationId, organizationId),
+        isNull(collections.deletedAt),
+        or(
+          ne(collections.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, collections.id),
+                  eq(assetPermissions.assetType, 'collection'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child metric files from dashboard files in library (when includeAssetChildren is true)
+  const childMetricsFromDashboards = db
+    .select({
+      assetId: metricFiles.id,
+      assetType: sql`'metric_file'::asset_type_enum`.as('assetType'),
+      name: metricFiles.name,
+      createdAt: metricFiles.createdAt,
+      updatedAt: metricFiles.updatedAt,
+      createdBy: metricFiles.createdBy,
+      organizationId: metricFiles.organizationId,
+      screenshotBucketKey: metricFiles.screenshotBucketKey,
+    })
+    .from(metricFiles)
+    .innerJoin(
+      metricFilesToDashboardFiles,
+      and(
+        eq(metricFilesToDashboardFiles.metricFileId, metricFiles.id),
+        isNull(metricFilesToDashboardFiles.deletedAt)
+      )
+    )
+    .innerJoin(dashboardFiles, eq(dashboardFiles.id, metricFilesToDashboardFiles.dashboardFileId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, dashboardFiles.id),
+        eq(userLibrary.assetType, 'dashboard_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(metricFiles.organizationId, organizationId),
+        isNull(metricFiles.deletedAt),
+        isNull(dashboardFiles.deletedAt),
+        or(
+          ne(dashboardFiles.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, dashboardFiles.id),
+                  eq(assetPermissions.assetType, 'dashboard_file'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child metric files from report files in library (when includeAssetChildren is true)
+  const childMetricsFromReports = db
+    .select({
+      assetId: metricFiles.id,
+      assetType: sql`'metric_file'::asset_type_enum`.as('assetType'),
+      name: metricFiles.name,
+      createdAt: metricFiles.createdAt,
+      updatedAt: metricFiles.updatedAt,
+      createdBy: metricFiles.createdBy,
+      organizationId: metricFiles.organizationId,
+      screenshotBucketKey: metricFiles.screenshotBucketKey,
+    })
+    .from(metricFiles)
+    .innerJoin(
+      metricFilesToReportFiles,
+      and(
+        eq(metricFilesToReportFiles.metricFileId, metricFiles.id),
+        isNull(metricFilesToReportFiles.deletedAt)
+      )
+    )
+    .innerJoin(reportFiles, eq(reportFiles.id, metricFilesToReportFiles.reportFileId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, reportFiles.id),
+        eq(userLibrary.assetType, 'report_file'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(metricFiles.organizationId, organizationId),
+        isNull(metricFiles.deletedAt),
+        isNull(reportFiles.deletedAt),
+        or(
+          ne(reportFiles.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, reportFiles.id),
+                  eq(assetPermissions.assetType, 'report_file'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child metric files from chat messages in library (when includeAssetChildren is true)
+  const childMetricsFromChats = db
+    .select({
+      assetId: metricFiles.id,
+      assetType: sql`'metric_file'::asset_type_enum`.as('assetType'),
+      name: metricFiles.name,
+      createdAt: metricFiles.createdAt,
+      updatedAt: metricFiles.updatedAt,
+      createdBy: metricFiles.createdBy,
+      organizationId: metricFiles.organizationId,
+      screenshotBucketKey: metricFiles.screenshotBucketKey,
+    })
+    .from(metricFiles)
+    .innerJoin(
+      messagesToFiles,
+      and(
+        eq(messagesToFiles.fileId, metricFiles.id),
+        isNull(messagesToFiles.deletedAt),
+        eq(messagesToFiles.isDuplicate, false)
+      )
+    )
+    .innerJoin(messages, eq(messages.id, messagesToFiles.messageId))
+    .innerJoin(chats, eq(chats.id, messages.chatId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, chats.id),
+        eq(userLibrary.assetType, 'chat'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(metricFiles.organizationId, organizationId),
+        isNull(metricFiles.deletedAt),
+        isNull(messages.deletedAt),
+        isNull(chats.deletedAt),
+        or(
+          ne(chats.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, chats.id),
+                  eq(assetPermissions.assetType, 'chat'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child dashboard files from chat messages in library (when includeAssetChildren is true)
+  const childDashboardsFromChats = db
+    .select({
+      assetId: dashboardFiles.id,
+      assetType: sql`'dashboard_file'::asset_type_enum`.as('assetType'),
+      name: dashboardFiles.name,
+      createdAt: dashboardFiles.createdAt,
+      updatedAt: dashboardFiles.updatedAt,
+      createdBy: dashboardFiles.createdBy,
+      organizationId: dashboardFiles.organizationId,
+      screenshotBucketKey: dashboardFiles.screenshotBucketKey,
+    })
+    .from(dashboardFiles)
+    .innerJoin(
+      messagesToFiles,
+      and(
+        eq(messagesToFiles.fileId, dashboardFiles.id),
+        isNull(messagesToFiles.deletedAt),
+        eq(messagesToFiles.isDuplicate, false)
+      )
+    )
+    .innerJoin(messages, eq(messages.id, messagesToFiles.messageId))
+    .innerJoin(chats, eq(chats.id, messages.chatId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, chats.id),
+        eq(userLibrary.assetType, 'chat'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(dashboardFiles.organizationId, organizationId),
+        isNull(dashboardFiles.deletedAt),
+        isNull(messages.deletedAt),
+        isNull(chats.deletedAt),
+        or(
+          ne(chats.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, chats.id),
+                  eq(assetPermissions.assetType, 'chat'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child report files from chat messages in library (when includeAssetChildren is true)
+  const childReportsFromChats = db
+    .select({
+      assetId: reportFiles.id,
+      assetType: sql`'report_file'::asset_type_enum`.as('assetType'),
+      name: reportFiles.name,
+      createdAt: reportFiles.createdAt,
+      updatedAt: reportFiles.updatedAt,
+      createdBy: reportFiles.createdBy,
+      organizationId: reportFiles.organizationId,
+      screenshotBucketKey: reportFiles.screenshotBucketKey,
+    })
+    .from(reportFiles)
+    .innerJoin(
+      messagesToFiles,
+      and(
+        eq(messagesToFiles.fileId, reportFiles.id),
+        isNull(messagesToFiles.deletedAt),
+        eq(messagesToFiles.isDuplicate, false)
+      )
+    )
+    .innerJoin(messages, eq(messages.id, messagesToFiles.messageId))
+    .innerJoin(chats, eq(chats.id, messages.chatId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, chats.id),
+        eq(userLibrary.assetType, 'chat'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(reportFiles.organizationId, organizationId),
+        isNull(reportFiles.deletedAt),
+        isNull(messages.deletedAt),
+        isNull(chats.deletedAt),
+        or(
+          ne(chats.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, chats.id),
+                  eq(assetPermissions.assetType, 'chat'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child metric files from collections in library (when includeAssetChildren is true)
+  const childMetricsFromCollections = db
+    .select({
+      assetId: metricFiles.id,
+      assetType: sql`'metric_file'::asset_type_enum`.as('assetType'),
+      name: metricFiles.name,
+      createdAt: metricFiles.createdAt,
+      updatedAt: metricFiles.updatedAt,
+      createdBy: metricFiles.createdBy,
+      organizationId: metricFiles.organizationId,
+      screenshotBucketKey: metricFiles.screenshotBucketKey,
+    })
+    .from(metricFiles)
+    .innerJoin(
+      collectionsToAssets,
+      and(
+        eq(collectionsToAssets.assetId, metricFiles.id),
+        eq(collectionsToAssets.assetType, 'metric_file'),
+        isNull(collectionsToAssets.deletedAt)
+      )
+    )
+    .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, collections.id),
+        eq(userLibrary.assetType, 'collection'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(metricFiles.organizationId, organizationId),
+        isNull(metricFiles.deletedAt),
+        isNull(collections.deletedAt),
+        or(
+          ne(collections.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, collections.id),
+                  eq(assetPermissions.assetType, 'collection'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child dashboard files from collections in library (when includeAssetChildren is true)
+  const childDashboardsFromCollections = db
+    .select({
+      assetId: dashboardFiles.id,
+      assetType: sql`'dashboard_file'::asset_type_enum`.as('assetType'),
+      name: dashboardFiles.name,
+      createdAt: dashboardFiles.createdAt,
+      updatedAt: dashboardFiles.updatedAt,
+      createdBy: dashboardFiles.createdBy,
+      organizationId: dashboardFiles.organizationId,
+      screenshotBucketKey: dashboardFiles.screenshotBucketKey,
+    })
+    .from(dashboardFiles)
+    .innerJoin(
+      collectionsToAssets,
+      and(
+        eq(collectionsToAssets.assetId, dashboardFiles.id),
+        eq(collectionsToAssets.assetType, 'dashboard_file'),
+        isNull(collectionsToAssets.deletedAt)
+      )
+    )
+    .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, collections.id),
+        eq(userLibrary.assetType, 'collection'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(dashboardFiles.organizationId, organizationId),
+        isNull(dashboardFiles.deletedAt),
+        isNull(collections.deletedAt),
+        or(
+          ne(collections.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, collections.id),
+                  eq(assetPermissions.assetType, 'collection'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child report files from collections in library (when includeAssetChildren is true)
+  const childReportsFromCollections = db
+    .select({
+      assetId: reportFiles.id,
+      assetType: sql`'report_file'::asset_type_enum`.as('assetType'),
+      name: reportFiles.name,
+      createdAt: reportFiles.createdAt,
+      updatedAt: reportFiles.updatedAt,
+      createdBy: reportFiles.createdBy,
+      organizationId: reportFiles.organizationId,
+      screenshotBucketKey: reportFiles.screenshotBucketKey,
+    })
+    .from(reportFiles)
+    .innerJoin(
+      collectionsToAssets,
+      and(
+        eq(collectionsToAssets.assetId, reportFiles.id),
+        eq(collectionsToAssets.assetType, 'report_file'),
+        isNull(collectionsToAssets.deletedAt)
+      )
+    )
+    .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, collections.id),
+        eq(userLibrary.assetType, 'collection'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(reportFiles.organizationId, organizationId),
+        isNull(reportFiles.deletedAt),
+        isNull(collections.deletedAt),
+        or(
+          ne(collections.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, collections.id),
+                  eq(assetPermissions.assetType, 'collection'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Child chats from collections in library (when includeAssetChildren is true)
+  const childChatsFromCollections = db
+    .select({
+      assetId: chats.id,
+      assetType: sql`'chat'::asset_type_enum`.as('assetType'),
+      name: chats.title,
+      createdAt: chats.createdAt,
+      updatedAt: chats.updatedAt,
+      createdBy: chats.createdBy,
+      organizationId: chats.organizationId,
+      screenshotBucketKey: chats.screenshotBucketKey,
+    })
+    .from(chats)
+    .innerJoin(
+      collectionsToAssets,
+      and(
+        eq(collectionsToAssets.assetId, chats.id),
+        eq(collectionsToAssets.assetType, 'chat'),
+        isNull(collectionsToAssets.deletedAt)
+      )
+    )
+    .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
+    .innerJoin(
+      userLibrary,
+      and(
+        eq(userLibrary.assetId, collections.id),
+        eq(userLibrary.assetType, 'collection'),
+        eq(userLibrary.userId, userId),
+        isNull(userLibrary.deletedAt)
+      )
+    )
+    .where(
+      and(
+        eq(chats.organizationId, organizationId),
+        isNull(chats.deletedAt),
+        isNull(collections.deletedAt),
+        or(
+          ne(collections.workspaceSharing, 'none'),
+          exists(
+            db
+              .select({ value: sql`1` })
+              .from(assetPermissions)
+              .where(
+                and(
+                  eq(assetPermissions.assetId, collections.id),
+                  eq(assetPermissions.assetType, 'collection'),
+                  eq(assetPermissions.identityId, userId),
+                  eq(assetPermissions.identityType, 'user'),
+                  isNull(assetPermissions.deletedAt)
+                )
+              )
+          )
+        )
+      )
+    );
+
+  // Build the union query based on includeAssetChildren parameter
+  const baseUnion = permissionedReportFiles
     .union(permissionedMetricFiles)
     .union(permissionedDashboardFiles)
     .union(permissionedChats)
-    .as('permissioned_assets');
+    .union(permissionedCollections);
+
+  const permissionedAssets = includeAssetChildren
+    ? baseUnion
+        .union(childMetricsFromDashboards)
+        .union(childMetricsFromReports)
+        .union(childMetricsFromChats)
+        .union(childDashboardsFromChats)
+        .union(childReportsFromChats)
+        .union(childMetricsFromCollections)
+        .union(childDashboardsFromCollections)
+        .union(childReportsFromCollections)
+        .union(childChatsFromCollections)
+        .as('permissioned_assets')
+    : baseUnion.as('permissioned_assets');
 
   const filters: SQL[] = [];
 
@@ -293,7 +901,7 @@ export async function listPermissionedLibraryAssets(
 
   const libraryAssets: LibraryAssetListItem[] = assetsResult.map((asset) => ({
     asset_id: asset.assetId,
-    asset_type: asset.assetType as LibraryAssetType,
+    asset_type: asset.assetType as AssetType,
     name: asset.name ?? '',
     created_at: asset.createdAt,
     updated_at: asset.updatedAt,

@@ -52,7 +52,7 @@ const app = new Hono().delete(
       }
     }
 
-    const updateResult = await bulkUpdateLibraryField(assetsToUpdate, false);
+    const updateResult = await bulkUpdateLibraryField(assetsToUpdate, user.id, false);
     const success = updateResult.success && failedAssets.length === 0;
 
     const output: LibraryDeleteResponse = {
