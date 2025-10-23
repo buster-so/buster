@@ -51,11 +51,16 @@ export const useConfirmModalContext = () => {
     props: ConfirmProps<T>
   ): Promise<T | undefined> | T => {
     return new Promise<T | undefined>((resolve, reject) => {
+      // Per-modal action lock to prevent spam clicking
+      let actionInProgress = false;
+
       const newModal: QueuedModal<T> = {
         ...props,
         resolve,
         reject,
         onOk: async () => {
+          if (actionInProgress) return;
+          actionInProgress = true;
           try {
             const res = await Promise.resolve(props.onOk());
             resolve(res);
@@ -63,11 +68,14 @@ export const useConfirmModalContext = () => {
             reject(error);
           } finally {
             closeModalWithDelay();
+            actionInProgress = false;
           }
         },
         onCancel:
           props.cancelButtonProps?.hide !== true
             ? async () => {
+                if (actionInProgress) return;
+                actionInProgress = true;
                 try {
                   await props.onCancel?.();
                   resolve(undefined);
@@ -75,6 +83,7 @@ export const useConfirmModalContext = () => {
                   reject(error);
                 } finally {
                   closeModalWithDelay();
+                  actionInProgress = false;
                 }
               }
             : undefined,
