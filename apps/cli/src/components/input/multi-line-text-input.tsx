@@ -1,5 +1,12 @@
 import { Box, Text, useInput } from 'ink';
 import { useEffect, useRef, useState } from 'react';
+import { detectPaste, insertTextAtCursor } from '../../utils/paste-handler';
+import {
+  createPasteToken,
+  reconstructActualText,
+  shouldCollapsePaste,
+  type TokenMap,
+} from '../../utils/paste-token';
 import { getSetting } from '../../utils/settings';
 import type { VimMode, VimState } from '../../utils/vim-mode';
 import { handleVimKeybinding } from '../../utils/vim-mode';
@@ -7,7 +14,7 @@ import { handleVimKeybinding } from '../../utils/vim-mode';
 interface MultiLineTextInputProps {
   value: string;
   onChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (finalValue?: string) => void;
   onMentionChange?: (mention: string | null, cursorPosition: number) => void;
   onSlashChange?: (query: string | null, cursorPosition: number) => void;
   onAutocompleteNavigate?: (direction: 'up' | 'down' | 'select' | 'close') => void;
@@ -36,6 +43,19 @@ export function MultiLineTextInput({
   // Always show cursor - no blinking to prevent re-renders
   const showCursor = true;
 
+  // Collapsed paste state
+  // tokenMap: stores mapping of tokens (e.g., "[Pasted text #1 +10 lines]") to actual text
+  // nextTokenNumber: counter for numbering paste tokens (#1, #2, #3, etc.)
+  const [tokenMap, setTokenMap] = useState<TokenMap>({});
+  const [nextTokenNumber, setNextTokenNumber] = useState(1);
+
+  // Paste buffering state for consolidating chunked pastes
+  // Terminal may split large pastes into multiple chunks. We buffer them
+  // and process as a single paste after a timeout.
+  const pasteBufferRef = useRef<string[]>([]);
+  const pasteTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pasteCursorPositionRef = useRef<number>(0);
+
   // Vim mode state
   const [vimEnabled] = useState(() => getSetting('vimMode'));
   const [vimState, setVimState] = useState<VimState>({
@@ -50,10 +70,84 @@ export function MultiLineTextInput({
     }
   }, [vimState.mode, vimEnabled, onVimModeChange]);
 
+  // Cleanup paste timer on unmount
+  useEffect(() => {
+    return () => {
+      if (pasteTimerRef.current) {
+        clearTimeout(pasteTimerRef.current);
+      }
+    };
+  }, []);
+
   // Update cursor position when value changes externally (e.g., when cleared after submit)
+  // Also reset token state when input is cleared
   useEffect(() => {
     setCursorPosition(value.length);
+
+    // If value is cleared (after submit), reset token tracking and paste buffer
+    if (value === '') {
+      setTokenMap({});
+      setNextTokenNumber(1);
+
+      // Clear any pending paste timer and buffer
+      if (pasteTimerRef.current) {
+        clearTimeout(pasteTimerRef.current);
+        pasteTimerRef.current = null;
+      }
+      pasteBufferRef.current = [];
+    }
   }, [value]);
+
+  // Function to process buffered paste chunks as a single paste
+  const processBufferedPaste = () => {
+    const fullPastedText = pasteBufferRef.current.join('');
+    const cursorPos = pasteCursorPositionRef.current;
+
+    // Clear buffer and timer
+    pasteBufferRef.current = [];
+    pasteTimerRef.current = null;
+
+    if (!fullPastedText) return;
+
+    // Check if we should collapse this paste (> 5 lines)
+    if (shouldCollapsePaste(fullPastedText)) {
+      // Create a token for the large paste
+      const pasteTokenResult = createPasteToken({
+        text: fullPastedText,
+        tokenNumber: nextTokenNumber,
+      });
+
+      // Insert the token in the display value
+      const result = insertTextAtCursor({
+        currentValue: value,
+        cursorPosition: cursorPos,
+        textToInsert: pasteTokenResult.token,
+      });
+
+      // Update token map to track this token's actual content
+      setTokenMap((prev) => ({
+        ...prev,
+        [pasteTokenResult.token]: pasteTokenResult.actualText,
+      }));
+
+      // Increment token counter for next paste
+      setNextTokenNumber((prev) => prev + 1);
+
+      // Update parent with display value (with token)
+      onChange(result.newValue);
+      setCursorPosition(result.newCursorPosition);
+      return;
+    }
+
+    // Small paste (≤ 5 lines): Insert normally without collapsing
+    const result = insertTextAtCursor({
+      currentValue: value,
+      cursorPosition: cursorPos,
+      textToInsert: fullPastedText,
+    });
+    onChange(result.newValue);
+    setCursorPosition(result.newCursorPosition);
+  };
 
   // Detect slash commands with debounce
   useEffect(() => {
@@ -139,8 +233,41 @@ export function MultiLineTextInput({
     (input, key) => {
       if (!focus) return;
 
+      // Disable all input when thinking (except Escape to abort)
+      if (isThinking && !key.escape) {
+        return;
+      }
+
       // Debug: Log what we're receiving
-      // console.log('Input:', input, 'Key:', key);
+      // console.log('Input received:', input, 'Key:', key);
+
+      // PASTE DETECTION: Fast-path for pasted content
+      // Detect paste early to bypass expensive checks (vim, autocomplete triggers, etc.)
+      const hasSpecialKeys = Boolean(key.ctrl || key.meta || key.shift);
+      const isPaste = detectPaste({ input, hasSpecialKeys });
+
+      if (isPaste) {
+        // Buffer this chunk - large pastes may come in multiple chunks from the terminal
+        // Save cursor position from the first chunk
+        if (pasteBufferRef.current.length === 0) {
+          pasteCursorPositionRef.current = cursorPosition;
+        }
+
+        // Add chunk to buffer
+        pasteBufferRef.current.push(input);
+
+        // Clear any existing timer
+        if (pasteTimerRef.current) {
+          clearTimeout(pasteTimerRef.current);
+        }
+
+        // Start new timer - if no more chunks arrive in 50ms, process the buffered paste
+        pasteTimerRef.current = setTimeout(() => {
+          processBufferedPaste();
+        }, 50);
+
+        return;
+      }
 
       // Handle vim mode if enabled (but skip escape when thinking - abort takes priority)
       if (vimEnabled && !(key.escape && isThinking)) {
@@ -193,7 +320,14 @@ export function MultiLineTextInput({
 
         // In insert mode, handle submit with Enter (when not in autocomplete)
         if (vimState.mode === 'insert' && key.return && !isAutocompleteOpen) {
-          onSubmit();
+          // Before submitting, reconstruct actual text from display text with tokens
+          const actualText = reconstructActualText({
+            displayText: value,
+            tokenMap,
+          });
+
+          // Pass the reconstructed text directly to onSubmit
+          onSubmit(actualText);
           return;
         }
 
@@ -296,7 +430,14 @@ export function MultiLineTextInput({
       // Handle Enter - submit (only if not modified and autocomplete is not open)
       // This is now handled above in autocomplete navigation section
       if (key.return && !key.meta && !key.shift && !key.ctrl && !isAutocompleteOpen) {
-        onSubmit();
+        // Before submitting, reconstruct actual text from display text with tokens
+        const actualText = reconstructActualText({
+          displayText: value,
+          tokenMap,
+        });
+
+        // Pass the reconstructed text directly to onSubmit
+        onSubmit(actualText);
         return;
       }
 

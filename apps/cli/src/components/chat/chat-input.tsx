@@ -14,7 +14,7 @@ interface ChatInputProps {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (finalValue?: string) => void;
   onVimModeChange?: (mode: VimMode) => void;
   onCommandExecute?: (command: SlashCommand) => void;
   onAutocompleteStateChange?: (isOpen: boolean) => void;

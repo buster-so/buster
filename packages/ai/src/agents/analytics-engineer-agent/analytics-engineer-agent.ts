@@ -36,10 +36,10 @@ export function createAnalyticsEngineerAgent(
   const workingDirectoryContextMessage = analyticsEngineerAgentOptions.isSubagent
     ? null
     : ({
-        role: 'system',
-        content: createWorkingDirectoryContext(process.cwd()),
-        providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
-      } as ModelMessage);
+      role: 'system',
+      content: createWorkingDirectoryContext(process.cwd()),
+      providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+    } as ModelMessage);
 
   async function stream({ messages }: AnalyticsEngineerAgentStreamOptions) {
     const toolSet = await createAnalyticsEngineerToolset(analyticsEngineerAgentOptions);
@@ -48,10 +48,10 @@ export function createAnalyticsEngineerAgent(
     const agentsMdContent = await readAgentsMd();
     const agentsMdMessage = agentsMdContent
       ? ({
-          role: 'system',
-          content: `# Additional Agent Context from AGENTS.md\n\n${agentsMdContent}`,
-          providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
-        } as ModelMessage)
+        role: 'system',
+        content: `# Additional Agent Context from AGENTS.md\n\n${agentsMdContent}`,
+        providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+      } as ModelMessage)
       : null;
 
     // Read git communication rules when in headless mode
@@ -60,11 +60,20 @@ export function createAnalyticsEngineerAgent(
       : null;
     const gitCommunicationRulesMessage = gitCommunicationRulesContent
       ? ({
-          role: 'system',
-          content: gitCommunicationRulesContent,
-          providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
-        } as ModelMessage)
+        role: 'system',
+        content: gitCommunicationRulesContent,
+        providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+      } as ModelMessage)
       : null;
+
+    // Add provider options to all incoming messages
+    const messagesWithOptions = messages.map(msg => ({
+      ...msg,
+      providerOptions: {
+        ...msg.providerOptions,
+        ...DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+      },
+    }));
 
     // Build messages array with system messages and working directory context
     const allMessages = [
@@ -72,7 +81,7 @@ export function createAnalyticsEngineerAgent(
       ...(workingDirectoryContextMessage ? [workingDirectoryContextMessage] : []),
       ...(agentsMdMessage ? [agentsMdMessage] : []),
       ...(gitCommunicationRulesMessage ? [gitCommunicationRulesMessage] : []),
-      ...messages,
+      ...messagesWithOptions,
     ];
 
     return wrapTraced(
@@ -100,14 +109,11 @@ export function createAnalyticsEngineerAgent(
           messages: allMessages,
           stopWhen: STOP_CONDITIONS,
           maxOutputTokens: 64000,
+          ...(analyticsEngineerAgentOptions.abortSignal && {
+            abortSignal: analyticsEngineerAgentOptions.abortSignal,
+          }),
           // temperature: 0,
           onError: ({ error }) => {
-            // Log error with context for debugging
-            console.error('Analytics Engineer Agent streaming error:', {
-              error,
-              chatId: analyticsEngineerAgentOptions.chatId,
-              messageId: analyticsEngineerAgentOptions.messageId,
-            });
           },
         });
       },

@@ -1,0 +1,65 @@
+Launch a fast exploration sub-agent powered by Claude Haiku 3.5 for search, research, and investigation tasks.
+
+The explore agent is optimized for quick, cost-effective information gathering with access to all file tools (read, grep, glob, bash), database tools (runSql, retrieveMetadata), and planning tools (todoWrite).
+
+WHEN to use the Explore tool:
+- Searching for specific code patterns, functions, or implementations across the codebase
+- Researching how a feature or system works by analyzing multiple files
+- Investigating bugs or issues that require looking through logs, configs, and code
+- Gathering information from multiple sources (files, database schema, documentation)
+- Quick reconnaissance tasks that need fast results
+- Finding examples or patterns in the codebase
+- Understanding data structures, APIs, or architectural patterns
+- Locating where specific functionality is implemented
+
+When NOT to use the Explore tool:
+- If you know the exact file path to read, use the Read tool instead - it's faster
+- For simple single-file searches, use Grep or Read tools directly
+- For tasks that involve writing or modifying code (use Task tool instead)
+- For complex multi-step implementation tasks (use Task tool instead)
+- When you need the most powerful reasoning (Task tool uses Sonnet which is better for complex logic)
+
+Usage notes:
+1. The explore agent uses Claude Haiku 3.5 for fast, cost-effective exploration
+2. Launch multiple explore agents concurrently for parallel research (use a single message with multiple tool calls)
+3. When an explore agent completes, it returns findings back to you. This is not visible to the user, so you should summarize the findings
+4. Each explore agent is stateless - provide complete, detailed instructions in your prompt
+5. Clearly specify what information the agent should search for and what to return
+6. Explore agents cannot spawn other sub-agents - they complete their work directly
+7. Explore agents should focus on reading and researching, not writing or modifying files
+
+Example usage for concurrent exploration:
+
+<example>
+user: "I need to understand how authentication works in this codebase"
+assistant thinking: This requires investigating multiple areas - I should launch parallel explore agents to search for auth-related code, tests, and configuration.
+assistant: I'll research authentication by launching 3 concurrent explore agents.
+<launches 3 Explore tool calls in parallel>
+1. description: "Find auth implementation", prompt: "Search the codebase for authentication implementation code. Look for files with 'auth', 'login', 'session' in their names or contents. Read the main authentication files and analyze how authentication is implemented. Return a summary of the authentication approach and key files."
+2. description: "Find auth tests", prompt: "Search for authentication-related tests. Look for test files that cover authentication, login, or session management. Read the test files and summarize what authentication scenarios are being tested."
+3. description: "Find auth config", prompt: "Search for authentication configuration. Look for config files, environment variables, or settings related to authentication. Return a summary of how authentication is configured."
+</example>
+
+<example>
+user: "Where is the customer data being transformed?"
+assistant thinking: This is a focused search task - perfect for a single explore agent.
+assistant: I'll search for customer data transformation logic.
+<launches single Explore tool call>
+description: "Find customer transforms", prompt: "Search the codebase for customer data transformation logic. Look for files that read, transform, or process customer data. Use grep to search for 'customer' and 'transform' patterns. Read relevant files and analyze the transformation logic. Return a summary of where and how customer data is being transformed, including file paths and line numbers."
+</example>
+
+<example>
+user: "Find all the places where we call the external analytics API"
+assistant thinking: This is a search task across the codebase - ideal for explore agent.
+assistant: I'll search for all analytics API calls.
+<launches single Explore tool call>
+description: "Find analytics API calls", prompt: "Search the entire codebase for calls to the external analytics API. Use grep to find patterns like 'analytics', 'api.analytics', 'analyticsClient', etc. Read the files containing these calls and document each location where the analytics API is called. Return a summary with file paths, line numbers, and context for each API call."
+</example>
+
+<example>
+user: "Help me understand the database schema for the orders table"
+assistant thinking: This requires investigating both database metadata and model files - good for explore.
+assistant: I'll explore the orders table schema.
+<launches single Explore tool call>
+description: "Research orders schema", prompt: "Research the orders table schema. First, use retrieveMetadata to get the table structure and columns. Then search for and read any model files related to orders (look for 'orders', 'order' in file names). Analyze both the database schema and any ORM models or migrations. Return a comprehensive summary of the orders table structure, including columns, types, relationships, and any business logic in the models."
+</example>

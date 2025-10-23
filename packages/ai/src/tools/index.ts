@@ -58,6 +58,7 @@ export {
 } from './planning-thinking-tools/update-clarifications-file-tool/update-clarifications-file-tool';
 // Task tools
 export { createTaskTool, TASK_TOOL_NAME } from './task-tools/task-tool/task-tool';
+export { createExploreTool, EXPLORE_TOOL_NAME } from './task-tools/explore-tool/explore-tool';
 export {
   CREATE_DASHBOARDS_TOOL_NAME,
   createCreateDashboardsTool,

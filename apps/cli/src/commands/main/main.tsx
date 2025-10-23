@@ -119,8 +119,10 @@ export function Main() {
     }
   });
 
-  const handleSubmit = useCallback(async () => {
-    const trimmed = input.trim();
+  const handleSubmit = useCallback(async (finalValue?: string) => {
+    // Use finalValue if provided (from paste token reconstruction), otherwise use input state
+    const textToSubmit = finalValue !== undefined ? finalValue : input;
+    const trimmed = textToSubmit.trim();
     if (!trimmed || !sessionInitialized) {
       setInput('');
       return;
