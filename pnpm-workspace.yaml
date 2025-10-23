@@ -10,33 +10,33 @@ packages:
   - apps/supabase
 
 catalog:
-  '@aws-sdk/client-s3': ^3.888.0
-  '@aws-sdk/s3-request-presigner': ^3.888.0
-  '@electric-sql/client': ^1.0.12
-  '@electric-sql/react': ^1.0.12
-  '@supabase/supabase-js': 2.57.4
-  '@trigger.dev/build': ^4.0.2
-  '@trigger.dev/sdk': ^4.0.2
+  '@aws-sdk/client-s3': ^3.914.0
+  '@aws-sdk/s3-request-presigner': ^3.914.0
+  '@electric-sql/client': ^1.0.14
+  '@electric-sql/react': ^1.0.14
+  '@supabase/supabase-js': 2.76.1
+  '@trigger.dev/build': ^4.0.4
+  '@trigger.dev/sdk': ^4.0.4
   '@types/js-yaml': 4.0.9
-  '@types/react': ^19.1.13
-  '@types/react-dom': ^19.1.9
-  ai: ^5.0.6
+  '@types/react': ^19.2.2
+  '@types/react-dom': ^19.2.2
+  ai: ^5.0.77
   axios: ^1.12.2
   dayjs: ^1.11.18
-  dotenv: ^16.4.7
-  drizzle-orm: ^0.44.5
-  hono: ^4.9.7
+  dotenv: ^17.2.3
+  drizzle-orm: ^0.44.6
+  hono: ^4.10.2
   js-yaml: 4.1.0
   lodash-es: ^4.17.21
   pg: ^8.16.3
-  react: ^19.1.1
-  react-dom: ^19.1.1
+  react: ^19.2.0
+  react-dom: ^19.2.0
   tsup: ^8.5.0
-  tsx: ^4.20.5
-  uuid: ^11.1.0
-  vite: ^7.1.4
+  tsx: ^4.20.6
+  uuid: ^13.0.0
+  vite: ^7.1.12
   vite-tsconfig-paths: 6.0.0-beta.4
-  vitest: ^3.2.4
+  vitest: ^4.0.1
   zod: ^3.25.0
 
 minimumReleaseAge: 30
