@@ -62,6 +62,7 @@ export async function performTextSearch(
     page: searchRequest.page,
     page_size: searchRequest.page_size,
     filters,
+    includeAddedToLibrary: searchRequest.includeAddedToLibrary,
   });
   const searchDuration = performance.now() - searchStart;
 
