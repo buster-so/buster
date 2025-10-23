@@ -22,6 +22,7 @@ const app = new Hono().get(
       orderingDirection,
       groupBy,
       query,
+      includeAssetChildren,
     } = c.req.valid('query');
     const user = c.get('busterUser');
 
@@ -45,6 +46,7 @@ const app = new Hono().get(
         orderingDirection,
         groupBy,
         query,
+        includeAssetChildren,
       });
 
       // Helper function to convert screenshot bucket keys to signed URLs

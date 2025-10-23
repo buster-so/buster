@@ -1,7 +1,7 @@
 import {
+  AssetTypeSchema,
   type BulkUpdateLibraryFieldInput,
   BulkUpdateLibraryFieldInputSchema,
-  LibraryAssetTypeSchema,
 } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { PaginatedRequestSchema } from '../type-utilities';
@@ -14,7 +14,7 @@ export const GetLibraryAssetsRequestQuerySchema = z
           return [val];
         }
         return val;
-      }, LibraryAssetTypeSchema.array().min(1))
+      }, AssetTypeSchema.array().min(1))
       .optional(),
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
@@ -38,6 +38,15 @@ export const GetLibraryAssetsRequestQuerySchema = z
     groupBy: z.enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none']).optional(),
     query: z.string().optional(),
     orderingDirection: z.enum(['asc', 'desc']).optional(),
+    includeAssetChildren: z
+      .preprocess((val) => {
+        if (typeof val === 'string') {
+          return val.toLowerCase() === 'true';
+        }
+        return Boolean(val);
+      }, z.boolean())
+      .default(false)
+      .optional(),
   })
   .merge(PaginatedRequestSchema);
 
