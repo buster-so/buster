@@ -21,12 +21,27 @@ export const LibrarySearchModal = React.memo(() => {
       tertiaryButton: {
         children: 'Select',
         disabled: selectedItems.size === 0,
+        variant: 'ghost',
         onClick: () => {
           setSelectedItems(new Set());
         },
       },
+      secondaryButton: {
+        children: 'Cancel',
+        variant: 'ghost',
+        onClick: () => {
+          onCloseLibrarySearch();
+        },
+      },
+      primaryButton: {
+        children: 'Add to library',
+        variant: 'default',
+        onClick: () => {
+          alert('TODO: Add to library');
+        },
+      },
     }),
-    [selectedItems.size, setSelectedItems]
+    [selectedItems.size, onCloseLibrarySearch, setSelectedItems]
   );
 
   console.log('footerConfig', footerConfig);

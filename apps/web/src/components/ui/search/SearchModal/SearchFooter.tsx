@@ -48,13 +48,23 @@ export const SearchFooter = React.memo(
           },
         ].filter((v) => !!v.children) as React.ComponentProps<typeof FooterItem>[]);
 
-    console.log('footerItems', footerItems);
+    const leftItems = footerItems.filter((item) => item.type === 'div' || item.side === 'left');
+    const rightItems = footerItems.filter(
+      (item) => item.type === 'button' && item.side === 'right'
+    );
 
     return (
-      <div className="flex space-x-4.5 border-t min-h-12 items-center px-6">
-        {footerItems.map((item, index) => (
-          <FooterItem key={index} {...item} />
-        ))}
+      <div className="flex justify-between border-t min-h-12 items-center px-6">
+        <div className="flex space-x-4.5 items-center">
+          {leftItems.map((item, index) => (
+            <FooterItem key={`left-${index}`} {...item} />
+          ))}
+        </div>
+        <div className="flex space-x-2 items-center">
+          {rightItems.map((item, index) => (
+            <FooterItem key={`right-${index}`} {...item} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -74,12 +84,8 @@ const FooterItem = (
 ) => {
   const { type } = props;
   if (type === 'button') {
-    const { onClick, disabled, ...buttonProps } = props;
-    return (
-      <Button type="button" variant={'ghost'} onClick={onClick} disabled={disabled}>
-        {buttonProps.children}
-      </Button>
-    );
+    const { side, ...buttonProps } = props;
+    return <Button {...buttonProps}>{buttonProps.children}</Button>;
   }
 
   const { text, icons } = props;
