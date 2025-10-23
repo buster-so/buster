@@ -27,7 +27,7 @@ export const BulkUpdateLibraryFieldResponseSchema = z.object({
 
 export type BulkUpdateLibraryFieldResponse = z.infer<typeof BulkUpdateLibraryFieldResponseSchema>;
 
-export const LibraryAssetListItemSchema = z.object({
+export const AssetListItemSchema = z.object({
   asset_id: z.string().uuid(),
   asset_type: AssetTypeSchema,
   name: z.string(),
@@ -40,9 +40,13 @@ export const LibraryAssetListItemSchema = z.object({
   screenshot_url: z.string().nullable(),
 });
 
-export type LibraryAssetListItem = z.infer<typeof LibraryAssetListItemSchema>;
+export type AssetListItem = z.infer<typeof AssetListItemSchema>;
 
-export const ListPermissionedLibraryAssetsInputSchema = z
+// Keep the old names for backward compatibility
+export const LibraryAssetListItemSchema = AssetListItemSchema;
+export type LibraryAssetListItem = AssetListItem;
+
+export const ListPermissionedAssetsInputSchema = z
   .object({
     organizationId: z.string().uuid(),
     userId: z.string().uuid(),
@@ -60,19 +64,28 @@ export const ListPermissionedLibraryAssetsInputSchema = z
   })
   .merge(PaginationInputSchema);
 
-export type ListPermissionedLibraryAssetsInput = z.infer<
-  typeof ListPermissionedLibraryAssetsInputSchema
->;
+export type ListPermissionedAssetsInput = z.infer<typeof ListPermissionedAssetsInputSchema>;
 
-export const GroupedLibraryAssetsResponseSchema = z.object({
-  groups: z.record(z.string(), LibraryAssetListItemSchema.array()),
+// Keep the old names for backward compatibility
+export const ListPermissionedLibraryAssetsInputSchema = ListPermissionedAssetsInputSchema;
+export type ListPermissionedLibraryAssetsInput = ListPermissionedAssetsInput;
+
+export const GroupedAssetsResponseSchema = z.object({
+  groups: z.record(z.string(), AssetListItemSchema.array()),
   pagination: InfinitePaginationSchema,
 });
 
-export type GroupedLibraryAssets = z.infer<typeof GroupedLibraryAssetsResponseSchema>['groups'];
+// Keep the old name for backward compatibility
+export const GroupedLibraryAssetsResponseSchema = GroupedAssetsResponseSchema;
 
-export type GroupedLibraryAssetsResponse = z.infer<typeof GroupedLibraryAssetsResponseSchema>;
+export type GroupedAssets = z.infer<typeof GroupedAssetsResponseSchema>['groups'];
+export type GroupedAssetsResponse = z.infer<typeof GroupedAssetsResponseSchema>;
 
-export type ListPermissionedLibraryAssetsResponse =
-  | PaginatedResponse<LibraryAssetListItem>
-  | GroupedLibraryAssetsResponse;
+export type ListPermissionedAssetsResponse =
+  | PaginatedResponse<AssetListItem>
+  | GroupedAssetsResponse;
+
+// Keep the old names for backward compatibility
+export type GroupedLibraryAssets = GroupedAssets;
+export type GroupedLibraryAssetsResponse = GroupedAssetsResponse;
+export type ListPermissionedLibraryAssetsResponse = ListPermissionedAssetsResponse;

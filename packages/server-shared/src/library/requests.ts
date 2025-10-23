@@ -6,7 +6,7 @@ import {
 import { z } from 'zod';
 import { PaginatedRequestSchema } from '../type-utilities';
 
-export const GetLibraryAssetsRequestQuerySchema = z
+export const GetAssetsRequestQuerySchema = z
   .object({
     assetTypes: z
       .preprocess((val) => {
@@ -50,7 +50,11 @@ export const GetLibraryAssetsRequestQuerySchema = z
   })
   .merge(PaginatedRequestSchema);
 
-export type GetLibraryAssetsRequestQuery = z.infer<typeof GetLibraryAssetsRequestQuerySchema>;
+export type GetAssetsRequestQuery = z.infer<typeof GetAssetsRequestQuerySchema>;
+
+// Keep the old names for backward compatibility
+export const GetLibraryAssetsRequestQuerySchema = GetAssetsRequestQuerySchema;
+export type GetLibraryAssetsRequestQuery = GetAssetsRequestQuery;
 
 export const LibraryPostRequestBodySchema = BulkUpdateLibraryFieldInputSchema;
 

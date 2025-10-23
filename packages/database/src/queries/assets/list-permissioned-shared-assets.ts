@@ -9,12 +9,13 @@ import {
   inArray,
   isNull,
   lte,
+  ne,
   not,
   type SQL,
   sql,
 } from 'drizzle-orm';
 import { db } from '../../connection';
-import { userLibrary, users } from '../../schema';
+import { users } from '../../schema';
 import {
   type AssetListItem,
   type AssetType,
@@ -40,7 +41,7 @@ import {
   permissionedReportFiles,
 } from '../asset-permissions/asset-permission-subqueries';
 
-export async function listPermissionedLibraryAssets(
+export async function listPermissionedSharedAssets(
   input: ListPermissionedAssetsInput
 ): Promise<ListPermissionedAssetsResponse> {
   const {
@@ -83,10 +84,10 @@ export async function listPermissionedLibraryAssets(
         .union(childChatsFromCollections(organizationId, userId))
     : baseUnion;
 
-  // Add library join to filter only assets in user's library
+  // Filter for shared assets (not created by the current user)
   const permissionedAssets = allPermissionedAssets.as('permissioned_assets');
 
-  const filters: SQL[] = [];
+  const filters: SQL[] = [ne(permissionedAssets.createdBy, userId)];
 
   if (assetTypes && assetTypes.length > 0) {
     filters.push(inArray(permissionedAssets.assetType, assetTypes));
@@ -136,16 +137,7 @@ export async function listPermissionedLibraryAssets(
       organizationId: permissionedAssets.organizationId,
     })
     .from(permissionedAssets)
-    .innerJoin(users, eq(permissionedAssets.createdBy, users.id))
-    .innerJoin(
-      userLibrary,
-      and(
-        eq(userLibrary.assetId, permissionedAssets.assetId),
-        eq(userLibrary.assetType, permissionedAssets.assetType),
-        eq(userLibrary.userId, userId),
-        isNull(userLibrary.deletedAt)
-      )
-    );
+    .innerJoin(users, eq(permissionedAssets.createdBy, users.id));
 
   const filteredAssetQuery = whereCondition ? baseAssetQuery.where(whereCondition) : baseAssetQuery;
 
@@ -176,7 +168,7 @@ export async function listPermissionedLibraryAssets(
     : baseCountQuery);
   const totalValue = countResult[0]?.total ?? 0;
 
-  const libraryAssets: AssetListItem[] = assetsResult.map((asset) => ({
+  const sharedAssets: AssetListItem[] = assetsResult.map((asset) => ({
     asset_id: asset.assetId,
     asset_type: asset.assetType as AssetType,
     name: asset.name ?? '',
@@ -193,8 +185,8 @@ export async function listPermissionedLibraryAssets(
   if (groupBy && groupBy !== 'none') {
     const groups: Record<string, AssetListItem[]> = {};
 
-    for (let i = 0; i < libraryAssets.length; i++) {
-      const asset = libraryAssets[i];
+    for (let i = 0; i < sharedAssets.length; i++) {
+      const asset = sharedAssets[i];
       const resultAsset = assetsResult[i];
       if (!asset || !resultAsset) {
         continue;
@@ -235,7 +227,7 @@ export async function listPermissionedLibraryAssets(
   }
 
   return createPaginatedResponse({
-    data: libraryAssets,
+    data: sharedAssets,
     page,
     page_size,
     total: totalValue,

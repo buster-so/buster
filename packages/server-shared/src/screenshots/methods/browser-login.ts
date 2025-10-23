@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/suspicious/noConsole: console.error is used for debugging */
+
 import type { Browser, Page } from 'playwright';
 import { z } from 'zod';
 import { getSupabaseCookieKey, getSupabaseUser } from '../../supabase/server';

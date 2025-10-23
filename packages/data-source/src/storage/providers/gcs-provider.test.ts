@@ -3,7 +3,18 @@ import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { GCSConfig } from '../types';
 import { createGCSProvider } from './gcs-provider';
 
-vi.mock('@google-cloud/storage');
+// Mock instance and constructor args
+let mockStorageInstance: any;
+let mockStorageConstructorArgs: any;
+
+vi.mock('@google-cloud/storage', () => ({
+  Storage: class {
+    constructor(config: any) {
+      mockStorageConstructorArgs = config;
+      Object.assign(this, mockStorageInstance);
+    }
+  },
+}));
 
 describe('GCS Provider', () => {
   let mockBucket: {
@@ -20,9 +31,6 @@ describe('GCS Provider', () => {
     exists: Mock;
     name?: string;
     metadata?: Record<string, unknown>;
-  };
-  let mockStorage: {
-    bucket: Mock;
   };
 
   const mockConfig: GCSConfig = {
@@ -55,18 +63,16 @@ describe('GCS Provider', () => {
       getFiles: vi.fn(),
     };
 
-    mockStorage = {
+    mockStorageInstance = {
       bucket: vi.fn().mockReturnValue(mockBucket),
     };
-
-    (Storage as unknown as Mock).mockReturnValue(mockStorage);
   });
 
   describe('createGCSProvider', () => {
     it('should create GCS client with correct configuration', () => {
       createGCSProvider(mockConfig);
 
-      expect(Storage).toHaveBeenCalledWith({
+      expect(mockStorageConstructorArgs).toEqual({
         projectId: 'test-project',
         credentials: {
           type: 'service_account',
@@ -89,9 +95,12 @@ describe('GCS Provider', () => {
     });
 
     it('should handle initialization errors', () => {
-      (Storage as unknown as Mock).mockImplementation(() => {
-        throw new Error('Storage init failed');
-      });
+      // Configure the mock to throw when bucket is accessed
+      mockStorageInstance = {
+        bucket: vi.fn().mockImplementation(() => {
+          throw new Error('Storage init failed');
+        }),
+      };
 
       expect(() => createGCSProvider(mockConfig)).toThrow(
         'Failed to initialize GCS client: Storage init failed'
@@ -356,7 +365,7 @@ describe('GCS Provider', () => {
           },
         },
       ];
-      mockStorage.bucket.mockReturnValue({
+      mockStorageInstance.bucket.mockReturnValue({
         ...mockBucket,
         getFiles: vi.fn().mockResolvedValue([mockFiles]),
       });
@@ -380,7 +389,7 @@ describe('GCS Provider', () => {
 
     it('should handle list with options', async () => {
       const provider = createGCSProvider(mockConfig);
-      mockStorage.bucket.mockReturnValue({
+      mockStorageInstance.bucket.mockReturnValue({
         ...mockBucket,
         getFiles: vi.fn().mockResolvedValue([[]]),
       });
@@ -390,7 +399,7 @@ describe('GCS Provider', () => {
         continuationToken: 'token',
       });
 
-      expect(mockStorage.bucket().getFiles).toHaveBeenCalledWith({
+      expect(mockStorageInstance.bucket().getFiles).toHaveBeenCalledWith({
         prefix: 'prefix/',
         maxResults: 10,
         pageToken: 'token',
@@ -399,7 +408,7 @@ describe('GCS Provider', () => {
 
     it('should handle empty list', async () => {
       const provider = createGCSProvider(mockConfig);
-      mockStorage.bucket.mockReturnValue({
+      mockStorageInstance.bucket.mockReturnValue({
         ...mockBucket,
         getFiles: vi.fn().mockResolvedValue([[]]),
       });
@@ -411,7 +420,7 @@ describe('GCS Provider', () => {
 
     it('should handle list errors', async () => {
       const provider = createGCSProvider(mockConfig);
-      mockStorage.bucket.mockReturnValue({
+      mockStorageInstance.bucket.mockReturnValue({
         ...mockBucket,
         getFiles: vi.fn().mockRejectedValue(new Error('List failed')),
       });
@@ -428,7 +437,7 @@ describe('GCS Provider', () => {
           metadata: { size: 100 },
         },
       ];
-      mockStorage.bucket.mockReturnValue({
+      mockStorageInstance.bucket.mockReturnValue({
         ...mockBucket,
         getFiles: vi.fn().mockResolvedValue([mockFiles]),
       });
