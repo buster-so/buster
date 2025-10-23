@@ -33,7 +33,9 @@ jobs:
 
       - name: Setup Node Environment
         uses: ./.github/actions/setup-node-env
-      
+        with:
+          use-stickydisk: 'false'
+
       - name: Run migrations
         run: pnpm run db:migrate
         env:

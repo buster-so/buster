@@ -1,4 +1,5 @@
-import React, { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../scroll-area/ScrollArea';
 
@@ -7,8 +8,10 @@ export const AppPageLayoutContent: React.FC<
     className?: string;
     scrollable?: boolean;
     id?: string;
+    viewportRef?: React.RefObject<HTMLDivElement | null>;
+    scrollContainerStyle?: React.CSSProperties;
   }>
-> = ({ className = '', children, scrollable = true, id }) => {
+> = ({ viewportRef, scrollContainerStyle, className = '', children, scrollable = true, id }) => {
   const Selector = scrollable ? ScrollArea : 'main';
   const ChildSelector = scrollable ? 'main' : React.Fragment;
 
@@ -20,6 +23,8 @@ export const AppPageLayoutContent: React.FC<
         'relative', //added this to error boundary components
         className
       )}
+      viewportRef={scrollable ? viewportRef : undefined}
+      style={scrollContainerStyle}
     >
       <ChildSelector>{children}</ChildSelector>
     </Selector>

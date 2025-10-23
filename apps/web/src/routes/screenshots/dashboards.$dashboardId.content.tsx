@@ -2,7 +2,6 @@ import { GetDashboardScreenshotQuerySchema } from '@buster/server-shared/screens
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { prefetchGetDashboard } from '@/api/buster_rest/dashboards';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
-import { BusterChartDynamic } from '@/components/ui/charts/BusterChartDynamic';
 import { useGetDashboardParams } from '@/context/Dashboards/useGetDashboardParams';
 import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
 

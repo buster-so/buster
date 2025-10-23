@@ -28,10 +28,11 @@ export const useThreeDotFavoritesOptions = ({
     {},
     { enabled: false, staleTime: 60 * 1000 }
   );
-  const { data: collectionList } = useGetCollectionsList(
+  const { data: collectionsListResponse } = useGetCollectionsList(
     {},
     { enabled: false, staleTime: 60 * 1000 }
   );
+  const collectionList = collectionsListResponse?.data || [];
 
   const nameSearchArray = useMemo(() => {
     if (assetType === 'metric_file' && metricList) {

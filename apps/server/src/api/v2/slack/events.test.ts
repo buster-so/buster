@@ -324,12 +324,10 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     // Mock messaging service
     const mockSendMessage = vi.fn().mockResolvedValue({ ok: true, ts: '1234567890.123456' });
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    vi.mocked(SlackMessagingService).mockImplementation(function (this: any) {
+      this.sendMessage = mockSendMessage;
+      return this;
+    });
 
     const payload = {
       type: 'event_callback' as const,
@@ -391,12 +389,10 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     // Mock messaging service
     const mockSendMessage = vi.fn().mockResolvedValue({ ok: true, ts: '1234567890.123456' });
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    vi.mocked(SlackMessagingService).mockImplementation(function (this: any) {
+      this.sendMessage = mockSendMessage;
+      return this;
+    });
 
     const payload = {
       type: 'event_callback' as const,
@@ -460,12 +456,10 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     // Mock messaging service to throw error
     const mockSendMessage = vi.fn().mockRejectedValue(new Error('Slack API error'));
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    vi.mocked(SlackMessagingService).mockImplementation(function (this: any) {
+      this.sendMessage = mockSendMessage;
+      return this;
+    });
 
     const payload = {
       type: 'event_callback' as const,
@@ -519,12 +513,10 @@ describe('eventsHandler - Unauthorized Users', () => {
 
     // Mock messaging service (shouldn't be called)
     const mockSendMessage = vi.fn();
-    vi.mocked(SlackMessagingService).mockImplementation(
-      () =>
-        ({
-          sendMessage: mockSendMessage,
-        }) as any
-    );
+    vi.mocked(SlackMessagingService).mockImplementation(function (this: any) {
+      this.sendMessage = mockSendMessage;
+      return this;
+    });
 
     const payload = {
       type: 'event_callback' as const,

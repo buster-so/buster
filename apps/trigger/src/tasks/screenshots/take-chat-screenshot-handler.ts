@@ -2,6 +2,7 @@ import { hasChatScreenshotBeenTakenWithin } from '@buster/database/queries';
 import { getChatScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
+import { commonTriggerScreenshotConfig } from './config';
 import { type TakeChatScreenshotTrigger, TakeChatScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
@@ -13,6 +14,7 @@ export const takeChatScreenshotHandlerTask: ReturnType<
     { success: boolean } | undefined
   >
 > = schemaTask({
+  ...commonTriggerScreenshotConfig,
   id: screenshots_task_keys.take_chat_screenshot,
   schema: TakeChatScreenshotTriggerSchema,
   run: async (args) => {

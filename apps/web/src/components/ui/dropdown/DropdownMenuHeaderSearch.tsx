@@ -45,6 +45,42 @@ export const DropdownMenuHeaderSearch = <T,>({
     requestAnimationFrame(() => {
       focusInput();
     });
+
+    // Add keyboard listener to refocus input when typing
+    const handleKeyDown = (e: Event) => {
+      const keyboardEvent = e as KeyboardEvent;
+
+      // Skip if already focused on input
+      if (document.activeElement === inputRef.current) {
+        return;
+      }
+
+      // Check if this is a printable character (letter, number, space, etc.)
+      // Ignore special keys like arrows, Enter, Escape, Tab, etc.
+      const isPrintableChar =
+        keyboardEvent.key.length === 1 &&
+        !keyboardEvent.ctrlKey &&
+        !keyboardEvent.metaKey &&
+        !keyboardEvent.altKey;
+
+      if (isPrintableChar && inputRef.current) {
+        // Refocus the input and append the typed character
+        inputRef.current.focus();
+        // The character will be captured by the input since we're not preventing default
+      }
+    };
+
+    // Find the menu element to attach the listener
+    const menuElement = inputRef.current?.closest('[role="menu"]');
+    if (menuElement) {
+      menuElement.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      if (menuElement) {
+        menuElement.removeEventListener('keydown', handleKeyDown);
+      }
+    };
   }, []);
 
   return (

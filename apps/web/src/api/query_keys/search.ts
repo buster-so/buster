@@ -1,6 +1,5 @@
-import type { SearchTextRequest, SearchTextResponse } from '@buster/server-shared';
+import type { SearchTextRequest, SearchTextResponse } from '@buster/server-shared/search';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
-import type { search } from '../buster_rest/search';
 
 export const getSearchResult = (params: SearchTextRequest) =>
   queryOptions<SearchTextResponse>({

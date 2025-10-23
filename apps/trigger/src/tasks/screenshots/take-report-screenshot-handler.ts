@@ -2,6 +2,7 @@ import { hasReportScreenshotBeenTakenWithin } from '@buster/database/queries';
 import { getReportScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
+import { commonTriggerScreenshotConfig } from './config';
 import { TakeReportScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
@@ -13,6 +14,7 @@ export const takeReportScreenshotHandlerTask: ReturnType<
     { success: boolean } | undefined
   >
 > = schemaTask({
+  ...commonTriggerScreenshotConfig,
   id: screenshots_task_keys.take_report_screenshot,
   schema: TakeReportScreenshotTriggerSchema,
   run: async (args) => {

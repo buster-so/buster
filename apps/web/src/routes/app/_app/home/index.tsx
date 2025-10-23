@@ -6,7 +6,7 @@ const searchParamsSchema = z.object({
   q: z.string().optional(),
   submit: z
     .preprocess((val) => {
-      if (typeof val === 'string') val === 'true';
+      if (typeof val === 'string') val.toLowerCase() === 'true';
       return val;
     }, z.boolean())
     .optional(),

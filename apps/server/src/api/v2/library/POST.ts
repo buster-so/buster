@@ -50,7 +50,7 @@ const app = new Hono().post('/', zValidator('json', LibraryPostRequestBodySchema
     }
   }
 
-  const savedAssetResponse = await bulkUpdateLibraryField(assetsToSave, true);
+  const savedAssetResponse = await bulkUpdateLibraryField(assetsToSave, user.id, true);
   const success = savedAssetResponse.success && failedAssets.length === 0;
 
   const output: LibraryPostResponse = {
