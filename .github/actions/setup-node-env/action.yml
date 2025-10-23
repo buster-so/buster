@@ -9,7 +9,7 @@ inputs:
   pnpm-version:
     description: 'pnpm version to use'
     required: false
-    default: '10.18.3'
+    default: '10.19.0'
   bun-version:
     description: 'Bun version to use'
     required: false
@@ -26,6 +26,14 @@ inputs:
     description: 'Whether to install Supabase CLI'
     required: false
     default: 'false'
+  use-stickydisk:
+    description: 'Use Blacksmith stickydisk for Turbo cache instead of standard cache'
+    required: false
+    default: 'true'
+  stickydisk-key:
+    description: 'Stickydisk cache key (required when use-stickydisk is true)'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -53,7 +61,15 @@ runs:
           pnpm-workspace-v2-${{ inputs.cache-key }}-${{ github.ref_name }}-
           pnpm-workspace-v2-${{ inputs.cache-key }}-
 
-    - name: Cache Turbo
+    - name: Mount Turbo cache sticky disk
+      if: ${{ inputs.use-stickydisk == 'true' && runner.os != 'Windows' }}
+      uses: useblacksmith/stickydisk@v1
+      with:
+        key: ${{ inputs.stickydisk-key }}
+        path: ./.turbo
+
+    - name: Cache Turbo (standard cache)
+      if: ${{ inputs.use-stickydisk != 'true' || runner.os == 'Windows' }}
       uses: actions/cache@v4
       with:
         path: .turbo

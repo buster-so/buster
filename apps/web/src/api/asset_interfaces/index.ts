@@ -1,5 +1,4 @@
 export type * from './chat';
-export type * from './collection';
 export type * from './dashboard';
 export type * from './dataset_groups';
 export type * from './datasets';

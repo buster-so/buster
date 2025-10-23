@@ -1,7 +1,7 @@
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import { useNavigate } from '@tanstack/react-router';
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
 import {
@@ -65,7 +65,10 @@ export const useSaveToCollectionsDropdownContent = ({
   const navigate = useNavigate();
   const [openCollectionModal, setOpenCollectionModal] = useState(false);
 
-  const { data: collectionsList, isPending: isCreatingCollection } = useGetCollectionsList({});
+  const { data: collectionsListResponse, isPending: isCreatingCollection } = useGetCollectionsList(
+    {}
+  );
+  const collectionsList = collectionsListResponse?.data || [];
 
   const items: DropdownProps['items'] = useMemo(() => {
     const collectionsItems = (collectionsList || []).map<IDropdownItem>((collection) => {

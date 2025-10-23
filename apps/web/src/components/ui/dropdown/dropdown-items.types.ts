@@ -25,7 +25,12 @@ export type IDropdownItem<
   linkTarget?: '_blank' | '_self';
   linkIcon?: 'arrow-right' | 'arrow-external' | 'caret-right' | 'none';
   selectType?: DropdownProps<T>['selectType'];
+  emptyStateText?: string | React.ReactNode;
   className?: string;
+  menuHeader?: string | React.ReactNode; //if string it will render a search box
+  onSearch?: (search: string) => void;
+  onScrollToBottom?: () => void;
+  isFetchingNextPage?: boolean;
 };
 
 export interface DropdownDivider {

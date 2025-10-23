@@ -62,13 +62,41 @@ async function updateAssetLibraryField(
   assetType: LibraryAssetType,
   savedToLibrary: boolean
 ): Promise<void> {
-  const table = libraryAssetTableMap[assetType];
-
-  await db
-    .update(table)
-    .set({
-      savedToLibrary,
-      updatedAt: new Date().toISOString(),
-    })
-    .where(and(eq(table.id, assetId), isNull(table.deletedAt)));
+  // Handle each asset type explicitly to satisfy TypeScript
+  if (assetType === 'chat') {
+    await db
+      .update(chats)
+      .set({
+        savedToLibrary,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(chats.id, assetId), isNull(chats.deletedAt)));
+  } else if (assetType === 'dashboard_file') {
+    await db
+      .update(dashboardFiles)
+      .set({
+        savedToLibrary,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(dashboardFiles.id, assetId), isNull(dashboardFiles.deletedAt)));
+  } else if (assetType === 'metric_file') {
+    await db
+      .update(metricFiles)
+      .set({
+        savedToLibrary,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(metricFiles.id, assetId), isNull(metricFiles.deletedAt)));
+  } else if (assetType === 'report_file') {
+    await db
+      .update(reportFiles)
+      .set({
+        savedToLibrary,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(reportFiles.id, assetId), isNull(reportFiles.deletedAt)));
+  } else {
+    const exhaustiveCheck: never = assetType;
+    throw new Error(`Invalid asset type: ${exhaustiveCheck}`);
+  }
 }

@@ -2,7 +2,6 @@ import { GetReportScreenshotQuerySchema } from '@buster/server-shared/screenshot
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ensureMetricData } from '@/api/buster_rest/metrics';
 import { prefetchGetReport } from '@/api/buster_rest/reports';
-import { BusterChartDynamic } from '@/components/ui/charts/BusterChartDynamic';
 import { ReportPageController } from '@/controllers/ReportPageControllers';
 
 export const Route = createFileRoute('/screenshots/reports/$reportId/content')({
