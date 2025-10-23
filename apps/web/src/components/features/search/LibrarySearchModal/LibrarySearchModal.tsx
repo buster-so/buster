@@ -75,6 +75,7 @@ export const LibrarySearchModal = React.memo(() => {
     mounted: isOpen,
     includeAssetAncestors: true,
     includeScreenshots: true,
+    includeAddedToLibrary: true,
     scrollConfig: {
       scrollThreshold: 55,
     },

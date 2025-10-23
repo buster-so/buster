@@ -29,6 +29,7 @@ export const useSearchInfinite = ({
   | 'assetTypes'
   | 'includeAssetAncestors'
   | 'includeScreenshots'
+  | 'includeAddedToLibrary'
   | 'endDate'
   | 'startDate'
   | 'query'
