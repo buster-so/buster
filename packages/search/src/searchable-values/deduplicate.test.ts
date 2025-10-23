@@ -88,7 +88,6 @@ import {
   checkExistence,
   closeConnection,
   createConnection,
-  type DuckDBConnection,
   deduplicateValues,
   escapeSqlString,
   executeQuery,

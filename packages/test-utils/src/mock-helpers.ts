@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/noConstructorReturn: for tests it seems fine */
 import { vi } from 'vitest';
 
 // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
@@ -40,9 +41,16 @@ export function createMockDate(fixedDate: string | Date) {
   const mockDate = new Date(fixedDate);
   const originalDate = Date;
 
-  // @ts-expect-error
-  global.Date = vi.fn(() => mockDate);
-  global.Date.now = vi.fn(() => mockDate.getTime());
+  // Create a constructor function that returns the mock date
+  global.Date = class extends Date {
+    constructor() {
+      super(mockDate);
+      // Return the fixed mock date
+      return mockDate;
+    }
+  } as DateConstructor;
+
+  global.Date.now = vi.fn(() => mockDate.getTime()) as typeof Date.now;
 
   return {
     restore: () => {

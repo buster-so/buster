@@ -559,9 +559,9 @@ describe('security-utils', () => {
 
       // Verify the insert was called with values
       expect(mockTx.insert).toHaveBeenCalled();
-      const insertMock = vi.mocked(mockTx.insert);
-      expect(insertMock().values).toHaveBeenCalled();
-      expect(insertMock().values().onConflictDoUpdate).toHaveBeenCalled();
+      const insertChain = mockTx.insert() as ReturnType<typeof mockTx.insert>;
+      expect(insertChain.values).toHaveBeenCalled();
+      expect(insertChain.values().onConflictDoUpdate).toHaveBeenCalled();
     });
   });
 });

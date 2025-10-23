@@ -40,10 +40,11 @@ import * as slackHelpers from './slack-helpers';
 // Mock dependencies
 vi.mock('./slack-helpers');
 vi.mock('@buster/slack', () => ({
-  SlackAuthService: vi.fn().mockImplementation(() => ({
-    generateAuthUrl: vi.fn(),
-    handleCallback: vi.fn(),
-  })),
+  SlackAuthService: vi.fn(function (this: any) {
+    this.generateAuthUrl = vi.fn();
+    this.handleCallback = vi.fn();
+    return this;
+  }),
 }));
 
 // Mock environment variables before importing

@@ -1,25 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createWebSearchTool, type WebSearchToolOutput } from './web-search-tool';
 
-vi.mock('@buster/web-tools', () => {
-  const mockFirecrawlService = {
-    webSearch: vi.fn(),
-  };
+const mockWebSearch = vi.fn();
 
-  return {
-    FirecrawlService: vi.fn().mockImplementation(() => mockFirecrawlService),
-    mockFirecrawlService,
-  };
-});
+vi.mock('@buster/web-tools', () => ({
+  FirecrawlService: class {
+    webSearch = mockWebSearch;
+  },
+}));
 
 describe('webSearch tool', () => {
-  let mockFirecrawlService: any;
   let webSearchTool: ReturnType<typeof createWebSearchTool>;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    const { mockFirecrawlService: mock } = vi.mocked(await import('@buster/web-tools')) as any;
-    mockFirecrawlService = mock;
     webSearchTool = createWebSearchTool();
   });
 
@@ -36,7 +30,7 @@ describe('webSearch tool', () => {
       ],
     };
 
-    mockFirecrawlService.webSearch.mockResolvedValue(mockResponse);
+    mockWebSearch.mockResolvedValue(mockResponse);
 
     const result = (await webSearchTool.execute!(
       {
@@ -64,7 +58,7 @@ describe('webSearch tool', () => {
       results: [],
     };
 
-    mockFirecrawlService.webSearch.mockResolvedValue(mockResponse);
+    mockWebSearch.mockResolvedValue(mockResponse);
 
     await webSearchTool.execute!(
       {
@@ -76,7 +70,7 @@ describe('webSearch tool', () => {
       { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
     );
 
-    expect(mockFirecrawlService.webSearch).toHaveBeenCalledWith('test query', {
+    expect(mockWebSearch).toHaveBeenCalledWith('test query', {
       limit: 3,
       scrapeOptions: {
         formats: ['html', 'markdown'],
@@ -85,7 +79,7 @@ describe('webSearch tool', () => {
   });
 
   it('should handle errors gracefully', async () => {
-    mockFirecrawlService.webSearch.mockRejectedValue(new Error('Search failed'));
+    mockWebSearch.mockRejectedValue(new Error('Search failed'));
 
     const result = (await webSearchTool.execute!(
       {
@@ -105,7 +99,7 @@ describe('webSearch tool', () => {
       results: [],
     };
 
-    mockFirecrawlService.webSearch.mockResolvedValue(mockResponse);
+    mockWebSearch.mockResolvedValue(mockResponse);
 
     await webSearchTool.execute!(
       {
@@ -114,7 +108,7 @@ describe('webSearch tool', () => {
       { toolCallId: 'test-tool-call', messages: [], abortSignal: new AbortController().signal }
     );
 
-    expect(mockFirecrawlService.webSearch).toHaveBeenCalledWith('test query', {
+    expect(mockWebSearch).toHaveBeenCalledWith('test query', {
       limit: 5,
       scrapeOptions: {
         formats: ['markdown'],

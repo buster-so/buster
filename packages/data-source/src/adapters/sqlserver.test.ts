@@ -10,7 +10,8 @@ const mockedSql = vi.mocked(sql);
 
 describe('SQLServerAdapter', () => {
   let adapter: SQLServerAdapter;
-  let mockPool: any;
+  let mockPoolInstance: any;
+  let mockPoolConstructorArgs: any;
   let mockRequest: any;
 
   beforeEach(() => {
@@ -23,15 +24,20 @@ describe('SQLServerAdapter', () => {
       input: vi.fn().mockReturnThis(),
     };
 
-    // Create mock pool for each test
-    mockPool = {
+    // Create mock pool instance for each test
+    mockPoolInstance = {
       request: vi.fn().mockReturnValue(mockRequest),
       close: vi.fn().mockResolvedValue(undefined),
       connect: vi.fn().mockResolvedValue(undefined),
     };
 
     // Mock the ConnectionPool constructor
-    mockedSql.ConnectionPool = vi.fn(() => mockPool) as any;
+    mockedSql.ConnectionPool = class {
+      constructor(config: any) {
+        mockPoolConstructorArgs = config;
+        Object.assign(this, mockPoolInstance);
+      }
+    } as any;
 
     // Mock SQL Server data types
     mockedSql.NVarChar = vi.fn();
@@ -58,7 +64,7 @@ describe('SQLServerAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(mockedSql.ConnectionPool).toHaveBeenCalledWith({
+      expect(mockPoolConstructorArgs).toEqual({
         server: 'localhost',
         port: 1433,
         database: 'testdb',
@@ -69,7 +75,7 @@ describe('SQLServerAdapter', () => {
           trustServerCertificate: false,
         },
       });
-      expect(mockPool.connect).toHaveBeenCalled();
+      expect(mockPoolInstance.connect).toHaveBeenCalled();
     });
 
     it('should use default port when not specified', async () => {
@@ -83,7 +89,7 @@ describe('SQLServerAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(mockedSql.ConnectionPool).toHaveBeenCalledWith(
+      expect(mockPoolConstructorArgs).toEqual(
         expect.objectContaining({
           port: undefined,
         })
@@ -103,7 +109,7 @@ describe('SQLServerAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(mockedSql.ConnectionPool).toHaveBeenCalledWith(
+      expect(mockPoolConstructorArgs).toEqual(
         expect.objectContaining({
           options: {
             encrypt: false,
@@ -136,7 +142,7 @@ describe('SQLServerAdapter', () => {
         password: 'testpass',
       };
 
-      mockPool.connect.mockRejectedValueOnce(new Error('Connection failed'));
+      mockPoolInstance.connect.mockRejectedValueOnce(new Error('Connection failed'));
 
       await expect(adapter.initialize(credentials)).rejects.toThrow(
         'Failed to initialize SQL Server client: Connection failed'
@@ -277,7 +283,7 @@ describe('SQLServerAdapter', () => {
 
       await timeoutAdapter.initialize(longTimeoutConfig);
 
-      expect(mockedSql.ConnectionPool).toHaveBeenCalledWith(
+      expect(mockPoolConstructorArgs).toEqual(
         expect.objectContaining({
           requestTimeout: 5000,
         })
@@ -467,7 +473,7 @@ describe('SQLServerAdapter', () => {
       await adapter.initialize(credentials);
       await adapter.close();
 
-      expect(mockPool.close).toHaveBeenCalled();
+      expect(mockPoolInstance.close).toHaveBeenCalled();
     });
 
     it('should handle close errors gracefully', async () => {
@@ -481,7 +487,7 @@ describe('SQLServerAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      mockPool.close.mockRejectedValueOnce(new Error('Close failed'));
+      mockPoolInstance.close.mockRejectedValueOnce(new Error('Close failed'));
 
       // Should not throw
       await adapter.close();

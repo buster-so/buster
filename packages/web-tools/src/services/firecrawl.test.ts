@@ -12,14 +12,13 @@ interface MockFirecrawlApp {
 // Mock the FirecrawlApp
 vi.mock('@mendable/firecrawl-js', () => {
   return {
-    default: vi.fn().mockImplementation(
-      (): MockFirecrawlApp => ({
-        deepResearch: vi.fn(),
-        checkDeepResearchStatus: vi.fn(),
-        scrapeUrl: vi.fn(),
-        search: vi.fn(),
-      })
-    ),
+    default: vi.fn(function (this: MockFirecrawlApp) {
+      this.deepResearch = vi.fn();
+      this.checkDeepResearchStatus = vi.fn();
+      this.scrapeUrl = vi.fn();
+      this.search = vi.fn();
+      return this;
+    }),
   };
 });
 

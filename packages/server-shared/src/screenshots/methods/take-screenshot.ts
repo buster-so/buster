@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noConsole: console.error is used for debugging */
 import type { Page } from 'playwright';
 import sharp from 'sharp';
 
