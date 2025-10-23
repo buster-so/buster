@@ -88,6 +88,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
 
       - name: Lint all packages
         run: pnpm turbo lint
@@ -106,6 +107,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
 
       - name: Build all packages
         run: pnpm turbo build --filter='!@buster-app/api-legacy'
@@ -175,6 +177,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
 
       - name: Run all unit tests
         run: pnpm turbo test:unit
@@ -198,6 +201,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
           install-supabase: 'true'
 
       - name: Mount binary cache sticky disk

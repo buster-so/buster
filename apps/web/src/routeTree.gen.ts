@@ -42,6 +42,7 @@ import { Route as AppAppReportsIndexRouteImport } from './routes/app/_app/report
 import { Route as AppAppNewUserIndexRouteImport } from './routes/app/_app/new-user/index'
 import { Route as AppAppMetricsIndexRouteImport } from './routes/app/_app/metrics.index'
 import { Route as AppAppLogsIndexRouteImport } from './routes/app/_app/logs.index'
+import { Route as AppAppLibraryIndexRouteImport } from './routes/app/_app/library/index'
 import { Route as AppAppHomeIndexRouteImport } from './routes/app/_app/home/index'
 import { Route as AppAppDatasetsIndexRouteImport } from './routes/app/_app/datasets.index'
 import { Route as AppAppDashboardsIndexRouteImport } from './routes/app/_app/dashboards.index'
@@ -359,6 +360,11 @@ const AppAppMetricsIndexRoute = AppAppMetricsIndexRouteImport.update({
 const AppAppLogsIndexRoute = AppAppLogsIndexRouteImport.update({
   id: '/logs/',
   path: '/logs/',
+  getParentRoute: () => AppAppRoute,
+} as any)
+const AppAppLibraryIndexRoute = AppAppLibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
   getParentRoute: () => AppAppRoute,
 } as any)
 const AppAppHomeIndexRoute = AppAppHomeIndexRouteImport.update({
@@ -1245,6 +1251,7 @@ export interface FileRoutesByFullPath {
   '/app/dashboards': typeof AppAppDashboardsIndexRoute
   '/app/datasets': typeof AppAppDatasetsIndexRoute
   '/app/home/': typeof AppAppHomeIndexRoute
+  '/app/library': typeof AppAppLibraryIndexRoute
   '/app/logs': typeof AppAppLogsIndexRoute
   '/app/metrics': typeof AppAppMetricsIndexRoute
   '/app/new-user/': typeof AppAppNewUserIndexRoute
@@ -1384,6 +1391,7 @@ export interface FileRoutesByTo {
   '/app/dashboards': typeof AppAppDashboardsIndexRoute
   '/app/datasets': typeof AppAppDatasetsIndexRoute
   '/app/home': typeof AppAppHomeIndexRoute
+  '/app/library': typeof AppAppLibraryIndexRoute
   '/app/logs': typeof AppAppLogsIndexRoute
   '/app/metrics': typeof AppAppMetricsIndexRoute
   '/app/new-user': typeof AppAppNewUserIndexRoute
@@ -1512,6 +1520,7 @@ export interface FileRoutesById {
   '/app/_app/dashboards/': typeof AppAppDashboardsIndexRoute
   '/app/_app/datasets/': typeof AppAppDatasetsIndexRoute
   '/app/_app/home/': typeof AppAppHomeIndexRoute
+  '/app/_app/library/': typeof AppAppLibraryIndexRoute
   '/app/_app/logs/': typeof AppAppLogsIndexRoute
   '/app/_app/metrics/': typeof AppAppMetricsIndexRoute
   '/app/_app/new-user/': typeof AppAppNewUserIndexRoute
@@ -1672,6 +1681,7 @@ export interface FileRouteTypes {
     | '/app/dashboards'
     | '/app/datasets'
     | '/app/home/'
+    | '/app/library'
     | '/app/logs'
     | '/app/metrics'
     | '/app/new-user/'
@@ -1811,6 +1821,7 @@ export interface FileRouteTypes {
     | '/app/dashboards'
     | '/app/datasets'
     | '/app/home'
+    | '/app/library'
     | '/app/logs'
     | '/app/metrics'
     | '/app/new-user'
@@ -1938,6 +1949,7 @@ export interface FileRouteTypes {
     | '/app/_app/dashboards/'
     | '/app/_app/datasets/'
     | '/app/_app/home/'
+    | '/app/_app/library/'
     | '/app/_app/logs/'
     | '/app/_app/metrics/'
     | '/app/_app/new-user/'
@@ -2293,6 +2305,13 @@ declare module '@tanstack/react-router' {
       path: '/logs'
       fullPath: '/app/logs'
       preLoaderRoute: typeof AppAppLogsIndexRouteImport
+      parentRoute: typeof AppAppRoute
+    }
+    '/app/_app/library/': {
+      id: '/app/_app/library/'
+      path: '/library'
+      fullPath: '/app/library'
+      preLoaderRoute: typeof AppAppLibraryIndexRouteImport
       parentRoute: typeof AppAppRoute
     }
     '/app/_app/home/': {
@@ -3716,6 +3735,7 @@ interface AppAppRouteChildren {
   AppAppCollectionsIndexRoute: typeof AppAppCollectionsIndexRoute
   AppAppDashboardsIndexRoute: typeof AppAppDashboardsIndexRoute
   AppAppDatasetsIndexRoute: typeof AppAppDatasetsIndexRoute
+  AppAppLibraryIndexRoute: typeof AppAppLibraryIndexRoute
   AppAppLogsIndexRoute: typeof AppAppLogsIndexRoute
   AppAppMetricsIndexRoute: typeof AppAppMetricsIndexRoute
   AppAppReportsIndexRoute: typeof AppAppReportsIndexRoute
@@ -3730,6 +3750,7 @@ const AppAppRouteChildren: AppAppRouteChildren = {
   AppAppCollectionsIndexRoute: AppAppCollectionsIndexRoute,
   AppAppDashboardsIndexRoute: AppAppDashboardsIndexRoute,
   AppAppDatasetsIndexRoute: AppAppDatasetsIndexRoute,
+  AppAppLibraryIndexRoute: AppAppLibraryIndexRoute,
   AppAppLogsIndexRoute: AppAppLogsIndexRoute,
   AppAppMetricsIndexRoute: AppAppMetricsIndexRoute,
   AppAppReportsIndexRoute: AppAppReportsIndexRoute,

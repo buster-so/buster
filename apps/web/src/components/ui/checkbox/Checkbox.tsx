@@ -37,7 +37,7 @@ const checkboxVariants = cva(
         variant: 'default',
         checked: 'indeterminate',
         className:
-          'bg-primary-light text-background border-primary-light hover:bg-primary! hover:border-primary! hover:disabled:bg-inherit',
+          'bg-gray-light/5 text-gray-light hover:bg-primary! hover:text-background hover:border-primary! hover:disabled:bg-inherit',
       },
     ],
   }
@@ -67,19 +67,25 @@ const Checkbox = React.forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root
     },
     ref
   ) => {
+    const checkedState = indeterminate ? 'indeterminate' : (checked ?? false);
+    const checkedVariant = indeterminate ? 'indeterminate' : checked;
+
     return (
       <CheckboxPrimitive.Root
         ref={ref}
         disabled={disabled || false}
-        className={cn(checkboxVariants({ variant, size, disabled, checked }), className)}
-        checked={checked || false}
+        className={cn(
+          checkboxVariants({ variant, size, disabled, checked: checkedVariant }),
+          className
+        )}
+        checked={checkedState}
         {...props}
       >
         <CheckboxPrimitive.Indicator
           className={cn('absolute inset-0 flex items-center justify-center')}
         >
-          <div className="text-background flex">
-            {checked === 'indeterminate' ? <Minus /> : <Check />}
+          <div className="text-inherit flex">
+            {checked === 'indeterminate' || indeterminate ? <Minus /> : <Check />}
           </div>
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>

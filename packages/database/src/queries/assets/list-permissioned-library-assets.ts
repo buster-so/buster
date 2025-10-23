@@ -1,10 +1,12 @@
 import {
   and,
+  asc,
   count,
   desc,
   eq,
   exists,
   gte,
+  ilike,
   inArray,
   isNull,
   lte,
@@ -45,6 +47,10 @@ export async function listPermissionedLibraryAssets(
     endDate,
     includeCreatedBy,
     excludeCreatedBy,
+    ordering,
+    orderingDirection,
+    groupBy,
+    query,
     page,
     page_size,
   } = ListPermissionedLibraryAssetsInputSchema.parse(input);
@@ -60,6 +66,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: reportFiles.updatedAt,
       createdBy: reportFiles.createdBy,
       organizationId: reportFiles.organizationId,
+      screenshotBucketKey: reportFiles.screenshotBucketKey,
     })
     .from(reportFiles)
     .innerJoin(
@@ -104,6 +111,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: metricFiles.updatedAt,
       createdBy: metricFiles.createdBy,
       organizationId: metricFiles.organizationId,
+      screenshotBucketKey: metricFiles.screenshotBucketKey,
     })
     .from(metricFiles)
     .innerJoin(
@@ -148,6 +156,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: dashboardFiles.updatedAt,
       createdBy: dashboardFiles.createdBy,
       organizationId: dashboardFiles.organizationId,
+      screenshotBucketKey: dashboardFiles.screenshotBucketKey,
     })
     .from(dashboardFiles)
     .innerJoin(
@@ -192,6 +201,7 @@ export async function listPermissionedLibraryAssets(
       updatedAt: chats.updatedAt,
       createdBy: chats.createdBy,
       organizationId: chats.organizationId,
+      screenshotBucketKey: chats.screenshotBucketKey,
     })
     .from(chats)
     .innerJoin(
@@ -259,6 +269,10 @@ export async function listPermissionedLibraryAssets(
     filters.push(not(inArray(permissionedAssets.createdBy, excludeCreatedBy)));
   }
 
+  if (query) {
+    filters.push(ilike(permissionedAssets.name, `%${query}%`));
+  }
+
   const whereCondition =
     filters.length === 0 ? undefined : filters.length === 1 ? filters[0] : and(...filters);
 
@@ -268,21 +282,41 @@ export async function listPermissionedLibraryAssets(
       assetType: permissionedAssets.assetType,
       name: permissionedAssets.name,
       updatedAt: permissionedAssets.updatedAt,
+      updatedAtDate: sql<string>`DATE(${permissionedAssets.updatedAt})`.as('updated_at_date'),
       createdAt: permissionedAssets.createdAt,
+      createdAtDate: sql<string>`DATE(${permissionedAssets.createdAt})`.as('created_at_date'),
       createdBy: permissionedAssets.createdBy,
       createdByName: users.name,
       createdByEmail: users.email,
       createdByAvatarUrl: users.avatarUrl,
+      screenshotBucketKey: permissionedAssets.screenshotBucketKey,
+      organizationId: permissionedAssets.organizationId,
     })
     .from(permissionedAssets)
     .innerJoin(users, eq(permissionedAssets.createdBy, users.id));
 
   const filteredAssetQuery = whereCondition ? baseAssetQuery.where(whereCondition) : baseAssetQuery;
 
-  const assetsResult = await filteredAssetQuery
-    .orderBy(desc(permissionedAssets.createdAt))
-    .limit(page_size)
-    .offset(offset);
+  // Determine ordering direction (default to desc for backward compatibility)
+  const direction = orderingDirection === 'asc' ? asc : desc;
+
+  // Apply ordering and execute query
+  const assetsResult = await (async () => {
+    if (ordering === 'updated_at') {
+      return await filteredAssetQuery
+        .orderBy(direction(permissionedAssets.updatedAt))
+        .limit(page_size)
+        .offset(offset);
+    }
+    if (ordering === 'created_at') {
+      return await filteredAssetQuery
+        .orderBy(direction(permissionedAssets.createdAt))
+        .limit(page_size)
+        .offset(offset);
+    }
+    // No explicit ordering - let database decide
+    return await filteredAssetQuery.limit(page_size).offset(offset);
+  })();
 
   const baseCountQuery = db.select({ total: count() }).from(permissionedAssets);
   const countResult = await (whereCondition
@@ -300,7 +334,53 @@ export async function listPermissionedLibraryAssets(
     created_by_name: asset.createdByName,
     created_by_email: asset.createdByEmail,
     created_by_avatar_url: asset.createdByAvatarUrl,
+    screenshot_url: asset.screenshotBucketKey,
   }));
+
+  // Handle groupBy
+  if (groupBy && groupBy !== 'none') {
+    const groups: Record<string, LibraryAssetListItem[]> = {};
+
+    for (let i = 0; i < libraryAssets.length; i++) {
+      const asset = libraryAssets[i];
+      const resultAsset = assetsResult[i];
+      if (!asset || !resultAsset) {
+        continue;
+      }
+
+      let groupKey: string;
+
+      if (groupBy === 'asset_type') {
+        groupKey = asset.asset_type;
+      } else if (groupBy === 'owner') {
+        groupKey = asset.created_by;
+      } else if (groupBy === 'created_at') {
+        // Use database-computed date (YYYY-MM-DD) for consistent day-based grouping
+        groupKey = resultAsset.createdAtDate;
+      } else if (groupBy === 'updated_at') {
+        // Use database-computed date (YYYY-MM-DD) for consistent day-based grouping
+        groupKey = resultAsset.updatedAtDate;
+      } else {
+        groupKey = 'ungrouped';
+      }
+
+      const groupArray = groups[groupKey] ?? [];
+      groupArray.push(asset);
+      groups[groupKey] = groupArray;
+    }
+
+    const totalPages = Math.ceil(totalValue / page_size);
+    const hasMore = page < totalPages;
+
+    return {
+      groups,
+      pagination: {
+        page,
+        page_size,
+        has_more: hasMore,
+      },
+    };
+  }
 
   return createPaginatedResponse({
     data: libraryAssets,

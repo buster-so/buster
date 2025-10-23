@@ -1,6 +1,4 @@
-import type { AssetType } from '@buster/server-shared';
 import type { ShareAssetType } from '@buster/server-shared/share';
-import type { JSX } from 'react';
 import {
   FileContent,
   Folder5,

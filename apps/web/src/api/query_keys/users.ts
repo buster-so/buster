@@ -17,15 +17,14 @@ import type {
 
 const favoritesGetList = queryOptions<UserFavoriteResponse>({
   queryKey: ['myself', 'list', 'favorites'] as const,
-  staleTime: 1000 * 60 * 20, // 20 minutes,
+  staleTime: 1000 * 60 * 15, // 15 minutes,
   initialData: [],
-  initialDataUpdatedAt: 0,
   retry: () => false, //used to silence the retry error
 });
 
 const userGetUserMyself = queryOptions<UserResponse | null>({
   queryKey: ['myself'] as const,
-  staleTime: 1000 * 60 * 30, // 30 minutes
+  staleTime: 1000 * 60 * 20, // 20 minutes
   retry: () => false, //used to silence the retry error
 });
 

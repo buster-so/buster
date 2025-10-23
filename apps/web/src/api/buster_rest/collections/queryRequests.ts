@@ -1,3 +1,4 @@
+import type { BusterCollection } from '@buster/server-shared/collections';
 import type { ShareAssetType } from '@buster/server-shared/share';
 import {
   type QueryClient,
@@ -8,7 +9,6 @@ import {
 } from '@tanstack/react-query';
 import { create } from 'mutative';
 import { useMemo } from 'react';
-import type { BusterCollection } from '@/api/asset_interfaces/collection';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -29,14 +29,14 @@ import {
 } from './requests';
 
 export const useGetCollectionsList = (
-  filters: Omit<Parameters<typeof collectionsGetList>[0], 'page_token' | 'page_size'>,
+  filters: Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>,
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof collectionsGetList>>, ApiError>,
     'queryKey' | 'queryFn' | 'initialData'
   >
 ) => {
   const payload = useMemo(() => {
-    return { ...filters, page_token: 0, page_size: 3500 };
+    return { ...filters, page: 1, page_size: 3500 };
   }, [filters]);
 
   return useQuery({

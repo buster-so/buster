@@ -1,8 +1,6 @@
-import Cookies from 'js-cookie';
 import type { LayoutSize } from '@/components/ui/layouts/AppLayout';
 import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/create-auto-save-id';
-import { isServer } from '@/lib/window';
-import { getServerCookie } from './getServerCookie';
+import { getCookie } from './getCookie';
 
 export const getAppLayout = async ({
   id,
@@ -12,9 +10,7 @@ export const getAppLayout = async ({
   preservedSide?: 'left' | 'right';
 }) => {
   const cookieName = createAutoSaveId(id);
-  const cookieValue = isServer
-    ? await getServerCookie({ data: { cookieName } })
-    : Cookies.get(cookieName);
+  const cookieValue = await getCookie({ data: cookieName });
 
   if (!cookieValue) {
     return null;

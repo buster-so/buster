@@ -115,6 +115,10 @@
     "./library": {
       "types": "./dist/library/index.d.ts",
       "default": "./dist/library/index.js"
+    },
+    "./type-utilities": {
+      "types": "./dist/type-utilities/index.d.ts",
+      "default": "./dist/type-utilities/index.js"
     }
   },
   "module": "src/index.ts",

@@ -413,7 +413,7 @@ export function UserProfile() {
 ```typescript
 // queries/user-queries.ts
 import { queryOptions } from '@tanstack/react-query';
-import type { GetUserResponse } from '@buster/server-shared';
+import type { GetUserResponse } from '@buster/server-shared/users';
 
 export const userQueryOptions = (userId: string) =>
   queryOptions({
@@ -441,7 +441,7 @@ export function UserDetails({ userId }: { userId: string }) {
 import type { 
   CreateDashboardRequest,
   CreateDashboardResponse 
-} from '@buster/server-shared';
+} from '@buster/server-shared/dashboards';
 
 export async function createDashboard(
   data: CreateDashboardRequest
