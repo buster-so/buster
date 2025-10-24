@@ -7,19 +7,10 @@ export const getSearchResult = (params: SearchTextRequest) =>
     staleTime: 1000 * 30, // 30 seconds,
   });
 
-export const getSearchResultInfinite = () =>
-  infiniteQueryOptions<SearchTextResponse>({
-    queryKey: ['search', 'results', 'infinite'] as const,
-    staleTime: 1000 * 30, // 30 seconds,
-    getNextPageParam: (lastPage) => {
-      if (!lastPage.pagination.has_more) {
-        return undefined;
-      }
-      return lastPage.pagination.page + 1;
-    },
-    initialPageParam: 1,
-  });
-
 export const searchQueryKeys = {
   getSearchResult,
+  getSearchResultInfinite: (params: Partial<SearchTextRequest>) => ({
+    queryKey: ['search', 'results', 'infinite', params] as const,
+    staleTime: 1000 * 30, // 30 seconds,
+  }),
 };

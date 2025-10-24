@@ -13,8 +13,9 @@ import { useLibrarySearchStore } from './library-store';
 const mode: SearchMode = 'select-multiple';
 
 export const LibrarySearchModal = React.memo(() => {
-  const { mutate: postLibraryAssets, isPending: isPostingLibraryAssets } = usePostLibraryAssets();
-  const { mutate: removeLibraryAssets, isPending: isRemovingLibraryAssets } =
+  const { mutateAsync: postLibraryAssets, isPending: isPostingLibraryAssets } =
+    usePostLibraryAssets();
+  const { mutateAsync: removeLibraryAssets, isPending: isRemovingLibraryAssets } =
     useDeleteLibraryAssets();
 
   const { isOpen, onCloseLibrarySearch: onCloseLibrarySearchStore } = useLibrarySearchStore();
@@ -76,39 +77,40 @@ export const LibrarySearchModal = React.memo(() => {
     onCloseLibrarySearchStore();
   });
 
-  const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({
-    page_size: 25,
-    assetTypes,
-    startDate: selectedDateRange?.from?.toISOString(),
-    endDate: selectedDateRange?.to?.toISOString(),
-    query: debouncedSearchQuery,
-    enabled: isOpen,
-    mounted: isOpen,
-    includeAssetAncestors: true,
-    includeScreenshots: true,
-    includeAddedToLibrary: true,
-    scrollConfig: {
-      scrollThreshold: 55,
-    },
-  });
+  const { allResults, isFetchingNextPage, isFetched, scrollContainerRef, refetch } =
+    useSearchInfinite({
+      page_size: 25,
+      assetTypes,
+      startDate: selectedDateRange?.from?.toISOString(),
+      endDate: selectedDateRange?.to?.toISOString(),
+      query: debouncedSearchQuery,
+      enabled: isOpen,
+      mounted: isOpen,
+      includeAssetAncestors: true,
+      includeScreenshots: true,
+      includeAddedToLibrary: true,
+      scrollConfig: {
+        scrollThreshold: 55,
+      },
+    });
 
   console.log(
     'allResults',
     allResults.filter((result) => result.addedToLibrary)
   );
 
-  const onSubmit = useMemoizedFn(() => {
+  const onSubmit = useMemoizedFn(async () => {
     // Parse composite keys back to { assetId, assetType } objects
     const assetsToAddParsed = Array.from(itemsToAdd).map((key) => parseSelectionKey(key));
     const assetsToRemoveParsed = Array.from(itemsToRemove).map((key) => parseSelectionKey(key));
 
     // Execute both operations
     if (assetsToAddParsed.length > 0) {
-      postLibraryAssets(assetsToAddParsed);
+      await postLibraryAssets(assetsToAddParsed);
     }
 
     if (assetsToRemoveParsed.length > 0) {
-      removeLibraryAssets(assetsToRemoveParsed);
+      await removeLibraryAssets(assetsToRemoveParsed);
     }
 
     onCloseModalAndReset();

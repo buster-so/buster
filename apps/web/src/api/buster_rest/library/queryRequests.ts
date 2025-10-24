@@ -29,8 +29,7 @@ export const useLibraryAssetsInfinite = ({
   enabled?: boolean;
 }) => {
   return useInfiniteScroll<LibraryAssetListItem>({
-    queryKey: ['library', 'get', 'list-infinite', params] as const,
-    staleTime: 1000 * 40, // 40 seconds
+    ...libraryQueryKeys.libraryGetListInfinite(params),
     queryFn: ({ pageParam = 1 }) => {
       return getLibraryAssets({ ...params, page_size, page: pageParam });
     },
@@ -58,7 +57,7 @@ export const prefetchGetLibraryAssetsInfinite = async (
   }
 ) => {
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ['library', 'get', 'list-infinite', filters] as const,
+    ...libraryQueryKeys.libraryGetListInfinite(filters),
     queryFn: () =>
       getLibraryAssets({ ...filters, page_size: filters.page_size ?? DEFAULT_PAGE_SIZE, page: 1 }),
     initialPageParam: 1,
