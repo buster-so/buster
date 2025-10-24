@@ -51,7 +51,15 @@ export type SearchTextResponse = SearchPaginatedResponse<TextSearchResult>;
 export async function searchText(input: SearchTextInput): Promise<SearchTextResponse> {
   try {
     const validated = SearchTextInputSchema.parse(input);
-    const { searchString, organizationId, userId, page, page_size, filters, includeAddedToLibrary } = validated;
+    const {
+      searchString,
+      organizationId,
+      userId,
+      page,
+      page_size,
+      filters,
+      includeAddedToLibrary,
+    } = validated;
     const offset = (page - 1) * page_size;
     const paginationCheckCount = page_size + 1;
 
@@ -106,37 +114,43 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
          )`
       : sql<string>`left(${assetSearchV2.additionalText}, ${snippetLength})`;
 
-
     let results: TextSearchResult[];
 
     if (includeAddedToLibrary) {
       results = await db
-      .select({
-        assetId: assetSearchV2.assetId,
-        assetType: assetSearchV2.assetType,
-        title: highlightedTitleSql,
-        additionalText: additionalSnippetSql,
-        updatedAt: assetSearchV2.updatedAt,
-        screenshotBucketKey: assetSearchV2.screenshotBucketKey,
-        createdBy: assetSearchV2.createdBy,
-        createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
-        createdByAvatarUrl: users.avatarUrl,
-        addedToLibrary: sql<boolean>`CASE WHEN ${userLibrary.userId} IS NOT NULL THEN true ELSE false END`,
-      })
-      .from(assetSearchV2)
-      .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
-      .innerJoin(
-        permissionedAssetsSubquery,
-        eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
-      )
-      .leftJoin(userLibrary, and(eq(userLibrary.assetId, assetSearchV2.assetId), eq(userLibrary.userId, userId)))
-      .where(and(...allConditions))
-      .orderBy(
-        sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
-        desc(assetSearchV2.updatedAt)
-      )
-      .limit(paginationCheckCount)
-      .offset(offset);
+        .select({
+          assetId: assetSearchV2.assetId,
+          assetType: assetSearchV2.assetType,
+          title: highlightedTitleSql,
+          additionalText: additionalSnippetSql,
+          updatedAt: assetSearchV2.updatedAt,
+          screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+          createdBy: assetSearchV2.createdBy,
+          createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+          createdByAvatarUrl: users.avatarUrl,
+          addedToLibrary: sql<boolean>`CASE WHEN ${userLibrary.userId} IS NOT NULL THEN true ELSE false END`,
+        })
+        .from(assetSearchV2)
+        .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
+        .innerJoin(
+          permissionedAssetsSubquery,
+          eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
+        )
+        .leftJoin(
+          userLibrary,
+          and(
+            eq(userLibrary.assetId, assetSearchV2.assetId),
+            eq(userLibrary.userId, userId),
+            isNull(userLibrary.deletedAt)
+          )
+        )
+        .where(and(...allConditions))
+        .orderBy(
+          sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
+          desc(assetSearchV2.updatedAt)
+        )
+        .limit(paginationCheckCount)
+        .offset(offset);
     } else {
       results = await db
         .select({
