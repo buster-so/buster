@@ -46,7 +46,6 @@ import { Route as AppAppLibraryIndexRouteImport } from './routes/app/_app/librar
 import { Route as AppAppHomeIndexRouteImport } from './routes/app/_app/home/index'
 import { Route as AppAppDatasetsIndexRouteImport } from './routes/app/_app/datasets.index'
 import { Route as AppAppDashboardsIndexRouteImport } from './routes/app/_app/dashboards.index'
-import { Route as AppAppCollectionsIndexRouteImport } from './routes/app/_app/collections.index'
 import { Route as AppAppChatsIndexRouteImport } from './routes/app/_app/chats.index'
 import { Route as ScreenshotsReportsReportIdContentRouteImport } from './routes/screenshots/reports.$reportId.content'
 import { Route as ScreenshotsMetricsMetricIdContentRouteImport } from './routes/screenshots/metrics.$metricId.content'
@@ -380,11 +379,6 @@ const AppAppDatasetsIndexRoute = AppAppDatasetsIndexRouteImport.update({
 const AppAppDashboardsIndexRoute = AppAppDashboardsIndexRouteImport.update({
   id: '/dashboards/',
   path: '/dashboards/',
-  getParentRoute: () => AppAppRoute,
-} as any)
-const AppAppCollectionsIndexRoute = AppAppCollectionsIndexRouteImport.update({
-  id: '/collections/',
-  path: '/collections/',
   getParentRoute: () => AppAppRoute,
 } as any)
 const AppAppChatsIndexRoute = AppAppChatsIndexRouteImport.update({
@@ -1247,7 +1241,6 @@ export interface FileRoutesByFullPath {
   '/screenshots/metrics/$metricId/content': typeof ScreenshotsMetricsMetricIdContentRoute
   '/screenshots/reports/$reportId/content': typeof ScreenshotsReportsReportIdContentRoute
   '/app/chats': typeof AppAppChatsIndexRoute
-  '/app/collections': typeof AppAppCollectionsIndexRoute
   '/app/dashboards': typeof AppAppDashboardsIndexRoute
   '/app/datasets': typeof AppAppDatasetsIndexRoute
   '/app/home/': typeof AppAppHomeIndexRoute
@@ -1387,7 +1380,6 @@ export interface FileRoutesByTo {
   '/screenshots/metrics/$metricId/content': typeof ScreenshotsMetricsMetricIdContentRoute
   '/screenshots/reports/$reportId/content': typeof ScreenshotsReportsReportIdContentRoute
   '/app/chats': typeof AppAppChatsIndexRoute
-  '/app/collections': typeof AppAppCollectionsIndexRoute
   '/app/dashboards': typeof AppAppDashboardsIndexRoute
   '/app/datasets': typeof AppAppDatasetsIndexRoute
   '/app/home': typeof AppAppHomeIndexRoute
@@ -1516,7 +1508,6 @@ export interface FileRoutesById {
   '/screenshots/metrics/$metricId/content': typeof ScreenshotsMetricsMetricIdContentRoute
   '/screenshots/reports/$reportId/content': typeof ScreenshotsReportsReportIdContentRoute
   '/app/_app/chats/': typeof AppAppChatsIndexRoute
-  '/app/_app/collections/': typeof AppAppCollectionsIndexRoute
   '/app/_app/dashboards/': typeof AppAppDashboardsIndexRoute
   '/app/_app/datasets/': typeof AppAppDatasetsIndexRoute
   '/app/_app/home/': typeof AppAppHomeIndexRoute
@@ -1677,7 +1668,6 @@ export interface FileRouteTypes {
     | '/screenshots/metrics/$metricId/content'
     | '/screenshots/reports/$reportId/content'
     | '/app/chats'
-    | '/app/collections'
     | '/app/dashboards'
     | '/app/datasets'
     | '/app/home/'
@@ -1817,7 +1807,6 @@ export interface FileRouteTypes {
     | '/screenshots/metrics/$metricId/content'
     | '/screenshots/reports/$reportId/content'
     | '/app/chats'
-    | '/app/collections'
     | '/app/dashboards'
     | '/app/datasets'
     | '/app/home'
@@ -1945,7 +1934,6 @@ export interface FileRouteTypes {
     | '/screenshots/metrics/$metricId/content'
     | '/screenshots/reports/$reportId/content'
     | '/app/_app/chats/'
-    | '/app/_app/collections/'
     | '/app/_app/dashboards/'
     | '/app/_app/datasets/'
     | '/app/_app/home/'
@@ -2333,13 +2321,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboards'
       fullPath: '/app/dashboards'
       preLoaderRoute: typeof AppAppDashboardsIndexRouteImport
-      parentRoute: typeof AppAppRoute
-    }
-    '/app/_app/collections/': {
-      id: '/app/_app/collections/'
-      path: '/collections'
-      fullPath: '/app/collections'
-      preLoaderRoute: typeof AppAppCollectionsIndexRouteImport
       parentRoute: typeof AppAppRoute
     }
     '/app/_app/chats/': {
@@ -3732,7 +3713,6 @@ interface AppAppRouteChildren {
   AppAppNewUserRoute: typeof AppAppNewUserRouteWithChildren
   AppAppDatasetsDatasetIdRoute: typeof AppAppDatasetsDatasetIdRouteWithChildren
   AppAppChatsIndexRoute: typeof AppAppChatsIndexRoute
-  AppAppCollectionsIndexRoute: typeof AppAppCollectionsIndexRoute
   AppAppDashboardsIndexRoute: typeof AppAppDashboardsIndexRoute
   AppAppDatasetsIndexRoute: typeof AppAppDatasetsIndexRoute
   AppAppLibraryIndexRoute: typeof AppAppLibraryIndexRoute
@@ -3747,7 +3727,6 @@ const AppAppRouteChildren: AppAppRouteChildren = {
   AppAppNewUserRoute: AppAppNewUserRouteWithChildren,
   AppAppDatasetsDatasetIdRoute: AppAppDatasetsDatasetIdRouteWithChildren,
   AppAppChatsIndexRoute: AppAppChatsIndexRoute,
-  AppAppCollectionsIndexRoute: AppAppCollectionsIndexRoute,
   AppAppDashboardsIndexRoute: AppAppDashboardsIndexRoute,
   AppAppDatasetsIndexRoute: AppAppDatasetsIndexRoute,
   AppAppLibraryIndexRoute: AppAppLibraryIndexRoute,

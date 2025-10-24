@@ -93,13 +93,13 @@ const yourStuff: ISidebarGroup = createSidebarGroup({
         link: { to: '/app/dashboards' },
         id: '/app/dashboards/',
       },
-      {
-        label: 'Collections',
-        assetType: 'collection' satisfies AssetType,
-        icon: <ASSET_ICONS.collections />,
-        link: { to: '/app/collections' },
-        id: '/app/collections/',
-      },
+      // {
+      //   label: 'Collections',
+      //   assetType: 'collection' satisfies AssetType,
+      //   icon: <ASSET_ICONS.collections />,
+      //   link: { to: '/app/collections' },
+      //   id: '/app/collections/',
+      // },
       {
         label: 'Reports',
         assetType: 'report_file' satisfies AssetType,
