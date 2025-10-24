@@ -75,8 +75,6 @@ export const LibraryGridView = React.memo(
           </LibrarySectionContainer>
         )}
 
-        {isInitialLoading && <div className="text-text-tertiary text-center py-8">Loading...</div>}
-
         {!isInitialLoading &&
           hasItems &&
           (hasGroups ? (

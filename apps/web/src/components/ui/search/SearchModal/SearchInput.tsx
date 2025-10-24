@@ -31,22 +31,7 @@ export const SearchInput: React.FC<
           />
           {filterContent}
         </div>
-        <AnimatePresence initial={false} mode="wait">
-          {filterDropdownContent && (
-            <motion.div
-              className="overflow-hidden shadow-[0_-0.5px_0_0_var(--border)] flex items-center px-5"
-              initial={{ opacity: 0, height: '0px' }}
-              animate={{ opacity: 1, height: '40px' }}
-              exit={{ opacity: 0, height: '0px' }}
-              transition={{
-                height: { duration: 0.15, delay: 0.065 },
-                opacity: { duration: 0.15 },
-              }}
-            >
-              {filterDropdownContent}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {filterDropdownContent}
       </div>
     );
   }
