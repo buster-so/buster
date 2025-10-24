@@ -19,7 +19,8 @@ export const GlobalSearchModal = () => {
     assetTypes,
     debouncedSearchQuery,
     filtersParams,
-    onSetFilters,
+    setSelectedAssets,
+    setSelectedDateRange,
   } = useCommonSearch({ mode });
 
   const { allResults, isFetching, scrollContainerRef } = useSearchInfinite({
@@ -37,12 +38,24 @@ export const GlobalSearchModal = () => {
   });
 
   const filterContent = useMemo(() => {
-    return <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />;
-  }, [filtersParams, onSetFilters]);
+    return (
+      <GlobalSearchModalFilters
+        {...filtersParams}
+        setSelectedAssets={setSelectedAssets}
+        setSelectedDateRange={setSelectedDateRange}
+      />
+    );
+  }, [filtersParams, setSelectedAssets, setSelectedDateRange]);
 
   const filterDropdownContent = useMemo(() => {
-    return <FilterSearchPills {...filtersParams} {...onSetFilters} />;
-  }, [filtersParams, onSetFilters]);
+    return (
+      <FilterSearchPills
+        {...filtersParams}
+        setSelectedAssets={setSelectedAssets}
+        setSelectedDateRange={setSelectedDateRange}
+      />
+    );
+  }, [filtersParams, setSelectedAssets, setSelectedDateRange]);
 
   return (
     <SearchModalBase

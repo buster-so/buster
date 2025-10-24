@@ -25,9 +25,10 @@ export const LibrarySearchModal = React.memo(() => {
     selectedDateRange,
     assetTypes,
     debouncedSearchQuery,
-    onSetFilters,
     searchQuery,
     setSearchQuery,
+    setSelectedAssets,
+    setSelectedDateRange,
   } = useCommonSearch({ mode });
 
   const {
@@ -41,7 +42,8 @@ export const LibrarySearchModal = React.memo(() => {
   } = useSearchMultiSelect({
     setSearchQuery,
     onCloseModal: onCloseLibrarySearch,
-    ...onSetFilters,
+    setSelectedAssets,
+    setSelectedDateRange,
   });
 
   const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({

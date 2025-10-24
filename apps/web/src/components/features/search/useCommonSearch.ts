@@ -24,14 +24,6 @@ export const useCommonSearch = ({ mode }: { mode: SearchMode }) => {
     return;
   }, [selectedAssets, hasQuery]);
 
-  const onSetFilters: OnSetFiltersParams = useMemo(
-    () => ({
-      setSelectedAssets,
-      setSelectedDateRange,
-    }),
-    [setSelectedAssets, setSelectedDateRange]
-  );
-
   const filtersParams: FiltersParams = useMemo(
     () => ({
       selectedAssets,
@@ -43,11 +35,12 @@ export const useCommonSearch = ({ mode }: { mode: SearchMode }) => {
   return {
     searchQuery,
     setSearchQuery,
+    setSelectedAssets,
+    setSelectedDateRange,
     selectedDateRange,
     assetTypes,
     debouncedSearchQuery,
     filtersParams,
-    onSetFilters,
   };
 };
 

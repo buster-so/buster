@@ -10,6 +10,7 @@ import {
 import { create } from 'mutative';
 import { useMemo } from 'react';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { searchQueryKeys } from '@/api/query_keys/search';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { isQueryStale } from '@/lib/query';
@@ -276,6 +277,12 @@ export const useAddAssetToCollection = (useInvalidate = true) => {
         const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
         queryClient.cancelQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
+
+        const searchQueryKey = searchQueryKeys
+          .getSearchResultInfinite({ collectionId: variables.id })
+          .queryKey.slice(0, 2);
+        queryClient.cancelQueries({ queryKey: searchQueryKey });
+        queryClient.invalidateQueries({ queryKey: searchQueryKey, refetchType: 'all' });
       }
     },
   });
@@ -302,6 +309,12 @@ export const useRemoveAssetFromCollection = (useInvalidate = true) => {
         const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
         queryClient.cancelQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
+
+        const searchQueryKey = searchQueryKeys
+          .getSearchResultInfinite({ collectionId: variables.id })
+          .queryKey.slice(0, 2);
+        queryClient.cancelQueries({ queryKey: searchQueryKey });
+        queryClient.invalidateQueries({ queryKey: searchQueryKey, refetchType: 'all' });
       }
     },
   });

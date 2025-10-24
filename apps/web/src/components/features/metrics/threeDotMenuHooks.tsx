@@ -329,7 +329,6 @@ export const useNavigateToDashboardMetricItem = ({
   dashboardId: string;
   dashboardVersionNumber: number | undefined;
 }): IDropdownItem[] => {
-  const navigate = useNavigate();
   return useMemo(() => {
     return createDropdownItems([
       {

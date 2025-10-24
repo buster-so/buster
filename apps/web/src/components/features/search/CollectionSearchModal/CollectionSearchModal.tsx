@@ -30,9 +30,10 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
     selectedDateRange,
     assetTypes,
     debouncedSearchQuery,
-    onSetFilters,
     searchQuery,
     setSearchQuery,
+    setSelectedAssets,
+    setSelectedDateRange,
   } = useCommonSearch({ mode });
 
   const {
@@ -46,8 +47,9 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
   } = useSearchMultiSelect({
     setSearchQuery,
     onCloseModal: onCloseCollectionSearch,
-    ...onSetFilters,
-  });
+    setSelectedAssets,
+    setSelectedDateRange,
+});
 
   const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({
     page_size: 25,
