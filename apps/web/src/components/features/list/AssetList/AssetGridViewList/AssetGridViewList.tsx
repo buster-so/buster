@@ -4,7 +4,6 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
-import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
@@ -12,11 +11,11 @@ import { useMounted } from '@/hooks/useMount';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
+import type { AssetGridViewListProps } from '../AssetList.types';
 import { getGroupMetadata } from '../grouping-meta-helpers';
 import { AssetGridSectionContainer } from './AssetGridSectionContainer';
-import type { AssetGridViewListProps } from './AssetGridViewList.types';
 
-export const LibraryGridView = React.memo(
+export const AssetGridViewList = React.memo(
   ({
     items,
     isFetchingNextPage,
@@ -25,7 +24,7 @@ export const LibraryGridView = React.memo(
     groups,
     scrollContainerRef,
     ContextMenu,
-    prelistConent,
+    prelistContent,
     groupBy,
     emptyContent,
   }: AssetGridViewListProps) => {
@@ -64,7 +63,7 @@ export const LibraryGridView = React.memo(
           className
         )}
       >
-        {prelistConent}
+        {prelistContent}
 
         {!isInitialLoading &&
           hasItems &&
@@ -75,7 +74,7 @@ export const LibraryGridView = React.memo(
               scrollContainerRef={scrollContainerRef}
               groupBy={groupBy}
               items={items}
-              hasPrelistContent={!!prelistConent}
+              hasPrelistContent={!!prelistContent}
               ContextMenu={ContextMenu}
             />
           ) : (
@@ -83,7 +82,7 @@ export const LibraryGridView = React.memo(
               items={items}
               columns={columns}
               scrollContainerRef={scrollContainerRef}
-              hasPrelistContent={!!prelistConent}
+              hasPrelistContent={!!prelistContent}
               ContextMenu={ContextMenu}
             />
           ))}
