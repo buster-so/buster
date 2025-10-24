@@ -7,7 +7,6 @@ import { Text } from '@/components/ui/typography/Text';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
-import type { LibrarySearchParams } from '../schema';
 
 const LibraryGridItem = React.memo(
   ({ asset_id, asset_type, name, updated_at, screenshot_url }: LibraryAssetListItem) => {
@@ -19,7 +18,7 @@ const LibraryGridItem = React.memo(
 
     return (
       <Link {...link} preload={false} className="h-full">
-        <div className="group border rounded cursor-pointer hover:shadow hover:bg-item-hover-active overflow-hidden h-full flex flex-col">
+        <div className="group border rounded cursor-pointer hover:shadow hover:border-gray-dark hover:bg-item-hover-active overflow-hidden h-full flex flex-col">
           <div className="px-2.5 flex-1 pt-1.5 bg-item-select min-h-[125px] max-h-[125px] overflow-hidden">
             <img
               src={imageUrl}

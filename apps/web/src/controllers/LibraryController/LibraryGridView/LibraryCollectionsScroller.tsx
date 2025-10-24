@@ -111,7 +111,7 @@ const CollectionCard = React.memo(
           <div
             className={cn(
               'flex flex-col gap-y-2 h-21 min-w-36 w-36 border rounded py-2.5 px-3 justify-between',
-              'cursor-pointer hover:bg-item-hover bg-background'
+              'cursor-pointer hover:border-gray-dark bg-background'
             )}
           >
             <Text variant={'default'} className="line-clamp-2" size={'base'}>

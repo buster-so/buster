@@ -2,7 +2,6 @@ import isEmpty from 'lodash/isEmpty';
 import { useMemo } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
 import type { SearchMode } from '@/components/ui/search/SearchModal/search-modal.types';
-import { useDebounce } from '@/hooks/useDebounce';
 import { SearchModalBase } from '../SearchModalBase/SearchModalBase';
 import { useCommonSearch } from '../useCommonSearch';
 import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
@@ -38,10 +37,18 @@ export const GlobalSearchModal = () => {
   });
 
   const filterContent = useMemo(() => {
-    const hasFilters =
-      Object.values(filtersParams).some((x) => !isEmpty(x)) && !isEmpty(searchQuery);
-    if (!hasFilters) return null;
+    // const hasFilters =
+    //   Object.values(filtersParams).some((x) => !isEmpty(x)) && !isEmpty(searchQuery);
+    // if (!hasFilters) return null;
     return <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />;
+  }, [filtersParams, onSetFilters]);
+
+  const filterDropdownContent = useMemo(() => {
+    const hasFilters = Object.values(filtersParams).some((x) => !isEmpty(x));
+    console.log(filtersParams);
+    if (!hasFilters) return null;
+
+    return <div>Filter Content</div>;
   }, [filtersParams, onSetFilters]);
 
   return (
@@ -55,6 +62,7 @@ export const GlobalSearchModal = () => {
       onClose={onClose}
       mode={mode}
       filterContent={filterContent}
+      filterDropdownContent={filterDropdownContent}
     />
   );
 };
