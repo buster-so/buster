@@ -46,14 +46,14 @@ export const SearchTextRequestSchema = z
     endDate: z.string().datetime().optional(),
     startDate: z.string().datetime().optional(),
     includeAddedToLibrary: z
-    .preprocess((val) => {
-      if (typeof val === 'string') {
-        return val.toLowerCase() === 'true';
-      }
-      return Boolean(val);
-    }, z.boolean())
-    .default(false)
-    .optional()
+      .preprocess((val) => {
+        if (typeof val === 'string') {
+          return val.toLowerCase() === 'true';
+        }
+        return Boolean(val);
+      }, z.boolean())
+      .default(false)
+      .optional(),
   })
   .merge(PaginatedRequestSchema);
 
