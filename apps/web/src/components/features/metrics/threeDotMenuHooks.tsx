@@ -269,7 +269,7 @@ export const useNavigatetoMetricItem = ({
 }: {
   metricId: string;
   metricVersionNumber: number | undefined;
-}): IDropdownItem[] => {
+}): IDropdownItems => {
   return useMemo(() => {
     return createDropdownItems([
       {
@@ -328,7 +328,7 @@ export const useNavigateToDashboardMetricItem = ({
   metricVersionNumber: number | undefined;
   dashboardId: string;
   dashboardVersionNumber: number | undefined;
-}): IDropdownItem[] => {
+}): IDropdownItems => {
   return useMemo(() => {
     return createDropdownItems([
       {

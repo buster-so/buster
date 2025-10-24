@@ -1,7 +1,13 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import React, { useCallback, useMemo } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
-import { useDeleteChat, useDuplicateChat, useGetChat, useRemoveChatFromCollections, useSaveChatToCollections } from '@/api/buster_rest/chats';
+import {
+  useDeleteChat,
+  useDuplicateChat,
+  useGetChat,
+  useRemoveChatFromCollections,
+  useSaveChatToCollections,
+} from '@/api/buster_rest/chats';
 import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
 import { useFavoriteStar } from '@/components/features/favorites';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';

@@ -332,7 +332,7 @@ type AncestorObject = {
   isMain?: boolean;
 };
 
-const AncestorContainer = ({ isMain, type, title, secondaryText, id }: AncestorObject) => {
+const AncestorContainer = ({ type, title, secondaryText, id }: AncestorObject) => {
   const router = useRouter();
 
   let Icon = <ASSET_ICONS.metrics />;

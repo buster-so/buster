@@ -36,8 +36,7 @@ export const InvitePeopleModal: React.FC<{
   const memoizedHeader = useMemo(() => {
     return {
       title: 'Invite others to join your workspace',
-      description:
-        'You can share the link below with others you’d like to join your workspace. You can also input their email to send them an invite.',
+      description: 'Enter the emails of the people you want to invite to your workspace.',
     };
   }, []);
 

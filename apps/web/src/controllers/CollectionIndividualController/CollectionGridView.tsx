@@ -3,6 +3,6 @@ import React from 'react';
 
 export const CollectionGridView: React.FC<{
   collection: BusterCollection;
-}> = React.memo(({ collection }) => {
+}> = React.memo(() => {
   return <div>asdf</div>;
 });

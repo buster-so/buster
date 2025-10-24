@@ -49,7 +49,7 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
     onCloseModal: onCloseCollectionSearch,
     setSelectedAssets,
     setSelectedDateRange,
-});
+  });
 
   const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({
     page_size: 25,
@@ -120,7 +120,6 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
       isRemovingAssetFromCollection,
     ]
   );
-
 
   return (
     <SearchModalBase
