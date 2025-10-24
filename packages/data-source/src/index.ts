@@ -11,6 +11,7 @@ export {
   getSupportedTypes,
   isSupported,
 } from './adapters/factory';
+export { MotherDuckAdapter } from './adapters/motherduck';
 export { MySQLAdapter } from './adapters/mysql';
 export { PostgreSQLAdapter } from './adapters/postgresql';
 export { RedshiftAdapter } from './adapters/redshift';
@@ -64,6 +65,7 @@ export * from './storage';
 export type {
   BigQueryCredentials,
   Credentials,
+  MotherDuckCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   RedshiftCredentials,

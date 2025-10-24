@@ -50,6 +50,22 @@ export class MotherDuckIntrospector extends BaseIntrospector {
   }
 
   /**
+   * Escape SQL string literal to prevent SQL injection
+   * Escapes single quotes by doubling them per SQL standard
+   */
+  private escapeSqlString(value: string): string {
+    return value.replace(/'/g, "''");
+  }
+
+  /**
+   * Escape SQL identifier to prevent SQL injection
+   * Escapes double quotes by doubling them per SQL standard
+   */
+  private escapeSqlIdentifier(value: string): string {
+    return value.replace(/"/g, '""');
+  }
+
+  /**
    * Get all databases
    * Uses duckdb_databases() system function
    */
@@ -102,7 +118,7 @@ export class MotherDuckIntrospector extends BaseIntrospector {
     try {
       let whereClause = "WHERE schema_name NOT IN ('information_schema', 'pg_catalog')";
       if (database) {
-        whereClause += ` AND catalog_name = '${database}'`;
+        whereClause += ` AND catalog_name = '${this.escapeSqlString(database)}'`;
       }
 
       const result = await this.adapter.query(`
@@ -161,11 +177,11 @@ export class MotherDuckIntrospector extends BaseIntrospector {
       let whereClause = "WHERE table_schema NOT IN ('information_schema', 'pg_catalog')";
 
       if (database && schema) {
-        whereClause += ` AND table_catalog = '${database}' AND table_schema = '${schema}'`;
+        whereClause += ` AND table_catalog = '${this.escapeSqlString(database)}' AND table_schema = '${this.escapeSqlString(schema)}'`;
       } else if (schema) {
-        whereClause += ` AND table_schema = '${schema}'`;
+        whereClause += ` AND table_schema = '${this.escapeSqlString(schema)}'`;
       } else if (database) {
-        whereClause += ` AND table_catalog = '${database}'`;
+        whereClause += ` AND table_catalog = '${this.escapeSqlString(database)}'`;
       }
 
       const result = await this.adapter.query(`
@@ -198,7 +214,7 @@ export class MotherDuckIntrospector extends BaseIntrospector {
               // Get row count
               const countQuery = `
                 SELECT COUNT(*) as row_count
-                FROM "${table.database}"."${table.schema}"."${table.name}"
+                FROM "${this.escapeSqlIdentifier(table.database)}"."${this.escapeSqlIdentifier(table.schema)}"."${this.escapeSqlIdentifier(table.name)}"
               `;
               const countResult = await this.adapter.query(countQuery);
               const rowCount = countResult.rows[0]?.row_count
@@ -238,15 +254,15 @@ export class MotherDuckIntrospector extends BaseIntrospector {
       let whereClause = "WHERE table_schema NOT IN ('information_schema', 'pg_catalog')";
 
       if (database && schema && table) {
-        whereClause += ` AND table_catalog = '${database}' AND table_schema = '${schema}' AND table_name = '${table}'`;
+        whereClause += ` AND table_catalog = '${this.escapeSqlString(database)}' AND table_schema = '${this.escapeSqlString(schema)}' AND table_name = '${this.escapeSqlString(table)}'`;
       } else if (schema && table) {
-        whereClause += ` AND table_schema = '${schema}' AND table_name = '${table}'`;
+        whereClause += ` AND table_schema = '${this.escapeSqlString(schema)}' AND table_name = '${this.escapeSqlString(table)}'`;
       } else if (schema) {
-        whereClause += ` AND table_schema = '${schema}'`;
+        whereClause += ` AND table_schema = '${this.escapeSqlString(schema)}'`;
       } else if (database) {
-        whereClause += ` AND table_catalog = '${database}'`;
+        whereClause += ` AND table_catalog = '${this.escapeSqlString(database)}'`;
       } else if (table) {
-        whereClause += ` AND table_name = '${table}'`;
+        whereClause += ` AND table_name = '${this.escapeSqlString(table)}'`;
       }
 
       const result = await this.adapter.query(`
@@ -293,11 +309,11 @@ export class MotherDuckIntrospector extends BaseIntrospector {
       let whereClause = "WHERE table_schema NOT IN ('information_schema', 'pg_catalog')";
 
       if (database && schema) {
-        whereClause += ` AND table_catalog = '${database}' AND table_schema = '${schema}'`;
+        whereClause += ` AND table_catalog = '${this.escapeSqlString(database)}' AND table_schema = '${this.escapeSqlString(schema)}'`;
       } else if (schema) {
-        whereClause += ` AND table_schema = '${schema}'`;
+        whereClause += ` AND table_schema = '${this.escapeSqlString(schema)}'`;
       } else if (database) {
-        whereClause += ` AND table_catalog = '${database}'`;
+        whereClause += ` AND table_catalog = '${this.escapeSqlString(database)}'`;
       }
 
       const result = await this.adapter.query(`

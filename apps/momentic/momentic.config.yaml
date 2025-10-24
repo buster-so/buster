@@ -2,7 +2,7 @@ name: buster
 include:
   - "**/*.test.yaml"
   - "**/*.module.yaml"
-parallel: 10
+parallel: 5
 environments:
   - name: development
     baseUrl: http://localhost:3000

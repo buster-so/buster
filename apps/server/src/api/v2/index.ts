@@ -4,6 +4,7 @@ import healthcheckRoutes from '../healthcheck';
 import authRoutes from './auth';
 import chatsRoutes from './chats';
 import dashboardRoutes from './dashboards';
+import { dataSources } from './data-sources';
 import datasetsRoutes from './datasets';
 import deployRoutes from './deploy';
 import dictionariesRoutes from './dictionaries';
@@ -31,6 +32,7 @@ import userRoutes from './users';
 const app = new Hono()
   .route('/auth', authRoutes)
   .route('/users', userRoutes)
+  .route('/data-sources', dataSources)
   .route('/datasets', datasetsRoutes)
   .route('/deploy', deployRoutes)
   .route('/docs', docsRoutes)
