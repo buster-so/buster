@@ -4,6 +4,7 @@ import { hasToolCall, type ModelMessage, stepCountIs, streamText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import z from 'zod';
 import { Sonnet4 } from '../../llm';
+import { Haiku45 } from '../../llm/haiku-4-5';
 import { DEFAULT_ANTHROPIC_OPTIONS } from '../../llm/providers/gateway';
 import {
   createCreateDashboardsTool,
@@ -201,10 +202,10 @@ export function createAnalystAgent(analystAgentOptions: AnalystAgentOptions) {
     return wrapTraced(
       () =>
         streamText({
-          model: Sonnet4,
+          model: Haiku45,
           providerOptions: DEFAULT_ANTHROPIC_OPTIONS,
           headers: {
-            'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07',
+            // 'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14,context-1m-2025-08-07',
           },
           tools: {
             [SEQUENTIAL_THINKING_TOOL_NAME]: sequentialThinking,
