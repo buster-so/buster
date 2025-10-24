@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import { useLibraryAssetsInfinite } from '@/api/buster_rest/library';
 import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
+import { FilterLibraryPills } from '@/components/features/search/FilterPills';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
 import { computeLibraryFilters } from './compute-library-filters';
 import { LibraryGridView } from './LibraryGridView';
@@ -47,6 +48,8 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
       contentContainerId="library-content"
       scrollable={false}
     >
+      <FilterLibraryPills {...managedFilters} />
+
       {layout === 'grid' && <LibraryGridView {...libraryViewProps} />}
       {layout === 'list' && <LibraryListView {...libraryViewProps} />}
     </AppPageLayout>

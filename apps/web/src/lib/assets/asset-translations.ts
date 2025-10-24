@@ -7,3 +7,7 @@ export const AssetTypeTranslations: Record<AssetType, string> = {
   collection: 'Collection',
   metric_file: 'Metric',
 };
+
+export const assetTypeLabel = (assetType: AssetType) => {
+  return AssetTypeTranslations[assetType];
+};
