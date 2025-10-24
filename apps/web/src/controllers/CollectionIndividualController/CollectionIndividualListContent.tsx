@@ -3,7 +3,6 @@ import type {
   BusterCollectionItemAsset,
 } from '@buster/server-shared/collections';
 import React, { useMemo, useState } from 'react';
-import { AddToCollectionModal } from '@/components/features/collections/AddToCollectionModal';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';
 import {
@@ -17,48 +16,20 @@ import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
-import { canEdit } from '../../lib/share';
 import { CollectionIndividualSelectedPopup } from './CollectionsIndividualPopup';
 
-export const CollectionIndividualContent: React.FC<{
-  collection: BusterCollection | undefined;
-  openAddTypeModal: boolean;
-  setOpenAddTypeModal: (open: boolean) => void;
-}> = React.memo(({ collection, openAddTypeModal, setOpenAddTypeModal }) => {
-  const loadedAsset = collection?.id;
-  const isEditor = canEdit(collection?.permission);
-
-  const onCloseModal = useMemoizedFn(() => {
-    setOpenAddTypeModal(false);
-  });
-
-  if (!loadedAsset) {
-    return null;
-  }
-
+export const CollectionIndividualListContent: React.FC<{
+  collection: BusterCollection;
+  emptyState: React.ReactNode;
+}> = React.memo(({ collection, emptyState }) => {
   const assetList = collection?.assets || [];
 
   return (
-    <>
-      <CollectionList
-        assetList={assetList}
-        openAddTypeModal={openAddTypeModal}
-        setOpenAddTypeModal={setOpenAddTypeModal}
-        selectedCollection={collection}
-        loadedAsset={loadedAsset}
-      />
-
-      {isEditor && (
-        <AddToCollectionModal
-          open={openAddTypeModal}
-          onClose={onCloseModal}
-          collectionId={collection.id}
-        />
-      )}
-    </>
+    <CollectionList assetList={assetList} selectedCollection={collection} emptyState={emptyState} />
   );
 });
-CollectionIndividualContent.displayName = 'CollectionIndividualContent';
+
+CollectionIndividualListContent.displayName = 'CollectionIndividualListContent';
 
 const columns: BusterListColumn<BusterCollectionItemAsset>[] = [
   {
@@ -102,11 +73,9 @@ const columns: BusterListColumn<BusterCollectionItemAsset>[] = [
 
 const CollectionList: React.FC<{
   assetList: BusterCollectionItemAsset[];
-  openAddTypeModal: boolean;
-  setOpenAddTypeModal: (value: boolean) => void;
   selectedCollection: BusterCollection;
-  loadedAsset: string;
-}> = React.memo(({ setOpenAddTypeModal, selectedCollection, assetList, loadedAsset }) => {
+  emptyState: React.ReactNode;
+}> = React.memo(({ selectedCollection, assetList, emptyState }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const items: BusterListRowItem<BusterCollectionItemAsset>[] = useMemo(() => {
@@ -128,10 +97,6 @@ const CollectionList: React.FC<{
     setSelectedRowKeys(selectedRowKeys);
   });
 
-  const onOpenAddTypeModal = useMemoizedFn(() => {
-    setOpenAddTypeModal(true);
-  });
-
   return (
     <div className="relative flex h-full flex-col items-center">
       <BusterList
@@ -139,16 +104,7 @@ const CollectionList: React.FC<{
         columns={columns}
         onSelectChange={onSelectChange}
         selectedRowKeys={selectedRowKeys}
-        emptyState={
-          loadedAsset ? (
-            <ListEmptyStateWithButton
-              title="You haven’t saved anything to your collection yet."
-              buttonText="Add to collection"
-              description="As soon as you add metrics and dashboards to your collection, they will appear here."
-              onClick={onOpenAddTypeModal}
-            />
-          ) : null
-        }
+        emptyState={emptyState}
       />
 
       <CollectionIndividualSelectedPopup

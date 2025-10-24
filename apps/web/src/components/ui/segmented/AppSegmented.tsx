@@ -162,7 +162,6 @@ export const AppSegmented: AppSegmentedComponent = (<
       return;
     }
 
-    console.log('item', item);
     if (item && !item.disabled && value !== selectedValue) {
       item.onClick?.();
       setSelectedValue(item.value);

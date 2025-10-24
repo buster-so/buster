@@ -17,15 +17,19 @@ import { cn } from '@/lib/utils';
 
 type AssetOrderPopoverProps = {
   layout: 'grid' | 'list';
-  ordering: 'updated_at' | 'created_at' | 'none' | undefined;
-  groupBy: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined;
-  orderingDirection: 'asc' | 'desc' | undefined;
+  ordering?: 'updated_at' | 'created_at' | 'none' | undefined;
+  groupBy?: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined;
+  orderingDirection?: 'asc' | 'desc' | undefined;
   onChangeLayout: (layout: AssetOrderPopoverProps['layout']) => void;
-  onChangeOrdering: (ordering: AssetOrderPopoverProps['ordering']) => void;
-  onChangeOrderingDirection: (
+  onChangeOrdering?: (ordering: AssetOrderPopoverProps['ordering']) => void;
+  onChangeOrderingDirection?: (
     orderingDirection: AssetOrderPopoverProps['orderingDirection']
   ) => void;
-  onChangeGroupBy: (groupBy: AssetOrderPopoverProps['groupBy']) => void;
+  onChangeGroupBy?: (groupBy: AssetOrderPopoverProps['groupBy']) => void;
+  showLayout?: boolean;
+  showOrdering?: boolean;
+  showGroupBy?: boolean;
+  showDirection?: boolean;
 };
 
 export const AssetOrderPopover = React.memo(
@@ -34,6 +38,10 @@ export const AssetOrderPopover = React.memo(
     ordering,
     groupBy,
     orderingDirection,
+    showLayout = true,
+    showOrdering = true,
+    showGroupBy = true,
+    showDirection = true,
     onChangeLayout,
     onChangeOrdering,
     onChangeOrderingDirection,
@@ -48,17 +56,23 @@ export const AssetOrderPopover = React.memo(
         content={useMemo(
           () => (
             <div className="flex flex-col gap-y-2">
-              <LayoutItem layout={layout} onChangeLayout={onChangeLayout} />
-              <OrderingItem
-                ordering={ordering}
-                orderingDirection={orderingDirection}
-                onChangeOrdering={onChangeOrdering}
-                onChangeOrderingDirection={onChangeOrderingDirection}
-              />
-              <GroupByItem groupBy={groupBy} onChangeGroupBy={onChangeGroupBy} />
+              {showLayout && <LayoutItem layout={layout} onChangeLayout={onChangeLayout} />}
+              {showOrdering && (
+                <OrderingItem
+                  ordering={ordering}
+                  orderingDirection={orderingDirection}
+                  showDirection={showDirection}
+                  showOrdering={showOrdering}
+                  onChangeOrdering={onChangeOrdering}
+                  onChangeOrderingDirection={onChangeOrderingDirection}
+                />
+              )}
+              {showGroupBy && onChangeGroupBy && (
+                <GroupByItem groupBy={groupBy} onChangeGroupBy={onChangeGroupBy} />
+              )}
             </div>
           ),
-          [layout, ordering, groupBy, orderingDirection]
+          [layout, ordering, groupBy, orderingDirection, showLayout, showOrdering, showGroupBy]
         )}
       >
         <Tooltip title="View, group and sort">
@@ -153,33 +167,39 @@ const OrderingItem = ({
   orderingDirection,
   onChangeOrdering,
   onChangeOrderingDirection,
+  showDirection,
+  showOrdering,
 }: {
   ordering: LibrarySearchParams['ordering'];
   orderingDirection: 'asc' | 'desc' | undefined;
-  onChangeOrdering: (ordering: LibrarySearchParams['ordering']) => void;
-  onChangeOrderingDirection: (orderingDirection: 'asc' | 'desc') => void;
+  onChangeOrdering?: (ordering: LibrarySearchParams['ordering']) => void;
+  onChangeOrderingDirection?: (orderingDirection: 'asc' | 'desc') => void;
+  showDirection: boolean;
+  showOrdering: boolean;
 }) => {
   const navigate = useNavigate();
 
   const value = orderByitems.find((item) => item.value === ordering) || orderByitems[0];
 
   const onClickOrderingDirection = useMemoizedFn(() => {
-    onChangeOrderingDirection(orderingDirection === 'desc' ? 'asc' : 'desc');
+    onChangeOrderingDirection?.(orderingDirection === 'desc' ? 'asc' : 'desc');
   });
 
   return (
     <ItemContainer title="Ordering">
       <div className={cn('flex items-center gap-x-2')}>
-        <Select
-          items={orderByitems}
-          search={false}
-          value={value.value}
-          onChange={(v) => {
-            onChangeOrdering(v);
-          }}
-        />
+        {showOrdering && (
+          <Select
+            items={orderByitems}
+            search={false}
+            value={value.value}
+            onChange={(v) => {
+              onChangeOrdering?.(v);
+            }}
+          />
+        )}
 
-        {orderingDirection && ordering !== 'none' && (
+        {showDirection && orderingDirection && ordering !== 'none' && (
           <Button
             variant="default"
             size={'tall'}

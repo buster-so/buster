@@ -39,8 +39,8 @@ export const CollectionThreeDotDropdown: React.FC<{
                 await deleteCollection(
                   { id },
                   {
-                    onSuccess: () => {
-                      navigate({ to: '/app/library' });
+                    onSuccess: (d) => {
+                      if (d) navigate({ to: '/app/library' });
                     },
                   }
                 );
@@ -65,6 +65,7 @@ export const CollectionThreeDotDropdown: React.FC<{
             label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
             icon: isFavorited ? <StarFilled /> : <Star />,
             onClick: () => onFavoriteClick(),
+            closeOnSelect: false,
           },
         ].filter((x) => !x.hidden)
       ),
@@ -73,7 +74,7 @@ export const CollectionThreeDotDropdown: React.FC<{
 
   return (
     <>
-      <Dropdown items={items}>
+      <Dropdown items={items} align="end" side="bottom">
         <Button variant="ghost" prefix={<Dots />} data-testid="collection-three-dot-dropdown" />
       </Dropdown>
       <RenameCollectionModal

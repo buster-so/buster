@@ -155,7 +155,7 @@ export const useDeleteCollection = () => {
   }) => {
     const ids = Array.isArray(id) ? id : [id];
     const deleteMethod = async () => {
-      await collectionsDeleteCollection({ ids });
+      return await collectionsDeleteCollection({ ids });
     };
 
     if (useConfirmModal) {
