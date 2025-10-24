@@ -4,7 +4,7 @@ import type { LibrarySearchParams } from './schema';
 export const computeLibraryFilters = (
   filtersProps: LibrarySearchParams,
   userId: string
-): LibrarySearchParams => {
+): Omit<Parameters<typeof useLibraryAssetsInfinite>[0], 'scrollConfig'> => {
   const {
     asset_types,
     ordering,

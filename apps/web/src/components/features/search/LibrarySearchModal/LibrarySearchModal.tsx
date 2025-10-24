@@ -94,11 +94,6 @@ export const LibrarySearchModal = React.memo(() => {
       },
     });
 
-  console.log(
-    'allResults',
-    allResults.filter((result) => result.addedToLibrary)
-  );
-
   const onSubmit = useMemoizedFn(async () => {
     // Parse composite keys back to { assetId, assetType } objects
     const assetsToAddParsed = Array.from(itemsToAdd).map((key) => parseSelectionKey(key));

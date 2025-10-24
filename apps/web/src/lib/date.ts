@@ -377,3 +377,11 @@ export const getBestDateFormat = (minDate: dayjs.Dayjs, maxDate: dayjs.Dayjs) =>
   }
   return 'YYYY'; // 2024
 };
+
+export const isYesterday = (date: string | Date) => {
+  return dayjs(date).isSame(dayjs().subtract(1, 'day'), 'day');
+};
+
+export const dateSpansIntoPreviousYears = (date: string | Date) => {
+  return dayjs(date).isBefore(dayjs(), 'year');
+};
