@@ -1,8 +1,8 @@
 export { createGithubIntegration } from './create-github-integration';
-export { getActiveGithubIntegration } from './get-active-github-integration';
 export {
   getApiKeyForInstallationId,
   getGithubIntegrationByInstallationId,
-} from './get-github-integration-by-installation-id';
+  getGithubIntegrationByOrganizationId,
+} from './get-github-integration';
 export { softDeleteGithubIntegration } from './soft-delete-github-integration';
 export { updateGithubIntegration } from './update-github-integration';

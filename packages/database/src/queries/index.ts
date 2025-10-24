@@ -1,3 +1,4 @@
+export * from './agent-automation-tasks';
 export * from './api-keys';
 export * from './asset-permissions';
 export * from './assets';

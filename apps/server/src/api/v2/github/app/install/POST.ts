@@ -4,7 +4,7 @@ import type { AppInstallResponse } from '@buster/server-shared/github';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { requireAuth } from '../../../../../middleware/auth';
-import { storeInstallationState } from '../../services/installation-state';
+import { storeInstallationState } from '../../helpers/installation-state';
 
 const app = new Hono().post('/', requireAuth, async (c) => {
   const user = c.get('busterUser');

@@ -2,14 +2,13 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '../../connection';
 import { githubIntegrations } from '../../schema';
 
-
 type GithubRepositories = {
   full_name: string;
   id: number;
   name: string;
   node_id: string;
   private: boolean;
-}
+};
 
 /**
  * Update GitHub integration
@@ -25,7 +24,10 @@ export async function updateGithubIntegration(
     deletedAt?: string;
   }
 ) {
-  const updateData: Record<string, string | number | Record<string, string> | undefined | GithubRepositories[]> = {
+  const updateData: Record<
+    string,
+    string | number | Record<string, string> | undefined | GithubRepositories[]
+  > = {
     updatedAt: new Date().toISOString(),
   };
 

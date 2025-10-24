@@ -11,8 +11,6 @@ export async function createGithubIntegration(data: {
   githubOrgId: string;
   installationId: string;
   githubOrgName?: string;
-  accessibleRepositories?: string[];
-  permissions?: Record<string, string>;
   status?: 'pending' | 'active' | 'suspended' | 'revoked';
 }) {
   const [integration] = await db
@@ -24,8 +22,6 @@ export async function createGithubIntegration(data: {
       githubOrgId: data.githubOrgId,
       installationId: data.installationId,
       githubOrgName: data.githubOrgName,
-      accessibleRepositories: data.accessibleRepositories,
-      permissions: data.permissions,
       status: data.status || 'pending',
       createdAt: new Date().toISOString(),
     })

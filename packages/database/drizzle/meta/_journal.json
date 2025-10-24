@@ -869,6 +869,13 @@
       "when": 1761241260579,
       "tag": "0124_premium_killer_shrike",
       "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1761322004320,
+      "tag": "0125_true_thundra",
+      "breakpoints": true
     }
   ]
 }

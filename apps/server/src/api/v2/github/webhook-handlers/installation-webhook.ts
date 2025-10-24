@@ -13,10 +13,8 @@ type GitHubIntegration = InferSelectModel<typeof githubIntegrations>;
  * Handle GitHub App installation webhook callback
  * Processes different actions: created, deleted, suspend, unsuspend
  */
-export async function handleInstallationCallback(
-  payload: InstallationWebhookEvents,
-  organizationId?: string,
-  userId?: string
+export async function handleInstallationWebhook(
+  payload: InstallationWebhookEvents
 ): Promise<GitHubIntegration> {
   const { action, installation } = payload;
 
@@ -27,11 +25,9 @@ export async function handleInstallationCallback(
   try {
     switch (action) {
       case 'created':
-        return await handleInstallationCreated({
+        return await handleInstallationCreatedWebhook({
           installation,
           repositories: payload.repositories,
-          organizationId,
-          userId,
         });
 
       case 'deleted': {
@@ -101,13 +97,11 @@ export async function handleInstallationCallback(
 /**
  * Handle new GitHub App installation
  */
-async function handleInstallationCreated(params: {
+async function handleInstallationCreatedWebhook(params: {
   installation: InstallationWebhookEvents['installation'];
   repositories?: InstallationWebhookEvents['repositories'];
-  organizationId?: string | undefined;
-  userId?: string | undefined;
 }): Promise<GitHubIntegration> {
-  const { installation, organizationId, userId, repositories } = params;
+  const { installation, repositories } = params;
 
   let githubOrgName = 'Unknown Account';
   if (installation.account) {
@@ -118,10 +112,37 @@ async function handleInstallationCreated(params: {
     }
   }
 
-  // Check if integration already exists
-  const existing = await getGithubIntegrationByInstallationId(installation.id.toString());
+  // Check if integration already exists. The setup callback will create the row with user/org data.
+  // We need to wait for the row to be created before adding the installation metadata.
+  let existing: GitHubIntegration | undefined;
+  const maxRetries = 3;
+  const baseBackoffMs = 300;
+  const maxJitterMs = 200;
 
-  if (existing && existing.deletedAt === null) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    existing = await getGithubIntegrationByInstallationId(installation.id.toString());
+
+    if (existing) {
+      break;
+    }
+
+    if (attempt < maxRetries - 1) {
+      const jitter = Math.random() * maxJitterMs;
+      const backoff = baseBackoffMs + jitter;
+      console.info(
+        `Integration not found for installation ${installation.id}, retrying in ${backoff.toFixed(0)}ms (attempt ${attempt + 1}/${maxRetries})`
+      );
+      await new Promise((resolve) => setTimeout(resolve, backoff));
+    }
+  }
+
+  if (!existing) {
+    const errorMsg = `Failed to find GitHub integration for installation ${installation.id} after ${maxRetries} attempts`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+  }
+
+  if (existing.deletedAt === null) {
     console.info(`GitHub integration already exists for installation ${installation.id}`);
 
     // Update existing integration to ensure it's active
@@ -140,28 +161,5 @@ async function handleInstallationCreated(params: {
     return updated;
   }
 
-  if (!organizationId || !userId) {
-    throw new Error('Organization ID and user ID are required to create a new integration');
-  }
-
-  // Create new integration
-  const integration = await createGithubIntegration({
-    installationId: installation.id.toString(),
-    appId: installation.app_id.toString(),
-    githubOrgId: installation.account?.id.toString() ?? '0',
-    githubOrgName,
-    // accessibleRepositories: repositories,
-    permissions: installation.permissions,
-    organizationId,
-    userId,
-    status: 'active',
-  });
-
-  if (!integration) {
-    throw new Error(`Failed to create integration for installation ${installation.id}`);
-  }
-
-  console.info(`Created GitHub integration for installation ${installation.id}`);
-
-  return integration;
+  throw new Error(`GitHub integration is deleted for installation ${installation.id}`);
 }

@@ -1,4 +1,4 @@
-import { getActiveGithubIntegration, type User } from '@buster/database/queries';
+import { getGithubIntegrationByOrganizationId, type User } from '@buster/database/queries';
 import type { GetGitHubIntegrationResponse } from '@buster/server-shared/github';
 import type { UserOrganizationRole } from '@buster/server-shared/organization';
 import { Hono } from 'hono';
@@ -22,7 +22,7 @@ async function getIntegrationHandler(userOrg: {
 }): Promise<GetGitHubIntegrationResponse> {
   try {
     // Get active GitHub integration for the organization
-    const integration = await getActiveGithubIntegration(userOrg.organizationId);
+    const integration = await getGithubIntegrationByOrganizationId(userOrg.organizationId);
 
     if (!integration) {
       return {

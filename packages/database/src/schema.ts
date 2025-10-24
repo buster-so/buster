@@ -20,6 +20,8 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import {
+  AgentAutomationTaskEventTriggerSchema,
+  AgentAutomationTaskTypeSchema,
   AssetPermissionRoleSchema,
   AssetTypeSchema,
   ChatTypeSchema,
@@ -50,6 +52,15 @@ import {
   WorkspaceSharingSchema,
 } from './schema-types';
 import type { DatasetMetadata } from './schema-types/dataset-metadata';
+
+export const agentAutomationTaskTypeEnum = pgEnum(
+  'agent_automation_task_type_enum',
+  AgentAutomationTaskTypeSchema.options
+);
+export const agentAutomationTaskEventTriggerEnum = pgEnum(
+  'agent_automation_task_event_trigger_enum',
+  AgentAutomationTaskEventTriggerSchema.options
+);
 
 export const assetPermissionRoleEnum = pgEnum(
   'asset_permission_role_enum',
@@ -1684,7 +1695,7 @@ export const githubIntegrations = pgTable(
     githubOrgId: varchar('github_org_id', { length: 255 }).notNull(),
     githubOrgName: varchar('github_org_name', { length: 255 }),
     permissions: jsonb('permissions').default({}),
-    accessibleRepositories: jsonb('accessible_repositories').default({}),
+    accessibleRepositories: jsonb('accessible_repositories').default([]),
     status: githubIntegrationStatusEnum().default('pending').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
@@ -2009,15 +2020,14 @@ export const userLibrary = pgTable(
   ]
 );
 
-export const automationTasks = pgTable(
-  'automation_tasks',
+export const agentAutomationTasks = pgTable(
+  'agent_automation_tasks',
   {
     id: uuid('id').defaultRandom().primaryKey().notNull(),
     organizationId: uuid('organization_id').notNull(),
     integrationId: uuid('integration_id').notNull(),
-    agentType: text('agent_type').notNull(),
-    runEvent: text('run_event').notNull(),
-    modelingRepository: text('modeling_repository'),
+    agentType: agentAutomationTaskTypeEnum('agent_type').notNull(),
+    eventTrigger: agentAutomationTaskEventTriggerEnum('event_trigger').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -2045,12 +2055,13 @@ export const automationTaskRepositories = pgTable(
   {
     id: uuid('id').defaultRandom().primaryKey().notNull(),
     taskId: uuid('task_id').notNull(),
-    repository: text('repository').notNull(),
+    actionRepository: text('action_repository').notNull(),
+    modelingRepository: text('modeling_repository'),
   },
   (table) => [
     foreignKey({
       columns: [table.taskId],
-      foreignColumns: [automationTasks.id],
+      foreignColumns: [agentAutomationTasks.id],
       name: 'automation_task_repositories_task_id_fkey',
     }).onDelete('cascade'),
   ]

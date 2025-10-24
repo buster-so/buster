@@ -1,9 +1,26 @@
-import type { InferSelectModel } from 'drizzle-orm';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, InferSelectModel, isNull } from 'drizzle-orm';
 import { db } from '../../connection';
 import { apiKeys, githubIntegrations } from '../../schema';
 
 type GitHubIntegration = InferSelectModel<typeof githubIntegrations>;
+
+/**
+ * Get active GitHub integration by organization ID
+ */
+export async function getGithubIntegrationByOrganizationId(organizationId: string) {
+  const [integration] = await db
+    .select()
+    .from(githubIntegrations)
+    .where(
+      and(
+        eq(githubIntegrations.organizationId, organizationId),
+        isNull(githubIntegrations.deletedAt)
+      )
+    )
+    .limit(1);
+
+  return integration;
+}
 
 /**
  * Get GitHub integration by installation ID

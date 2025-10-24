@@ -1,8 +1,12 @@
-import { createGithubIntegration, getGithubIntegrationByInstallationId, updateGithubIntegration } from '@buster/database/queries';
+import {
+  createGithubIntegration,
+  getGithubIntegrationByInstallationId,
+  updateGithubIntegration,
+} from '@buster/database/queries';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { retrieveInstallationState } from '../../../services/installation-state';
+import { retrieveInstallationState } from '../../../helpers/installation-state';
 
 // Define request schemas
 const GithubInstallationCallbackSchema = z.object({
@@ -115,7 +119,7 @@ export async function githubInstallationCallbackHandler(
       }
 
       return {
-        redirectUrl: `${baseUrl}/app/settings/integrations?status=success`
+        redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
       };
     } else if (existing) {
       return {
