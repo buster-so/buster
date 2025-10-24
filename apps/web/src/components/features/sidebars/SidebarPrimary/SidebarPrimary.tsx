@@ -14,6 +14,8 @@ import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons';
 import { Flag, House4, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
+import Compose2 from '@/components/ui/icons/NucleoIconOutlined/compose-2';
+import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
 import {
   COLLAPSED_HIDDEN,
   COLLAPSED_JUSTIFY_CENTER,
@@ -45,10 +47,16 @@ const topItems: ISidebarList = createSidebarList({
   id: 'top-items',
   items: [
     {
-      label: 'Home',
-      icon: <House4 />,
+      label: 'New chat',
+      icon: <Compose2 />,
       link: { to: '/app/home', preload: 'viewport', preloadDelay: 1000 },
       id: '/app/home',
+    },
+    {
+      label: 'Library',
+      icon: <FolderContent />,
+      link: { to: '/app/library', preload: 'intent' },
+      id: '/app/library/',
     },
     {
       label: 'Chat history',
