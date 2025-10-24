@@ -60,6 +60,7 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
     includeAssetAncestors: true,
     includeScreenshots: true,
     includeAddedToLibrary: true,
+    collectionId,
   });
 
   const onSubmit = useMemoizedFn(async () => {

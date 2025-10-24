@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2, userLibrary, users } from '../../schema';
+import { assetSearchV2, collectionsToAssets, userLibrary, users } from '../../schema';
 import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
 import { AssetTypeSchema } from '../../schema-types/asset';
 import type { TextSearchResultSchema } from '../../schema-types/search';
@@ -35,6 +35,7 @@ export const SearchTextInputSchema = z
     userId: z.string().uuid(),
     filters: SearchFiltersSchema,
     includeAddedToLibrary: z.boolean().optional(),
+    collectionId: z.string().uuid().optional(),
   })
   .merge(PaginationInputSchema);
 
@@ -59,6 +60,7 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
       page_size,
       filters,
       includeAddedToLibrary,
+      collectionId,
     } = validated;
     const offset = (page - 1) * page_size;
     const paginationCheckCount = page_size + 1;
@@ -116,7 +118,55 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
 
     let results: TextSearchResult[];
 
-    if (includeAddedToLibrary) {
+    // Handle different combinations of includeAddedToLibrary and collectionId
+    if (includeAddedToLibrary && collectionId) {
+      // Both flags enabled - include both addedToLibrary and inCollection
+      results = await db
+        .select({
+          assetId: assetSearchV2.assetId,
+          assetType: assetSearchV2.assetType,
+          title: highlightedTitleSql,
+          additionalText: additionalSnippetSql,
+          updatedAt: assetSearchV2.updatedAt,
+          screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+          createdBy: assetSearchV2.createdBy,
+          createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+          createdByAvatarUrl: users.avatarUrl,
+          addedToLibrary: sql<boolean>`CASE WHEN ${userLibrary.userId} IS NOT NULL THEN true ELSE false END`,
+          inCollection: sql<boolean>`CASE WHEN ${collectionsToAssets.collectionId} IS NOT NULL THEN true ELSE false END`,
+        })
+        .from(assetSearchV2)
+        .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
+        .innerJoin(
+          permissionedAssetsSubquery,
+          eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
+        )
+        .leftJoin(
+          userLibrary,
+          and(
+            eq(userLibrary.assetId, assetSearchV2.assetId),
+            eq(userLibrary.userId, userId),
+            isNull(userLibrary.deletedAt)
+          )
+        )
+        .leftJoin(
+          collectionsToAssets,
+          and(
+            eq(collectionsToAssets.assetId, assetSearchV2.assetId),
+            eq(collectionsToAssets.assetType, assetSearchV2.assetType),
+            eq(collectionsToAssets.collectionId, collectionId),
+            isNull(collectionsToAssets.deletedAt)
+          )
+        )
+        .where(and(...allConditions))
+        .orderBy(
+          sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
+          desc(assetSearchV2.updatedAt)
+        )
+        .limit(paginationCheckCount)
+        .offset(offset);
+    } else if (includeAddedToLibrary) {
+      // Only addedToLibrary flag enabled
       results = await db
         .select({
           assetId: assetSearchV2.assetId,
@@ -142,6 +192,43 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
             eq(userLibrary.assetId, assetSearchV2.assetId),
             eq(userLibrary.userId, userId),
             isNull(userLibrary.deletedAt)
+          )
+        )
+        .where(and(...allConditions))
+        .orderBy(
+          sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
+          desc(assetSearchV2.updatedAt)
+        )
+        .limit(paginationCheckCount)
+        .offset(offset);
+    } else if (collectionId) {
+      // Only collectionId flag enabled
+      results = await db
+        .select({
+          assetId: assetSearchV2.assetId,
+          assetType: assetSearchV2.assetType,
+          title: highlightedTitleSql,
+          additionalText: additionalSnippetSql,
+          updatedAt: assetSearchV2.updatedAt,
+          screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+          createdBy: assetSearchV2.createdBy,
+          createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+          createdByAvatarUrl: users.avatarUrl,
+          inCollection: sql<boolean>`CASE WHEN ${collectionsToAssets.collectionId} IS NOT NULL THEN true ELSE false END`,
+        })
+        .from(assetSearchV2)
+        .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
+        .innerJoin(
+          permissionedAssetsSubquery,
+          eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
+        )
+        .leftJoin(
+          collectionsToAssets,
+          and(
+            eq(collectionsToAssets.assetId, assetSearchV2.assetId),
+            eq(collectionsToAssets.assetType, assetSearchV2.assetType),
+            eq(collectionsToAssets.collectionId, collectionId),
+            isNull(collectionsToAssets.deletedAt)
           )
         )
         .where(and(...allConditions))

@@ -101,7 +101,9 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
     if (mode === 'select-multiple') {
       const itemKey = createSelectionKey(item.assetId, item.assetType);
-      await props.onSelect(itemKey, item.addedToLibrary ?? false);
+      // Use inCollection if available (collection context), otherwise use addedToLibrary (library context)
+      const wasInCollection = item.inCollection ?? item.addedToLibrary ?? false;
+      await props.onSelect(itemKey, wasInCollection);
       return;
     }
 
@@ -117,17 +119,20 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
 
   const getSelected = useCallback(
     (item: SearchTextData): boolean => {
-      // Handle select-multiple mode with library tracking
+      // Handle select-multiple mode with library/collection tracking
       if (mode === 'select-multiple') {
         const itemKey = createSelectionKey(item.assetId, item.assetType);
         const hasPendingChange = props.isItemSelected(itemKey);
 
-        // If item was in library: show selected unless marked for removal
-        if (item.addedToLibrary) {
+        // Use inCollection if available (collection context), otherwise use addedToLibrary (library context)
+        const wasInCollectionOrLibrary = item.inCollection ?? item.addedToLibrary ?? false;
+
+        // If item was in collection/library: show selected unless marked for removal
+        if (wasInCollectionOrLibrary) {
           return !hasPendingChange; // invert: pending means removing
         }
 
-        // If item wasn't in library: show selected if marked for addition
+        // If item wasn't in collection/library: show selected if marked for addition
         return hasPendingChange;
       }
 

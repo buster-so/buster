@@ -33,6 +33,7 @@ export const useSearchInfinite = ({
   | 'endDate'
   | 'startDate'
   | 'query'
+  | 'collectionId'
 > & {
   scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
   enabled?: boolean;
