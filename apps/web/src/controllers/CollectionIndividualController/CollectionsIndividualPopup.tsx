@@ -2,7 +2,7 @@ import React from 'react';
 import { useGetCollection, useRemoveAssetFromCollection } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
 import { Trash } from '@/components/ui/icons';
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list/BusterListNew';
+import { ListSelectedOptionPopupContainer } from '@/components/ui/list/BusterListNew';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 export const CollectionIndividualSelectedPopup: React.FC<{
@@ -13,7 +13,7 @@ export const CollectionIndividualSelectedPopup: React.FC<{
   const show = selectedRowKeys.size > 0;
 
   return (
-    <BusterListSelectedOptionPopupContainer
+    <ListSelectedOptionPopupContainer
       selectedRowKeys={selectedRowKeys}
       onSelectChange={onSelectChange}
       buttons={[

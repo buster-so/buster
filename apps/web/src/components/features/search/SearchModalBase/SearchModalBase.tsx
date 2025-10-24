@@ -59,7 +59,8 @@ type SearchModalBaseProps = (
   SearchModalBaseContentProps;
 
 // Helper functions for composite keys
-const createSelectionKey = (assetId: string, assetType: AssetType) => `${assetId}:${assetType}`;
+export const createSelectionKey = (assetId: string, assetType: AssetType) =>
+  `${assetId}:${assetType}`;
 
 export const parseSelectionKey = (key: string): { assetId: string; assetType: AssetType } => {
   const [assetId, assetType] = key.split(':', 2);
@@ -99,7 +100,6 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
     }
 
     if (mode === 'select-multiple') {
-      console.log('item.asdf', item);
       const itemKey = createSelectionKey(item.assetId, item.assetType);
       await props.onSelect(itemKey, item.addedToLibrary ?? false);
       return;

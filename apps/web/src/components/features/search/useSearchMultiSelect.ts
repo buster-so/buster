@@ -1,7 +1,17 @@
 import { useCallback, useState } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
-export const useSearchMultiSelect = () => {
+export const useSearchMultiSelect = ({
+  setSearchQuery,
+  setSelectedAssets,
+  setSelectedDateRange,
+  onCloseModal,
+}: {
+  setSearchQuery: (value: string) => void;
+  setSelectedAssets: (assets: null) => void;
+  setSelectedDateRange: (dateRange: null) => void;
+  onCloseModal: () => void;
+}) => {
   // Track items to add (were NOT in library, user selected them)
   const [itemsToAdd, setItemsToAdd] = useState<Set<string>>(new Set());
   // Track items to remove (were IN library, user unselected them)
@@ -39,6 +49,17 @@ export const useSearchMultiSelect = () => {
     [itemsToAdd, itemsToRemove]
   );
 
+  const onCloseModalAndReset = useMemoizedFn(() => {
+    setTimeout(() => {
+      setItemsToAdd(new Set());
+      setItemsToRemove(new Set());
+      setSearchQuery('');
+      setSelectedAssets(null);
+      setSelectedDateRange(null);
+    }, 300);
+    onCloseModal();
+  });
+
   return {
     itemsToAdd,
     itemsToRemove,
@@ -46,5 +67,6 @@ export const useSearchMultiSelect = () => {
     setItemsToAdd,
     setItemsToRemove,
     handleSelectItem,
+    onCloseModalAndReset,
   };
 };

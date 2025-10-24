@@ -20,6 +20,6 @@ export const setLibrarySearchValue = (v: string) => {
   librarySearchStore.setState((x) => ({ ...x, value: v }));
 };
 
-export const onCloseLibrarySearch = () => {
+export const onCloseLibrarySearch = (v?: null) => {
   toggleLibrarySearch(false);
 };

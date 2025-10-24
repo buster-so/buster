@@ -273,10 +273,9 @@ export const useAddAssetToCollection = (useInvalidate = true) => {
     mutationFn: addAssetToCollection,
     onSuccess: (_, variables) => {
       if (useInvalidate) {
-        queryClient.invalidateQueries({
-          queryKey: collectionQueryKeys.collectionsGetCollection(variables.id).queryKey,
-          refetchType: 'all',
-        });
+        const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
+        queryClient.cancelQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
       }
     },
   });
@@ -300,10 +299,9 @@ export const useRemoveAssetFromCollection = (useInvalidate = true) => {
     },
     onSuccess: (_, variables) => {
       if (useInvalidate) {
-        queryClient.invalidateQueries({
-          queryKey: collectionQueryKeys.collectionsGetCollection(variables.id).queryKey,
-          refetchType: 'all',
-        });
+        const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
+        queryClient.cancelQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
       }
     },
   });

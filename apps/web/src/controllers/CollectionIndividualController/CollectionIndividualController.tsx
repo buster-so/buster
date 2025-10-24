@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useGetCollection } from '@/api/buster_rest/collections';
-import { AddToCollectionModal } from '@/components/features/collections/AddToCollectionModal';
+import { CollectionSearchModal } from '@/components/features/search/CollectionSearchModal/CollectionSearchModal';
+import { useCollectionSearchStore } from '@/components/features/search/CollectionSearchModal/collection-search-store';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
 import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -12,14 +13,14 @@ export const CollectionIndividualController: React.FC<{
   collectionId: string;
   layout: 'grid' | 'list';
 }> = ({ collectionId, layout }) => {
-  const [openAddTypeModal, setOpenAddTypeModal] = useState(false);
+  const { toggleCollectionSearch } = useCollectionSearchStore();
   const { data: collection, isFetched: isCollectionFetched } = useGetCollection(collectionId);
 
   const isEditor = canEdit(collection?.permission);
   const isLoaded = isCollectionFetched && !!collection?.id;
 
   const onCloseModal = useMemoizedFn(() => {
-    setOpenAddTypeModal(false);
+    toggleCollectionSearch();
   });
 
   const emptyState = useMemo(() => {
@@ -29,17 +30,17 @@ export const CollectionIndividualController: React.FC<{
         title="You haven’t saved anything to your collection yet."
         buttonText="Add to collection"
         description="As soon as you add metrics and dashboards to your collection, they will appear here."
-        onClick={() => setOpenAddTypeModal(true)}
+        onClick={() => toggleCollectionSearch()}
       />
     );
-  }, [setOpenAddTypeModal, isLoaded]);
+  }, [toggleCollectionSearch, isLoaded]);
 
   return (
     <AppPageLayout
       headerSizeVariant="list"
       header={
         <CollectionsIndividualHeader
-          setOpenAddTypeModal={setOpenAddTypeModal}
+          setOpenAddTypeModal={toggleCollectionSearch}
           collection={collection}
           isFetched={isCollectionFetched}
           layout={layout}
@@ -59,13 +60,7 @@ export const CollectionIndividualController: React.FC<{
         </React.Fragment>
       )}
 
-      {isEditor && (
-        <AddToCollectionModal
-          open={openAddTypeModal}
-          onClose={onCloseModal}
-          collectionId={collection.id}
-        />
-      )}
+      {isEditor && <CollectionSearchModal collectionId={collection.id} />}
     </AppPageLayout>
   );
 };

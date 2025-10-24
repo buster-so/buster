@@ -19,15 +19,7 @@ export const LibrarySearchModal = React.memo(() => {
   const { mutateAsync: removeLibraryAssets, isPending: isRemovingLibraryAssets } =
     useDeleteLibraryAssets();
 
-  const { isOpen, onCloseLibrarySearch: onCloseLibrarySearchStore } = useLibrarySearchStore();
-  const {
-    itemsToAdd,
-    itemsToRemove,
-    setItemsToAdd,
-    setItemsToRemove,
-    isItemSelected,
-    handleSelectItem,
-  } = useSearchMultiSelect();
+  const { isOpen, onCloseLibrarySearch } = useLibrarySearchStore();
 
   const {
     selectedDateRange,
@@ -38,15 +30,18 @@ export const LibrarySearchModal = React.memo(() => {
     setSearchQuery,
   } = useCommonSearch({ mode });
 
-  const onCloseModalAndReset = useMemoizedFn(() => {
-    setTimeout(() => {
-      setItemsToAdd(new Set());
-      setItemsToRemove(new Set());
-      setSearchQuery('');
-      onSetFilters.setSelectedAssets(null);
-      onSetFilters.setSelectedDateRange(null);
-    }, 300);
-    onCloseLibrarySearchStore();
+  const {
+    itemsToAdd,
+    itemsToRemove,
+    setItemsToAdd,
+    setItemsToRemove,
+    isItemSelected,
+    handleSelectItem,
+    onCloseModalAndReset,
+  } = useSearchMultiSelect({
+    setSearchQuery,
+    onCloseModal: onCloseLibrarySearch,
+    ...onSetFilters,
   });
 
   const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({
