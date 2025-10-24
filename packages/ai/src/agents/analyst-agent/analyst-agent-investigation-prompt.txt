@@ -933,6 +933,64 @@ You can create, update, or modify the following assets, which are automatically 
   - Do this instead:
     - Select sum(sales) as revenue
   - If you need to display data from a specific point in time, use date filters rather than hardcoded values
+- **CRITICAL - Join Cardinality and Aggregation Safety**:
+  - **The Problem**: When joining tables with different cardinalities (1-to-many relationships), measures from the "one" side get duplicated for each row on the "many" side. Aggregating these duplicated values produces inflated, incorrect results
+  - **Recognition Pattern**: Before writing any query with joins and aggregations, identify the grain/cardinality of each table:
+    - What makes each row unique in table A? (e.g., one row per customer)
+    - What makes each row unique in table B? (e.g., multiple rows per customer—one per order)
+    - If table A has measures you want to aggregate (e.g., customer lifetime value) and you're joining to table B, those measures will be duplicated
+  - **Validation Questions to Ask Yourself**:
+    1. What is the grain of each table I'm joining? (e.g., customer-level vs. order-level)
+    2. Which measures exist at which grain? (e.g., customer.total_value exists once per customer)
+    3. If I join a customer table (1 row per customer) to an orders table (many rows per customer), will customer-level measures be duplicated?
+    4. Am I aggregating any measures that could be inflated by join duplication?
+  - **The Solution - Two-Stage Aggregation**:
+    1. **First CTE**: Aggregate at the granular level where measures are NOT duplicated (e.g., GROUP BY customer_id to get one row per customer)
+    2. **Second CTE or final SELECT**: Aggregate at the desired reporting level (e.g., by region, by product category)
+    3. This ensures measures at higher granularities are only counted once
+  - **Example of the Error**:
+    ```sql
+    -- WRONG: Customer revenue gets counted multiple times (once per order)
+    SELECT
+      c.region,
+      SUM(c.lifetime_value) as total_customer_value  -- INFLATED!
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    GROUP BY c.region
+    ```
+  - **Corrected Approach**:
+    ```sql
+    -- CORRECT: Aggregate customer-level measures first, then roll up
+    WITH customer_aggregates AS (
+      SELECT
+        c.customer_id,
+        c.region,
+        c.lifetime_value,
+        COUNT(DISTINCT o.order_id) as order_count
+      FROM customers c
+      LEFT JOIN orders o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.region, c.lifetime_value
+    )
+    SELECT
+      region,
+      SUM(lifetime_value) as total_customer_value,  -- Now correct!
+      SUM(order_count) as total_orders
+    FROM customer_aggregates
+    GROUP BY region
+    ```
+  - **Testing Pattern**: After writing a query with joins and aggregations, validate it by:
+    1. Running the query without aggregation to see the raw joined rows
+    2. Checking if any rows appear duplicated (same entity ID appears multiple times)
+    3. Comparing aggregated totals against known values or simpler queries without joins
+    4. For customer/entity counts: Use COUNT(DISTINCT entity_id) and verify it matches expected totals
+  - **When This Applies**:
+    - Any time you join tables with 1-to-many relationships
+    - When aggregating measures that exist at different granularities (customer-level + order-level)
+    - Particularly critical for: revenue totals, customer counts, inventory values, any "per-entity" metric
+  - **Document Your Approach**: In your sequential thinking, explicitly state:
+    - The grain of each table being joined
+    - Which measures exist at which grain
+    - How you're preventing duplication (e.g., "aggregating customer-level measures first before joining to order details")
 - Grouping and Aggregation:
   - `GROUP BY` Clause: Include all non-aggregated `SELECT` columns. Using explicit names is clearer than ordinal positions (`GROUP BY 1, 2`)
   - `HAVING` Clause: Use `HAVING` to filter *after* aggregation (e.g., `HAVING COUNT(*) > 10`). Use `WHERE` to filter *before* aggregation for efficiency
