@@ -2,6 +2,15 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '../../connection';
 import { githubIntegrations } from '../../schema';
 
+
+type GithubRepositories = {
+  full_name: string;
+  id: number;
+  name: string;
+  node_id: string;
+  private: boolean;
+}
+
 /**
  * Update GitHub integration
  */
@@ -11,12 +20,12 @@ export async function updateGithubIntegration(
     githubOrgName?: string;
     githubOrgId?: string;
     permissions?: Record<string, string>;
-    accessibleRepositories?: Record<string, string>;
+    accessibleRepositories?: GithubRepositories[] | undefined;
     status?: 'pending' | 'active' | 'suspended' | 'revoked';
     deletedAt?: string;
   }
 ) {
-  const updateData: Record<string, string | number | Record<string, string> | undefined> = {
+  const updateData: Record<string, string | number | Record<string, string> | undefined | GithubRepositories[]> = {
     updatedAt: new Date().toISOString(),
   };
 

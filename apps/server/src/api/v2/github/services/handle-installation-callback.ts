@@ -76,6 +76,19 @@ export async function handleInstallationCallback(
 
         return updated;
       }
+      case 'new_permissions_accepted': {
+        const updated = await updateGithubIntegration(payload.installation.id.toString(), {
+          accessibleRepositories: payload.repositories,
+          permissions: payload.installation.permissions,
+        });
+        if (!updated) {
+          throw new Error(
+            `Failed to update permissions for installation ${payload.installation.id}`
+          );
+        }
+
+        return updated;
+      }
       default:
         throw new Error(`Unsupported webhook action: ${action}`);
     }
@@ -94,7 +107,7 @@ async function handleInstallationCreated(params: {
   organizationId?: string | undefined;
   userId?: string | undefined;
 }): Promise<GitHubIntegration> {
-  const { installation, organizationId, userId } = params;
+  const { installation, organizationId, userId, repositories } = params;
 
   let githubOrgName = 'Unknown Account';
   if (installation.account) {
@@ -116,8 +129,7 @@ async function handleInstallationCreated(params: {
       status: 'active',
       githubOrgName,
       githubOrgId: installation.account?.id.toString() ?? '0',
-      // TODO: Add accessible repositories
-      // accessibleRepositories: repositories,
+      accessibleRepositories: repositories,
       permissions: installation.permissions,
     });
 
