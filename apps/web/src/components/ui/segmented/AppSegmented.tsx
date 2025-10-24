@@ -29,6 +29,7 @@ export interface SegmentedItem<
   tooltip?: string;
   link?: ILinkProps<TRouter, TOptions, TFrom>;
   respectBlocker?: boolean; //links automatically respect blocker
+  onClick?: () => void;
 }
 
 export interface AppSegmentedProps<
@@ -161,7 +162,9 @@ export const AppSegmented: AppSegmentedComponent = (<
       return;
     }
 
+    console.log('item', item);
     if (item && !item.disabled && value !== selectedValue) {
+      item.onClick?.();
       setSelectedValue(item.value);
       startTransition(() => {
         onChange?.(item);
