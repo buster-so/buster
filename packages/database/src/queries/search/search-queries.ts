@@ -138,7 +138,11 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
         )
         .leftJoin(
           userLibrary,
-          and(eq(userLibrary.assetId, assetSearchV2.assetId), eq(userLibrary.userId, userId))
+          and(
+            eq(userLibrary.assetId, assetSearchV2.assetId),
+            eq(userLibrary.userId, userId),
+            isNull(userLibrary.deletedAt)
+          )
         )
         .where(and(...allConditions))
         .orderBy(

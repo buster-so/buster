@@ -424,7 +424,6 @@ export const childReportsFromChats = (organizationId: string, userId: string) =>
         isNull(reportFiles.deletedAt),
         isNull(messages.deletedAt),
         isNull(chats.deletedAt),
-        
         or(
           ne(chats.workspaceSharing, 'none'),
           exists(
