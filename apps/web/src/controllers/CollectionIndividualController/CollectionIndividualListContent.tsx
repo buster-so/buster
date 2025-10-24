@@ -1,45 +1,32 @@
+import type { AssetType } from '@buster/server-shared/assets';
 import type {
   BusterCollection,
   BusterCollectionItemAsset,
 } from '@buster/server-shared/collections';
 import React, { useMemo, useState } from 'react';
-import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
+import { ASSET_ICONS, assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRowItem,
+  type BusterListRow,
   createListItem,
-  ListEmptyStateWithButton,
-} from '@/components/ui/list';
+} from '@/components/ui/list/BusterListNew';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { CollectionIndividualSelectedPopup } from './CollectionsIndividualPopup';
 
-export const CollectionIndividualListContent: React.FC<{
-  collection: BusterCollection;
-  emptyState: React.ReactNode;
-}> = React.memo(({ collection, emptyState }) => {
-  const assetList = collection?.assets || [];
-
-  return (
-    <CollectionList assetList={assetList} selectedCollection={collection} emptyState={emptyState} />
-  );
-});
-
-CollectionIndividualListContent.displayName = 'CollectionIndividualListContent';
-
 const columns: BusterListColumn<BusterCollectionItemAsset>[] = [
   {
     dataIndex: 'name',
     title: 'Title',
     render: (_, { asset_type, name }) => {
-      const Icon = CollectionIconRecord[asset_type];
+      const Icon = assetTypeToIcon(asset_type);
       return (
         <div className="flex w-full items-center space-x-2 overflow-hidden">
-          {Icon}
+          <Icon />
           <Text variant="secondary" truncate>
             {name}
           </Text>
@@ -49,7 +36,7 @@ const columns: BusterListColumn<BusterCollectionItemAsset>[] = [
   },
   {
     dataIndex: 'updated_at',
-    title: 'Last edited',
+    title: 'Updated at',
     width: 145,
     render: (v) => formatDate({ date: v, format: 'lll' }),
   },
@@ -71,54 +58,68 @@ const columns: BusterListColumn<BusterCollectionItemAsset>[] = [
   },
 ];
 
-const CollectionList: React.FC<{
-  assetList: BusterCollectionItemAsset[];
-  selectedCollection: BusterCollection;
+export const CollectionIndividualListContent: React.FC<{
+  collection: BusterCollection;
   emptyState: React.ReactNode;
-}> = React.memo(({ selectedCollection, assetList, emptyState }) => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+}> = React.memo(({ collection, emptyState }) => {
+  const assetList = collection?.assets || [];
 
-  const items: BusterListRowItem<BusterCollectionItemAsset>[] = useMemo(() => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(new Set());
+
+  const rows: BusterListRow<BusterCollectionItemAsset>[] = useMemo(() => {
+    if (assetList.length === 0) return [];
+
     const createAssetLinkItem = createListItem<BusterCollectionItemAsset>();
-    return assetList.map((asset) =>
-      createAssetLinkItem({
-        id: asset.id,
-        link: createSimpleAssetRoute(asset),
-        data: {
-          ...asset,
-          name: asset.name || `New ${asset.asset_type}`,
-          asset_type: asset.asset_type,
-        },
-      })
-    );
-  }, [assetList, selectedCollection.id]);
+    const allRows: BusterListRow<BusterCollectionItemAsset>[] = [
+      {
+        type: 'section',
+        id: 'collection-assets',
+        title: 'Assets',
+        secondaryTitle: String(assetList.length),
+      },
+    ];
 
-  const onSelectChange = useMemoizedFn((selectedRowKeys: string[]) => {
-    setSelectedRowKeys(selectedRowKeys);
+    assetList.forEach((asset) => {
+      allRows.push(
+        createAssetLinkItem({
+          id: asset.id,
+          link: createSimpleAssetRoute(asset),
+          data: {
+            ...asset,
+            name: asset.name || `New ${asset.asset_type}`,
+          },
+          type: 'row',
+        })
+      );
+    });
+    return allRows;
+  }, [assetList, collection.id]);
+
+  const onSelectChange = useMemoizedFn((v: Set<string>) => {
+    // setSelectedRowKeys(selectedRowKeys);
+    setSelectedRowKeys(v);
   });
 
   return (
-    <div className="relative flex h-full flex-col items-center">
+    <React.Fragment>
       <BusterList
-        rows={items}
+        rows={rows}
         columns={columns}
+        hideLastRowBorder={false}
+        showSelectAll={true}
+        showHeader={true}
+        emptyState={emptyState}
         onSelectChange={onSelectChange}
         selectedRowKeys={selectedRowKeys}
-        emptyState={emptyState}
       />
 
       <CollectionIndividualSelectedPopup
         selectedRowKeys={selectedRowKeys}
         onSelectChange={onSelectChange}
-        collectionId={selectedCollection.id}
+        collectionId={collection.id}
       />
-    </div>
+    </React.Fragment>
   );
 });
-CollectionList.displayName = 'CollectionList';
 
-const CollectionIconRecord: Record<string, React.ReactNode> = {
-  dashboard: <ASSET_ICONS.dashboards />,
-  metric: <ASSET_ICONS.metrics />,
-  report: <ASSET_ICONS.reports />,
-};
+CollectionIndividualListContent.displayName = 'CollectionIndividualListContent';

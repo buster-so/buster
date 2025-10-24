@@ -2,15 +2,15 @@ import React from 'react';
 import { useGetCollection, useRemoveAssetFromCollection } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
 import { Trash } from '@/components/ui/icons';
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
+import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list/BusterListNew';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 export const CollectionIndividualSelectedPopup: React.FC<{
-  selectedRowKeys: string[];
+  selectedRowKeys: Set<string>;
   collectionId: string;
-  onSelectChange: (selectedRowKeys: string[]) => void;
+  onSelectChange: (selectedRowKeys: Set<string>) => void;
 }> = React.memo(({ selectedRowKeys, onSelectChange, collectionId }) => {
-  const show = selectedRowKeys.length > 0;
+  const show = selectedRowKeys.size > 0;
 
   return (
     <BusterListSelectedOptionPopupContainer
@@ -32,9 +32,9 @@ export const CollectionIndividualSelectedPopup: React.FC<{
 CollectionIndividualSelectedPopup.displayName = 'CollectionIndividualSelectedPopup';
 
 const CollectionDeleteButton: React.FC<{
-  selectedRowKeys: string[];
+  selectedRowKeys: Set<string>;
   collectionId: string;
-  onSelectChange: (selectedRowKeys: string[]) => void;
+  onSelectChange: (selectedRowKeys: Set<string>) => void;
 }> = ({ selectedRowKeys, collectionId }) => {
   const { mutateAsync: removeAssetFromCollection } = useRemoveAssetFromCollection();
   const { data: collection } = useGetCollection(collectionId);
@@ -46,7 +46,7 @@ const CollectionDeleteButton: React.FC<{
         assets: (collection.assets || [])?.reduce<
           { type: 'metric_file' | 'dashboard_file'; id: string }[]
         >((result, asset) => {
-          if (selectedRowKeys.includes(asset.id)) {
+          if (selectedRowKeys.has(asset.id)) {
             result.push({
               type: asset.asset_type as 'metric_file' | 'dashboard_file',
               id: asset.id,
