@@ -38,9 +38,6 @@ export const GlobalSearchModal = () => {
   });
 
   const filterContent = useMemo(() => {
-    // const hasFilters =
-    //   Object.values(filtersParams).some((x) => !isEmpty(x)) && !isEmpty(searchQuery);
-    // if (!hasFilters) return null;
     return <GlobalSearchModalFilters {...filtersParams} {...onSetFilters} />;
   }, [filtersParams, onSetFilters]);
 

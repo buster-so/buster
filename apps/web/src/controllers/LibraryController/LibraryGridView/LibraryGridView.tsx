@@ -17,7 +17,7 @@ import { LibraryEmptyView } from '../LibraryEmptyView';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
 import type { LibraryViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
-import { LibraryCollectionsScroller } from './LibraryCollectionsScroller';
+import { LibraryCollectionGrid } from './LibraryCollectionGrid';
 import { LibrarySectionContainer } from './LibrarySectionContainer';
 
 export const LibraryGridView = React.memo(
@@ -71,7 +71,7 @@ export const LibraryGridView = React.memo(
       >
         {hasCollections && (
           <LibrarySectionContainer title="Collections" icon={<Folder />}>
-            <LibraryCollectionsScroller collections={collections} />
+            <LibraryCollectionGrid collections={collections} />
           </LibrarySectionContainer>
         )}
 
