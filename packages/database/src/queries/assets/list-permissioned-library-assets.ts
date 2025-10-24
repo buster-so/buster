@@ -14,7 +14,7 @@ import {
   sql,
 } from 'drizzle-orm';
 import { db } from '../../connection';
-import { userLibrary, users } from '../../schema';
+import { users } from '../../schema';
 import {
   type AssetListItem,
   type AssetType,
@@ -24,20 +24,20 @@ import {
   type ListPermissionedAssetsResponse,
 } from '../../schema-types';
 import {
-  childChatsFromCollections,
-  childDashboardsFromChats,
-  childDashboardsFromCollections,
-  childMetricsFromChats,
-  childMetricsFromCollections,
-  childMetricsFromDashboards,
-  childMetricsFromReports,
-  childReportsFromChats,
-  childReportsFromCollections,
-  permissionedChats,
-  permissionedCollections,
-  permissionedDashboardFiles,
-  permissionedMetricFiles,
-  permissionedReportFiles,
+  libraryChildChatsFromCollections,
+  libraryChildDashboardsFromChats,
+  libraryChildDashboardsFromCollections,
+  libraryChildMetricsFromChats,
+  libraryChildMetricsFromCollections,
+  libraryChildMetricsFromDashboards,
+  libraryChildMetricsFromReports,
+  libraryChildReportsFromChats,
+  libraryChildReportsFromCollections,
+  libraryPermissionedChats,
+  libraryPermissionedCollections,
+  libraryPermissionedDashboardFiles,
+  libraryPermissionedMetricFiles,
+  libraryPermissionedReportFiles,
 } from '../asset-permissions/asset-permission-subqueries';
 
 export async function listPermissionedLibraryAssets(
@@ -63,27 +63,27 @@ export async function listPermissionedLibraryAssets(
 
   const offset = (page - 1) * page_size;
 
-  // Build the union query based on includeAssetChildren parameter
-  const baseUnion = permissionedReportFiles(organizationId, userId)
-    .union(permissionedMetricFiles(organizationId, userId))
-    .union(permissionedDashboardFiles(organizationId, userId))
-    .union(permissionedChats(organizationId, userId))
-    .union(permissionedCollections(organizationId, userId));
+  // Build the union query using library-aware subqueries
+  // These subqueries already include library filtering, so no separate join is needed
+  const baseUnion = libraryPermissionedReportFiles(organizationId, userId)
+    .union(libraryPermissionedMetricFiles(organizationId, userId))
+    .union(libraryPermissionedDashboardFiles(organizationId, userId))
+    .union(libraryPermissionedChats(organizationId, userId))
+    .union(libraryPermissionedCollections(organizationId, userId));
 
   const allPermissionedAssets = includeAssetChildren
     ? baseUnion
-        .union(childMetricsFromDashboards(organizationId, userId))
-        .union(childMetricsFromReports(organizationId, userId))
-        .union(childMetricsFromChats(organizationId, userId))
-        .union(childDashboardsFromChats(organizationId, userId))
-        .union(childReportsFromChats(organizationId, userId))
-        .union(childMetricsFromCollections(organizationId, userId))
-        .union(childDashboardsFromCollections(organizationId, userId))
-        .union(childReportsFromCollections(organizationId, userId))
-        .union(childChatsFromCollections(organizationId, userId))
+        .union(libraryChildMetricsFromDashboards(organizationId, userId))
+        .union(libraryChildMetricsFromReports(organizationId, userId))
+        .union(libraryChildMetricsFromChats(organizationId, userId))
+        .union(libraryChildDashboardsFromChats(organizationId, userId))
+        .union(libraryChildReportsFromChats(organizationId, userId))
+        .union(libraryChildMetricsFromCollections(organizationId, userId))
+        .union(libraryChildDashboardsFromCollections(organizationId, userId))
+        .union(libraryChildReportsFromCollections(organizationId, userId))
+        .union(libraryChildChatsFromCollections(organizationId, userId))
     : baseUnion;
 
-  // Add library join to filter only assets in user's library
   const permissionedAssets = allPermissionedAssets.as('permissioned_assets');
 
   const filters: SQL[] = [];
@@ -136,16 +136,7 @@ export async function listPermissionedLibraryAssets(
       organizationId: permissionedAssets.organizationId,
     })
     .from(permissionedAssets)
-    .innerJoin(users, eq(permissionedAssets.createdBy, users.id))
-    .innerJoin(
-      userLibrary,
-      and(
-        eq(userLibrary.assetId, permissionedAssets.assetId),
-        eq(userLibrary.assetType, permissionedAssets.assetType),
-        eq(userLibrary.userId, userId),
-        isNull(userLibrary.deletedAt)
-      )
-    );
+    .innerJoin(users, eq(permissionedAssets.createdBy, users.id));
 
   const filteredAssetQuery = whereCondition ? baseAssetQuery.where(whereCondition) : baseAssetQuery;
 
