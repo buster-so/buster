@@ -13,8 +13,7 @@ import type {
   SearchTextResponse,
 } from '@buster/server-shared';
 import { getAssetScreenshotSignedUrl } from './get-asset-screenshot';
-import { processSearchResultText } from './text-processing-helpers';
-
+ 
 /**
  * Perform text search and enhance results with asset ancestors
  * @param userId - The user ID making the request

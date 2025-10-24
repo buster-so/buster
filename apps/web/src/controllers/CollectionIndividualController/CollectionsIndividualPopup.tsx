@@ -1,3 +1,4 @@
+import type { ShareAssetType } from '@buster/server-shared/share';
 import React from 'react';
 import { useGetCollection, useRemoveAssetFromCollection } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
@@ -44,11 +45,11 @@ const CollectionDeleteButton: React.FC<{
       await removeAssetFromCollection({
         id: collectionId,
         assets: (collection.assets || [])?.reduce<
-          { type: 'metric_file' | 'dashboard_file'; id: string }[]
+          { type: Exclude<ShareAssetType, 'collection'>; id: string }[]
         >((result, asset) => {
           if (selectedRowKeys.has(asset.id)) {
             result.push({
-              type: asset.asset_type as 'metric_file' | 'dashboard_file',
+              type: asset.asset_type as Exclude<ShareAssetType, 'collection'>,
               id: asset.id,
             });
           }

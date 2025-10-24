@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import {
-  useAddAndRemoveAssetsFromCollection,
   useAddAssetToCollection,
   useGetCollection,
   useRemoveAssetFromCollection,
@@ -11,7 +10,7 @@ import type {
   SearchMode,
 } from '@/components/ui/search/SearchModal/search-modal.types';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { createSelectionKey, parseSelectionKey, SearchModalBase } from '../SearchModalBase';
+import { parseSelectionKey, SearchModalBase } from '../SearchModalBase';
 import { useCommonSearch } from '../useCommonSearch';
 import { useSearchMultiSelect } from '../useSearchMultiSelect';
 import { useCollectionSearchStore } from './collection-search-store';
@@ -60,7 +59,7 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
     mounted: isOpen,
     includeAssetAncestors: true,
     includeScreenshots: true,
-    includeAddedToLibrary: false,
+    includeAddedToLibrary: true,
   });
 
   const onSubmit = useMemoizedFn(async () => {
@@ -119,13 +118,6 @@ export const CollectionSearchModal = React.memo(({ collectionId }: { collectionI
     ]
   );
 
-  useEffect(() => {
-    if (collection && isOpen && !itemsToAdd.size) {
-      setItemsToAdd(
-        new Set(collection.assets?.map((asset) => createSelectionKey(asset.id, asset.asset_type)))
-      );
-    }
-  }, [collection, isOpen]);
 
   return (
     <SearchModalBase
