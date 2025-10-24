@@ -1,22 +1,14 @@
 import z from 'zod';
+import { AssetTypeSchema } from './asset';
 import {
   InfinitePaginationSchema,
   type PaginatedResponse,
   PaginationInputSchema,
 } from './pagination';
 
-// Library assets exclude collections - only assets with savedToLibrary field
-export const LibraryAssetTypeSchema = z.enum([
-  'chat',
-  'metric_file',
-  'dashboard_file',
-  'report_file',
-]);
-export type LibraryAssetType = z.infer<typeof LibraryAssetTypeSchema>;
-
 export const LibraryAssetIdentifierSchema = z.object({
   assetId: z.string().uuid(),
-  assetType: LibraryAssetTypeSchema,
+  assetType: AssetTypeSchema,
 });
 export type LibraryAssetIdentifier = z.infer<typeof LibraryAssetIdentifierSchema>;
 
@@ -35,9 +27,9 @@ export const BulkUpdateLibraryFieldResponseSchema = z.object({
 
 export type BulkUpdateLibraryFieldResponse = z.infer<typeof BulkUpdateLibraryFieldResponseSchema>;
 
-export const LibraryAssetListItemSchema = z.object({
+export const AssetListItemSchema = z.object({
   asset_id: z.string().uuid(),
-  asset_type: LibraryAssetTypeSchema,
+  asset_type: AssetTypeSchema,
   name: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -48,13 +40,17 @@ export const LibraryAssetListItemSchema = z.object({
   screenshot_url: z.string().nullable(),
 });
 
-export type LibraryAssetListItem = z.infer<typeof LibraryAssetListItemSchema>;
+export type AssetListItem = z.infer<typeof AssetListItemSchema>;
 
-export const ListPermissionedLibraryAssetsInputSchema = z
+// Keep the old names for backward compatibility
+export const LibraryAssetListItemSchema = AssetListItemSchema;
+export type LibraryAssetListItem = AssetListItem;
+
+export const ListPermissionedAssetsInputSchema = z
   .object({
     organizationId: z.string().uuid(),
     userId: z.string().uuid(),
-    assetTypes: LibraryAssetTypeSchema.array().min(1).optional(),
+    assetTypes: AssetTypeSchema.array().min(1).optional(),
     createdById: z.string().uuid().optional(),
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
@@ -64,22 +60,32 @@ export const ListPermissionedLibraryAssetsInputSchema = z
     orderingDirection: z.enum(['asc', 'desc']).optional(),
     groupBy: z.enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none']).optional(),
     query: z.string().optional(),
+    includeAssetChildren: z.boolean().optional(),
   })
   .merge(PaginationInputSchema);
 
-export type ListPermissionedLibraryAssetsInput = z.infer<
-  typeof ListPermissionedLibraryAssetsInputSchema
->;
+export type ListPermissionedAssetsInput = z.infer<typeof ListPermissionedAssetsInputSchema>;
 
-export const GroupedLibraryAssetsResponseSchema = z.object({
-  groups: z.record(z.string(), LibraryAssetListItemSchema.array()),
+// Keep the old names for backward compatibility
+export const ListPermissionedLibraryAssetsInputSchema = ListPermissionedAssetsInputSchema;
+export type ListPermissionedLibraryAssetsInput = ListPermissionedAssetsInput;
+
+export const GroupedAssetsResponseSchema = z.object({
+  groups: z.record(z.string(), AssetListItemSchema.array()),
   pagination: InfinitePaginationSchema,
 });
 
-export type GroupedLibraryAssets = z.infer<typeof GroupedLibraryAssetsResponseSchema>['groups'];
+// Keep the old name for backward compatibility
+export const GroupedLibraryAssetsResponseSchema = GroupedAssetsResponseSchema;
 
-export type GroupedLibraryAssetsResponse = z.infer<typeof GroupedLibraryAssetsResponseSchema>;
+export type GroupedAssets = z.infer<typeof GroupedAssetsResponseSchema>['groups'];
+export type GroupedAssetsResponse = z.infer<typeof GroupedAssetsResponseSchema>;
 
-export type ListPermissionedLibraryAssetsResponse =
-  | PaginatedResponse<LibraryAssetListItem>
-  | GroupedLibraryAssetsResponse;
+export type ListPermissionedAssetsResponse =
+  | PaginatedResponse<AssetListItem>
+  | GroupedAssetsResponse;
+
+// Keep the old names for backward compatibility
+export type GroupedLibraryAssets = GroupedAssets;
+export type GroupedLibraryAssetsResponse = GroupedAssetsResponse;
+export type ListPermissionedLibraryAssetsResponse = ListPermissionedAssetsResponse;

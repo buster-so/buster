@@ -1,3 +1,3 @@
-import type { GroupedLibraryAssets, LibraryAssetType } from '@buster/database/schema-types';
+import type { GroupedAssets, GroupedLibraryAssets } from '@buster/database/schema-types';
 
-export type { LibraryAssetType, GroupedLibraryAssets };
+export type { GroupedAssets, GroupedLibraryAssets };

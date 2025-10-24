@@ -101,7 +101,6 @@ describe('metric-helpers', () => {
     workspaceSharingEnabledBy: null,
     deletedAt: null,
     screenshotBucketKey: null,
-    savedToLibrary: false,
     screenshotTakenAt: null,
     ...overrides,
   });

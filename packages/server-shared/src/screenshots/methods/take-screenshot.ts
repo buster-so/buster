@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noConsole: console.error is used for debugging */
 import type { Page } from 'playwright';
 import sharp from 'sharp';
 
@@ -52,7 +53,7 @@ export const assertBeforeScreenshot = async (page: Page, { fullPath }: { fullPat
 
   // Assert that the page is at the expected full path
   const currentUrl = page.url();
-  const expectedUrl = new URL(fullPath).pathname;
+  const expectedUrl = new URL(fullPath).pathname.replace(/\/+/g, '/'); // Normalize multiple slashes to single slash
   const actualUrl = new URL(currentUrl).pathname;
 
   if (actualUrl !== expectedUrl) {

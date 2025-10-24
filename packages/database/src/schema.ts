@@ -760,7 +760,6 @@ export const dashboardFiles = pgTable(
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
     screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
-    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('dashboard_files_created_by_idx').using(
@@ -836,7 +835,6 @@ export const reportFiles = pgTable(
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
     screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
-    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('report_files_created_by_idx').using(
@@ -911,7 +909,6 @@ export const chats = pgTable(
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
     screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
-    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('chats_created_at_idx').using(
@@ -1064,7 +1061,6 @@ export const metricFiles = pgTable(
     }),
     screenshotBucketKey: text('screenshot_bucket_key'),
     screenshotTakenAt: timestamp('screenshot_taken_at', { withTimezone: true, mode: 'string' }),
-    savedToLibrary: boolean('saved_to_library').default(false).notNull(),
   },
   (table) => [
     index('metric_files_created_by_idx').using(
@@ -2003,5 +1999,32 @@ export const logsWriteBackConfigs = pgTable(
       'btree',
       table.deletedAt.asc().nullsLast()
     ),
+  ]
+);
+
+export const userLibrary = pgTable(
+  'user_library',
+  {
+    userId: uuid('user_id').notNull(),
+    assetType: assetTypeEnum('asset_type').notNull(),
+    assetId: uuid('asset_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'user_library_user_id_fkey',
+    }).onUpdate('cascade'),
+    primaryKey({
+      columns: [table.userId, table.assetType, table.assetId],
+      name: 'user_library_pkey',
+    }),
   ]
 );

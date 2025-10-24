@@ -4,19 +4,17 @@ import { DataSourceType } from '../types/credentials';
 import { BigQueryAdapter } from './bigquery';
 
 // Create mock BigQuery instance
-const mockBigQuery = {
-  dataset: vi.fn().mockReturnValue({
-    table: vi.fn().mockReturnValue({
-      query: vi.fn(),
-    }),
-  }),
-  getDatasets: vi.fn(),
-  createQueryJob: vi.fn(),
-};
+let mockBigQueryInstance: any;
+let mockBigQueryConstructorArgs: any;
 
 // Mock @google-cloud/bigquery module
 vi.mock('@google-cloud/bigquery', () => ({
-  BigQuery: vi.fn(() => mockBigQuery),
+  BigQuery: class {
+    constructor(config: any) {
+      mockBigQueryConstructorArgs = config;
+      Object.assign(this, mockBigQueryInstance);
+    }
+  },
 }));
 
 describe('BigQueryAdapter', () => {
@@ -24,6 +22,15 @@ describe('BigQueryAdapter', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockBigQueryInstance = {
+      dataset: vi.fn().mockReturnValue({
+        table: vi.fn().mockReturnValue({
+          query: vi.fn(),
+        }),
+      }),
+      getDatasets: vi.fn(),
+      createQueryJob: vi.fn(),
+    };
     adapter = new BigQueryAdapter();
   });
 
@@ -43,7 +50,7 @@ describe('BigQueryAdapter', () => {
       await adapter.initialize(credentials);
 
       const { BigQuery } = await import('@google-cloud/bigquery');
-      expect(BigQuery).toHaveBeenCalledWith({
+      expect(mockBigQueryConstructorArgs).toEqual({
         projectId: 'test-project',
         credentials: {
           type: 'service_account',
@@ -65,7 +72,7 @@ describe('BigQueryAdapter', () => {
       await adapter.initialize(credentials);
 
       const { BigQuery } = await import('@google-cloud/bigquery');
-      expect(BigQuery).toHaveBeenCalledWith({
+      expect(mockBigQueryConstructorArgs).toEqual({
         projectId: 'test-project',
         keyFilename: '/path/to/key.json',
         location: 'US',
@@ -101,7 +108,7 @@ describe('BigQueryAdapter', () => {
       await adapter.initialize(credentials);
 
       const { BigQuery } = await import('@google-cloud/bigquery');
-      expect(BigQuery).toHaveBeenCalledWith(
+      expect(mockBigQueryConstructorArgs).toEqual(
         expect.objectContaining({
           projectId: 'test-project',
           credentials: serviceAccountObject,
@@ -131,7 +138,7 @@ describe('BigQueryAdapter', () => {
       await adapter.initialize(credentials);
 
       const { BigQuery } = await import('@google-cloud/bigquery');
-      expect(BigQuery).toHaveBeenCalledWith(
+      expect(mockBigQueryConstructorArgs).toEqual(
         expect.objectContaining({
           projectId: 'test-project',
           location: 'US',
@@ -150,7 +157,7 @@ describe('BigQueryAdapter', () => {
       await adapter.initialize(credentials);
 
       const { BigQuery } = await import('@google-cloud/bigquery');
-      expect(BigQuery).toHaveBeenCalledWith(
+      expect(mockBigQueryConstructorArgs).toEqual(
         expect.objectContaining({
           projectId: 'test-project',
           location: 'us-central1',
@@ -198,11 +205,11 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([mockRows, null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT * FROM dataset.table');
 
-      expect(mockBigQuery.createQueryJob).toHaveBeenCalledWith({
+      expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith({
         query: 'SELECT * FROM dataset.table',
         location: undefined,
         jobTimeoutMs: 60000,
@@ -234,11 +241,11 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([mockRows, null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT * FROM dataset.table WHERE id = ?', [1]);
 
-      expect(mockBigQuery.createQueryJob).toHaveBeenCalledWith({
+      expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith({
         query: 'SELECT * FROM dataset.table WHERE id = @param0',
         params: { param0: 1 },
         location: undefined,
@@ -259,11 +266,11 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([mockRows, null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT * FROM dataset.table', [], 10);
 
-      expect(mockBigQuery.createQueryJob).toHaveBeenCalledWith(
+      expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith(
         expect.objectContaining({
           maxResults: 11, // Requests one extra to check for more rows
         })
@@ -283,7 +290,7 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([mockRows, null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT * FROM dataset.table', [], 10);
 
@@ -297,11 +304,11 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([[], null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       await adapter.query('SELECT 1', [], undefined, 5000);
 
-      expect(mockBigQuery.createQueryJob).toHaveBeenCalledWith(
+      expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith(
         expect.objectContaining({
           jobTimeoutMs: 5000,
         })
@@ -314,11 +321,11 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([[], null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       await adapter.query('SELECT 1');
 
-      expect(mockBigQuery.createQueryJob).toHaveBeenCalledWith({
+      expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith({
         query: 'SELECT 1',
         location: undefined,
         jobTimeoutMs: 60000,
@@ -327,7 +334,7 @@ describe('BigQueryAdapter', () => {
     });
 
     it('should handle query errors', async () => {
-      mockBigQuery.createQueryJob.mockRejectedValueOnce(new Error('Query failed'));
+      mockBigQueryInstance.createQueryJob.mockRejectedValueOnce(new Error('Query failed'));
 
       await expect(adapter.query('SELECT * FROM invalid_table')).rejects.toThrow(
         'BigQuery query failed: Query failed'
@@ -352,7 +359,7 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([[], null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT * FROM dataset.table WHERE 1=0');
 
@@ -369,7 +376,7 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([mockRows, null, {}]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT 1 as id');
 
@@ -390,7 +397,7 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([mockRows, null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.query('SELECT * FROM dataset.table');
 
@@ -413,12 +420,12 @@ describe('BigQueryAdapter', () => {
         getQueryResults: vi.fn().mockResolvedValueOnce([[], null, mockMetadata]),
       };
 
-      mockBigQuery.createQueryJob.mockResolvedValueOnce([mockJob]);
+      mockBigQueryInstance.createQueryJob.mockResolvedValueOnce([mockJob]);
 
       const result = await adapter.testConnection();
 
       expect(result).toBe(true);
-      expect(mockBigQuery.createQueryJob).toHaveBeenCalledWith({
+      expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith({
         query: 'SELECT 1 as test',
         useLegacySql: false,
       });
@@ -433,7 +440,9 @@ describe('BigQueryAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      mockBigQuery.createQueryJob.mockRejectedValueOnce(new Error('Connection test failed'));
+      mockBigQueryInstance.createQueryJob.mockRejectedValueOnce(
+        new Error('Connection test failed')
+      );
 
       const result = await adapter.testConnection();
 

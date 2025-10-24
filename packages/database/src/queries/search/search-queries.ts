@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2, users } from '../../schema';
+import { assetSearchV2, userLibrary, users } from '../../schema';
 import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
 import { AssetTypeSchema } from '../../schema-types/asset';
 import type { TextSearchResultSchema } from '../../schema-types/search';
@@ -34,6 +34,7 @@ export const SearchTextInputSchema = z
     organizationId: z.string().uuid(),
     userId: z.string().uuid(),
     filters: SearchFiltersSchema,
+    includeAddedToLibrary: z.boolean().optional(),
   })
   .merge(PaginationInputSchema);
 
@@ -50,7 +51,15 @@ export type SearchTextResponse = SearchPaginatedResponse<TextSearchResult>;
 export async function searchText(input: SearchTextInput): Promise<SearchTextResponse> {
   try {
     const validated = SearchTextInputSchema.parse(input);
-    const { searchString, organizationId, userId, page, page_size, filters } = validated;
+    const {
+      searchString,
+      organizationId,
+      userId,
+      page,
+      page_size,
+      filters,
+      includeAddedToLibrary,
+    } = validated;
     const offset = (page - 1) * page_size;
     const paginationCheckCount = page_size + 1;
 
@@ -105,31 +114,70 @@ export async function searchText(input: SearchTextInput): Promise<SearchTextResp
          )`
       : sql<string>`left(${assetSearchV2.additionalText}, ${snippetLength})`;
 
-    const results = await db
-      .select({
-        assetId: assetSearchV2.assetId,
-        assetType: assetSearchV2.assetType,
-        title: highlightedTitleSql,
-        additionalText: additionalSnippetSql,
-        updatedAt: assetSearchV2.updatedAt,
-        screenshotBucketKey: assetSearchV2.screenshotBucketKey,
-        createdBy: assetSearchV2.createdBy,
-        createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
-        createdByAvatarUrl: users.avatarUrl,
-      })
-      .from(assetSearchV2)
-      .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
-      .innerJoin(
-        permissionedAssetsSubquery,
-        eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
-      )
-      .where(and(...allConditions))
-      .orderBy(
-        sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
-        desc(assetSearchV2.updatedAt)
-      )
-      .limit(paginationCheckCount)
-      .offset(offset);
+    let results: TextSearchResult[];
+
+    if (includeAddedToLibrary) {
+      results = await db
+        .select({
+          assetId: assetSearchV2.assetId,
+          assetType: assetSearchV2.assetType,
+          title: highlightedTitleSql,
+          additionalText: additionalSnippetSql,
+          updatedAt: assetSearchV2.updatedAt,
+          screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+          createdBy: assetSearchV2.createdBy,
+          createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+          createdByAvatarUrl: users.avatarUrl,
+          addedToLibrary: sql<boolean>`CASE WHEN ${userLibrary.userId} IS NOT NULL THEN true ELSE false END`,
+        })
+        .from(assetSearchV2)
+        .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
+        .innerJoin(
+          permissionedAssetsSubquery,
+          eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
+        )
+        .leftJoin(
+          userLibrary,
+          and(
+            eq(userLibrary.assetId, assetSearchV2.assetId),
+            eq(userLibrary.userId, userId),
+            isNull(userLibrary.deletedAt)
+          )
+        )
+        .where(and(...allConditions))
+        .orderBy(
+          sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
+          desc(assetSearchV2.updatedAt)
+        )
+        .limit(paginationCheckCount)
+        .offset(offset);
+    } else {
+      results = await db
+        .select({
+          assetId: assetSearchV2.assetId,
+          assetType: assetSearchV2.assetType,
+          title: highlightedTitleSql,
+          additionalText: additionalSnippetSql,
+          updatedAt: assetSearchV2.updatedAt,
+          screenshotBucketKey: assetSearchV2.screenshotBucketKey,
+          createdBy: assetSearchV2.createdBy,
+          createdByName: sql<string>`COALESCE(${users.name}, ${users.email})`,
+          createdByAvatarUrl: users.avatarUrl,
+        })
+        .from(assetSearchV2)
+        .innerJoin(users, eq(assetSearchV2.createdBy, users.id))
+        .innerJoin(
+          permissionedAssetsSubquery,
+          eq(assetSearchV2.assetId, permissionedAssetsSubquery.assetId)
+        )
+        .where(and(...allConditions))
+        .orderBy(
+          sql`CASE WHEN ${assetSearchV2.assetType} = 'metric_file' THEN 1 ELSE 0 END`,
+          desc(assetSearchV2.updatedAt)
+        )
+        .limit(paginationCheckCount)
+        .offset(offset);
+    }
 
     const hasMore = results.length > page_size;
 

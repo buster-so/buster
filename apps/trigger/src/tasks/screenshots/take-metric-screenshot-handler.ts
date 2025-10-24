@@ -2,6 +2,7 @@ import { hasMetricScreenshotBeenTakenWithin } from '@buster/database/queries';
 import { getMetricScreenshot } from '@buster/server-shared/screenshots/methods';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import dayjs from 'dayjs';
+import { commonTriggerScreenshotConfig } from './config';
 import { TakeMetricScreenshotTriggerSchema } from './schemas';
 import { screenshots_task_keys } from './task-keys';
 import { uploadScreenshotHandler } from './upload-screenshot-handler';
@@ -13,14 +14,9 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
     { success: boolean } | undefined
   >
 > = schemaTask({
+  ...commonTriggerScreenshotConfig,
   id: screenshots_task_keys.take_metric_screenshot,
   schema: TakeMetricScreenshotTriggerSchema,
-  maxDuration: 60 * 2, // 2 minutes max
-  retry: {
-    maxAttempts: 1,
-    minTimeoutInMs: 1000, // 1 second
-    maxTimeoutInMs: 60 * 1000, // 1 minute
-  },
   run: async (args) => {
     logger.info('Getting metric screenshot', { args });
 

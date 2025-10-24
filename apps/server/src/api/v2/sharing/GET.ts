@@ -1,4 +1,4 @@
-import { getUserOrganizationId, listPermissionedLibraryAssets } from '@buster/database/queries';
+import { getUserOrganizationId, listPermissionedSharedAssets } from '@buster/database/queries';
 import type { AssetListItem } from '@buster/database/schema-types';
 import { getAssetScreenshotSignedUrl } from '@buster/search';
 import { type AssetGetResponse, GetAssetsRequestQuerySchema } from '@buster/server-shared';
@@ -29,7 +29,7 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
     throw new HTTPException(403, { message: 'User not associated with any organization' });
   }
   try {
-    const dbResponse = await listPermissionedLibraryAssets({
+    const dbResponse = await listPermissionedSharedAssets({
       userId: user.id,
       organizationId: userOrg.organizationId,
       page,

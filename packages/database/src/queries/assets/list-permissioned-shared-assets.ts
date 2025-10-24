@@ -9,6 +9,7 @@ import {
   inArray,
   isNull,
   lte,
+  ne,
   not,
   type SQL,
   sql,
@@ -24,23 +25,23 @@ import {
   type ListPermissionedAssetsResponse,
 } from '../../schema-types';
 import {
-  libraryChildChatsFromCollections,
-  libraryChildDashboardsFromChats,
-  libraryChildDashboardsFromCollections,
-  libraryChildMetricsFromChats,
-  libraryChildMetricsFromCollections,
-  libraryChildMetricsFromDashboards,
-  libraryChildMetricsFromReports,
-  libraryChildReportsFromChats,
-  libraryChildReportsFromCollections,
-  libraryPermissionedChats,
-  libraryPermissionedCollections,
-  libraryPermissionedDashboardFiles,
-  libraryPermissionedMetricFiles,
-  libraryPermissionedReportFiles,
+  childChatsFromCollections,
+  childDashboardsFromChats,
+  childDashboardsFromCollections,
+  childMetricsFromChats,
+  childMetricsFromCollections,
+  childMetricsFromDashboards,
+  childMetricsFromReports,
+  childReportsFromChats,
+  childReportsFromCollections,
+  permissionedChats,
+  permissionedCollections,
+  permissionedDashboardFiles,
+  permissionedMetricFiles,
+  permissionedReportFiles,
 } from '../asset-permissions/asset-permission-subqueries';
 
-export async function listPermissionedLibraryAssets(
+export async function listPermissionedSharedAssets(
   input: ListPermissionedAssetsInput
 ): Promise<ListPermissionedAssetsResponse> {
   const {
@@ -63,30 +64,30 @@ export async function listPermissionedLibraryAssets(
 
   const offset = (page - 1) * page_size;
 
-  // Build the union query using library-aware subqueries
-  // These subqueries already include library filtering, so no separate join is needed
-  const baseUnion = libraryPermissionedReportFiles(organizationId, userId)
-    .union(libraryPermissionedMetricFiles(organizationId, userId))
-    .union(libraryPermissionedDashboardFiles(organizationId, userId))
-    .union(libraryPermissionedChats(organizationId, userId))
-    .union(libraryPermissionedCollections(organizationId, userId));
+  // Build the union query based on includeAssetChildren parameter
+  const baseUnion = permissionedReportFiles(organizationId, userId)
+    .union(permissionedMetricFiles(organizationId, userId))
+    .union(permissionedDashboardFiles(organizationId, userId))
+    .union(permissionedChats(organizationId, userId))
+    .union(permissionedCollections(organizationId, userId));
 
   const allPermissionedAssets = includeAssetChildren
     ? baseUnion
-        .union(libraryChildMetricsFromDashboards(organizationId, userId))
-        .union(libraryChildMetricsFromReports(organizationId, userId))
-        .union(libraryChildMetricsFromChats(organizationId, userId))
-        .union(libraryChildDashboardsFromChats(organizationId, userId))
-        .union(libraryChildReportsFromChats(organizationId, userId))
-        .union(libraryChildMetricsFromCollections(organizationId, userId))
-        .union(libraryChildDashboardsFromCollections(organizationId, userId))
-        .union(libraryChildReportsFromCollections(organizationId, userId))
-        .union(libraryChildChatsFromCollections(organizationId, userId))
+        .union(childMetricsFromDashboards(organizationId, userId))
+        .union(childMetricsFromReports(organizationId, userId))
+        .union(childMetricsFromChats(organizationId, userId))
+        .union(childDashboardsFromChats(organizationId, userId))
+        .union(childReportsFromChats(organizationId, userId))
+        .union(childMetricsFromCollections(organizationId, userId))
+        .union(childDashboardsFromCollections(organizationId, userId))
+        .union(childReportsFromCollections(organizationId, userId))
+        .union(childChatsFromCollections(organizationId, userId))
     : baseUnion;
 
+  // Filter for shared assets (not created by the current user)
   const permissionedAssets = allPermissionedAssets.as('permissioned_assets');
 
-  const filters: SQL[] = [];
+  const filters: SQL[] = [ne(permissionedAssets.createdBy, userId)];
 
   if (assetTypes && assetTypes.length > 0) {
     filters.push(inArray(permissionedAssets.assetType, assetTypes));
@@ -167,7 +168,7 @@ export async function listPermissionedLibraryAssets(
     : baseCountQuery);
   const totalValue = countResult[0]?.total ?? 0;
 
-  const libraryAssets: AssetListItem[] = assetsResult.map((asset) => ({
+  const sharedAssets: AssetListItem[] = assetsResult.map((asset) => ({
     asset_id: asset.assetId,
     asset_type: asset.assetType as AssetType,
     name: asset.name ?? '',
@@ -184,8 +185,8 @@ export async function listPermissionedLibraryAssets(
   if (groupBy && groupBy !== 'none') {
     const groups: Record<string, AssetListItem[]> = {};
 
-    for (let i = 0; i < libraryAssets.length; i++) {
-      const asset = libraryAssets[i];
+    for (let i = 0; i < sharedAssets.length; i++) {
+      const asset = sharedAssets[i];
       const resultAsset = assetsResult[i];
       if (!asset || !resultAsset) {
         continue;
@@ -226,7 +227,7 @@ export async function listPermissionedLibraryAssets(
   }
 
   return createPaginatedResponse({
-    data: libraryAssets,
+    data: sharedAssets,
     page,
     page_size,
     total: totalValue,

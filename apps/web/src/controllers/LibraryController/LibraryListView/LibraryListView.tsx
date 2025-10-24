@@ -1,6 +1,6 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type { BusterCollectionListItem } from '@buster/server-shared/collections';
-import type { LibraryAssetListItem, LibraryAssetType } from '@buster/server-shared/library';
+import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import React, { useMemo } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';

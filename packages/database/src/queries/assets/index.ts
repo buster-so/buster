@@ -44,6 +44,7 @@ export {
   getUsersWithAssetPermissions,
 } from './get-users-with-asset-permissions';
 export { listPermissionedLibraryAssets } from './list-permissioned-library-assets';
+export { listPermissionedSharedAssets } from './list-permissioned-shared-assets';
 export {
   type UpdateAssetScreenshotBucketKeyInput,
   UpdateAssetScreenshotBucketKeyInputSchema,
