@@ -116,7 +116,7 @@ const LibraryGridItem = React.memo((props: LibraryAssetListItem) => {
   return (
     <LibraryItemContextMenu {...props}>
       <Link {...link} preload={false} className="h-full">
-        <div className="group border rounded cursor-pointer hover:shadow hover:bg-item-hover-active overflow-hidden h-full flex flex-col">
+        <div className="group border rounded cursor-pointer hover:bg-item-hover-active hover:border-gray-dark! overflow-hidden h-full flex flex-col">
           <div
             className={cn(
               'px-2.5 flex-1 pt-1.5 bg-item-select overflow-hidden',

@@ -115,7 +115,11 @@ export const FilterSearchPills: React.FC<FiltersParams & OnSetFiltersParams> = (
   return <FilterPillsContainer pills={pills} className="border-t" />;
 };
 
-export const FilterLibraryPills: React.FC<ReturnType<typeof computeLibraryFilters>> = (params) => {
+export const FilterLibraryPills: React.FC<
+  ReturnType<typeof computeLibraryFilters> & {
+    filter: LibrarySearchParams['filter'];
+  }
+> = (params) => {
   const navigate = useNavigate();
 
   const allPills: FilterPill<string>[] = useMemo(() => {
@@ -128,6 +132,7 @@ export const FilterLibraryPills: React.FC<ReturnType<typeof computeLibraryFilter
       startDate,
       endDate,
       groupBy,
+      filter,
       includeCreatedBy,
     } = params;
 
@@ -225,16 +230,18 @@ export const FilterLibraryPills: React.FC<ReturnType<typeof computeLibraryFilter
     }
 
     if (includeCreatedBy && includeCreatedBy.length > 0) {
-      pills.push({
-        title: 'Owner',
-        value: 'includeCreatedBy',
-        subTitle: `${pluralize('user', includeCreatedBy.length, true)}`,
-        onRemove: () =>
-          navigate({
-            to: '/app/library',
-            search: (prev) => ({ ...prev, owner_ids: undefined }),
-          }),
-      });
+      if (!(filter === 'owned_by_me' && includeCreatedBy.length === 1)) {
+        pills.push({
+          title: 'Owner',
+          value: 'includeCreatedBy',
+          subTitle: `${pluralize('user', includeCreatedBy.length, true)}`,
+          onRemove: () =>
+            navigate({
+              to: '/app/library',
+              search: (prev) => ({ ...prev, owner_ids: undefined }),
+            }),
+        });
+      }
     }
 
     return pills;

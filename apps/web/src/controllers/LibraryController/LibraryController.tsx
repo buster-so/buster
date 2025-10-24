@@ -48,7 +48,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
       contentContainerId="library-content"
       scrollable={false}
     >
-      <FilterLibraryPills {...managedFilters} />
+      <FilterLibraryPills {...managedFilters} filter={filtersProps.filter} />
 
       {layout === 'grid' && <LibraryGridView {...libraryViewProps} />}
       {layout === 'list' && <LibraryListView {...libraryViewProps} />}
