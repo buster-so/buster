@@ -50,6 +50,10 @@ export function createStructuralMetadataFetcher(
     case DataSourceType.SQLServer:
       return getSQLServerStructuralMetadata;
 
+    case DataSourceType.MotherDuck:
+      // MotherDuck uses DuckDB which has PostgreSQL-compatible information_schema
+      return getPostgreSQLStructuralMetadata;
+
     default: {
       // Exhaustive check using never type
       const exhaustiveCheck: never = dialect;
@@ -82,6 +86,10 @@ export function createTableSampler(dialect: IntrospectionDialect): TableSampler 
 
     case DataSourceType.SQLServer:
       return getSQLServerTableSample;
+
+    case DataSourceType.MotherDuck:
+      // MotherDuck uses DuckDB which supports TABLESAMPLE like PostgreSQL
+      return getPostgreSQLTableSample;
 
     default: {
       // Exhaustive check using never type

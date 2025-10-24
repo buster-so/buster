@@ -205,10 +205,7 @@ export class RedshiftAdapter extends BaseAdapter {
     if (this.client) {
       try {
         await this.client.end();
-      } catch (error) {
-        // Log error but don't throw - connection is being closed anyway
-        console.error('Error closing Redshift connection:', error);
-      }
+      } catch (_error) {}
       this.client = undefined;
     }
     this.connected = false;
@@ -251,9 +248,8 @@ export class RedshiftAdapter extends BaseAdapter {
         tableName.toLowerCase(),
       ]);
       const firstRow = result.rows[0] as { count?: string } | undefined;
-      return !!firstRow && Number.parseInt(firstRow.count ?? '0') > 0;
-    } catch (error) {
-      console.error('Error checking table existence:', error);
+      return !!firstRow && Number.parseInt(firstRow.count ?? '0', 10) > 0;
+    } catch (_error) {
       return false;
     }
   }
@@ -290,7 +286,6 @@ export class RedshiftAdapter extends BaseAdapter {
 
     try {
       await this.client.query(createTableSQL);
-      console.info(`Table ${schema}.${tableName} created successfully`);
     } catch (error) {
       throw new Error(
         `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -354,7 +349,6 @@ export class RedshiftAdapter extends BaseAdapter {
 
     try {
       await this.client.query(insertSQL, params);
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw new Error(
         `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -255,8 +255,7 @@ export class BigQueryAdapter extends BaseAdapter {
       const table = dataset.table(tableName);
       const [exists] = await table.exists();
       return exists;
-    } catch (error) {
-      console.error('Error checking table existence:', error);
+    } catch (_error) {
       return false;
     }
   }
@@ -294,7 +293,6 @@ export class BigQueryAdapter extends BaseAdapter {
     try {
       const [job] = await this.client.createQueryJob({ query: createTableSQL });
       await job.getQueryResults();
-      console.info(`Table ${schema}.${tableName} created successfully`);
     } catch (error) {
       throw new Error(
         `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -373,7 +371,6 @@ export class BigQueryAdapter extends BaseAdapter {
         params,
       });
       await job.getQueryResults();
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw new Error(
         `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`

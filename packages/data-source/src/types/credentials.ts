@@ -8,6 +8,7 @@ export enum DataSourceType {
   MySQL = 'mysql',
   SQLServer = 'sqlserver',
   Redshift = 'redshift',
+  MotherDuck = 'motherduck',
 }
 
 /**
@@ -224,6 +225,32 @@ export interface RedshiftCredentials {
 }
 
 /**
+ * MotherDuck credentials interface (cloud-native DuckDB)
+ */
+export interface MotherDuckCredentials {
+  /** Data source type */
+  type: DataSourceType.MotherDuck;
+
+  /** MotherDuck access token (Read/Write or Read Scaling) */
+  token: string;
+
+  /** Optional database name to connect to (defaults to default database) */
+  database?: string;
+
+  /** Enable SaaS mode for additional security isolation (defaults to true for server-side execution) */
+  saas_mode?: boolean;
+
+  /** Database attachment mode: 'multi' allows multiple databases, 'single' restricts to one */
+  attach_mode?: 'multi' | 'single';
+
+  /** Connection timeout in milliseconds */
+  connection_timeout?: number;
+
+  /** Query timeout in milliseconds */
+  query_timeout?: number;
+}
+
+/**
  * Union type for all supported credential types
  */
 export type Credentials =
@@ -232,7 +259,8 @@ export type Credentials =
   | PostgreSQLCredentials
   | MySQLCredentials
   | SQLServerCredentials
-  | RedshiftCredentials;
+  | RedshiftCredentials
+  | MotherDuckCredentials;
 
 /**
  * Type guard to check if credentials are for Snowflake
@@ -284,6 +312,15 @@ export function isRedshiftCredentials(
   credentials: Credentials
 ): credentials is RedshiftCredentials {
   return credentials.type === DataSourceType.Redshift;
+}
+
+/**
+ * Type guard to check if credentials are for MotherDuck
+ */
+export function isMotherDuckCredentials(
+  credentials: Credentials
+): credentials is MotherDuckCredentials {
+  return credentials.type === DataSourceType.MotherDuck;
 }
 
 /**

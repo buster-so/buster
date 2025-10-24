@@ -271,13 +271,7 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
                   column.sampleValues = this.truncateSampleValues(stat.sampleValues, column) ?? '';
                 }
               }
-            } catch (error) {
-              // Log warning but don't fail the entire introspection
-              console.warn(
-                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
-                error
-              );
-            }
+            } catch (_error) {}
           })
         );
       })

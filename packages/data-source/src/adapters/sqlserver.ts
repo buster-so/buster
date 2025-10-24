@@ -230,10 +230,7 @@ export class SQLServerAdapter extends BaseAdapter {
     if (this.pool) {
       try {
         await this.pool.close();
-      } catch (error) {
-        // Log error but don't throw - connection is being closed anyway
-        console.error('Error closing SQL Server connection:', error);
-      }
+      } catch (_error) {}
       this.pool = undefined;
     }
     this.connected = false;
@@ -277,8 +274,7 @@ export class SQLServerAdapter extends BaseAdapter {
 
       const firstRow = result.recordset[0] as { count?: number } | undefined;
       return !!firstRow && (firstRow.count ?? 0) > 0;
-    } catch (error) {
-      console.error('Error checking table existence:', error);
+    } catch (_error) {
       return false;
     }
   }
@@ -321,7 +317,6 @@ export class SQLServerAdapter extends BaseAdapter {
     try {
       const request = this.pool.request();
       await request.query(createTableSQL);
-      console.info(`Table ${schema}.${tableName} created successfully`);
     } catch (error) {
       throw new Error(
         `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -395,8 +390,6 @@ export class SQLServerAdapter extends BaseAdapter {
         .input('confidenceScore', sql.NVarChar, record.confidenceScore)
         .input('assumptions', sql.NVarChar, JSON.stringify(record.assumptions))
         .query(insertSQL);
-
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw new Error(
         `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -88,25 +88,11 @@ export async function getCachedMetricData(
     const storageProvider = await getProviderForOrganization(organizationId);
     const key = generateCacheKey(organizationId, metricId, reportId, version);
 
-    console.info('[metric-cache] Fetching cached data', {
-      organizationId,
-      metricId,
-      reportId,
-      version,
-      key,
-    });
-
     let downloadResult = await storageProvider.download(key);
 
     // If versioned key doesn't exist and version was provided, try without version for backward compatibility
     if ((!downloadResult.success || !downloadResult.data) && version !== undefined) {
       const legacyKey = generateLegacyCacheKey(organizationId, metricId, reportId);
-      console.info('[metric-cache] Trying legacy cache key', {
-        organizationId,
-        metricId,
-        reportId,
-        legacyKey,
-      });
       downloadResult = await storageProvider.download(legacyKey);
     }
 
@@ -115,7 +101,6 @@ export async function getCachedMetricData(
         organizationId,
         metricId,
         reportId,
-        version,
       });
       return null;
     }
@@ -128,7 +113,6 @@ export async function getCachedMetricData(
       organizationId,
       metricId,
       reportId,
-      version,
       rowCount: data.data?.length || 0,
     });
 
@@ -153,15 +137,6 @@ export async function setCachedMetricData(
     const storageProvider = await getProviderForOrganization(organizationId);
     const key = generateCacheKey(organizationId, metricId, reportId, version);
 
-    console.info('[metric-cache] Caching metric data', {
-      organizationId,
-      metricId,
-      reportId,
-      version,
-      key,
-      rowCount: data.data?.length || 0,
-    });
-
     // Convert data to JSON format
     const jsonBuffer = dataToJson(data);
 
@@ -182,7 +157,6 @@ export async function setCachedMetricData(
         organizationId,
         metricId,
         reportId,
-        version,
         sizeBytes: jsonBuffer.length,
       });
     } else {

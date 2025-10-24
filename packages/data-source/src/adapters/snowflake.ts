@@ -70,7 +70,6 @@ export class SnowflakeAdapter extends BaseAdapter {
           this.connected = true;
           this.lastActivity = now;
           warmConnectionLastUsed = now;
-          console.info('Reusing warm Snowflake connection');
           return;
         }
         // Connection is stale, destroy it
@@ -162,7 +161,6 @@ export class SnowflakeAdapter extends BaseAdapter {
     return new Promise((resolve) => {
       connection.destroy((err: SnowflakeError | undefined) => {
         if (err) {
-          console.error('Error destroying connection:', err);
         }
         resolve();
       });
@@ -327,7 +325,6 @@ export class SnowflakeAdapter extends BaseAdapter {
       this.connection === warmConnection &&
       Date.now() - this.lastActivity < CONNECTION_REUSE_TIME
     ) {
-      console.info('Keeping Snowflake connection warm for reuse');
     } else if (this.connection) {
       // Connection is too old or not the warm connection, destroy it
       await this.destroyConnection(this.connection);
@@ -424,7 +421,6 @@ export class SnowflakeAdapter extends BaseAdapter {
 
     try {
       await this.query(insertSQL, params);
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw classifyError(error);
     }
@@ -495,14 +491,11 @@ export class SnowflakeAdapter extends BaseAdapter {
         await new Promise<void>((resolve) => {
           warmConnection?.destroy((err: SnowflakeError | undefined) => {
             if (err) {
-              console.error('Error destroying warm connection:', err);
             }
             resolve();
           });
         });
-      } catch (error) {
-        console.error('Failed to destroy warm connection:', error);
-      }
+      } catch (_error) {}
       warmConnection = null;
       warmConnectionCredentials = null;
     }

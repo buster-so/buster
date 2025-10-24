@@ -137,8 +137,7 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
 
       await file.delete();
       return true;
-    } catch (error) {
-      console.error('GCS delete error:', error);
+    } catch (_error) {
       return false;
     }
   }
@@ -150,8 +149,7 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
 
       const [exists] = await file.exists();
       return exists;
-    } catch (error) {
-      console.error('GCS exists error:', error);
+    } catch (_error) {
       return false;
     }
   }
@@ -189,8 +187,7 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
             : new Date(),
         etag: file.metadata.etag || '',
       }));
-    } catch (error) {
-      console.error('GCS list error:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -200,13 +197,10 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
     const testData = 'test';
 
     try {
-      // Test bucket exists
-      console.info('GCS: Testing bucket exists for:', config.bucket);
       let bucketExists: boolean;
       try {
         [bucketExists] = await bucketInstance.exists();
       } catch (error) {
-        console.error('GCS: Error checking bucket existence:', error);
         return {
           success: false,
           canRead: false,
@@ -225,8 +219,6 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
           error: 'Bucket does not exist or is not accessible',
         };
       }
-
-      console.info('GCS: Bucket exists, testing write permission');
       // Test write
       const uploadResult = await upload(testKey, testData);
       if (!uploadResult.success) {
@@ -238,8 +230,6 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
           error: `Cannot write to bucket: ${uploadResult.error}`,
         };
       }
-
-      console.info('GCS: Write successful, testing read permission');
       // Test read
       const downloadResult = await download(testKey);
       if (!downloadResult.success) {
@@ -253,8 +243,6 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
           error: `Cannot read from bucket: ${downloadResult.error}`,
         };
       }
-
-      console.info('GCS: Read successful, testing delete permission');
       // Test delete
       const deleteResult = await deleteObject(testKey);
       if (!deleteResult) {
@@ -266,8 +254,6 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
           error: 'Cannot delete from bucket',
         };
       }
-
-      console.info('GCS: All tests passed successfully');
       return {
         success: true,
         canRead: true,
@@ -275,7 +261,6 @@ export function createGCSProvider(config: GCSConfig): StorageProvider {
         canDelete: true,
       };
     } catch (error) {
-      console.error('GCS: Unexpected error during connection test:', error);
       return {
         success: false,
         canRead: false,

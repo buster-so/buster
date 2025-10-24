@@ -82,8 +82,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
 
       this.cache.databases = { data: databases, lastFetched: new Date() };
       return databases;
-    } catch (error) {
-      console.warn('Failed to fetch SQL Server databases:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -125,8 +124,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
 
       this.cache.schemas = { data: schemas, lastFetched: new Date() };
       return schemas;
-    } catch (error) {
-      console.warn('Failed to fetch SQL Server schemas:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -210,8 +208,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
               rowCount: this.parseNumber(stats?.row_count) ?? 0,
               sizeBytes: this.parseNumber(stats?.size_bytes) ?? 0,
             };
-          } catch (error) {
-            console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
+          } catch (_error) {
             return table;
           }
         })
@@ -223,8 +220,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
       }
 
       return tablesWithStats;
-    } catch (error) {
-      console.warn('Failed to fetch SQL Server tables:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -316,8 +312,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
       }
 
       return columns;
-    } catch (error) {
-      console.warn('Failed to fetch SQL Server columns:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -382,8 +377,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
       }
 
       return views;
-    } catch (error) {
-      console.warn('Failed to fetch SQL Server views:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -463,9 +457,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
           });
         }
       }
-    } catch (error) {
-      console.warn(`Could not get statistics for table ${table}:`, error);
-
+    } catch (_error) {
       // Fallback: create empty statistics for each column
       for (const column of columns) {
         columnStatistics.push({
@@ -806,13 +798,7 @@ ORDER BY s.column_name`;
                   column.sampleValues = stat.sampleValues ?? '';
                 }
               }
-            } catch (error) {
-              // Log warning but don't fail the entire introspection
-              console.warn(
-                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
-                error
-              );
-            }
+            } catch (_error) {}
           })
         );
       })

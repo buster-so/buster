@@ -142,14 +142,6 @@ export async function executeMetricQuery(
         if (isTimeout && attempt < retryDelays.length) {
           // Wait before retry
           const delay = retryDelays[attempt] || 6000;
-          console.warn(
-            `[execute-metric-query] SQL execution timeout on attempt ${attempt + 1}/${retryDelays.length + 1}. Retrying in ${delay}ms...`,
-            {
-              sqlPreview: `${sql.substring(0, 100)}...`,
-              attempt: attempt + 1,
-              nextDelay: delay,
-            }
-          );
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue; // Retry
         }
@@ -165,15 +157,6 @@ export async function executeMetricQuery(
         if (isTimeout && attempt < retryDelays.length) {
           // Wait before retry
           const delay = retryDelays[attempt] || 6000;
-          console.warn(
-            `[execute-metric-query] SQL execution timeout (exception) on attempt ${attempt + 1}/${retryDelays.length + 1}. Retrying in ${delay}ms...`,
-            {
-              sqlPreview: `${sql.substring(0, 100)}...`,
-              attempt: attempt + 1,
-              nextDelay: delay,
-              error: errorMessage,
-            }
-          );
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue; // Retry
         }
@@ -187,8 +170,6 @@ export async function executeMetricQuery(
     throw new Error('Max retries exceeded for SQL execution');
   } finally {
     // Always close the data source connection
-    await dataSource.close().catch((err) => {
-      console.error('Failed to close data source connection:', err);
-    });
+    await dataSource.close().catch((_err) => {});
   }
 }

@@ -113,7 +113,6 @@ export async function getStructuralMetadata(
       filters,
     };
   } catch (error) {
-    console.error('Failed to fetch MySQL structural metadata:', error);
     throw new Error(
       `Failed to fetch structural metadata: ${error instanceof Error ? error.message : 'Unknown error'}`
     );

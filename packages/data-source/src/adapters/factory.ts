@@ -1,6 +1,7 @@
 import { type Credentials, DataSourceType } from '../types/credentials';
 import type { DatabaseAdapter } from './base';
 import { BigQueryAdapter } from './bigquery';
+import { MotherDuckAdapter } from './motherduck';
 import { MySQLAdapter } from './mysql';
 import { PostgreSQLAdapter } from './postgresql';
 import { RedshiftAdapter } from './redshift';
@@ -47,6 +48,10 @@ export function createAdapterInstance(credentials: Credentials): DatabaseAdapter
 
     case DataSourceType.Redshift:
       adapter = new RedshiftAdapter();
+      break;
+
+    case DataSourceType.MotherDuck:
+      adapter = new MotherDuckAdapter();
       break;
 
     default: {

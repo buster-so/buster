@@ -151,7 +151,12 @@ export function classifyError(
     errorMessage.includes('Authentication') ||
     errorMessage.includes('Invalid username or password') ||
     errorMessage.includes('Access denied') ||
-    errorMessage.includes('credentials')
+    errorMessage.includes('credentials') ||
+    // MotherDuck-specific auth errors
+    errorMessage.includes('Invalid token') ||
+    errorMessage.includes('Token expired') ||
+    errorMessage.includes('Unauthorized') ||
+    errorMessage.includes('motherduck_token')
   ) {
     return new AuthenticationError(errorMessage, originalError);
   }
@@ -173,9 +178,26 @@ export function classifyError(
     errorMessage.includes('configuration') ||
     errorMessage.includes('Configuration') ||
     errorMessage.includes('Invalid') ||
-    errorMessage.includes('not found')
+    errorMessage.includes('not found') ||
+    // MotherDuck-specific config errors
+    errorMessage.includes('Invalid database') ||
+    errorMessage.includes('Unknown parameter') ||
+    errorMessage.includes('saas_mode') ||
+    errorMessage.includes('attach_mode')
   ) {
     return new ConfigurationError(errorMessage, originalError);
+  }
+
+  // MotherDuck-specific query errors
+  if (
+    errorMessage.includes('Parser Error') ||
+    errorMessage.includes('Catalog Error') ||
+    errorMessage.includes('Binder Error') ||
+    errorMessage.includes('Syntax error') ||
+    errorMessage.includes('Table with name') ||
+    errorMessage.includes('does not exist')
+  ) {
+    return new QueryExecutionError(errorMessage, context?.sql, originalError);
   }
 
   // Default to query execution error

@@ -1158,6 +1158,9 @@ importers:
       '@buster/vitest-config':
         specifier: workspace:*
         version: link:../vitest-config
+      '@duckdb/node-api':
+        specifier: 1.4.1-r.4
+        version: 1.4.1-r.4
       '@google-cloud/bigquery':
         specifier: ^8.1.1
         version: 8.1.1
@@ -2362,6 +2365,9 @@ packages:
   '@duckdb/node-api@1.4.1-r.1':
     resolution: {integrity: sha512-OQgLTZHkHfhbl4lNgn/dD9WwwKujbshPTl6ZW/waqNK10kcZmrtZM70FrMiBVKi4FDbaFSN8/EQ6n8N2K1GlRw==}
 
+  '@duckdb/node-api@1.4.1-r.4':
+    resolution: {integrity: sha512-dvlkGZBlQBKzt5CDP2lv8stppufCCxK3RWbRGBjg8KHuGxreLNIKN1uzB4p6qpJuMZsD5N8UJd0dqidoKOZ/cw==}
+
   '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.26':
     resolution: {integrity: sha512-SioksFdehT2TWuGx6otWM2bCJ6kjD4Nq9r6xHCA4gvko1MBESIm+XhwvwcnGx2IaXTzKRZ+DPxNTPobPX18lpQ==}
     cpu: [arm64]
@@ -2369,6 +2375,11 @@ packages:
 
   '@duckdb/node-bindings-darwin-arm64@1.4.1-r.1':
     resolution: {integrity: sha512-Ji/b0zKg7R2tta3T0CQx29XtLlkrJggDK91d0qaFtPgXSrtnevEBHg7PVS5lC0i0Lwksk1BQB8P5/5aGwUGttA==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@duckdb/node-bindings-darwin-arm64@1.4.1-r.4':
+    resolution: {integrity: sha512-4ZklLdqX5ZqqR0guwVj5DTTwIEL/o0aqJSWBU4loMbOSAZOLANVMG8+x9YJXI3aJjbQ+90VAzJN3ptJs3X1Ong==}
     cpu: [arm64]
     os: [darwin]
 
@@ -2382,6 +2393,11 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  '@duckdb/node-bindings-darwin-x64@1.4.1-r.4':
+    resolution: {integrity: sha512-tSWkNzXRjndWNMWJLJzOymGc8gscG2rwYf7wDm6r+e80f0VwrjP1bcNKB/qdKdmubkz1yRU/TWoVEpaK42266A==}
+    cpu: [x64]
+    os: [darwin]
+
   '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.26':
     resolution: {integrity: sha512-vhHmoiQpkeXb0PbhsLEEmulG05BxO1elNhHVMLobdAwVfoGEPE3fZkH4bPgvTGywwZC7ccqMFwMjYTTOIIJvLg==}
     cpu: [arm64]
@@ -2389,6 +2405,11 @@ packages:
 
   '@duckdb/node-bindings-linux-arm64@1.4.1-r.1':
     resolution: {integrity: sha512-8ugaMZsPSBhys+ZubWzfuJ3Q67anOCOIeu+w34W0HVq3jy0MWA8LOGTNWPbTvdQuVKrS7YyBLtAxjeBy2akiRg==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@duckdb/node-bindings-linux-arm64@1.4.1-r.4':
+    resolution: {integrity: sha512-RO7M85r+bK0Cvn9lD+304gFl3V2eHK47qnmlGCu7kFPHCAowGCYosKim9ML5FslD3ZBdghGl4AdNnrtY3i3mgQ==}
     cpu: [arm64]
     os: [linux]
 
@@ -2402,6 +2423,11 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@duckdb/node-bindings-linux-x64@1.4.1-r.4':
+    resolution: {integrity: sha512-jQKjaje/z35oUdYv7gvCyqZTpsgskgTyt1vyLCnGV/Kwi6UevzorvwEmpvglqxaMONvRQvoGZykfSzHc2ZlS5w==}
+    cpu: [x64]
+    os: [linux]
+
   '@duckdb/node-bindings-win32-x64@1.3.2-alpha.26':
     resolution: {integrity: sha512-wNZmvYgnkUS3/pC9RQNO6yJeI8EANxB5LAyERJMHtMKrF6LB1nTEYmFbSlVJQ9n10qtNxKv/fF47AAAovOnG6g==}
     cpu: [x64]
@@ -2412,11 +2438,19 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@duckdb/node-bindings-win32-x64@1.4.1-r.4':
+    resolution: {integrity: sha512-IgwffRzZxYmsys6VD3zE3Zd6M9Ld24pNuP/h2eNQL6aY+kRa47R5ULEQ2E8BDFuB+ZIu680XQK5lNG+sW4DTNg==}
+    cpu: [x64]
+    os: [win32]
+
   '@duckdb/node-bindings@1.3.2-alpha.26':
     resolution: {integrity: sha512-066o5XrzesZnF/qhNlpmFwDxvIXNYQWr48bjw/ecyLfUcpcvqE0MyL1/zV5oScfcf7hSd/dSntRVzUnQmJCwXg==}
 
   '@duckdb/node-bindings@1.4.1-r.1':
     resolution: {integrity: sha512-juctO06hK1DVPCt8uLwZh8IY/aqlUPEZ7MuAsecP3DVSfQH8L3T3/KRvanjg0X1PrviLptr81BYilriOarbP8g==}
+
+  '@duckdb/node-bindings@1.4.1-r.4':
+    resolution: {integrity: sha512-dlVzEH1Hizi1LxxiLOs9hpBhvH7mEWQA6ayJ/6NZQbru//UdmjKg27//4+Rbbg2+dF0E9CebOefxlAkKFWi3uA==}
 
   '@ecies/ciphers@0.2.4':
     resolution: {integrity: sha512-t+iX+Wf5nRKyNzk8dviW3Ikb/280+aEJAnw9YXvCp2tYGPSkMki+NRY+8aNLmVFv3eNtMdvViPNOPxS8SZNP+w==}
@@ -15347,10 +15381,17 @@ snapshots:
     dependencies:
       '@duckdb/node-bindings': 1.4.1-r.1
 
+  '@duckdb/node-api@1.4.1-r.4':
+    dependencies:
+      '@duckdb/node-bindings': 1.4.1-r.4
+
   '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.26':
     optional: true
 
   '@duckdb/node-bindings-darwin-arm64@1.4.1-r.1':
+    optional: true
+
+  '@duckdb/node-bindings-darwin-arm64@1.4.1-r.4':
     optional: true
 
   '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.26':
@@ -15359,10 +15400,16 @@ snapshots:
   '@duckdb/node-bindings-darwin-x64@1.4.1-r.1':
     optional: true
 
+  '@duckdb/node-bindings-darwin-x64@1.4.1-r.4':
+    optional: true
+
   '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.26':
     optional: true
 
   '@duckdb/node-bindings-linux-arm64@1.4.1-r.1':
+    optional: true
+
+  '@duckdb/node-bindings-linux-arm64@1.4.1-r.4':
     optional: true
 
   '@duckdb/node-bindings-linux-x64@1.3.2-alpha.26':
@@ -15371,10 +15418,16 @@ snapshots:
   '@duckdb/node-bindings-linux-x64@1.4.1-r.1':
     optional: true
 
+  '@duckdb/node-bindings-linux-x64@1.4.1-r.4':
+    optional: true
+
   '@duckdb/node-bindings-win32-x64@1.3.2-alpha.26':
     optional: true
 
   '@duckdb/node-bindings-win32-x64@1.4.1-r.1':
+    optional: true
+
+  '@duckdb/node-bindings-win32-x64@1.4.1-r.4':
     optional: true
 
   '@duckdb/node-bindings@1.3.2-alpha.26':
@@ -15393,6 +15446,14 @@ snapshots:
       '@duckdb/node-bindings-linux-arm64': 1.4.1-r.1
       '@duckdb/node-bindings-linux-x64': 1.4.1-r.1
       '@duckdb/node-bindings-win32-x64': 1.4.1-r.1
+
+  '@duckdb/node-bindings@1.4.1-r.4':
+    optionalDependencies:
+      '@duckdb/node-bindings-darwin-arm64': 1.4.1-r.4
+      '@duckdb/node-bindings-darwin-x64': 1.4.1-r.4
+      '@duckdb/node-bindings-linux-arm64': 1.4.1-r.4
+      '@duckdb/node-bindings-linux-x64': 1.4.1-r.4
+      '@duckdb/node-bindings-win32-x64': 1.4.1-r.4
 
   '@ecies/ciphers@0.2.4(@noble/ciphers@1.3.0)':
     dependencies:
@@ -20308,7 +20369,7 @@ snapshots:
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.0.3
-      vitest: 4.0.2(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/ui@4.0.1)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 4.0.2(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/ui@4.0.1)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1)
       ws: 8.18.3
     transitivePeerDependencies:
       - bufferutil
@@ -20329,7 +20390,7 @@ snapshots:
       magicast: 0.3.5
       std-env: 3.9.0
       tinyrainbow: 3.0.3
-      vitest: 4.0.2(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/ui@4.0.1)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 4.0.2(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/ui@4.0.1)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1)
     optionalDependencies:
       '@vitest/browser': 4.0.1(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(vite@7.1.12(@types/node@24.3.1)(jiti@2.6.1)(lightningcss@1.30.1)(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1))(vitest@4.0.2)
     transitivePeerDependencies:
@@ -20444,7 +20505,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.0.2(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/ui@4.0.1)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 4.0.2(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.3.1)(@vitest/ui@4.0.1)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.5(@types/node@24.3.1)(typescript@5.9.3))(sass@1.93.2)(terser@5.43.1)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
