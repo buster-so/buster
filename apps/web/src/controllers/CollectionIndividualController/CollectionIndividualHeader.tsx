@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { canEdit } from '@/lib/share';
+import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { CollectionThreeDotDropdown } from './CollectionThreeDotMenu';
 
 export const CollectionsIndividualHeader: React.FC<{
@@ -44,6 +44,9 @@ const ContentRight: React.FC<{
   const collectionTitle = collection?.name;
   const navigate = useNavigate();
 
+  const isEditor = canEdit(collection.permission);
+  const isEffectiveOwner = getIsEffectiveOwner(collection.permission);
+
   const onButtonClick = useMemoizedFn(() => {
     setOpenAddTypeModal(true);
   });
@@ -58,10 +61,12 @@ const ContentRight: React.FC<{
 
   return (
     <div className="flex items-center space-x-1">
-      <AppTooltip title={'Add to collection'}>
-        <Button variant={'ghost'} prefix={<Plus />} onClick={onButtonClick} />
-      </AppTooltip>
-      <ShareCollectionButton collectionId={collection.id} />
+      {isEditor && (
+        <AppTooltip title={'Add to collection'}>
+          <Button variant={'ghost'} prefix={<Plus />} onClick={onButtonClick} />
+        </AppTooltip>
+      )}
+      {isEffectiveOwner && <ShareCollectionButton collectionId={collection.id} />}
       <AssetOrderPopover
         layout={layout}
         onChangeLayout={onChangeLayout}
@@ -72,7 +77,10 @@ const ContentRight: React.FC<{
       <CollectionThreeDotDropdown
         id={collection.id}
         name={collectionTitle}
-        permission={collection.permission}
+        isEffectiveOwner={isEffectiveOwner}
+        isEditor={isEditor}
+        collection={collection}
+        setOpenAddTypeModal={setOpenAddTypeModal}
       />
     </div>
   );
