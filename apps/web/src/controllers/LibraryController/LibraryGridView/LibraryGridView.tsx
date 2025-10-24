@@ -5,6 +5,7 @@ import React, { useRef } from 'react';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
+import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
 import { useMounted } from '@/hooks/useMount';
@@ -92,6 +93,7 @@ export const LibraryGridView = React.memo(
               allResults={allResults}
               columns={columns}
               scrollContainerRef={scrollContainerRef}
+              hasCollections={hasCollections}
             />
           ))}
 
@@ -170,6 +172,7 @@ const LibraryGroupedView = ({
         allResults={allResults}
         columns={columns}
         scrollContainerRef={scrollContainerRef}
+        hasCollections={hasCollections}
       />
     );
   }
@@ -187,7 +190,7 @@ const LibraryGroupedView = ({
             items={items}
             columns={columns}
             scrollContainerRef={scrollContainerRef}
-            className={hasCollections && groupIndex === 0 ? 'mt-11' : 'mt-6'}
+            className={hasCollections ? (groupIndex === 0 ? 'mt-11' : 'mt-6') : ''}
           />
         );
       })}
@@ -269,10 +272,12 @@ const LibraryUngroupedView = ({
   allResults,
   columns,
   scrollContainerRef,
+  hasCollections,
 }: {
   allResults: LibraryAssetListItem[];
   columns: number;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  hasCollections: boolean;
 }) => {
   // Calculate rows needed for grid
   const rowCount = Math.ceil(allResults.length / columns);
@@ -288,7 +293,11 @@ const LibraryUngroupedView = ({
   });
 
   return (
-    <LibrarySectionContainer title="Recently visited" icon={<Clock />} className="mt-11">
+    <LibrarySectionContainer
+      title="Library"
+      icon={<Grid2 />}
+      className={hasCollections ? 'mt-11' : ''}
+    >
       <div
         ref={virtualStartRef}
         style={{

@@ -39,8 +39,8 @@ export const SearchInput: React.FC<
               animate={{ opacity: 1, height: '40px' }}
               exit={{ opacity: 0, height: '0px' }}
               transition={{
-                height: { duration: 0.15 },
-                opacity: { duration: 0.15, delay: 0.065 },
+                height: { duration: 0.15, delay: 0.065 },
+                opacity: { duration: 0.15 },
               }}
             >
               {filterDropdownContent}

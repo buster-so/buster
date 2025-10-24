@@ -45,9 +45,7 @@ export const GlobalSearchModal = () => {
 
   const filterDropdownContent = useMemo(() => {
     const hasFilters = Object.values(filtersParams).some((x) => !isEmpty(x));
-    console.log(filtersParams);
     if (!hasFilters) return null;
-
     return <div>Filter Content</div>;
   }, [filtersParams, onSetFilters]);
 
