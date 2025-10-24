@@ -75,6 +75,13 @@ interface MySqlOutput {
   threads: number;
 }
 
+interface MotherDuckOutput {
+  type: 'duckdb';
+  path: string;
+  threads: number;
+  extensions?: string[];
+}
+
 /** buildOutput: type-safe conversion from credentials to dbt output format */
 export function buildOutput(
   creds: Credentials
@@ -84,7 +91,8 @@ export function buildOutput(
   | BigQueryOutput
   | RedshiftOutput
   | SqlServerOutput
-  | MySqlOutput {
+  | MySqlOutput
+  | MotherDuckOutput {
   switch (creds.type) {
     case DataSourceType.PostgreSQL:
       return {
@@ -164,6 +172,18 @@ export function buildOutput(
         schema: 'public',
         threads: 4,
       };
+
+    case DataSourceType.MotherDuck: {
+      // MotherDuck connection string format: md:database?motherduck_token=token
+      const path = `md:${creds.default_database}?motherduck_token=${creds.token}`;
+
+      return {
+        type: 'duckdb',
+        path,
+        threads: 4,
+        extensions: ['httpfs', 'parquet'],
+      };
+    }
 
     default: {
       // Exhaustive check - this should never be reached

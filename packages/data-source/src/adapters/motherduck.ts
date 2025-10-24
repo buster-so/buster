@@ -87,7 +87,7 @@ export class MotherDuckAdapter extends BaseAdapter {
     }
 
     // Build base connection string
-    const database = credentials.database || '';
+    const database = credentials.default_database;
     const params: string[] = [`motherduck_token=${token}`];
 
     // Add optional parameters

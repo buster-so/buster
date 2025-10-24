@@ -22,7 +22,7 @@ describe('MotherDuck Integration Tests', () => {
   const getCredentials = (): MotherDuckCredentials => ({
     type: DataSourceType.MotherDuck,
     token: process.env.TEST_MOTHERDUCK_TOKEN!,
-    database: 'sample_data',
+    default_database: 'sample_data',
     // saas_mode defaults to true for server-side security
   });
 
@@ -242,7 +242,7 @@ describe('MotherDuck Integration Tests', () => {
         const invalidCredentials: MotherDuckCredentials = {
           type: DataSourceType.MotherDuck,
           token: 'invalid_token_12345',
-          database: 'sample_data',
+          default_database: 'sample_data',
         };
 
         await expect(invalidAdapter.initialize(invalidCredentials)).rejects.toThrow();

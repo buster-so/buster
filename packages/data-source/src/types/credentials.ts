@@ -234,8 +234,8 @@ export interface MotherDuckCredentials {
   /** MotherDuck access token (Read/Write or Read Scaling) */
   token: string;
 
-  /** Optional database name to connect to (defaults to default database) */
-  database?: string;
+  /** Default database name to connect to */
+  default_database: string;
 
   /** Enable SaaS mode for additional security isolation (defaults to true for server-side execution) */
   saas_mode?: boolean;
