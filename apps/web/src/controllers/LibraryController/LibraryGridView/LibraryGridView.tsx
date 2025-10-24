@@ -5,7 +5,6 @@ import React, { useRef } from 'react';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import Clock from '@/components/ui/icons/NucleoIconOutlined/clock';
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
-import { ListEmptyStateWithButton } from '@/components/ui/list/ListEmptyStateWithButton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
 import { useMounted } from '@/hooks/useMount';
@@ -86,6 +85,7 @@ export const LibraryGridView = React.memo(
               scrollContainerRef={scrollContainerRef}
               groupBy={groupBy}
               allResults={allResults}
+              hasCollections={hasCollections}
             />
           ) : (
             <LibraryUngroupedView
@@ -155,12 +155,14 @@ const LibraryGroupedView = ({
   scrollContainerRef,
   groupBy,
   allResults,
+  hasCollections,
 }: {
   allGroups: Record<string, LibraryAssetListItem[]>;
   columns: number;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   groupBy: LibrarySearchParams['group_by'];
   allResults: LibraryAssetListItem[];
+  hasCollections: boolean;
 }) => {
   if (groupBy === 'none' || !groupBy) {
     return (
@@ -185,7 +187,7 @@ const LibraryGroupedView = ({
             items={items}
             columns={columns}
             scrollContainerRef={scrollContainerRef}
-            className={groupIndex === 0 ? 'mt-11' : 'mt-6'}
+            className={hasCollections && groupIndex === 0 ? 'mt-11' : 'mt-6'}
           />
         );
       })}
@@ -217,9 +219,7 @@ const LibraryGroupSection = ({
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => scrollContainerRef.current,
-    scrollMargin: 0,
-    estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
-    overscan: 3,
+    ...commonRowVirtualizerProps,
   });
 
   return (
@@ -259,6 +259,12 @@ const LibraryGroupSection = ({
   );
 };
 
+const commonRowVirtualizerProps = {
+  overscan: 5,
+  scrollMargin: 0,
+  estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
+};
+
 const LibraryUngroupedView = ({
   allResults,
   columns,
@@ -273,14 +279,12 @@ const LibraryUngroupedView = ({
 
   // Ref to measure offset from collections section
   const virtualStartRef = useRef<HTMLDivElement>(null);
-  const _mounted = useMounted(); //keep this because we tanstack virtualizer need to trigger reflow
+  const _mounted = useMounted(); //keep this because we tanstack virtualizer need to trigger reflow when switching between list/grid
 
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => scrollContainerRef.current,
-    scrollMargin: 0,
-    estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
-    overscan: 3, // Render 3 extra rows above/below for smooth scrolling
+    ...commonRowVirtualizerProps,
   });
 
   return (

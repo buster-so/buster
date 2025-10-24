@@ -96,15 +96,16 @@ export const SearchModalBase = (props: SearchModalBaseProps) => {
       return;
     }
 
-    if (mode === 'select-single') {
-      const newItem = item.assetId === props.selectedItem ? null : item.assetId;
-      await props.onSelect?.(newItem ? { assetId: newItem, assetType: item.assetType } : null);
+    if (mode === 'select-multiple') {
+      console.log('item.asdf', item);
+      const itemKey = createSelectionKey(item.assetId, item.assetType);
+      await props.onSelect(itemKey, item.addedToLibrary ?? false);
       return;
     }
 
-    if (mode === 'select-multiple') {
-      const itemKey = createSelectionKey(item.assetId, item.assetType);
-      await props.onSelect(itemKey, item.addedToLibrary ?? false);
+    if (mode === 'select-single') {
+      const newItem = item.assetId === props.selectedItem ? null : item.assetId;
+      await props.onSelect?.(newItem ? { assetId: newItem, assetType: item.assetType } : null);
       return;
     }
 

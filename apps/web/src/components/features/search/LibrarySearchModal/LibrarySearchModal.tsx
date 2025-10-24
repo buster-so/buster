@@ -17,7 +17,7 @@ export const LibrarySearchModal = React.memo(() => {
   const { mutate: removeLibraryAssets, isPending: isRemovingLibraryAssets } =
     useDeleteLibraryAssets();
 
-  const { isOpen, onCloseLibrarySearch } = useLibrarySearchStore();
+  const { isOpen, onCloseLibrarySearch: onCloseLibrarySearchStore } = useLibrarySearchStore();
 
   // Track items to add (were NOT in library, user selected them)
   const [itemsToAdd, setItemsToAdd] = useState<Set<string>>(new Set());
@@ -60,10 +60,21 @@ export const LibrarySearchModal = React.memo(() => {
     selectedDateRange,
     assetTypes,
     debouncedSearchQuery,
+    onSetFilters,
     searchQuery,
     setSearchQuery,
-    ...rest
   } = useCommonSearch({ mode });
+
+  const onCloseModalAndReset = useMemoizedFn(() => {
+    setTimeout(() => {
+      setItemsToAdd(new Set());
+      setItemsToRemove(new Set());
+      setSearchQuery('');
+      onSetFilters.setSelectedAssets(null);
+      onSetFilters.setSelectedDateRange(null);
+    }, 300);
+    onCloseLibrarySearchStore();
+  });
 
   const { allResults, isFetchingNextPage, isFetched, scrollContainerRef } = useSearchInfinite({
     page_size: 25,
@@ -81,6 +92,11 @@ export const LibrarySearchModal = React.memo(() => {
     },
   });
 
+  console.log(
+    'allResults',
+    allResults.filter((result) => result.addedToLibrary)
+  );
+
   const onSubmit = useMemoizedFn(() => {
     // Parse composite keys back to { assetId, assetType } objects
     const assetsToAddParsed = Array.from(itemsToAdd).map((key) => parseSelectionKey(key));
@@ -95,10 +111,7 @@ export const LibrarySearchModal = React.memo(() => {
       removeLibraryAssets(assetsToRemoveParsed);
     }
 
-    // Reset state after submission
-    setItemsToAdd(new Set());
-    setItemsToRemove(new Set());
-    onCloseLibrarySearch();
+    onCloseModalAndReset();
   });
 
   const footerConfig = React.useMemo<SearchModalContentProps['footerConfig']>(
@@ -115,20 +128,19 @@ export const LibrarySearchModal = React.memo(() => {
       secondaryButton: {
         children: 'Cancel',
         variant: 'ghost',
-        onClick: onCloseLibrarySearch,
+        onClick: onCloseModalAndReset,
       },
       primaryButton: {
         children: 'Update library',
         variant: 'default',
         loading: isPostingLibraryAssets || isRemovingLibraryAssets,
-        disabled: itemsToAdd.size === 0 && itemsToRemove.size === 0,
         onClick: onSubmit,
       },
     }),
     [
       itemsToAdd.size,
       itemsToRemove.size,
-      onCloseLibrarySearch,
+      onCloseModalAndReset,
       isPostingLibraryAssets,
       isRemovingLibraryAssets,
       postLibraryAssets,
@@ -139,7 +151,7 @@ export const LibrarySearchModal = React.memo(() => {
   return (
     <SearchModalBase
       isOpen={isOpen}
-      onClose={onCloseLibrarySearch}
+      onClose={onCloseModalAndReset}
       mode={mode}
       value={searchQuery}
       onChangeValue={setSearchQuery}

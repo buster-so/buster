@@ -127,7 +127,11 @@ const SearchItemComponent = <M, T extends string>(
       {isSelectMode && (
         <Checkbox
           checked={typeof selected === 'function' ? selected(value) : selected}
-          onCheckedChange={() => onSelectGlobal(item)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onSelectGlobal(item);
+          }}
         />
       )}
 
