@@ -300,33 +300,38 @@ export const IndentationFlexibleReplacer: Replacer = function* (content, find) {
   }
 };
 
+/**
+ * Unescapes common escape sequences in a string
+ * Converts literal \n, \t, \r, etc. to actual newlines, tabs, returns
+ */
+export function unescapeString(str: string): string {
+  return str.replace(/\\(n|t|r|'|"|`|\\|\n|\$)/g, (match, capturedChar) => {
+    switch (capturedChar) {
+      case 'n':
+        return '\n';
+      case 't':
+        return '\t';
+      case 'r':
+        return '\r';
+      case "'":
+        return "'";
+      case '"':
+        return '"';
+      case '`':
+        return '`';
+      case '\\':
+        return '\\';
+      case '\n':
+        return '\n';
+      case '$':
+        return '$';
+      default:
+        return match;
+    }
+  });
+}
+
 export const EscapeNormalizedReplacer: Replacer = function* (content, find) {
-  const unescapeString = (str: string): string => {
-    return str.replace(/\\(n|t|r|'|"|`|\\|\n|\$)/g, (match, capturedChar) => {
-      switch (capturedChar) {
-        case 'n':
-          return '\n';
-        case 't':
-          return '\t';
-        case 'r':
-          return '\r';
-        case "'":
-          return "'";
-        case '"':
-          return '"';
-        case '`':
-          return '`';
-        case '\\':
-          return '\\';
-        case '\n':
-          return '\n';
-        case '$':
-          return '$';
-        default:
-          return match;
-      }
-    });
-  };
 
   const unescapedFind = unescapeString(find);
 
@@ -493,6 +498,9 @@ export function replace(
     throw new Error('oldString and newString must be different');
   }
 
+  // Unescape the newString to convert literal \n, \t, etc. to actual characters
+  const unescapedNewString = unescapeString(newString);
+
   let notFound = true;
 
   for (const replacer of [
@@ -511,11 +519,11 @@ export function replace(
       if (index === -1) continue;
       notFound = false;
       if (replaceAll) {
-        return content.replaceAll(search, newString);
+        return content.replaceAll(search, unescapedNewString);
       }
       const lastIndex = content.lastIndexOf(search);
       if (index !== lastIndex) continue;
-      return content.substring(0, index) + newString + content.substring(index + search.length);
+      return content.substring(0, index) + unescapedNewString + content.substring(index + search.length);
     }
   }
 

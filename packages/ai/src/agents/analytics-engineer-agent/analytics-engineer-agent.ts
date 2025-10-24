@@ -16,6 +16,24 @@ export const ANALYST_ENGINEER_AGENT_NAME = 'analyticsEngineerAgent';
 
 const STOP_CONDITIONS = [stepCountIs(250)];
 
+/**
+ * Helper function to add cache settings to the last message via providerOptions
+ */
+function addCacheToLastMessage(messages: ModelMessage[]): ModelMessage[] {
+  return messages.map((msg, index) => {
+    if (index === messages.length - 1) {
+      return {
+        ...msg,
+        providerOptions: {
+          ...msg.providerOptions,
+          ...DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
+        },
+      };
+    }
+    return msg;
+  });
+}
+
 export function createAnalyticsEngineerAgent(
   analyticsEngineerAgentOptions: AnalyticsEngineerAgentOptions
 ) {
@@ -28,7 +46,6 @@ export function createAnalyticsEngineerAgent(
   const systemMessage = {
     role: 'system',
     content: promptFunction(),
-    providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
   } as ModelMessage;
 
   // Working directory context message (only for main agent, not subagent)
@@ -38,7 +55,6 @@ export function createAnalyticsEngineerAgent(
     : ({
       role: 'system',
       content: createWorkingDirectoryContext(process.cwd()),
-      providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
     } as ModelMessage);
 
   async function stream({ messages }: AnalyticsEngineerAgentStreamOptions) {
@@ -50,7 +66,6 @@ export function createAnalyticsEngineerAgent(
       ? ({
         role: 'system',
         content: `# Additional Agent Context from AGENTS.md\n\n${agentsMdContent}`,
-        providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
       } as ModelMessage)
       : null;
 
@@ -62,18 +77,8 @@ export function createAnalyticsEngineerAgent(
       ? ({
         role: 'system',
         content: gitCommunicationRulesContent,
-        providerOptions: DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
       } as ModelMessage)
       : null;
-
-    // Add provider options to all incoming messages
-    const messagesWithOptions = messages.map(msg => ({
-      ...msg,
-      providerOptions: {
-        ...msg.providerOptions,
-        ...DEFAULT_ANALYTICS_ENGINEER_OPTIONS,
-      },
-    }));
 
     // Build messages array with system messages and working directory context
     const allMessages = [
@@ -81,7 +86,7 @@ export function createAnalyticsEngineerAgent(
       ...(workingDirectoryContextMessage ? [workingDirectoryContextMessage] : []),
       ...(agentsMdMessage ? [agentsMdMessage] : []),
       ...(gitCommunicationRulesMessage ? [gitCommunicationRulesMessage] : []),
-      ...messagesWithOptions,
+      ...messages,
     ];
 
     return wrapTraced(
@@ -109,12 +114,16 @@ export function createAnalyticsEngineerAgent(
           messages: allMessages,
           stopWhen: STOP_CONDITIONS,
           maxOutputTokens: 64000,
+          prepareStep: ({ messages }) => {
+            return {
+              messages: addCacheToLastMessage(messages),
+            };
+          },
           ...(analyticsEngineerAgentOptions.abortSignal && {
             abortSignal: analyticsEngineerAgentOptions.abortSignal,
           }),
           // temperature: 0,
-          onError: ({ error }) => {
-          },
+          onError: () => { },
         });
       },
       {
