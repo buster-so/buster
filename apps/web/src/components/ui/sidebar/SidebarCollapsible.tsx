@@ -22,7 +22,6 @@ import { Link } from '@tanstack/react-router';
 import React, { useEffect } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { cn } from '@/lib/classMerge';
-import type { ILinkProps } from '@/types/routes';
 import {
   Collapsible,
   CollapsibleContent,
@@ -52,22 +51,25 @@ const SidebarTrigger: React.FC<SidebarTriggerProps> = ({
     useCollapsible && COLLAPSED_HIDDEN,
     'flex items-center gap-2.5 rounded px-1.5 py-1 text-base transition-colors',
     'text-foreground hover:bg-nav-item-hover w-full',
-    'group min-h-6',
+    'group min-h-7',
     !link && 'cursor-pointer',
     triggerClassName
   );
+
+  console.log(label, isOpen);
 
   const iconContent = (
     <>
       {icon && <span className="group-hover:hidden flex text-icon-size">{icon}</span>}
       <span
         className={cn(
-          '-rotate-90 transition-transform duration-200 text-xs',
-          icon && 'group-hover:flex hidden',
-          isOpen && 'rotate-0'
+          'hover:bg-gray-light/20 p-1 rounded-sm text-xs',
+          icon && 'group-hover:flex hidden '
         )}
       >
-        <CaretDown />
+        <span className={cn('-rotate-90 transition-transform duration-200', isOpen && 'rotate-0')}>
+          <CaretDown />
+        </span>
       </span>
     </>
   );
@@ -248,7 +250,9 @@ export const SidebarCollapsible: React.FC<
               !isMounted && isOpen ? `${items.length * 28 + items.length * 2 - 2}px` : undefined,
           }}
         >
-          <div className="gap-y-0.5 flex flex-col">
+          <div className="relative gap-y-0.5 flex flex-col pl-6.5">
+            <div className="absolute left-3.5 top-0 bottom-0 w-px bg-border" />
+
             {isMounted && isSortable ? (
               <DndContext
                 sensors={sensors}

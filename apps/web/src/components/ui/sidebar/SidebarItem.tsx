@@ -71,14 +71,16 @@ export const SidebarItem: React.FC<
   const content = (
     <>
       <div className={'flex items-center gap-2 overflow-hidden'}>
-        <span
-          className={cn('text-icon-size! text-icon-color', {
-            'text-text-disabled': disabled,
-            'pl-4.5': !icon, //hmmm... maybe this should be a prop?
-          })}
-        >
-          {icon}
-        </span>
+        {icon && (
+          <span
+            className={cn('text-icon-size! text-icon-color', {
+              'text-text-disabled': disabled,
+            })}
+          >
+            {icon}
+          </span>
+        )}
+
         <span className={cn(COLLAPSED_HIDDEN_BLOCK, 'leading-1.3 truncate', className)}>
           {label}
         </span>

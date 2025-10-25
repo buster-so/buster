@@ -37,7 +37,10 @@ import {
 import { getListChats } from './requestsV2';
 
 export const useGetListChats = (
-  filters?: Omit<Parameters<typeof getListChats>[0], 'page' | 'page_size'>
+  filters?: Omit<Parameters<typeof getListChats>[0], 'page' | 'page_size'> & {
+    page?: number;
+    page_size?: number;
+  }
 ) => {
   const filtersCompiled: Parameters<typeof getListChats>[0] = useMemo(
     () => ({ admin_view: false, page: 1, page_size: 5000, ...filters }),

@@ -41,6 +41,7 @@ import { cn } from '@/lib/classMerge';
 import { LazyErrorBoundary } from '../../global/LazyErrorBoundary';
 import { toggleGlobalSearch } from '../../search/GlobalSearchModal';
 import { SidebarUserFooter } from '../SidebarUserFooter';
+import { useChatHistorySidebar } from './useChatHistorySidebar';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
 
 const LazyGlobalModals = lazy(() => import('./PrimaryGlobalModals'));
@@ -60,64 +61,7 @@ const topItems: ISidebarList = createSidebarList({
       link: { to: '/app/library', preload: 'intent' },
       id: '/app/library/',
     },
-    {
-      label: 'Chat history',
-      icon: <ASSET_ICONS.chats />,
-      link: {
-        to: '/app/chats',
-        preload: 'viewport',
-        preloadDelay: 2000,
-        activeOptions: {
-          exact: true,
-        },
-      },
-      id: '/app/chats/',
-    },
   ],
-});
-
-const yourStuff: ISidebarGroup = createSidebarGroup({
-  label: 'Your stuff',
-  id: 'your-stuff',
-  items: createSidebarItems(
-    [
-      {
-        label: 'Metrics',
-        assetType: 'metric_file' satisfies AssetType,
-        icon: <ASSET_ICONS.metrics />,
-        link: { to: '/app/metrics' },
-        id: '/app/metrics',
-      },
-      {
-        label: 'Dashboards',
-        assetType: 'dashboard_file' satisfies AssetType,
-        icon: <ASSET_ICONS.dashboards />,
-        link: { to: '/app/dashboards' },
-        id: '/app/dashboards/',
-      },
-      // {
-      //   label: 'Collections',
-      //   assetType: 'collection' satisfies AssetType,
-      //   icon: <ASSET_ICONS.collections />,
-      //   link: { to: '/app/collections' },
-      //   id: '/app/collections/',
-      // },
-      {
-        label: 'Reports',
-        assetType: 'report_file' satisfies AssetType,
-        icon: <ASSET_ICONS.reports />,
-        link: { to: '/app/reports' },
-        id: '/app/reports/',
-      },
-    ].map(({ assetType, ...item }) => ({
-      ...item,
-      link: {
-        ...item.link,
-        activeOptions: { exact: true },
-      },
-      //  active: selectedAssetType === assetType,
-    }))
-  ),
 });
 
 const adminTools: ISidebarGroup = createSidebarGroup({
@@ -142,39 +86,14 @@ const adminTools: ISidebarGroup = createSidebarGroup({
   ]),
 });
 
-const tryGroup = (showInvitePeople: boolean): ISidebarGroup => ({
-  label: 'Try',
-  id: 'try',
-  items: [
-    createSidebarItem({
-      label: 'Invite people',
-      icon: <Plus />,
-      id: 'invite-people',
-      onClick: () => toggleInviteModal(),
-      show: showInvitePeople,
-    }),
-    createSidebarItem({
-      label: 'Leave feedback',
-      icon: <Flag />,
-      id: 'leave-feedback',
-      onClick: () => toggleContactSupportModal('feedback'),
-    }),
-  ].reduce((acc, { show, ...item }) => {
-    if (show !== false) acc.push(item);
-    return acc;
-  }, [] as ISidebarItem[]),
-});
-
 const makeSidebarItems = ({
   isUserRegistered,
   isAdmin,
   favoritesDropdownItems,
-  tryGroupMemoized,
 }: {
   isUserRegistered: boolean;
   isAdmin: boolean;
   favoritesDropdownItems: ISidebarGroup | null;
-  tryGroupMemoized: ISidebarGroup;
 }) => {
   if (!isUserRegistered) return [];
 
@@ -184,35 +103,51 @@ const makeSidebarItems = ({
     items.push(adminTools);
   }
 
-  items.push(yourStuff);
-
   if (favoritesDropdownItems) {
     items.push(favoritesDropdownItems);
   }
 
-  items.push(tryGroupMemoized);
-
   return items;
 };
 
+// {
+//   label: 'Chat history',
+//   icon: <ASSET_ICONS.chats />,
+//   link: {
+//     to: '/app/chats',
+//     preload: 'viewport',
+//     preloadDelay: 2000,
+//     activeOptions: {
+//       exact: true,
+//     },
+//   },
+//   id: '/app/chats/',
+// },
+
 export const SidebarPrimary = React.memo(() => {
   const isAdmin = useIsUserAdmin();
-  const restrictNewUserInvitations = useRestrictNewUserInvitations();
   const isUserRegistered = useIsUserRegistered();
 
   const favoritesDropdownItems = useFavoriteSidebarPanel();
+  const chatHistoryItems = useChatHistorySidebar();
 
-  const tryGroupMemoized = useMemo(
-    () => tryGroup(!restrictNewUserInvitations),
-    [restrictNewUserInvitations]
-  );
+  const sidebarItems: SidebarProps['content'] = useMemo(() => {
+    if (!isUserRegistered) return [];
 
-  const sidebarItems: SidebarProps['content'] = makeSidebarItems({
-    isUserRegistered,
-    isAdmin,
-    favoritesDropdownItems,
-    tryGroupMemoized,
-  });
+    const items = [topItems];
+
+    if (isAdmin) {
+      items.push(adminTools);
+    }
+
+    if (chatHistoryItems) items.push(chatHistoryItems);
+
+    if (favoritesDropdownItems) {
+      items.push(favoritesDropdownItems);
+    }
+
+    return items;
+  }, [isAdmin, chatHistoryItems, favoritesDropdownItems, isUserRegistered]);
 
   return (
     <>
