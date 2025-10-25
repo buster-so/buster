@@ -19,10 +19,9 @@ export type ISidebarItem<
   TRouter extends RegisteredRouter = RegisteredRouter,
   TOptions = unknown,
   TFrom extends string = string,
-> = ISidebarItemBase &
-  {
-    link?: ILinkProps<TRouter, TOptions, TFrom>;
-  };
+> = ISidebarItemBase & {
+  link?: ILinkProps<TRouter, TOptions, TFrom>;
+};
 
 export interface ISidebarGroup<
   TRouter extends RegisteredRouter = RegisteredRouter,

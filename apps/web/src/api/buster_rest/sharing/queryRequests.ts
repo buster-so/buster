@@ -1,7 +1,7 @@
 import type { AssetListItem, GetAssetsRequestQuery } from '@buster/server-shared/library';
 import { keepPreviousData, type QueryClient, useQuery } from '@tanstack/react-query';
-import { useInfiniteScroll } from '@/api/query-helpers';
 import { sharingQueryKeys } from '@/api/query_keys/sharing';
+import { useInfiniteScroll } from '@/api/query-helpers';
 import { getSharingAssets } from './requests';
 
 const DEFAULT_PAGE_SIZE = 100;

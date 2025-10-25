@@ -48,45 +48,59 @@ const SidebarTrigger: React.FC<SidebarTriggerProps> = ({
   useCollapsible,
   triggerClassName,
 }) => {
-  const WrapperComponent = ({ children }: { children: React.ReactNode }) => {
-    if (link) {
-      return <Link {...link}>{children}</Link>;
-    }
-    return <>{children}</>;
-  };
+  const containerClasses = cn(
+    useCollapsible && COLLAPSED_HIDDEN,
+    'flex items-center gap-2.5 rounded px-1.5 py-1 text-base transition-colors',
+    'text-foreground hover:bg-nav-item-hover w-full',
+    'group min-h-6',
+    !link && 'cursor-pointer',
+    triggerClassName
+  );
 
-  return (
-    <WrapperComponent>
-      <CollapsibleTrigger
-        asChild
-        className={cn(useCollapsible && COLLAPSED_HIDDEN, 'w-full', triggerClassName)}
+  const iconContent = (
+    <>
+      {icon && <span className="group-hover:hidden flex text-icon-size">{icon}</span>}
+      <span
+        className={cn(
+          '-rotate-90 transition-transform duration-200 text-xs',
+          icon && 'group-hover:flex hidden',
+          isOpen && 'rotate-0'
+        )}
       >
-        <button type="button" className="w-full cursor-pointer text-left">
-          <div
-            className={cn(
-              'flex items-center gap-2.5 rounded px-1.5 py-1 text-base transition-colors',
-              'text-foreground hover:bg-nav-item-hover w-full',
-              'group min-h-6 cursor-pointer',
-              triggerClassName
-            )}
+        <CaretDown />
+      </span>
+    </>
+  );
+
+  if (link) {
+    // When there's a link, only the icon triggers collapse
+    return (
+      <div className={containerClasses}>
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className={cn('text-icon-color w-4 flex items-center justify-center cursor-pointer')}
           >
-            <div className={cn('text-icon-color w-4 flex items-center justify-center')}>
-              {icon && <span className="group-hover:hidden flex text-icon-size">{icon}</span>}
-              <span
-                className={cn(
-                  '-rotate-90 transition-transform duration-200 text-xs',
-                  icon && 'group-hover:flex hidden',
-                  isOpen && 'rotate-0'
-                )}
-              >
-                <CaretDown />
-              </span>
-            </div>
-            <span className="truncate">{label}</span>
-          </div>
-        </button>
-      </CollapsibleTrigger>
-    </WrapperComponent>
+            {iconContent}
+          </button>
+        </CollapsibleTrigger>
+        <Link {...link} className="truncate flex-1">
+          {label}
+        </Link>
+      </div>
+    );
+  }
+
+  // When there's no link, the entire component triggers collapse
+  return (
+    <CollapsibleTrigger className={cn(useCollapsible && COLLAPSED_HIDDEN, 'w-full text-left')}>
+      <div className={containerClasses}>
+        <div className={cn('text-icon-color w-4 flex items-center justify-center')}>
+          {iconContent}
+        </div>
+        <span className="truncate">{label}</span>
+      </div>
+    </CollapsibleTrigger>
   );
 };
 
