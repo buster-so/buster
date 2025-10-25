@@ -56,15 +56,13 @@ const SidebarTrigger: React.FC<SidebarTriggerProps> = ({
     triggerClassName
   );
 
-  console.log(label, isOpen);
-
   const iconContent = (
     <>
       {icon && <span className="group-hover:hidden flex text-icon-size">{icon}</span>}
       <span
         className={cn(
           'hover:bg-gray-light/20 p-1 rounded-sm text-xs',
-          icon && 'group-hover:flex hidden '
+          icon && 'group-hover:flex hidden'
         )}
       >
         <span className={cn('-rotate-90 transition-transform duration-200', isOpen && 'rotate-0')}>

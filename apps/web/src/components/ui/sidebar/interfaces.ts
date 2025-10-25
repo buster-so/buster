@@ -12,6 +12,7 @@ type ISidebarItemBase = {
   onRemove?: () => void;
   onClick?: () => void;
   collapsedTooltip?: string;
+  className?: string;
 };
 
 // Discriminated union: either has a route (with optional activeOptions) or no route at all

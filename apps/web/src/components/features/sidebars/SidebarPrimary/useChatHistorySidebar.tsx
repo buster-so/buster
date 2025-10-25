@@ -12,6 +12,32 @@ export const useChatHistorySidebar = (): ISidebarGroup | null => {
 
   const chatHistoryItems: ISidebarGroup | null = useMemo(() => {
     if (!data || data.length === 0) return null;
+
+    const items = data.map((c) => {
+      return createSidebarItem({
+        id: c.id,
+        label: c.name,
+        link: {
+          to: `/app/chats/$chatId`,
+          params: {
+            chatId: c.id,
+          },
+        },
+      });
+    });
+
+    items.push(
+      createSidebarItem({
+        id: 'all-chats',
+        label: 'See chats',
+        link: {
+          to: '/app/chats',
+          preload: 'intent',
+        },
+        className: 'bg-transparent! hover:underline',
+      })
+    );
+
     return {
       label: 'Chat history',
       icon: <ASSET_ICONS.chats />,
@@ -24,18 +50,7 @@ export const useChatHistorySidebar = (): ISidebarGroup | null => {
         },
       },
       id: '/app/chats/',
-      items: data.map((c) => {
-        return createSidebarItem({
-          id: c.id,
-          label: c.name,
-          link: {
-            to: `/app/chats/$chatId`,
-            params: {
-              chatId: c.id,
-            },
-          },
-        });
-      }),
+      items,
     } satisfies ISidebarGroup;
   }, [data]);
 

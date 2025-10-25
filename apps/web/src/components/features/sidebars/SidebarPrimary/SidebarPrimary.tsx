@@ -1,42 +1,30 @@
-import type { AssetType } from '@buster/server-shared/assets';
 import { Link, useNavigate } from '@tanstack/react-router';
 import React, { lazy, Suspense, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import {
-  useIsAnonymousUser,
-  useIsUserAdmin,
-  useIsUserRegistered,
-  useRestrictNewUserInvitations,
-} from '@/api/buster_rest/users/useGetUserInfo';
+import { useIsUserAdmin, useIsUserRegistered } from '@/api/buster_rest/users/useGetUserInfo';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
-import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons';
-import { Flag, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
+import { Magnifier, Table, UnorderedList2 } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
 import Compose2 from '@/components/ui/icons/NucleoIconOutlined/compose-2';
 import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
 import Gear from '@/components/ui/icons/NucleoIconOutlined/gear';
-import Settings from '@/components/ui/icons/NucleoIconOutlined/users-settings';
 import {
   COLLAPSED_HIDDEN,
   COLLAPSED_JUSTIFY_CENTER,
   COLLAPSED_VISIBLE,
   type ISidebarGroup,
-  type ISidebarItem,
   type ISidebarList,
   type SidebarProps,
 } from '@/components/ui/sidebar';
 import {
   createSidebarGroup,
-  createSidebarItem,
   createSidebarItems,
   createSidebarList,
 } from '@/components/ui/sidebar/create-sidebar-item';
 import { Sidebar } from '@/components/ui/sidebar/SidebarComponent';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
-import { toggleContactSupportModal } from '@/context/GlobalStore/useContactSupportModalStore';
-import { toggleInviteModal } from '@/context/GlobalStore/useInviteModalStore';
 import { cn } from '@/lib/classMerge';
 import { LazyErrorBoundary } from '../../global/LazyErrorBoundary';
 import { toggleGlobalSearch } from '../../search/GlobalSearchModal';
@@ -86,44 +74,6 @@ const adminTools: ISidebarGroup = createSidebarGroup({
   ]),
 });
 
-const makeSidebarItems = ({
-  isUserRegistered,
-  isAdmin,
-  favoritesDropdownItems,
-}: {
-  isUserRegistered: boolean;
-  isAdmin: boolean;
-  favoritesDropdownItems: ISidebarGroup | null;
-}) => {
-  if (!isUserRegistered) return [];
-
-  const items = [topItems];
-
-  if (isAdmin) {
-    items.push(adminTools);
-  }
-
-  if (favoritesDropdownItems) {
-    items.push(favoritesDropdownItems);
-  }
-
-  return items;
-};
-
-// {
-//   label: 'Chat history',
-//   icon: <ASSET_ICONS.chats />,
-//   link: {
-//     to: '/app/chats',
-//     preload: 'viewport',
-//     preloadDelay: 2000,
-//     activeOptions: {
-//       exact: true,
-//     },
-//   },
-//   id: '/app/chats/',
-// },
-
 export const SidebarPrimary = React.memo(() => {
   const isAdmin = useIsUserAdmin();
   const isUserRegistered = useIsUserRegistered();
@@ -136,14 +86,14 @@ export const SidebarPrimary = React.memo(() => {
 
     const items = [topItems];
 
-    if (isAdmin) {
-      items.push(adminTools);
-    }
-
     if (chatHistoryItems) items.push(chatHistoryItems);
 
     if (favoritesDropdownItems) {
       items.push(favoritesDropdownItems);
+    }
+
+    if (isAdmin) {
+      items.push(adminTools);
     }
 
     return items;

@@ -5,6 +5,7 @@ import {
   useUpdateUserFavorites,
 } from '@/api/buster_rest/users';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
+import Star from '@/components/ui/icons/NucleoIconOutlined/star';
 import type { ISidebarGroup } from '@/components/ui/sidebar';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { createSidebarItem } from '../../../ui/sidebar/create-sidebar-item';
@@ -20,6 +21,7 @@ export const useFavoriteSidebarPanel = (): ISidebarGroup | null => {
     return {
       label: 'Favorites',
       id: 'favorites',
+      icon: <Star />,
       isSortable: true,
       onItemsReorder: updateUserFavorites,
       items: favorites.map((favorite) => {

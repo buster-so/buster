@@ -40,12 +40,7 @@ const itemVariants = cva(
   }
 );
 
-export const SidebarItem: React.FC<
-  ISidebarItem &
-    VariantProps<typeof itemVariants> & {
-      className?: string;
-    }
-> = ({
+export const SidebarItem: React.FC<ISidebarItem & VariantProps<typeof itemVariants>> = ({
   label,
   icon,
   link,
@@ -81,9 +76,7 @@ export const SidebarItem: React.FC<
           </span>
         )}
 
-        <span className={cn(COLLAPSED_HIDDEN_BLOCK, 'leading-1.3 truncate', className)}>
-          {label}
-        </span>
+        <span className={cn(COLLAPSED_HIDDEN_BLOCK, 'leading-1.3 truncate')}>{label}</span>
       </div>
       {onRemove && (
         <Button
