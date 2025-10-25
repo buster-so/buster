@@ -18,9 +18,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Link } from '@tanstack/react-router';
 import React, { useEffect } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { cn } from '@/lib/classMerge';
+import type { ILinkProps } from '@/types/routes';
 import {
   Collapsible,
   CollapsibleContent,
@@ -33,35 +35,60 @@ import { SidebarItem } from './SidebarItem';
 
 const modifiers = [restrictToVerticalAxis];
 
-interface SidebarTriggerProps {
-  label: string;
+type SidebarTriggerProps = {
   isOpen: boolean;
-  className?: string;
-}
+  useCollapsible: boolean;
+} & Pick<ISidebarGroup, 'link' | 'icon' | 'label' | 'triggerClassName'>;
 
-const SidebarTrigger: React.FC<SidebarTriggerProps> = React.memo(({ label, isOpen, className }) => {
+const SidebarTrigger: React.FC<SidebarTriggerProps> = ({
+  icon,
+  label,
+  isOpen,
+  link,
+  useCollapsible,
+  triggerClassName,
+}) => {
+  const WrapperComponent = ({ children }: { children: React.ReactNode }) => {
+    if (link) {
+      return <Link {...link}>{children}</Link>;
+    }
+    return <>{children}</>;
+  };
+
   return (
-    <div
-      className={cn(
-        'flex items-center gap-1 rounded px-1.5 py-1 text-base transition-colors',
-        'text-text-secondary hover:bg-nav-item-hover',
-        'group min-h-6 cursor-pointer',
-        className
-      )}
-    >
-      <span className="truncate">{label}</span>
-
-      <div
-        className={cn(
-          'text-icon-color text-3xs -rotate-90 transition-transform duration-200',
-          isOpen && 'rotate-0'
-        )}
+    <WrapperComponent>
+      <CollapsibleTrigger
+        asChild
+        className={cn(useCollapsible && COLLAPSED_HIDDEN, 'w-full', triggerClassName)}
       >
-        <CaretDown />
-      </div>
-    </div>
+        <button type="button" className="w-full cursor-pointer text-left">
+          <div
+            className={cn(
+              'flex items-center gap-2.5 rounded px-1.5 py-1 text-base transition-colors',
+              'text-foreground hover:bg-nav-item-hover w-full',
+              'group min-h-6 cursor-pointer',
+              triggerClassName
+            )}
+          >
+            <div className={cn('text-icon-color w-4 flex items-center justify-center')}>
+              {icon && <span className="group-hover:hidden flex text-icon-size">{icon}</span>}
+              <span
+                className={cn(
+                  '-rotate-90 transition-transform duration-200 text-xs',
+                  icon && 'group-hover:flex hidden',
+                  isOpen && 'rotate-0'
+                )}
+              >
+                <CaretDown />
+              </span>
+            </div>
+            <span className="truncate">{label}</span>
+          </div>
+        </button>
+      </CollapsibleTrigger>
+    </WrapperComponent>
   );
-});
+};
 
 SidebarTrigger.displayName = 'SidebarTrigger';
 
@@ -70,7 +97,7 @@ interface SortableSidebarItemProps {
   active?: boolean;
 }
 
-const SortableSidebarItem: React.FC<SortableSidebarItemProps> = React.memo(({ item, active }) => {
+const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({ item, active }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: item.disabled,
@@ -103,9 +130,7 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = React.memo(({ it
       </div>
     </div>
   );
-});
-
-SortableSidebarItem.displayName = 'SortableSidebarItem';
+};
 
 export const SidebarCollapsible: React.FC<
   ISidebarGroup & {
@@ -123,9 +148,10 @@ export const SidebarCollapsible: React.FC<
     variant = 'collapsible',
     icon,
     defaultOpen = true,
-    useCollapsible,
+    useCollapsible = true,
     triggerClassName,
     className,
+    link,
   }) => {
     // Track client mount to avoid SSR/CSR hydration mismatches for dnd-kit generated attributes
     const [isMounted, setIsMounted] = React.useState(false);
@@ -176,14 +202,14 @@ export const SidebarCollapsible: React.FC<
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn('space-y-0.5', className)}>
         {variant === 'collapsible' && (
-          <CollapsibleTrigger
-            asChild
-            className={cn(useCollapsible && COLLAPSED_HIDDEN, 'w-full', triggerClassName)}
-          >
-            <button type="button" className="w-full cursor-pointer text-left">
-              <SidebarTrigger label={label} isOpen={isOpen} />
-            </button>
-          </CollapsibleTrigger>
+          <SidebarTrigger
+            label={label}
+            isOpen={isOpen}
+            icon={icon}
+            link={link}
+            useCollapsible={useCollapsible}
+            triggerClassName={triggerClassName}
+          />
         )}
 
         {variant === 'icon' && (

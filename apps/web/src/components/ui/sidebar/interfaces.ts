@@ -20,14 +20,9 @@ export type ISidebarItem<
   TOptions = unknown,
   TFrom extends string = string,
 > = ISidebarItemBase &
-  (
-    | {
-        link: ILinkProps<TRouter, TOptions, TFrom>;
-      }
-    | {
-        link?: never;
-      }
-  );
+  {
+    link?: ILinkProps<TRouter, TOptions, TFrom>;
+  };
 
 export interface ISidebarGroup<
   TRouter extends RegisteredRouter = RegisteredRouter,
@@ -44,6 +39,7 @@ export interface ISidebarGroup<
   onItemsReorder?: (ids: string[]) => void;
   triggerClassName?: string;
   className?: string;
+  link?: ILinkProps<TRouter, TOptions, TFrom>;
 }
 
 export interface ISidebarList<

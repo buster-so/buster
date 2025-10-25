@@ -49,14 +49,14 @@ export const CollectionIndividualController: React.FC<{
     >
       {isLoaded && (
         <React.Fragment>
-          {layout === 'list' && (
-            <CollectionIndividualListContent collection={collection} emptyState={emptyState} />
-          )}
+          {/* {layout === 'list' && ( */}
+          <CollectionIndividualListContent collection={collection} emptyState={emptyState} />
+          {/* )}
           {layout === 'grid' && (
             <div className="text-center text-sm text-gray-500 flex items-center justify-center h-full">
               Grid view is coming soon
             </div>
-          )}
+          )} */}
         </React.Fragment>
       )}
 

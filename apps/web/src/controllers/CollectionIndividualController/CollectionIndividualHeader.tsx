@@ -67,13 +67,13 @@ const ContentRight: React.FC<{
         </AppTooltip>
       )}
       {isEffectiveOwner && <ShareCollectionButton collectionId={collection.id} />}
-      <AssetOrderPopover
+      {/* <AssetOrderPopover
         layout={layout}
         onChangeLayout={onChangeLayout}
         showDirection={false}
         showGroupBy={false}
         showOrdering={false}
-      />
+      /> */}
       <CollectionThreeDotDropdown
         id={collection.id}
         name={collectionTitle}

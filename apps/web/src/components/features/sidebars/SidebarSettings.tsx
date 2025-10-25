@@ -114,7 +114,6 @@ export const SidebarSettings = () => {
         content={sidebarItems}
         header={useMemo(() => <SidebarSettingsHeader />, [])}
         footer={useMemo(() => <SidebarUserFooter />, [])}
-        useCollapsible={false}
       />
     </ComponentErrorCard>
   );

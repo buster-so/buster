@@ -12,10 +12,12 @@ import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons';
-import { Flag, House4, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
+import { Flag, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
 import Compose2 from '@/components/ui/icons/NucleoIconOutlined/compose-2';
 import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
+import Gear from '@/components/ui/icons/NucleoIconOutlined/gear';
+import Settings from '@/components/ui/icons/NucleoIconOutlined/users-settings';
 import {
   COLLAPSED_HIDDEN,
   COLLAPSED_JUSTIFY_CENTER,
@@ -121,6 +123,7 @@ const yourStuff: ISidebarGroup = createSidebarGroup({
 const adminTools: ISidebarGroup = createSidebarGroup({
   label: 'Admin tools',
   id: 'admin-tools',
+  icon: <Gear />,
   items: createSidebarItems([
     {
       label: 'Logs',
