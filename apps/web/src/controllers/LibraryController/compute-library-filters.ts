@@ -67,3 +67,5 @@ export const computeLibraryFilters = (
 
   return filters;
 };
+
+export const computeSharedWithMeFilters = computeLibraryFilters;

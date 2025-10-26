@@ -9,13 +9,17 @@ import {
 
 export interface PopoverProps
   extends React.ComponentProps<typeof PopoverBase>,
-    Pick<React.ComponentProps<typeof PopoverContent>, 'align' | 'side' | 'onOpenAutoFocus'> {
+    Pick<
+      React.ComponentProps<typeof PopoverContent>,
+      'align' | 'side' | 'onOpenAutoFocus' | 'disablePortal'
+    > {
   children: React.ReactNode;
   content: React.ReactNode;
   className?: string;
   trigger?: PopoverTriggerType;
   size?: PopoverContentVariant['size'];
   sideOffset?: number;
+  modal?: boolean;
 }
 
 export const Popover = React.memo<PopoverProps>(
@@ -29,10 +33,12 @@ export const Popover = React.memo<PopoverProps>(
     size = 'default',
     sideOffset,
     onOpenAutoFocus,
+    modal,
+    disablePortal,
     ...props
   }) => {
     return (
-      <PopoverBase trigger={trigger} {...props}>
+      <PopoverBase trigger={trigger} modal={modal} {...props}>
         <PopoverTrigger asChild>
           <span className="">{children}</span>
         </PopoverTrigger>
@@ -43,6 +49,7 @@ export const Popover = React.memo<PopoverProps>(
           size={size}
           sideOffset={sideOffset}
           onOpenAutoFocus={onOpenAutoFocus}
+          disablePortal={disablePortal}
         >
           {content}
         </PopoverContent>

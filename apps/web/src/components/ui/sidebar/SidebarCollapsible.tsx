@@ -45,6 +45,7 @@ type SidebarTriggerProps = {
 interface SortableSidebarItemProps {
   item: ISidebarGroup['items'][0];
   active?: boolean;
+  isDragging?: boolean;
 }
 
 export const SidebarCollapsible: React.FC<
@@ -146,16 +147,23 @@ export const SidebarCollapsible: React.FC<
 
 SidebarCollapsible.displayName = 'SidebarCollapsible';
 
-const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({ item, active }) => {
+const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({
+  item,
+  active,
+  isDragging: isExternalDragging,
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: item.disabled,
   });
 
+  // When showSidebar=false (in popover), don't use opacity since we won't show DragOverlay
+  const shouldShowPlaceholder = isExternalDragging !== undefined ? isExternalDragging : isDragging;
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0 : 1,
+    opacity: shouldShowPlaceholder ? 0.4 : 1,
   };
 
   const handleClick = useMemoizedFn((e: React.MouseEvent) => {
@@ -172,7 +180,10 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({ item, active 
       {...attributes}
       {...listeners}
       onClick={handleClick}
-      className={cn(isDragging && 'pointer-events-none')}
+      className={cn(
+        isDragging && 'pointer-events-none',
+        shouldShowPlaceholder && 'cursor-grabbing'
+      )}
     >
       <div onClick={isDragging ? (e) => e.stopPropagation() : undefined}>
         <SidebarItem {...item} active={active} />
@@ -270,7 +281,7 @@ const CollapsibleContent = ({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 2,
+        distance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -324,16 +335,19 @@ const CollapsibleContent = ({
                 key={item.id}
                 item={item}
                 active={activeItem === item.id || item.active}
+                isDragging={draggingId === item.id}
               />
             ))}
           </SortableContext>
-          <DragOverlay>
-            {draggingId && draggingItem ? (
-              <div className="opacity-70 shadow">
-                <SidebarItem {...draggingItem} active={draggingItem.active} />
-              </div>
-            ) : null}
-          </DragOverlay>
+          {showSidebar && (
+            <DragOverlay dropAnimation={null}>
+              {draggingId && draggingItem ? (
+                <div className="opacity-70 shadow">
+                  <SidebarItem {...draggingItem} active={draggingItem.active} />
+                </div>
+              ) : null}
+            </DragOverlay>
+          )}
         </DndContext>
       ) : (
         items.map((item) => (
@@ -358,6 +372,8 @@ const SidebarSmallWidthContent: React.FC<
       trigger={trigger}
       align="start"
       side="right"
+      modal={false}
+      disablePortal={true}
       content={
         <CollapsibleContent
           items={items}

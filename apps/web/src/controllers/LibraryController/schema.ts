@@ -19,6 +19,7 @@ export const wrappedLayoutSchema = z
   })
   .default('grid');
 export type LibraryLayout = z.infer<typeof layoutSchema>;
+export type SharedWithMeLayout = LibraryLayout;
 
 export const searchParamsSchema = z.object({
   q: z.string().optional(),
@@ -37,3 +38,4 @@ export const searchParamsSchema = z.object({
 });
 
 export type LibrarySearchParams = z.infer<typeof searchParamsSchema>;
+export type SharedWithMeSearchParams = LibrarySearchParams;

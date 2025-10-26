@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { useIsUserAdmin, useIsUserRegistered } from '@/api/buster_rest/users/useGetUserInfo';
+import { useIsUserAdmin } from '@/api/buster_rest/users/useGetUserInfo';
 import { BackButton } from '@/components/ui/buttons/BackButton';
 import ApartmentBuilding from '@/components/ui/icons/NucleoIconOutlined/apartment-building';
 import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
+import { COLLAPSED_HIDDEN } from '@/components/ui/sidebar/config';
 import { createSidebarGroup } from '@/components/ui/sidebar/create-sidebar-item';
-import { AppTooltip } from '@/components/ui/tooltip';
 import LockCircle from '../../ui/icons/NucleoIconOutlined/lock-circle';
 import { type ISidebarGroup, Sidebar } from '../../ui/sidebar';
 import { ComponentErrorCard } from '../global/ComponentErrorCard';
