@@ -4,10 +4,12 @@ import type { ISidebarGroup } from '@/components/ui/sidebar';
 import { createSidebarItem } from '@/components/ui/sidebar/create-sidebar-item';
 import { ASSET_ICONS } from '../../icons/assetIcons';
 
+export const CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT = 10;
+
 export const useChatHistorySidebar = (): ISidebarGroup | null => {
   const { data } = useGetListChats({
     page: 1,
-    page_size: 10,
+    page_size: CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT,
   });
 
   const chatHistoryItems: ISidebarGroup | null = useMemo(() => {

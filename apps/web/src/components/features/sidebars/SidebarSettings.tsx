@@ -3,7 +3,6 @@ import { useIsUserAdmin, useIsUserRegistered } from '@/api/buster_rest/users/use
 import { BackButton } from '@/components/ui/buttons/BackButton';
 import ApartmentBuilding from '@/components/ui/icons/NucleoIconOutlined/apartment-building';
 import CircleUser from '@/components/ui/icons/NucleoIconOutlined/circle-user';
-import { COLLAPSED_HIDDEN, COLLAPSED_VISIBLE } from '@/components/ui/sidebar/config';
 import { createSidebarGroup } from '@/components/ui/sidebar/create-sidebar-item';
 import { AppTooltip } from '@/components/ui/tooltip';
 import LockCircle from '../../ui/icons/NucleoIconOutlined/lock-circle';

@@ -1,9 +1,11 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { prefetchGetChatsList } from '@/api/buster_rest/chats';
 import { prefetchListDatasources } from '@/api/buster_rest/data_source';
 import { prefetchGetDatasets } from '@/api/buster_rest/datasets';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
 import { prefetchGetUserFavorites } from '@/api/buster_rest/users/favorites';
 import { getAppLayout } from '@/api/server-functions/getAppLayout';
+import { CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT } from '@/components/features/sidebars/SidebarPrimary/useChatHistorySidebar';
 import type { LayoutSize } from '@/components/ui/layouts/AppLayout';
 import { PrimaryAppLayout } from '../../layouts/PrimaryAppLayout';
 import { Route as NewUserRoute } from './_app/new-user';
@@ -26,6 +28,10 @@ export const Route = createFileRoute('/app/_app')({
       prefetchGetUserFavorites(queryClient),
       prefetchListDatasources(queryClient),
       prefetchGetDatasets(queryClient),
+      prefetchGetChatsList(queryClient, {
+        page: 1,
+        page_size: CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT,
+      }),
     ]);
 
     return {

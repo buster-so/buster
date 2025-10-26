@@ -20,16 +20,19 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Link } from '@tanstack/react-router';
 import React, { useEffect } from 'react';
+import { Popover } from '@/components/ui/popover';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { useMounted } from '@/hooks/useMount';
 import { cn } from '@/lib/classMerge';
 import {
   Collapsible,
-  CollapsibleContent,
+  CollapsibleContent as CollapsibleContentBase,
   CollapsibleTrigger,
 } from '../collapsible/CollapsibleBase';
 import { CaretDown } from '../icons/NucleoIconFilled';
 import { COLLAPSED_HIDDEN } from './config';
 import type { ISidebarGroup } from './interfaces';
+import { useSidebarIsCollapsed } from './SidebarContext';
 import { SidebarItem } from './SidebarItem';
 
 const modifiers = [restrictToVerticalAxis];
@@ -38,6 +41,145 @@ type SidebarTriggerProps = {
   isOpen: boolean;
   useCollapsible: boolean;
 } & Pick<ISidebarGroup, 'link' | 'icon' | 'label' | 'triggerClassName'>;
+
+interface SortableSidebarItemProps {
+  item: ISidebarGroup['items'][0];
+  active?: boolean;
+}
+
+export const SidebarCollapsible: React.FC<
+  ISidebarGroup & {
+    useCollapsible?: boolean;
+    activeItem?: string;
+    onItemsReorder?: (ids: string[]) => void;
+  }
+> = React.memo(
+  ({
+    label,
+    items,
+    isSortable = false,
+    activeItem,
+    onItemsReorder,
+    variant = 'collapsible',
+    icon,
+    defaultOpen = true,
+    useCollapsible = true,
+    triggerClassName,
+    className,
+    link,
+    id,
+  }) => {
+    // Track client mount to avoid SSR/CSR hydration mismatches for dnd-kit generated attributes
+    const isMounted = useMounted();
+    const isSidebarCollapsed = useSidebarIsCollapsed();
+
+    const [isOpen, setIsOpen] = React.useState(defaultOpen);
+    const isOpenComputed = isOpen && !isSidebarCollapsed;
+
+    if (isSidebarCollapsed) {
+      return (
+        <SidebarSmallWidthContent
+          activeItem={activeItem}
+          items={items}
+          icon={icon}
+          label={label}
+          link={link}
+          isSortable={isSortable}
+          onItemsReorder={onItemsReorder}
+          id={id}
+        />
+      );
+    }
+
+    return (
+      <Collapsible
+        open={isOpenComputed}
+        onOpenChange={setIsOpen}
+        className={cn('space-y-0.5', className)}
+      >
+        {variant === 'collapsible' && (
+          <SidebarTrigger
+            label={label}
+            isOpen={isOpen}
+            icon={icon}
+            link={link}
+            useCollapsible={useCollapsible}
+            triggerClassName={triggerClassName}
+          />
+        )}
+
+        {variant === 'icon' && (
+          <div
+            className={cn(
+              'flex items-center space-x-2.5 px-1.5 py-1 text-base',
+              'text-text-secondary'
+            )}
+          >
+            {icon && <span className="text-icon-color text-icon-size">{icon}</span>}
+            <span className="">{label}</span>
+          </div>
+        )}
+
+        <CollapsibleContentBase
+          className={cn(
+            isMounted &&
+              'data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up'
+          )}
+          style={{
+            minHeight:
+              !isMounted && isOpen ? `${items.length * 28 + items.length * 2 - 2}px` : undefined,
+          }}
+        >
+          <CollapsibleContent
+            items={items}
+            isMounted={isMounted}
+            isSortable={isSortable}
+            activeItem={activeItem}
+            onItemsReorder={onItemsReorder}
+            showSidebar={true}
+          />
+        </CollapsibleContentBase>
+      </Collapsible>
+    );
+  }
+);
+
+SidebarCollapsible.displayName = 'SidebarCollapsible';
+
+const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({ item, active }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+    disabled: item.disabled,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0 : 1,
+  };
+
+  const handleClick = useMemoizedFn((e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      onClick={handleClick}
+      className={cn(isDragging && 'pointer-events-none')}
+    >
+      <div onClick={isDragging ? (e) => e.stopPropagation() : undefined}>
+        <SidebarItem {...item} active={active} />
+      </div>
+    </div>
+  );
+};
 
 const SidebarTrigger: React.FC<SidebarTriggerProps> = ({
   icon,
@@ -103,196 +245,141 @@ const SidebarTrigger: React.FC<SidebarTriggerProps> = ({
     </CollapsibleTrigger>
   );
 };
-
 SidebarTrigger.displayName = 'SidebarTrigger';
 
-interface SortableSidebarItemProps {
-  item: ISidebarGroup['items'][0];
-  active?: boolean;
-}
+const CollapsibleContent = ({
+  items,
+  onItemsReorder,
+  isMounted,
+  isSortable,
+  activeItem,
+  showSidebar,
+  className,
+}: {
+  items: ISidebarGroup['items'];
+  onItemsReorder?: (ids: string[]) => void;
+  isMounted: boolean;
+  isSortable: boolean;
+  activeItem?: string;
+  showSidebar: boolean;
+  className?: string;
+}) => {
+  const [sortedItems, setSortedItems] = React.useState(items);
+  const [draggingId, setDraggingId] = React.useState<string | null>(null);
 
-const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({ item, active }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: item.id,
-    disabled: item.disabled,
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 2,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragStart = useMemoizedFn((event: DragStartEvent) => {
+    setDraggingId(event.active.id as string);
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0 : 1,
-  };
+  const handleDragEnd = useMemoizedFn((event: DragEndEvent) => {
+    const { active, over } = event;
+    setDraggingId(null);
 
-  const handleClick = useMemoizedFn((e: React.MouseEvent) => {
-    if (isDragging) {
-      e.preventDefault();
-      e.stopPropagation();
+    if (active.id !== over?.id) {
+      setSortedItems((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+        const moveddArray = arrayMove(items, oldIndex, newIndex);
+        onItemsReorder?.(moveddArray.map((item) => item.id));
+        return moveddArray;
+      });
     }
   });
 
+  const draggingItem = draggingId ? sortedItems.find((item) => item.id === draggingId) : null;
+
+  useEffect(() => {
+    setSortedItems(items);
+  }, [items]);
+
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={handleClick}
-      className={cn(isDragging && 'pointer-events-none')}
-    >
-      <div onClick={isDragging ? (e) => e.stopPropagation() : undefined}>
-        <SidebarItem {...item} active={active} />
-      </div>
+    <div className={cn('relative gap-y-0.5 flex flex-col ', showSidebar && 'pl-6.5', className)}>
+      {showSidebar && <div className="absolute left-3.5 top-0 bottom-0 w-px bg-border" />}
+
+      {isMounted && isSortable ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          modifiers={modifiers}
+        >
+          <SortableContext
+            items={sortedItems.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {sortedItems.map((item) => (
+              <SortableSidebarItem
+                key={item.id}
+                item={item}
+                active={activeItem === item.id || item.active}
+              />
+            ))}
+          </SortableContext>
+          <DragOverlay>
+            {draggingId && draggingItem ? (
+              <div className="opacity-70 shadow">
+                <SidebarItem {...draggingItem} active={draggingItem.active} />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      ) : (
+        items.map((item) => (
+          <SidebarItem key={item.id} {...item} active={activeItem === item.id || item.active} />
+        ))
+      )}
     </div>
   );
 };
 
-export const SidebarCollapsible: React.FC<
-  ISidebarGroup & {
-    useCollapsible?: boolean;
-    activeItem?: string;
-    onItemsReorder?: (ids: string[]) => void;
-  }
-> = React.memo(
-  ({
-    label,
-    items,
-    isSortable = false,
-    activeItem,
-    onItemsReorder,
-    variant = 'collapsible',
-    icon,
-    defaultOpen = true,
-    useCollapsible = true,
-    triggerClassName,
-    className,
-    link,
-  }) => {
-    // Track client mount to avoid SSR/CSR hydration mismatches for dnd-kit generated attributes
-    const [isMounted, setIsMounted] = React.useState(false);
-    React.useEffect(() => {
-      setIsMounted(true);
-    }, []);
+//This is used to display the sidebar content when the sidebar is collapsed
+const SidebarSmallWidthContent: React.FC<
+  Pick<
+    ISidebarGroup,
+    'items' | 'icon' | 'label' | 'link' | 'isSortable' | 'onItemsReorder' | 'id'
+  > & { activeItem?: string }
+> = ({ items, icon, link, isSortable = false, id, onItemsReorder, activeItem }) => {
+  const trigger = link ? 'click' : 'click';
 
-    const [isOpen, setIsOpen] = React.useState(defaultOpen);
-    const [sortedItems, setSortedItems] = React.useState(items);
-    const [draggingId, setDraggingId] = React.useState<string | null>(null);
-
-    const sensors = useSensors(
-      useSensor(PointerSensor, {
-        activationConstraint: {
-          distance: 2,
-        },
-      }),
-      useSensor(KeyboardSensor, {
-        coordinateGetter: sortableKeyboardCoordinates,
-      })
-    );
-
-    const handleDragStart = useMemoizedFn((event: DragStartEvent) => {
-      setDraggingId(event.active.id as string);
-    });
-
-    const handleDragEnd = useMemoizedFn((event: DragEndEvent) => {
-      const { active, over } = event;
-      setDraggingId(null);
-
-      if (active.id !== over?.id) {
-        setSortedItems((items) => {
-          const oldIndex = items.findIndex((item) => item.id === active.id);
-          const newIndex = items.findIndex((item) => item.id === over?.id);
-          const moveddArray = arrayMove(items, oldIndex, newIndex);
-          onItemsReorder?.(moveddArray.map((item) => item.id));
-          return moveddArray;
-        });
-      }
-    });
-
-    const draggingItem = draggingId ? sortedItems.find((item) => item.id === draggingId) : null;
-
-    useEffect(() => {
-      setSortedItems(items);
-    }, [items]);
-
-    return (
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn('space-y-0.5', className)}>
-        {variant === 'collapsible' && (
-          <SidebarTrigger
-            label={label}
-            isOpen={isOpen}
-            icon={icon}
-            link={link}
-            useCollapsible={useCollapsible}
-            triggerClassName={triggerClassName}
-          />
-        )}
-
-        {variant === 'icon' && (
-          <div
-            className={cn(
-              'flex items-center space-x-2.5 px-1.5 py-1 text-base',
-              'text-text-secondary'
-            )}
-          >
-            {icon && <span className="text-icon-color text-icon-size">{icon}</span>}
-            <span className="">{label}</span>
-          </div>
-        )}
-
+  return (
+    <Popover
+      trigger={trigger}
+      align="start"
+      side="right"
+      content={
         <CollapsibleContent
-          className={cn(
-            isMounted &&
-              'data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up'
-          )}
-          style={{
-            minHeight:
-              !isMounted && isOpen ? `${items.length * 28 + items.length * 2 - 2}px` : undefined,
-          }}
-        >
-          <div className="relative gap-y-0.5 flex flex-col pl-6.5">
-            <div className="absolute left-3.5 top-0 bottom-0 w-px bg-border" />
-
-            {isMounted && isSortable ? (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                modifiers={modifiers}
-              >
-                <SortableContext
-                  items={sortedItems.map((item) => item.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {sortedItems.map((item) => (
-                    <SortableSidebarItem
-                      key={item.id}
-                      item={item}
-                      active={activeItem === item.id || item.active}
-                    />
-                  ))}
-                </SortableContext>
-                <DragOverlay>
-                  {draggingId && draggingItem ? (
-                    <div className="opacity-70 shadow">
-                      <SidebarItem {...draggingItem} active={draggingItem.active} />
-                    </div>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-            ) : (
-              items.map((item) => (
-                <SidebarItem
-                  key={item.id}
-                  {...item}
-                  active={activeItem === item.id || item.active}
-                />
-              ))
-            )}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  }
-);
-
-SidebarCollapsible.displayName = 'SidebarCollapsible';
+          items={items}
+          isMounted={true}
+          isSortable={isSortable}
+          activeItem={activeItem}
+          onItemsReorder={onItemsReorder}
+          showSidebar={false}
+          className="max-w-[320px] min-w-[180px]"
+        />
+      }
+    >
+      <div
+        data-testid={`sidebar-collapsible-${id}`}
+        className={cn(
+          'flex flex-col space-y-0.5 h-7 overflow-y-auto',
+          'text-icon-color! text-icon-size flex items-center justify-center',
+          'hover:bg-nav-item-hover w-full rounded-sm cursor-pointer'
+        )}
+      >
+        {icon}
+      </div>
+    </Popover>
+  );
+};
