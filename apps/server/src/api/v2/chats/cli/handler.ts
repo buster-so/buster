@@ -27,6 +27,7 @@ export async function createCliChatHandler(
     created_by_id: user.id,
     created_by_name: user.email || 'Unknown',
     created_by_avatar: null,
+    collections: [],
     individual_permissions: [],
     publicly_accessible: false,
     public_expiry_date: null,

@@ -11,6 +11,7 @@ import {
   createMessage,
   generateAssetMessages,
   getChatWithDetails,
+  getCollectionsAssociatedWithChat,
   getMessagesForChatWithUserDetails,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
@@ -171,14 +172,16 @@ export async function buildChatWithMessages(
     messageMap[msg.message.id] = chatMessage;
   }
 
-  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount] = await Promise.all([
-    getPubliclyEnabledByUser(chat.publiclyEnabledBy),
-    getUsersWithAssetPermissions({
-      assetId: chat.id,
-      assetType: 'chat',
-    }),
-    getOrganizationMemberCount(chat.organizationId),
-  ]);
+  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount, collections] =
+    await Promise.all([
+      getPubliclyEnabledByUser(chat.publiclyEnabledBy),
+      getUsersWithAssetPermissions({
+        assetId: chat.id,
+        assetType: 'chat',
+      }),
+      getOrganizationMemberCount(chat.organizationId),
+      getCollectionsAssociatedWithChat(chat.id, user?.id || chat.createdBy),
+    ]);
 
   // Ensure message_ids array has no duplicates
   const uniqueMessageIds = [...new Set(messageIds)];
@@ -199,6 +202,7 @@ export async function buildChatWithMessages(
     created_by_id: chat.createdBy,
     created_by_name: createdByName,
     created_by_avatar: user?.avatarUrl || null,
+    collections,
     individual_permissions: individualPermissions,
     publicly_accessible: chat.publiclyAccessible || false,
     public_expiry_date: chat.publicExpiryDate || null,

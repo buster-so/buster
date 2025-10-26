@@ -79,6 +79,7 @@ describe('chat-helpers', () => {
     created_by_id: 'user-123',
     created_by_name: 'Test User',
     created_by_avatar: null,
+    collections: [],
     publicly_accessible: false,
     public_expiry_date: null,
     public_enabled_by: null,
