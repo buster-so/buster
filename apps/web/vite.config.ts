@@ -34,9 +34,6 @@ const config = defineConfig(({ command, mode }) => {
       'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId),
       'import.meta.env.VITE_BUILD_AT': JSON.stringify(buildAt),
     },
-    optimizeDeps: {
-      exclude: ['playwright-core', 'chromium-bidi'],
-    },
     plugins: [
       // this is the plugin that enables path aliases
       tsConfigPaths({ projects: ['./tsconfig.json'] }),
@@ -62,10 +59,6 @@ const config = defineConfig(({ command, mode }) => {
         external: (id) => {
           // Exclude .test and .stories files
           if (/\.(test|stories)\.(js|ts|jsx|tsx)$/.test(id)) {
-            return true;
-          }
-          // Exclude playwright-core (Node.js-only package)
-          if (id.includes('playwright-core')) {
             return true;
           }
           // Don't externalize React and React DOM - let them be bundled
