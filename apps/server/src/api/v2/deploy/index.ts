@@ -1,22 +1,9 @@
-import { deploy } from '@buster/server-shared';
-import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { requireAuth } from '../../../middleware/auth';
-import { standardErrorHandler } from '../../../utils/response';
-import { deployHandler } from './POST';
+import automationApp from './automation';
+import projectApp from './project';
 
 const app = new Hono()
-  .use('*', requireAuth)
-
-  // POST /deploy - Unified deployment for models and docs
-  .post('/', zValidator('json', deploy.UnifiedDeployRequestSchema), async (c) => {
-    const request = c.req.valid('json');
-    const user = c.get('busterUser');
-
-    const response = await deployHandler(request, user);
-    return c.json(response);
-  })
-
-  .onError(standardErrorHandler);
+  .route('/project', projectApp)
+  .route('/automation', automationApp);
 
 export default app;

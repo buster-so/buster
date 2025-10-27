@@ -15,18 +15,17 @@ import type { deploy } from '@buster/server-shared';
 import { and, eq, isNull } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
-type UnifiedDeployRequest = deploy.UnifiedDeployRequest;
+type ModelsDocsDeployRequest = deploy.ModelsDocsDeployRequest;
 type UnifiedDeployResponse = deploy.UnifiedDeployResponse;
 type ModelDeployResult = deploy.ModelDeployResult;
 type DocDeployResult = deploy.DocDeployResult;
 type LogsWritebackResult = deploy.LogsWritebackResult;
 
 /**
- * Deploy handler for unified model and doc deployment
- * Orchestrates deployment using simple database operations
+ * Handler for deploying models and docs
  */
-export async function deployHandler(
-  request: UnifiedDeployRequest,
+export async function deployProjectHandler(
+  request: ModelsDocsDeployRequest,
   user: User
 ): Promise<UnifiedDeployResponse> {
   // Get user's organization
@@ -124,7 +123,7 @@ export async function deployHandler(
             modelResult.summary.successCount++;
           }
         } catch (error) {
-          console.error(`Failed to deploy model ${model.name}:`, error);
+          console.error(`[deployProjectHandler] Failed to deploy model ${model.name}:`, error);
           modelResult.failures.push({
             name: model.name,
             errors: [error instanceof Error ? error.message : 'Unknown error'],
@@ -149,7 +148,7 @@ export async function deployHandler(
           docResult.created.push(doc.name);
           docResult.summary.createdCount++;
         } catch (error) {
-          console.error(`Failed to deploy doc ${doc.name}:`, error);
+          console.error(`[deployProjectHandler] Failed to deploy doc ${doc.name}:`, error);
           docResult.failed.push({
             name: doc.name,
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -182,7 +181,7 @@ export async function deployHandler(
 
     return result;
   } catch (error) {
-    console.error('[deployHandler] Deployment failed:', error);
+    console.error('[deployProjectHandler] Deployment failed:', error);
 
     // Re-throw HTTPExceptions as-is
     if (error instanceof HTTPException) {
@@ -323,3 +322,4 @@ async function handleLogsWritebackConfig(
     };
   }
 }
+
