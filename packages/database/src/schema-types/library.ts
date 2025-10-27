@@ -1,8 +1,8 @@
 import z from 'zod';
 import { AssetTypeSchema } from './asset';
 import {
+  type InfinitePaginatedResponse,
   InfinitePaginationSchema,
-  type PaginatedResponse,
   PaginationInputSchema,
 } from './pagination';
 
@@ -61,6 +61,7 @@ export const ListPermissionedAssetsInputSchema = z
     groupBy: z.enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none']).optional(),
     query: z.string().optional(),
     includeAssetChildren: z.boolean().optional(),
+    pinCollections: z.boolean().optional(),
   })
   .merge(PaginationInputSchema);
 
@@ -82,7 +83,7 @@ export type GroupedAssets = z.infer<typeof GroupedAssetsResponseSchema>['groups'
 export type GroupedAssetsResponse = z.infer<typeof GroupedAssetsResponseSchema>;
 
 export type ListPermissionedAssetsResponse =
-  | PaginatedResponse<AssetListItem>
+  | InfinitePaginatedResponse<AssetListItem>
   | GroupedAssetsResponse;
 
 // Keep the old names for backward compatibility

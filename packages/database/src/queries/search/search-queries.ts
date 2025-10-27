@@ -1,8 +1,8 @@
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2, collectionsToAssets, userLibrary, users } from '../../schema';
-import { PaginationInputSchema, type SearchPaginatedResponse } from '../../schema-types';
+import { assetSearchV2, userLibrary, users } from '../../schema';
+import { type InfinitePaginatedResponse, PaginationInputSchema } from '../../schema-types';
 import { AssetTypeSchema } from '../../schema-types/asset';
 import type { TextSearchResultSchema } from '../../schema-types/search';
 import { createPermissionedAssetsSubquery } from './access-control-helpers';
@@ -43,7 +43,7 @@ export type SearchFilters = z.infer<typeof SearchFiltersSchema>;
 export type SearchTextInput = z.infer<typeof SearchTextInputSchema>;
 export type TextSearchResult = z.infer<typeof TextSearchResultSchema>;
 
-export type SearchTextResponse = SearchPaginatedResponse<TextSearchResult>;
+export type SearchTextResponse = InfinitePaginatedResponse<TextSearchResult>;
 
 /**
  * Search asset_search_v2 table using pgroonga index
