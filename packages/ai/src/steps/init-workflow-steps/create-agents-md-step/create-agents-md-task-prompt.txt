@@ -1,0 +1,344 @@
+# Task: Create AGENTS.md for Data Repository
+
+## Objective
+Analyze a data repository to understand its complete structure, conventions, and patterns, then create a comprehensive `AGENTS.md` file that serves as an onboarding guide for engineers joining the project. This is a living document that represents the current state of the repository and how all technologies work together.
+
+## Context
+The `AGENTS.md` file complements the general system prompt with project-specific context. It captures the complete technology stack, data pipeline, modeling philosophy, naming conventions, and high-level domain knowledge. While dbt is typically the primary focus, this document covers the entire data ecosystem to give new engineers a holistic understanding.
+
+**Target audience**: An experienced engineer (preferably with dbt knowledge) who needs to understand THIS specific project.
+
+## Success Criteria
+- [ ] All existing documentation files read and synthesized (README, CLAUDE.md, .cursorrules, etc.)
+- [ ] Complete technology stack documented (extraction → transformation → consumption)
+- [ ] End-to-end data pipeline mapped with timing context for major changes
+- [ ] Modeling philosophy identified (Kimball, medallion, OBT, etc.)
+- [ ] Repository structure and organization documented (entire repo)
+- [ ] Naming conventions captured (only notable/non-standard patterns)
+- [ ] Code standards extracted with inline @ references
+- [ ] CI/CD, testing, and deployment patterns documented
+- [ ] High-level domain knowledge captured (not model-specific)
+- [ ] Deprecated/archived components identified and documented
+- [ ] `AGENTS.md` created at repository root with frontmatter (last_updated, repo_commit_sha)
+
+## Input
+- Complete data repository (dbt models, scripts, configs, docs, CI/CD)
+- Existing documentation files
+- Git history for understanding pattern evolution
+- Project configuration files
+
+## Specific Requirements
+- **Documentation-first**: Read all docs (README, CLAUDE.md, AGENTS.md, .cursorrules, etc.) before analyzing code
+- **Living document**: Represents current state; note timing for major changes (e.g., "Migrated from X in Aug 2024")
+- **Evidence-based**: Only document what you've read or observed - if you haven't seen evidence in files, don't document it
+- **Current state focus**: No "NEW" or "RECENTLY ADDED" language; document what exists now
+- **Migration awareness**: Use git naturally to identify technology changes, migrations, deprecations, and archivals
+- **Concise overview**: This is the highest-level overview - keep it concise knowing detail lives in downstream docs
+- **Holistic view**: Cover entire repository while keeping dbt as primary focus
+- **Natural observation**: Let patterns emerge from analysis; don't force structure
+- **Experienced audience**: Don't explain standard conventions unless project deviates
+- **Inline references**: Explain concept first, then add @ reference (not "just see @file")
+- **Use git naturally**: Check history when helpful for understanding timing/evolution
+- **No model-specifics**: Model/column details belong in schema.yml
+- **No file counts**: Avoid "~70 models" - these change rapidly
+- **No data patterns**: Avoid percentages, metrics, specific observations (belong in model docs)
+
+## Workflow
+
+### 1. Read Existing Documentation First
+
+**Priority: Understand what's already documented before analyzing code.**
+
+Use Read to examine all documentation files:
+- README.md - Project overview, setup, conventions
+- CLAUDE.md - Any AI assistant instructions or context
+- AGENTS.md - If updating existing, understand current state
+- .cursorrules, .windsurfrules - Editor-specific guidance
+- docs/ directory - Architecture, style guides, glossaries, runbooks
+
+Capture the current git commit SHA for frontmatter (`git rev-parse HEAD`).
+
+Extract from documentation:
+- Business context and use cases
+- Stated conventions and standards
+- Technology stack and pipeline
+- Known patterns and philosophies
+- Team preferences and workflows
+- Deprecated/archived mentions
+- Migration history
+
+Use TodoWrite to track what you learn and what needs investigation.
+
+### 2. Understand Technology Stack & Data Pipeline
+
+Explore the repository to identify all technologies in the data pipeline. Use Read on configuration files (dbt_project.yml, packages.yml, requirements.txt, pyproject.toml). Use Grep to search documentation for technology mentions.
+
+Check git history naturally for evidence of technology changes. Look for migration commits, tool replacements, or deprecations. Use Grep in configs for commented-out or old tool references.
+
+Map the complete pipeline:
+- Extraction/loading layer (Fivetran, Airbyte, custom scripts?)
+- Data warehouse (Snowflake, BigQuery, Redshift, Postgres?)
+- Transformation (dbt packages and extensions)
+- Orchestration (Airflow, Dagster, CI/CD?)
+- Data quality tools (Great Expectations, Soda, dbt tests?)
+- Consumption layer (Looker, Tableau, exports?)
+
+Document timing of changes based on evidence from git history or documentation. Only document what you've actually seen evidence for.
+
+### 3. Analyze dbt Project Structure & Data Flow
+
+Use Ls to explore the models/ directory hierarchy. Identify layers (staging, intermediate, marts, or custom layers). Use Read on dbt_project.yml to understand materialization defaults and configurations.
+
+Find and read source definitions using Glob (look for sources.yml or _sources.yml files). Understand what source systems feed the pipeline.
+
+Read a few representative models per layer to understand the transformation philosophy:
+- Staging: What level of transformation? Type casting only? Column renaming?
+- Intermediate: Where does business logic live? How are joins handled?
+- Marts: Aggregations? Dimensional models? Wide tables?
+
+Check for incremental models using Grep to find is_incremental() patterns. Understand the materialization strategy.
+
+### 4. Identify Modeling Philosophy
+
+Look for evidence of the dimensional modeling approach being used. Use Ls to check directory names and file patterns. Use Grep to search for model prefixes (dim_, fct_, hub_, link_, sat_).
+
+Common patterns:
+- `dim_*` and `fct_*` prefixes → Kimball dimensional modeling
+- bronze/silver/gold layers → Medallion architecture
+- Wide denormalized tables → One Big Table approach
+- hub/link/satellite patterns → Data Vault
+
+Check git history if patterns are mixed to understand evolution. Look in architecture docs for stated modeling philosophy.
+
+Document the primary approach and note any legacy patterns still present. Use git to understand when modeling approaches changed if applicable.
+
+### 5. Map Complete Repository Structure
+
+Use Ls to get the full directory structure. Identify all components beyond dbt models:
+- models/ - dbt transformation structure and organization
+- scripts/ - Python/Bash utilities (what are they for?)
+- tests/ - Custom dbt tests or other test suites
+- .github/workflows/ or .gitlab-ci.yml - CI/CD configuration
+- docs/ - Documentation structure
+- macros/ - dbt macros (how organized?)
+- seeds/ - Reference data
+- notebooks/ - Analysis notebooks
+- Other unique directories
+
+Note the organization philosophy:
+- How are models organized? (by source? domain? function?)
+- How are scripts structured?
+- Where does documentation live?
+
+### 6. Analyze Naming Conventions (Only Notable Patterns)
+
+Sample representative models across layers using Glob. Read 15-20 models to identify patterns.
+
+Only document conventions if they're non-standard or need clarification. Assume the audience knows standard dbt patterns.
+
+Look for:
+- Custom prefixes or unusual patterns
+- Deviations from standard dbt naming
+- Mixed patterns (use git to understand which is newer/preferred)
+
+For mixed patterns, choose the most recent and common approach. Note legacy patterns inline where relevant.
+
+### 7. Document CI/CD, Testing & Deployment
+
+Use Read on CI/CD configs (.github/workflows/, .gitlab-ci.yml). Understand the workflow:
+- What happens on PR?
+- What happens on merge to main?
+- What testing runs where?
+
+Look for testing infrastructure:
+- Pre-commit hooks (.pre-commit-config.yaml)
+- Linting configs (sqlfluff, sqlfmt, ruff, black)
+- Data quality tools (Great Expectations, Soda, Elementary)
+
+Understand deployment:
+- How does dbt run in production? (CI/CD? Orchestrator? Manual?)
+- Environment strategy (dev, staging, prod)
+- Approval processes
+
+Use Grep to search for dbt commands in CI/CD files to understand testing and deployment patterns.
+
+### 8. Extract Code Standards
+
+Look for code style documentation and configuration files using Ls and Read:
+- SQL style: .sqlfluff, .editorconfig, docs/style guides
+- Python style: pyproject.toml, setup.cfg, .flake8, .black.toml
+- dbt standards: macros README, model documentation patterns
+
+Sample a few models and scripts using Read to observe patterns. Only document notable or enforced conventions.
+
+When documenting standards, explain the concept briefly then add @ reference inline:
+- ✅ "SQL formatted with sqlfluff enforcing trailing commas and 4-space indentation. Full guide: @docs/sql_style_guide.md"
+- ❌ "For SQL style, see @docs/sql_style_guide.md"
+
+### 9. Capture High-Level Domain Knowledge
+
+Read documentation (README, docs/) to extract business concepts and entity relationships. Focus on what an engineer needs to understand the BUSINESS, not the data.
+
+**What to include** (high-level concepts):
+- Business overview: What does the company/project do?
+- Entity lifecycles (Customer: New → Active → Churned)
+- Key business rules (Revenue recognition approach)
+- Important relationships (B2C vs B2B customers)
+
+**What NOT to include** (data-specific details):
+- Specific percentages or metrics ("96.5% are B2C")
+- Data patterns ("73% of orders have reasons")
+- Column-level details ("customers with personID are B2C")
+- Specific counts or averages
+
+**Rule of thumb**: If it includes a percentage, count, or specific data observation, it belongs in model documentation (schema.yml), not AGENTS.md.
+
+Look for existing glossaries or business definition docs to reference with @.
+
+### 10. Identify Deprecated & Archived Components
+
+Use Grep to search documentation and configs for deprecation mentions (deprecated, archived, legacy, "no longer", "stopped using", "previously", "formerly").
+
+Check git history for evidence of removals or tool changes. Look for commits about migrations, deprecations, or archiving.
+
+Check for commented-out configurations in dbt_project.yml and packages.yml that might indicate old tools.
+
+Use Ls to see if there are archived or deprecated directories (don't force the pattern, just observe what exists).
+
+Only document what you've seen evidence for:
+- If docs mention migrations → Document with source
+- If git shows tool removal → Document with timing
+- If you see no evidence → Don't speculate
+
+Document tools/systems no longer used, legacy patterns still present, and migration timelines based on evidence.
+
+### 11. Find Key Documentation References
+
+Use Glob to find all markdown files in the repository. Identify documentation worth referencing:
+- Architecture and design docs
+- Style guides and conventions
+- Business glossaries
+- Deployment runbooks
+- Onboarding guides
+
+These will be referenced inline throughout AGENTS.md using @ syntax.
+
+### 12. Create AGENTS.md
+
+**Frontmatter format**:
+```markdown
+---
+last_updated: 2025-01-15
+repo_commit_sha: a1b2c3d4e5f6g7h8i9j0
+---
+```
+
+**Structure and content**:
+
+Create a concise, high-level overview covering:
+
+1. **Business Context** - What does this project do? Who uses it? (1-3 paragraphs)
+
+2. **Technology Stack** - Complete data platform, dbt ecosystem, testing/quality tools, and how they work together
+
+3. **Data Pipeline Overview** - End-to-end flow, source systems, transformation layers and philosophy, consumption layer
+
+4. **Modeling Philosophy** - Primary approach (Kimball, medallion, OBT, etc.) with evidence. Note any evolution or legacy patterns.
+
+5. **Repository Structure** - Directory organization and philosophy
+
+6. **Naming Conventions** - Only non-standard or notable patterns. Assume standard dbt knowledge.
+
+7. **CI/CD & Deployment** - CI platform, testing strategy, deployment process
+
+8. **Code Standards** - Key conventions with inline @ references to detailed guides
+
+9. **Documentation Standards** - Current approach, coverage expectations, where docs live
+
+10. **Domain Knowledge** - High-level business concepts only (no data patterns or metrics)
+
+11. **Team Preferences** - Development workflow, communication, getting help (if documented)
+
+12. **Key Documentation References** - List important @ references
+
+13. **Deprecated & Archived Components** - Brief section noting what's no longer used (inline notes throughout where relevant)
+
+**Writing principles**:
+- Keep concise - this is the highest level, detail lives downstream
+- Explain concept then add @ reference inline
+- Document current state with timing for major changes
+- Only document what you've seen evidence for
+- Prefer clarity over completeness
+- Use bullet points, paragraphs, or diagrams as appropriate
+
+## Verification
+
+**Content checklist**:
+- [ ] AGENTS.md has frontmatter (last_updated, repo_commit_sha)
+- [ ] Business context is high-level (1-3 paragraphs, not exhaustive)
+- [ ] Complete technology stack with pipeline flow documented
+- [ ] Modeling philosophy section included with evidence
+- [ ] Repository structure covers entire repo (not just dbt)
+- [ ] CI/CD, testing, and deployment documented
+- [ ] Inline @ references explain concept first
+- [ ] Only notable/non-standard conventions documented
+- [ ] Domain knowledge is high-level concepts (no percentages/metrics/data patterns)
+- [ ] Deprecated/archived section at bottom + inline notes where relevant
+- [ ] Document represents current state with timing context for changes
+- [ ] No file counts or changing metrics
+- [ ] Concise and focused on onboarding an experienced engineer
+
+## Additional Notes
+
+**Living document mindset**:
+- AGENTS.md represents the CURRENT state
+- Note timing for major changes (e.g., "Migrated from X in Aug 2024")
+- Don't use "NEW" or "RECENTLY ADDED" language
+- Use git naturally to understand when patterns evolved
+
+**Documentation-first approach**:
+- Read README, CLAUDE.md, AGENTS.md, .cursorrules FIRST
+- Let existing docs inform your analysis
+- Use code analysis to fill gaps or verify docs
+
+**Evidence-based documentation**:
+- Only document what you've actually read or observed
+- If you haven't seen evidence in files/git, don't document it
+- Cite sources naturally when helpful (e.g., "per README.md")
+
+**Inline reference style**:
+Always explain the concept, then reference:
+- ✅ "SQL formatted with sqlfluff enforcing trailing commas and 4-space indentation. Full guide: @docs/sql_style_guide.md"
+- ❌ "For SQL style, see @docs/sql_style_guide.md"
+
+**Natural observation with principle-based guidance**:
+- Let patterns emerge from thorough analysis
+- Use tools (Grep, Read, Ls, git) to discover patterns
+- Don't force structure or run prescriptive commands
+- Think conceptually about goals, not specific command sequences
+
+**Migration and archival detection**:
+- Use git naturally to find technology changes
+- Check docs for "previously", "formerly", migration mentions
+- Look for commented configs indicating old tools
+- Only document what you find evidence for
+
+**Conciseness**:
+- This is the highest-level overview
+- Detail lives in downstream docs (@ reference them)
+- Keep focused on what an engineer needs to be productive
+- Quality over quantity
+
+**Target audience**:
+"What does an experienced engineer need to understand the BUSINESS and REPOSITORY to be productive?"
+
+**Avoid**:
+- File counts ("~70 models") → Change frequently
+- Model-specific details ("fct_orders has 8% nulls") → Belong in schema.yml
+- **Data patterns and percentages** ("96.5% of customers are B2C") → Belong in model docs
+- **Specific metrics** ("Average 3.86 line items per order") → Belong in model docs
+- Standard conventions → Assume audience knowledge
+- Duplicating referenced docs → Use @ inline
+- Change log style → Document current state
+- Prescriptive command sequences → Use tools naturally
+- Speculating without evidence → Only document what you've seen

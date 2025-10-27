@@ -119,107 +119,110 @@ export function Main() {
     }
   });
 
-  const handleSubmit = useCallback(async (finalValue?: string) => {
-    // Use finalValue if provided (from paste token reconstruction), otherwise use input state
-    const textToSubmit = finalValue !== undefined ? finalValue : input;
-    const trimmed = textToSubmit.trim();
-    if (!trimmed || !sessionInitialized) {
-      setInput('');
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (finalValue?: string) => {
+      // Use finalValue if provided (from paste token reconstruction), otherwise use input state
+      const textToSubmit = finalValue !== undefined ? finalValue : input;
+      const trimmed = textToSubmit.trim();
+      if (!trimmed || !sessionInitialized) {
+        setInput('');
+        return;
+      }
 
-    const chatId = getCurrentChatId();
-    const messageId = crypto.randomUUID();
-    const cwd = workingDirectory.current;
-    let updatedModelMessages: ModelMessage[] = [];
+      const chatId = getCurrentChatId();
+      const messageId = crypto.randomUUID();
+      const cwd = workingDirectory.current;
+      let updatedModelMessages: ModelMessage[] = [];
 
-    try {
-      // Use raw ModelMessage array directly (from API - already in correct format)
-      // For new sessions, this starts as empty array
-      // For resumed sessions, this contains messages loaded from API
-      const userMessage: ModelMessage = {
-        role: 'user',
-        content: trimmed,
-      };
-      updatedModelMessages = [...modelMessages, userMessage];
-
-      // Update UI state immediately
-      handleMessageUpdate(updatedModelMessages);
-
-      // Clear input and set thinking
-      setInput('');
-      setIsThinking(true);
-
-      // Get or create SDK for API-first approach
-      let sdk = null;
       try {
-        sdk = await getOrCreateSdk();
-      } catch (error) {
-        debugLogger.warn('No SDK available - some features may be limited:', error);
-      }
-
-      // Create AbortController for this agent execution
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
-
-      // Run agent with callback for message updates (API-first, no local file saves)
-      await runChatAgent(
-        {
-          chatId,
-          messageId,
-          workingDirectory: cwd,
-          abortSignal: abortController.signal,
-          prompt: trimmed, // Pass the user prompt for database creation
-          messages: updatedModelMessages, // Pass all messages including new user message
-          sdk: sdk || undefined, // Pass SDK for API-first approach
-        },
-        {
-          onThinkingStateChange: (thinking) => {
-            setIsThinking(thinking);
-          },
-          onMessageUpdate: handleMessageUpdate,
-          onError: (error) => {
-            debugLogger.error('Agent stream error:', error);
-            setIsThinking(false);
-          },
-          onAbort: () => {
-            debugLogger.warn('Agent stream aborted');
-            setIsThinking(false);
-          },
-        }
-      );
-    } catch (error) {
-      // Handle abort gracefully
-      if (error instanceof Error && error.name === 'AbortError') {
-        // Agent was aborted, just clear thinking state
-        setIsThinking(false);
-      } else {
-        // Handle all other errors - log and display to user
-        debugLogger.error('Error in agent execution:', error);
-
-        // Create error message to add to conversation
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const errorContent = `**Error:** An error occurred during agent execution:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\nPlease try again or contact support if the issue persists.`;
-
-        // Add error as assistant message so user sees it in the UI
-        const errorModelMessage: ModelMessage = {
-          role: 'assistant',
-          content: errorContent,
+        // Use raw ModelMessage array directly (from API - already in correct format)
+        // For new sessions, this starts as empty array
+        // For resumed sessions, this contains messages loaded from API
+        const userMessage: ModelMessage = {
+          role: 'user',
+          content: trimmed,
         };
+        updatedModelMessages = [...modelMessages, userMessage];
 
-        const messagesWithError = [...updatedModelMessages, errorModelMessage];
-        handleMessageUpdate(messagesWithError);
+        // Update UI state immediately
+        handleMessageUpdate(updatedModelMessages);
 
-        // Note: Error state is shown in UI but not saved
-        // API-first approach - messages are saved during agent execution
+        // Clear input and set thinking
+        setInput('');
+        setIsThinking(true);
+
+        // Get or create SDK for API-first approach
+        let sdk = null;
+        try {
+          sdk = await getOrCreateSdk();
+        } catch (error) {
+          debugLogger.warn('No SDK available - some features may be limited:', error);
+        }
+
+        // Create AbortController for this agent execution
+        const abortController = new AbortController();
+        abortControllerRef.current = abortController;
+
+        // Run agent with callback for message updates (API-first, no local file saves)
+        await runChatAgent(
+          {
+            chatId,
+            messageId,
+            workingDirectory: cwd,
+            abortSignal: abortController.signal,
+            prompt: trimmed, // Pass the user prompt for database creation
+            messages: updatedModelMessages, // Pass all messages including new user message
+            sdk: sdk || undefined, // Pass SDK for API-first approach
+          },
+          {
+            onThinkingStateChange: (thinking) => {
+              setIsThinking(thinking);
+            },
+            onMessageUpdate: handleMessageUpdate,
+            onError: (error) => {
+              debugLogger.error('Agent stream error:', error);
+              setIsThinking(false);
+            },
+            onAbort: () => {
+              debugLogger.warn('Agent stream aborted');
+              setIsThinking(false);
+            },
+          }
+        );
+      } catch (error) {
+        // Handle abort gracefully
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Agent was aborted, just clear thinking state
+          setIsThinking(false);
+        } else {
+          // Handle all other errors - log and display to user
+          debugLogger.error('Error in agent execution:', error);
+
+          // Create error message to add to conversation
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorContent = `**Error:** An error occurred during agent execution:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\nPlease try again or contact support if the issue persists.`;
+
+          // Add error as assistant message so user sees it in the UI
+          const errorModelMessage: ModelMessage = {
+            role: 'assistant',
+            content: errorContent,
+          };
+
+          const messagesWithError = [...updatedModelMessages, errorModelMessage];
+          handleMessageUpdate(messagesWithError);
+
+          // Note: Error state is shown in UI but not saved
+          // API-first approach - messages are saved during agent execution
+          setIsThinking(false);
+        }
+      } finally {
+        // Clean up abort controller
+        abortControllerRef.current = null;
         setIsThinking(false);
       }
-    } finally {
-      // Clean up abort controller
-      abortControllerRef.current = null;
-      setIsThinking(false);
-    }
-  }, [input, sessionInitialized, modelMessages, handleMessageUpdate]);
+    },
+    [input, sessionInitialized, modelMessages, handleMessageUpdate]
+  );
 
   const handleResumeConversation = useCallback(
     async (conversation: Conversation) => {

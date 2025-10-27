@@ -62,7 +62,7 @@ export type { StepRetryOptions } from './utils/with-step-retry';
 export { createRetryableStep, runStepsWithRetry, withStepRetry } from './utils/with-step-retry';
 export * from './workflows';
 // Workflow exports - only export main workflow functions and public types
-export { runAnalystWorkflow } from './workflows';
+export { runAnalystWorkflow, runInitWorkflow } from './workflows';
 export type { AnalystWorkflowInput } from './workflows/analyst-agent-workflow/analyst-workflow';
 export type { AnalystWorkflowOutput } from './workflows/analyst-agent-workflow/workflow-output.types';
 export type { PostProcessingWorkflowOutput } from './workflows/message-post-processing-workflow/message-post-processing-workflow';

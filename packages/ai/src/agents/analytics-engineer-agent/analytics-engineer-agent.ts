@@ -53,9 +53,9 @@ export function createAnalyticsEngineerAgent(
   const workingDirectoryContextMessage = analyticsEngineerAgentOptions.isSubagent
     ? null
     : ({
-      role: 'system',
-      content: createWorkingDirectoryContext(process.cwd()),
-    } as ModelMessage);
+        role: 'system',
+        content: createWorkingDirectoryContext(process.cwd()),
+      } as ModelMessage);
 
   async function stream({ messages }: AnalyticsEngineerAgentStreamOptions) {
     const toolSet = await createAnalyticsEngineerToolset(analyticsEngineerAgentOptions);
@@ -64,9 +64,9 @@ export function createAnalyticsEngineerAgent(
     const agentsMdContent = await readAgentsMd();
     const agentsMdMessage = agentsMdContent
       ? ({
-        role: 'system',
-        content: `# Additional Agent Context from AGENTS.md\n\n${agentsMdContent}`,
-      } as ModelMessage)
+          role: 'system',
+          content: `# Additional Agent Context from AGENTS.md\n\n${agentsMdContent}`,
+        } as ModelMessage)
       : null;
 
     // Read git communication rules when in headless mode
@@ -75,9 +75,9 @@ export function createAnalyticsEngineerAgent(
       : null;
     const gitCommunicationRulesMessage = gitCommunicationRulesContent
       ? ({
-        role: 'system',
-        content: gitCommunicationRulesContent,
-      } as ModelMessage)
+          role: 'system',
+          content: gitCommunicationRulesContent,
+        } as ModelMessage)
       : null;
 
     // Build messages array with system messages and working directory context
@@ -123,7 +123,7 @@ export function createAnalyticsEngineerAgent(
             abortSignal: analyticsEngineerAgentOptions.abortSignal,
           }),
           // temperature: 0,
-          onError: () => { },
+          onError: () => {},
         });
       },
       {

@@ -332,7 +332,6 @@ export function unescapeString(str: string): string {
 }
 
 export const EscapeNormalizedReplacer: Replacer = function* (content, find) {
-
   const unescapedFind = unescapeString(find);
 
   // Try direct match with unescaped find string
@@ -523,7 +522,9 @@ export function replace(
       }
       const lastIndex = content.lastIndexOf(search);
       if (index !== lastIndex) continue;
-      return content.substring(0, index) + unescapedNewString + content.substring(index + search.length);
+      return (
+        content.substring(0, index) + unescapedNewString + content.substring(index + search.length)
+      );
     }
   }
 

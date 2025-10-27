@@ -8,9 +8,7 @@ import { createExploreToolExecute } from './explore-tool-execute';
 export const EXPLORE_TOOL_NAME = 'explore';
 
 export const ExploreToolInputSchema = z.object({
-  description: z
-    .string()
-    .describe('A short (3-5 word) description of what to explore/search for'),
+  description: z.string().describe('A short (3-5 word) description of what to explore/search for'),
   prompt: z
     .string()
     .describe(
