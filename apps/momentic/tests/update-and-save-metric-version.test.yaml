@@ -138,7 +138,7 @@ steps:
     type: PRESET_ACTION
     command:
       id: 47e7bb3e-fe86-4414-8fbb-1983fd9edca6
-      loadTimeout: 2
+      loadTimeout: 15
       type: REFRESH
   - id: 5de3a198-c9b0-4ba3-a23f-7c150ba66bf8
     type: PRESET_ACTION

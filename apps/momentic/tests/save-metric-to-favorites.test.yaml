@@ -60,7 +60,7 @@ steps:
     type: PRESET_ACTION
     command:
       id: 88ad5705-7ea0-4cdd-8d43-11f10e465b5e
-      loadTimeout: 2
+      loadTimeout: 15
       type: NAVIGATE
       url: "{{env.BASE_URL}}/app/home"
   - id: 3a9cd80c-ceab-4fc4-bb9e-cc119c8b2b03

@@ -280,12 +280,61 @@ jobs:
 
       - name: Run Momentic E2E Tests
         id: momentic-tests
+        env:
+          BASE_URL: http://localhost:3000
         run: |
           echo "🧪 Running Momentic E2E tests..."
+
+          # Start service monitoring in background
+          {
+            while true; do
+              for port in 3000 3001 3002; do
+                if ! lsof -ti:$port > /dev/null 2>&1; then
+                  echo "❌ [$(date '+%Y-%m-%d %H:%M:%S')] Service on port $port died!"
+                  echo "=== Latest turbo.log ==="
+                  tail -100 ../../../turbo.log || echo "No logs available"
+                  echo "=== Process Status ==="
+                  ps aux | grep -E 'node|bun|buster_server' || true
+                  exit 1
+                fi
+              done
+              sleep 10
+            done
+          } &
+          MONITOR_PID=$!
+          echo "Started service monitor with PID $MONITOR_PID"
+
+          # Run Momentic tests
           cd apps/momentic
           pnpm dlx momentic install-browsers --all
-          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY  --exclude "llm-call-tests/*" --upload-results
+          TEST_EXIT_CODE=0
+          pnpm dlx momentic run --api-key $MOMENTIC_API_KEY --env development --exclude "llm-call-tests/*" --upload-results || TEST_EXIT_CODE=$?
 
+          # Stop monitor
+          kill $MONITOR_PID 2>/dev/null || true
+
+          exit $TEST_EXIT_CODE
+
+
+      - name: Display service logs on failure
+        if: failure()
+        run: |
+          echo "=== Service Logs (Last 500 lines) ==="
+          tail -500 turbo.log || echo "No turbo.log found"
+          echo ""
+          echo "=== Process Status ==="
+          ps aux | grep -E 'node|bun|buster_server' || true
+          echo ""
+          echo "=== Port Status ==="
+          lsof -i :3000 || echo "Nothing on port 3000"
+          lsof -i :3001 || echo "Nothing on port 3001"
+          lsof -i :3002 || echo "Nothing on port 3002"
+          echo ""
+          echo "=== Memory Usage ==="
+          free -h || echo "Memory info not available"
+          echo ""
+          echo "=== Disk Usage ==="
+          df -h || echo "Disk info not available"
 
       - name: Stop services
         if: always()

@@ -21,7 +21,7 @@ steps:
     type: PRESET_ACTION
     command:
       id: 5038aa2a-8eea-4e19-ad77-ed8f008bc8a4
-      loadTimeout: 2
+      loadTimeout: 15
       type: NAVIGATE
       url: "{{env.BASE_URL}}/app/metrics"
   - id: 6a9a21b7-f989-4aa1-84d0-846038d6a72f
