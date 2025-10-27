@@ -1,5 +1,6 @@
 import type { BusterCollectionListItem } from '@buster/server-shared/collections';
-import { Link } from '@tanstack/react-router';
+import type { LibraryAssetListItem } from '@buster/server-shared/library';
+import { Link, type LinkProps } from '@tanstack/react-router';
 import { cn } from '@udecode/cn';
 import React from 'react';
 import { useDeleteCollection } from '@/api/buster_rest/collections';
@@ -13,12 +14,33 @@ import {
 import { Trash } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
 import { formatDate } from '@/lib/date';
+import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 
-export const CollectionCard = React.memo(
-  ({ id, name, updated_at, created_by_avatar_url, created_by_name }: BusterCollectionListItem) => {
+export const AssetGridCardSmall = React.memo(
+  ({
+    asset_id,
+    asset_type,
+    name,
+    updated_at,
+    created_by_avatar_url,
+    created_by_name,
+  }: LibraryAssetListItem) => {
+    const Wrapper = ({ children }: { children: React.ReactNode }) => {
+      if (asset_type === 'collection') {
+        return <CollectionCardContextMenu id={asset_id}>{children}</CollectionCardContextMenu>;
+      }
+
+      return <>{children}</>;
+    };
+
+    const link = createSimpleAssetRoute({
+      asset_type,
+      id: asset_id,
+    }) as LinkProps;
+
     return (
-      <CollectionCardContextMenu id={id}>
-        <Link to="/app/collections/$collectionId" params={{ collectionId: id }}>
+      <Wrapper>
+        <Link {...link}>
           <div
             className={cn(
               'flex flex-col gap-y-2 h-21 border rounded py-2.5 px-3 justify-between',
@@ -33,6 +55,7 @@ export const CollectionCard = React.memo(
                 image={created_by_avatar_url || undefined}
                 name={created_by_name || undefined}
                 size={12}
+                className="text-xs"
               />
               <Text variant={'tertiary'} size={'xs'}>
                 {formatDate({ date: updated_at, format: 'MMM D' })}
@@ -40,12 +63,12 @@ export const CollectionCard = React.memo(
             </div>
           </div>
         </Link>
-      </CollectionCardContextMenu>
+      </Wrapper>
     );
   }
 );
 
-CollectionCard.displayName = 'CollectionCard';
+AssetGridCardSmall.displayName = 'AssetGridCardSmall';
 
 const CollectionCardContextMenu = React.memo(
   ({

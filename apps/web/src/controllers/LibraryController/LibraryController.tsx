@@ -22,7 +22,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, l
 
   const pinCollections = !hasFiltersEnabled && !filters.group_by;
 
-  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
+  const { scrollContainerRef, allGroups, allResults, isFetchingNextPage, isFetched } =
     useLibraryAssetsInfinite({ ...managedFilters, pinCollections });
 
   const libraryViewProps: LibraryViewProps = {
