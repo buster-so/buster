@@ -15,21 +15,21 @@ export const Route = createFileRoute('/app/_app/library/')({
   component: RouteComponent,
   validateSearch: searchParamsSchema,
   beforeLoad: async ({ search }) => {
-    const libraryLayout: LibraryLayout = await getCookie({ data: LAYOUT_COOKIE_NAME }).then((v) =>
+    const layout: LibraryLayout = await getCookie({ data: LAYOUT_COOKIE_NAME }).then((v) =>
       wrappedLayoutSchema.parse(search.layout ?? v)
     );
-    return { libraryLayout, search };
+    return { layout, search };
   },
-  loader: async ({ context: { queryClient, search, libraryLayout } }) => {
+  loader: async ({ context: { queryClient, search, layout } }) => {
     const userId = await prefetchGetMyUserInfo(queryClient).then((v) => v?.user?.id || '');
     const computedFilters = computeLibraryFilters(search, userId);
     await Promise.all([prefetchGetLibraryAssetsInfinite(queryClient, computedFilters)]);
-    return { libraryLayout };
+    return { layout };
   },
 });
 
 function RouteComponent() {
   const filters = Route.useSearch();
-  const { libraryLayout } = Route.useLoaderData();
-  return <LibraryController filters={filters} layout={libraryLayout} />;
+  const { layout } = Route.useLoaderData();
+  return <LibraryController filters={filters} layout={layout} />;
 }

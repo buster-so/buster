@@ -1,16 +1,16 @@
-import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
-import type { LibrarySearchParams } from './schema';
+import type { LibrarySearchParams, SharedWithMeSearchParams } from './schema';
 
 export type LibraryViewProps = {
   allGroups: undefined | Record<string, LibraryAssetListItem[]>;
   allResults: LibraryAssetListItem[];
-  filters: LibrarySearchParams;
+  filters: LibrarySearchParams | SharedWithMeSearchParams;
   isFetchingNextPage: boolean;
   className?: string;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   isInitialLoading: boolean;
-  useCollections: boolean;
+  pinCollectionsToTop?: boolean;
+  type: 'library' | 'shared-with-me';
 };
 
-export type SharedWithMeViewProps = Omit<LibraryViewProps, 'useCollections'>;
+export type SharedWithMeViewProps = LibraryViewProps;

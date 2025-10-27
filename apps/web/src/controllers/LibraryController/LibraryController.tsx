@@ -23,6 +23,8 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, l
   const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
     useLibraryAssetsInfinite(managedFilters);
 
+  const type = 'library' as const;
+
   const libraryViewProps: LibraryViewProps = {
     allResults,
     allGroups,
@@ -30,12 +32,13 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, l
     isFetchingNextPage,
     scrollContainerRef,
     isInitialLoading: !isFetched,
-    useCollections: !hasFiltersEnabled,
+    pinCollectionsToTop: !hasFiltersEnabled,
+    type,
   };
 
   return (
     <AppPageLayout
-      header={<LibraryHeader layout={layout} filters={filters} />}
+      header={<LibraryHeader type={type} layout={layout} filters={filters} />}
       contentContainerId="library-content"
       scrollable={false}
     >

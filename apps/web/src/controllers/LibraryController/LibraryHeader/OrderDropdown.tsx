@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import { AssetOrderPopover } from '@/components/features/list/AssetList';
 import { setLibraryLayoutCookie } from '@/context/Library/useLibraryLayout';
+import type { LibraryViewProps } from '../library.types';
 import type { LibraryLayout, LibrarySearchParams } from '../schema';
 
 export const OrderDropdown = React.memo(
@@ -10,11 +11,13 @@ export const OrderDropdown = React.memo(
     ordering,
     groupBy,
     ordering_direction,
+    type,
   }: {
     layout: LibraryLayout;
     ordering: LibrarySearchParams['ordering'];
     groupBy: LibrarySearchParams['group_by'];
     ordering_direction: LibrarySearchParams['ordering_direction'];
+    type: LibraryViewProps['type'];
   }) => {
     const navigate = useNavigate();
     return (

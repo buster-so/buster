@@ -3,6 +3,7 @@ import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
 import { getCookie } from '@/api/server-functions/getCookie';
 import { SHARED_WITH_ME_LAYOUT_COOKIE_NAME } from '@/context/Library/useSharedWithMeLayout';
 import { computeSharedWithMeFilters } from '@/controllers/LibraryController/compute-library-filters';
+import { SharedWithMeController } from '@/controllers/LibraryController/SharedWithMeController';
 import {
   type SharedWithMeLayout,
   searchParamsSchema,
@@ -27,5 +28,7 @@ export const Route = createFileRoute('/app/_app/shared-with-me')({
 });
 
 function RouteComponent() {
-  return <div>Hello "/app/_app/shared-with-me"!</div>;
+  const filters = Route.useSearch();
+  const { layout } = Route.useLoaderData();
+  return <SharedWithMeController filters={filters} layout={layout} />;
 }

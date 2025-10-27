@@ -23,6 +23,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/classMerge';
 import { getNow } from '@/lib/date';
+import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
 
 export const FilterDropdown = React.memo(
@@ -31,11 +32,13 @@ export const FilterDropdown = React.memo(
     asset_types,
     start_date,
     end_date,
+    type,
   }: {
     owner_ids: LibrarySearchParams['owner_ids'];
     asset_types: LibrarySearchParams['asset_types'];
     start_date: LibrarySearchParams['start_date'];
     end_date: LibrarySearchParams['end_date'];
+    type: LibraryViewProps['type'] | SharedWithMeViewProps['type'];
   }) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);

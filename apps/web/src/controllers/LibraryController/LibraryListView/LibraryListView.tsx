@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/list/BusterListNew';
 import { LibraryEmptyView } from '../LibraryEmptyView';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
-import type { LibraryViewProps } from '../library.types';
+import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
 
 const createLibraryListItem = createListItem<AssetListItem>();
 
@@ -19,8 +19,8 @@ export const LibraryListView = ({
   scrollContainerRef,
   allGroups,
   isInitialLoading,
-  useCollections,
-}: LibraryViewProps) => {
+  pinCollectionsToTop,
+}: LibraryViewProps | SharedWithMeViewProps) => {
   const { group_by } = filters;
 
   const {
@@ -30,7 +30,7 @@ export const LibraryListView = ({
     prelistItems: BusterListRow<AssetListItem>[];
     mainItems: LibraryAssetListItem[];
   } = useMemo(() => {
-    if (!useCollections) {
+    if (!pinCollectionsToTop) {
       return {
         prelistItems: [],
         mainItems: allResults,
@@ -73,7 +73,7 @@ export const LibraryListView = ({
       prelistItems,
       mainItems,
     };
-  }, [allResults, useCollections]);
+  }, [allResults, pinCollectionsToTop]);
 
   return (
     <AssetListViewList

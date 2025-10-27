@@ -3,7 +3,7 @@ import { AssetGridSectionContainer, AssetGridViewList } from '@/components/featu
 import Folder from '@/components/ui/icons/NucleoIconOutlined/folder';
 import { LibraryEmptyView } from '../LibraryEmptyView';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
-import type { LibraryViewProps } from '../library.types';
+import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
 import { LibraryCollectionGrid } from './LibraryCollectionGrid';
 
 export const LibraryGridView = React.memo(
@@ -15,7 +15,8 @@ export const LibraryGridView = React.memo(
     filters,
     scrollContainerRef,
     allGroups,
-  }: LibraryViewProps) => {
+    type,
+  }: LibraryViewProps | SharedWithMeViewProps) => {
     const prelistContent = useMemo(() => {
       // return (
       //   <AssetGridSectionContainer title="Collections" icon={<Folder />}>

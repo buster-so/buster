@@ -48,3 +48,10 @@ export const useSearchInfinite = ({
     mounted,
   });
 };
+
+export const prefetchSearchInfinite = (params: Parameters<typeof useSearchInfinite>[0]) => {
+  return useQuery({
+    ...searchQueryKeys.getSearchResultInfinite(params),
+    queryFn: ({ signal }) => search({ page: 1, ...params }, signal),
+  });
+};
