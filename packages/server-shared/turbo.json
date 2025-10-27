@@ -17,6 +17,10 @@
       "persistent": true,
       "dependsOn": ["^build"],
       "with": ["@buster/database#dev"]
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
     }
   }
 }
