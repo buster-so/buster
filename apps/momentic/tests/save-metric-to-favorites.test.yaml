@@ -12,6 +12,7 @@ retries: 0
 envs:
   - name: development
     default: true
+disabled: true
 steps:
   - id: b0f51405-5b33-4297-a0bc-d12fed7e88eb
     type: MODULE
