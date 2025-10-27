@@ -30,7 +30,7 @@ import {
 } from './requests';
 
 export const useGetCollectionsList = (
-  filters: Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>,
+  filters?: Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>,
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof collectionsGetList>>, ApiError>,
     'queryKey' | 'queryFn' | 'initialData'

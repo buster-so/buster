@@ -70,6 +70,11 @@ export const FilterDropdown = React.memo(
             selected: asset_types?.includes('metric_file'),
             icon: <ASSET_ICONS.metrics />,
           },
+          {
+            label: 'Collections',
+            value: 'collection' satisfies AssetType,
+            icon: <ASSET_ICONS.collections />,
+          },
         ].map((item) => ({
           ...item,
           selected: asset_types?.includes(item.value as AssetType),

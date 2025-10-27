@@ -31,7 +31,7 @@ export const computeLibraryFilters = (
   }
 
   if (asset_types) {
-    filters.assetTypes = asset_types.filter((type) => type !== 'collection');
+    filters.assetTypes = asset_types;
   }
 
   if (ordering) {

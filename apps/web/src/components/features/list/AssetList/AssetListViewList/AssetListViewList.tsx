@@ -68,8 +68,6 @@ export const AssetListViewList = ({
   const rows: BusterListRow<AssetListItem>[] = useMemo(() => {
     const allRows: BusterListRow<AssetListItem>[] = [...prelistItems];
 
-    if (allRows.length === 0) return allRows;
-
     if (
       groupBy === 'asset_type' ||
       groupBy === 'owner' ||
@@ -108,7 +106,7 @@ export const AssetListViewList = ({
       const _exhaustiveCheck: never | undefined | 'none' = groupBy;
       allRows.push({
         type: 'section',
-        id: 'library-assets',
+        id: 'asset-list',
         title: 'Assets',
         secondaryTitle: String(items.length),
       } satisfies BusterListSectionRow);

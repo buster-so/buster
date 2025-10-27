@@ -1,23 +1,11 @@
-import type { AssetType } from '@buster/server-shared/assets';
-import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import React, { useMemo } from 'react';
-import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { type AssetListItem, AssetListViewList } from '@/components/features/list/AssetList';
-import { Avatar } from '@/components/ui/avatar';
-import { ListEmptyStateWithButton } from '@/components/ui/list';
-import type {
-  BusterListColumn,
-  BusterListRow,
-  InfiniteScrollConfig,
-} from '@/components/ui/list/BusterListNew';
 import {
-  BusterList,
+  type BusterListRow,
   type BusterListSectionRow,
   createListItem,
 } from '@/components/ui/list/BusterListNew';
-import { formatDate } from '@/lib/date';
-import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { LibraryEmptyView } from '../LibraryEmptyView';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
 import type { LibraryViewProps } from '../library.types';
@@ -26,48 +14,73 @@ const createLibraryListItem = createListItem<AssetListItem>();
 
 export const LibraryListView = ({
   allResults,
-  collections,
   filters,
   isFetchingNextPage,
   scrollContainerRef,
   allGroups,
   isInitialLoading,
+  useCollections,
 }: LibraryViewProps) => {
   const { group_by } = filters;
 
-  const collectionRows: BusterListRow<AssetListItem>[] = useMemo(() => {
-    if (collections.length === 0) return [];
-    const collectionItems = collections.map((collection) => {
-      return createLibraryListItem({
-        type: 'row',
-        id: collection.id,
-        data: { ...collection, asset_id: collection.id, asset_type: 'collection' as const },
-        link: {
-          to: '/app/collections/$collectionId',
-          params: {
-            collectionId: collection.id,
-          },
-        },
-      });
-    });
+  const {
+    prelistItems,
+    mainItems,
+  }: {
+    prelistItems: BusterListRow<AssetListItem>[];
+    mainItems: LibraryAssetListItem[];
+  } = useMemo(() => {
+    if (!useCollections) {
+      return {
+        prelistItems: [],
+        mainItems: allResults,
+      };
+    }
 
-    return [
-      {
+    const prelistItems: BusterListRow<AssetListItem>[] = [];
+    const mainItems: LibraryAssetListItem[] = [];
+
+    for (const result of allResults) {
+      if (result.asset_type === 'collection') {
+        prelistItems.push(
+          createLibraryListItem({
+            type: 'row',
+            id: result.asset_id,
+            data: { ...result, asset_id: result.asset_id, asset_type: 'collection' as const },
+            link: {
+              to: '/app/collections/$collectionId',
+              params: {
+                collectionId: result.asset_id,
+              },
+            },
+          })
+        );
+        continue;
+      }
+      mainItems.push(result);
+    }
+
+    if (prelistItems.length > 0) {
+      prelistItems.unshift({
         type: 'section',
         id: 'collections',
         title: 'Collections',
-        secondaryTitle: String(collectionItems.length),
-      } satisfies BusterListSectionRow,
-      ...collectionItems,
-    ];
-  }, [collections]);
+        secondaryTitle: String(prelistItems.length),
+      } satisfies BusterListSectionRow);
+    }
+
+    return {
+      prelistItems,
+      mainItems,
+    };
+  }, [allResults, useCollections]);
 
   return (
     <AssetListViewList
-      items={allResults}
+      items={mainItems}
       groupBy={group_by}
       groups={allGroups}
-      prelistItems={collectionRows}
+      prelistItems={prelistItems}
       isFetchingNextPage={isFetchingNextPage}
       scrollContainerRef={scrollContainerRef}
       emptyContent={<LibraryEmptyView />}

@@ -1,3 +1,4 @@
+import isEmpty from 'lodash/isEmpty';
 import type React from 'react';
 import { useMemo } from 'react';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
@@ -21,7 +22,10 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
   filters: filtersProps,
   layout,
 }) => {
-  const { data: collections } = useGetCollectionsList({});
+  const hasFiltersEnabled = useMemo(() => {
+    return !isEmpty(filtersProps) && Object.values(filtersProps).some(Boolean);
+  }, [filtersProps]);
+
   const managedFilters = useManagedFilters(filtersProps);
 
   const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
@@ -35,11 +39,11 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
   const libraryViewProps: LibraryViewProps = {
     allResults,
     allGroups,
-    collections: collections?.data || [],
     filters: filtersProps,
     isFetchingNextPage,
     scrollContainerRef,
     isInitialLoading: !isFetched,
+    useCollections: !hasFiltersEnabled,
   };
 
   return (
