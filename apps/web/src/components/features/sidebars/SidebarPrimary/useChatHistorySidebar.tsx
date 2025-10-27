@@ -3,10 +3,14 @@ import { useGetListChats } from '@/api/buster_rest/chats';
 import type { ISidebarGroup } from '@/components/ui/sidebar';
 import { createSidebarItem } from '@/components/ui/sidebar/create-sidebar-item';
 import { ASSET_ICONS } from '../../icons/assetIcons';
+import type { SidebarPrimaryProps } from './SidebarPrimary';
 
 export const CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT = 10;
+export const CHAT_HISTORY_SIDEBAR_ID = 'chat-history';
 
-export const useChatHistorySidebar = (): ISidebarGroup | null => {
+export const useChatHistorySidebar = ({
+  defaultOpenChatHistory = true,
+}: Pick<SidebarPrimaryProps, 'defaultOpenChatHistory'>): ISidebarGroup | null => {
   const { data } = useGetListChats({
     page: 1,
     page_size: CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT,
@@ -51,10 +55,11 @@ export const useChatHistorySidebar = (): ISidebarGroup | null => {
           exact: true,
         },
       },
-      id: '/app/chats/',
+      id: CHAT_HISTORY_SIDEBAR_ID,
       items,
+      defaultOpen: defaultOpenChatHistory,
     } satisfies ISidebarGroup;
-  }, [data]);
+  }, [data, defaultOpenChatHistory]);
 
   return chatHistoryItems;
 };

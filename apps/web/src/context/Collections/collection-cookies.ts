@@ -5,6 +5,6 @@ export const COLLECTION_LAYOUT_COOKIE_NAME = (collectionId: string) =>
 
 export const setCollectionLayoutCookie = (collectionId: string, layout: 'grid' | 'list') => {
   Cookies.set(COLLECTION_LAYOUT_COOKIE_NAME(collectionId), JSON.stringify({ value: layout }), {
-    expires: 180, // 180 days
+    expires: 365, // 365 days
   });
 };

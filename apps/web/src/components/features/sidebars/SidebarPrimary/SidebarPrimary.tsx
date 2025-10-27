@@ -29,8 +29,10 @@ import { cn } from '@/lib/classMerge';
 import { LazyErrorBoundary } from '../../global/LazyErrorBoundary';
 import { toggleGlobalSearch } from '../../search/GlobalSearchModal';
 import { SidebarUserFooter } from '../SidebarUserFooter';
+import { useAdminToolSidebar } from './useAdminToolSidebar';
 import { useChatHistorySidebar } from './useChatHistorySidebar';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
+import { useSharedWithMeSidebar } from './useSharedWithMeSidebar';
 
 const LazyGlobalModals = lazy(() => import('./PrimaryGlobalModals'));
 
@@ -52,73 +54,70 @@ const topItems: ISidebarList = createSidebarList({
   ],
 });
 
-const adminTools: ISidebarGroup = createSidebarGroup({
-  label: 'Admin tools',
-  id: 'admin-tools',
-  icon: <Gear />,
-  items: createSidebarItems([
-    {
-      label: 'Logs',
-      icon: <UnorderedList2 />,
-      link: { to: '/app/logs', preload: 'viewport', preloadDelay: 1000 },
-      id: '/app/logs/',
-      collapsedTooltip: 'Logs',
-    },
-    {
-      label: 'Datasets',
-      icon: <Table />,
-      link: { to: '/app/datasets' },
-      id: '/app/datasets/',
-      collapsedTooltip: 'Datasets',
-    },
-  ]),
-});
+export type SidebarPrimaryProps = {
+  defaultOpenChatHistory: boolean;
+  defaultOpenFavorites: boolean;
+  defaultOpenAdminTools: boolean;
+};
 
-export const SidebarPrimary = React.memo(() => {
-  const isAdmin = useIsUserAdmin();
-  const isUserRegistered = useIsUserRegistered();
+export const SidebarPrimary = React.memo(
+  ({
+    defaultOpenChatHistory,
+    defaultOpenFavorites,
+    defaultOpenAdminTools,
+  }: SidebarPrimaryProps) => {
+    const isAdmin = useIsUserAdmin();
+    const isUserRegistered = useIsUserRegistered();
 
-  const favoritesDropdownItems = useFavoriteSidebarPanel();
-  const chatHistoryItems = useChatHistorySidebar();
+    const favoritesDropdownItems = useFavoriteSidebarPanel({ defaultOpenFavorites });
+    const chatHistoryItems = useChatHistorySidebar({ defaultOpenChatHistory });
+    const adminToolsItems = useAdminToolSidebar({ defaultOpenAdminTools });
+    const sharedWithMeItems = useSharedWithMeSidebar();
 
-  const sidebarItems: SidebarProps['content'] = useMemo(() => {
-    if (!isUserRegistered) return [];
+    const sidebarItems: SidebarProps['content'] = useMemo(() => {
+      if (!isUserRegistered) return [];
 
-    const items = [topItems];
+      const items = [topItems];
 
-    if (chatHistoryItems) items.push(chatHistoryItems);
+      if (sharedWithMeItems) items.push(sharedWithMeItems);
 
-    if (favoritesDropdownItems) {
-      items.push(favoritesDropdownItems);
-    }
+      if (chatHistoryItems) items.push(chatHistoryItems);
 
-    if (isAdmin) {
-      items.push(adminTools);
-    }
+      if (favoritesDropdownItems) items.push(favoritesDropdownItems);
 
-    return items;
-  }, [isAdmin, chatHistoryItems, favoritesDropdownItems, isUserRegistered]);
+      if (isAdmin) items.push(adminToolsItems);
 
-  return (
-    <>
-      <Sidebar
-        content={sidebarItems}
-        header={useMemo(
-          () => <SidebarPrimaryHeader hideActions={!isUserRegistered} />,
-          [isUserRegistered]
-        )}
-        footer={useMemo(() => <SidebarUserFooter />, [])}
-        useCollapsible={isUserRegistered}
-      />
+      return items;
+    }, [
+      isAdmin,
+      adminToolsItems,
+      chatHistoryItems,
+      favoritesDropdownItems,
+      sharedWithMeItems,
+      isUserRegistered,
+    ]);
 
-      <LazyErrorBoundary>
-        <Suspense fallback={null}>
-          <LazyGlobalModals />
-        </Suspense>
-      </LazyErrorBoundary>
-    </>
-  );
-});
+    return (
+      <>
+        <Sidebar
+          content={sidebarItems}
+          header={useMemo(
+            () => <SidebarPrimaryHeader hideActions={!isUserRegistered} />,
+            [isUserRegistered]
+          )}
+          footer={useMemo(() => <SidebarUserFooter />, [])}
+          useCollapsible={isUserRegistered}
+        />
+
+        <LazyErrorBoundary>
+          <Suspense fallback={null}>
+            <LazyGlobalModals />
+          </Suspense>
+        </LazyErrorBoundary>
+      </>
+    );
+  }
+);
 
 SidebarPrimary.displayName = 'SidebarPrimary';
 

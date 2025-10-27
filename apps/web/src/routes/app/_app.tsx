@@ -5,8 +5,16 @@ import { prefetchGetDatasets } from '@/api/buster_rest/datasets';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
 import { prefetchGetUserFavorites } from '@/api/buster_rest/users/favorites';
 import { getAppLayout } from '@/api/server-functions/getAppLayout';
-import { CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT } from '@/components/features/sidebars/SidebarPrimary/useChatHistorySidebar';
+import { getCookie } from '@/api/server-functions/getCookie';
+import type { SidebarPrimaryProps } from '@/components/features/sidebars/SidebarPrimary';
+import { ADMIN_TOOLS_SIDEBAR_ID } from '@/components/features/sidebars/SidebarPrimary/useAdminToolSidebar';
+import {
+  CHAT_HISTORY_SIDEBAR_ID,
+  CHAT_HISTORY_SIDEBAR_ITEMS_LIMIT,
+} from '@/components/features/sidebars/SidebarPrimary/useChatHistorySidebar';
+import { FAVORITES_SIDEBAR_ID } from '@/components/features/sidebars/SidebarPrimary/useFavoritesSidebarPanel';
 import type { LayoutSize } from '@/components/ui/layouts/AppLayout';
+import { getCollapsibleCookie } from '@/components/ui/sidebar/sidebar-helpers';
 import { PrimaryAppLayout } from '../../layouts/PrimaryAppLayout';
 import { Route as NewUserRoute } from './_app/new-user';
 
@@ -23,8 +31,9 @@ export const Route = createFileRoute('/app/_app')({
   },
   loader: async ({ context }) => {
     const { queryClient } = context;
-    const [initialLayout] = await Promise.all([
+    const [initialLayout, sidebarProps] = await Promise.all([
       getAppLayout({ id: PRIMARY_APP_LAYOUT_ID }),
+      getSidebarCookies(),
       prefetchGetUserFavorites(queryClient),
       prefetchListDatasources(queryClient),
       prefetchGetDatasets(queryClient),
@@ -36,21 +45,39 @@ export const Route = createFileRoute('/app/_app')({
 
     return {
       initialLayout,
+      sidebarProps,
       defaultLayout: DEFAULT_LAYOUT,
       layoutId: PRIMARY_APP_LAYOUT_ID,
     };
   },
   component: () => {
-    const { initialLayout, defaultLayout } = Route.useLoaderData();
+    const { initialLayout, defaultLayout, sidebarProps } = Route.useLoaderData();
 
     return (
       <PrimaryAppLayout
         initialLayout={initialLayout}
         layoutId={PRIMARY_APP_LAYOUT_ID}
         defaultLayout={defaultLayout}
+        {...sidebarProps}
       >
         <Outlet />
       </PrimaryAppLayout>
     );
   },
 });
+
+const getSidebarCookies = async (): Promise<SidebarPrimaryProps> => {
+  const sidebarCookies = await Promise.all([
+    getCollapsibleCookie(CHAT_HISTORY_SIDEBAR_ID),
+    getCollapsibleCookie(FAVORITES_SIDEBAR_ID),
+    getCollapsibleCookie(ADMIN_TOOLS_SIDEBAR_ID),
+  ]);
+  const checkCookie = (cookie: string | null | undefined) => {
+    return cookie === 'true' || !cookie;
+  };
+  return {
+    defaultOpenChatHistory: checkCookie(sidebarCookies[0]),
+    defaultOpenFavorites: checkCookie(sidebarCookies[1]),
+    defaultOpenAdminTools: checkCookie(sidebarCookies[2]),
+  };
+};

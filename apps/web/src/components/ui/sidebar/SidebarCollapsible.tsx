@@ -19,6 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Link } from '@tanstack/react-router';
+import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { Popover } from '@/components/ui/popover';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -34,6 +35,7 @@ import { COLLAPSED_HIDDEN } from './config';
 import type { ISidebarGroup } from './interfaces';
 import { useSidebarIsCollapsed } from './SidebarContext';
 import { SidebarItem } from './SidebarItem';
+import { setCollapsibleCookie } from './sidebar-helpers';
 
 const modifiers = [restrictToVerticalAxis];
 
@@ -95,7 +97,10 @@ export const SidebarCollapsible: React.FC<
     return (
       <Collapsible
         open={isOpenComputed}
-        onOpenChange={setIsOpen}
+        onOpenChange={(v) => {
+          setIsOpen(v);
+          setCollapsibleCookie(id, v);
+        }}
         className={cn('space-y-0.5', className)}
       >
         {variant === 'collapsible' && (
