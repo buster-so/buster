@@ -1,13 +1,14 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, arrayOverlaps } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { agentAutomationTasks, automationTaskRepositories } from '../../schema';
-import { AgentAutomationTaskEventTriggerSchema } from '../../schema-types';
+import { agentAutomationTasks } from '../../schema';
+import { AgentEventTriggerSchema } from '../../schema-types';
 
 const GetAgentTasksForEventSchema = z.object({
   organizationId: z.string(),
-  eventTrigger: z.enum(AgentAutomationTaskEventTriggerSchema.options),
-  repository: z.string().optional(),
+  eventTrigger: z.enum(AgentEventTriggerSchema.options),
+  repository: z.string(),
+  branch: z.string(),
 });
 
 type GetAgentTasksForEvent = z.infer<typeof GetAgentTasksForEventSchema>;
@@ -16,28 +17,20 @@ type GetAgentTasksForEvent = z.infer<typeof GetAgentTasksForEventSchema>;
  * Includes the associated repositories for each task
  */
 export async function getAgentTasksForEvent(params: GetAgentTasksForEvent) {
-  const { organizationId, eventTrigger, repository } = params;
-  const whereClauseStatements = [
-    eq(agentAutomationTasks.organizationId, organizationId),
-    eq(agentAutomationTasks.eventTrigger, eventTrigger),
-    isNull(agentAutomationTasks.deletedAt),
-  ];
-
-  if (repository) {
-    whereClauseStatements.push(eq(automationTaskRepositories.actionRepository, repository));
-  }
+  const { organizationId, eventTrigger, repository, branch } = params;
 
   const results = await db
     .select({
       task: agentAutomationTasks,
-      repository: automationTaskRepositories,
     })
     .from(agentAutomationTasks)
-    .leftJoin(
-      automationTaskRepositories,
-      eq(agentAutomationTasks.id, automationTaskRepositories.taskId)
-    )
-    .where(and(...whereClauseStatements));
+    .where(and(
+      eq(agentAutomationTasks.organizationId, organizationId),
+      eq(agentAutomationTasks.eventTrigger, eventTrigger),
+      isNull(agentAutomationTasks.deletedAt),
+      eq(agentAutomationTasks.repository, repository),
+      arrayOverlaps(agentAutomationTasks.branches, [branch, '*']),
+    ));
 
   return results;
 }

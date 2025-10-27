@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AgentNameSchema } from '@buster/database/schema-types';
 
 // ============================================================================
 // Model Schemas - Define the structure of semantic layer models
@@ -175,9 +176,63 @@ export const ProjectContextSchema = z.object({
   exclude: z.array(z.string()).default([]),
 });
 
+// ============================================================================
+// Automation Schemas - Define CI/CD agent automation configuration
+// ============================================================================
+
+// Upstream repository configuration for conflict detection
+export const UpstreamRepositorySchema = z.object({
+  repository: z.string().describe('Upstream repository in format owner/repo'),
+  branches: z.array(z.string()).optional().default(['*']).describe('Branches to track'),
+});
+
+// Base event trigger schema with common fields
+const BaseEventTriggerSchema = z.object({
+  repository: z.string().optional().describe('Repository in format owner/repo (optional, defaults to current)'),
+  branches: z.array(z.string()).optional().default(['*']).describe('Branch filters'),
+});
+
+// Pull request event trigger (supports types)
+export const PullRequestEventTriggerSchema = BaseEventTriggerSchema.extend({
+  event: z.literal('pull_request'),
+  types: z
+    .array(z.enum(['opened', 'reopened', 'synchronize'])) // Other options not supported: 'closed', 'edited', 'labeled', 'unlabeled'
+    .optional()
+    .describe('PR event types to trigger on'),
+  upstream_repositories: z
+    .array(UpstreamRepositorySchema)
+    .optional()
+    .describe('Upstream repositories for conflict detection'),
+});
+
+// Push event trigger (no types support)
+export const PushEventTriggerSchema = BaseEventTriggerSchema.extend({
+  event: z.literal('push'),
+  upstream_repositories: z
+    .array(UpstreamRepositorySchema)
+    .optional()
+    .describe('Upstream repositories for conflict detection'),
+});
+
+// Union of all event triggers
+export const EventTriggerSchema = z.discriminatedUnion('event', [
+  PullRequestEventTriggerSchema,
+  PushEventTriggerSchema,
+]);
+
+// Agent automation configuration
+export const AgentAutomationSchema = z.object({
+  agent: z.enum(AgentNameSchema.options),
+  on: z.array(EventTriggerSchema).min(1).describe('Event triggers for this agent'),
+});
+
+// Full automation configuration
+export const AutomationConfigSchema = z.array(AgentAutomationSchema);
+
 export const BusterConfigSchema = z.object({
   projects: z.array(ProjectContextSchema).min(1),
   logs: LogsConfigSchema.optional().describe('Logs writeback configuration'),
+  automation: AutomationConfigSchema.optional().describe('CI/CD agent automation configuration'),
 });
 
 // ============================================================================
@@ -263,6 +318,13 @@ export type Model = z.infer<typeof ModelSchema>;
 
 export type ProjectContext = z.infer<typeof ProjectContextSchema>;
 export type BusterConfig = z.infer<typeof BusterConfigSchema>;
+
+export type UpstreamRepository = z.infer<typeof UpstreamRepositorySchema>;
+export type PullRequestEventTrigger = z.infer<typeof PullRequestEventTriggerSchema>;
+export type PushEventTrigger = z.infer<typeof PushEventTriggerSchema>;
+export type EventTrigger = z.infer<typeof EventTriggerSchema>;
+export type AgentAutomation = z.infer<typeof AgentAutomationSchema>;
+export type AutomationConfig = z.infer<typeof AutomationConfigSchema>;
 
 export type DeployColumn = z.infer<typeof DeployColumnSchema>;
 export type DeployModel = z.infer<typeof DeployModelSchema>;

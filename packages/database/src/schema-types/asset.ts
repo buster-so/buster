@@ -22,21 +22,20 @@ export const AssetPermissionRoleSchema = z.enum([
 
 export type AssetPermissionRole = z.infer<typeof AssetPermissionRoleSchema>;
 
-export const AgentAutomationTaskTypeSchema = z.enum([
-  'data_engineer_documentation',
-  'data_engineer_initial_setup',
-  'data_engineer_upstream_change_detection',
+export const AgentNameSchema = z.enum([
+  'documentation_agent',
+  'upstream_conflict_agent',
 ]);
-export type AgentAutomationTaskType = z.infer<typeof AgentAutomationTaskTypeSchema>;
+export type AgentName = z.infer<typeof AgentNameSchema>;
 
-export const AgentAutomationTaskEventTriggerSchema = z.enum([
+export const AgentEventTriggerSchema = z.enum([
   'pull_request.opened',
   'pull_request.synchronize',
   'pull_request.reopened',
   'issue_comment.created',
   'push',
 ]);
-export type AgentAutomationTaskEventTrigger = z.infer<typeof AgentAutomationTaskEventTriggerSchema>;
+export type AgentEventTrigger = z.infer<typeof AgentEventTriggerSchema>;
 
 export const AncestorSchema = z.object({
   id: z.string().uuid(),

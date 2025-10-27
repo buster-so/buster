@@ -120,6 +120,11 @@ export function processDeploymentResponse(
     };
   }
 
+  // Process automation results
+  if (response.automation) {
+    result.automation = response.automation;
+  }
+
   return result;
 }
 
@@ -251,6 +256,22 @@ export function formatDeploymentSummary(
       if (result.docs.failed.length > (verbose ? 10 : 3)) {
         lines.push(`    ... and ${result.docs.failed.length - (verbose ? 10 : 3)} more`);
       }
+    }
+  }
+
+  // Automation section - show if configured or verbose
+  if (result.automation) {
+    lines.push('');
+    if (result.automation.configured) {
+      lines.push(
+        `  ✓ Automation configured: ${result.automation.agentCount} agent${result.automation.agentCount === 1 ? '' : 's'}, ${result.automation.triggerCount} trigger${result.automation.triggerCount === 1 ? '' : 's'}`
+      );
+    } else if (verbose) {
+      lines.push('  ℹ No automation configuration (existing automation will be removed if present)');
+    }
+
+    if (result.automation.error) {
+      lines.push(`    ⚠ Warning: ${result.automation.error}`);
     }
   }
 

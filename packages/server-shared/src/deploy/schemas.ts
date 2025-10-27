@@ -1,6 +1,6 @@
 import { z } from 'zod';
 // Import DeployModelSchema and LogsConfigSchema from datasets to avoid duplication
-import { DeployModelSchema, LogsConfigSchema } from '../datasets/schemas';
+import { AutomationConfigSchema, DeployModelSchema, LogsConfigSchema } from '../datasets/schemas';
 
 // ============================================================================
 // Unified Deploy Request/Response Schemas
@@ -35,6 +35,7 @@ export const UnifiedDeployRequestSchema = z.object({
   deleteAbsentModels: z.boolean().default(true),
   deleteAbsentDocs: z.boolean().default(true),
   logsWriteback: LogsWritebackConfigSchema.optional().describe('Logs writeback configuration'),
+  automation: AutomationConfigSchema.optional().describe('CI/CD agent automation configuration'),
 });
 
 // Response schemas for deployment results
@@ -94,11 +95,20 @@ export const LogsWritebackResultSchema = z.object({
   error: z.string().optional().describe('Error message if configuration failed'),
 });
 
+// Schema for automation deployment result
+export const AutomationDeployResultSchema = z.object({
+  configured: z.boolean().describe('Whether automation was configured'),
+  agentCount: z.number().optional().describe('Number of agents configured'),
+  triggerCount: z.number().optional().describe('Total number of event triggers configured'),
+  error: z.string().optional().describe('Error message if configuration failed'),
+});
+
 // Unified response combining both models and docs results
 export const UnifiedDeployResponseSchema = z.object({
   models: ModelDeployResultSchema,
   docs: DocDeployResultSchema,
   logsWriteback: LogsWritebackResultSchema.optional(),
+  automation: AutomationDeployResultSchema.optional(),
 });
 
 // ============================================================================
@@ -114,5 +124,6 @@ export type UnifiedDeployResponse = z.infer<typeof UnifiedDeployResponseSchema>;
 export type ModelDeployResult = z.infer<typeof ModelDeployResultSchema>;
 export type DocDeployResult = z.infer<typeof DocDeployResultSchema>;
 export type LogsWritebackResult = z.infer<typeof LogsWritebackResultSchema>;
+export type AutomationDeployResult = z.infer<typeof AutomationDeployResultSchema>;
 export type DeploymentItem = z.infer<typeof DeploymentItemSchema>;
 export type DeploymentFailure = z.infer<typeof DeploymentFailureSchema>;

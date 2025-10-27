@@ -20,8 +20,8 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import {
-  AgentAutomationTaskEventTriggerSchema,
-  AgentAutomationTaskTypeSchema,
+  AgentNameSchema,
+  AgentEventTriggerSchema,
   AssetPermissionRoleSchema,
   AssetTypeSchema,
   ChatTypeSchema,
@@ -53,13 +53,13 @@ import {
 } from './schema-types';
 import type { DatasetMetadata } from './schema-types/dataset-metadata';
 
-export const agentAutomationTaskTypeEnum = pgEnum(
-  'agent_automation_task_type_enum',
-  AgentAutomationTaskTypeSchema.options
+export const agentNameEnum = pgEnum(
+  'agent_name_enum',
+  AgentNameSchema .options
 );
-export const agentAutomationTaskEventTriggerEnum = pgEnum(
-  'agent_automation_task_event_trigger_enum',
-  AgentAutomationTaskEventTriggerSchema.options
+export const agentEventTriggerEnum = pgEnum(
+  'agent_event_trigger_enum',
+  AgentEventTriggerSchema.options
 );
 
 export const assetPermissionRoleEnum = pgEnum(
@@ -2026,8 +2026,10 @@ export const agentAutomationTasks = pgTable(
     id: uuid('id').defaultRandom().primaryKey().notNull(),
     organizationId: uuid('organization_id').notNull(),
     integrationId: uuid('integration_id').notNull(),
-    agentType: agentAutomationTaskTypeEnum('agent_type').notNull(),
-    eventTrigger: agentAutomationTaskEventTriggerEnum('event_trigger').notNull(),
+    agentName: agentNameEnum('agent_name').notNull(),
+    eventTrigger: agentEventTriggerEnum('event_trigger').notNull(),
+    repository: text('project_repository').notNull(),
+    branches: text('branches').array().notNull().default(['*']),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -2050,17 +2052,18 @@ export const agentAutomationTasks = pgTable(
   ]
 );
 
-export const automationTaskRepositories = pgTable(
-  'automation_task_repositories',
+export const agentUpstreamRepositories = pgTable(
+  'agent_upstream_repositories',
   {
     id: uuid('id').defaultRandom().primaryKey().notNull(),
-    taskId: uuid('task_id').notNull(),
-    actionRepository: text('action_repository').notNull(),
-    modelingRepository: text('modeling_repository'),
+    agentAutomationTaskId: uuid('agent_automation_task_id').notNull(),
+    repository: text('repository').notNull(),
+    upstreamRepository: text('upstream_repository').notNull(),
+    branches: text('branches').array().notNull().default(['*']),
   },
   (table) => [
     foreignKey({
-      columns: [table.taskId],
+      columns: [table.agentAutomationTaskId],
       foreignColumns: [agentAutomationTasks.id],
       name: 'automation_task_repositories_task_id_fkey',
     }).onDelete('cascade'),

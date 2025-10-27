@@ -1,5 +1,5 @@
 import { getAgentTasksForEvent, getApiKeyForInstallationId } from '@buster/database/queries';
-import type { AgentAutomationTaskEventTrigger } from '@buster/database/schema-types';
+import type { AgentEventTrigger, AgentName } from '@buster/database/schema-types';
 import type { Octokit, PullRequestWebhookEvent } from '@buster/github';
 import { type GithubContext, runDocsAgentAsync } from '@buster/sandbox';
 import { AuthDetailsAppInstallationResponseSchema } from '@buster/server-shared';
@@ -20,7 +20,7 @@ export async function handlePullRequestWebhook(
   const installationId = payload.installation?.id;
 
   // Determine event trigger based on action
-  let eventTrigger: AgentAutomationTaskEventTrigger;
+  let eventTrigger: AgentEventTrigger;
 
   switch (action) {
     case 'opened':
@@ -62,6 +62,7 @@ export async function handlePullRequestWebhook(
     organizationId: apiKey.organizationId,
     eventTrigger,
     repository: repo,
+    branch,
   });
 
   if (automationTasks.length === 0) {
@@ -84,9 +85,9 @@ export async function handlePullRequestWebhook(
   }
 
   for (const { task } of automationTasks) {
-    console.info(`Running agent task ${task.agentType} for event ${eventTrigger}`);
-    switch (task.agentType) {
-      case 'data_engineer_documentation': {
+    console.info(`Running agent task ${task.agentName} for event ${eventTrigger}`);
+    switch (task.agentName) {
+      case 'documentation_agent': {
         await runDocsAgentAsync({
           installationToken: authDetails.installationId.toString(),
           repoUrl,
@@ -97,13 +98,10 @@ export async function handlePullRequestWebhook(
         });
         break;
       }
-
-      case 'data_engineer_initial_setup':
-        break;
-      case 'data_engineer_upstream_change_detection':
+      case 'upstream_conflict_agent':
         break;
       default: {
-        const _exhaustiveCheck: never = task.agentType;
+        const _exhaustiveCheck: never = task.agentName;
         throw new Error(`Invalid agent type: ${_exhaustiveCheck}`);
       }
     }

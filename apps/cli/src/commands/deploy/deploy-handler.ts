@@ -64,10 +64,20 @@ export async function deployHandler(options: DeployOptions): Promise<CLIDeployme
       console.info('  Table:', busterConfig.logs.table_name || 'buster_query_logs');
     }
 
+    // Debug: Check if automation config is present
+    if (busterConfig.automation) {
+      console.info('\nAutomation configured in buster.yml:');
+      console.info('  Agents:', busterConfig.automation.length);
+      for (const agentConfig of busterConfig.automation) {
+        console.info(`  - ${agentConfig.agent}: ${agentConfig.on.length} trigger(s)`);
+      }
+    }
+
     // 4. Process all projects in parallel
+    // TODO: Change this to not deploy automation each time.
     const projectResults = await Promise.all(
       busterConfig.projects.map((project) =>
-        processProject(project, configBaseDir, deploy, options, busterConfig.logs)
+        processProject(project, configBaseDir, deploy, options, busterConfig.logs, busterConfig.automation)
       )
     );
 
@@ -97,7 +107,8 @@ async function processProject(
   configBaseDir: string,
   deploy: DeployFunction,
   options: DeployOptions,
-  logsConfig?: LogsConfig
+  logsConfig?: LogsConfig,
+  automationConfig?: import('@buster/server-shared').AutomationConfig
 ): Promise<CLIDeploymentResult> {
   console.info(`\nProcessing ${project.name} project...`);
 
@@ -215,7 +226,8 @@ async function processProject(
     docs,
     true, // deleteAbsentModels
     true, // deleteAbsentDocs
-    logsConfig // Pass logs config from buster.yml
+    logsConfig, // Pass logs config from buster.yml
+    automationConfig // Pass automation config from buster.yml
   );
 
   // 8. Create model-to-file mapping for result processing (pure)

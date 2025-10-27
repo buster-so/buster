@@ -1,5 +1,5 @@
 import { getAgentTasksForEvent, getApiKeyForInstallationId } from '@buster/database/queries';
-import type { AgentAutomationTaskEventTrigger } from '@buster/database/schema-types';
+import type { AgentEventTrigger } from '@buster/database/schema-types';
 import type { Octokit, PushWebhookEvent } from '@buster/github';
 import { type GithubContext, runDocsAgentAsync } from '@buster/sandbox';
 import { AuthDetailsAppInstallationResponseSchema } from '@buster/server-shared';
@@ -16,9 +16,13 @@ export async function handlePushWebhook(
   const repo = payload.repository.full_name;
   const repoUrl = payload.repository.html_url;
   const installationId = payload.installation?.id;
+  
+  // Extract branch name from ref (e.g., "refs/heads/main" -> "main")
+  const headBranch = payload.ref.split('/').pop();
+  const baseBranch = payload.base_ref?.split('/').pop() || headBranch;
 
   // Push events only have one trigger type
-  const eventTrigger: AgentAutomationTaskEventTrigger = 'push';
+  const eventTrigger: AgentEventTrigger = 'push';
 
   if (!installationId) {
     throw new Error('Installation ID is required');
@@ -44,16 +48,13 @@ export async function handlePushWebhook(
     organizationId: apiKey.organizationId,
     eventTrigger,
     repository: repo,
+    branch: headBranch || ''
   });
 
   if (automationTasks.length === 0) {
     console.info(`No agent tasks found for event ${eventTrigger}`);
     return;
   }
-
-  // Extract branch name from ref (e.g., "refs/heads/main" -> "main")
-  const headBranch = payload.ref.split('/').pop();
-  const baseBranch = payload.base_ref?.split('/').pop() || headBranch;
 
   const context: GithubContext = {
     action: 'push',
@@ -67,9 +68,9 @@ export async function handlePushWebhook(
   };
 
   for (const { task } of automationTasks) {
-    console.info(`Running agent task ${task.agentType} for event ${eventTrigger}`);
-    switch (task.agentType) {
-      case 'data_engineer_documentation': {
+    console.info(`Running agent task ${task.agentName} for event ${eventTrigger}`);
+    switch (task.agentName) {
+      case 'documentation_agent': {
         await runDocsAgentAsync({
           installationToken: authDetails.installationId.toString(),
           repoUrl,
@@ -81,12 +82,10 @@ export async function handlePushWebhook(
         break;
       }
 
-      case 'data_engineer_initial_setup':
-        break;
-      case 'data_engineer_upstream_change_detection':
+      case 'upstream_conflict_agent':
         break;
       default: {
-        const _exhaustiveCheck: never = task.agentType;
+        const _exhaustiveCheck: never = task.agentName;
         throw new Error(`Invalid agent type: ${_exhaustiveCheck}`);
       }
     }
