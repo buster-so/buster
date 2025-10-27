@@ -275,7 +275,6 @@ jobs:
           check_port 3000 "Frontend (Web)"
           check_port 3001/health "Backend APIV1"
           check_port 3002/healthcheck "Api V2"
-          check_port 3003/v1/health "Electric Server"
 
           echo "🎉 All services are ready!"
 

@@ -28,18 +28,18 @@ const app = new Hono()
         password
       );
 
-      triggerScreenshotIfNeeded<TakeMetricScreenshotTrigger>({
-        tag: `take-metric-screenshot-${id}`,
-        key: screenshots_task_keys.take_metric_screenshot,
-        context: c,
-        payload: {
-          metricId: id,
-          isOnSaveEvent: false,
-          accessToken: c.get('accessToken'),
-          organizationId:
-            (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '',
-        },
-      });
+      // triggerScreenshotIfNeeded<TakeMetricScreenshotTrigger>({
+      //   tag: `take-metric-screenshot-${id}`,
+      //   key: screenshots_task_keys.take_metric_screenshot,
+      //   context: c,
+      //   payload: {
+      //     metricId: id,
+      //     isOnSaveEvent: false,
+      //     accessToken: c.get('accessToken'),
+      //     organizationId:
+      //       (await getUserOrganizationId(user.id).then((res) => res?.organizationId)) || '',
+      //   },
+      // });
 
       return c.json(response);
     }
