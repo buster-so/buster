@@ -135,12 +135,7 @@ export const AssetListViewList = ({
   }, [items, groups, prelistItems, groupBy]);
 
   const infiniteScrollConfig: InfiniteScrollConfig | undefined = useMemo(
-    () =>
-      isFetchingNextPage
-        ? {
-            loadingNewContent: <div>Loading...</div>,
-          }
-        : undefined,
+    () => (isFetchingNextPage ? { loadingNewContent: <span>Loading...</span> } : undefined),
     [isFetchingNextPage]
   );
 

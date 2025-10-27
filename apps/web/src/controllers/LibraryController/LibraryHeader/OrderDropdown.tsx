@@ -55,7 +55,7 @@ export const OrderDropdown = React.memo(
           navigate({
             to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => {
-              return { ...prev, group_by: v };
+              return { ...prev, group_by: v === 'none' ? undefined : v };
             },
           });
         }}

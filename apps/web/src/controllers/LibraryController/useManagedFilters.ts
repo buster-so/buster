@@ -24,9 +24,10 @@ export const useManagedFilters = (
   }, [filtersProps, userId]);
 };
 
-export const useHasFiltersEnabled = (
-  filtersProps: LibrarySearchParams | SharedWithMeSearchParams
-) => {
+export const useHasFiltersEnabled = ({
+  layout,
+  ...filtersProps
+}: LibrarySearchParams | SharedWithMeSearchParams) => {
   return useMemo(() => {
     return !isEmpty(filtersProps) && Object.values(filtersProps).some(Boolean);
   }, [filtersProps]);

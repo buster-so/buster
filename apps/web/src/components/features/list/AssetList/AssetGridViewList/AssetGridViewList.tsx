@@ -1,4 +1,4 @@
-import type { LibraryAssetListItem } from '@buster/server-shared/library';
+import type { GroupedAssets, LibraryAssetListItem } from '@buster/server-shared/library';
 import { Link, type LinkProps } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
@@ -160,7 +160,7 @@ const AssetGridGroupedView = ({
   hasPrelistContent: boolean;
   ContextMenu: AssetGridViewListProps['ContextMenu'];
 }) => {
-  if (groupBy === 'none' || !groupBy) {
+  if (groupBy === 'none' || !groups) {
     return (
       <AssetGridUngroupedView
         items={items}
@@ -172,20 +172,27 @@ const AssetGridGroupedView = ({
     );
   }
 
+  console.log(groups);
+
   return (
     <>
-      {Object.entries(groups ?? {}).map(([groupKey, items], groupIndex) => {
-        const { title, icon } = getGroupMetadata(groupKey, items, groupBy);
-
+      {Object.entries(groups ?? {}).map(([groupKey, groupItems], groupIndex) => {
+        const { title, icon } = getGroupMetadata(
+          groupKey as keyof GroupedAssets,
+          groupItems,
+          groupBy
+        );
         return (
           <AssetGridGroupSection
-            key={groupKey}
+            key={groupIndex + groupKey}
             title={title}
             icon={icon}
             items={items}
             columns={columns}
             scrollContainerRef={scrollContainerRef}
-            className={hasPrelistContent ? (groupIndex === 0 ? 'mt-11' : 'mt-6') : ''}
+            className={cn(
+              hasPrelistContent && groupIndex === 0 ? 'mt-11' : groupIndex > 0 ? 'mt-6' : ''
+            )}
             ContextMenu={ContextMenu}
           />
         );

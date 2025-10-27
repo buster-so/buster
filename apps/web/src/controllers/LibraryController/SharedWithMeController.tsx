@@ -7,7 +7,7 @@ import { LibraryHeader } from './LibraryHeader';
 import { LibraryListView } from './LibraryListView';
 import type { SharedWithMeViewProps } from './library.types';
 import type { SharedWithMeLayout, SharedWithMeSearchParams } from './schema';
-import { useHasFiltersEnabled, useManagedFilters } from './useManagedFilters';
+import { useManagedFilters } from './useManagedFilters';
 
 export type SharedWithMeControllerProps = {
   filters: SharedWithMeSearchParams;

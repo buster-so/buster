@@ -1,4 +1,3 @@
-import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons/Button';
 import { Sliders3 } from '@/components/ui/icons/NucleoIconOutlined';
@@ -177,8 +176,6 @@ const OrderingItem = ({
   showDirection: boolean;
   showOrdering: boolean;
 }) => {
-  const navigate = useNavigate();
-
   const value = orderByitems.find((item) => item.value === ordering) || orderByitems[0];
 
   const onClickOrderingDirection = useMemoizedFn(() => {
@@ -194,7 +191,7 @@ const OrderingItem = ({
             search={false}
             value={value.value}
             onChange={(v) => {
-              onChangeOrdering?.(v);
+              onChangeOrdering?.(v === 'none' ? undefined : v);
             }}
           />
         )}
@@ -243,8 +240,6 @@ const GroupByItem = ({
   groupBy: LibrarySearchParams['group_by'];
   onChangeGroupBy: (groupBy: LibrarySearchParams['group_by']) => void;
 }) => {
-  const navigate = useNavigate();
-
   const value = groupByItems.find((item) => item.value === groupBy) || groupByItems[0];
 
   return (

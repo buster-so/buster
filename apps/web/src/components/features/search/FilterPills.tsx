@@ -181,7 +181,7 @@ export const FilterLibraryPills: React.FC<
       const translation: Record<NonNullable<LibrarySearchParams['ordering']>, string> = {
         updated_at: 'Updated at',
         created_at: 'Created at',
-        none: 'None',
+        none: 'Updated at',
       };
 
       pills.push({

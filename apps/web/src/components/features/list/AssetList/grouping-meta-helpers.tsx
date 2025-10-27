@@ -16,7 +16,6 @@ export const getGroupMetadata = (
 ): { title: string; icon: React.ReactNode } => {
   if (groupBy === 'asset_type' || groupBy === undefined) {
     const Icon = assetTypeToIcon(groupKey);
-    console.log(groupKey);
     return {
       title: assetTypeLabel(groupKey),
       icon: <Icon />,

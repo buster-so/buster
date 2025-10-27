@@ -63,7 +63,7 @@ export const computeLibraryFilters = (
     filters.includeCreatedBy = owner_ids;
   }
 
-  if (!filter) {
+  if (!filter && !group_by) {
     filters.pinCollections = true;
   }
 
