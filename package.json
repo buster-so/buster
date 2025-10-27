@@ -52,7 +52,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-     "@types/node": "^22.18.1",
+    "@types/node": "^22.18.1",
     "@biomejs/biome": "2.2.6",
     "tsx": "catalog:",
     "turbo": "^2.5.8",
@@ -65,7 +65,8 @@
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
-        "shiki"
+        "shiki",
+        "@opentelemetry/api"
       ],
       "allowedVersions": {
         "shiki": "3"

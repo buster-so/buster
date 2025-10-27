@@ -129,10 +129,8 @@ version: 1.0.0
     const structure: TestFileStructure = {
       'dbt_project.yml': `
 name: my_project
-model-paths:
+model-paths: [unclosed bracket
   - models
-    invalid yaml syntax here
-  - more models
 `,
     };
 

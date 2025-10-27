@@ -1,5 +1,6 @@
 import { currentSpan, wrapTraced } from 'braintrust';
 import { createAgentsMdStep } from '../../steps/init-workflow-steps/create-agents-md-step/create-agents-md-step';
+import { findDbtModelPathsStep } from '../../steps/init-workflow-steps/find-dbt-model-paths-step/find-dbt-model-paths-step';
 import type { InitWorkflowInput, InitWorkflowOutput } from './types';
 
 /**
@@ -30,6 +31,8 @@ export async function runInitWorkflow(input: InitWorkflowInput): Promise<void> {
 
 export async function initWorkflow(input: InitWorkflowInput): Promise<void> {
   await createAgentsMdStep(input);
+
+  await findDbtModelPathsStep();
 
   return;
 }

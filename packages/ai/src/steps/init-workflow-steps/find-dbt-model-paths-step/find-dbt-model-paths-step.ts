@@ -6,8 +6,17 @@ import { DbtProjectFileModelPathsSchema } from './types';
 
 export async function findDbtModelPathsStep(): Promise<string[]> {
   return wrapTraced(
-    async () => {
-      return await findDbtModelPaths();
+    async (span) => {
+      const dbtModelPaths = await findDbtModelPaths();
+
+      span.log({
+        metadata: {
+          dbtModelPaths,
+          dbtModelPathsCount: dbtModelPaths.length,
+        },
+      });
+
+      return dbtModelPaths;
     },
     {
       name: 'Find DBT Model Paths Step',
