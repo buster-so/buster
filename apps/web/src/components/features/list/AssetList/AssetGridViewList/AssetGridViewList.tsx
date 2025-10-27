@@ -122,8 +122,8 @@ const AssetGridItem = React.memo(
                 className={cn('w-full h-full object-contain object-top rounded-t-sm bg-background')}
               />
             </div>
-            <div className="h-[60px] px-3 pt-2.5 pb-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center bg-background">
-              <Text>{name}</Text>
+            <div className="h-[60px] px-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center bg-background justify-center">
+              <Text className="line-clamp-2 break-words whitespace-pre-line">{name}</Text>
               <div className="flex items-center space-x-1 text-xs text-text-tertiary">
                 <Clock />
                 <Text variant={'tertiary'} size="sm">
@@ -143,6 +143,20 @@ const AssetGridItem = React.memo(
 
 AssetGridItem.displayName = 'AssetGridItem';
 
+type VirtualListItem =
+  | {
+      type: 'header';
+      groupKey: string;
+      title: string;
+      icon: React.ReactNode;
+      isFirst: boolean;
+    }
+  | {
+      type: 'row';
+      items: LibraryAssetListItem[];
+      rowIndex: number;
+    };
+
 const AssetGridGroupedView = ({
   groups,
   columns,
@@ -160,6 +174,8 @@ const AssetGridGroupedView = ({
   hasPrelistContent: boolean;
   ContextMenu: AssetGridViewListProps['ContextMenu'];
 }) => {
+  const _mounted = useMounted();
+
   if (groupBy === 'none' || !groups) {
     return (
       <AssetGridUngroupedView
@@ -172,76 +188,78 @@ const AssetGridGroupedView = ({
     );
   }
 
-  console.log(groups);
+  // Flatten groups into a single virtual list structure
+  const virtualItems: VirtualListItem[] = React.useMemo(() => {
+    const result: VirtualListItem[] = [];
+    const groupEntries = Object.entries(groups ?? {});
 
-  return (
-    <>
-      {Object.entries(groups ?? {}).map(([groupKey, groupItems], groupIndex) => {
-        const { title, icon } = getGroupMetadata(
-          groupKey as keyof GroupedAssets,
-          groupItems,
-          groupBy
-        );
-        return (
-          <AssetGridGroupSection
-            key={groupIndex + groupKey}
-            title={title}
-            icon={icon}
-            items={items}
-            columns={columns}
-            scrollContainerRef={scrollContainerRef}
-            className={cn(
-              hasPrelistContent && groupIndex === 0 ? 'mt-11' : groupIndex > 0 ? 'mt-6' : ''
-            )}
-            ContextMenu={ContextMenu}
-          />
-        );
-      })}
-    </>
-  );
-};
+    groupEntries.forEach(([groupKey, groupItems], groupIndex) => {
+      const { title, icon } = getGroupMetadata(
+        groupKey as keyof GroupedAssets,
+        groupItems,
+        groupBy
+      );
 
-const AssetGridGroupSection = ({
-  title,
-  icon,
-  items,
-  columns,
-  scrollContainerRef,
-  className,
-  ContextMenu,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  items: LibraryAssetListItem[];
-  columns: number;
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
-  className?: string;
-  ContextMenu: AssetGridViewListProps['ContextMenu'];
-}) => {
-  const virtualStartRef = useRef<HTMLDivElement>(null);
-  const _mounted = useMounted(); //keep this because we tanstack virtualizer need to trigger reflow
+      // Add group header
+      result.push({
+        type: 'header',
+        groupKey,
+        title,
+        icon,
+        isFirst: groupIndex === 0,
+      });
 
-  // Calculate rows needed for grid
-  const rowCount = Math.ceil(items.length / columns);
+      // Add rows for this group
+      const rowCount = Math.ceil(groupItems.length / columns);
+      for (let i = 0; i < rowCount; i++) {
+        const startIndex = i * columns;
+        const rowItems = groupItems.slice(startIndex, startIndex + columns);
+        result.push({
+          type: 'row',
+          items: rowItems,
+          rowIndex: i,
+        });
+      }
+    });
+
+    return result;
+  }, [groups, columns, groupBy]);
 
   const rowVirtualizer = useVirtualizer({
-    count: rowCount,
+    count: virtualItems.length,
     getScrollElement: () => scrollContainerRef.current,
-    ...commonRowVirtualizerProps,
+    estimateSize: (index) => {
+      const item = virtualItems[index];
+      if (item.type === 'header') {
+        // Header height: icon + text + spacing
+        // First header gets extra top margin if there's prelist content
+        // Non-first headers get margin-top for spacing between sections
+        const baseHeaderHeight = 18; // height of the header itself
+        const topSpacing = item.isFirst && hasPrelistContent ? 24 : index > 0 ? 24 : 0;
+        const bottomSpacing = 12; // gap before content
+        return topSpacing + baseHeaderHeight + bottomSpacing;
+      }
+      // Row height: item height + gap
+      return 125 + 60 + 16; // image + name + gap
+    },
+    overscan: 5,
+    scrollMargin: 0,
   });
 
   return (
-    <AssetGridSectionContainer title={title} icon={icon} className={className}>
-      <div
-        ref={virtualStartRef}
-        style={{
-          height: `${rowVirtualizer.getTotalSize()}px`,
-          position: 'relative',
-        }}
-      >
-        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-          const startIndex = virtualRow.index * columns;
-          const rowItems = items.slice(startIndex, startIndex + columns);
+    <div
+      style={{
+        height: `${rowVirtualizer.getTotalSize()}px`,
+        position: 'relative',
+      }}
+    >
+      {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+        const item = virtualItems[virtualRow.index];
+
+        if (item.type === 'header') {
+          // Calculate padding based on whether this is first header and if there's prelist content
+          const topPadding = item.isFirst && hasPrelistContent ? 24 : virtualRow.index > 0 ? 24 : 0;
+          const bottomPadding = 12;
 
           return (
             <div
@@ -251,26 +269,48 @@ const AssetGridGroupSection = ({
                 top: 0,
                 left: 0,
                 width: '100%',
+                height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
+                paddingTop: `${topPadding}px`,
+                paddingBottom: `${bottomPadding}px`,
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-4">
-                {rowItems.map((asset) => (
-                  <AssetGridItem key={asset.asset_id} {...asset} ContextMenu={ContextMenu} />
-                ))}
+              <div className="flex items-center space-x-1 mx-2">
+                <span className="text-text-secondary">{item.icon}</span>
+                <Text variant={'secondary'} size={'sm'}>
+                  {item.title}
+                </Text>
               </div>
             </div>
           );
-        })}
-      </div>
-    </AssetGridSectionContainer>
-  );
-};
+        }
 
-const commonRowVirtualizerProps = {
-  overscan: 5,
-  scrollMargin: 0,
-  estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
+        return (
+          <div
+            key={virtualRow.key}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+          >
+            <div
+              className="grid gap-4 pb-4"
+              style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+            >
+              {item.items.map((asset) => (
+                <AssetGridItem key={asset.asset_id} {...asset} ContextMenu={ContextMenu} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 const AssetGridUngroupedView = ({
@@ -296,7 +336,9 @@ const AssetGridUngroupedView = ({
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => scrollContainerRef.current,
-    ...commonRowVirtualizerProps,
+    overscan: 5,
+    scrollMargin: 0,
+    estimateSize: () => 125 + 60 + 16, // Height of image + name + gap
   });
 
   return (

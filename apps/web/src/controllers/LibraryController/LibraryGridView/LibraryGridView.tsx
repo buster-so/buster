@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { AssetGridSectionContainer, AssetGridViewList } from '@/components/features/list/AssetList';
+import React from 'react';
+import { AssetGridViewList } from '@/components/features/list/AssetList';
 import { LibraryEmptyView } from '../LibraryEmptyView';
 import { LibraryItemContextMenu } from '../LibraryItemDropdown';
 import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
