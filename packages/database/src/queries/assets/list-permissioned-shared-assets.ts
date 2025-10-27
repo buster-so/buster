@@ -63,6 +63,7 @@ export async function listPermissionedSharedAssets(
   } = ListPermissionedAssetsInputSchema.parse(input);
 
   const offset = (page - 1) * page_size;
+  const limit = page_size + 1;
 
   // Build the union query based on includeAssetChildren parameter
   const baseUnion = permissionedReportFiles(organizationId, userId)
