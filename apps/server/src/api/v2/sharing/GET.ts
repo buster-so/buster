@@ -20,6 +20,7 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
     groupBy,
     query,
     includeAssetChildren,
+    pinCollections,
   } = c.req.valid('query');
   const user = c.get('busterUser');
 
@@ -44,6 +45,7 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
       groupBy,
       query,
       includeAssetChildren,
+      pinCollections,
     });
 
     // Helper function to convert screenshot bucket keys to signed URLs

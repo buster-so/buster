@@ -33,7 +33,7 @@ export const InfinitePaginationSchema = z.object({
 
 export type InfinitePaginationMetadata = z.infer<typeof InfinitePaginationSchema>;
 
-export interface SearchPaginatedResponse<T> {
+export interface InfinitePaginatedResponse<T> {
   data: T[];
   pagination: InfinitePaginationMetadata;
 }
