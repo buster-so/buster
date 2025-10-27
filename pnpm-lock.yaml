@@ -235,8 +235,8 @@ importers:
         version: 3.25.76
     devDependencies:
       momentic:
-        specifier: ^2.17.8
-        version: 2.17.8(@types/node@24.3.1)
+        specifier: ^2.17.17
+        version: 2.17.17(@types/node@24.3.1)
       tsx:
         specifier: 'catalog:'
         version: 4.20.6
@@ -1496,12 +1496,6 @@ packages:
 
   '@ai-sdk/gateway@1.0.20':
     resolution: {integrity: sha512-2K0kGnHyLfT1v2+3xXbLqohfWBJ/vmIh1FTWnrvZfvuUuBdOi2DMgnSQzkLvFVLyM8mhOcx+ZwU6IOOsuyOv/w==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4
-
-  '@ai-sdk/gateway@1.0.23':
-    resolution: {integrity: sha512-ynV7WxpRK2zWLGkdOtrU2hW22mBVkEYVS3iMg1+ZGmAYSgzCqzC74bfOJZ2GU1UdcrFWUsFI9qAYjsPkd+AebA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -6963,12 +6957,6 @@ packages:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
 
-  ai@5.0.44:
-    resolution: {integrity: sha512-l/rdoM4LcRpsRBVvZQBwSU73oNoFGlWj+PcH86QRzxDGJgZqgGItWO0QcKjBNcLDmUjGN1VYd/8J0TAXHJleRQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4
-
   ai@5.0.77:
     resolution: {integrity: sha512-w0xP/guV27qLUR+60ru7dSDfF1Wlk6lPEHtXPBLfa8TNQ8Qc4FZ1RE9UGAdZmZU396FA6lKtP9P89Jzb5Z+Hnw==}
     engines: {node: '>=18'}
@@ -10168,11 +10156,6 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
 
-  mime@4.0.7:
-    resolution: {integrity: sha512-2OfDPL+e03E0LrXaGYOtTFIYhiuzep94NSsuhrNULq+stylcJedcHdzHtz0atMUuGwJfFYs0YL5xeC/Ca2x0eQ==}
-    engines: {node: '>=16'}
-    hasBin: true
-
   mime@4.1.0:
     resolution: {integrity: sha512-X5ju04+cAzsojXKes0B/S4tcYtFAJ6tTMuSPBEn9CPGlrWr8Fiw7qYeLT0XyH80HSoAoqWCaz+MWKh22P7G1cw==}
     engines: {node: '>=16'}
@@ -10277,8 +10260,8 @@ packages:
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
 
-  momentic@2.17.8:
-    resolution: {integrity: sha512-SGURZaQsz3L/YoaCQskYRhDuR7WCki2D99+sPwXRTYW8RF8Y0ApMCC98cFr+k8+1Q4H9On/Tlw5O2KFtMME5zQ==}
+  momentic@2.17.17:
+    resolution: {integrity: sha512-TVOVmsuZyHEw67VkhUNfA14cgvo2o1GZ9K/+uiUxcnrbFGjbqupH7Veal3fy4g5m+WUru9hXGCSW7Xd6GhwOlg==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -13452,12 +13435,6 @@ snapshots:
       '@ai-sdk/provider-utils': 3.0.8(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/gateway@1.0.23(zod@3.25.76)':
-    dependencies:
-      '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.9(zod@3.25.76)
-      zod: 3.25.76
-
   '@ai-sdk/gateway@2.0.0(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
@@ -15327,7 +15304,7 @@ snapshots:
   '@dotenvx/dotenvx@1.49.1':
     dependencies:
       commander: 11.1.0
-      dotenv: 17.2.2
+      dotenv: 17.2.3
       eciesjs: 0.4.15
       execa: 5.1.1
       fdir: 6.5.0(picomatch@4.0.3)
@@ -20669,14 +20646,6 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@5.0.44(zod@3.25.76):
-    dependencies:
-      '@ai-sdk/gateway': 1.0.23(zod@3.25.76)
-      '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.9(zod@3.25.76)
-      '@opentelemetry/api': 1.9.0
-      zod: 3.25.76
-
   ai@5.0.77(zod@3.25.76):
     dependencies:
       '@ai-sdk/gateway': 2.0.0(zod@3.25.76)
@@ -24313,8 +24282,6 @@ snapshots:
 
   mime@3.0.0: {}
 
-  mime@4.0.7: {}
-
   mime@4.1.0: {}
 
   mimic-fn@2.1.0: {}
@@ -24418,7 +24385,7 @@ snapshots:
 
   moment@2.30.1: {}
 
-  momentic@2.17.8(@types/node@24.3.1):
+  momentic@2.17.17(@types/node@24.3.1):
     dependencies:
       '@actions/exec': 1.1.1
       '@actions/io': 1.1.3
@@ -24434,7 +24401,7 @@ snapshots:
       '@octokit/rest': 20.1.2
       '@sentry/node': 9.46.0
       adm-zip: 0.5.16
-      ai: 5.0.44(zod@3.25.76)
+      ai: 5.0.77(zod@3.25.76)
       axios: 1.12.2
       body-parser: 1.20.3
       chalk: 5.6.2
@@ -24458,7 +24425,7 @@ snapshots:
       js-beautify: 1.15.1
       junit-report-builder: 5.1.1
       lodash-es: 4.17.21
-      mime: 4.0.7
+      mime: 4.1.0
       moment: 2.30.1
       nodejs-file-downloader: 4.13.0
       open: 10.1.2
@@ -25389,7 +25356,7 @@ snapshots:
 
   playwright-extra@4.3.6(playwright-core@1.52.0)(playwright@1.52.0):
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
     optionalDependencies:
       playwright: 1.52.0
       playwright-core: 1.52.0
@@ -25666,7 +25633,7 @@ snapshots:
 
   puppeteer-extra-plugin-recaptcha@3.6.8(playwright-extra@4.3.6(playwright-core@1.52.0)(playwright@1.52.0)):
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
       merge-deep: 3.0.3
       puppeteer-extra-plugin: 3.2.3(playwright-extra@4.3.6(playwright-core@1.52.0)(playwright@1.52.0))
     optionalDependencies:
