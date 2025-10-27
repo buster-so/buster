@@ -1,23 +1,24 @@
 import type { AssetType } from '@buster/server-shared/assets';
-import type { LibraryAssetListItem } from '@buster/server-shared/library';
+import type { GroupedAssets, LibraryAssetListItem } from '@buster/server-shared/library';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';
 import { Calendar } from '@/components/ui/icons';
-import { AssetTypeTranslations } from '@/lib/assets/asset-translations';
+import { assetTypeLabel } from '@/lib/assets/asset-translations';
 import { formatDate } from '@/lib/date';
 
 export const getGroupMetadata = (
-  groupKey: string,
+  groupKey: keyof GroupedAssets,
   items: Pick<
     LibraryAssetListItem,
     'created_at' | 'updated_at' | 'created_by_name' | 'created_by_avatar_url' | 'created_by_email'
   >[],
-  groupBy: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none'
+  groupBy: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined
 ): { title: string; icon: React.ReactNode } => {
-  if (groupBy === 'asset_type') {
-    const Icon = assetTypeToIcon(groupKey as AssetType);
+  if (groupBy === 'asset_type' || groupBy === undefined) {
+    const Icon = assetTypeToIcon(groupKey);
+    console.log(groupKey);
     return {
-      title: AssetTypeTranslations[groupKey as AssetType],
+      title: assetTypeLabel(groupKey),
       icon: <Icon />,
     };
   }

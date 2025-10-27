@@ -1,6 +1,4 @@
-import isEmpty from 'lodash/isEmpty';
 import type React from 'react';
-import { useMemo } from 'react';
 import { useLibraryAssetsInfinite } from '@/api/buster_rest/library';
 import { FilterLibraryPills } from '@/components/features/search/FilterPills';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
@@ -19,11 +17,13 @@ export type LibraryControllerProps = {
 const type = 'library' as const;
 
 export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, layout }) => {
-  const managedFilters = useManagedFilters({ ...filters, type: 'library' });
   const hasFiltersEnabled = useHasFiltersEnabled(filters);
+  const managedFilters = useManagedFilters({ ...filters, type: 'library' });
+
+  const pinCollections = !hasFiltersEnabled;
 
   const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
-    useLibraryAssetsInfinite(managedFilters);
+    useLibraryAssetsInfinite({ ...managedFilters, pinCollections });
 
   const libraryViewProps: LibraryViewProps = {
     allResults,
@@ -32,7 +32,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, l
     isFetchingNextPage,
     scrollContainerRef,
     isInitialLoading: !isFetched,
-    pinCollectionsToTop: !hasFiltersEnabled,
+    pinCollections,
     type,
   };
 

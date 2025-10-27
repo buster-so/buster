@@ -33,7 +33,7 @@ export const SharedWithMeController: React.FC<SharedWithMeControllerProps> = ({
     isFetchingNextPage,
     scrollContainerRef,
     isInitialLoading: !isFetched,
-    pinCollectionsToTop: false,
+    pinCollections: false,
   };
 
   return (

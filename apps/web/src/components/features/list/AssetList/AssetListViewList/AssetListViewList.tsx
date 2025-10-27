@@ -1,3 +1,4 @@
+import type { GroupedAssets } from '@buster/server-shared/library';
 import { useMemo } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';
@@ -66,17 +67,22 @@ export const AssetListViewList = ({
   emptyContent,
 }: AssetListViewListProps) => {
   const rows: BusterListRow<AssetListItem>[] = useMemo(() => {
-    const allRows: BusterListRow<AssetListItem>[] = [...prelistItems];
+    const allRows: BusterListRow<AssetListItem>[] = [...(prelistItems ?? [])];
 
     if (
       groupBy === 'asset_type' ||
       groupBy === 'owner' ||
       groupBy === 'created_at' ||
-      groupBy === 'updated_at'
+      groupBy === 'updated_at' ||
+      groups
     ) {
       if (!groups) return allRows;
       Object.entries(groups).forEach(([groupKey, groupItems]) => {
-        const { title, icon } = getGroupMetadata(groupKey, groupItems, groupBy);
+        const { title, icon } = getGroupMetadata(
+          groupKey as keyof GroupedAssets,
+          groupItems,
+          groupBy
+        );
         allRows.push({
           type: 'section',
           id: groupKey,

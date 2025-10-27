@@ -1,3 +1,4 @@
+import type { GroupedAssets } from '@buster/server-shared/library';
 import type { ShareAssetType } from '@buster/server-shared/share';
 import {
   FileContent,
@@ -28,7 +29,7 @@ export const ASSET_ICONS = {
   report_file: FileContent,
 };
 
-export const assetTypeToIcon = (assetType: ShareAssetType) => {
+export const assetTypeToIcon = (assetType: ShareAssetType | keyof GroupedAssets) => {
   switch (assetType) {
     case 'metric_file':
       return ASSET_ICONS.metrics;
@@ -40,6 +41,8 @@ export const assetTypeToIcon = (assetType: ShareAssetType) => {
       return ASSET_ICONS.chats;
     case 'report_file':
       return ASSET_ICONS.reports;
+    case 'assets':
+      return ASSET_ICONS.dashboards;
     default: {
       const _result: never = assetType;
       console.warn('Asset type to icon not found', assetType);

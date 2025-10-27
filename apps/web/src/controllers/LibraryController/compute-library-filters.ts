@@ -63,6 +63,10 @@ export const computeLibraryFilters = (
     filters.includeCreatedBy = owner_ids;
   }
 
+  if (!filter) {
+    filters.pinCollections = true;
+  }
+
   const _exhaustiveCheck: Record<string, never> = rest;
 
   return filters;

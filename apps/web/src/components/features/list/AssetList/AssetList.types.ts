@@ -27,5 +27,5 @@ export type AssetListItem = Pick<
 >;
 
 export type AssetListViewListProps = AssetGridViewListProps & {
-  prelistItems: BusterListRow<AssetListItem>[];
+  prelistItems?: BusterListRow<AssetListItem>[];
 };

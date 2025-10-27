@@ -4,6 +4,8 @@ import { users } from '../../schema';
 import {
   type AssetListItem,
   type AssetType,
+  AssetTypeSchema,
+  type GroupedAssetsKeys,
   type ListPermissionedAssetsInput,
   ListPermissionedAssetsInputSchema,
   type ListPermissionedAssetsResponse,
@@ -239,14 +241,17 @@ export async function listPermissionedLibraryAssets(
   }
 
   if (pinCollections) {
-    const groups: Record<string, AssetListItem[]> = { collections: [], assets: [] };
+    const groups: Record<'collection' | 'assets', AssetListItem[]> = {
+      collection: [],
+      assets: [],
+    };
     for (let i = 0; i < libraryAssets.length; i++) {
       const asset = libraryAssets[i];
       if (!asset) {
         continue;
       }
       if (asset.asset_type === 'collection') {
-        groups.collections?.push(asset);
+        groups.collection?.push(asset);
       } else {
         groups.assets?.push(asset);
       }
