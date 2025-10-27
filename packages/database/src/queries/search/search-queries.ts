@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearchV2, userLibrary, users } from '../../schema';
+import { assetSearchV2, collectionsToAssets, userLibrary, users } from '../../schema';
 import { type InfinitePaginatedResponse, PaginationInputSchema } from '../../schema-types';
 import { AssetTypeSchema } from '../../schema-types/asset';
 import type { TextSearchResultSchema } from '../../schema-types/search';
