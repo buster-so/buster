@@ -6,13 +6,13 @@ import { computeSharedWithMeFilters } from '@/controllers/LibraryController/comp
 import { SharedWithMeController } from '@/controllers/LibraryController/SharedWithMeController';
 import {
   type SharedWithMeLayout,
-  searchParamsSchema,
+  sharedWithMeSearchParamsSchema,
   wrappedLayoutSchema,
 } from '@/controllers/LibraryController/schema';
 
 export const Route = createFileRoute('/app/_app/shared-with-me')({
   component: RouteComponent,
-  validateSearch: searchParamsSchema,
+  validateSearch: sharedWithMeSearchParamsSchema,
   beforeLoad: async ({ search }) => {
     const layout: SharedWithMeLayout = await getCookie({
       data: SHARED_WITH_ME_LAYOUT_COOKIE_NAME,

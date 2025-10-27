@@ -1,5 +1,6 @@
 import type { useLibraryAssetsInfinite } from '@/api/buster_rest/library';
-import type { LibrarySearchParams } from './schema';
+import type { useSharingAssetsInfinite } from '@/api/buster_rest/sharing';
+import type { LibrarySearchParams, SharedWithMeSearchParams } from './schema';
 
 export const computeLibraryFilters = (
   filtersProps: LibrarySearchParams,
@@ -26,7 +27,7 @@ export const computeLibraryFilters = (
     filters.includeCreatedBy = [userId];
   } else if (filter === 'shared_with_me') {
     filters.excludeCreatedBy = [userId];
-  } else {
+  } else if (filter === 'collections') {
     const _exhaustiveCheck: undefined = filter;
   }
 
@@ -62,10 +63,65 @@ export const computeLibraryFilters = (
     filters.includeCreatedBy = owner_ids;
   }
 
-  // biome-ignore lint/complexity/noBannedTypes: This is a temporary fix to satisfy the linter
-  const _exhaustiveCheck: {} = rest;
+  const _exhaustiveCheck: Record<string, never> = rest;
 
   return filters;
 };
 
-export const computeSharedWithMeFilters = computeLibraryFilters;
+export const computeSharedWithMeFilters = (
+  filterProps: SharedWithMeSearchParams,
+  _userId: string
+): Omit<Parameters<typeof useSharingAssetsInfinite>[0], 'scrollConfig'> => {
+  const {
+    filter,
+    q,
+    layout,
+    group_by,
+    ordering,
+    ordering_direction,
+    start_date,
+    end_date,
+    owner_ids,
+    asset_types,
+    ...rest
+  } = filterProps;
+
+  const filters: Omit<Parameters<typeof useSharingAssetsInfinite>[0], 'scrollConfig'> = {};
+
+  if (filter === 'all') {
+    filters.assetTypes = asset_types?.length ? asset_types : undefined;
+  } else if (filter === 'collections') {
+    filters.assetTypes = ['collection'];
+  } else if (filter === 'assets') {
+    filters.assetTypes = (asset_types || []).filter((type) => type !== 'collection');
+  } else {
+    const _exhaustiveCheck: undefined = filter;
+  }
+
+  if (ordering) {
+    filters.ordering = ordering;
+  }
+
+  if (start_date) {
+    filters.startDate = start_date;
+  }
+  if (end_date) {
+    filters.endDate = end_date;
+  }
+  if (group_by) {
+    filters.groupBy = group_by;
+  }
+  if (q) {
+    filters.query = q;
+  }
+  if (ordering_direction) {
+    filters.orderingDirection = ordering_direction;
+  }
+  if (owner_ids?.length) {
+    filters.includeCreatedBy = owner_ids;
+  }
+
+  const _exhaustiveCheck: Record<string, never> = rest;
+
+  return filters;
+};

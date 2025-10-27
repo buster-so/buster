@@ -16,14 +16,14 @@ export type LibraryControllerProps = {
   layout: LibraryLayout;
 };
 
+const type = 'library' as const;
+
 export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, layout }) => {
-  const managedFilters = useManagedFilters(filters);
+  const managedFilters = useManagedFilters({ ...filters, type: 'library' });
   const hasFiltersEnabled = useHasFiltersEnabled(filters);
 
   const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
     useLibraryAssetsInfinite(managedFilters);
-
-  const type = 'library' as const;
 
   const libraryViewProps: LibraryViewProps = {
     allResults,
@@ -42,7 +42,7 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, l
       contentContainerId="library-content"
       scrollable={false}
     >
-      <FilterLibraryPills {...managedFilters} filter={filters.filter} />
+      <FilterLibraryPills {...managedFilters} filter={filters.filter} type={type} />
 
       {layout === 'grid' && <LibraryGridView {...libraryViewProps} />}
       {layout === 'list' && <LibraryListView {...libraryViewProps} />}

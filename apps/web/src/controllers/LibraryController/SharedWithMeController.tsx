@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { useSharingAssetsInfinite } from '@/api/buster_rest/sharing';
 import { FilterLibraryPills } from '@/components/features/search/FilterPills';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
@@ -14,17 +14,16 @@ export type SharedWithMeControllerProps = {
   layout: SharedWithMeLayout;
 };
 
+const type = 'shared-with-me' as const;
+
 export const SharedWithMeController: React.FC<SharedWithMeControllerProps> = ({
   filters,
   layout,
 }) => {
-  const managedFilters = useManagedFilters(filters);
-  const hasFiltersEnabled = useHasFiltersEnabled(filters);
+  const managedFilters = useManagedFilters({ ...filters, type });
 
   const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
     useSharingAssetsInfinite(managedFilters);
-
-  const type = 'shared-with-me' as const;
 
   const sharedWithMeViewProps: SharedWithMeViewProps = {
     type,
@@ -43,7 +42,7 @@ export const SharedWithMeController: React.FC<SharedWithMeControllerProps> = ({
       contentContainerId="library-content"
       scrollable={false}
     >
-      <FilterLibraryPills {...managedFilters} filter={filters.filter} />
+      <FilterLibraryPills {...managedFilters} filter={filters.filter} type={type} />
 
       {layout === 'grid' && <LibraryGridView {...sharedWithMeViewProps} />}
       {layout === 'list' && <LibraryListView {...sharedWithMeViewProps} />}

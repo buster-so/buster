@@ -29,7 +29,7 @@ export const OrderDropdown = React.memo(
         onChangeLayout={(v) => {
           setLibraryLayoutCookie(v);
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => {
               return { ...prev, layout: v };
             },
@@ -37,7 +37,7 @@ export const OrderDropdown = React.memo(
         }}
         onChangeOrdering={(v) => {
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => {
               return { ...prev, ordering: v };
             },
@@ -45,7 +45,7 @@ export const OrderDropdown = React.memo(
         }}
         onChangeOrderingDirection={(v) => {
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => {
               return { ...prev, ordering_direction: v };
             },
@@ -53,7 +53,7 @@ export const OrderDropdown = React.memo(
         }}
         onChangeGroupBy={(v) => {
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => {
               return { ...prev, group_by: v };
             },

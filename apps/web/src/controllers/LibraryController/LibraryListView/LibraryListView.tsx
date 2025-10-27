@@ -20,6 +20,7 @@ export const LibraryListView = ({
   allGroups,
   isInitialLoading,
   pinCollectionsToTop,
+  type,
 }: LibraryViewProps | SharedWithMeViewProps) => {
   const { group_by } = filters;
 
@@ -83,7 +84,7 @@ export const LibraryListView = ({
       prelistItems={prelistItems}
       isFetchingNextPage={isFetchingNextPage}
       scrollContainerRef={scrollContainerRef}
-      emptyContent={<LibraryEmptyView />}
+      emptyContent={<LibraryEmptyView type={type} />}
       ContextMenu={LibraryItemContextMenu}
       isInitialLoading={isInitialLoading}
     />

@@ -36,7 +36,7 @@ export const LibraryGridView = React.memo(
         isFetchingNextPage={isFetchingNextPage}
         isInitialLoading={isInitialLoadingProp}
         scrollContainerRef={scrollContainerRef}
-        emptyContent={<LibraryEmptyView />}
+        emptyContent={<LibraryEmptyView type={type} />}
         groupBy={filters.group_by}
         className={className}
       />

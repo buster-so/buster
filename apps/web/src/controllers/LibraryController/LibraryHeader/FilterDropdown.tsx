@@ -43,7 +43,7 @@ export const FilterDropdown = React.memo(
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
 
-    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids, open });
+    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids, open, type });
 
     const AssetTypeDropdownItems: IDropdownItem = useMemo(() => {
       return {
@@ -83,7 +83,7 @@ export const FilterDropdown = React.memo(
           selected: asset_types?.includes(item.value as AssetType),
           onClick: () => {
             navigate({
-              to: '/app/library',
+              to: type === 'library' ? '/app/library' : '/app/shared-with-me',
               search: (prev) => {
                 const isSelected = asset_types?.includes(item.value as AssetType);
                 const newAssetTypes = isSelected
@@ -130,7 +130,7 @@ export const FilterDropdown = React.memo(
             onUpdate={({ range }) => {
               if (range.from == null && range.to == null) {
                 navigate({
-                  to: '/app/library',
+                  to: type === 'library' ? '/app/library' : '/app/shared-with-me',
                   search: (prev) => ({
                     ...prev,
                     start_date: undefined,
@@ -139,7 +139,7 @@ export const FilterDropdown = React.memo(
                 });
               } else {
                 navigate({
-                  to: '/app/library',
+                  to: type === 'library' ? '/app/library' : '/app/shared-with-me',
                   search: (prev) => ({
                     ...prev,
                     start_date: range.from
@@ -153,7 +153,7 @@ export const FilterDropdown = React.memo(
             }}
             onCancel={() => {
               navigate({
-                to: '/app/library',
+                to: type === 'library' ? '/app/library' : '/app/shared-with-me',
                 search: (prev) => ({
                   ...prev,
                   start_date: undefined,
@@ -165,7 +165,7 @@ export const FilterDropdown = React.memo(
           />,
         ],
       });
-    }, [start_date, end_date]);
+    }, [start_date, end_date, type]);
 
     const dropdownItems = createDropdownItems([
       OwnerDropdownItems,
@@ -192,9 +192,11 @@ export const FilterDropdown = React.memo(
 const useOwnerDropdownItems = ({
   owner_ids,
   open,
+  type,
 }: {
   owner_ids: LibrarySearchParams['owner_ids'];
   open: boolean;
+  type: LibraryViewProps['type'];
 }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -258,7 +260,7 @@ const useOwnerDropdownItems = ({
         selected: owner_ids?.includes(user.id),
         onClick: () => {
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => {
               const isSelected = prev.owner_ids?.includes(user.id);
               const owner_ids = isSelected

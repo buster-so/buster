@@ -1,11 +1,13 @@
 import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
 import pluralize from 'pluralize';
 import React, { useMemo } from 'react';
 import XMark from '@/components/ui/icons/NucleoIconOutlined/xmark';
 import type { computeLibraryFilters } from '@/controllers/LibraryController/compute-library-filters';
-import type { LibrarySearchParams } from '@/controllers/LibraryController/schema';
+import type {
+  LibrarySearchParams,
+  SharedWithMeSearchParams,
+} from '@/controllers/LibraryController/schema';
 import { assetTypeLabel } from '@/lib/assets/asset-translations';
 import { dateSpansIntoPreviousYears, formatDate, isYesterday } from '@/lib/date';
 import { cn } from '@/lib/utils';
@@ -117,7 +119,8 @@ export const FilterSearchPills: React.FC<FiltersParams & OnSetFiltersParams> = (
 
 export const FilterLibraryPills: React.FC<
   ReturnType<typeof computeLibraryFilters> & {
-    filter: LibrarySearchParams['filter'];
+    filter: LibrarySearchParams['filter'] | SharedWithMeSearchParams['filter'];
+    type: 'library' | 'shared-with-me';
   }
 > = (params) => {
   const navigate = useNavigate();
@@ -134,6 +137,7 @@ export const FilterLibraryPills: React.FC<
       groupBy,
       filter,
       includeCreatedBy,
+      type,
     } = params;
 
     if (startDate || endDate) {
@@ -152,9 +156,8 @@ export const FilterLibraryPills: React.FC<
         value: 'dateRange',
         subTitle: subTitle,
         onRemove: () => {
-          console.log('onRemove');
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => ({ ...prev, start_date: undefined, end_date: undefined }),
           });
         },
@@ -168,7 +171,7 @@ export const FilterLibraryPills: React.FC<
         subTitle: assetTypes.map((x) => assetTypeLabel(x)).join(', '),
         onRemove: () =>
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => ({ ...prev, asset_types: undefined }),
           }),
       });
@@ -186,7 +189,10 @@ export const FilterLibraryPills: React.FC<
         value: 'ordering',
         subTitle: translation[ordering],
         onRemove: () =>
-          navigate({ to: '/app/library', search: (prev) => ({ ...prev, ordering: undefined }) }),
+          navigate({
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
+            search: (prev) => ({ ...prev, ordering: undefined }),
+          }),
       });
     }
 
@@ -205,7 +211,7 @@ export const FilterLibraryPills: React.FC<
         subTitle: translation[orderingDirection],
         onRemove: () =>
           navigate({
-            to: '/app/library',
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
             search: (prev) => ({ ...prev, orderingDirection: undefined }),
           }),
       });
@@ -225,19 +231,22 @@ export const FilterLibraryPills: React.FC<
         value: 'groupBy',
         subTitle: translation[groupBy],
         onRemove: () =>
-          navigate({ to: '/app/library', search: (prev) => ({ ...prev, group_by: undefined }) }),
+          navigate({
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
+            search: (prev) => ({ ...prev, group_by: undefined }),
+          }),
       });
     }
 
     if (includeCreatedBy && includeCreatedBy.length > 0) {
-      if (!(filter === 'owned_by_me' && includeCreatedBy.length === 1)) {
+      if (!(filter === 'owned_by_me' && includeCreatedBy.length === 1 && type === 'library')) {
         pills.push({
           title: 'Owner',
           value: 'includeCreatedBy',
           subTitle: `${pluralize('user', includeCreatedBy.length, true)}`,
           onRemove: () =>
             navigate({
-              to: '/app/library',
+              to: type === 'library' ? '/app/library' : '/app/shared-with-me',
               search: (prev) => ({ ...prev, owner_ids: undefined }),
             }),
         });

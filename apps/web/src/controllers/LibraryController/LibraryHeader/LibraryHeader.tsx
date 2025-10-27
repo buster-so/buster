@@ -7,7 +7,7 @@ import { Dots, Plus } from '@/components/ui/icons';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography/Text';
 import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
-import type { LibraryLayout, LibrarySearchParams } from '../schema';
+import type { LibraryLayout, LibrarySearchParams, SharedWithMeSearchParams } from '../schema';
 import { FilterDropdown } from './FilterDropdown';
 import { FilterSwitch } from './FilterSwitch';
 import { OrderDropdown } from './OrderDropdown';
@@ -18,40 +18,54 @@ const LibrarySearchModal = lazy(() =>
   }))
 );
 
-export const LibraryHeader: React.FC<{
-  layout: LibraryLayout;
-  filters: LibrarySearchParams;
-  type: LibraryViewProps['type'] | SharedWithMeViewProps['type'];
-}> = React.memo(({ layout, filters, type }) => {
-  const title = type === 'library' ? 'Library' : 'Shared with me';
+type LibraryHeaderProps =
+  | {
+      layout: LibraryLayout;
+      filters: LibrarySearchParams;
+      type: 'library';
+    }
+  | {
+      layout: LibraryLayout;
+      filters: SharedWithMeSearchParams;
+      type: 'shared-with-me';
+    };
 
-  return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center space-x-3">
-        <Text>{title}</Text>
-        <FilterSwitch filter={filters.filter} type={type} />
+export const LibraryHeader: React.FC<LibraryHeaderProps> = React.memo(
+  ({ layout, filters, type }) => {
+    const title = type === 'library' ? 'Library' : 'Shared with me';
+
+    return (
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center space-x-3">
+          <Text>{title}</Text>
+          {type === 'library' ? (
+            <FilterSwitch filter={filters.filter} type="library" />
+          ) : (
+            <FilterSwitch filter={filters.filter} type="shared-with-me" />
+          )}
+        </div>
+        <div className="flex items-center space-x-1">
+          {type === 'library' && <OpenLibrarySearchModalButton />}
+          <FilterDropdown
+            owner_ids={filters.owner_ids}
+            asset_types={filters.asset_types}
+            start_date={filters.start_date}
+            end_date={filters.end_date}
+            type={type}
+          />
+          <OrderDropdown
+            layout={layout}
+            ordering={filters.ordering}
+            groupBy={filters.group_by}
+            ordering_direction={filters.ordering_direction}
+            type={type}
+          />
+          <Button variant="ghost" prefix={<Dots />} onClick={() => {}} />
+        </div>
       </div>
-      <div className="flex items-center space-x-1">
-        {type === 'library' && <OpenLibrarySearchModalButton />}
-        <FilterDropdown
-          owner_ids={filters.owner_ids}
-          asset_types={filters.asset_types}
-          start_date={filters.start_date}
-          end_date={filters.end_date}
-          type={type}
-        />
-        <OrderDropdown
-          layout={layout}
-          ordering={filters.ordering}
-          groupBy={filters.group_by}
-          ordering_direction={filters.ordering_direction}
-          type={type}
-        />
-        <Button variant="ghost" prefix={<Dots />} onClick={() => {}} />
-      </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 const OpenLibrarySearchModalButton = () => {
   return (
