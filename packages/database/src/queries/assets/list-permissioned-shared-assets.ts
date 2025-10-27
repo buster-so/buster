@@ -1,25 +1,9 @@
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gte,
-  ilike,
-  inArray,
-  isNull,
-  lte,
-  ne,
-  not,
-  type SQL,
-  sql,
-} from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, lte, ne, not, type SQL, sql } from 'drizzle-orm';
 import { db } from '../../connection';
 import { users } from '../../schema';
 import {
   type AssetListItem,
   type AssetType,
-  createPaginatedResponse,
   type ListPermissionedAssetsInput,
   ListPermissionedAssetsInputSchema,
   type ListPermissionedAssetsResponse,
@@ -60,6 +44,7 @@ export async function listPermissionedSharedAssets(
     page,
     page_size,
     includeAssetChildren,
+    pinCollections,
   } = ListPermissionedAssetsInputSchema.parse(input);
 
   const offset = (page - 1) * page_size;
@@ -145,29 +130,54 @@ export async function listPermissionedSharedAssets(
   // Determine ordering direction (default to desc for backward compatibility)
   const direction = orderingDirection === 'asc' ? asc : desc;
 
-  // Apply ordering and execute query
-  const assetsResult = await (async () => {
-    if (ordering === 'updated_at') {
-      return await filteredAssetQuery
-        .orderBy(direction(permissionedAssets.updatedAt))
-        .limit(page_size)
-        .offset(offset);
-    }
-    if (ordering === 'created_at') {
-      return await filteredAssetQuery
-        .orderBy(direction(permissionedAssets.createdAt))
-        .limit(page_size)
-        .offset(offset);
-    }
-    // No explicit ordering - let database decide
-    return await filteredAssetQuery.limit(page_size).offset(offset);
-  })();
+  const orderingClauses: SQL[] = [];
+  // Do groupBy clause first, then do ordering
+  if (groupBy === 'asset_type') {
+    // Custom order: collection (0), chat (1), report (2), dashboard (3), metric (4)
+    orderingClauses.push(
+      asc(sql`CASE ${permissionedAssets.assetType}
+        WHEN 'collection' THEN 0
+        WHEN 'chat' THEN 1
+        WHEN 'report_file' THEN 2
+        WHEN 'dashboard_file' THEN 3
+        WHEN 'metric_file' THEN 4
+        ELSE 5
+      END`)
+    );
+  } else if (groupBy === 'owner') {
+    orderingClauses.push(direction(permissionedAssets.createdBy));
+  } else if (groupBy === 'created_at') {
+    orderingClauses.push(direction(permissionedAssets.createdAt));
+  } else if (groupBy === 'updated_at') {
+    orderingClauses.push(direction(permissionedAssets.updatedAt));
+  } else if (groupBy !== 'none' && groupBy !== undefined) {
+    const _exhaustiveCheck: never = groupBy;
+    throw new Error(`Invalid groupBy: ${_exhaustiveCheck}`);
+  }
 
-  const baseCountQuery = db.select({ total: count() }).from(permissionedAssets);
-  const countResult = await (whereCondition
-    ? baseCountQuery.where(whereCondition)
-    : baseCountQuery);
-  const totalValue = countResult[0]?.total ?? 0;
+  if (orderingClauses.length === 0 && pinCollections) {
+    // Order collections first (0), then other assets (1)
+    orderingClauses.push(
+      asc(sql`CASE WHEN ${permissionedAssets.assetType} = 'collection' THEN 0 ELSE 1 END`)
+    );
+  }
+
+  if (ordering === 'updated_at' || ordering === 'none' || ordering === undefined) {
+    orderingClauses.push(direction(permissionedAssets.updatedAt));
+  } else if (ordering === 'created_at') {
+    orderingClauses.push(direction(permissionedAssets.createdAt));
+  } else {
+    const _exhaustiveCheck: never = ordering;
+    throw new Error(`Invalid ordering: ${_exhaustiveCheck}`);
+  }
+
+  // Apply ordering and execute query
+  const assetsResult = await filteredAssetQuery
+    .orderBy(...orderingClauses)
+    .limit(limit)
+    .offset(offset);
+
+  const hasMore = assetsResult.length > page_size;
 
   const sharedAssets: AssetListItem[] = assetsResult.map((asset) => ({
     asset_id: asset.assetId,
@@ -181,6 +191,11 @@ export async function listPermissionedSharedAssets(
     created_by_avatar_url: asset.createdByAvatarUrl,
     screenshot_url: asset.screenshotBucketKey,
   }));
+
+  if (hasMore) {
+    // Remove the last asset if there is more than the page size
+    sharedAssets.pop();
+  }
 
   // Handle groupBy
   if (groupBy && groupBy !== 'none') {
@@ -214,8 +229,29 @@ export async function listPermissionedSharedAssets(
       groups[groupKey] = groupArray;
     }
 
-    const totalPages = Math.ceil(totalValue / page_size);
-    const hasMore = page < totalPages;
+    return {
+      groups,
+      pagination: {
+        page,
+        page_size,
+        has_more: hasMore,
+      },
+    };
+  }
+
+  if (pinCollections) {
+    const groups: Record<string, AssetListItem[]> = { collections: [], assets: [] };
+    for (let i = 0; i < sharedAssets.length; i++) {
+      const asset = sharedAssets[i];
+      if (!asset) {
+        continue;
+      }
+      if (asset.asset_type === 'collection') {
+        groups.collections?.push(asset);
+      } else {
+        groups.assets?.push(asset);
+      }
+    }
 
     return {
       groups,
@@ -227,10 +263,12 @@ export async function listPermissionedSharedAssets(
     };
   }
 
-  return createPaginatedResponse({
+  return {
     data: sharedAssets,
-    page,
-    page_size,
-    total: totalValue,
-  });
+    pagination: {
+      page,
+      page_size,
+      has_more: hasMore,
+    },
+  };
 }

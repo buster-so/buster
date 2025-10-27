@@ -1,17 +1,4 @@
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  gte,
-  ilike,
-  inArray,
-  isNull,
-  lte,
-  not,
-  type SQL,
-  sql,
-} from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, lte, not, type SQL, sql } from 'drizzle-orm';
 import { db } from '../../connection';
 import { users } from '../../schema';
 import {
@@ -143,9 +130,19 @@ export async function listPermissionedLibraryAssets(
   const direction = orderingDirection === 'asc' ? asc : desc;
 
   const orderingClauses: SQL[] = [];
-  // Do groupBy clause first, then do ordering 
-  if (groupBy === 'asset_type') { 
-    orderingClauses.push(direction(permissionedAssets.assetType));
+  // Do groupBy clause first, then do ordering
+  if (groupBy === 'asset_type') {
+    // Custom order: collection (0), chat (1), report (2), dashboard (3), metric (4)
+    orderingClauses.push(
+      asc(sql`CASE ${permissionedAssets.assetType}
+        WHEN 'collection' THEN 0
+        WHEN 'chat' THEN 1
+        WHEN 'report_file' THEN 2
+        WHEN 'dashboard_file' THEN 3
+        WHEN 'metric_file' THEN 4
+        ELSE 5
+      END`)
+    );
   } else if (groupBy === 'owner') {
     orderingClauses.push(direction(permissionedAssets.createdBy));
   } else if (groupBy === 'created_at') {
@@ -175,9 +172,9 @@ export async function listPermissionedLibraryAssets(
 
   // Apply ordering and execute query
   const assetsResult = await filteredAssetQuery
-        .orderBy(...orderingClauses)
-        .limit(limit)
-        .offset(offset);
+    .orderBy(...orderingClauses)
+    .limit(limit)
+    .offset(offset);
 
   const hasMore = assetsResult.length > page_size;
 
@@ -242,7 +239,7 @@ export async function listPermissionedLibraryAssets(
   }
 
   if (pinCollections) {
-    const groups: Record<string, AssetListItem[]> = {collections: [], assets: []};
+    const groups: Record<string, AssetListItem[]> = { collections: [], assets: [] };
     for (let i = 0; i < libraryAssets.length; i++) {
       const asset = libraryAssets[i];
       if (!asset) {
