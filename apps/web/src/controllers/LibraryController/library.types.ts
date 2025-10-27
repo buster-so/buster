@@ -12,3 +12,5 @@ export type LibraryViewProps = {
   isInitialLoading: boolean;
   useCollections: boolean;
 };
+
+export type SharedWithMeViewProps = Omit<LibraryViewProps, 'useCollections'>;

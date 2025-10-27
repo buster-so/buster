@@ -9,7 +9,6 @@ import { LibraryCollectionGrid } from './LibraryCollectionGrid';
 export const LibraryGridView = React.memo(
   ({
     allResults,
-    collections,
     isFetchingNextPage,
     isInitialLoading: isInitialLoadingProp,
     className,
@@ -18,12 +17,14 @@ export const LibraryGridView = React.memo(
     allGroups,
   }: LibraryViewProps) => {
     const prelistContent = useMemo(() => {
-      return (
-        <AssetGridSectionContainer title="Collections" icon={<Folder />}>
-          <LibraryCollectionGrid collections={collections} />
-        </AssetGridSectionContainer>
-      );
-    }, [collections]);
+      // return (
+      //   <AssetGridSectionContainer title="Collections" icon={<Folder />}>
+      //     <LibraryCollectionGrid collections={collections} />
+      //   </AssetGridSectionContainer>
+      // );
+
+      return <></>;
+    }, []);
 
     return (
       <AssetGridViewList

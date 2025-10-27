@@ -5,7 +5,6 @@ import { prefetchGetDatasets } from '@/api/buster_rest/datasets';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest/users';
 import { prefetchGetUserFavorites } from '@/api/buster_rest/users/favorites';
 import { getAppLayout } from '@/api/server-functions/getAppLayout';
-import { getCookie } from '@/api/server-functions/getCookie';
 import type { SidebarPrimaryProps } from '@/components/features/sidebars/SidebarPrimary';
 import { ADMIN_TOOLS_SIDEBAR_ID } from '@/components/features/sidebars/SidebarPrimary/useAdminToolSidebar';
 import {

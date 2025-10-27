@@ -1,45 +1,32 @@
 import isEmpty from 'lodash/isEmpty';
 import type React from 'react';
 import { useMemo } from 'react';
-import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import { useLibraryAssetsInfinite } from '@/api/buster_rest/library';
-import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
 import { FilterLibraryPills } from '@/components/features/search/FilterPills';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
-import { computeLibraryFilters } from './compute-library-filters';
 import { LibraryGridView } from './LibraryGridView';
 import { LibraryHeader } from './LibraryHeader';
 import { LibraryListView } from './LibraryListView';
 import type { LibraryViewProps } from './library.types';
 import type { LibraryLayout, LibrarySearchParams } from './schema';
+import { useHasFiltersEnabled, useManagedFilters } from './useManagedFilters';
 
 export type LibraryControllerProps = {
   filters: LibrarySearchParams;
   layout: LibraryLayout;
 };
 
-export const LibraryController: React.FC<LibraryControllerProps> = ({
-  filters: filtersProps,
-  layout,
-}) => {
-  const hasFiltersEnabled = useMemo(() => {
-    return !isEmpty(filtersProps) && Object.values(filtersProps).some(Boolean);
-  }, [filtersProps]);
-
-  const managedFilters = useManagedFilters(filtersProps);
+export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, layout }) => {
+  const managedFilters = useManagedFilters(filters);
+  const hasFiltersEnabled = useHasFiltersEnabled(filters);
 
   const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
-    useLibraryAssetsInfinite({
-      ...managedFilters,
-      scrollConfig: {
-        scrollThreshold: 125,
-      },
-    });
+    useLibraryAssetsInfinite(managedFilters);
 
   const libraryViewProps: LibraryViewProps = {
     allResults,
     allGroups,
-    filters: filtersProps,
+    filters,
     isFetchingNextPage,
     scrollContainerRef,
     isInitialLoading: !isFetched,
@@ -48,22 +35,14 @@ export const LibraryController: React.FC<LibraryControllerProps> = ({
 
   return (
     <AppPageLayout
-      header={<LibraryHeader layout={layout} filters={filtersProps} />}
+      header={<LibraryHeader layout={layout} filters={filters} />}
       contentContainerId="library-content"
       scrollable={false}
     >
-      <FilterLibraryPills {...managedFilters} filter={filtersProps.filter} />
+      <FilterLibraryPills {...managedFilters} filter={filters.filter} />
 
       {layout === 'grid' && <LibraryGridView {...libraryViewProps} />}
       {layout === 'list' && <LibraryListView {...libraryViewProps} />}
     </AppPageLayout>
   );
-};
-
-const useManagedFilters = (
-  filtersProps: LibrarySearchParams
-): Omit<Parameters<typeof useLibraryAssetsInfinite>[0], 'scrollConfig'> => {
-  const user = useGetUserBasicInfo();
-  const userId = user?.id ?? '';
-  return useMemo(() => computeLibraryFilters(filtersProps, userId), [filtersProps, userId]);
 };

@@ -19,7 +19,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Link } from '@tanstack/react-router';
-import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { Popover } from '@/components/ui/popover';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';

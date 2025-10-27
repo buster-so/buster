@@ -5,24 +5,18 @@ import { useIsUserAdmin, useIsUserRegistered } from '@/api/buster_rest/users/use
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { Button } from '@/components/ui/buttons';
-import { Magnifier, Table, UnorderedList2 } from '@/components/ui/icons';
+import { Magnifier } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
 import Compose2 from '@/components/ui/icons/NucleoIconOutlined/compose-2';
 import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
-import Gear from '@/components/ui/icons/NucleoIconOutlined/gear';
 import {
   COLLAPSED_HIDDEN,
   COLLAPSED_JUSTIFY_CENTER,
   COLLAPSED_VISIBLE,
-  type ISidebarGroup,
   type ISidebarList,
   type SidebarProps,
 } from '@/components/ui/sidebar';
-import {
-  createSidebarGroup,
-  createSidebarItems,
-  createSidebarList,
-} from '@/components/ui/sidebar/create-sidebar-item';
+import { createSidebarList } from '@/components/ui/sidebar/create-sidebar-item';
 import { Sidebar } from '@/components/ui/sidebar/SidebarComponent';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import { cn } from '@/lib/classMerge';
