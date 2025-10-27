@@ -1,4 +1,12 @@
-import { MotherDuckAdapter } from '@buster/data-source';
+import {
+  BigQueryAdapter,
+  MotherDuckAdapter,
+  MySQLAdapter,
+  PostgreSQLAdapter,
+  RedshiftAdapter,
+  SnowflakeAdapter,
+  SQLServerAdapter,
+} from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import {
   checkDataSourceNameExists,
@@ -8,22 +16,27 @@ import {
   getUserOrganizationId,
 } from '@buster/database/queries';
 import { HTTPException } from 'hono/http-exception';
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDataSourceHandler } from './create-data-source';
 
 // Mock all dependencies
 vi.mock('@buster/database/queries');
 vi.mock('@buster/data-source', () => {
+  // Create a factory function that returns a mock adapter
+  const createMockAdapter = () => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    testConnection: vi.fn().mockResolvedValue(true),
+    close: vi.fn().mockResolvedValue(undefined),
+  });
+
   return {
-    // Make MotherDuckAdapter constructible with 'new'
-    MotherDuckAdapter: vi.fn(() => ({
-      initialize: vi.fn().mockResolvedValue(undefined),
-      testConnection: vi.fn().mockResolvedValue(true),
-      close: vi.fn().mockResolvedValue(undefined),
-    })),
-    DataSourceType: {
-      MotherDuck: 'motherduck',
-    },
+    PostgreSQLAdapter: vi.fn(() => createMockAdapter()),
+    MySQLAdapter: vi.fn(() => createMockAdapter()),
+    BigQueryAdapter: vi.fn(() => createMockAdapter()),
+    SnowflakeAdapter: vi.fn(() => createMockAdapter()),
+    SQLServerAdapter: vi.fn(() => createMockAdapter()),
+    RedshiftAdapter: vi.fn(() => createMockAdapter()),
+    MotherDuckAdapter: vi.fn(() => createMockAdapter()),
   };
 });
 
@@ -158,7 +171,149 @@ describe('createDataSourceHandler', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(HTTPException);
         expect((error as HTTPException).status).toBe(400);
-        expect((error as HTTPException).message).toContain('Invalid MotherDuck credentials');
+        // Note: error message uses lowercase 'motherduck' from request.type
+        expect((error as HTTPException).message).toContain('Invalid motherduck credentials');
+      }
+    });
+  });
+
+  describe('Adapter Type Coverage', () => {
+    it('should handle PostgreSQL data sources', async () => {
+      const postgresRequest = {
+        name: 'My PostgreSQL DB',
+        type: 'postgres' as const,
+        host: 'localhost',
+        port: 5432,
+        username: 'user',
+        password: 'pass',
+        default_database: 'mydb',
+      };
+
+      await expect(createDataSourceHandler(mockUser, postgresRequest)).rejects.toThrow();
+
+      // Verify PostgreSQLAdapter was instantiated
+      expect(PostgreSQLAdapter).toHaveBeenCalled();
+    });
+
+    it('should handle MySQL data sources', async () => {
+      const mysqlRequest = {
+        name: 'My MySQL DB',
+        type: 'mysql' as const,
+        host: 'localhost',
+        port: 3306,
+        username: 'user',
+        password: 'pass',
+        default_database: 'mydb',
+      };
+
+      await expect(createDataSourceHandler(mockUser, mysqlRequest)).rejects.toThrow();
+
+      // Verify MySQLAdapter was instantiated
+      expect(MySQLAdapter).toHaveBeenCalled();
+    });
+
+    it('should handle BigQuery data sources', async () => {
+      const bigqueryRequest = {
+        name: 'My BigQuery',
+        type: 'bigquery' as const,
+        credentials_json: '{"type":"service_account"}',
+        default_project_id: 'my-project',
+        default_dataset_id: 'my-dataset',
+      };
+
+      await expect(createDataSourceHandler(mockUser, bigqueryRequest)).rejects.toThrow();
+
+      // Verify BigQueryAdapter was instantiated
+      expect(BigQueryAdapter).toHaveBeenCalled();
+    });
+
+    it('should handle Snowflake data sources', async () => {
+      const snowflakeRequest = {
+        name: 'My Snowflake',
+        type: 'snowflake' as const,
+        account_id: 'myaccount',
+        warehouse_id: 'warehouse',
+        username: 'user',
+        password: 'pass',
+        default_database: 'mydb',
+      };
+
+      await expect(createDataSourceHandler(mockUser, snowflakeRequest)).rejects.toThrow();
+
+      // Verify SnowflakeAdapter was instantiated
+      expect(SnowflakeAdapter).toHaveBeenCalled();
+    });
+
+    it('should handle SQL Server data sources', async () => {
+      const sqlserverRequest = {
+        name: 'My SQL Server',
+        type: 'sqlserver' as const,
+        host: 'localhost',
+        port: 1433,
+        username: 'sa',
+        password: 'pass',
+        default_database: 'master',
+      };
+
+      await expect(createDataSourceHandler(mockUser, sqlserverRequest)).rejects.toThrow();
+
+      // Verify SQLServerAdapter was instantiated
+      expect(SQLServerAdapter).toHaveBeenCalled();
+    });
+
+    it('should handle Redshift data sources', async () => {
+      const redshiftRequest = {
+        name: 'My Redshift',
+        type: 'redshift' as const,
+        host: 'cluster.region.redshift.amazonaws.com',
+        port: 5439,
+        username: 'user',
+        password: 'pass',
+        default_database: 'mydb',
+      };
+
+      await expect(createDataSourceHandler(mockUser, redshiftRequest)).rejects.toThrow();
+
+      // Verify RedshiftAdapter was instantiated
+      expect(RedshiftAdapter).toHaveBeenCalled();
+    });
+
+    it('should handle MotherDuck data sources', async () => {
+      const motherduckRequest = {
+        name: 'My MotherDuck',
+        type: 'motherduck' as const,
+        token: 'token_abc',
+        default_database: 'mydb',
+      };
+
+      await expect(createDataSourceHandler(mockUser, motherduckRequest)).rejects.toThrow();
+
+      // Verify MotherDuckAdapter was instantiated
+      expect(MotherDuckAdapter).toHaveBeenCalled();
+    });
+
+    it('should throw error for unimplemented Databricks adapter', async () => {
+      const databricksRequest = {
+        name: 'My Databricks',
+        type: 'databricks' as const,
+        host: 'workspace.cloud.databricks.com',
+        api_key: 'dapi123',
+        warehouse_id: 'warehouse-id',
+        default_catalog: 'main',
+      };
+
+      await expect(createDataSourceHandler(mockUser, databricksRequest)).rejects.toThrow(
+        HTTPException
+      );
+
+      try {
+        await createDataSourceHandler(mockUser, databricksRequest);
+      } catch (error) {
+        expect(error).toBeInstanceOf(HTTPException);
+        expect((error as HTTPException).status).toBe(400);
+        expect((error as HTTPException).message).toContain(
+          'Databricks adapter not yet implemented'
+        );
       }
     });
   });

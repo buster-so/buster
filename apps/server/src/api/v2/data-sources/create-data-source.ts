@@ -1,4 +1,12 @@
-import { DataSourceType, MotherDuckAdapter } from '@buster/data-source';
+import {
+  BigQueryAdapter,
+  MotherDuckAdapter,
+  MySQLAdapter,
+  PostgreSQLAdapter,
+  RedshiftAdapter,
+  SnowflakeAdapter,
+  SQLServerAdapter,
+} from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import {
   checkDataSourceNameExists,
@@ -7,17 +15,61 @@ import {
   getUser,
   getUserOrganizationId,
 } from '@buster/database/queries';
-import type { CreateDataSourceRequest, CreateDataSourceResponse } from '@buster/server-shared';
+import type {
+  CreateDataSourceRequest,
+  CreateDataSourceResponse,
+  DataSourceType,
+} from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';
 
+// Type for data source adapters
+interface DataSourceAdapter {
+  // biome-ignore lint/suspicious/noExplicitAny: Each adapter has its own specific credential type from its package
+  initialize(credentials: any): Promise<void>;
+  testConnection(): Promise<boolean>;
+  close(): Promise<void>;
+}
+
 /**
- * Handler for creating a new data source (MotherDuck only for now)
+ * Get the appropriate adapter for a data source type
+ * Uses exhaustive type checking to ensure all data source types are handled
+ */
+function getAdapterForType(type: DataSourceType): DataSourceAdapter {
+  switch (type) {
+    case 'postgres':
+      return new PostgreSQLAdapter();
+    case 'mysql':
+      return new MySQLAdapter();
+    case 'bigquery':
+      return new BigQueryAdapter();
+    case 'snowflake':
+      return new SnowflakeAdapter();
+    case 'sqlserver':
+      return new SQLServerAdapter();
+    case 'redshift':
+      return new RedshiftAdapter();
+    case 'motherduck':
+      return new MotherDuckAdapter();
+    case 'databricks':
+      // TODO: Add Databricks adapter when available
+      throw new Error('Databricks adapter not yet implemented');
+    default: {
+      // Exhaustive check: This will cause a TypeScript error if a new type is added
+      // to DataSourceType but not handled in the switch statement
+      const exhaustiveCheck: never = type;
+      throw new Error(`Unsupported data source type: ${exhaustiveCheck}`);
+    }
+  }
+}
+
+/**
+ * Handler for creating a new data source
  *
  * Flow:
  * 1. Get user's organization and verify membership
  * 2. Check user has required role (DataAdmin or WorkspaceAdmin)
  * 3. Verify data source name is unique in organization
- * 4. Validate MotherDuck credentials by testing connection
+ * 4. Validate credentials by testing connection
  * 5. Store credentials in vault
  * 6. Create data source record
  * 7. Return response with creator info
@@ -55,20 +107,13 @@ export async function createDataSourceHandler(
     });
   }
 
-  // Step 4: Validate MotherDuck credentials
-  const credentials = {
-    type: DataSourceType.MotherDuck as const,
-    token: request.token,
-    default_database: request.default_database,
-    saas_mode: request.saas_mode ?? true,
-    ...(request.attach_mode && { attach_mode: request.attach_mode }),
-    ...(request.connection_timeout && { connection_timeout: request.connection_timeout }),
-    ...(request.query_timeout && { query_timeout: request.query_timeout }),
-  };
+  // Step 4: Extract credentials from request (excluding name field)
+  const { name: _, ...credentials } = request;
 
-  let adapter: MotherDuckAdapter | undefined;
+  // Step 5: Validate credentials by testing connection
+  let adapter: DataSourceAdapter | undefined;
   try {
-    adapter = new MotherDuckAdapter();
+    adapter = getAdapterForType(request.type);
     await adapter.initialize(credentials);
     const isValid = await adapter.testConnection();
 
@@ -77,12 +122,13 @@ export async function createDataSourceHandler(
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[createDataSource] MotherDuck credential validation failed', {
+    console.error('[createDataSource] Credential validation failed', {
       error: message,
       errorType: error instanceof Error ? error.constructor.name : typeof error,
+      dataSourceType: request.type,
     });
     throw new HTTPException(400, {
-      message: `Invalid MotherDuck credentials: ${message}`,
+      message: `Invalid ${request.type} credentials: ${message}`,
     });
   } finally {
     // Always close the adapter connection
@@ -97,13 +143,13 @@ export async function createDataSourceHandler(
     }
   }
 
-  // Step 5: Store credentials in vault
+  // Step 6: Store credentials in vault
   let secret: string;
   try {
     secret = await createSecret({
       secret: JSON.stringify(credentials),
       name: `data-source-${request.name}-${Date.now()}`,
-      description: `MotherDuck credentials for data source: ${request.name}`,
+      description: `${request.type} credentials for data source: ${request.name}`,
     });
   } catch (error) {
     console.error('[createDataSource] Failed to store credentials', {
@@ -115,12 +161,12 @@ export async function createDataSourceHandler(
     });
   }
 
-  // Step 6: Create data source record
+  // Step 7: Create data source record
   let dataSource: Awaited<ReturnType<typeof createDataSource>>;
   try {
     dataSource = await createDataSource({
       name: request.name,
-      type: 'motherduck',
+      type: request.type,
       organizationId: userOrg.organizationId,
       createdBy: user.id,
       secretId: secret,
@@ -135,7 +181,7 @@ export async function createDataSourceHandler(
     });
   }
 
-  // Step 7: Get creator info for response
+  // Step 8: Get creator info for response
   const creator = await getUser({ id: user.id });
 
   if (!creator) {
@@ -145,7 +191,7 @@ export async function createDataSourceHandler(
     });
   }
 
-  // Step 8: Build and return response
+  // Step 9: Build and return response
   return {
     id: dataSource.id,
     name: dataSource.name,

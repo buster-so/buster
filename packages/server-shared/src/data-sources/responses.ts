@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CredentialsSchema } from './requests';
 
 /**
  * Creator information included in data source response
@@ -15,9 +16,17 @@ export const CreatedBySchema = z.object({
 export const OnboardingStatusSchema = z.enum(['notStarted', 'inProgress', 'completed', 'failed']);
 
 /**
- * Create data source response schema
+ * Dataset summary information
  */
-export const CreateDataSourceResponseSchema = z.object({
+export const DatasetSummarySchema = z.object({
+  id: z.string().uuid().describe('Dataset ID'),
+  name: z.string().describe('Dataset name'),
+});
+
+/**
+ * Base data source fields shared across response types
+ */
+const BaseDataSourceSchema = z.object({
   id: z.string().uuid().describe('Unique data source identifier'),
   name: z.string().describe('Data source name'),
   type: z.string().describe('Data source type'),
@@ -30,7 +39,51 @@ export const CreateDataSourceResponseSchema = z.object({
   onboardingError: z.string().nullable().describe('Error message if onboarding failed'),
 });
 
-// Types
+/**
+ * Create data source response schema (no credentials or datasets)
+ */
+export const CreateDataSourceResponseSchema = BaseDataSourceSchema;
+
+/**
+ * Get data source response schema (includes credentials and datasets)
+ */
+export const GetDataSourceResponseSchema = BaseDataSourceSchema.extend({
+  credentials: CredentialsSchema.describe('Data source credentials'),
+  datasets: z.array(DatasetSummarySchema).describe('Associated datasets'),
+});
+
+/**
+ * List item schema (minimal fields for list view)
+ */
+export const DataSourceListItemSchema = z.object({
+  id: z.string().uuid().describe('Data source ID'),
+  name: z.string().describe('Data source name'),
+  type: z.string().describe('Data source type'),
+  updatedAt: z.string().datetime().describe('Last update timestamp'),
+});
+
+/**
+ * Paginated list response schema
+ */
+export const ListDataSourcesResponseSchema = z.object({
+  items: z.array(DataSourceListItemSchema).describe('Data source items'),
+  total: z.number().int().describe('Total number of items'),
+  page: z.number().int().describe('Current page number'),
+  pageSize: z.number().int().describe('Items per page'),
+  hasMore: z.boolean().describe('Whether more pages exist'),
+});
+
+/**
+ * Update data source response schema (same as get response)
+ */
+export const UpdateDataSourceResponseSchema = GetDataSourceResponseSchema;
+
+// Export inferred types
 export type CreatedBy = z.infer<typeof CreatedBySchema>;
 export type OnboardingStatus = z.infer<typeof OnboardingStatusSchema>;
+export type DatasetSummary = z.infer<typeof DatasetSummarySchema>;
 export type CreateDataSourceResponse = z.infer<typeof CreateDataSourceResponseSchema>;
+export type GetDataSourceResponse = z.infer<typeof GetDataSourceResponseSchema>;
+export type DataSourceListItem = z.infer<typeof DataSourceListItemSchema>;
+export type ListDataSourcesResponse = z.infer<typeof ListDataSourcesResponseSchema>;
+export type UpdateDataSourceResponse = z.infer<typeof UpdateDataSourceResponseSchema>;
