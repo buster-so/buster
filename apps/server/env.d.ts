@@ -16,6 +16,7 @@ declare global {
       SERVER_URL: string;
       NODE_ENV?: 'development' | 'production' | 'test';
       VITE_PUBLIC_URL: string;
+      IS_E2E_TEST: 'true' | 'false' | undefined;
     }
   }
 }

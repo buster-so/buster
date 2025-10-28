@@ -40,7 +40,7 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noConsole": "warn",
+        "noConsole": "off",
         "noTemplateCurlyInString": "off"
       },
       "complexity": {
