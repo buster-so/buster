@@ -40,7 +40,7 @@
     "@electric-sql/client": "catalog:",
     "@hono/zod-validator": "^0.7.4",
     "@supabase/supabase-js": "catalog:",
-    "@trigger.dev/sdk": "4.0.4",
+    "@trigger.dev/sdk": "catalog:",
     "ai": "catalog:",
     "dayjs": "catalog:",
     "drizzle-orm": "catalog:",
