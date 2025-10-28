@@ -286,13 +286,13 @@ jobs:
           pnpm dlx momentic install-browsers --all
           pnpm dlx momentic run --api-key $MOMENTIC_API_KEY  --exclude "llm-call-tests/*" --upload-results
 
-      - name: Sleep for 30 minutes (for SSH inspection)
-        if: always()
-        run: |
-          echo "😴 Sleeping for 30 minutes to allow SSH inspection..."
-          echo "Services are still running. You can SSH into the instance now."
-          sleep 1800
-          echo "✅ Sleep complete"
+      # - name: Sleep for 30 minutes (for SSH inspection)
+      #   if: always()
+      #   run: |
+      #     echo "😴 Sleeping for 30 minutes to allow SSH inspection..."
+      #     echo "Services are still running. You can SSH into the instance now."
+      #     sleep 1800
+      #     echo "✅ Sleep complete"
 
       - name: Stop services
         if: always()
