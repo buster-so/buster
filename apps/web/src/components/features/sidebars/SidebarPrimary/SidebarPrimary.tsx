@@ -149,7 +149,12 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
 
           <Tooltip title="Start a chat" shortcuts={['C']}>
             <Link to={'/app/home'}>
-              <Button size="tall" data-testid="start-chat-button" rounding={'large'} prefix={<PencilSquareIcon />} />
+              <Button
+                size="tall"
+                data-testid="start-chat-button"
+                rounding={'large'}
+                prefix={<PencilSquareIcon />}
+              />
             </Link>
           </Tooltip>
         </div>

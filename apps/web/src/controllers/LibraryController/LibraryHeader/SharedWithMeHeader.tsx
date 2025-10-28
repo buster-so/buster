@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/buttons/Button';
 import { Dots } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography/Text';
 import type { LibraryLayout, LibrarySearchParams, SharedWithMeSearchParams } from '../schema';
-import { FilterDropdown } from './FilterDropdown';
+import { FilterDropdownButton } from './FilterDropdown';
 import { FilterSwitch } from './FilterSwitch';
 import { OrderDropdown } from './OrderDropdown';
 
@@ -33,7 +33,7 @@ export const LibraryHeader: React.FC<SharedWithMeHeaderProps | LibraryHeaderProp
           )}
         </div>
         <div className="flex items-center space-x-1">
-          <FilterDropdown
+          <FilterDropdownButton
             owner_ids={filters.owner_ids}
             asset_types={filters.asset_types}
             start_date={filters.start_date}

@@ -41,11 +41,3 @@ steps:
   - id: 277b0e2e-36fb-4c41-95c7-8f661e96c98e
     type: MODULE
     moduleId: 666c6102-d4fa-4c6e-998c-4b283337ad92
-  - id: 4da5083c-3a49-4741-8740-7c408dfe088a
-    type: PRESET_ACTION
-    command:
-      id: fb0db24d-c142-4a07-82a1-e9ae0693aff1
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: Metrics in the left side navigation panel
