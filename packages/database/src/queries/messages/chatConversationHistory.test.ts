@@ -272,6 +272,8 @@ describe('getChatConversationHistory - Orphaned Tool Call Cleanup', () => {
     // Should have removed the assistant message with only orphaned tool call
     expect(result).toHaveLength(2); // user + assistant text response
     expect(result[0]?.role).toBe('user');
+    // User message should have timestamp appended
+    expect(result[0]?.content).toBe('test\n\nSent at: 2025-01-01T00:00:00.000Z');
     expect(result[1]?.role).toBe('assistant');
     expect(result[1]?.content).toBe('This is a text response');
   });
@@ -333,6 +335,15 @@ describe('getChatConversationHistory - Orphaned Tool Call Cleanup', () => {
     });
 
     expect(result).toHaveLength(2);
-    expect(result).toEqual(mockMessages);
+    // User message should now have timestamp appended
+    expect(result[0]).toEqual({
+      role: 'user',
+      content: 'Hello\n\nSent at: 2025-01-01T00:00:00.000Z',
+    });
+    // Assistant message should remain unchanged
+    expect(result[1]).toEqual({
+      role: 'assistant',
+      content: 'Hi there!',
+    });
   });
 });

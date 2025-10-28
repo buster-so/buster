@@ -417,11 +417,16 @@ export async function getChatConversationHistory(
     const chatMessages = await getMessagesUpToTimestamp(chatId, createdAt);
 
     // Collect all rawLlmMessages from all messages
-    const allRawMessages: unknown[] = [];
+    // Track message timestamps for later appending to user messages
+    // We'll use the message creation timestamp for all messages in that batch
+    const allRawMessages: Array<{ message: unknown; createdAt: string }> = [];
 
     for (const message of chatMessages) {
       if (message.rawLlmMessages && Array.isArray(message.rawLlmMessages)) {
-        allRawMessages.push(...message.rawLlmMessages);
+        // Tag each raw message with its parent message's creation timestamp
+        for (const rawMsg of message.rawLlmMessages) {
+          allRawMessages.push({ message: rawMsg, createdAt: message.createdAt });
+        }
       }
     }
 
@@ -431,13 +436,19 @@ export async function getChatConversationHistory(
     }
 
     // Convert from old CoreMessage format to new ModelMessage format if needed
-    const convertedMessages = convertCoreToModel(allRawMessages);
+    const convertedMessages = convertCoreToModel(allRawMessages.map((m) => m.message));
 
     // Deduplicate messages based on content and role
+    // Track timestamps alongside messages during deduplication
     // We'll use a Map to track unique messages, using a combination of role and stringified content as the key
-    const uniqueMessagesMap = new Map<string, ModelMessage>();
+    const uniqueMessagesMap = new Map<string, { message: ModelMessage; createdAt: string }>();
 
-    for (const message of convertedMessages) {
+    for (let i = 0; i < convertedMessages.length; i++) {
+      const message = convertedMessages[i];
+      const timestamp = allRawMessages[i]?.createdAt;
+
+      if (!message || !timestamp) continue;
+
       // Create a unique key based on role and content
       // This ensures we don't have duplicate messages with the same role and content
       const messageKey = JSON.stringify({
@@ -455,20 +466,58 @@ export async function getChatConversationHistory(
 
       // Only add if we haven't seen this message before
       if (!uniqueMessagesMap.has(messageKey)) {
-        uniqueMessagesMap.set(messageKey, message);
+        uniqueMessagesMap.set(messageKey, { message, createdAt: timestamp });
       }
     }
 
     // Convert back to array and maintain chronological order
     // Since we're merging from multiple messages, we should preserve the order they appear
-    const deduplicatedMessages = Array.from(uniqueMessagesMap.values());
+    const deduplicatedMessagesWithTimestamps = Array.from(uniqueMessagesMap.values());
+    const deduplicatedMessages = deduplicatedMessagesWithTimestamps.map((m) => m.message);
 
     // Remove orphaned tool calls (tool calls without matching tool results)
-    const cleanedMessages = removeOrphanedToolCalls(deduplicatedMessages);
+    // We need to track which messages survived the orphan removal to get their timestamps
+    const cleanedMessagesWithTimestamps: Array<{ message: ModelMessage; createdAt: string }> = [];
+    const cleanedMessageSet = new Set(removeOrphanedToolCalls(deduplicatedMessages));
+
+    for (const item of deduplicatedMessagesWithTimestamps) {
+      if (cleanedMessageSet.has(item.message)) {
+        cleanedMessagesWithTimestamps.push(item);
+      }
+    }
+
+    // Append timestamps to user messages
+    // NOTE: This is currently done at the database boundary to ensure all consumers
+    // (analyst workflow, post-processing, public API) get timestamped messages.
+    // In the future, if different workflows need different timestamp formats or behaviors,
+    // this logic may need to be moved to the individual workflow level.
+    // For now, appending "\n\nSent at: <timestamp>" to user message content
+    // provides temporal context to the AI agent for better analysis.
+    const finalMessages: ModelMessage[] = [];
+
+    for (const item of cleanedMessagesWithTimestamps) {
+      const message = item.message;
+
+      // Type-safe: UserContent can be string | Array<TextPart | ImagePart | FilePart>
+      // We only append timestamps to string content for simplicity
+      if (message.role === 'user' && typeof message.content === 'string') {
+        // Format timestamp as ISO string for consistency
+        const formattedTimestamp = new Date(item.createdAt).toISOString();
+
+        // Create a new message object to maintain immutability (following ModelMessage type from AI SDK v5)
+        finalMessages.push({
+          ...message,
+          content: `${message.content}\n\nSent at: ${formattedTimestamp}`,
+        } as ModelMessage);
+      } else {
+        // For non-user messages or array content, use as-is
+        finalMessages.push(message);
+      }
+    }
 
     // Validate output
     try {
-      return ChatConversationHistoryOutputSchema.parse(cleanedMessages);
+      return ChatConversationHistoryOutputSchema.parse(finalMessages);
     } catch (validationError) {
       throw new Error(
         `Output validation failed: ${validationError instanceof Error ? validationError.message : 'Invalid output format'}`
