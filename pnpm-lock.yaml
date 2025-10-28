@@ -22,10 +22,10 @@ catalogs:
       specifier: 2.76.1
       version: 2.76.1
     '@trigger.dev/build':
-      specifier: ^4.0.5
+      specifier: ^4.0.4
       version: 4.0.5
     '@trigger.dev/sdk':
-      specifier: ^4.0.5
+      specifier: ^4.0.4
       version: 4.0.5
     '@types/js-yaml':
       specifier: 4.0.9
