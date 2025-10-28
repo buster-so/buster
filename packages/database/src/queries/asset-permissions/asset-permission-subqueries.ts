@@ -1,4 +1,4 @@
-import { and, eq, exists, isNull, ne, or, sql } from 'drizzle-orm';
+import { and, eq, exists, isNotNull, isNull, ne, or, sql } from 'drizzle-orm';
 import { db } from '../../connection';
 import {
   assetPermissions,
@@ -837,7 +837,7 @@ export const libraryPermissionedCollections = (organizationId: string, userId: s
       screenshotBucketKey: collections.screenshotBucketKey,
     })
     .from(collections)
-    .innerJoin(
+    .leftJoin(
       userLibrary,
       and(
         eq(userLibrary.assetId, collections.id),
@@ -850,6 +850,7 @@ export const libraryPermissionedCollections = (organizationId: string, userId: s
       and(
         eq(collections.organizationId, organizationId),
         isNull(collections.deletedAt),
+        or(isNotNull(userLibrary.userId), eq(collections.createdBy, userId)),
         or(
           ne(collections.workspaceSharing, 'none'),
           exists(
@@ -1178,7 +1179,7 @@ export const libraryChildMetricsFromCollections = (organizationId: string, userI
       )
     )
     .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
-    .innerJoin(
+    .leftJoin(
       userLibrary,
       and(
         eq(userLibrary.assetId, collections.id),
@@ -1192,6 +1193,7 @@ export const libraryChildMetricsFromCollections = (organizationId: string, userI
         eq(metricFiles.organizationId, organizationId),
         isNull(metricFiles.deletedAt),
         isNull(collections.deletedAt),
+        or(isNotNull(userLibrary.userId), eq(collections.createdBy, userId)),
         or(
           ne(collections.workspaceSharing, 'none'),
           exists(
@@ -1234,7 +1236,7 @@ export const libraryChildDashboardsFromCollections = (organizationId: string, us
       )
     )
     .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
-    .innerJoin(
+    .leftJoin(
       userLibrary,
       and(
         eq(userLibrary.assetId, collections.id),
@@ -1248,6 +1250,7 @@ export const libraryChildDashboardsFromCollections = (organizationId: string, us
         eq(dashboardFiles.organizationId, organizationId),
         isNull(dashboardFiles.deletedAt),
         isNull(collections.deletedAt),
+        or(isNotNull(userLibrary.userId), eq(collections.createdBy, userId)),
         or(
           ne(collections.workspaceSharing, 'none'),
           exists(
@@ -1290,7 +1293,7 @@ export const libraryChildReportsFromCollections = (organizationId: string, userI
       )
     )
     .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
-    .innerJoin(
+    .leftJoin(
       userLibrary,
       and(
         eq(userLibrary.assetId, collections.id),
@@ -1304,6 +1307,7 @@ export const libraryChildReportsFromCollections = (organizationId: string, userI
         eq(reportFiles.organizationId, organizationId),
         isNull(reportFiles.deletedAt),
         isNull(collections.deletedAt),
+        or(isNotNull(userLibrary.userId), eq(collections.createdBy, userId)),
         or(
           ne(collections.workspaceSharing, 'none'),
           exists(
@@ -1346,7 +1350,7 @@ export const libraryChildChatsFromCollections = (organizationId: string, userId:
       )
     )
     .innerJoin(collections, eq(collections.id, collectionsToAssets.collectionId))
-    .innerJoin(
+    .leftJoin(
       userLibrary,
       and(
         eq(userLibrary.assetId, collections.id),
@@ -1360,6 +1364,7 @@ export const libraryChildChatsFromCollections = (organizationId: string, userId:
         eq(chats.organizationId, organizationId),
         isNull(chats.deletedAt),
         isNull(collections.deletedAt),
+        or(isNotNull(userLibrary.userId), eq(collections.createdBy, userId)),
         or(
           ne(collections.workspaceSharing, 'none'),
           exists(

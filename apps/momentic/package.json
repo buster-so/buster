@@ -23,11 +23,10 @@
     "@buster/env-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    
     "zod": "catalog:"
   },
   "devDependencies": {
-    "momentic": "^2.17.8",
+    "momentic": "^2.17.17",
     "tsx": "catalog:"
   }
 }

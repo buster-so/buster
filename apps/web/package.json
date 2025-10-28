@@ -14,7 +14,7 @@
     "generate-routes": "tsr generate",
     "lint": "biome check --write",
     "serve": "vite preview",
-    "start": "pnpm start:local",
+    "start": "cross-env NODE_OPTIONS=--max-old-space-size=8192 pnpm start:local",
     "start:local": "bun ./.output/server/index.mjs",
     "storybook": "storybook dev -p 6006",
     "test": "vitest run",

@@ -18,36 +18,43 @@ export const takeDashboardScreenshotHandlerTask: ReturnType<
   id: screenshots_task_keys.take_dashboard_screenshot,
   schema: TakeDashboardScreenshotTriggerSchema,
   run: async (args) => {
-    logger.info('Getting dashboard screenshot', { args });
+    try {
+      logger.info('Getting dashboard screenshot', { args });
 
-    const { isOnSaveEvent, dashboardId, organizationId } = args;
+      const { isOnSaveEvent, dashboardId, organizationId } = args;
 
-    const shouldTakeNewScreenshot = await shouldTakenNewScreenshot({
-      dashboardId,
-      isOnSaveEvent,
-    });
+      const shouldTakeNewScreenshot = await shouldTakenNewScreenshot({
+        dashboardId,
+        isOnSaveEvent,
+      });
 
-    logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
+      logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
 
-    if (!shouldTakeNewScreenshot) {
-      logger.info('Dashboard screenshot already taken', { dashboardId });
-      return;
+      if (!shouldTakeNewScreenshot) {
+        logger.info('Dashboard screenshot already taken', { dashboardId });
+        return;
+      }
+
+      const screenshotBuffer = await getDashboardScreenshot(args);
+
+      logger.info('Dashboard screenshot taken', {
+        screenshotBufferLength: screenshotBuffer.length,
+      });
+
+      const result = await uploadScreenshotHandler({
+        assetType: 'dashboard_file',
+        assetId: dashboardId,
+        image: screenshotBuffer,
+        organizationId,
+      });
+
+      logger.info('Dashboard screenshot uploaded', { result });
+
+      return result;
+    } catch (error) {
+      logger.error('Error taking dashboard screenshot', { error });
+      return { success: false };
     }
-
-    const screenshotBuffer = await getDashboardScreenshot(args);
-
-    logger.info('Dashboard screenshot taken', { screenshotBufferLength: screenshotBuffer.length });
-
-    const result = await uploadScreenshotHandler({
-      assetType: 'dashboard_file',
-      assetId: dashboardId,
-      image: screenshotBuffer,
-      organizationId,
-    });
-
-    logger.info('Dashboard screenshot uploaded', { result });
-
-    return result;
   },
 });
 
