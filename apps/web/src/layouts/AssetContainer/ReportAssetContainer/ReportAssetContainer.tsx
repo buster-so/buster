@@ -18,7 +18,7 @@ export const ReportAssetContainer: React.FC<{
           return (
             <React.Fragment>
               <AssetContainer
-                scrollable
+                scrollable={false}
                 header={
                   <ReportAssetHeader
                     reportId={reportId}

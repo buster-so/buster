@@ -138,10 +138,7 @@ export const ReportEditor = React.memo(
 
       return (
         <Plate editor={editor} onValueChange={onValueChangeDebounced}>
-          <EditorContainer
-            variant={variant}
-            className={cn('editor-container relative', containerClassName)}
-          >
+          <EditorContainer variant={variant} className={cn('relative', containerClassName)}>
             {preEditorChildren}
             <ThemeWrapper id={id}>
               <Editor

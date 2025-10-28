@@ -9,6 +9,7 @@ import { ReportEditorSkeleton } from '@/components/ui/report/ReportEditorSkeleto
 import type { BusterReportEditor } from '@/components/ui/report/types';
 import { useGetScrollAreaRef } from '@/components/ui/scroll-area/useGetScrollAreaRef';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { useMount } from '@/hooks/useMount';
 import { useEditorContext } from '@/layouts/AssetContainer/ReportAssetContainer';
 import { cn } from '@/lib/utils';
 import { chatQueryKeys } from '../../api/query_keys/chat';
@@ -30,6 +31,7 @@ export const ReportPageController: React.FC<{
     const { setEditor } = useEditorContext();
     const isStreamingMessage = useIsStreamingMessage();
     const messageId = useGetCurrentMessageId();
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
 
     // Fetch the current message to check which files are being generated
     const { data: currentMessage } = useQuery<BusterChatMessage>({
@@ -78,26 +80,28 @@ export const ReportPageController: React.FC<{
     const onReady = useMemoizedFn((editor: BusterReportEditor) => {
       setEditor?.(editor);
       onReadyProp?.(editor);
+      const editorContainer = document.querySelector('.editor-container');
+      if (editorContainer) {
+        scrollAreaRef.current = editorContainer as HTMLDivElement;
+      }
     });
 
     useTrackAndUpdateReportChanges({ reportId, subscribe: isStreamingMessage });
 
-    const nodeRef = useRef<HTMLDivElement>(null);
-    const { scrollAreaRef } = useGetScrollAreaRef({ nodeRef });
-
     return (
-      <div
-        id="report-page-controller"
-        ref={nodeRef}
-        className={cn('relative h-full space-y-1.5 overflow-hidden', className)}
-      >
+      <>
         {report ? (
           <DynamicReportEditor
             key={reportId}
             value={content}
+            id="report-page-controller"
             placeholder="Start typing..."
             className={commonClassName}
-            containerClassName="mt-9"
+            containerClassName={cn(
+              'editor-container pt-9 overflow-y-auto',
+              'scrollbar scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent',
+              className
+            )}
             variant="default"
             useFixedToolbarKit={false}
             onValueChange={onChangeContent}
@@ -127,7 +131,7 @@ export const ReportPageController: React.FC<{
         ) : (
           <ReportEditorSkeleton className={commonClassName} />
         )}
-      </div>
+      </>
     );
   }
 );
