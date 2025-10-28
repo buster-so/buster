@@ -18,34 +18,39 @@ export const takeChatScreenshotHandlerTask: ReturnType<
   id: screenshots_task_keys.take_chat_screenshot,
   schema: TakeChatScreenshotTriggerSchema,
   run: async (args) => {
-    logger.info('Getting chart screenshot', { args });
+    try {
+      logger.info('Getting chart screenshot', { args });
 
-    const { chatId, isNewChatMessage, organizationId } = args;
+      const { chatId, isNewChatMessage, organizationId } = args;
 
-    const shouldTakeNewScreenshot = await shouldTakeChatScreenshot({
-      chatId,
-      isNewChatMessage,
-    });
+      const shouldTakeNewScreenshot = await shouldTakeChatScreenshot({
+        chatId,
+        isNewChatMessage,
+      });
 
-    if (!shouldTakeNewScreenshot) {
-      logger.info('Chat screenshot already taken', { chatId });
-      return;
+      if (!shouldTakeNewScreenshot) {
+        logger.info('Chat screenshot already taken', { chatId });
+        return;
+      }
+
+      const screenshotBuffer = await getChatScreenshot(args);
+
+      logger.info('Chart screenshot taken', { screenshotBufferLength: screenshotBuffer.length });
+
+      const result = await uploadScreenshotHandler({
+        assetType: 'chat',
+        assetId: chatId,
+        image: screenshotBuffer,
+        organizationId,
+      });
+
+      logger.info('Chart screenshot uploaded', { result });
+
+      return result;
+    } catch (error) {
+      logger.error('Error taking chart screenshot', { error });
+      return { success: false };
     }
-
-    const screenshotBuffer = await getChatScreenshot(args);
-
-    logger.info('Chart screenshot taken', { screenshotBufferLength: screenshotBuffer.length });
-
-    const result = await uploadScreenshotHandler({
-      assetType: 'chat',
-      assetId: chatId,
-      image: screenshotBuffer,
-      organizationId,
-    });
-
-    logger.info('Chart screenshot uploaded', { result });
-
-    return result;
   },
 });
 

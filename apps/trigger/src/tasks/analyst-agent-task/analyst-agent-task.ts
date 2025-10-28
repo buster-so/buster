@@ -522,6 +522,7 @@ export const analystAgentTask: ReturnType<
 
       //unfortuatenly slack messages don't have an access token...
       if (payload.access_token) {
+        //DO we need to check if momentic?
         await tasks.trigger(
           screenshots_task_keys.take_chat_screenshot,
           {
