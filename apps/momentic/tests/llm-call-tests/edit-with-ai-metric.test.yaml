@@ -16,22 +16,54 @@ steps:
   - id: 973ab47b-4cb7-4534-9732-70d9bbfe59f7
     type: MODULE
     moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
-  - id: 1908cbc6-9ae9-4634-9c46-21c35c3d34d8
+  - id: 632c13f7-022e-4948-920f-aa6080e95291
     type: PRESET_ACTION
     command:
-      id: 7da8c0e6-dc4a-4862-8860-5712963d5741
+      id: d09bcd37-2164-41cb-9abe-c4009da1e0c6
       type: CLICK
       target:
         type: description
-        elementDescriptor: Metrics in the side navigation panel
-  - id: e4be37e2-e046-43a0-aa3b-e5e30311de97
+        elementDescriptor: the search button in the left sidebar header
+  - id: 787ab4ad-e9fd-44bb-959b-b8784447a6b7
     type: PRESET_ACTION
     command:
-      id: 09107b57-ca3f-493f-b0b7-bdad37960a7e
+      id: a5fa3bce-f536-444c-b4df-c2670d6bb37a
       type: CLICK
       target:
         type: description
-        elementDescriptor: Click on the bottom metric title
+        elementDescriptor: the icon button to open the search input menu in the search modal
+  - id: cfac2dfb-4095-4cff-816a-39a57b6c96f8
+    type: PRESET_ACTION
+    command:
+      id: 153f3957-0172-45a3-ba07-973ed1b0765e
+      type: HOVER
+      target:
+        type: description
+        elementDescriptor: the 'Asset type' menu item in the Filters floating menu
+  - id: 102fe962-7f67-4a9a-a89f-ad28445ba014
+    type: PRESET_ACTION
+    command:
+      id: 65b3eb9a-6e42-495b-b73b-277514840446
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the Charts checkbox in the Filters dropdown menu
+  - id: 557c2667-d828-4437-a09b-695e79f82586
+    type: PRESET_ACTION
+    command:
+      id: 982a8362-376e-4f36-b6e6-c018be292de1
+      type: WAIT
+      delay: 2
+  - id: a445cf98-6254-4b21-82fd-b23ca0913a04
+    type: PRESET_ACTION
+    command:
+      id: 1d6be7bc-7e2e-45e7-bb14-5b0918bb11e7
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the search result option in the search modal (Today group, or
+          the Last Week group, or the all others group)
+      delayMs: 1
   - id: 639155eb-2be8-4657-a2e1-99edd50d38df
     type: PRESET_ACTION
     command:

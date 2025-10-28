@@ -123,6 +123,7 @@ const SearchItemComponent = <M, T extends string>(
       value={value}
       disabled={disabled}
       onSelect={() => onSelectGlobal(item)}
+      data-testid={`search-item-${value}`}
     >
       {isSelectMode && (
         <Checkbox
