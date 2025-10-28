@@ -11,7 +11,6 @@ import { zValidator } from '@hono/zod-validator';
 import { triggerScreenshotIfNeeded } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import yaml from 'js-yaml';
 import { requireAuth, requireOrganization } from '../../../middleware/auth';
 import { standardErrorHandler } from '../../../utils/response';
 import { getDashboardHandler } from './[id]/GET';
@@ -42,7 +41,7 @@ const app = new Hono()
 
       return c.json(response);
     } catch (error) {
-      console.error('Error creating dashboard:', error);
+      console.error('Error creating dashboard', error);
       throw new HTTPException(500, { message: 'Failed to create dashboard' });
     }
   })
