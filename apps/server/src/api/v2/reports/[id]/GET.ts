@@ -90,16 +90,16 @@ const app = new Hono()
         password
       );
 
-      // triggerScreenshotIfNeeded<TakeReportScreenshotTrigger>({
-      //   tag: `take-report-screenshot-${reportId}`,
-      //   key: screenshots_task_keys.take_report_screenshot,
-      //   context: c,
-      //   payload: {
-      //     reportId,
-      //     organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-      //     accessToken: c.get('accessToken'),
-      //   },
-      // });
+      triggerScreenshotIfNeeded<TakeReportScreenshotTrigger>({
+        tag: `take-report-screenshot-${reportId}`,
+        key: screenshots_task_keys.take_report_screenshot,
+        context: c,
+        payload: {
+          reportId,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+        },
+      });
 
       return c.json(response);
     }

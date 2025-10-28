@@ -54,17 +54,17 @@ const app = new Hono().get(
         user
       );
 
-      // triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
-      //   tag: `take-dashboard-screenshot-${id}`,
-      //   key: screenshots_task_keys.take_dashboard_screenshot,
-      //   context: c,
-      //   payload: {
-      //     dashboardId: id,
-      //     organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-      //     accessToken: c.get('accessToken'),
-      //     isOnSaveEvent: false,
-      //   },
-      // });
+      triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+        tag: `take-dashboard-screenshot-${id}`,
+        key: screenshots_task_keys.take_dashboard_screenshot,
+        context: c,
+        payload: {
+          dashboardId: id,
+          organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+          accessToken: c.get('accessToken'),
+          isOnSaveEvent: false,
+        },
+      });
 
       return c.json(response);
     } catch (error) {

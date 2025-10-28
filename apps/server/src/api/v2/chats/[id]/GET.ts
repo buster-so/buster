@@ -47,18 +47,18 @@ const app = new Hono().get(
 
     const response: GetChatResponse = await getChatHandler(getChatHandlerParams);
 
-    // triggerScreenshotIfNeeded<TakeChatScreenshotTrigger>({
-    //   tag: `take-chat-screenshot-${id}`,
-    //   key: screenshots_task_keys.take_chat_screenshot,
-    //   context: c,
-    //   payload: {
-    //     chatId: id,
-    //     isNewChatMessage: false,
-    //     organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
-    //     accessToken: c.get('accessToken'),
-    //   },
-    //   shouldTrigger: !response.screenshot_taken_at,
-    // });
+    triggerScreenshotIfNeeded<TakeChatScreenshotTrigger>({
+      tag: `take-chat-screenshot-${id}`,
+      key: screenshots_task_keys.take_chat_screenshot,
+      context: c,
+      payload: {
+        chatId: id,
+        isNewChatMessage: false,
+        organizationId: (await getUserOrganizationId(user.id))?.organizationId || '',
+        accessToken: c.get('accessToken'),
+      },
+      shouldTrigger: !response.screenshot_taken_at,
+    });
 
     return c.json(response);
   }
