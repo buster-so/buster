@@ -23,7 +23,7 @@ export const LibraryGridView = React.memo(
     const useCollectionsView = pinCollections && allGroups?.collection;
 
     const prelistContent = useMemo(() => {
-      if (pinCollections && allGroups?.collection) {
+      if (pinCollections && allGroups?.collection?.length) {
         return <LibraryCollectionGrid items={allGroups.collection} />;
       }
       return undefined;
@@ -48,6 +48,7 @@ export const LibraryGridView = React.memo(
         groupBy={filters.group_by}
         className={className}
         prelistContent={prelistContent}
+        type={type}
       />
     );
   }

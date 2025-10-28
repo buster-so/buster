@@ -1,5 +1,6 @@
 import type { GroupedAssets } from '@buster/server-shared/library';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import { Avatar } from '@/components/ui/avatar';
@@ -119,6 +120,7 @@ export const AssetListViewList = ({
     ) {
       if (!groups) return allRows;
       Object.entries(groups).forEach(([groupKey, groupItems]) => {
+        if (!groupItems.length) return;
         const { title, icon } = getGroupMetadata(
           groupKey as keyof GroupedAssets,
           groupItems,

@@ -24,6 +24,7 @@ export const LibraryListView = ({
       emptyContent={<LibraryEmptyView type={type} />}
       ContextMenu={LibraryItemContextMenu}
       isInitialLoading={isInitialLoading}
+      type={type}
     />
   );
 };
