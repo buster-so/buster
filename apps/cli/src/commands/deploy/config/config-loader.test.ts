@@ -241,7 +241,7 @@ describe('config-loader', () => {
     it('should resolve configuration with project name', () => {
       const resolved = resolveConfiguration(
         defaultConfig,
-        { dryRun: false, verbose: false, debug: false },
+        { dryRun: false, verbose: false, debug: false, skipModels: false, skipAutomation: false },
         'test-project'
       );
 
@@ -257,6 +257,8 @@ describe('config-loader', () => {
         dryRun: false,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       });
 
       expect(resolved.data_source_name).toBe('postgres');
@@ -278,6 +280,8 @@ describe('config-loader', () => {
         dryRun: false,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       });
 
       expect(resolved.include).toEqual(['**/*.yml', '**/*.yaml']);
@@ -288,7 +292,7 @@ describe('config-loader', () => {
       expect(() =>
         resolveConfiguration(
           defaultConfig,
-          { dryRun: false, verbose: false, debug: false },
+          { dryRun: false, verbose: false, debug: false, skipModels: false, skipAutomation: false },
           'non-existent'
         )
       ).toThrow("Project 'non-existent' not found in buster.yml");
@@ -300,7 +304,13 @@ describe('config-loader', () => {
       };
 
       expect(() =>
-        resolveConfiguration(config, { dryRun: false, verbose: false, debug: false })
+        resolveConfiguration(config, {
+          dryRun: false,
+          verbose: false,
+          debug: false,
+          skipModels: false,
+          skipAutomation: false,
+        })
       ).toThrow('No projects defined in buster.yml');
     });
   });

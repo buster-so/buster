@@ -155,7 +155,7 @@ export async function loadBusterConfig(
     throw new Error(`Failed to parse buster.yml at ${configFile}`);
   }
 
-  if (config.automation && config.automation.length === 0) {
+  if (config.automation && config.automation.length > 0) {
     let repositoryName: string | undefined;
     for (const agent of config.automation) {
       if (agent.on.length > 0) {
@@ -182,7 +182,6 @@ export async function loadBusterConfig(
   }
 
   // Loaded configuration successfully
-
   // Return both the config and its path
   return {
     config,
@@ -290,22 +289,24 @@ export async function getGitRepositoryName(startDir: string): Promise<string | u
 
         const url = urlMatch[1].trim();
 
-        // Extract repository name from URL
-        // Handle both SSH (git@github.com:user/repo.git) and HTTPS (https://github.com/user/repo.git) formats
+        // Extract repository name with owner from URL
+        // Handle both SSH (git@github.com:owner/repo.git) and HTTPS (https://github.com/owner/repo.git) formats
         let repoName: string | undefined;
 
-        // SSH format: git@github.com:user/repo.git
+        // SSH format: git@github.com:owner/repo.git
         if (url.includes('@') && url.includes(':')) {
           const parts = url.split(':');
           if (parts.length >= 2) {
-            repoName = parts[parts.length - 1];
+            // Get everything after the colon (owner/repo.git)
+            repoName = parts.slice(1).join(':');
           }
         }
-        // HTTPS format: https://github.com/user/repo.git
+        // HTTPS format: https://github.com/owner/repo.git
         else if (url.includes('://')) {
           const parts = url.split('/');
           if (parts.length >= 2) {
-            repoName = parts[parts.length - 1];
+            // Get the last two parts (owner/repo.git)
+            repoName = parts.slice(-2).join('/');
           }
         }
 

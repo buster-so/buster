@@ -23,71 +23,79 @@ export async function handleInstallationWebhook(
   );
 
   try {
-    switch (action) {
-      case 'created':
-        return await handleInstallationCreatedWebhook({
-          installation,
-          repositories: payload.repositories,
-        });
-
-      case 'deleted': {
-        const updated = await updateGithubIntegration(payload.installation.id.toString(), {
-          status: 'revoked',
-          deletedAt: new Date().toISOString(),
-        });
-
-        if (!updated) {
-          throw new Error(
-            `Failed to delete integration for installation ${payload.installation.id}`
-          );
-        }
-
-        return updated;
-      }
-
-      case 'suspend': {
-        const updated = await updateGithubIntegration(payload.installation.id.toString(), {
-          status: 'suspended',
-        });
-
-        if (!updated) {
-          throw new Error(
-            `Failed to suspend integration for installation ${payload.installation.id}`
-          );
-        }
-
-        return updated;
-      }
-
-      case 'unsuspend': {
-        const updated = await updateGithubIntegration(payload.installation.id.toString(), {
-          status: 'active',
-        });
-
-        if (!updated) {
-          throw new Error(
-            `Failed to unsuspend integration for installation ${payload.installation.id}`
-          );
-        }
-
-        return updated;
-      }
-      case 'new_permissions_accepted': {
-        const updated = await updateGithubIntegration(payload.installation.id.toString(), {
-          accessibleRepositories: payload.repositories,
-          permissions: payload.installation.permissions,
-        });
-        if (!updated) {
-          throw new Error(
-            `Failed to update permissions for installation ${payload.installation.id}`
-          );
-        }
-
-        return updated;
-      }
-      default:
-        throw new Error(`Unsupported webhook action: ${action}`);
+    // Handle 'created' action separately since it has special retry logic
+    if (action === 'created') {
+      return await handleInstallationCreatedWebhook({
+        installation,
+        repositories: payload.repositories,
+      });
     }
+
+    // For all other actions, fetch the existing integration
+    const existing = await getGithubIntegrationByInstallationId(installation.id.toString());
+
+    if (!existing) {
+      throw new Error(`Integration not found for installation ${installation.id}`);
+    }
+
+    // Handle each action type
+    if (action === 'deleted') {
+      const updated = await updateGithubIntegration(existing.id, {
+        status: 'revoked',
+        deletedAt: new Date().toISOString(),
+      });
+
+      if (!updated) {
+        throw new Error(`Failed to delete integration for installation ${payload.installation.id}`);
+      }
+
+      return updated;
+    }
+
+    if (action === 'suspend') {
+      const updated = await updateGithubIntegration(existing.id, {
+        status: 'suspended',
+      });
+
+      if (!updated) {
+        throw new Error(
+          `Failed to suspend integration for installation ${payload.installation.id}`
+        );
+      }
+
+      return updated;
+    }
+
+    if (action === 'unsuspend') {
+      const updated = await updateGithubIntegration(existing.id, {
+        status: 'active',
+      });
+
+      if (!updated) {
+        throw new Error(
+          `Failed to unsuspend integration for installation ${payload.installation.id}`
+        );
+      }
+
+      return updated;
+    }
+
+    if (action === 'new_permissions_accepted') {
+      const updated = await updateGithubIntegration(existing.id, {
+        accessibleRepositories: payload.repositories,
+        permissions: payload.installation.permissions,
+      });
+
+      if (!updated) {
+        throw new Error(`Failed to update permissions for installation ${payload.installation.id}`);
+      }
+
+      return updated;
+    }
+
+    // Exhaustive check - this should never be reached if all action types are handled
+    const _exhaustiveCheck: never = action;
+    throw new Error(`Unsupported webhook action: ${_exhaustiveCheck}`);
   } catch (error) {
     console.error('Failed to handle installation callback:', error);
     throw error;
@@ -155,7 +163,7 @@ async function handleInstallationCreatedWebhook(params: {
     });
 
     if (!updated) {
-      throw new Error(`Failed to update integration for installation ${installation.id}`);
+      throw new Error(`No integrations updated for installation ${installation.id}`);
     }
 
     return updated;

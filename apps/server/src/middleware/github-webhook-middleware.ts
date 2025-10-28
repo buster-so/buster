@@ -76,13 +76,18 @@ export function githubWebhookMiddleware(): MiddlewareHandler {
 
       return next();
     } catch (error) {
+      if (error instanceof Error) {
+        console.error(`Error during Github webhook: ${error.message}`);
+      } else {
+        console.error(`Error during Github webhook: ${error}`);
+      }
+
       if (error instanceof HTTPException) {
         throw error;
       }
 
-      console.error('Failed to validate GitHub webhook:', error);
       throw new HTTPException(400, {
-        message: 'Invalid webhook payload',
+        message: `Github Webhook Failed`,
       });
     }
   };

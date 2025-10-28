@@ -2025,7 +2025,7 @@ export const agentAutomationTasks = pgTable(
     integrationId: uuid('integration_id').notNull(),
     agentName: agentNameEnum('agent_name').notNull(),
     eventTrigger: agentEventTriggerEnum('event_trigger').notNull(),
-    repository: text('project_repository').notNull(),
+    repository: text('repository').notNull(),
     branches: text('branches').array().notNull().default(['*']),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
@@ -2046,6 +2046,9 @@ export const agentAutomationTasks = pgTable(
       foreignColumns: [githubIntegrations.id],
       name: 'automation_tasks_integration_id_fkey',
     }).onDelete('cascade'),
+    uniqueIndex('agent_automation_tasks_unique_active')
+      .on(table.organizationId, table.integrationId, table.agentName, table.eventTrigger)
+      .where(isNull(table.deletedAt)),
   ]
 );
 

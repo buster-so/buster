@@ -98,6 +98,8 @@ export const DeployOptionsSchema = z.object({
   dryRun: z.boolean().default(false),
   verbose: z.boolean().default(false),
   debug: z.boolean().default(false),
+  skipModels: z.boolean().default(false),
+  skipAutomation: z.boolean().default(false),
 });
 
 // ============================================================================

@@ -288,6 +288,7 @@ async function handleAutomationDeployment(
       }
     }
 
+    console.info('[handleAutomationDeployment] Flattened tasks:', flattenedTasks);
     // Deploy automation tasks to the database
     const result = await deployAutomationTasks({
       organizationId,
@@ -314,7 +315,10 @@ async function handleAutomationDeployment(
 
     return {
       configured: false,
-      error: 'Error while handling deployment of automation tasks',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Unknown Error while handling deployment of automation tasks',
     };
   }
 }

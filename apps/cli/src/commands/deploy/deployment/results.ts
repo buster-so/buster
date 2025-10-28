@@ -42,6 +42,35 @@ export function mergeDeploymentResults(results: CLIDeploymentResult[]): CLIDeplo
         };
       }
 
+      // Merge automation results if present
+      if (result.automation || acc.automation) {
+        const accAgentCount = acc.automation?.agentCount || 0;
+        const accTriggerCount = acc.automation?.triggerCount || 0;
+        const resultAgentCount = result.automation?.agentCount || 0;
+        const resultTriggerCount = result.automation?.triggerCount || 0;
+
+        const configured =
+          acc.automation?.configured || false || result.automation?.configured || false;
+        const agentCount = accAgentCount + resultAgentCount;
+        const triggerCount = accTriggerCount + resultTriggerCount;
+
+        // Collect errors from both results
+        const errors: string[] = [];
+        if (acc.automation?.error) {
+          errors.push(acc.automation.error);
+        }
+        if (result.automation?.error) {
+          errors.push(result.automation.error);
+        }
+
+        base.automation = {
+          configured,
+          agentCount: agentCount > 0 ? agentCount : undefined,
+          triggerCount: triggerCount > 0 ? triggerCount : undefined,
+          error: errors.length > 0 ? errors.join('; ') : undefined,
+        };
+      }
+
       return base;
     },
     {
@@ -261,20 +290,54 @@ export function formatDeploymentSummary(
 
   // Automation section - show if configured or verbose
   if (result.automation) {
-    lines.push('');
+    const agentCount = result.automation.agentCount || 0;
+    const triggerCount = result.automation.triggerCount || 0;
+
     if (result.automation.configured) {
+      lines.push('');
       lines.push(
-        `  ✓ Automation configured: ${result.automation.agentCount} agent${result.automation.agentCount === 1 ? '' : 's'}, ${result.automation.triggerCount} trigger${result.automation.triggerCount === 1 ? '' : 's'}`
+        `  ${agentCount + triggerCount} automation ${agentCount + triggerCount === 1 ? 'item' : 'items'} deployed`
       );
-    } else if (verbose) {
-      lines.push(
-        '  ℹ No automation configuration (existing automation will be removed if present)'
-      );
+
+      if (agentCount > 0) {
+        lines.push(`    • ${agentCount} ${agentCount === 1 ? 'agent' : 'agents'} configured`);
+      }
+      if (triggerCount > 0) {
+        lines.push(
+          `    • ${triggerCount} ${triggerCount === 1 ? 'trigger' : 'triggers'} configured`
+        );
+      }
+
+      if (verbose && (agentCount > 0 || triggerCount > 0)) {
+        lines.push('    Status:');
+        lines.push('      ✓ Automation configured successfully');
+        if (agentCount > 0) {
+          lines.push(
+            `      ✓ ${agentCount} ${agentCount === 1 ? 'agent' : 'agents'} ready for CI/CD events`
+          );
+        }
+        if (triggerCount > 0) {
+          lines.push(
+            `      ✓ ${triggerCount} event ${triggerCount === 1 ? 'trigger' : 'triggers'} configured`
+          );
+        }
+      }
+    } else {
+      if (verbose || result.automation.error) {
+        lines.push('');
+        lines.push('  0 automation items deployed');
+        if (verbose) {
+          lines.push('    • No automation configuration found');
+          lines.push('    • Existing automation (if any) will be removed');
+        }
+      }
     }
 
     if (result.automation.error) {
-      lines.push(`    ⚠ Warning: ${result.automation.error}`);
+      lines.push(`    ⚠ Error: ${result.automation.error}`);
     }
+  } else {
+    lines.push('  No automation agents/triggers to deploy');
   }
 
   // Failures section

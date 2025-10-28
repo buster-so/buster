@@ -12,7 +12,7 @@ const DeployAutomationTasksInputSchema = z.object({
     z.object({
       agentName: AgentNameSchema,
       eventTrigger: AgentEventTriggerSchema,
-      repository: z.string(),
+      repository: z.string().min(1, 'Repository must be a valid repository name'),
       branches: z.array(z.string()),
     })
   ),
@@ -29,8 +29,9 @@ interface Task {
 }
 
 // Helper to create a unique key for a task
-function getTaskKey(task: Task): string {
-  return `${task.agentName}|${task.eventTrigger}|${task.repository}|${JSON.stringify(task.branches.sort())}`;
+// The unique identifier is agentName + eventTrigger, allowing repository and branches to be updated
+function getTaskKey(task: Pick<Task, 'agentName' | 'eventTrigger'>): string {
+  return `${task.agentName}|${task.eventTrigger}`;
 }
 
 /**
@@ -69,6 +70,12 @@ export const deployAutomationTasks = async (
       throw new Error('No active GitHub integration found for this organization');
     }
 
+    for (const task of tasks) {
+      if (!task.repository.includes('/')) {
+        task.repository = `${githubIntegration.githubOrgName}/${task.repository}`;
+      }
+    }
+
     const integrationId = githubIntegration.id;
 
     return await db.transaction(async (tx) => {
@@ -98,8 +105,6 @@ export const deployAutomationTasks = async (
         const key = getTaskKey({
           agentName: task.agentName,
           eventTrigger: task.eventTrigger,
-          repository: task.repository,
-          branches: task.branches,
         });
 
         existingTasksMap.set(key, task);
@@ -113,19 +118,19 @@ export const deployAutomationTasks = async (
 
       // 3. Determine what actions to take
       const tasksToCreate: Task[] = [];
-      const tasksToRestore: string[] = [];
-      const tasksToUpdate: string[] = [];
+      const tasksToRestore: Array<{ id: string; task: Task }> = [];
+      const tasksToUpdate: Array<{ id: string; task: Task }> = [];
 
       for (const [key, task] of desiredTasksMap) {
         const softDeletedTask = softDeletedTasksMap.get(key);
         const activeTask = activeTasksMap.get(key);
 
         if (softDeletedTask) {
-          // Restore soft-deleted task
-          tasksToRestore.push(softDeletedTask.id);
+          // Restore soft-deleted task and update its repository/branches
+          tasksToRestore.push({ id: softDeletedTask.id, task });
         } else if (activeTask) {
-          // Update existing active task
-          tasksToUpdate.push(activeTask.id);
+          // Update existing active task (repository and/or branches may have changed)
+          tasksToUpdate.push({ id: activeTask.id, task });
         } else {
           // Create new task
           tasksToCreate.push(task);
@@ -164,26 +169,34 @@ export const deployAutomationTasks = async (
         created = tasksToCreate.length;
       }
 
-      // Restore soft-deleted tasks
+      // Restore soft-deleted tasks and update their repository/branches
       if (tasksToRestore.length > 0) {
-        await tx
-          .update(agentAutomationTasks)
-          .set({
-            deletedAt: null,
-            updatedAt: now,
-          })
-          .where(inArray(agentAutomationTasks.id, tasksToRestore));
+        for (const { id, task } of tasksToRestore) {
+          await tx
+            .update(agentAutomationTasks)
+            .set({
+              deletedAt: null,
+              repository: task.repository,
+              branches: task.branches,
+              updatedAt: now,
+            })
+            .where(eq(agentAutomationTasks.id, id));
+        }
         restored = tasksToRestore.length;
       }
 
-      // Update existing active tasks
+      // Update existing active tasks (repository and/or branches may have changed)
       if (tasksToUpdate.length > 0) {
-        await tx
-          .update(agentAutomationTasks)
-          .set({
-            updatedAt: now,
-          })
-          .where(inArray(agentAutomationTasks.id, tasksToUpdate));
+        for (const { id, task } of tasksToUpdate) {
+          await tx
+            .update(agentAutomationTasks)
+            .set({
+              repository: task.repository,
+              branches: task.branches,
+              updatedAt: now,
+            })
+            .where(eq(agentAutomationTasks.id, id));
+        }
         updated = tasksToUpdate.length;
       }
 
