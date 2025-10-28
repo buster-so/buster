@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons/Button';
 import { Sliders3 } from '@/components/ui/icons/NucleoIconOutlined';
 import GridLayoutRows from '@/components/ui/icons/NucleoIconOutlined/grid-layout-rows';
@@ -14,7 +15,7 @@ import type { LibrarySearchParams } from '@/controllers/LibraryController/schema
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { cn } from '@/lib/utils';
 
-type AssetOrderPopoverProps = {
+export type AssetOrderPopoverProps = {
   layout: 'grid' | 'list';
   ordering?: 'updated_at' | 'created_at' | 'none' | undefined;
   groupBy?: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined;
@@ -31,58 +32,17 @@ type AssetOrderPopoverProps = {
   showDirection?: boolean;
 };
 
-export const AssetOrderPopover = React.memo(
-  ({
-    layout,
-    ordering,
-    groupBy,
-    orderingDirection,
-    showLayout = true,
-    showOrdering = true,
-    showGroupBy = true,
-    showDirection = true,
-    onChangeLayout,
-    onChangeOrdering,
-    onChangeOrderingDirection,
-    onChangeGroupBy,
-  }: AssetOrderPopoverProps) => {
-    return (
-      <Popover
-        align="end"
-        side="bottom"
-        sideOffset={2}
-        className="min-w-[275px]"
-        content={useMemo(
-          () => (
-            <div className="flex flex-col gap-y-2">
-              {showLayout && <LayoutItem layout={layout} onChangeLayout={onChangeLayout} />}
-              {showOrdering && (
-                <OrderingItem
-                  ordering={ordering}
-                  orderingDirection={orderingDirection}
-                  showDirection={showDirection}
-                  showOrdering={showOrdering}
-                  onChangeOrdering={onChangeOrdering}
-                  onChangeOrderingDirection={onChangeOrderingDirection}
-                />
-              )}
-              {showGroupBy && onChangeGroupBy && (
-                <GroupByItem groupBy={groupBy} onChangeGroupBy={onChangeGroupBy} />
-              )}
-            </div>
-          ),
-          [layout, ordering, groupBy, orderingDirection, showLayout, showOrdering, showGroupBy]
-        )}
-      >
-        <Tooltip title="View, group and sort">
-          <Button variant="ghost" prefix={<Sliders3 />} onClick={() => {}} />
-        </Tooltip>
-      </Popover>
-    );
-  }
-);
+export const AssetOrderPopoverButton = (props: AssetOrderPopoverProps) => {
+  return (
+    <AssetOrderPopover {...props}>
+      <Tooltip title="View, group and sort">
+        <Button variant="ghost" prefix={<Sliders3 />} />
+      </Tooltip>
+    </AssetOrderPopover>
+  );
+};
 
-AssetOrderPopover.displayName = 'AssetOrderPopover';
+AssetOrderPopoverButton.displayName = 'AssetOrderPopoverButton';
 
 const ItemContainer = ({
   className,
@@ -253,5 +213,73 @@ const GroupByItem = ({
         }}
       />
     </ItemContainer>
+  );
+};
+
+export const AssetOrderPopover = ({
+  children,
+  ...props
+}: AssetOrderPopoverProps & { children: React.ReactNode }) => {
+  return (
+    <Popover
+      align="end"
+      side="bottom"
+      sideOffset={2}
+      className="min-w-[275px]"
+      content={useMemo(() => <AssetOrderPopoverContent {...props} />, [props])}
+    >
+      {children}
+    </Popover>
+  );
+};
+
+export const AssetOrderPopoverContent = (
+  props: Pick<
+    AssetOrderPopoverProps,
+    | 'layout'
+    | 'ordering'
+    | 'groupBy'
+    | 'orderingDirection'
+    | 'showLayout'
+    | 'showOrdering'
+    | 'showGroupBy'
+    | 'showDirection'
+    | 'onChangeLayout'
+    | 'onChangeOrdering'
+    | 'onChangeOrderingDirection'
+    | 'onChangeGroupBy'
+  >
+) => {
+  const {
+    layout,
+    ordering,
+    groupBy,
+    orderingDirection,
+    showLayout = true,
+    showOrdering = true,
+    showGroupBy = true,
+    showDirection = true,
+    onChangeLayout,
+    onChangeOrdering,
+    onChangeOrderingDirection,
+    onChangeGroupBy,
+  } = props;
+  return (
+    <div className="flex flex-col gap-y-2">
+      {showLayout && <LayoutItem layout={layout} onChangeLayout={onChangeLayout} />}
+      {showOrdering && (
+        <OrderingItem
+          ordering={ordering}
+          orderingDirection={orderingDirection}
+          showDirection={showDirection}
+          showOrdering={showOrdering}
+          onChangeOrdering={onChangeOrdering}
+          onChangeOrderingDirection={onChangeOrderingDirection}
+        />
+      )}
+      {showGroupBy && onChangeGroupBy && (
+        <GroupByItem groupBy={groupBy} onChangeGroupBy={onChangeGroupBy} />
+      )}
+    </div>
   );
 };

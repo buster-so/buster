@@ -8,8 +8,9 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography/Text';
 import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
 import type { LibraryLayout, LibrarySearchParams, SharedWithMeSearchParams } from '../schema';
-import { FilterDropdown } from './FilterDropdown';
+import { FilterDropdownButton } from './FilterDropdown';
 import { FilterSwitch } from './FilterSwitch';
+import { LibraryThreeDotMenu } from './LibraryThreeDotMenu';
 import { OrderDropdown } from './OrderDropdown';
 
 const LibrarySearchModal = lazy(() =>
@@ -46,7 +47,7 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = React.memo(
         </div>
         <div className="flex items-center space-x-1">
           {type === 'library' && <OpenLibrarySearchModalButton />}
-          <FilterDropdown
+          <FilterDropdownButton
             owner_ids={filters.owner_ids}
             asset_types={filters.asset_types}
             start_date={filters.start_date}
@@ -60,7 +61,7 @@ export const LibraryHeader: React.FC<LibraryHeaderProps> = React.memo(
             ordering_direction={filters.ordering_direction}
             type={type}
           />
-          <Button variant="ghost" prefix={<Dots />} onClick={() => {}} />
+          <LibraryThreeDotMenu type={type} />
         </div>
       </div>
     );

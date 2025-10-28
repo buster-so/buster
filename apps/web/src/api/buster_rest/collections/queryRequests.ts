@@ -10,6 +10,7 @@ import {
 import { create } from 'mutative';
 import { useMemo } from 'react';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { libraryQueryKeys } from '@/api/query_keys/library';
 import { searchQueryKeys } from '@/api/query_keys/search';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -104,6 +105,10 @@ export const useCreateCollection = () => {
     onSuccess: (collection) => {
       queryClient.invalidateQueries({
         queryKey: collectionQueryKeys.collectionsGetList().queryKey,
+        refetchType: 'all',
+      });
+      queryClient.invalidateQueries({
+        queryKey: libraryQueryKeys.libraryGetListInfinite({}).queryKey.slice(0, 2),
         refetchType: 'all',
       });
       queryClient.setQueryData(

@@ -73,6 +73,7 @@ export const AssetGridViewList = React.memo(
               items={items}
               hasPrelistContent={!!prelistContent}
               ContextMenu={ContextMenu}
+              type={type}
             />
           ) : (
             <AssetGridUngroupedView
@@ -149,6 +150,7 @@ const AssetGridGroupedView = ({
     const groupEntries = Object.entries(groups ?? {});
 
     groupEntries.forEach(([groupKey, groupItems], groupIndex) => {
+      if (groupItems.length === 0) return;
       const { title, icon } = getGroupMetadata(
         groupKey as keyof GroupedAssets,
         groupItems,

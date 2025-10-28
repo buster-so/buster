@@ -26,168 +26,21 @@ import { getNow } from '@/lib/date';
 import type { LibraryViewProps, SharedWithMeViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
 
-export const FilterDropdown = React.memo(
-  ({
-    owner_ids,
-    asset_types,
-    start_date,
-    end_date,
-    type,
-  }: {
-    owner_ids: LibrarySearchParams['owner_ids'];
-    asset_types: LibrarySearchParams['asset_types'];
-    start_date: LibrarySearchParams['start_date'];
-    end_date: LibrarySearchParams['end_date'];
-    type: LibraryViewProps['type'] | SharedWithMeViewProps['type'];
-  }) => {
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-
-    const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids, open, type });
-
-    const AssetTypeDropdownItems: IDropdownItem = useMemo(() => {
-      return {
-        label: 'Asset type',
-        value: 'asset-type',
-        icon: <Grid2 />,
-        selectType: 'multiple',
-        items: [
-          {
-            label: 'Chats',
-            value: 'chat' satisfies AssetType,
-            icon: <ASSET_ICONS.chats />,
-          },
-          {
-            label: 'Reports',
-            value: 'report_file' satisfies AssetType,
-            icon: <ASSET_ICONS.reports />,
-          },
-          {
-            label: 'Dashboards',
-            value: 'dashboard_file' satisfies AssetType,
-            icon: <ASSET_ICONS.dashboards />,
-          },
-          {
-            label: 'Charts',
-            value: 'metric_file' satisfies AssetType,
-            selected: asset_types?.includes('metric_file'),
-            icon: <ASSET_ICONS.metrics />,
-          },
-          {
-            label: 'Collections',
-            value: 'collection' satisfies AssetType,
-            icon: <ASSET_ICONS.collections />,
-          },
-        ].map((item) => ({
-          ...item,
-          selected: asset_types?.includes(item.value as AssetType),
-          onClick: () => {
-            navigate({
-              to: type === 'library' ? '/app/library' : '/app/shared-with-me',
-              search: (prev) => {
-                const isSelected = asset_types?.includes(item.value as AssetType);
-                const newAssetTypes = isSelected
-                  ? prev.asset_types?.filter((v) => v !== (item.value as AssetType))
-                  : [...(prev.asset_types || []), item.value as AssetType];
-                const hasAssetTypes = newAssetTypes && newAssetTypes.length > 0;
-
-                return {
-                  ...prev,
-                  asset_types: hasAssetTypes ? newAssetTypes : undefined,
-                };
-              },
-            });
-          },
-        })) as IDropdownItem<AssetType>['items'],
-      };
-    }, [asset_types]);
-
-    const DatesDropdownItems: IDropdownItem = useMemo(() => {
-      const closeContent = () => {
-        document.dispatchEvent(
-          new KeyboardEvent('keydown', {
-            key: 'Escape',
-            bubbles: true,
-            cancelable: true,
-          })
-        );
-      };
-
-      return createDropdownItem({
-        label: 'Date range',
-        value: 'date-range',
-        icon: <Calendar />,
-        className: 'max-h-[400px] w-[620px]',
-        closeOnSelect: true,
-        items: [
-          <DateRangePickerContent
-            key="date-range"
-            disableDateAfter={getNow().add(12, 'hours').toDate()}
-            initialDateFrom={start_date}
-            initialDateTo={end_date}
-            cancelButtonText="Clear"
-            showResetButton={false}
-            onUpdate={({ range }) => {
-              if (range.from == null && range.to == null) {
-                navigate({
-                  to: type === 'library' ? '/app/library' : '/app/shared-with-me',
-                  search: (prev) => ({
-                    ...prev,
-                    start_date: undefined,
-                    end_date: undefined,
-                  }),
-                });
-              } else {
-                navigate({
-                  to: type === 'library' ? '/app/library' : '/app/shared-with-me',
-                  search: (prev) => ({
-                    ...prev,
-                    start_date: range.from
-                      ? dayjs(range.from).startOf('day').toISOString()
-                      : dayjs().startOf('day').toISOString(),
-                    end_date: range.to ? dayjs(range.to).endOf('day').toISOString() : undefined,
-                  }),
-                });
-              }
-              closeContent();
-            }}
-            onCancel={() => {
-              navigate({
-                to: type === 'library' ? '/app/library' : '/app/shared-with-me',
-                search: (prev) => ({
-                  ...prev,
-                  start_date: undefined,
-                  end_date: undefined,
-                }),
-              });
-              closeContent();
-            }}
-          />,
-        ],
-      });
-    }, [start_date, end_date, type]);
-
-    const dropdownItems = createDropdownItems([
-      OwnerDropdownItems,
-      AssetTypeDropdownItems,
-      DatesDropdownItems,
-    ]);
-
-    return (
-      <Dropdown
-        items={dropdownItems}
-        align="end"
-        side="bottom"
-        menuHeader={<div className="px-2.5 py-1.5 text-text-tertiary">Filters...</div>}
-        onOpenChange={setOpen}
-      >
-        <Tooltip title="Filters">
-          <Button variant="ghost" prefix={<BarsFilter />} />
-        </Tooltip>
-      </Dropdown>
-    );
-  }
-);
+export const FilterDropdownButton = (props: {
+  owner_ids: LibrarySearchParams['owner_ids'];
+  asset_types: LibrarySearchParams['asset_types'];
+  start_date: LibrarySearchParams['start_date'];
+  end_date: LibrarySearchParams['end_date'];
+  type: LibraryViewProps['type'] | SharedWithMeViewProps['type'];
+}) => {
+  return (
+    <FilterDropdownContent {...props}>
+      <Tooltip title="Filters">
+        <Button variant="ghost" prefix={<BarsFilter />} />
+      </Tooltip>
+    </FilterDropdownContent>
+  );
+};
 
 const useOwnerDropdownItems = ({
   owner_ids,
@@ -286,4 +139,196 @@ const useOwnerDropdownItems = ({
   }, [owner_ids, allUsers, isFetching, fetchNextPage]);
 
   return OwnerDropdownItems;
+};
+
+export const FilterDropdownContent = React.memo(
+  ({
+    owner_ids,
+    asset_types,
+    start_date,
+    end_date,
+    type,
+    children,
+  }: {
+    owner_ids: LibrarySearchParams['owner_ids'];
+    asset_types: LibrarySearchParams['asset_types'];
+    start_date: LibrarySearchParams['start_date'];
+    end_date: LibrarySearchParams['end_date'];
+    type: LibraryViewProps['type'] | SharedWithMeViewProps['type'];
+    children: React.ReactNode;
+  }) => {
+    const [open, setOpen] = useState(false);
+
+    const dropdownItems = useFilterDropdownItems({
+      owner_ids,
+      asset_types,
+      start_date,
+      end_date,
+      type,
+      open,
+    });
+
+    return (
+      <Dropdown
+        items={dropdownItems}
+        align="end"
+        side="bottom"
+        menuHeader={<div className="px-2.5 py-1.5 text-text-tertiary">Filters...</div>}
+        onOpenChange={setOpen}
+      >
+        {children}
+      </Dropdown>
+    );
+  }
+);
+
+export const useFilterDropdownItems = ({
+  owner_ids,
+  asset_types,
+  start_date,
+  end_date,
+  type,
+  open = true,
+}: {
+  owner_ids: LibrarySearchParams['owner_ids'];
+  asset_types: LibrarySearchParams['asset_types'];
+  start_date: LibrarySearchParams['start_date'];
+  end_date: LibrarySearchParams['end_date'];
+  type: LibraryViewProps['type'] | SharedWithMeViewProps['type'];
+  open: boolean;
+}) => {
+  const navigate = useNavigate();
+
+  const OwnerDropdownItems = useOwnerDropdownItems({ owner_ids, open, type });
+
+  const AssetTypeDropdownItems: IDropdownItem = useMemo(() => {
+    return {
+      label: 'Asset type',
+      value: 'asset-type',
+      icon: <Grid2 />,
+      selectType: 'multiple',
+      items: [
+        {
+          label: 'Chats',
+          value: 'chat' satisfies AssetType,
+          icon: <ASSET_ICONS.chats />,
+        },
+        {
+          label: 'Reports',
+          value: 'report_file' satisfies AssetType,
+          icon: <ASSET_ICONS.reports />,
+        },
+        {
+          label: 'Dashboards',
+          value: 'dashboard_file' satisfies AssetType,
+          icon: <ASSET_ICONS.dashboards />,
+        },
+        {
+          label: 'Charts',
+          value: 'metric_file' satisfies AssetType,
+          selected: asset_types?.includes('metric_file'),
+          icon: <ASSET_ICONS.metrics />,
+        },
+        {
+          label: 'Collections',
+          value: 'collection' satisfies AssetType,
+          icon: <ASSET_ICONS.collections />,
+        },
+      ].map((item) => ({
+        ...item,
+        selected: asset_types?.includes(item.value as AssetType),
+        onClick: () => {
+          navigate({
+            to: type === 'library' ? '/app/library' : '/app/shared-with-me',
+            search: (prev) => {
+              const isSelected = asset_types?.includes(item.value as AssetType);
+              const newAssetTypes = isSelected
+                ? prev.asset_types?.filter((v) => v !== (item.value as AssetType))
+                : [...(prev.asset_types || []), item.value as AssetType];
+              const hasAssetTypes = newAssetTypes && newAssetTypes.length > 0;
+
+              return {
+                ...prev,
+                asset_types: hasAssetTypes ? newAssetTypes : undefined,
+              };
+            },
+          });
+        },
+      })) as IDropdownItem<AssetType>['items'],
+    };
+  }, [asset_types]);
+
+  const DatesDropdownItems: IDropdownItem = useMemo(() => {
+    const closeContent = () => {
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Escape',
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+    };
+
+    return createDropdownItem({
+      label: 'Date range',
+      value: 'date-range',
+      icon: <Calendar />,
+      className: 'max-h-[400px] w-[620px]',
+      closeOnSelect: true,
+      items: [
+        <DateRangePickerContent
+          key="date-range"
+          disableDateAfter={getNow().add(12, 'hours').toDate()}
+          initialDateFrom={start_date}
+          initialDateTo={end_date}
+          cancelButtonText="Clear"
+          showResetButton={false}
+          onUpdate={({ range }) => {
+            if (range.from == null && range.to == null) {
+              navigate({
+                to: type === 'library' ? '/app/library' : '/app/shared-with-me',
+                search: (prev) => ({
+                  ...prev,
+                  start_date: undefined,
+                  end_date: undefined,
+                }),
+              });
+            } else {
+              navigate({
+                to: type === 'library' ? '/app/library' : '/app/shared-with-me',
+                search: (prev) => ({
+                  ...prev,
+                  start_date: range.from
+                    ? dayjs(range.from).startOf('day').toISOString()
+                    : dayjs().startOf('day').toISOString(),
+                  end_date: range.to ? dayjs(range.to).endOf('day').toISOString() : undefined,
+                }),
+              });
+            }
+            closeContent();
+          }}
+          onCancel={() => {
+            navigate({
+              to: type === 'library' ? '/app/library' : '/app/shared-with-me',
+              search: (prev) => ({
+                ...prev,
+                start_date: undefined,
+                end_date: undefined,
+              }),
+            });
+            closeContent();
+          }}
+        />,
+      ],
+    });
+  }, [start_date, end_date, type]);
+
+  return useMemo(() => {
+    const dropdownItems = createDropdownItems([
+      OwnerDropdownItems,
+      AssetTypeDropdownItems,
+      DatesDropdownItems,
+    ]);
+    return dropdownItems;
+  }, [OwnerDropdownItems, AssetTypeDropdownItems, DatesDropdownItems]);
 };
