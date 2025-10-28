@@ -31,7 +31,7 @@ export const AssetGridItem = React.memo(
               <img
                 src={imageUrl}
                 alt={name}
-                className={cn('w-full h-full object-contain object-top rounded-t-sm bg-background')}
+                className={cn('w-full h-full object-cover object-top rounded-t-sm bg-background')}
               />
             </div>
             <div className="h-[60px] px-3 flex flex-col space-y-0.5 border-t group-hover:bg-item-hover flex-shrink-0 justify-center bg-background">

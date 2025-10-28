@@ -97,7 +97,7 @@ export const computeSharedWithMeFilters = (
   } else if (filter === 'collections') {
     filters.assetTypes = ['collection'];
   } else if (filter === 'assets') {
-    filters.assetTypes = (asset_types || []).filter((type) => type !== 'collection');
+    filters.assetTypes = asset_types || [];
   } else {
     const _exhaustiveCheck: undefined = filter;
   }

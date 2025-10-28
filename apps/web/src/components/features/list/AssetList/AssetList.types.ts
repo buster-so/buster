@@ -13,6 +13,7 @@ export type AssetGridViewListProps = {
   emptyContent: React.ReactNode;
   ContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>>;
   groupBy: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined;
+  type: 'library' | 'shared-with-me';
 };
 
 export type AssetListItem = Pick<

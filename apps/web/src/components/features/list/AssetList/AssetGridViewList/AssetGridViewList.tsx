@@ -23,6 +23,7 @@ export const AssetGridViewList = React.memo(
     prelistContent,
     groupBy,
     emptyContent,
+    type,
   }: AssetGridViewListProps) => {
     // Calculate number of columns based on viewport width
     const [columns, setColumns] = React.useState(3);
@@ -80,6 +81,7 @@ export const AssetGridViewList = React.memo(
               scrollContainerRef={scrollContainerRef}
               hasPrelistContent={!!prelistContent}
               ContextMenu={ContextMenu}
+              type={type}
             />
           ))}
 
@@ -115,6 +117,7 @@ const AssetGridGroupedView = ({
   ContextMenu,
   items,
   hasPrelistContent,
+  type,
 }: {
   groups: AssetGridViewListProps['groups'];
   columns: number;
@@ -123,6 +126,7 @@ const AssetGridGroupedView = ({
   items: LibraryAssetListItem[];
   hasPrelistContent: boolean;
   ContextMenu: AssetGridViewListProps['ContextMenu'];
+  type: AssetGridViewListProps['type'];
 }) => {
   const _mounted = useMounted();
 
@@ -134,6 +138,7 @@ const AssetGridGroupedView = ({
         scrollContainerRef={scrollContainerRef}
         hasPrelistContent={hasPrelistContent}
         ContextMenu={ContextMenu}
+        type={type}
       />
     );
   }
@@ -269,12 +274,14 @@ const AssetGridUngroupedView = ({
   scrollContainerRef,
   hasPrelistContent,
   ContextMenu,
+  type,
 }: {
   items: LibraryAssetListItem[];
   columns: number;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   hasPrelistContent: boolean;
   ContextMenu: AssetGridViewListProps['ContextMenu'];
+  type: AssetGridViewListProps['type'];
 }) => {
   // Calculate rows needed for grid
   const rowCount = Math.ceil(items.length / columns);
@@ -293,7 +300,7 @@ const AssetGridUngroupedView = ({
 
   return (
     <AssetGridSectionContainer
-      title="Library"
+      title={type === 'library' ? 'Library' : 'Assets'}
       icon={<Grid2 />}
       className={hasPrelistContent ? 'mt-11' : ''}
     >

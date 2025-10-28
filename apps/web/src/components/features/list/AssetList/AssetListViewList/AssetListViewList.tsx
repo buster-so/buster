@@ -1,5 +1,5 @@
 import type { GroupedAssets } from '@buster/server-shared/library';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import { Avatar } from '@/components/ui/avatar';
@@ -39,15 +39,18 @@ const NameComponent = (name: string, record: AssetListItem) => {
         trigger="hover"
         align="start"
         childrenClassName="truncate block min-w-0"
-        delayDuration={record.screenshot_url ? 240 : 650}
-        className={cn('max-h-36 w-42 p-0.5', isLoaded ? '' : 'hidden')}
+        delayDuration={record.screenshot_url ? 250 : 650}
+        className={cn('max-h-72 w-72 mx-0.5 px-0! pt-0.5 pb-0! relative', isLoaded ? '' : 'hidden')}
         content={
-          <img
-            src={imageUrl}
-            alt={record.name}
-            className={cn('max-h-36 w-auto max-w-full object-top object-contain mx-auto block')}
-            onLoad={() => setIsLoaded(true)}
-          />
+          <div className="relative max-h-72 w-auto rounded-b overflow-hidden">
+            <img
+              src={imageUrl}
+              alt={record.name}
+              className={cn('max-h-72 w-auto max-w-full object-top object-cover mx-auto block')}
+              onLoad={() => setIsLoaded(true)}
+            />
+            <div className="w-full absolute bottom-0 rounded-b h-4.5 bg-gradient-to-t from-background to-transparent" />
+          </div>
         }
       >
         <div className="truncate">{name}</div>

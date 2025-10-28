@@ -172,7 +172,7 @@ export const FilterLibraryPills: React.FC<
         onRemove: () =>
           navigate({
             to: type === 'library' ? '/app/library' : '/app/shared-with-me',
-            search: (prev) => ({ ...prev, asset_types: undefined }),
+            search: (prev) => ({ ...prev, asset_types: undefined, filter: undefined }),
           }),
       });
     }
