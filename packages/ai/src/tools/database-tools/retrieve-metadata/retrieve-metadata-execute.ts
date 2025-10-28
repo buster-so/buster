@@ -39,8 +39,26 @@ async function executeApiRequest(
     });
 
     if (!response.ok) {
-      const errorData = (await response.json().catch(() => ({}))) as { error?: string };
-      const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+      // Extract error message from response body
+      // API returns errors in format: { error: "detailed message" }
+      let errorMessage: string;
+      try {
+        const errorData = (await response.json()) as { error?: string };
+        errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+      } catch {
+        // If JSON parsing fails, use status text
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      }
+
+      // Log the full error for debugging
+      console.error('[retrieve-metadata] API error response:', {
+        status: response.status,
+        error: errorMessage,
+        dataSourceId,
+        database,
+        schema,
+        name,
+      });
 
       return {
         success: false,
@@ -56,6 +74,15 @@ async function executeApiRequest(
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Metadata retrieval failed';
+
+    // Log the exception for debugging
+    console.error('[retrieve-metadata] Exception during API request:', {
+      error: errorMessage,
+      dataSourceId,
+      database,
+      schema,
+      name,
+    });
 
     return {
       success: false,

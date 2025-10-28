@@ -1,7 +1,6 @@
 import type { Credentials } from '@buster/data-source';
 import { classifyError, createAdapter, DataSourceType, sampleTable } from '@buster/data-source';
-import { getDataSourceCredentials, updateDatasetMetadata } from '@buster/database/queries';
-import type { DatasetMetadata } from '@buster/database/schema-types';
+import { getDataSourceCredentials } from '@buster/database/queries';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { BasicStatsAnalyzer } from './statistics/basic-stats';
 import { ClassificationAnalyzer } from './statistics/classification';
@@ -336,30 +335,6 @@ export const getTableStatisticsTask: ReturnType<
         columnsAnalyzed: columnProfiles.length,
         numericColumns: columnProfiles.filter((p) => p.numericStats).length,
       });
-
-      // Update dataset with metadata
-      logger.log('Updating dataset metadata', { tableId });
-
-      const metadata: DatasetMetadata = {
-        rowCount: payload.table.rowCount,
-        sizeBytes: payload.table.sizeBytes,
-        sampleSize: sample.sampleSize,
-        samplingMethod: sample.samplingMethod,
-        columnProfiles: columnProfiles,
-        sampleRows: sampleRows, // Add sample rows to metadata
-        introspectedAt: new Date().toISOString(),
-      };
-
-      await updateDatasetMetadata({
-        dataSourceId: payload.dataSourceId,
-        databaseIdentifier: payload.table.database,
-        schema: payload.table.schema,
-        databaseName: payload.table.database,
-        name: payload.table.name,
-        metadata,
-      });
-
-      logger.log('Dataset metadata updated successfully', { tableId });
 
       const finalResult = {
         success: true,

@@ -1,0 +1,451 @@
+ # Task: Document the {{model_path}} model
+
+  ## Objective
+  Document a dbt model to capture the deep understanding an experienced analyst or data engineer would have after working with it for months. Your documentation should transfer the "cached knowledge" - the distributions, patterns, nuances, gotchas, and context that make someone effective with the data.
+
+  When you're done, a new team member should be able to read your documentation and understand the model at the level of someone who has worked with it extensively. They should know what the data looks like, how it behaves, where the edge cases are, and how to use it appropriately in analysis.
+
+  **This is strictly a documentation task. Do not add tests.**
+
+  ## Core Principles
+
+## Documentation Output Structure
+
+**One-to-One File Mapping**: Each dbt model (`.sql` file) gets exactly one corresponding documentation file (`.yml` file). The YAML file should have the same base name as the SQL file it documents.
+
+For example:
+- `models/marts/customers.sql` → `models/marts/customers.yml`
+- `models/staging/stg_orders.sql` → `models/staging/stg_orders.yml`
+
+**No Changelog**: Do not create or maintain a `schema.yml` changelog section. Documentation should capture current state and patterns, not historical changes. Version control handles change history.
+
+**Single Model Per File**: Each YAML file documents exactly one model. Do not combine multiple models into a single `schema.yml` file.
+
+  ### Understanding First
+  Documentation without understanding is just noise. Before you write anything, build a complete mental model of the data.
+
+  Start by reading the existing documentation and code to understand the original intent. What was this model designed to do? What problem does it solve? Then search the repository for usage patterns - how do downstream models and analyses actually use this? This tells you what matters in practice.
+
+  Profile the data to understand what it actually looks like, not what you assume it should be. Use RetrieveMetadata to see distributions, null rates, cardinality, and concentration patterns. Remember that RetrieveMetadata samples data, so statistics are approximate - but they reveal the shape and character of the data, which is what matters.
+
+  Strictly Avoid Redundant Queries
+
+  Treat the `RetrieveMetadata` output as the source of truth for initial data profiling. **Do not** run a SQL query if the answer is already present in the metadata, even to "confirm" it. The goal is to capture patterns, and the approximate statistics from metadata are sufficient for this.
+
+  Specifically, **avoid running SQL for**:
+  * **Counts and Cardinality:** If `rowCount` and `distinctValueCount` are available, do not run `COUNT(*)` or `COUNT(DISTINCT ...)`.
+  * **Frequent Values:** If `frequentValues` is provided, do not run `GROUP BY ... ORDER BY COUNT(*) DESC` to find the top values.
+  * **Basic Ranges:** If `minValue` and `maxValue` are present, do not run `MIN()` or `MAX()` queries.
+
+Only use SQL for questions that **cannot** be answered by the column-level metadata, such as validating relationships between tables, calculating multi-step aggregations (e.g., average items per order), or investigating complex conditional logic.
+
+  When metadata isn't sufficient, write efficient SQL to validate patterns, test relationships, or check edge cases. For large tables, be smart about your queries - use LIMIT, sampling, and efficient predicates to avoid expensive full table scans.
+
+  Only after you truly understand the data should you document it. Understanding comes first; documentation follows.
+
+  ### Evidence-Based Documentation
+  Every claim you make in documentation should be grounded in evidence from the data itself.
+
+  When you say "most customers are individuals," that should come from profiling that shows 93% have personID. When you say "values concentrate in territory 4," that should be backed by metadata showing 24% concentration. When you say "sequences can skip numbers," that should come from observing the actual sequence distributions.
+
+  Focus on distributions and proportions rather than exact counts. Saying "45% of operations are subassembly" captures a stable pattern. Saying "30,107 rows are subassembly" is a brittle fact that will change with the next data load.
+
+  Use approximate scale when context helps ("~67K operations") but avoid exact counts throughout the documentation. The goal is to convey the shape and character of the data, not to create a snapshot that goes stale immediately.
+
+  ### Additive Approach
+  The documentation you're working with represents accumulated knowledge from the team. Respect that knowledge.
+
+  Your job is to enhance and extend what exists, not to replace it. When you find existing documentation, read it carefully. Often it contains context and nuances that aren't obvious from the data alone - business rules, historical context, known issues, reasons for design decisions.
+
+  Only change existing content when you have clear evidence that contradicts it. If documentation says "all customers have orders" but profiling shows 4% don't, update it with the evidence. But if documentation provides context you can't derive from data (like "this field was added for the 2023 migration"), preserve it.
+
+  Add depth and context to what's there. If a column description says "customer identifier," you can enhance it with grain details, null patterns, usage guidance, and gotchas. You're building on top of existing knowledge, not replacing it.
+
+  ### Separation of Concerns
+  The schema.yml structure has different sections for different purposes. **This separation must be strictly maintained** because it helps readers find information and keeps each section focused.
+
+  **Model description**: This is the holistic view. It describes what the model is, why it exists, what patterns characterize the data, what kind of analysis it enables, and what critical context someone needs to know. Keep it focused and concise - this is the executive summary of the model.
+
+  **Crucially, model descriptions should never contain relationship or join information.** If you find yourself writing "Join to person for demographics" or "LEFT JOIN to sales_order_header" or "Most analysis requires joining to X, Y, and Z" - stop. That content belongs exclusively in the relationships section.
+
+  Why? Because mixing concerns makes documentation harder to use. Someone reading the model description wants to understand what the model is, not get lost in join mechanics. Someone looking at relationships wants to see all the connections in one place, not hunt through prose descriptions.
+
+  **Relationships section**: This is where all join information lives. For each connection to another model, document why the relationship exists (business purpose), how to join (cardinality, coverage, join type considerations), and what patterns to expect. This section answers "how does this model connect to others?"
+
+  **Column descriptions**: These provide specific details about individual columns - business meaning, usage guidance, data characteristics, patterns, and gotchas. This is where you get into the specifics that matter for working with each field.
+
+  **Metadata fields**: data_type, options, and searchable provide structured information that tools can parse and act on.
+
+  ### Be Concise in Model Descriptions
+  Model descriptions should be focused and efficient. They need to cover the essentials - purpose, grain, key patterns, usage type, critical context - but they shouldn't be exhaustive encyclopedias.
+
+  If your model description is getting very long (say, more than 20-30 lines), that's often a sign that information has leaked from other sections. Join details belong in relationships. Column-specific nuances belong in column descriptions. Keep the model description at the right altitude - it's the overview, not the detailed manual.
+
+  Think of it this way: someone should be able to read just the model description and understand what the model is and whether it's what they need for their analysis. They shouldn't have to read the whole description to get past join instructions to understand the model's purpose.
+
+  ## What You're Documenting
+
+  ### Model-Level Understanding
+  The model description captures the holistic view - what an experienced person would know about the model as a whole.
+
+  **Purpose & Context**: Start with why this model exists. What problem does it solve? What kind of analysis does it enable? Who uses it? This grounds everything else - it tells readers whether this is the right model for their needs.
+
+  **Grain**: Be precise about what one row represents. If it's a composite key, explain what combines to form uniqueness. Give approximate scale (order of magnitude) to help readers understand if this is a small lookup table or a massive fact table. Avoid exact row counts - they go stale immediately.
+
+  **Lineage**: Briefly note where data comes from and what major transformations shape it. This helps readers understand the data's origin and trustworthiness. You don't need to document every CTE and join - just the key lineage facts like "sourced from stg_customer" or "enriched with derived behavioral filters."
+
+  **Patterns & Distributions**: This is where you capture what the data actually looks like. Where do values concentrate? What correlations exist? What standardizations appear? Are there segmentation patterns? Use proportions and percentages to paint the picture.
+
+  For example: "Customer base is 93% individual (B2C), 4% business (B2B), with 3% hybrid contacts." Or: "Operations concentrate in later manufacturing stages (45% subassembly, 28% final assembly)." Or: "Territory distribution is highly skewed - top 3 territories account for 61% of customers."
+
+  These patterns help readers understand the data's character. They know what's typical, what's rare, and where to focus attention.
+
+  **Usage Guidance**: Describe what kind of analysis this model enables and how it fits in the ecosystem. What downstream models depend on it? What metrics use it? Is this a foundational dimension or a derived mart?
+
+  Keep this high-level and holistic. Do not list specific models to join to or describe join mechanics - that's what relationships are for. Instead, describe the role: "Primary entity for customer segmentation and profiling" or "Enables manufacturing efficiency analysis and cost tracking."
+
+  **Critical Context**: What edge cases, gotchas, business rules, or data quality issues should someone know about? What transformations affect interpretation (like date shifting)? What limitations exist?
+
+  This is where you document the things that aren't obvious but matter in practice. Things an experienced person would warn a newcomer about.
+
+  ### 3. Map Relationships
+  Identify how this model connects to others — conceptually first, mechanically second — using **metadata, lineage, and upstream key movement**. The goal is to understand relationships without scanning large data volumes.
+
+  **Discovery (metadata-first approach)**  
+  Start by examining the model SQL and lineage graph. Every `ref()` or `source()` points to potential upstream dependencies.  
+  Look for how **keys flow through the pipeline** — which identifiers are introduced, renamed, or passed downstream.  
+  For example, if an upstream staging model defines `user_id` and that same key appears here, it’s likely part of the same entity lineage.
+
+  Use metadata to confirm where else those columns appear across the project. For example:
+
+  ```sql
+  -- Parameterize {patterns} with stems from candidate key columns (e.g., user_id)
+  SELECT 
+      table_schema,
+      table_name,
+      column_name,
+      data_type
+  FROM information_schema.columns
+  WHERE column_name ILIKE ANY (ARRAY[{patterns}])
+  ORDER BY table_schema, table_name;
+  ````
+
+  This helps identify common keys shared across multiple models — a strong indicator of implicit relationships and lineage continuity.
+
+  **Heuristics (metadata + lineage context)**
+
+  * Trace how key fields propagate: if a column originates upstream (via `ref()`), it likely defines a relationship chain.
+  * Prefer tables whose lineage introduces or owns the key (e.g., `users` defines `id`, while downstream models carry `user_id`).
+  * Treat consistent naming and key persistence as “soft constraints” confirming entity relationships.
+  * Use warehouse catalog hints (like column comments, tags, or uniqueness indicators) to reinforce key roles without scanning data.
+
+  **(Optional) Lightweight validation — only if near-free**
+  Avoid any query that would scan large fact tables. Validate relationships only when:
+
+  * You can leverage approximate functions (`APPROX_COUNT_DISTINCT`, `HLL_COUNT`) or sampling (`TABLESAMPLE`, partitions).
+  * The parent table is small (e.g., dimensions, lookups).
+
+  Example cheap checks:
+
+  ```sql
+  -- Approx distincts (parent uniqueness)
+  SELECT APPROX_COUNT_DISTINCT(id) AS approx_distinct_ids FROM dim_users;
+
+  -- Sampled coverage (~estimates only)
+  WITH sample_fact AS (
+    SELECT user_id FROM fact_orders TABLESAMPLE BERNOULLI(0.5)
+  )
+  SELECT 
+    100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM sample_fact),0) AS pct_matched_est
+  FROM sample_fact f
+  WHERE EXISTS (SELECT 1 FROM dim_users d WHERE d.id = f.user_id);
+  ```
+
+  **Interpretation and documentation**
+  When you’ve inferred likely relationships, describe both **lineage** and **business purpose**:
+
+  * Which upstream keys this model inherits or extends.
+  * What entity that key represents and why it matters.
+  * Whether missing or unmatched keys are legitimate (e.g., future-state data) or data quality issues.
+
+  Document all relationships **only** in the `relationships:` section of the model YAML:
+
+  * **Business relationship:** Why the connection exists and what it enables.
+  * **Join considerations:** Expected cardinality and join type (LEFT vs INNER).
+  * **Coverage:** Include proportions if derived efficiently; omit if unverified.
+  * **Cardinality notes:** Summarize practical patterns (“~1.3 orders per customer”).
+
+  This lineage-aware approach captures both the structural and semantic meaning of relationships — how keys originate, move, and connect — while keeping profiling lightweight and efficient.
+
+  ### Column-Level Understanding
+  Column descriptions capture what an experienced person would know about working with each field.
+
+  **Business meaning**: Start with what this column represents in business terms. Not just "customer identifier" but what it identifies and how it's used.
+
+  **Usage guidance**: When and how should someone use this field? If it's a foreign key, mention it. If it's part of a composite key, note that. If there are filtering considerations or join patterns, explain them.
+
+  **Data characteristics**: Describe what the data actually looks like. What's the distribution? Where do values concentrate? What's the null rate? What ranges exist? Use proportions to show patterns: "Highly skewed toward later stages" or "Split between intermediate (54%) and basic (44%)" or "No nulls - all customers assigned."
+
+  **Patterns & insights**: What did profiling reveal? Standardization (only 6 distinct values)? Correlation (perfectly correlated with location)? Concentration (80% in one category)? These insights help readers understand the data's behavior.
+
+  **Related context**: How does this column relate to others? Is it part of a composite key? Does it correlate with other fields? Are there dependencies to understand?
+
+  **Gotchas**: What edge cases, legitimate nulls, data quality issues, or non-obvious behaviors exist? What mistakes might someone make without knowing these details?
+
+  Structure your column descriptions as flowing narrative text, not rigid sections. Hit the points that matter for that specific column. Some columns need more context than others - use judgment.
+
+  One important note: Don't repeat information that's already in structured fields. The data_type field shows the type - you don't need to say "this is a VARCHAR" in the description. The options field lists values - you don't need to enumerate them in the description text (though you can reference patterns in the distribution).
+
+  ### Structured Metadata
+  The data_type, options, and searchable fields provide structured information that tools can parse.
+
+  **data_type**: Pull this directly from metadata. Use the raw warehouse type exactly as it appears: VARCHAR(50), NUMBER(38,0), TIMESTAMP, DECIMAL(9,4), etc. This tells readers and tools exactly what the column type is.
+
+  **options**: For enum or categorical columns with stable, limited values (typically ≤30 distinct), list them. You have two formats available:
+
+  Simple format when values are self-explanatory:
+  ```yaml
+  options:
+    - Pending
+    - Completed
+    - Canceled
+  ```
+
+  Descriptive format when context helps:
+  ```yaml
+  options:
+    - value: Occasional
+      description: Low purchase activity; ~62% of customers
+    - value: Weekly
+      description: High regular activity; ~3% of customers
+  ```
+
+  Include distribution percentages in descriptions when they're meaningful. This helps readers understand not just what values exist, but which ones matter.
+
+  Don't add options for IDs, dates, numeric measures, high-cardinality text fields, or PII. This is for categoricals that someone might filter or group by.
+
+  **searchable**: Set to true for categorical text fields that analysts would want to search or filter on. Think: industry names, product categories, customer segments, skill types - fields with business meaning and moderate cardinality (rough guide: 100-10K distinct values).
+
+  Don't flag as searchable: IDs, phone numbers, zip codes, email addresses, technical codes. These aren't fields someone filters on semantically.
+
+  ## Principles for Quality Documentation
+
+  ### Focus on Distributions, Not Absolutes
+  Documentation should capture patterns and proportions that reveal the shape and character of data, not brittle exact counts.
+
+  When you say "45% of operations are subassembly," you're describing a stable pattern. When you say "30,107 rows are subassembly," you're creating a fact that goes stale with the next data load. Focus on the former.
+
+  Use approximate scale when context helps. "~67K operations across ~43K work orders (avg 1.6 per order)" gives readers the order of magnitude and the relationship pattern. That's more useful than "67,131 operations across 42,625 work orders."
+
+  Percentages and proportions are your friends. They reveal distribution patterns, concentration, segmentation, and character in ways that remain stable even as absolute counts change.
+
+  ### Think Like an Experienced Person
+  Your goal is to document what someone learns after months of working with the data. What patterns do they notice? What correlations do they discover? What gotchas do they learn to watch out for?
+
+  This is the kind of knowledge you're trying to capture:
+  - "These costs are standardized - they don't actually vary in practice despite being different columns"
+  - "Sequences can skip numbers - not every order goes through all stages"
+  - "This field correlates perfectly with that one, so you can use either"
+  - "Values concentrate heavily in one category (80%), so most analysis focuses there"
+  - "Most cases are simple single-operation, but there's a subset of complex multi-step cases"
+
+  These are insights someone develops through experience. Document them so the next person doesn't have to rediscover them.
+
+  ### Keep Concerns Separate
+  This principle is critical enough to emphasize again. Model descriptions should stay holistic. They describe what the model is and what kind of analysis it enables. They should not contain join instructions, relationship details, or column-specific information.
+
+  **If you find yourself writing "Join to..." or "LEFT JOIN to..." or "connect to..." or mentioning specific models to use with this one, stop.** That content belongs in the relationships section, not the model description.
+
+  Why does this matter so much? Because mixing concerns makes documentation harder to use. Someone scanning model descriptions to find the right model doesn't want to wade through join instructions. Someone looking for relationship details wants them organized in one place, not scattered through prose.
+
+  Keep model descriptions focused on the model itself - its purpose, grain, patterns, and character. Leave join mechanics to the relationships section.
+
+  ### Use Language of Distributions
+  Describe data in terms of how values distribute, concentrate, and correlate.
+
+  **Concentration**: "Most orders are simple single-operation" or "Heavily skewed toward territory 4" or "Dominated by occasional riders (62%)" describes where the bulk of data sits.
+
+  **Standardization**: "Only 6 distinct values despite being numeric" or "Costs are standardized" or "Three standard patterns account for 85%" shows when variation is limited.
+
+  **Correlation**: "Perfectly correlated with location" or "Tends to co-occur with advanced knowledge" or "Highly dependent on order history" reveals relationships between fields.
+
+  **Segmentation**: "Split between intermediate (54%) and basic (44%)" or "Mix of B2C (93%) and B2B (4%)" shows how populations divide.
+
+  This language helps readers understand data behavior quickly.
+
+  ### Efficient Profiling
+  When you need to write SQL to validate patterns or relationships on large tables, be smart about query efficiency.
+
+  Use LIMIT when you just need to check patterns - you don't need all rows to see that sequences skip numbers. Use sampling when you need aggregate patterns but not exact counts. Use efficient predicates (indexed columns, partitions) to narrow scans.
+
+  For cardinality checks, GROUP BY with HAVING is efficient. For coverage checks, LEFT JOIN with aggregation is efficient. For distributions, GROUP BY with percentage calculations is efficient.
+
+  Avoid full table scans on massive tables. A billion-row table doesn't need a COUNT(*) to tell you it's large - metadata already showed you that.
+
+  ## Documentation Structure
+
+  ### Model Entry Template
+  ```yaml
+  models:
+    - name: model_name
+      description: |
+        [1-2 sentence overview of what this model is]
+        
+        Purpose: [Why it exists, what analysis it enables, who uses it]
+        
+        Contents: [Grain - one row per X. Composite key if applicable. Approximate scale]
+        
+        Lineage: [Source model/table, key transformations]
+        
+        Patterns:
+        [Distribution patterns - where values concentrate, proportions, percentages]
+        [Segmentation - how populations divide]
+        [Correlations and standardizations]
+        [Data quality observations]
+        
+        Usage Guidance:
+        [Kind of analysis this model supports - keep high-level]
+        [How it fits in the ecosystem - foundational dimension, derived mart, etc.]
+        [Downstream dependencies - what uses this]
+        [DO NOT mention joining to specific models or join mechanics - that's for relationships]
+        
+        Critical Context:
+        [Edge cases and gotchas someone should know]
+        [Business rules that affect interpretation]
+        [Data quality issues or limitations]
+        [Transformations like date shifting]
+      
+      relationships:
+        - name: related_model
+          description: >
+            Business relationship: [Why this connection exists, what it provides]
+            Join considerations: [Cardinality from both perspectives, patterns like avg count]
+            [LEFT JOIN vs INNER JOIN guidance, row multiplication warnings]
+            Coverage: [Percentage matched, what explains unmatched rows]
+            Cardinality notes: [Pattern with context - not just "many-to-one" but what that means]
+          source_col: column_name
+          ref_col: column_name
+          cardinality: many-to-one
+      
+      columns:
+        - name: column_name
+          description: |
+            [Narrative description covering: business meaning, usage guidance, data 
+            characteristics, patterns/insights, related context, gotchas. Flow naturally 
+            through what matters for this column. Don't force rigid sections - adapt to 
+            what this column needs. Don't repeat info from data_type or options fields.]
+          data_type: VARCHAR(50)
+          options:  # For categoricals ≤30 values
+            - value: option1
+              description: Context; ~45%
+            - value: option2
+              description: Context; ~28%
+          searchable: false  # true for categorical text with business meaning
+  ```
+
+  ### Column Description Flow
+  Column descriptions should flow naturally, not follow a rigid template. Cover what matters for that specific column. Some columns need heavy context, others need less. Use judgment.
+
+  Generally touch on:
+  - What it is (business meaning)
+  - How to use it (when relevant - join keys for FKs, filtering guidance, etc.)
+  - What the data looks like (distributions, concentration, null patterns)
+  - What profiling revealed (patterns, correlations, standardizations)
+  - Related context (composite keys, dependencies)
+  - Things to watch out for (edge cases, gotchas, legitimate nulls)
+
+  But don't force every column into the same structure. Write what that column needs.
+
+  ## Workflow
+
+  ### 1. Understand Context
+  Before touching documentation, understand the model completely.
+
+  Read the model SQL thoroughly. Understand every CTE, every join, every transformation. What is this model trying to do? What's the logic?
+
+  Find and read existing schema.yml. What documentation already exists? What gaps are there? What context is already captured that you should preserve?
+
+  Search the repository for references to this model. Use Grep to find where it's used. This tells you what matters in practice - what downstream models depend on it, what metrics use it, how analysts interact with it.
+
+  Review AGENTS.md for project-specific conventions and standards. Every project has patterns - respect them.
+
+  Identify lineage. What models feed into this? What models depend on it? How does this fit in the broader data flow?
+
+  Build a complete mental model before you write anything.
+
+  ### 2. Profile the Data
+  Use RetrieveMetadata to understand data characteristics. Focus on:
+  - Distribution patterns - where do values concentrate?
+  - Null rates - what's missing and why?
+  - Cardinality - how many distinct values?
+  - Ranges - what's the min/max for numerics and dates?
+  - Concentration - which values dominate?
+
+  Remember metadata samples, so statistics are approximate. That's fine - you're looking for patterns and character, not exact counts.
+
+  Identify candidates for options (categoricals with ≤30 values) and searchable flags (categorical text with business meaning).
+
+  When metadata isn't sufficient, write efficient SQL to validate patterns, check relationships, or investigate edge cases. Keep queries efficient - use LIMIT, sampling, and smart predicates.
+
+  ### 3. Map Relationships
+  For each model referenced in the SQL (each `ref()` call), identify and understand how this model connects to others — not just mechanically, but conceptually.
+
+  Start by examining the model SQL and lineage graph. Every `ref()` or `source()` indicates a potential relationship, but not all relationships are explicit. When constraints aren’t defined, infer them using naming conventions and behavioral evidence. Columns like `user_id`, `customer_key`, or `sales_order_id` often point to parent entities (`users.id`, `dim_customer.customer_key`, `sales_order_header.id`), especially when naming patterns align across models.
+
+  Validate these assumptions through profiling rather than assumption. Use sampling or metadata to measure coverage (what % of keys successfully match), cardinality (average children per parent), and uniqueness (is the parent key distinct). These metrics reveal not just structural relationships but how they behave in practice — for example, “most customers have a single order; repeat buyers drive the remaining 12%.”
+
+  As you investigate, pay attention to semantics and context. Determine the *business purpose* of each relationship — why this connection exists and what it enables — rather than only the join mechanics. Consider whether nulls are legitimate (e.g., future records or optional associations) or indicate data quality gaps.
+
+  When documenting, capture all of this in the **relationships section**, not the model description. Each entry should describe:
+  - **Business relationship:** the purpose of the link.
+  - **Join considerations:** expected cardinality and join type guidance (e.g., LEFT vs INNER).
+  - **Coverage:** proportion of matching rows and what explains mismatches.
+  - **Cardinality notes:** contextualized patterns (“avg 1.3 orders per customer”).
+
+  This approach ensures relationship documentation reflects real, validated structure and business meaning, not just SQL syntax.
+
+  ### 4. Document
+  Now that you understand everything, write documentation.
+
+  **Model description**: Focus on purpose, grain, patterns, holistic usage, and critical context. Keep it concise - aim for the essentials. Do not include join instructions or relationship details.
+
+  **Relationships**: For each connection, document business purpose, join mechanics, coverage, and cardinality patterns. This is where all join information lives.
+
+  **Columns**: Write narrative descriptions that cover what matters for each field. Business meaning, usage, characteristics, patterns, gotchas.
+
+  **Metadata**: Populate data_type from metadata. Add options for appropriate categoricals. Flag searchable for categorical text with business meaning.
+
+  Preserve existing documentation unless evidence contradicts it. You're enhancing, not replacing.
+
+  ### 5. Validate
+  Run `dbt parse` to check YAML syntax. Run `dbt compile -s model_name` to verify the model compiles.
+
+  **Review model description critically**:
+  - Does it mention joining, LEFT JOIN, connecting to specific models, or which models to use together? If yes, move that to relationships.
+  - Is it overly long? If yes, likely indicates join details or column specifics that belong elsewhere.
+  - Does it stay holistic, or does it get lost in details?
+
+  Verify no tests were added - this is documentation only.
+
+  Check that all claims are backed by evidence from profiling.
+
+  ### 6. Finish
+  For this task, you are finished once you've documented and validated.
+
+  DO NOT WRITE A CHANGELOG entry.  This will be done by the system after the fact.
+
+  ## Key Reminders
+
+  **This is documentation only**: Do not add tests. If tests already exist, leave them untouched. Your focus is descriptions and metadata fields only.
+
+  **Separate concerns strictly**: Keep relationship and join information in the relationships section, never in model descriptions. Model descriptions describe the model itself - its purpose, grain, patterns, character. They should not mention joining, connecting to other models, or which models to use together. If you write "Join to...", "LEFT JOIN to...", "connect to...", or list specific models to use with this one, you're violating this principle. Stop and move that content to relationships.
+
+  **Be concise in model descriptions**: Cover the essentials efficiently. If your model description exceeds 20-30 lines, you've likely included details that belong elsewhere. Long descriptions often indicate join information or column-specific details have leaked in.
+
+  **Use profiling evidence**: RetrieveMetadata samples data - statistics are approximate. That's fine. Focus on distributions, patterns, and proportions rather than exact counts. Document what the data shows, not what you assume.
+
+  **Think like an experienced person**: Document what someone would know after months of working with the data - patterns observed, correlations discovered, gotchas learned, mental shortcuts developed. Transfer that cached knowledge.
+
+  **Preserve existing knowledge**: Enhance and extend rather than replace. Only change existing content when evidence clearly contradicts it. The documentation represents accumulated team knowledge - respect it.
+
+  **Follow conventions**: Adhere to patterns in AGENTS.md and system instructions. Don't copy verbose or prescriptive patterns from other models if they violate these principles. Use judgment and these principles to create quality documentation.

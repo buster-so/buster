@@ -29,13 +29,14 @@ const app = new Hono()
   .onError((err, c) => {
     console.error('Metadata tool API error:', err);
 
-    // Let HTTPException responses pass through
+    // Handle HTTPException - return JSON format for consistent error handling
     if (err instanceof HTTPException) {
-      return err.getResponse();
+      return c.json({ error: err.message }, err.status);
     }
 
-    // Default error response
-    return c.json({ error: 'Internal server error' }, 500);
+    // Default error response for unexpected errors
+    const errorMessage = err instanceof Error ? err.message : 'Internal server error';
+    return c.json({ error: errorMessage }, 500);
   });
 
 export default app;

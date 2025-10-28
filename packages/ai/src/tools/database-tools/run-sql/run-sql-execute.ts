@@ -43,8 +43,23 @@ async function executeApiRequest(
       });
 
       if (!response.ok) {
-        const errorData = (await response.json().catch(() => ({}))) as { error?: string };
-        const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+        // Extract error message from response body
+        // API returns errors in format: { error: "detailed message" }
+        let errorMessage: string;
+        try {
+          const errorData = (await response.json()) as { error?: string };
+          errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+        } catch {
+          // If JSON parsing fails, use status text
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+
+        // Log the full error for debugging
+        console.error('[run-sql] API error response:', {
+          status: response.status,
+          error: errorMessage,
+          sql: `${sql.substring(0, 100)}...`,
+        });
 
         // Check if error is timeout-related
         const isTimeout =
@@ -66,7 +81,7 @@ async function executeApiRequest(
           continue; // Retry
         }
 
-        // Not a timeout or no more retries
+        // Not a timeout or no more retries - return detailed error message
         return {
           success: false,
           error: errorMessage,
@@ -81,6 +96,14 @@ async function executeApiRequest(
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'SQL execution failed';
+
+      // Log the exception for debugging
+      console.error('[run-sql] Exception during API request:', {
+        error: errorMessage,
+        sql: `${sql.substring(0, 100)}...`,
+        attempt: attempt + 1,
+      });
+
       const isTimeout =
         errorMessage.toLowerCase().includes('timeout') ||
         errorMessage.toLowerCase().includes('timed out') ||
@@ -102,7 +125,7 @@ async function executeApiRequest(
         continue; // Retry
       }
 
-      // Not a timeout or no more retries
+      // Not a timeout or no more retries - return detailed error message
       return {
         success: false,
         error: errorMessage,

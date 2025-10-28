@@ -1,4 +1,3 @@
-import type { ModelMessage } from 'ai';
 import { z } from 'zod';
 
 export const InitWorkflowInputSchema = z.object({

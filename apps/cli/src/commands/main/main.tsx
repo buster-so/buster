@@ -1,4 +1,5 @@
 import type { ModelMessage } from '@buster/ai';
+import { runInitWorkflow } from '@buster/ai/workflows/init-workflow/init-workflow';
 import { Box, Text, useApp, useInput } from 'ink';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -257,12 +258,64 @@ export function Main() {
         case 'history':
           setShowHistory(true);
           break;
+        case 'init': {
+          // Run init workflow directly without creating a chat message
+          const chatId = getCurrentChatId();
+          const messageId = crypto.randomUUID();
+
+          // Add system message to show init is running
+          const initMessage: CliAgentMessage = {
+            id: ++messageCounter.current,
+            message: {
+              kind: 'text-delta',
+              content: 'Running initialization workflow...\n',
+            },
+          };
+          setMessages((prev) => [...prev, initMessage]);
+          setIsThinking(true);
+
+          // Run workflow asynchronously
+          runInitWorkflow({
+            chatId,
+            messageId,
+            // TODO: get ids dynamically this is for testing.
+            userId: 'c2dd64cd-f7f3-4884-bc91-d46ae431901e',
+            organizationId: 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce',
+            dataSourceId: 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a',
+          })
+            .then(() => {
+              // Update message on success
+              const successMessage: CliAgentMessage = {
+                id: ++messageCounter.current,
+                message: {
+                  kind: 'text-delta',
+                  content: '✅ Initialization workflow completed successfully!\n',
+                },
+              };
+              setMessages((prev) => [...prev, successMessage]);
+              setIsThinking(false);
+            })
+            .catch((error) => {
+              // Update message on error
+              const errorMessage: CliAgentMessage = {
+                id: ++messageCounter.current,
+                message: {
+                  kind: 'text-delta',
+                  content: `❌ Initialization failed: ${error instanceof Error ? error.message : String(error)}\n`,
+                },
+              };
+              setMessages((prev) => [...prev, errorMessage]);
+              debugLogger.error('Init workflow failed:', error);
+              setIsThinking(false);
+            });
+          break;
+        }
         case 'help': {
           historyCounter.current += 1;
           const helpEntry: ChatHistoryEntry = {
             id: historyCounter.current,
             value:
-              'Available commands:\n/settings - Configure app settings\n/clear - Clear chat history\n/history - Browse and resume previous conversations\n/exit - Exit the app\n/help - Show this help',
+              'Available commands:\n/settings - Configure app settings\n/clear - Clear chat history\n/history - Browse and resume previous conversations\n/init - Initialize documentation for this repository\n/exit - Exit the app\n/help - Show this help',
           };
           setHistory((prev) => [...prev, helpEntry].slice(-5));
           break;
