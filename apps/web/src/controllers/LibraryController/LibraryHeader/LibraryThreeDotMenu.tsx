@@ -85,6 +85,33 @@ const useLibraryThreeDotMenu = ({
     open: true,
   });
 
+  const filterDropdown = {
+    label: 'Filters',
+    value: 'filters',
+    icon: <Sliders3 />,
+    closeOnSelect: true,
+    items: [
+      <div className="py-2 px-2">
+        <OrderDropdownContent
+          key="view-group-and-sort"
+          layout={layout}
+          ordering={ordering}
+          groupBy={group_by}
+          ordering_direction={ordering_direction}
+          type={type}
+        />
+      </div>,
+    ],
+  };
+
+  const orderDropdown = {
+    label: 'View, group and sort',
+    value: 'view-group-and-sort',
+    icon: <BarsFilter />,
+    closeOnSelect: true,
+    items: filterDropdownItems,
+  };
+
   if (type === 'library') {
     return [
       {
@@ -104,36 +131,13 @@ const useLibraryThreeDotMenu = ({
       {
         type: 'divider',
       },
-      {
-        label: 'Filters',
-        value: 'filters',
-        icon: <Sliders3 />,
-        closeOnSelect: true,
-        items: [
-          <div className="py-2 px-2">
-            <OrderDropdownContent
-              key="view-group-and-sort"
-              layout={layout}
-              ordering={ordering}
-              groupBy={group_by}
-              ordering_direction={ordering_direction}
-              type={type}
-            />
-          </div>,
-        ],
-      },
-      {
-        label: 'View, group and sort',
-        value: 'view-group-and-sort',
-        icon: <BarsFilter />,
-        closeOnSelect: true,
-        items: filterDropdownItems,
-      },
+      filterDropdown,
+      orderDropdown,
     ];
   }
 
   if (type === 'shared-with-me') {
-    return [];
+    return [filterDropdown, orderDropdown];
   }
 
   const _exhaustiveCheck: never = type;
