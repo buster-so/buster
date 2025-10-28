@@ -38,15 +38,17 @@ const editorContainerVariants = cva(
   }
 );
 
-export const EditorContainer = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> &
-    VariantProps<typeof editorContainerVariants> &
-    EditorContainerProps
->(({ className, variant, readOnly, children, ...htmlProps }, ref) => {
+export const EditorContainer = ({
+  className,
+  variant,
+  readOnly,
+  children,
+  ...htmlProps
+}: React.HTMLAttributes<HTMLDivElement> &
+  VariantProps<typeof editorContainerVariants> &
+  EditorContainerProps) => {
   return (
-    <div
-      ref={ref}
+    <PlateContainer
       className={cn(
         'ignore-click-outside/toolbar',
         editorContainerVariants({ variant, readOnly }),
@@ -54,9 +56,7 @@ export const EditorContainer = React.forwardRef<
       )}
       {...htmlProps}
     >
-      <PlateContainer>{children}</PlateContainer>
-    </div>
+      {children}
+    </PlateContainer>
   );
-});
-
-EditorContainer.displayName = 'EditorContainer';
+};
