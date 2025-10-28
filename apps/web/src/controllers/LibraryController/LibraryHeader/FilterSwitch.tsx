@@ -33,7 +33,7 @@ export const FilterSwitch: React.FC<FilterSwitchLibraryProps | FilterSwitchShare
               link: {
                 to: '/app/library',
                 search: (v) => {
-                  return { ...v, owner_id: undefined, filter: 'all' as const };
+                  return { ...v, owner_id: undefined, filter: undefined };
                 },
               },
             },

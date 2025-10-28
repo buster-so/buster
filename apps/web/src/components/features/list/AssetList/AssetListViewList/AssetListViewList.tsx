@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
 import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import { Avatar } from '@/components/ui/avatar';
+import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import type {
   BusterListColumn,
   BusterListRow,
@@ -85,6 +86,15 @@ const columns: BusterListColumn<AssetListItem>[] = [
 
 const createAssetListItem = createListItem<AssetListItem>();
 
+const RowTitle = ({ icon, title }: { icon: React.ReactNode; title: string }) => {
+  return (
+    <span className="flex gap-1.5 items-center">
+      <span className="text-icon-color">{icon}</span>
+      <span>{title}</span>
+    </span>
+  );
+};
+
 export const AssetListViewList = ({
   items,
   groupBy,
@@ -114,12 +124,7 @@ export const AssetListViewList = ({
         allRows.push({
           type: 'section',
           id: groupKey,
-          title: (
-            <span className="flex gap-1.5 items-center">
-              <span className="text-icon-color">{icon}</span>
-              <span>{title}</span>
-            </span>
-          ),
+          title: <RowTitle icon={icon} title={title} />,
           secondaryTitle: String(groupItems.length),
         } satisfies BusterListSectionRow);
         allRows.push(
@@ -141,7 +146,7 @@ export const AssetListViewList = ({
       allRows.push({
         type: 'section',
         id: 'asset-list',
-        title: 'Assets',
+        title: <RowTitle icon={<Grid2 />} title="Assets" />,
         secondaryTitle: String(items.length),
       } satisfies BusterListSectionRow);
       allRows.push(

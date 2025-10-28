@@ -10,6 +10,7 @@ import {
   SquareChart,
   Table,
 } from '@/components/ui/icons';
+import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import SquareChartPlus from '@/components/ui/icons/NucleoIconOutlined/square-chart-plus';
 
 export const ASSET_ICONS = {
@@ -42,7 +43,7 @@ export const assetTypeToIcon = (assetType: ShareAssetType | keyof GroupedAssets)
     case 'report_file':
       return ASSET_ICONS.reports;
     case 'assets':
-      return ASSET_ICONS.dashboards;
+      return Grid2;
     default: {
       const _result: never = assetType;
       console.warn('Asset type to icon not found', assetType);
