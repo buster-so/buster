@@ -19,12 +19,12 @@ steps:
   - id: 2bf4f1e1-84da-4c66-baf9-85b7a2e71332
     type: PRESET_ACTION
     command:
-      id: 1e3b9123-24b3-4316-8d62-857f1d4e44a0
+      id: c10fa6b9-7e83-4a45-aa10-bce5bbf36c56
       clearContent: true
       type: TYPE
       target:
         type: description
-        elementDescriptor: The text input box with Ask Buster a question..
+        elementDescriptor: The text input box with Ask a question
       value: Create me a dashboard with multiple metrics describing sales in 2024.
   - id: 1c1f4582-4a31-458b-ba66-b7d26b7a6500
     type: PRESET_ACTION
