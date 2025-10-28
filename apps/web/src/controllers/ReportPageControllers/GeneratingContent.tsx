@@ -14,7 +14,7 @@ export const GeneratingContent = ({
     <AnimatePresence mode="wait">
       {show && (
         <motion.div
-          className={cn('right-0 bottom-0 left-0 absolute translate-y-[-255px]', className)}
+          className={cn('right-0 -bottom-18 left-0 absolute ', className)}
           initial={{ opacity: 0, y: -3 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -3 }}

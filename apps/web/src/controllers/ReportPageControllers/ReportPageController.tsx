@@ -98,7 +98,7 @@ export const ReportPageController: React.FC<{
             placeholder="Start typing..."
             className={commonClassName}
             containerClassName={cn(
-              'editor-container pt-9 overflow-y-auto',
+              'editor-container pt-9 overflow-y-auto relative',
               'scrollbar scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent',
               className
             )}
