@@ -28,16 +28,16 @@ const NameComponent = (name: string, record: AssetListItem) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <span className="flex gap-1.5 items-center w-full truncate">
+    <span className="flex gap-1.5 items-center w-full">
       <AppTooltip title={assetTypeLabel(record.asset_type)}>
-        <span className="text-icon-color">
+        <span className="text-icon-color flex-shrink-0">
           <Icon />
         </span>
       </AppTooltip>
       <Popover
         trigger="hover"
         align="start"
-        childrenClassName="truncate block w-full"
+        childrenClassName="truncate block min-w-0"
         delayDuration={record.screenshot_url ? 240 : 650}
         className={cn('max-h-36 w-42 p-0.5', isLoaded ? '' : 'hidden')}
         content={
@@ -49,7 +49,7 @@ const NameComponent = (name: string, record: AssetListItem) => {
           />
         }
       >
-        <div className="truncate block w-full border">{name}</div>
+        <div className="truncate">{name}</div>
       </Popover>
     </span>
   );
