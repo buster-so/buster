@@ -18,39 +18,44 @@ export const takeMetricScreenshotHandlerTask: ReturnType<
   id: screenshots_task_keys.take_metric_screenshot,
   schema: TakeMetricScreenshotTriggerSchema,
   run: async (args) => {
-    logger.info('Getting metric screenshot', { args });
+    try {
+      logger.info('Getting metric screenshot', { args });
 
-    const { isOnSaveEvent, metricId, organizationId } = args;
+      const { isOnSaveEvent, metricId, organizationId } = args;
 
-    const shouldTakeNewScreenshot = await shouldTakenNewScreenshot({
-      metricId,
-      isOnSaveEvent,
-    });
+      const shouldTakeNewScreenshot = await shouldTakenNewScreenshot({
+        metricId,
+        isOnSaveEvent,
+      });
 
-    logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
+      logger.info('Should take new screenshot', { shouldTakeNewScreenshot });
 
-    if (!shouldTakeNewScreenshot) {
-      logger.info('Metric screenshot already taken', { metricId });
-      return;
+      if (!shouldTakeNewScreenshot) {
+        logger.info('Metric screenshot already taken', { metricId });
+        return;
+      }
+
+      logger.info('Getting metric screenshot');
+
+      const screenshotBuffer = await getMetricScreenshot(args);
+
+      logger.info('Metric screenshot taken', { screenshotBufferLength: screenshotBuffer.length });
+      logger.log('This is the screenshot buffer', { screenshotBuffer });
+
+      const result = await uploadScreenshotHandler({
+        assetType: 'metric_file',
+        assetId: metricId,
+        image: screenshotBuffer,
+        organizationId,
+      });
+
+      logger.info('Metric screenshot uploaded', { result });
+
+      return result;
+    } catch (error) {
+      logger.error('Error taking metric screenshot', { error });
+      return { success: false };
     }
-
-    logger.info('Getting metric screenshot');
-
-    const screenshotBuffer = await getMetricScreenshot(args);
-
-    logger.info('Metric screenshot taken', { screenshotBufferLength: screenshotBuffer.length });
-    logger.log('This is the screenshot buffer', { screenshotBuffer });
-
-    const result = await uploadScreenshotHandler({
-      assetType: 'metric_file',
-      assetId: metricId,
-      image: screenshotBuffer,
-      organizationId,
-    });
-
-    logger.info('Metric screenshot uploaded', { result });
-
-    return result;
   },
 });
 
