@@ -142,13 +142,14 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
               variant="ghost"
               rounding={'large'}
               prefix={<Magnifier />}
+              data-testid="search-button"
               onClick={() => toggleGlobalSearch(true)}
             />
           </Tooltip>
 
           <Tooltip title="Start a chat" shortcuts={['C']}>
             <Link to={'/app/home'}>
-              <Button size="tall" rounding={'large'} prefix={<PencilSquareIcon />} />
+              <Button size="tall" data-testid="start-chat-button" rounding={'large'} prefix={<PencilSquareIcon />} />
             </Link>
           </Tooltip>
         </div>
