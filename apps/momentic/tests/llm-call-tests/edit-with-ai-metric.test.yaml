@@ -54,15 +54,23 @@ steps:
       id: 982a8362-376e-4f36-b6e6-c018be292de1
       type: WAIT
       delay: 2
-  - id: a445cf98-6254-4b21-82fd-b23ca0913a04
+  - id: 23fb22b0-fbdd-49ac-84c9-5c7963202ca3
     type: PRESET_ACTION
     command:
-      id: 1d6be7bc-7e2e-45e7-bb14-5b0918bb11e7
+      id: 2c1629d5-8683-48c7-974c-cf8c2279a131
       type: CLICK
       target:
         type: description
-        elementDescriptor: the search result option in the search modal (Today group, or
-          the Last Week group, or the all others group)
+        elementDescriptor: the backdrop overlay for the search modal
+  - id: a445cf98-6254-4b21-82fd-b23ca0913a04
+    type: PRESET_ACTION
+    command:
+      id: bb797c99-b777-4900-bf43-56daa4970c7c
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the search result option in the search modal that is NOT
+          under the "Actions" group.
       delayMs: 1
   - id: 639155eb-2be8-4657-a2e1-99edd50d38df
     type: PRESET_ACTION
@@ -120,6 +128,3 @@ steps:
   - id: 4ef2efe9-8056-49a1-9481-9d22606e0192
     type: MODULE
     moduleId: 805447d3-e699-46f6-b1d2-0132840b3f20
-  - id: 9a66ca43-1333-4ee2-8cb7-b34a3d059897
-    type: MODULE
-    moduleId: 666c6102-d4fa-4c6e-998c-4b283337ad92
