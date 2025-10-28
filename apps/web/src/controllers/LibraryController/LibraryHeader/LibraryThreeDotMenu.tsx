@@ -8,7 +8,7 @@ import { Dots, Plus, Sliders3 } from '@/components/ui/icons';
 import BarsFilter from '@/components/ui/icons/NucleoIconOutlined/bars-filter';
 import type { LibraryViewProps } from '../library.types';
 import type { LibrarySearchParams } from '../schema';
-import { FilterDropdownContent, useFilterDropdownItems } from './FilterDropdown';
+import { useFilterDropdownItems } from './FilterDropdown';
 import { OrderDropdownContent } from './OrderDropdown';
 
 export const LibraryThreeDotMenu = React.memo(
