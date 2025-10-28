@@ -24,6 +24,9 @@ export type PushWebhookEvent = WebhookEventDefinition<'push'>;
 
 // Client exports
 export { createGitHubApp, getGitHubAppCredentials } from './client/app';
-
+export { createInstallationOctokit } from './services/installation';
 // Service exports
 export { generateNewInstallationToken } from './services/token';
+
+// Type exports
+export type { ChecksCreateParams, ChecksGetParams, ChecksUpdateParams } from './types';

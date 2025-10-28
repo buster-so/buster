@@ -27,3 +27,105 @@ export type GithubActionDocumentationGetParams = z.infer<
 export type GithubActionDocumentationGetQuery = z.infer<
   typeof GithubActionDocumentationGetQuerySchema
 >;
+
+// GitHub Check Run Request Schemas
+export const CheckRunCreateSchema = z.object({
+  owner: z.string().describe('Repository owner (username or org name)'),
+  repo: z.string().describe('Repository name'),
+  name: z.string().describe('Name of the check run'),
+  head_sha: z.string().describe('SHA of the commit to create the check run for'),
+  external_id: z.string().optional().describe('External ID for the check run'),
+  started_at: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp when the check run began'),
+});
+
+export type CheckRunCreateRequest = z.infer<typeof CheckRunCreateSchema>;
+
+export const CheckRunUpdateSchema = z.object({
+  owner: z.string().describe('Repository owner (username or org name)'),
+  repo: z.string().describe('Repository name'),
+  check_run_id: z.number().int().describe('The ID of the check run to update'),
+  name: z.string().optional().describe('Name of the check run'),
+  details_url: z.string().url().optional().describe('URL to view more details'),
+  external_id: z.string().optional().describe('External ID for the check run'),
+  started_at: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp when the check run began'),
+  status: z
+    .enum(['queued', 'in_progress', 'completed'])
+    .optional()
+    .describe('Status of the check run'),
+  conclusion: z
+    .enum([
+      'action_required',
+      'cancelled',
+      'failure',
+      'neutral',
+      'success',
+      'skipped',
+      'stale',
+      'timed_out',
+    ])
+    .optional()
+    .describe('Conclusion of the check run (required if status is completed)'),
+  completed_at: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp when the check run completed'),
+  output: z
+    .object({
+      title: z.string().describe('Title of the check run output'),
+      summary: z.string().describe('Summary of the check run output'),
+      text: z.string().optional().describe('Details of the check run output'),
+      annotations: z
+        .array(
+          z.object({
+            path: z.string(),
+            start_line: z.number().int(),
+            end_line: z.number().int(),
+            annotation_level: z.enum(['notice', 'warning', 'failure']),
+            message: z.string(),
+            title: z.string().optional(),
+            raw_details: z.string().optional(),
+          })
+        )
+        .optional(),
+      images: z
+        .array(
+          z.object({
+            alt: z.string(),
+            image_url: z.string().url(),
+            caption: z.string().optional(),
+          })
+        )
+        .optional(),
+    })
+    .optional()
+    .describe('Output details for the check run'),
+  actions: z
+    .array(
+      z.object({
+        label: z.string(),
+        description: z.string(),
+        identifier: z.string(),
+      })
+    )
+    .optional()
+    .describe('Actions the user can perform'),
+});
+
+export type CheckRunUpdateRequest = z.infer<typeof CheckRunUpdateSchema>;
+
+export const CheckRunGetSchema = z.object({
+  owner: z.string().describe('Repository owner (username or org name)'),
+  repo: z.string().describe('Repository name'),
+  check_run_id: z.number().int().describe('The ID of the check run to retrieve'),
+});
+
+export type CheckRunGetRequest = z.infer<typeof CheckRunGetSchema>;

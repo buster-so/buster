@@ -1,6 +1,14 @@
 import type { deploy as deployTypes } from '@buster/server-shared';
 import type { GetChatsListRequest, GetChatsListResponseV2 } from '@buster/server-shared/chats';
 import type {
+  CheckRunCreateRequest,
+  CheckRunGetRequest,
+  CheckRunUpdateRequest,
+  CreateCheckRunResponse,
+  GetCheckRunResponse,
+  UpdateCheckRunResponse,
+} from '@buster/server-shared/github';
+import type {
   CreateMessageRequestBodySchema,
   CreateMessageResponse,
   GetRawMessagesResponse,
@@ -10,7 +18,7 @@ import type {
 import { isApiKeyValid } from '../auth';
 import { type SDKConfig, SDKConfigSchema } from '../config';
 import { deploy } from '../deploy';
-import { get, post, put } from '../http';
+import { get, patch, post, put } from '../http';
 
 type UnifiedDeployRequest = deployTypes.UnifiedDeployRequest;
 type UnifiedDeployResponse = deployTypes.UnifiedDeployResponse;
@@ -40,6 +48,11 @@ export interface BusterSDK {
     ) => Promise<UpdateMessageResponse>;
     getRawMessages: (chatId: string) => Promise<GetRawMessagesResponse>;
   };
+  checkRuns: {
+    create: (request: CheckRunCreateRequest) => Promise<CreateCheckRunResponse>;
+    get: (request: CheckRunGetRequest) => Promise<GetCheckRunResponse>;
+    update: (request: CheckRunUpdateRequest) => Promise<UpdateCheckRunResponse>;
+  };
 }
 
 // Create SDK instance
@@ -53,6 +66,20 @@ export function createBusterSDK(config: Partial<SDKConfig>): BusterSDK {
       isApiKeyValid: (apiKey?: string) => isApiKeyValid(validatedConfig, apiKey),
     },
     deploy: (request) => deploy(validatedConfig, request),
+    checkRuns: {
+      create: (request) =>
+        post<CreateCheckRunResponse>(validatedConfig, '/github/check-run', request),
+      get: (request) => {
+        const queryParams = {
+          owner: request.owner,
+          repo: request.repo,
+          check_run_id: String(request.check_run_id),
+        };
+        return get<GetCheckRunResponse>(validatedConfig, '/github/check-run', queryParams);
+      },
+      update: (request) =>
+        patch<UpdateCheckRunResponse>(validatedConfig, '/github/check-run', request),
+    },
     chats: {
       list: (params?: GetChatsListRequest) => {
         // Convert params to string record for HTTP client
