@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import type { AssetGridViewListProps } from '../AssetList.types';
 import { getGroupMetadata } from '../grouping-meta-helpers';
 import { AssetGridItem } from './AssetGridCard';
-import { AssetGridCardSmall } from './AssetGridCardSmall';
 import { AssetGridSectionContainer } from './AssetGridSectionContainer';
 
 export const AssetGridViewList = React.memo(
@@ -176,6 +175,8 @@ const AssetGridGroupedView = ({
     return result;
   }, [groups, columns, groupBy]);
 
+  const bottomSpacing = 12; // gap before content
+
   const rowVirtualizer = useVirtualizer({
     count: virtualItems.length,
     getScrollElement: () => scrollContainerRef.current,
@@ -187,7 +188,6 @@ const AssetGridGroupedView = ({
         // Non-first headers get margin-top for spacing between sections
         const baseHeaderHeight = 18; // height of the header itself
         const topSpacing = item.isFirst && hasPrelistContent ? 24 : index > 0 ? 24 : 0;
-        const bottomSpacing = 12; // gap before content
         return topSpacing + baseHeaderHeight + bottomSpacing;
       }
       // Row height: item height + gap
@@ -210,7 +210,6 @@ const AssetGridGroupedView = ({
         if (item.type === 'header') {
           // Calculate padding based on whether this is first header and if there's prelist content
           const topPadding = item.isFirst && hasPrelistContent ? 24 : virtualRow.index > 0 ? 24 : 0;
-          const bottomPadding = 12;
 
           return (
             <div
@@ -223,7 +222,7 @@ const AssetGridGroupedView = ({
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
                 paddingTop: `${topPadding}px`,
-                paddingBottom: `${bottomPadding}px`,
+                paddingBottom: `${bottomSpacing}px`,
                 display: 'flex',
                 alignItems: 'center',
               }}

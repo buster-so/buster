@@ -1,6 +1,7 @@
 import type { GroupedAssets } from '@buster/server-shared/library';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
+import { getScreenshotSkeleton } from '@/components/features/Skeletons/get-screenshot-skeleton';
 import { Avatar } from '@/components/ui/avatar';
 import type {
   BusterListColumn,
@@ -12,26 +13,53 @@ import {
   type BusterListSectionRow,
   createListItem,
 } from '@/components/ui/list/BusterListNew';
+import { Popover } from '@/components/ui/popover';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { assetTypeLabel } from '@/lib/assets/asset-translations';
+import { cn } from '@/lib/classMerge';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import type { AssetListItem, AssetListViewListProps } from '../AssetList.types';
 import { getGroupMetadata } from '../grouping-meta-helpers';
 
+const NameComponent = (name: string, record: AssetListItem) => {
+  const Icon = assetTypeToIcon(record.asset_type || 'collection');
+  const imageUrl = record.screenshot_url ?? getScreenshotSkeleton(record.asset_type);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <span className="flex gap-1.5 items-center w-full truncate">
+      <AppTooltip title={assetTypeLabel(record.asset_type)}>
+        <span className="text-icon-color">
+          <Icon />
+        </span>
+      </AppTooltip>
+      <Popover
+        trigger="hover"
+        align="start"
+        childrenClassName="truncate block w-full"
+        delayDuration={record.screenshot_url ? 240 : 650}
+        className={cn('max-h-36 w-42 p-0.5', isLoaded ? '' : 'hidden')}
+        content={
+          <img
+            src={imageUrl}
+            alt={record.name}
+            className={cn('max-h-36 w-auto max-w-full object-top object-contain mx-auto block')}
+            onLoad={() => setIsLoaded(true)}
+          />
+        }
+      >
+        <div className="truncate block w-full border">{name}</div>
+      </Popover>
+    </span>
+  );
+};
+
 const columns: BusterListColumn<AssetListItem>[] = [
   {
     dataIndex: 'name',
     title: 'Name',
-    render: (v, record) => {
-      const Icon = assetTypeToIcon(record.asset_type || 'collection');
-      return (
-        <span className="flex gap-1.5 items-center">
-          <span className="text-icon-color">
-            <Icon />
-          </span>
-          <span>{v}</span>
-        </span>
-      );
-    },
+    render: NameComponent,
   },
   {
     dataIndex: 'created_at',

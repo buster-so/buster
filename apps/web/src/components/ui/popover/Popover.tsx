@@ -20,6 +20,7 @@ export interface PopoverProps
   size?: PopoverContentVariant['size'];
   sideOffset?: number;
   modal?: boolean;
+  childrenClassName?: string;
 }
 
 export const Popover = React.memo<PopoverProps>(
@@ -29,6 +30,7 @@ export const Popover = React.memo<PopoverProps>(
     align,
     side,
     className = '',
+    childrenClassName = '',
     trigger = 'click',
     size = 'default',
     sideOffset,
@@ -40,7 +42,7 @@ export const Popover = React.memo<PopoverProps>(
     return (
       <PopoverBase trigger={trigger} modal={modal} {...props}>
         <PopoverTrigger asChild>
-          <span className="">{children}</span>
+          <span className={childrenClassName}>{children}</span>
         </PopoverTrigger>
         <PopoverContent
           align={align}

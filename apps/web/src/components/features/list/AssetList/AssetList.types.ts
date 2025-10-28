@@ -24,6 +24,7 @@ export type AssetListItem = Pick<
   | 'updated_at'
   | 'created_by_name'
   | 'created_by_avatar_url'
+  | 'screenshot_url'
 >;
 
 export type AssetListViewListProps = AssetGridViewListProps & {
