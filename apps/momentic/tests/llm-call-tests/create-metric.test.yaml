@@ -19,12 +19,12 @@ steps:
   - id: c183810d-3646-4fad-8659-e0c4410668c1
     type: PRESET_ACTION
     command:
-      id: 85256ad7-2be8-414a-802b-4cacfa14bea9
+      id: ef685611-643f-4e32-a69f-0bffa2195227
       clearContent: true
       type: TYPE
       target:
         type: description
-        elementDescriptor: The text input box with Ask Buster a question..
+        elementDescriptor: The text input box with ask a question..
       value: Create me a metric to show how many sales in 2024. Do not create me a
         report.
   - id: 9408b9f5-c28e-42f0-8e49-9bdae01d954b

@@ -40,11 +40,3 @@ steps:
   - id: b541eff4-bf57-4921-b892-73ca920b26b1
     type: MODULE
     moduleId: 34c6e2fd-2455-4423-bd16-81f75250a72e
-  - id: 53ba9655-010d-46dc-99e1-e1cc8114d3c1
-    type: PRESET_ACTION
-    command:
-      id: a1a6b321-d7f8-4303-98d9-e47d6ac4214d
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: Dashboards in the left side navigation panel
