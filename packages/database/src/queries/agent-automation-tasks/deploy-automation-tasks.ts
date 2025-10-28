@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { db } from '../../connection';
 import { agentAutomationTasks, githubIntegrations } from '../../schema';
 import type { AgentEventTrigger, AgentName } from '../../schema-types';
-import { AgentEventTriggerSchema, AgentNameSchema } from '../../schema-types';
+import { AgentEventTriggerSchema, AgentNameSchema, GithubRepository } from '../../schema-types';
 
 // Input validation schema - accepts flattened tasks
 const DeployAutomationTasksInputSchema = z.object({
@@ -70,9 +70,14 @@ export const deployAutomationTasks = async (
       throw new Error('No active GitHub integration found for this organization');
     }
 
+    const permissionedRepositories = (githubIntegration.accessibleRepositories as GithubRepository[]).map((repository) => repository.full_name);
+
     for (const task of tasks) {
       if (!task.repository.includes('/')) {
         task.repository = `${githubIntegration.githubOrgName}/${task.repository}`;
+      }
+      if (!permissionedRepositories.includes(task.repository)) {
+        throw new Error(`Repository ${task.repository} is not accessible to the Buster Agent Github app. Please add the repository before deploying automation tasks.`);
       }
     }
 

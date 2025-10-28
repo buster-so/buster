@@ -1,14 +1,7 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '../../connection';
 import { githubIntegrations } from '../../schema';
-
-type GithubRepositories = {
-  full_name: string;
-  id: number;
-  name: string;
-  node_id: string;
-  private: boolean;
-};
+import type { GithubRepository } from '../../schema-types/github';
 
 /**
  * Update GitHub integration
@@ -19,14 +12,14 @@ export async function updateGithubIntegration(
     githubOrgName?: string;
     githubOrgId?: string;
     permissions?: Record<string, string>;
-    accessibleRepositories?: GithubRepositories[] | undefined;
+    accessibleRepositories?: GithubRepository[] | undefined;
     status?: 'pending' | 'active' | 'suspended' | 'revoked';
     deletedAt?: string;
   }
 ) {
   const updateData: Record<
     string,
-    string | number | Record<string, string> | undefined | GithubRepositories[]
+    string | number | Record<string, string> | undefined | GithubRepository[]
   > = {
     updatedAt: new Date().toISOString(),
   };
@@ -34,7 +27,7 @@ export async function updateGithubIntegration(
   // Only add defined fields to update
   if (data.githubOrgName !== undefined) updateData.githubOrgName = data.githubOrgName;
   if (data.githubOrgId !== undefined) updateData.githubOrgId = data.githubOrgId;
-  if (data.permissions !== undefined) updateData.repositoryPermissions = data.permissions;
+  if (data.permissions !== undefined) updateData.permissions = data.permissions;
   if (data.accessibleRepositories !== undefined)
     updateData.accessibleRepositories = data.accessibleRepositories;
   if (data.status !== undefined) updateData.status = data.status;
