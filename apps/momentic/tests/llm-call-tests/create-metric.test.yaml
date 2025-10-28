@@ -26,7 +26,7 @@ steps:
         type: description
         elementDescriptor: The text input box with ask a question..
       value: Create me a metric to show how many sales in 2024. Do not create me a
-        report.
+        report. Do not create me a dashboard. Just a single metric
   - id: 9408b9f5-c28e-42f0-8e49-9bdae01d954b
     type: PRESET_ACTION
     command:

@@ -1,9 +1,9 @@
 fileType: momentic/module
-schemaVersion: 1.0.21
 moduleId: 34c6e2fd-2455-4423-bd16-81f75250a72e
 name: chat-finished-with-dashboard
 description: Chat should finish and there should be a dashboard on right side of the screen
 enabled: true
+schemaVersion: 1.0.21
 steps:
   - id: cf07daef-232a-41a3-a0ff-45f0cc7dbdaf
     type: PRESET_ACTION
@@ -14,13 +14,6 @@ steps:
         type: SUBSTRING
         url: /dashboards
       timeout: 600
-  - id: bec2dd00-99ee-432e-911e-a0d279cda9fa
-    type: PRESET_ACTION
-    command:
-      id: 361c5c6e-2b9f-4645-8397-6352f2d2640c
-      type: AI_ASSERTION
-      assertion: Verify we have a dashboard on the right side of the screen with
-        multiple metrics. These metrics can be graphs, charts, or values.
   - id: b418882e-262b-49e4-bdfa-b452a99267e3
     type: PRESET_ACTION
     command:

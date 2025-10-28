@@ -18,22 +18,62 @@ steps:
   - id: 0e93bee3-d7b9-4e02-923c-a478d1b15b0b
     type: MODULE
     moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
-  - id: eb1d6165-555e-496c-a8a4-95480697d2cd
+  - id: 076b2184-bb1d-43da-bbaf-bd516ea41e2a
     type: PRESET_ACTION
     command:
-      id: 148d835f-b9cd-4f38-aaef-8ec6133e895e
+      id: c6271eae-1276-4af4-95ef-8d068c34745b
       type: CLICK
       target:
         type: description
-        elementDescriptor: Metrics on the left side navigation panel
-  - id: a427c4c3-9910-485a-a49f-572801cdca4c
+        elementDescriptor: the search icon button in the left sidebar (search-button)
+  - id: 9409c776-0d83-49e1-a4c2-5ed473070c6c
     type: PRESET_ACTION
     command:
-      id: b48ef8ae-e668-40bc-b5d4-f1627651da38
+      id: 6ac8e4f4-8ab3-4d21-b527-fa2d3aaeece9
       type: CLICK
       target:
         type: description
-        elementDescriptor: Click the second metric title from the top of the list of metrics
+        elementDescriptor: the search modal's right-side icon button next to the search input
+  - id: 63e635dd-8121-4c45-bf9a-873714602b4e
+    type: PRESET_ACTION
+    command:
+      id: 5e9ff389-7553-4527-9eca-395f99cb8ed4
+      type: HOVER
+      target:
+        type: description
+        elementDescriptor: the Asset type menu item in the Filters dropdown (menu item
+          with submenu caret)
+  - id: 98b46337-ff5f-4f2f-8560-82f44ff483e0
+    type: PRESET_ACTION
+    command:
+      id: ffbd714a-ef5d-40b5-a315-8465402bdded
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the Charts checkbox item in the filters dropdown menu
+  - id: bd3dc745-3b25-41b5-99c5-77156a7130aa
+    type: PRESET_ACTION
+    command:
+      id: a4aeefe8-117f-49cb-866b-a57e7d6ade4d
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the modal dialog overlay (backdrop) behind the search modal
+  - id: ee8c8438-3b9d-4f31-9781-6a5aef38244f
+    type: PRESET_ACTION
+    command:
+      id: 087ff3ef-8455-4fd5-bb7e-af6cf4bef106
+      type: WAIT
+      delay: 2
+  - id: c7714404-0fa3-4148-a356-ed9e79c911a5
+    type: PRESET_ACTION
+    command:
+      id: 95ae0d9a-c0c9-4992-9619-afc7642d2cec
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the first suggestion option in the search modal suggestions
+          list that is not under the "Actions" group
   - id: 18ccec13-eb82-4434-8486-66547a2872b2
     type: PRESET_ACTION
     command:
