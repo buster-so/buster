@@ -2,7 +2,7 @@ import type { User } from '@buster/database/queries';
 import type { deploy } from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { deployProjectHandler } from './POST';
+import { deployHandler } from '../POST';
 
 // Mock all database functions
 vi.mock('@buster/database/queries', () => ({
@@ -35,7 +35,7 @@ const mockUpsertDataset = vi.mocked(upsertDataset);
 const mockUpsertDoc = vi.mocked(upsertDoc);
 const mockDbTransaction = vi.mocked(db.transaction);
 
-describe('deployProjectHandler', () => {
+describe('deployHandler', () => {
   const mockUser: User = {
     id: 'user-123',
     email: 'test@example.com',
@@ -43,7 +43,7 @@ describe('deployProjectHandler', () => {
     avatarUrl: null,
   };
 
-  const mockRequest: deploy.ModelsDocsDeployRequest = {
+  const mockRequest: deploy.UnifiedDeployRequest = {
     models: [
       {
         name: 'test_model',
@@ -93,7 +93,7 @@ describe('deployProjectHandler', () => {
     it('should throw 401 if user has no organization', async () => {
       mockGetUserOrganizationId.mockResolvedValue(null);
 
-      await expect(deployProjectHandler(mockRequest, mockUser)).rejects.toThrow(
+      await expect(deployHandler(mockRequest, mockUser)).rejects.toThrow(
         new HTTPException(401, {
           message: 'User is not associated with an organization',
         })
@@ -106,7 +106,7 @@ describe('deployProjectHandler', () => {
         role: 'viewer',
       });
 
-      await expect(deployProjectHandler(mockRequest, mockUser)).rejects.toThrow(
+      await expect(deployHandler(mockRequest, mockUser)).rejects.toThrow(
         new HTTPException(403, {
           message: 'Insufficient permissions. Only workspace admins and data admins can deploy.',
         })
@@ -129,7 +129,7 @@ describe('deployProjectHandler', () => {
       mockUpsertDataset.mockResolvedValue({ datasetId: 'dataset-123', updated: false });
       mockUpsertDoc.mockResolvedValue({} as any);
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(result.models.summary.successCount).toBe(1);
       expect(result.docs.summary.createdCount).toBe(2);
@@ -151,7 +151,7 @@ describe('deployProjectHandler', () => {
       mockUpsertDataset.mockResolvedValue({ datasetId: 'dataset-123', updated: false });
       mockUpsertDoc.mockResolvedValue({} as any);
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(result.models.summary.successCount).toBe(1);
       expect(result.docs.summary.createdCount).toBe(2);
@@ -177,7 +177,7 @@ describe('deployProjectHandler', () => {
       mockUpsertDataset.mockResolvedValue({ datasetId: 'dataset-123', updated: false });
       mockUpsertDoc.mockResolvedValue({} as any);
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(mockUpsertDataset).toHaveBeenCalledWith({
         name: 'test_model',
@@ -212,7 +212,7 @@ describe('deployProjectHandler', () => {
       mockUpsertDataset.mockResolvedValue({ datasetId: 'dataset-123', updated: true });
       mockUpsertDoc.mockResolvedValue({} as any);
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(result.models.updated).toEqual([
         {
@@ -228,7 +228,7 @@ describe('deployProjectHandler', () => {
       mockGetDataSourceByName.mockResolvedValue(null);
       mockUpsertDoc.mockResolvedValue({} as any);
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(result.models.failures).toEqual([
         {
@@ -253,7 +253,7 @@ describe('deployProjectHandler', () => {
       // Mock console.error to avoid test noise
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(result.models.failures).toEqual([
         {
@@ -267,7 +267,7 @@ describe('deployProjectHandler', () => {
     });
 
     it('should handle multiple models with mixed results', async () => {
-      const multiModelRequest: deploy.ModelsDocsDeployRequest = {
+      const multiModelRequest: deploy.UnifiedDeployRequest = {
         models: [
           {
             name: 'model1',
@@ -315,7 +315,7 @@ describe('deployProjectHandler', () => {
         .mockResolvedValueOnce({ datasetId: 'dataset-1', updated: false })
         .mockResolvedValueOnce({ datasetId: 'dataset-2', updated: true });
 
-      const result = await deployProjectHandler(multiModelRequest, mockUser);
+      const result = await deployHandler(multiModelRequest, mockUser);
 
       expect(result.models.summary.successCount).toBe(1);
       expect(result.models.summary.updateCount).toBe(1);
@@ -335,7 +335,7 @@ describe('deployProjectHandler', () => {
     it('should successfully deploy docs', async () => {
       mockUpsertDoc.mockResolvedValue({} as any);
 
-      const docsOnlyRequest: deploy.ModelsDocsDeployRequest = {
+      const docsOnlyRequest: deploy.UnifiedDeployRequest = {
         models: [],
         docs: [
           { name: 'README.md', content: '# Readme', type: 'normal' },
@@ -345,7 +345,7 @@ describe('deployProjectHandler', () => {
         deleteAbsentDocs: false,
       };
 
-      const result = await deployProjectHandler(docsOnlyRequest, mockUser);
+      const result = await deployHandler(docsOnlyRequest, mockUser);
 
       expect(mockUpsertDoc).toHaveBeenCalledTimes(2);
       expect(mockUpsertDoc).toHaveBeenCalledWith({
@@ -373,7 +373,7 @@ describe('deployProjectHandler', () => {
       // Mock console.error to avoid test noise
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const result = await deployProjectHandler(mockRequest, mockUser);
+      const result = await deployHandler(mockRequest, mockUser);
 
       expect(result.docs.created).toEqual(['README.md']);
       expect(result.docs.failed).toEqual([
@@ -403,7 +403,7 @@ describe('deployProjectHandler', () => {
       // Mock console.error to avoid test noise
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      await expect(deployProjectHandler(mockRequest, mockUser)).rejects.toThrow(
+      await expect(deployHandler(mockRequest, mockUser)).rejects.toThrow(
         new HTTPException(500, {
           message: 'Transaction failed',
         })
@@ -420,7 +420,7 @@ describe('deployProjectHandler', () => {
       // Mock console.error to avoid test noise
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      await expect(deployProjectHandler(mockRequest, mockUser)).rejects.toThrow(
+      await expect(deployHandler(mockRequest, mockUser)).rejects.toThrow(
         new HTTPException(503, { message: 'Service unavailable' })
       );
 
@@ -433,7 +433,7 @@ describe('deployProjectHandler', () => {
       // Mock console.error to avoid test noise
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      await expect(deployProjectHandler(mockRequest, mockUser)).rejects.toThrow(
+      await expect(deployHandler(mockRequest, mockUser)).rejects.toThrow(
         new HTTPException(500, {
           message: 'Deployment failed',
         })
@@ -452,14 +452,14 @@ describe('deployProjectHandler', () => {
     });
 
     it('should handle empty models and docs', async () => {
-      const emptyRequest: deploy.ModelsDocsDeployRequest = {
+      const emptyRequest: deploy.UnifiedDeployRequest = {
         models: [],
         docs: [],
         deleteAbsentModels: false,
         deleteAbsentDocs: false,
       };
 
-      const result = await deployProjectHandler(emptyRequest, mockUser);
+      const result = await deployHandler(emptyRequest, mockUser);
 
       expect(result.models.summary.totalModels).toBe(0);
       expect(result.docs.summary.totalDocs).toBe(0);
@@ -468,4 +468,3 @@ describe('deployProjectHandler', () => {
     });
   });
 });
-

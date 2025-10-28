@@ -1,4 +1,4 @@
-import { and, eq, isNull, arrayOverlaps } from 'drizzle-orm';
+import { and, arrayOverlaps, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { agentAutomationTasks } from '../../schema';
@@ -24,13 +24,15 @@ export async function getAgentTasksForEvent(params: GetAgentTasksForEvent) {
       task: agentAutomationTasks,
     })
     .from(agentAutomationTasks)
-    .where(and(
-      eq(agentAutomationTasks.organizationId, organizationId),
-      eq(agentAutomationTasks.eventTrigger, eventTrigger),
-      isNull(agentAutomationTasks.deletedAt),
-      eq(agentAutomationTasks.repository, repository),
-      arrayOverlaps(agentAutomationTasks.branches, [branch, '*']),
-    ));
+    .where(
+      and(
+        eq(agentAutomationTasks.organizationId, organizationId),
+        eq(agentAutomationTasks.eventTrigger, eventTrigger),
+        isNull(agentAutomationTasks.deletedAt),
+        eq(agentAutomationTasks.repository, repository),
+        arrayOverlaps(agentAutomationTasks.branches, [branch, '*'])
+      )
+    );
 
   return results;
 }

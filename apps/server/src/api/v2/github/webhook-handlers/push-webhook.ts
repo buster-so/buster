@@ -16,7 +16,7 @@ export async function handlePushWebhook(
   const repo = payload.repository.full_name;
   const repoUrl = payload.repository.html_url;
   const installationId = payload.installation?.id;
-  
+
   // Extract branch name from ref (e.g., "refs/heads/main" -> "main")
   const headBranch = payload.ref.split('/').pop();
   const baseBranch = payload.base_ref?.split('/').pop() || headBranch;
@@ -48,7 +48,7 @@ export async function handlePushWebhook(
     organizationId: apiKey.organizationId,
     eventTrigger,
     repository: repo,
-    branch: headBranch || ''
+    branch: headBranch || '',
   });
 
   if (automationTasks.length === 0) {

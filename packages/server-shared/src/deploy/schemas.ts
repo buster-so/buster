@@ -1,6 +1,11 @@
 import { z } from 'zod';
 // Import DeployModelSchema and LogsConfigSchema from datasets to avoid duplication
-import { AutomationConfigSchema, DeployModelSchema, LogsConfigSchema } from '../datasets/schemas';
+import {
+  AgentAutomationSchema,
+  AutomationConfigSchema,
+  DeployModelSchema,
+  LogsConfigSchema,
+} from '../datasets/schemas';
 
 // ============================================================================
 // Unified Deploy Request/Response Schemas
@@ -28,25 +33,15 @@ export const LogsWritebackConfigSchema = z
   .nullable()
   .describe('Configuration for writing logs back to data warehouse');
 
-// Schema for models and docs deployment
-export const ModelsDocsDeployRequestSchema = z.object({
+// Unified deploy request that handles models, docs, and automation
+export const UnifiedDeployRequestSchema = z.object({
   models: z.array(DeployModelSchema).default([]),
   docs: z.array(DeployDocSchema).default([]),
   deleteAbsentModels: z.boolean().default(true),
   deleteAbsentDocs: z.boolean().default(true),
   logsWriteback: LogsWritebackConfigSchema.optional().describe('Logs writeback configuration'),
+  automation: z.array(AgentAutomationSchema).optional().describe('Automation configuration'),
 });
-
-// Schema for automation configuration deployment
-export const AutomationDeployRequestSchema = z.object({
-  automation: AutomationConfigSchema.describe('CI/CD agent automation configuration'),
-});
-
-// Unified deploy request that handles either models/docs or automation
-export const UnifiedDeployRequestSchema = z.union([
-  ModelsDocsDeployRequestSchema,
-  AutomationDeployRequestSchema,
-]);
 
 // Response schemas for deployment results
 export const DeploymentItemSchema = z.object({
@@ -118,7 +113,7 @@ export const UnifiedDeployResponseSchema = z.object({
   models: ModelDeployResultSchema,
   docs: DocDeployResultSchema,
   logsWriteback: LogsWritebackResultSchema.optional(),
-  automation: AutomationDeployResultSchema.optional(),
+  automation: AutomationDeployResultSchema,
 });
 
 // ============================================================================
@@ -129,8 +124,6 @@ export type DeployModel = z.infer<typeof DeployModelSchema>;
 export type DeployDoc = z.infer<typeof DeployDocSchema>;
 export type LogsConfig = z.infer<typeof LogsConfigSchema>;
 export type LogsWritebackConfig = z.infer<typeof LogsWritebackConfigSchema>;
-export type ModelsDocsDeployRequest = z.infer<typeof ModelsDocsDeployRequestSchema>;
-export type AutomationDeployRequest = z.infer<typeof AutomationDeployRequestSchema>;
 export type UnifiedDeployRequest = z.infer<typeof UnifiedDeployRequestSchema>;
 export type UnifiedDeployResponse = z.infer<typeof UnifiedDeployResponseSchema>;
 export type ModelDeployResult = z.infer<typeof ModelDeployResultSchema>;

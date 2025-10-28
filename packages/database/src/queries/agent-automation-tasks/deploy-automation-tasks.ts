@@ -1,30 +1,27 @@
-import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { agentAutomationTasks, githubIntegrations } from '../../schema';
 import type { AgentEventTrigger, AgentName } from '../../schema-types';
+import { AgentEventTriggerSchema, AgentNameSchema } from '../../schema-types';
 
-// Input validation schema
+// Input validation schema - accepts flattened tasks
 const DeployAutomationTasksInputSchema = z.object({
   organizationId: z.string().uuid('Organization ID must be a valid UUID'),
-  automation: z.array(
+  tasks: z.array(
     z.object({
-      agent: z.string(),
-      on: z.array(
-        z.object({
-          event: z.enum(['pull_request', 'push']),
-          repository: z.string().optional(),
-          branches: z.array(z.string()).optional(),
-        })
-      ),
+      agentName: AgentNameSchema,
+      eventTrigger: AgentEventTriggerSchema,
+      repository: z.string(),
+      branches: z.array(z.string()),
     })
   ),
 });
 
 type DeployAutomationTasksInput = z.infer<typeof DeployAutomationTasksInputSchema>;
 
-// Internal type for flattened tasks
-interface FlattenedTask {
+// Task type
+interface Task {
   agentName: AgentName;
   eventTrigger: AgentEventTrigger;
   repository: string;
@@ -32,7 +29,7 @@ interface FlattenedTask {
 }
 
 // Helper to create a unique key for a task
-function getTaskKey(task: FlattenedTask): string {
+function getTaskKey(task: Task): string {
   return `${task.agentName}|${task.eventTrigger}|${task.repository}|${JSON.stringify(task.branches.sort())}`;
 }
 
@@ -51,7 +48,7 @@ export const deployAutomationTasks = async (
   deleted: number;
   restored: number;
 }> => {
-  const { organizationId, automation } = DeployAutomationTasksInputSchema.parse(params);
+  const { organizationId, tasks } = DeployAutomationTasksInputSchema.parse(params);
 
   try {
     const now = new Date().toISOString();
@@ -75,28 +72,9 @@ export const deployAutomationTasks = async (
     const integrationId = githubIntegration.id;
 
     return await db.transaction(async (tx) => {
-      // 1. Flatten the automation config into individual tasks
-      const desiredTasks: FlattenedTask[] = [];
-      for (const agentConfig of automation) {
-        for (const eventTrigger of agentConfig.on) {
-          if (!eventTrigger.repository) {
-            throw new Error(
-              `Repository must be specified for agent "${agentConfig.agent}" with event "${eventTrigger.event}"`
-            );
-          }
-
-          desiredTasks.push({
-            agentName: agentConfig.agent as AgentName,
-            eventTrigger: eventTrigger.event as AgentEventTrigger,
-            repository: eventTrigger.repository,
-            branches: eventTrigger.branches || ['*'],
-          });
-        }
-      }
-
-      // Create a map of desired tasks by their unique key
-      const desiredTasksMap = new Map<string, FlattenedTask>();
-      for (const task of desiredTasks) {
+      // 1. Create a map of desired tasks by their unique key
+      const desiredTasksMap = new Map<string, Task>();
+      for (const task of tasks) {
         desiredTasksMap.set(getTaskKey(task), task);
       }
 
@@ -134,7 +112,7 @@ export const deployAutomationTasks = async (
       }
 
       // 3. Determine what actions to take
-      const tasksToCreate: FlattenedTask[] = [];
+      const tasksToCreate: Task[] = [];
       const tasksToRestore: string[] = [];
       const tasksToUpdate: string[] = [];
 
@@ -226,7 +204,7 @@ export const deployAutomationTasks = async (
   } catch (error) {
     console.error('Error deploying automation tasks:', {
       organizationId,
-      automationCount: automation.length,
+      taskCount: tasks.length,
       error: error instanceof Error ? error.message : error,
     });
 
@@ -237,4 +215,3 @@ export const deployAutomationTasks = async (
     throw new Error('Failed to deploy automation tasks');
   }
 };
-

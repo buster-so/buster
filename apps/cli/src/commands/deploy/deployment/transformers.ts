@@ -17,8 +17,7 @@ export function prepareDeploymentRequest(
   docs: DeployDoc[] = [],
   deleteAbsentModels = true,
   deleteAbsentDocs = true,
-  logsConfig?: LogsConfig,
-  automationConfig?: AutomationConfig
+  logsConfig?: LogsConfig
 ): UnifiedDeployRequest {
   // Transform logs config to logsWriteback format if present
   const logsWriteback: LogsWritebackConfig | undefined = logsConfig
@@ -41,23 +40,13 @@ export function prepareDeploymentRequest(
     console.info('  ℹ No logs writeback configuration found - will remove any existing config');
   }
 
-  // Log automation config if present
-  if (automationConfig) {
-    const agentCount = automationConfig.length;
-    const triggerCount = automationConfig.reduce((sum, agent) => sum + agent.on.length, 0);
-    console.info('  ✓ Automation configuration found:', {
-      agents: agentCount,
-      triggers: triggerCount,
-    });
-  }
-
   return {
     models: models.map(modelToDeployModel),
     docs,
     deleteAbsentModels,
     deleteAbsentDocs,
     logsWriteback,
-    automation: automationConfig,
+    automation: [],
   };
 }
 

@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { AgentNameSchema } from '@buster/database/schema-types';
+import { z } from 'zod';
 
 // ============================================================================
 // Model Schemas - Define the structure of semantic layer models
@@ -188,7 +188,10 @@ export const UpstreamRepositorySchema = z.object({
 
 // Base event trigger schema with common fields
 const BaseEventTriggerSchema = z.object({
-  repository: z.string().optional().describe('Repository in format owner/repo (optional, defaults to current)'),
+  repository: z
+    .string()
+    .optional()
+    .describe('Repository in format owner/repo (optional, defaults to current)'),
   branches: z.array(z.string()).optional().default(['*']).describe('Branch filters'),
 });
 

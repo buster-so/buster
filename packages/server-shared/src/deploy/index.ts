@@ -1,7 +1,5 @@
 // Export all deploy schemas and types
 export {
-  type AutomationDeployRequest,
-  AutomationDeployRequestSchema,
   type AutomationDeployResult,
   AutomationDeployResultSchema,
   type DeployDoc,
@@ -24,8 +22,6 @@ export {
   LogsWritebackResultSchema,
   type ModelDeployResult,
   ModelDeployResultSchema,
-  type ModelsDocsDeployRequest,
-  ModelsDocsDeployRequestSchema,
   type UnifiedDeployRequest,
   UnifiedDeployRequestSchema,
   type UnifiedDeployResponse,

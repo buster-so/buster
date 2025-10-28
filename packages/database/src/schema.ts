@@ -20,8 +20,8 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import {
-  AgentNameSchema,
   AgentEventTriggerSchema,
+  AgentNameSchema,
   AssetPermissionRoleSchema,
   AssetTypeSchema,
   ChatTypeSchema,
@@ -53,10 +53,7 @@ import {
 } from './schema-types';
 import type { DatasetMetadata } from './schema-types/dataset-metadata';
 
-export const agentNameEnum = pgEnum(
-  'agent_name_enum',
-  AgentNameSchema .options
-);
+export const agentNameEnum = pgEnum('agent_name_enum', AgentNameSchema.options);
 export const agentEventTriggerEnum = pgEnum(
   'agent_event_trigger_enum',
   AgentEventTriggerSchema.options

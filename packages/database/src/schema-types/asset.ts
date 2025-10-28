@@ -22,10 +22,7 @@ export const AssetPermissionRoleSchema = z.enum([
 
 export type AssetPermissionRole = z.infer<typeof AssetPermissionRoleSchema>;
 
-export const AgentNameSchema = z.enum([
-  'documentation_agent',
-  'upstream_conflict_agent',
-]);
+export const AgentNameSchema = z.enum(['documentation_agent', 'upstream_conflict_agent']);
 export type AgentName = z.infer<typeof AgentNameSchema>;
 
 export const AgentEventTriggerSchema = z.enum([

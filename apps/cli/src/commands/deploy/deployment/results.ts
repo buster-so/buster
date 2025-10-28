@@ -267,7 +267,9 @@ export function formatDeploymentSummary(
         `  ✓ Automation configured: ${result.automation.agentCount} agent${result.automation.agentCount === 1 ? '' : 's'}, ${result.automation.triggerCount} trigger${result.automation.triggerCount === 1 ? '' : 's'}`
       );
     } else if (verbose) {
-      lines.push('  ℹ No automation configuration (existing automation will be removed if present)');
+      lines.push(
+        '  ℹ No automation configuration (existing automation will be removed if present)'
+      );
     }
 
     if (result.automation.error) {

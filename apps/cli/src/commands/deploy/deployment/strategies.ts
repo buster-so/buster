@@ -35,7 +35,10 @@ export function createDryRunDeployer(verbose = false): DeployFunction {
           console.info(`    - ${agentConfig.agent}:`);
           for (const trigger of agentConfig.on) {
             const repo = trigger.repository ? ` (${trigger.repository})` : '';
-            const types = trigger.event === 'pull_request' && trigger.types ? ` [${trigger.types.join(', ')}]` : '';
+            const types =
+              trigger.event === 'pull_request' && trigger.types
+                ? ` [${trigger.types.join(', ')}]`
+                : '';
             const branches = trigger.branches ? ` on branches: ${trigger.branches.join(', ')}` : '';
             console.info(`      - ${trigger.event}${repo}${types}${branches}`);
           }
@@ -198,6 +201,11 @@ export function createValidationDeployer(): DeployFunction {
           failedCount: docFailures.length,
         },
       },
+      automation: {
+        configured: false,
+        agentCount: 0,
+        triggerCount: 0,
+      },
     };
   };
 }
@@ -286,6 +294,11 @@ export function createRetryableDeployer(
           deletedCount: 0,
           failedCount: request.docs.length,
         },
+      },
+      automation: {
+        configured: false,
+        agentCount: 0,
+        triggerCount: 0,
       },
     };
   };
