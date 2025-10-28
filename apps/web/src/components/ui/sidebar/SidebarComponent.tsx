@@ -36,7 +36,6 @@ const ContentSelector: React.FC<{
   if (isSidebarGroup(content)) {
     return <SidebarCollapsible {...content} useCollapsible={useCollapsible} />;
   }
-
   return <SidebarList {...content} />;
 });
 ContentSelector.displayName = 'ContentSelector';

@@ -1,10 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import { cva, type VariantProps } from 'class-variance-authority';
-import type React from 'react';
+import React from 'react';
 import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons/Button';
 import { Xmark } from '../icons';
+import { AppTooltip } from '../tooltip';
 import type { ISidebarItem } from './interfaces';
+import { useSidebarIsCollapsed } from './SidebarContext';
 
 const itemVariants = cva(
   cn(
@@ -34,7 +36,12 @@ const itemVariants = cva(
   }
 );
 
-export const SidebarItem: React.FC<ISidebarItem & VariantProps<typeof itemVariants>> = ({
+export const SidebarItem: React.FC<
+  ISidebarItem &
+    VariantProps<typeof itemVariants> & {
+      hideTooltip?: boolean;
+    }
+> = ({
   label,
   icon,
   link,
@@ -46,8 +53,11 @@ export const SidebarItem: React.FC<ISidebarItem & VariantProps<typeof itemVarian
   className = '',
   onClick,
   collapsedTooltip,
+  hideTooltip,
   ...rest
 }) => {
+  const isSidebarCollapsed = useSidebarIsCollapsed();
+
   const wrapperProps = {
     className: cn(itemVariants({ disabled, variant }), 'justify-between', className),
     onClick,
@@ -55,6 +65,17 @@ export const SidebarItem: React.FC<ISidebarItem & VariantProps<typeof itemVarian
     'data-status': active ? 'active' : undefined,
     disabled,
     ...rest,
+  };
+
+  const Wrapper = ({ children }: { children: React.ReactNode }) => {
+    if (isSidebarCollapsed && !hideTooltip) {
+      return (
+        <AppTooltip side="right" align="start" title={label}>
+          {children}
+        </AppTooltip>
+      );
+    }
+    return <React.Fragment>{children}</React.Fragment>;
   };
 
   const content = (
@@ -97,7 +118,7 @@ export const SidebarItem: React.FC<ISidebarItem & VariantProps<typeof itemVarian
       </Link>
     );
 
-  return wrapperSwitch;
+  return <Wrapper>{wrapperSwitch}</Wrapper>;
 };
 
 SidebarItem.displayName = 'SidebarItem';

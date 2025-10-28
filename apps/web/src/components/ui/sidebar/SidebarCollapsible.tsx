@@ -30,6 +30,7 @@ import {
   CollapsibleTrigger,
 } from '../collapsible/CollapsibleBase';
 import { CaretDown } from '../icons/NucleoIconFilled';
+import { AppTooltip } from '../tooltip';
 import { COLLAPSED_HIDDEN } from './config';
 import type { ISidebarGroup } from './interfaces';
 import { useSidebarIsCollapsed } from './SidebarContext';
@@ -47,6 +48,7 @@ interface SortableSidebarItemProps {
   item: ISidebarGroup['items'][0];
   active?: boolean;
   isDragging?: boolean;
+  hideTooltip?: boolean;
 }
 
 export const SidebarCollapsible: React.FC<
@@ -155,6 +157,7 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({
   item,
   active,
   isDragging: isExternalDragging,
+  hideTooltip,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
@@ -190,7 +193,7 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = ({
       )}
     >
       <div onClick={isDragging ? (e) => e.stopPropagation() : undefined}>
-        <SidebarItem {...item} active={active} />
+        <SidebarItem {...item} active={active} hideTooltip={hideTooltip} />
       </div>
     </div>
   );
@@ -281,6 +284,7 @@ const CollapsibleContent = ({
 }) => {
   const [sortedItems, setSortedItems] = React.useState(items);
   const [draggingId, setDraggingId] = React.useState<string | null>(null);
+  const hideTooltip = !showSidebar;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -340,6 +344,7 @@ const CollapsibleContent = ({
                 item={item}
                 active={activeItem === item.id || item.active}
                 isDragging={draggingId === item.id}
+                hideTooltip={hideTooltip}
               />
             ))}
           </SortableContext>
@@ -347,7 +352,11 @@ const CollapsibleContent = ({
             <DragOverlay dropAnimation={null}>
               {draggingId && draggingItem ? (
                 <div className="opacity-70 shadow">
-                  <SidebarItem {...draggingItem} active={draggingItem.active} />
+                  <SidebarItem
+                    {...draggingItem}
+                    active={draggingItem.active}
+                    hideTooltip={hideTooltip}
+                  />
                 </div>
               ) : null}
             </DragOverlay>
@@ -355,7 +364,12 @@ const CollapsibleContent = ({
         </DndContext>
       ) : (
         items.map((item) => (
-          <SidebarItem key={item.id} {...item} active={activeItem === item.id || item.active} />
+          <SidebarItem
+            key={item.id}
+            {...item}
+            active={activeItem === item.id || item.active}
+            hideTooltip={hideTooltip}
+          />
         ))
       )}
     </div>
@@ -368,7 +382,7 @@ const SidebarSmallWidthContent: React.FC<
     ISidebarGroup,
     'items' | 'icon' | 'label' | 'link' | 'isSortable' | 'onItemsReorder' | 'id'
   > & { activeItem?: string }
-> = ({ items, icon, link, isSortable = false, id, onItemsReorder, activeItem }) => {
+> = ({ items, icon, link, label, isSortable = false, id, onItemsReorder, activeItem }) => {
   const trigger = link ? 'click' : 'click';
 
   return (
@@ -390,16 +404,18 @@ const SidebarSmallWidthContent: React.FC<
         />
       }
     >
-      <div
-        data-testid={`sidebar-collapsible-${id}`}
-        className={cn(
-          'flex flex-col space-y-0.5 h-7 overflow-y-auto',
-          'text-icon-color! text-icon-size flex items-center justify-center',
-          'hover:bg-nav-item-hover w-full rounded-sm cursor-pointer'
-        )}
-      >
-        {icon}
-      </div>
+      <AppTooltip side="right" align="start" title={label}>
+        <div
+          data-testid={`sidebar-collapsible-${id}`}
+          className={cn(
+            'flex flex-col space-y-0.5 h-7 overflow-y-auto',
+            'text-icon-color! text-icon-size flex items-center justify-center',
+            'hover:bg-nav-item-hover w-full rounded-sm cursor-pointer'
+          )}
+        >
+          {icon}
+        </div>
+      </AppTooltip>
     </Popover>
   );
 };

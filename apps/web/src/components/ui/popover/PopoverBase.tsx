@@ -56,7 +56,11 @@ const PopoverRoot: React.FC<PopoverProps> = ({
 
   const content =
     trigger === 'hover' ? (
-      <span className="relative min-w-0" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <span
+        className="relative min-w-0"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <span className="relative z-10 min-w-0">{children}</span>
       </span>
     ) : (
