@@ -1,62 +1,51 @@
 import type React from 'react';
-import { useMemo } from 'react';
-import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import { useLibraryAssetsInfinite } from '@/api/buster_rest/library';
-import { useGetUserBasicInfo } from '@/api/buster_rest/users/useGetUserInfo';
+import { FilterLibraryPills } from '@/components/features/search/FilterPills';
 import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
-import { computeLibraryFilters } from './compute-library-filters';
 import { LibraryGridView } from './LibraryGridView';
 import { LibraryHeader } from './LibraryHeader';
 import { LibraryListView } from './LibraryListView';
 import type { LibraryViewProps } from './library.types';
 import type { LibraryLayout, LibrarySearchParams } from './schema';
+import { useHasFiltersEnabled, useManagedFilters } from './useManagedFilters';
 
 export type LibraryControllerProps = {
   filters: LibrarySearchParams;
   layout: LibraryLayout;
 };
 
-export const LibraryController: React.FC<LibraryControllerProps> = ({
-  filters: filtersProps,
-  layout,
-}) => {
-  const { data: collections } = useGetCollectionsList({});
-  const managedFilters = useManagedFilters(filtersProps);
+const type = 'library' as const;
 
-  const { scrollContainerRef, allResults, allGroups, isFetchingNextPage, isFetched } =
-    useLibraryAssetsInfinite({
-      ...managedFilters,
-      scrollConfig: {
-        scrollThreshold: 125,
-      },
-    });
+export const LibraryController: React.FC<LibraryControllerProps> = ({ filters, layout }) => {
+  const hasFiltersEnabled = useHasFiltersEnabled(filters);
+  const managedFilters = useManagedFilters({ ...filters, type: 'library' });
+
+  const pinCollections = !hasFiltersEnabled && !filters.group_by;
+
+  const { scrollContainerRef, allGroups, allResults, isFetchingNextPage, isFetched } =
+    useLibraryAssetsInfinite({ ...managedFilters, pinCollections });
 
   const libraryViewProps: LibraryViewProps = {
     allResults,
     allGroups,
-    collections: collections?.data || [],
-    filters: filtersProps,
+    filters,
     isFetchingNextPage,
     scrollContainerRef,
-    isInitialLoading: isFetched,
+    isInitialLoading: !isFetched,
+    pinCollections,
+    type,
   };
 
   return (
     <AppPageLayout
-      header={<LibraryHeader layout={layout} filters={filtersProps} />}
+      header={<LibraryHeader type={type} layout={layout} filters={filters} />}
       contentContainerId="library-content"
       scrollable={false}
     >
+      <FilterLibraryPills {...managedFilters} filter={filters.filter} type={type} />
+
       {layout === 'grid' && <LibraryGridView {...libraryViewProps} />}
       {layout === 'list' && <LibraryListView {...libraryViewProps} />}
     </AppPageLayout>
   );
-};
-
-const useManagedFilters = (
-  filtersProps: LibrarySearchParams
-): Omit<Parameters<typeof useLibraryAssetsInfinite>[0], 'scrollConfig'> => {
-  const user = useGetUserBasicInfo();
-  const userId = user?.id ?? '';
-  return useMemo(() => computeLibraryFilters(filtersProps, userId), [filtersProps, userId]);
 };

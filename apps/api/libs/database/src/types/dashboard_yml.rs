@@ -6,7 +6,7 @@ use diesel::{
     sql_types::Jsonb,
     AsExpression, FromSqlRow,
 };
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
 use std::io::Write;
 use uuid::Uuid;
@@ -15,6 +15,93 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     static ref DASHBOARD_NAME_DESC_RE: Regex = Regex::new(r#"^(\s*(?:name|description):\s*)(.*)$"#).unwrap();
+}
+
+/// RowId can accept either a string or a u32 value when deserializing,
+/// but always serializes as a string
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RowId(String);
+
+impl RowId {
+    pub fn as_u32(&self) -> Option<u32> {
+        self.0.parse::<u32>().ok()
+    }
+    
+    pub fn as_string(&self) -> String {
+        self.0.clone()
+    }
+    
+    pub fn is_zero(&self) -> bool {
+        self.0 == "0" || self.0.is_empty()
+    }
+}
+
+impl From<u32> for RowId {
+    fn from(n: u32) -> Self {
+        RowId(n.to_string())
+    }
+}
+
+impl From<String> for RowId {
+    fn from(s: String) -> Self {
+        RowId(s)
+    }
+}
+
+impl From<&str> for RowId {
+    fn from(s: &str) -> Self {
+        RowId(s.to_string())
+    }
+}
+
+impl Serialize for RowId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // Always serialize as a string
+        serializer.serialize_str(&self.0)
+    }
+}
+
+impl<'de> Deserialize<'de> for RowId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = serde_json::Value::deserialize(deserializer)?;
+        match value {
+            serde_json::Value::Number(n) => {
+                // Accept number but convert to string
+                if let Some(n) = n.as_u64() {
+                    Ok(RowId((n as u32).to_string()))
+                } else {
+                    Err(serde::de::Error::custom("Invalid number for RowId"))
+                }
+            }
+            serde_json::Value::String(s) => Ok(RowId(s)),
+            _ => Err(serde::de::Error::custom("RowId must be a string or number")),
+        }
+    }
+}
+
+// Convenience implementations for comparisons
+impl PartialEq<u32> for RowId {
+    fn eq(&self, other: &u32) -> bool {
+        self.as_u32() == Some(*other)
+    }
+}
+
+impl PartialEq<&str> for RowId {
+    fn eq(&self, other: &&str) -> bool {
+        self.0 == *other
+    }
+}
+
+impl PartialEq<String> for RowId {
+    fn eq(&self, other: &String) -> bool {
+        &self.0 == other
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromSqlRow, AsExpression)]
@@ -44,7 +131,7 @@ pub struct Row {
     pub column_sizes: Vec<u32>, // sum of elements must be exactly 12, min size is 3
     
     #[serde(alias = "id")]
-    pub id: u32, // incremental id for rows
+    pub id: RowId, // can be a string or a u32
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -82,8 +169,8 @@ impl DashboardYml {
         }
 
         for (index, row) in file.rows.iter_mut().enumerate() {
-            if row.id == 0 {
-                row.id = (index + 1) as u32;
+            if row.id.is_zero() {
+                row.id = RowId::from((index + 1) as u32);
             }
         }
 
@@ -156,12 +243,14 @@ impl DashboardYml {
             .map_err(|e| anyhow::anyhow!("Failed to serialize dashboard yml: {}", e))
     }
     
-    pub fn get_next_row_id(&self) -> u32 {
-        self.rows
+    pub fn get_next_row_id(&self) -> RowId {
+        let max_numeric_id = self.rows
             .iter()
-            .map(|row| row.id)
+            .filter_map(|row| row.id.as_u32())
             .max()
-            .map_or(1, |max_id| max_id + 1)
+            .unwrap_or(0);
+        
+        RowId::from(max_numeric_id + 1)
     }
     
     pub fn add_row(&mut self, items: Vec<RowItem>, row_height: Option<u32>, column_sizes: Vec<u32>) {
@@ -209,7 +298,7 @@ mod tests {
                     ],
                     row_height: Some(400),
                     column_sizes: vec![12],
-                    id: 1,
+                    id: RowId::from(1),
                 }
             ],
         };
@@ -225,6 +314,9 @@ mod tests {
         assert!(row.get("rowHeight").is_some());
         assert!(row.get("columnSizes").is_some());
         assert!(row.get("id").is_some());
+        
+        // Verify id is serialized as a string
+        assert_eq!(row["id"], "1");
         
         assert!(row.get("row_height").is_none());
         assert!(row.get("column_sizes").is_none());
@@ -333,7 +425,7 @@ rows:
                     items: vec![RowItem { id: Uuid::new_v4() }],
                     row_height: None,
                     column_sizes: vec![12],
-                    id: 1,
+                    id: RowId::from(1),
                 }
             ],
         };
@@ -367,19 +459,19 @@ rows:
                     items: vec![RowItem { id: Uuid::new_v4() }],
                     row_height: None,
                     column_sizes: vec![12],
-                    id: 1,
+                    id: RowId::from(1),
                 },
                 Row {
                     items: vec![RowItem { id: Uuid::new_v4() }],
                     row_height: None,
                     column_sizes: vec![12],
-                    id: 5,
+                    id: RowId::from(5),
                 },
                 Row {
                     items: vec![RowItem { id: Uuid::new_v4() }],
                     row_height: None,
                     column_sizes: vec![12],
-                    id: 3,
+                    id: RowId::from(3),
                 }
             ],
         };
@@ -410,5 +502,81 @@ rows:
         let dashboard = DashboardYml::new(yaml).unwrap();
         
         assert_eq!(dashboard.rows[0].id, 42);
+    }
+    
+    #[test]
+    fn test_string_id_deserialization() {
+        // Test that string IDs are accepted during deserialization
+        let json = json!({
+            "name": "Test Dashboard",
+            "description": "Test with string IDs",
+            "rows": [
+                {
+                    "items": [
+                        {
+                            "id": "00000000-0000-0000-0000-000000000001"
+                        }
+                    ],
+                    "rowHeight": 400,
+                    "columnSizes": [12],
+                    "id": "custom-id-1"
+                },
+                {
+                    "items": [
+                        {
+                            "id": "00000000-0000-0000-0000-000000000002"
+                        }
+                    ],
+                    "rowHeight": 320,
+                    "columnSizes": [12],
+                    "id": "another-id"
+                }
+            ]
+        });
+        
+        let yaml = serde_yaml::to_string(&json).unwrap();
+        let dashboard = DashboardYml::new(yaml).unwrap();
+        
+        // Verify string IDs are preserved
+        assert_eq!(dashboard.rows[0].id, "custom-id-1");
+        assert_eq!(dashboard.rows[1].id, "another-id");
+        
+        // Verify they serialize as strings
+        let serialized = dashboard.to_value().unwrap();
+        assert_eq!(serialized["rows"][0]["id"], "custom-id-1");
+        assert_eq!(serialized["rows"][1]["id"], "another-id");
+    }
+    
+    #[test]
+    fn test_numeric_id_serializes_as_string() {
+        // Test that numeric IDs serialize as strings
+        let json = json!({
+            "name": "Test Dashboard",
+            "description": "Test numeric to string conversion",
+            "rows": [
+                {
+                    "items": [
+                        {
+                            "id": "00000000-0000-0000-0000-000000000001"
+                        }
+                    ],
+                    "rowHeight": 400,
+                    "columnSizes": [12],
+                    "id": 123
+                }
+            ]
+        });
+        
+        let yaml = serde_yaml::to_string(&json).unwrap();
+        let dashboard = DashboardYml::new(yaml).unwrap();
+        
+        // Verify numeric ID was accepted
+        assert_eq!(dashboard.rows[0].id, 123);
+        assert_eq!(dashboard.rows[0].id, "123");
+        
+        // Verify it serializes as a string
+        let serialized = dashboard.to_value().unwrap();
+        assert_eq!(serialized["rows"][0]["id"], "123");
+        assert!(serialized["rows"][0]["id"].is_string());
     }
 }

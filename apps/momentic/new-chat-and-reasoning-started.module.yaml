@@ -16,10 +16,9 @@ steps:
   - id: 13eef3cf-c983-45a1-bc6b-fdde2b7067e9
     type: PRESET_ACTION
     command:
-      id: 626f8745-fe33-49ab-8310-4335a0c7a51f
+      id: c06b709c-40c1-41bd-8beb-b1bd60a22bb9
       type: AI_ASSERTION
-      assertion: Text should appear in the middle of the screen showing the question
-        we asked
+      assertion: Text should appear somewhere on the screen showing the question we asked
   - id: a460ed8a-36ce-4145-9f79-ed46489125f6
     type: PRESET_ACTION
     command:

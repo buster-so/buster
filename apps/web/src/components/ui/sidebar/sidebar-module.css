@@ -1,0 +1,59 @@
+/* Apply scroll timeline to the scroll container */
+.sidebar-scroll-area {
+  scroll-timeline-name: --sidebarScrollTimeline;
+}
+
+/* Top scroll indicator - appears when user has scrolled down */
+.sidebar-scroll-indicator-top {
+  pointer-events: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 1px;
+  width: 100%;
+  /* Start with border transparent */
+  border-bottom: 1px solid transparent;
+  /* Animate based on scroll timeline */
+  animation-name: sidebarTopScrollAnimation;
+  animation-duration: 1ms; /* Firefox requires this */
+  animation-timeline: --sidebarScrollTimeline;
+  animation-range: 5px 40px; /* Fade in from 10px to 50px scroll */
+  animation-fill-mode: both;
+}
+
+@keyframes sidebarTopScrollAnimation {
+  from {
+    border-bottom-color: transparent;
+  }
+  to {
+    border-bottom-color: var(--color-border);
+  }
+}
+
+/* Bottom scroll indicator - appears when content is scrollable */
+.sidebar-scroll-indicator-bottom {
+  pointer-events: none;
+  position: sticky;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  /* Start with border transparent */
+  border-top: 1px solid transparent;
+  /* Animate based on scroll timeline */
+  animation-name: sidebarBottomScrollAnimation;
+  animation-duration: 1ms; /* Firefox requires this */
+  animation-timeline: --sidebarScrollTimeline;
+  animation-range: 1px 100px; /* Trigger when there's scrollable content */
+  animation-fill-mode: both;
+  /* Move it up so border appears on the footer wrapper */
+  margin-bottom: -1px;
+}
+
+@keyframes sidebarBottomScrollAnimation {
+  from {
+    border-top-color: var(--color-border);
+  }
+  to {
+    border-top-color: var(--color-border);
+  }
+}

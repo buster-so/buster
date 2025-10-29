@@ -1,6 +1,6 @@
 import { Command } from 'cmdk';
 import type React from 'react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { SearchEmptyState } from './SearchEmptyState';
 import { SearchFooter } from './SearchFooter';
 import { SearchInput } from './SearchInput';
@@ -28,6 +28,8 @@ export const SearchModalContent = <M, T extends string>({
   filter,
   scrollContainerRef,
   showBottomLoading = false,
+  mode,
+  footerConfig,
 }: SearchModalContentProps<M, T>) => {
   const { focusedValue, setFocusedValue } = useViewSearchItem({
     searchItems,
@@ -81,10 +83,15 @@ export const SearchModalContent = <M, T extends string>({
         onSelectGlobal={onSelectGlobal}
         scrollContainerRef={scrollContainerRef}
         showBottomLoading={showBottomLoading}
+        mode={mode}
       />
 
       <SearchEmptyState emptyState={emptyState} />
-      <SearchFooter />
+      <SearchFooter
+        primaryButton={footerConfig?.primaryButton}
+        secondaryButton={footerConfig?.secondaryButton}
+        tertiaryButton={footerConfig?.tertiaryButton}
+      />
     </Command>
   );
 };

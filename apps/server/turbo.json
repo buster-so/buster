@@ -22,7 +22,8 @@
         "@buster/data-source#dev",
         "@buster-app/trigger#dev",
         "@buster-app/electric-server#dev",
-        "@buster-app/api-legacy#dev"
+        "@buster-app/api-legacy#dev",
+        "@buster/search#dev"
       ]
     },
     "dev:fast": {

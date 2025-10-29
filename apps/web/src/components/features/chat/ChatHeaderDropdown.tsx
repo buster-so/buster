@@ -6,6 +6,7 @@ import { Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import {
+  useAddToCollectionSelectMenu,
   useDeleteChatSelectMenu,
   useDuplicateChatSelectMenu,
   useFavoriteChatSelectMenu,
@@ -26,6 +27,7 @@ export const ChatContainerHeaderDropdown: React.FC<{
   );
   const shareMenu = useShareMenuSelectMenu({ chatId });
   const renameChatTitle = useRenameChatTitle();
+  const addToCollectionMenu = useAddToCollectionSelectMenu({ chatId });
   const favoriteChat = useFavoriteChatSelectMenu({ chatId });
   const openInNewTab = useOpenInNewTabSelectMenu({ chatId });
   const duplicateChat = useDuplicateChatSelectMenu({ chatId });
@@ -38,6 +40,7 @@ export const ChatContainerHeaderDropdown: React.FC<{
     return [
       isOwnerEffective && shareMenu,
       isOwnerEffective && renameChatTitle,
+      addToCollectionMenu,
       favoriteChat,
       openInNewTab,
       { type: 'divider' },
@@ -50,6 +53,7 @@ export const ChatContainerHeaderDropdown: React.FC<{
     canEditChat,
     shareMenu,
     renameChatTitle,
+    addToCollectionMenu,
     favoriteChat,
     openInNewTab,
     duplicateChat,

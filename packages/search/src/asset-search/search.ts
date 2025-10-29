@@ -13,7 +13,6 @@ import type {
   SearchTextResponse,
 } from '@buster/server-shared';
 import { getAssetScreenshotSignedUrl } from './get-asset-screenshot';
-import { processSearchResultText } from './text-processing-helpers';
 
 /**
  * Perform text search and enhance results with asset ancestors
@@ -63,6 +62,7 @@ export async function performTextSearch(
     page_size: searchRequest.page_size,
     filters,
     includeAddedToLibrary: searchRequest.includeAddedToLibrary,
+    collectionId: searchRequest.collectionId,
   });
   const searchDuration = performance.now() - searchStart;
 

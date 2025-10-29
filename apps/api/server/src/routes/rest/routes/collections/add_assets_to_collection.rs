@@ -67,9 +67,10 @@ pub async fn add_assets_to_collection(
             "dashboard_file" => Some(AssetType::DashboardFile),
             "metric_file" => Some(AssetType::MetricFile),
             "report_file" => Some(AssetType::ReportFile),
+            "chat" => Some(AssetType::Chat),
             _ => None,
         };
-        
+
         asset_type.map(|t| AssetToAdd {
             id: asset.id,
             asset_type: t,
@@ -83,9 +84,10 @@ pub async fn add_assets_to_collection(
                     AssetType::DashboardFile => "dashboard_file",
                     AssetType::MetricFile => "metric_file",
                     AssetType::ReportFile => "report_file",
+                    AssetType::Chat => "chat",
                     _ => "unknown",
                 };
-                
+
                 FailedAsset {
                     id,
                     type_: type_str.to_string(),

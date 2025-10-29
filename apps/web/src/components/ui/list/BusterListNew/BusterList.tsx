@@ -51,7 +51,7 @@ function BusterListBase<T = unknown>(
     count: rows.length,
     getScrollElement: () => internalScrollParentRef.current,
     estimateSize: (i) => (rows[i].type === 'row' ? HEIGHT_OF_ROW : HEIGHT_OF_SECTION_ROW),
-    overscan: 0,
+    overscan: 7,
   });
 
   const onSelectSectionChange = useMemoizedFn((v: boolean, id: string) => {

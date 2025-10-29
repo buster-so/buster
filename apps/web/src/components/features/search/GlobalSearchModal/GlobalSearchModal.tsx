@@ -1,52 +1,30 @@
-import type { AssetType } from '@buster/server-shared/assets';
-import type React from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSearchInfinite } from '@/api/buster_rest/search';
-import { useDebounce } from '@/hooks/useDebounce';
-import { GlobalSearchModalBase } from './GlobalSearchModalBase';
+import type { SearchMode } from '@/components/ui/search/SearchModal/search-modal.types';
+import { FilterSearchPills } from '../FilterPills';
+import { SearchModalBase } from '../SearchModalBase/SearchModalBase';
+import { useCommonSearch } from '../useCommonSearch';
+import { GlobalSearchModalFilters } from './GlobalSearchModalFilters';
 import { useGlobalSearchStore } from './global-search-store';
 
+const mode: SearchMode = 'navigate';
+
 export const GlobalSearchModal = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedAssets, setSelectedAssets] = useState<AssetType[] | null>(null);
-  const [selectedDateRange, setSelectedDateRange] = useState<{
-    from: Date;
-    to: Date;
-  } | null>(null);
-  const { isOpen } = useGlobalSearchStore();
+  const { isOpen, onClose } = useGlobalSearchStore();
 
-  const debouncedSearchQuery = useDebounce(searchQuery, { wait: 100 });
-  const hasQuery = searchQuery.length > 0;
-  const openSecondaryContent = hasQuery;
-
-  const onSetFilters: OnSetFiltersParams = useMemo(
-    () => ({
-      setSelectedAssets,
-      setSelectedDateRange,
-    }),
-    [setSelectedAssets, setSelectedDateRange]
-  );
-
-  const filtersParams: FiltersParams = useMemo(
-    () => ({
-      selectedAssets,
-      selectedDateRange,
-    }),
-    [selectedAssets, selectedDateRange]
-  );
-
-  const assetTypes: AssetType[] | undefined = useMemo(() => {
-    if (selectedAssets?.length) {
-      return selectedAssets;
-    }
-    if (!hasQuery) {
-      return ['chat'];
-    }
-    return;
-  }, [selectedAssets, hasQuery]);
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedDateRange,
+    assetTypes,
+    debouncedSearchQuery,
+    filtersParams,
+    setSelectedAssets,
+    setSelectedDateRange,
+  } = useCommonSearch({ mode });
 
   const { allResults, isFetching, scrollContainerRef } = useSearchInfinite({
-    page_size: 20,
+    page_size: 25,
     assetTypes,
     startDate: selectedDateRange?.from?.toISOString(),
     endDate: selectedDateRange?.to?.toISOString(),
@@ -59,34 +37,38 @@ export const GlobalSearchModal = () => {
     mounted: isOpen,
   });
 
+  const filterContent = useMemo(() => {
+    return (
+      <GlobalSearchModalFilters
+        {...filtersParams}
+        setSelectedAssets={setSelectedAssets}
+        setSelectedDateRange={setSelectedDateRange}
+      />
+    );
+  }, [filtersParams, setSelectedAssets, setSelectedDateRange]);
+
+  const filterDropdownContent = useMemo(() => {
+    return (
+      <FilterSearchPills
+        {...filtersParams}
+        setSelectedAssets={setSelectedAssets}
+        setSelectedDateRange={setSelectedDateRange}
+      />
+    );
+  }, [filtersParams, setSelectedAssets, setSelectedDateRange]);
+
   return (
-    <GlobalSearchModalBase
+    <SearchModalBase
       value={searchQuery}
       items={allResults}
       onChangeValue={setSearchQuery}
       loading={isFetching}
       scrollContainerRef={scrollContainerRef}
-      openSecondaryContent={openSecondaryContent}
-      onSetFilters={onSetFilters}
-      filtersParams={filtersParams}
+      isOpen={isOpen}
+      onClose={onClose}
+      mode={mode}
+      filterContent={filterContent}
+      filterDropdownContent={filterDropdownContent}
     />
   );
-};
-
-export type OnSetFiltersParams = {
-  setSelectedAssets: React.Dispatch<React.SetStateAction<AssetType[] | null>>;
-  setSelectedDateRange: React.Dispatch<
-    React.SetStateAction<{
-      from: Date;
-      to: Date;
-    } | null>
-  >;
-};
-
-export type FiltersParams = {
-  selectedAssets: AssetType[] | null;
-  selectedDateRange: {
-    from: Date;
-    to: Date;
-  } | null;
 };

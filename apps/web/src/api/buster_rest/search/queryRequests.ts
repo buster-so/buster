@@ -29,21 +29,29 @@ export const useSearchInfinite = ({
   | 'assetTypes'
   | 'includeAssetAncestors'
   | 'includeScreenshots'
+  | 'includeAddedToLibrary'
   | 'endDate'
   | 'startDate'
   | 'query'
+  | 'collectionId'
 > & {
   scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
   enabled?: boolean;
   mounted?: boolean;
 }) => {
   return useInfiniteScroll<SearchTextData>({
-    queryKey: ['search', 'results', 'infinite', params] as const,
-    staleTime: 1000 * 40, // 40 seconds
+    ...searchQueryKeys.getSearchResultInfinite(params),
     queryFn: ({ pageParam = 1 }) => search({ page: pageParam, ...params }),
     placeholderData: keepPreviousData,
     enabled,
     scrollConfig,
     mounted,
+  });
+};
+
+export const prefetchSearchInfinite = (params: Parameters<typeof useSearchInfinite>[0]) => {
+  return useQuery({
+    ...searchQueryKeys.getSearchResultInfinite(params),
+    queryFn: ({ signal }) => search({ page: 1, ...params }, signal),
   });
 };
