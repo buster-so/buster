@@ -22,8 +22,8 @@ import {
 import {
   AssetPermissionRoleSchema,
   AssetTypeSchema,
-  ChatTitleUpdatedBySchema,
   ChatTypeSchema,
+  ChatUpdatedByTypeSchema,
   type DashboardYml,
   DataSourceOnboardingStatusSchema,
   DatasetTypeSchema,
@@ -116,9 +116,9 @@ export const messageAnalysisModeEnum = pgEnum(
 
 export const chatTypeEnum = pgEnum('chat_type_enum', ChatTypeSchema.options);
 
-export const chatTitleUpdatedByEnum = pgEnum(
-  'chat_title_updated_by_enum',
-  ChatTitleUpdatedBySchema.options
+export const chatUpdatedByTypeEnum = pgEnum(
+  'chat_updated_by_type_enum',
+  ChatUpdatedByTypeSchema.options
 );
 
 export const apiKeys = pgTable(
@@ -883,7 +883,7 @@ export const chats = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     title: text().notNull(),
-    titleUpdatedBy: chatTitleUpdatedByEnum('title_updated_by').default('agent').notNull(),
+    updatedByType: chatUpdatedByTypeEnum('updated_by_type').default('agent').notNull(),
     chatType: chatTypeEnum('chat_type').default('analyst').notNull(),
     organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })

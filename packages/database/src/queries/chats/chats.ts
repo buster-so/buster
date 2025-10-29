@@ -3,7 +3,11 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { assetPermissions, chats, messages, userFavorites, users } from '../../schema';
-import { ChatTypeSchema, MessageAnalysisModeSchema } from '../../schema-types';
+import {
+  ChatTypeSchema,
+  type ChatUpdatedByType,
+  MessageAnalysisModeSchema,
+} from '../../schema-types';
 
 // Type inference from schema
 export type Chat = InferSelectModel<typeof chats>;
@@ -322,7 +326,8 @@ export async function createChatWithMessage(input: CreateChatWithMessageInput): 
  */
 export async function updateChat(
   chatId: string,
-  fields: UpdateableChatFields
+  fields: UpdateableChatFields,
+  updatedByType: ChatUpdatedByType = 'agent'
 ): Promise<{ success: boolean }> {
   try {
     // First verify the chat exists and is not deleted
@@ -345,6 +350,7 @@ export async function updateChat(
             value !== undefined && key !== 'id' && key !== 'createdAt' && key !== 'deletedAt'
         )
       ),
+      updatedByType: updatedByType,
     };
 
     await db

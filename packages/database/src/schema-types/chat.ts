@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { AssetTypeSchema } from './asset';
 
-export const ChatTitleUpdatedBySchema = z
+export const ChatUpdatedByTypeSchema = z
   .enum(['user', 'agent'])
-  .describe('Source of the chat title update');
+  .describe('Type of entity that updated the chat');
 
-export type ChatTitleUpdatedBy = z.infer<typeof ChatTitleUpdatedBySchema>;
+export type ChatUpdatedByType = z.infer<typeof ChatUpdatedByTypeSchema>;
 
 export const ChatListItemSchema = z.object({
   id: z.string(),
