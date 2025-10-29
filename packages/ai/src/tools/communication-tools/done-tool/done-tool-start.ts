@@ -27,6 +27,7 @@ export function createDoneToolStart(context: DoneToolContext, doneToolState: Don
     doneToolState.isFinalizing = false;
     doneToolState.latestSequenceNumber = undefined;
     doneToolState.finalSequenceNumber = undefined;
+    doneToolState.finalReasoningMessageSet = false;
 
     // Selection logic moved to delta; skip extracting files here
     if (options.messages) {

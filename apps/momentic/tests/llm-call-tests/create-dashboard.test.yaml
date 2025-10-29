@@ -19,12 +19,12 @@ steps:
   - id: 2bf4f1e1-84da-4c66-baf9-85b7a2e71332
     type: PRESET_ACTION
     command:
-      id: 1e3b9123-24b3-4316-8d62-857f1d4e44a0
+      id: c10fa6b9-7e83-4a45-aa10-bce5bbf36c56
       clearContent: true
       type: TYPE
       target:
         type: description
-        elementDescriptor: The text input box with Ask Buster a question..
+        elementDescriptor: The text input box with Ask a question
       value: Create me a dashboard with multiple metrics describing sales in 2024.
   - id: 1c1f4582-4a31-458b-ba66-b7d26b7a6500
     type: PRESET_ACTION
@@ -40,11 +40,3 @@ steps:
   - id: b541eff4-bf57-4921-b892-73ca920b26b1
     type: MODULE
     moduleId: 34c6e2fd-2455-4423-bd16-81f75250a72e
-  - id: 53ba9655-010d-46dc-99e1-e1cc8114d3c1
-    type: PRESET_ACTION
-    command:
-      id: a1a6b321-d7f8-4303-98d9-e47d6ac4214d
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: Dashboards in the left side navigation panel

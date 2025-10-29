@@ -5,6 +5,7 @@ import {
   createChat,
   createMessage,
   getChatWithDetails,
+  getCollectionsAssociatedWithChat,
   getMessagesForChatWithUserDetails,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
@@ -95,6 +96,7 @@ vi.mock('@buster/database/queries', () => ({
   createAssetPermission: vi.fn(),
   getUsersWithAssetPermissions: vi.fn(),
   getOrganizationMemberCount: vi.fn(),
+  getCollectionsAssociatedWithChat: vi.fn(),
 }));
 
 // Mock access-controls
@@ -107,6 +109,7 @@ describe('chat-service', () => {
   const mockGetOrganizationMemberCount = getOrganizationMemberCount as any;
   const mockGetUsersWithAssetPermissions = getUsersWithAssetPermissions as any;
   const mockGetMessagesForChatWithUserDetails = getMessagesForChatWithUserDetails as any;
+  const mockGetCollectionsAssociatedWithChat = getCollectionsAssociatedWithChat as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -119,6 +122,7 @@ describe('chat-service', () => {
     mockGetOrganizationMemberCount.mockResolvedValue(5);
     mockGetUsersWithAssetPermissions.mockResolvedValue([]);
     mockGetMessagesForChatWithUserDetails.mockResolvedValue([]);
+    mockGetCollectionsAssociatedWithChat.mockResolvedValue([]);
   });
 
   describe('initializeChat', () => {

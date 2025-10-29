@@ -19,6 +19,7 @@ export const wrappedLayoutSchema = z
   })
   .default('grid');
 export type LibraryLayout = z.infer<typeof layoutSchema>;
+export type SharedWithMeLayout = LibraryLayout;
 
 export const searchParamsSchema = z.object({
   q: z.string().optional(),
@@ -32,8 +33,15 @@ export const searchParamsSchema = z.object({
   group_by: z
     .enum(['asset_type', 'owner', 'created_at', 'updated_at', 'none'])
     .default('none')
+    .catch('none')
     .optional(),
-  filter: z.enum(['all', 'owned_by_me', 'shared_with_me']).default('all').optional(),
+  filter: z.enum(['all', 'owned_by_me', 'shared_with_me']).default('all').catch('all').optional(),
+});
+
+//omit the filter field
+export const sharedWithMeSearchParamsSchema = searchParamsSchema.omit({ filter: true }).extend({
+  filter: z.enum(['all', 'collections', 'assets']).default('all').catch('all').optional(),
 });
 
 export type LibrarySearchParams = z.infer<typeof searchParamsSchema>;
+export type SharedWithMeSearchParams = z.infer<typeof sharedWithMeSearchParamsSchema>;

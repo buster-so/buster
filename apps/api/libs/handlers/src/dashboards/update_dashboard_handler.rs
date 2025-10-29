@@ -181,7 +181,7 @@ pub async fn update_dashboard_handler(
                         items: row_items,
                         row_height: dashboard_row.row_height,
                         column_sizes: dashboard_row.column_sizes.unwrap_or_default(),
-                        id: dashboard_row.id.parse::<u32>().unwrap_or(0),
+                        id: dashboard_row.id.parse::<u32>().unwrap_or(0).into(),
                     });
                 }
 

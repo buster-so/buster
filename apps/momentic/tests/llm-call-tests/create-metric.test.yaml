@@ -19,14 +19,14 @@ steps:
   - id: c183810d-3646-4fad-8659-e0c4410668c1
     type: PRESET_ACTION
     command:
-      id: 85256ad7-2be8-414a-802b-4cacfa14bea9
+      id: ef685611-643f-4e32-a69f-0bffa2195227
       clearContent: true
       type: TYPE
       target:
         type: description
-        elementDescriptor: The text input box with Ask Buster a question..
+        elementDescriptor: The text input box with ask a question..
       value: Create me a metric to show how many sales in 2024. Do not create me a
-        report.
+        report. Do not create me a dashboard. Just a single metric
   - id: 9408b9f5-c28e-42f0-8e49-9bdae01d954b
     type: PRESET_ACTION
     command:
@@ -41,11 +41,3 @@ steps:
   - id: 277b0e2e-36fb-4c41-95c7-8f661e96c98e
     type: MODULE
     moduleId: 666c6102-d4fa-4c6e-998c-4b283337ad92
-  - id: 4da5083c-3a49-4741-8740-7c408dfe088a
-    type: PRESET_ACTION
-    command:
-      id: fb0db24d-c142-4a07-82a1-e9ae0693aff1
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: Metrics in the left side navigation panel

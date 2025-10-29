@@ -12,6 +12,7 @@ type ISidebarItemBase = {
   onRemove?: () => void;
   onClick?: () => void;
   collapsedTooltip?: string;
+  className?: string;
 };
 
 // Discriminated union: either has a route (with optional activeOptions) or no route at all
@@ -19,15 +20,9 @@ export type ISidebarItem<
   TRouter extends RegisteredRouter = RegisteredRouter,
   TOptions = unknown,
   TFrom extends string = string,
-> = ISidebarItemBase &
-  (
-    | {
-        link: ILinkProps<TRouter, TOptions, TFrom>;
-      }
-    | {
-        link?: never;
-      }
-  );
+> = ISidebarItemBase & {
+  link?: ILinkProps<TRouter, TOptions, TFrom>;
+};
 
 export interface ISidebarGroup<
   TRouter extends RegisteredRouter = RegisteredRouter,
@@ -44,6 +39,7 @@ export interface ISidebarGroup<
   onItemsReorder?: (ids: string[]) => void;
   triggerClassName?: string;
   className?: string;
+  link?: ILinkProps<TRouter, TOptions, TFrom>;
 }
 
 export interface ISidebarList<

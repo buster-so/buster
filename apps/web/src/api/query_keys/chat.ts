@@ -28,11 +28,7 @@ const chatsMessagesFetchingData = (messageId: string) =>
 
 const chatsGetList = (filters?: Omit<Parameters<typeof getListChats>[0], 'page' | 'page_size'>) =>
   queryOptions<ChatListItem[]>({
-    queryKey: [
-      'chats',
-      'list',
-      filters || { page_token: 0, page_size: 5000, admin_view: false },
-    ] as const,
+    queryKey: ['chats', 'list', filters || { page_token: 0, page_size: 5000 }] as const,
     staleTime: 60 * 1000, // 1 minute
     initialData: [],
     initialDataUpdatedAt: 0,

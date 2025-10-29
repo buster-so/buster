@@ -11,4 +11,8 @@ export const libraryQueryKeys = {
       refetchOnWindowFocus: true,
       staleTime: 3 * 1000, // 3 seconds
     }),
+  libraryGetListInfinite: (filters: Partial<GetLibraryAssetsRequestQuery>) => ({
+    queryKey: ['library', 'get', 'list-infinite', filters] as const,
+    staleTime: 1000 * 30, // 30 seconds
+  }),
 };

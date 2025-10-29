@@ -11,6 +11,7 @@ import {
   createMessage,
   generateAssetMessages,
   getChatWithDetails,
+  getCollectionsAssociatedWithChat,
   getMessagesForChatWithUserDetails,
   getOrganizationMemberCount,
   getUsersWithAssetPermissions,
@@ -171,14 +172,16 @@ export async function buildChatWithMessages(
     messageMap[msg.message.id] = chatMessage;
   }
 
-  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount] = await Promise.all([
-    getPubliclyEnabledByUser(chat.publiclyEnabledBy),
-    getUsersWithAssetPermissions({
-      assetId: chat.id,
-      assetType: 'chat',
-    }),
-    getOrganizationMemberCount(chat.organizationId),
-  ]);
+  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount, collections] =
+    await Promise.all([
+      getPubliclyEnabledByUser(chat.publiclyEnabledBy),
+      getUsersWithAssetPermissions({
+        assetId: chat.id,
+        assetType: 'chat',
+      }),
+      getOrganizationMemberCount(chat.organizationId),
+      getCollectionsAssociatedWithChat(chat.id, user?.id || chat.createdBy),
+    ]);
 
   // Ensure message_ids array has no duplicates
   const uniqueMessageIds = [...new Set(messageIds)];
@@ -199,6 +202,7 @@ export async function buildChatWithMessages(
     created_by_id: chat.createdBy,
     created_by_name: createdByName,
     created_by_avatar: user?.avatarUrl || null,
+    collections,
     individual_permissions: individualPermissions,
     publicly_accessible: chat.publiclyAccessible || false,
     public_expiry_date: chat.publicExpiryDate || null,
@@ -490,13 +494,21 @@ export async function handleAssetChat(
     // Get the asset name from the first message
     const assetName = assetMessages[0]?.title || '';
 
+    // Extract version number from the file response message
+    const responseMessages = buildResponseMessages(assetMessages[0]?.responseMessages);
+    const fileMessage = Object.values(responseMessages).find(
+      (msg) => msg.type === 'file' && msg.id === assetId
+    );
+    const versionNumber =
+      fileMessage && 'version_number' in fileMessage ? fileMessage.version_number : 1;
+
     await db
       .update(chats)
       .set({
         title: assetName, // Set chat title to asset name
         mostRecentFileId: assetId,
         mostRecentFileType: assetType,
-        mostRecentVersionNumber: 1, // Asset imports always start at version 1
+        mostRecentVersionNumber: versionNumber,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(chats.id, chatId));
@@ -637,13 +649,21 @@ export async function handleAssetChatWithPrompt(
     // Update the chat with most recent file information and title (matching handleAssetChat)
     const assetName = assetMessages[0]?.title || '';
 
+    // Extract version number from the file response message
+    const responseMessages = buildResponseMessages(assetMessages[0]?.responseMessages);
+    const fileMessage = Object.values(responseMessages).find(
+      (msg) => msg.type === 'file' && msg.id === assetId
+    );
+    const versionNumber =
+      fileMessage && 'version_number' in fileMessage ? fileMessage.version_number : 1;
+
     await db
       .update(chats)
       .set({
         title: assetName, // Set chat title to asset name
         mostRecentFileId: assetId,
         mostRecentFileType: assetType,
-        mostRecentVersionNumber: 1, // Asset imports always start at version 1
+        mostRecentVersionNumber: versionNumber,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(chats.id, chatId));

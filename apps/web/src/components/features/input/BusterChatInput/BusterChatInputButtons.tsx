@@ -36,33 +36,14 @@ export const BusterChatInputButtons = React.memo(
     disabled: disabledProp,
     mode,
     onModeChange,
-    onDictate,
-    onDictateListeningChange,
+    // onDictate,
+    // onDictateListeningChange,
   }: BusterChatInputButtons) => {
-    const {
-      transcript,
-      listening,
-      browserSupportsSpeechRecognition,
-      onStartListening,
-      onStopListening,
-      hasPermission,
-    } = useSpeechRecognition();
     const hasValue = useMentionInputHasValue();
     const onChangeValue = useMentionInputSuggestionsOnChangeValue();
     const getValue = useMentionInputSuggestionsGetValue();
 
     const disableSubmit = !hasValue || disabledProp;
-
-    useEffect(() => {
-      if (listening && transcript) {
-        onDictate?.(transcript);
-        onChangeValue(transcript);
-      }
-    }, [listening, transcript, onDictate, onChangeValue]);
-
-    useEffect(() => {
-      onDictateListeningChange?.(listening);
-    }, [listening, onDictateListeningChange]);
 
     return (
       <div className="flex justify-between items-center gap-2">
@@ -74,39 +55,7 @@ export const BusterChatInputButtons = React.memo(
         />
 
         <div className="flex items-center gap-2">
-          {browserSupportsSpeechRecognition && (
-            <AppTooltip
-              title={
-                listening
-                  ? !hasPermission
-                    ? 'Audio permissions not enabled'
-                    : 'Stop dictation...'
-                  : 'Press to dictate...'
-              }
-            >
-              <Button
-                rounding={'large'}
-                variant={'ghost'}
-                prefix={<Microphone />}
-                onClick={listening ? onStopListening : onStartListening}
-                disabled={disableSubmit}
-                size={'tall'}
-                className={cn(
-                  'origin-center transform-gpu transition-all duration-300 ease-out will-change-transform text-text-secondary',
-                  !disableSubmit ? 'hover:scale-110 active:scale-95' : '',
-                  listening && 'bg-item-active shadow border text-foreground',
-                  listening && !hasPermission && 'bg-red-100! border border-red-300!'
-                )}
-                style={
-                  listening && !hasPermission
-                    ? ({
-                        '--icon-color': 'var(--color-red-400)',
-                      } as React.CSSProperties)
-                    : {}
-                }
-              />
-            </AppTooltip>
-          )}
+          {/* <DictationButton /> */}
           <AppTooltip
             delayDuration={disableSubmit ? 500 : 0}
             title={disableSubmit ? 'Please type something...' : submitting ? null : 'Submit'}

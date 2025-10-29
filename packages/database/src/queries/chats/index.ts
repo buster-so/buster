@@ -24,6 +24,7 @@ export {
   GetChatTitleInputSchema,
   getChatTitle,
 } from './get-chat-title';
+export { getCollectionsAssociatedWithChat } from './get-collections-associated-with-chat';
 export {
   type ListChatsRequest,
   ListChatsRequestSchema,

@@ -54,6 +54,7 @@ export const SearchTextRequestSchema = z
       }, z.boolean())
       .default(false)
       .optional(),
+    collectionId: z.string().optional(),
   })
   .merge(PaginatedRequestSchema);
 

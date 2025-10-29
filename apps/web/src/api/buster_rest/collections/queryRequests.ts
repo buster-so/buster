@@ -10,6 +10,8 @@ import {
 import { create } from 'mutative';
 import { useMemo } from 'react';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { libraryQueryKeys } from '@/api/query_keys/library';
+import { searchQueryKeys } from '@/api/query_keys/search';
 import { useProtectedAssetPassword } from '@/context/BusterAssets/useProtectedAssetStore';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { isQueryStale } from '@/lib/query';
@@ -29,7 +31,7 @@ import {
 } from './requests';
 
 export const useGetCollectionsList = (
-  filters: Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>,
+  filters?: Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>,
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof collectionsGetList>>, ApiError>,
     'queryKey' | 'queryFn' | 'initialData'
@@ -105,6 +107,10 @@ export const useCreateCollection = () => {
         queryKey: collectionQueryKeys.collectionsGetList().queryKey,
         refetchType: 'all',
       });
+      queryClient.invalidateQueries({
+        queryKey: libraryQueryKeys.libraryGetListInfinite({}).queryKey.slice(0, 2),
+        refetchType: 'all',
+      });
       queryClient.setQueryData(
         collectionQueryKeys.collectionsGetCollection(collection.id).queryKey,
         collection
@@ -155,7 +161,7 @@ export const useDeleteCollection = () => {
   }) => {
     const ids = Array.isArray(id) ? id : [id];
     const deleteMethod = async () => {
-      await collectionsDeleteCollection({ ids });
+      return await collectionsDeleteCollection({ ids });
     };
 
     if (useConfirmModal) {
@@ -273,10 +279,15 @@ export const useAddAssetToCollection = (useInvalidate = true) => {
     mutationFn: addAssetToCollection,
     onSuccess: (_, variables) => {
       if (useInvalidate) {
-        queryClient.invalidateQueries({
-          queryKey: collectionQueryKeys.collectionsGetCollection(variables.id).queryKey,
-          refetchType: 'all',
-        });
+        const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
+        queryClient.cancelQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
+
+        const searchQueryKey = searchQueryKeys
+          .getSearchResultInfinite({ collectionId: variables.id })
+          .queryKey.slice(0, 2);
+        queryClient.cancelQueries({ queryKey: searchQueryKey });
+        queryClient.invalidateQueries({ queryKey: searchQueryKey, refetchType: 'all' });
       }
     },
   });
@@ -300,10 +311,15 @@ export const useRemoveAssetFromCollection = (useInvalidate = true) => {
     },
     onSuccess: (_, variables) => {
       if (useInvalidate) {
-        queryClient.invalidateQueries({
-          queryKey: collectionQueryKeys.collectionsGetCollection(variables.id).queryKey,
-          refetchType: 'all',
-        });
+        const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
+        queryClient.cancelQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
+
+        const searchQueryKey = searchQueryKeys
+          .getSearchResultInfinite({ collectionId: variables.id })
+          .queryKey.slice(0, 2);
+        queryClient.cancelQueries({ queryKey: searchQueryKey });
+        queryClient.invalidateQueries({ queryKey: searchQueryKey, refetchType: 'all' });
       }
     },
   });

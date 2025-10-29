@@ -1,9 +1,9 @@
 fileType: momentic/module
-schemaVersion: 1.0.21
 moduleId: 666c6102-d4fa-4c6e-998c-4b283337ad92
 name: chat-finished-with-metric
 description: The chat has finished and a metric is showing.
 enabled: true
+schemaVersion: 1.0.21
 steps:
   - id: 5a0ce4f8-0d7b-4836-910a-48f31d29d0ff
     type: PRESET_ACTION
@@ -17,13 +17,12 @@ steps:
   - id: aa57fa2f-8c03-4928-9163-15a41ee776f3
     type: PRESET_ACTION
     command:
-      id: 21a91075-c205-4926-af5c-73c32cc4151d
+      id: ad8038c5-a229-4bd9-9d04-f29c515993c3
       type: AI_ASSERTION
       assertion: Confirm that a metric has been delivered, it should be on the right
         side of the page.  It should have the chart, results, sql up top, it
         should have the title, the time frame description, and a question
-        looking description.  In the center of that div. We should also see a
-        number descibing total bike sales
+        looking description.
   - id: 78fc9cd5-e8aa-41df-b270-daa24a27843c
     type: PRESET_ACTION
     command:

@@ -27,7 +27,7 @@ const app = new Hono()
       const response = await createDashboardHandler(request, user, org.organizationId);
 
       // Trigger screenshot for new dashboard
-      await triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
+      triggerScreenshotIfNeeded<TakeDashboardScreenshotTrigger>({
         tag: `take-dashboard-screenshot-${response.dashboard.id}`,
         key: screenshots_task_keys.take_dashboard_screenshot,
         context: c,

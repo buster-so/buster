@@ -22,6 +22,8 @@ pub enum AssetToRemove {
     Metric(Uuid),
     /// Report ID to remove
     Report(Uuid),
+    /// Chat ID to remove
+    Chat(Uuid),
 }
 
 /// Result of removing assets from a collection
@@ -313,6 +315,74 @@ pub async fn remove_assets_from_collection_handler(
                         report_id,
                         AssetType::ReportFile,
                         "Report is not in the collection".to_string(),
+                    ));
+                }
+            }
+            AssetToRemove::Chat(chat_id) => {
+                // Check if the chat is in the collection
+                let existing = match collections_to_assets::table
+                    .filter(collections_to_assets::collection_id.eq(collection_id))
+                    .filter(collections_to_assets::asset_id.eq(chat_id))
+                    .filter(collections_to_assets::asset_type.eq(AssetType::Chat))
+                    .filter(collections_to_assets::deleted_at.is_null())
+                    .first::<CollectionToAsset>(&mut conn)
+                    .await
+                {
+                    Ok(record) => Some(record),
+                    Err(diesel::NotFound) => None,
+                    Err(e) => {
+                        error!(
+                            "Error checking if chat is in collection: {}",
+                            e
+                        );
+                        result.failed_count += 1;
+                        result.failed_assets.push((
+                            chat_id,
+                            AssetType::Chat,
+                            format!("Database error: {}", e),
+                        ));
+                        continue;
+                    }
+                };
+
+                if let Some(existing_record) = existing {
+                    // Soft delete the record
+                    match diesel::update(collections_to_assets::table)
+                        .filter(collections_to_assets::collection_id.eq(existing_record.collection_id))
+                        .filter(collections_to_assets::asset_id.eq(existing_record.asset_id))
+                        .filter(collections_to_assets::asset_type.eq(existing_record.asset_type))
+                        .set((
+                            collections_to_assets::deleted_at.eq(chrono::Utc::now()),
+                            collections_to_assets::updated_at.eq(chrono::Utc::now()),
+                            collections_to_assets::updated_by.eq(user.id),
+                        ))
+                        .execute(&mut conn)
+                        .await
+                    {
+                        Ok(_) => {
+                            result.removed_count += 1;
+                        }
+                        Err(e) => {
+                            error!(
+                                collection_id = %collection_id,
+                                chat_id = %chat_id,
+                                "Error removing chat from collection: {}", e
+                            );
+                            result.failed_count += 1;
+                            result.failed_assets.push((
+                                chat_id,
+                                AssetType::Chat,
+                                format!("Database error: {}", e),
+                            ));
+                        }
+                    }
+                } else {
+                    // Chat is not in the collection, count as failed
+                    result.failed_count += 1;
+                    result.failed_assets.push((
+                        chat_id,
+                        AssetType::Chat,
+                        "Chat is not in the collection".to_string(),
                     ));
                 }
             }
