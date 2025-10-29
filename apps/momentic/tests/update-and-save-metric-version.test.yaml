@@ -60,11 +60,15 @@ steps:
   - id: bd3dc745-3b25-41b5-99c5-77156a7130aa
     type: PRESET_ACTION
     command:
-      id: 5d141521-7a14-456f-930a-ac6df3b3983d
+      id: b55cc1e1-7869-41d9-8c35-632ebd7a13d3
       type: CLICK
       target:
         type: description
-        elementDescriptor: the modal backdrop (dialog-overlay) behind the search modal
+        elementDescriptor: anything. literally just click the page. ANYWHERE THAT IS NOT
+          THE DROPDOWN!
+      relativePosition:
+        x: 0
+        y: 0
   - id: ee8c8438-3b9d-4f31-9781-6a5aef38244f
     type: PRESET_ACTION
     command:
