@@ -830,6 +830,108 @@ The following items were processed:
     });
   });
 
+  describe('Final Reasoning Message Tests', () => {
+    test('should set finalReasoningMessage only once during streaming', async () => {
+      vi.clearAllMocks();
+
+      const state: DoneToolState = {
+        toolCallId: 'test-entry',
+        args: '',
+        finalResponse: undefined,
+        finalReasoningMessageSet: false,
+      };
+
+      const deltaHandler = createDoneToolDelta(mockContext, state);
+
+      // First delta with finalResponse content - should set finalReasoningMessage
+      await deltaHandler({
+        inputTextDelta: '{"finalResponse": "First chunk',
+        toolCallId: 'tool-call-123',
+        messages: [],
+      });
+
+      const queries = await import('@buster/database/queries');
+
+      // Verify updateMessage was called once
+      expect(queries.updateMessage).toHaveBeenCalledTimes(1);
+      expect(queries.updateMessage).toHaveBeenCalledWith(
+        mockContext.messageId,
+        expect.objectContaining({
+          finalReasoningMessage: expect.stringMatching(/^Reasoned for/),
+        })
+      );
+      expect(state.finalReasoningMessageSet).toBe(true);
+
+      // Second delta with more content - should NOT call updateMessage again
+      await deltaHandler({
+        inputTextDelta: ' of content',
+        toolCallId: 'tool-call-123',
+        messages: [],
+      });
+
+      // Still only called once
+      expect(queries.updateMessage).toHaveBeenCalledTimes(1);
+
+      // Third delta - should still NOT call updateMessage
+      await deltaHandler({
+        inputTextDelta: ' and more text"}',
+        toolCallId: 'tool-call-123',
+        messages: [],
+      });
+
+      // Still only called once, not three times
+      expect(queries.updateMessage).toHaveBeenCalledTimes(1);
+      expect(state.finalReasoningMessageSet).toBe(true);
+    });
+
+    test('should not set finalReasoningMessage when finalResponse is empty', async () => {
+      vi.clearAllMocks();
+
+      const state: DoneToolState = {
+        toolCallId: 'test-entry',
+        args: '',
+        finalResponse: undefined,
+        finalReasoningMessageSet: false,
+      };
+
+      const deltaHandler = createDoneToolDelta(mockContext, state);
+
+      await deltaHandler({
+        inputTextDelta: '{"finalResponse": ""}',
+        toolCallId: 'tool-call-123',
+        messages: [],
+      });
+
+      const queries = await import('@buster/database/queries');
+
+      // Should not have been called because finalResponse is empty
+      expect(queries.updateMessage).not.toHaveBeenCalled();
+      expect(state.finalReasoningMessageSet).toBe(false);
+    });
+
+    test('should reset finalReasoningMessageSet on tool start', async () => {
+      const state: DoneToolState = {
+        toolCallId: 'old-call',
+        args: 'old data',
+        finalResponse: 'old response',
+        finalReasoningMessageSet: true,
+      };
+
+      const startHandler = createDoneToolStart(mockContext, state);
+
+      await startHandler({
+        toolCallId: 'new-call-123',
+        messages: [],
+      });
+
+      // Should reset the flag
+      expect(state.finalReasoningMessageSet).toBe(false);
+      expect(state.toolCallId).toBe('new-call-123');
+      expect(state.args).toBeUndefined();
+      expect(state.finalResponse).toBeUndefined();
+    });
+  });
+
   describe('Streaming Flow Integration', () => {
     test('should handle complete streaming flow from start to finish', async () => {
       const state: DoneToolState = {
