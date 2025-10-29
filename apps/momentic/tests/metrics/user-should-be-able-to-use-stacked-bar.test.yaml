@@ -52,11 +52,11 @@ steps:
   - id: 5c68dc50-7b1a-45f2-9d1a-f54bcc931370
     type: PRESET_ACTION
     command:
-      id: 35b67dd6-81d9-43c5-8421-18102e9fdac4
+      id: ffc45eb7-49de-4926-90dc-5853bd4aa361
       type: CLICK
       target:
         type: description
-        elementDescriptor: the dialog overlay behind the search modal (full-screen modal overlay)
+        elementDescriptor: the search textbox in the search modal
   - id: 86a299e8-0125-4c6f-83b0-d9c30b322adb
     type: PRESET_ACTION
     command:
