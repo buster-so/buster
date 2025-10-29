@@ -1,11 +1,7 @@
 import { getAgentTasksForEvent, getApiKeyForInstallationId } from '@buster/database/queries';
 import type { AgentEventTrigger, AgentName } from '@buster/database/schema-types';
-import {
-  generateNewInstallationToken,
-  type Octokit,
-  type PullRequestWebhookEvent,
-} from '@buster/github';
-import { type GithubContext, runDocsAgentAsync } from '@buster/sandbox';
+import type { Octokit, PullRequestWebhookEvent } from '@buster/github';
+import { buildCheckRunKey, type GithubContext, runDocsAgentAsync } from '@buster/sandbox';
 import { AuthDetailsAppInstallationResponseSchema } from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';
 import { createCheckRunHandler } from '../check-run/POST';
@@ -96,15 +92,22 @@ export async function handlePullRequestWebhook(
     console.info(`Running agent task ${task.agentName} for event ${eventTrigger}`);
     switch (task.agentName) {
       case 'documentation_agent': {
-        // TODO: pass check run id to the agent once we confirm it works
-        await createCheckRunHandler(apiKey.organizationId, {
-          owner,
-          repo,
-          name: 'Buster Documentation Agent',
-          head_sha: headSha,
-          external_id: task.id,
-          status: 'queued',
-        });
+        let checkRunKey: string | undefined;
+
+        try {
+          const checkRun = await createCheckRunHandler(apiKey.organizationId, {
+            owner,
+            repo,
+            name: 'Buster Documentation Agent',
+            head_sha: headSha,
+            external_id: task.id,
+            status: 'queued',
+          });
+          checkRunKey = buildCheckRunKey(checkRun.id, owner, repo);
+        } catch (error) {
+          // Log error but continue to execute the agent
+          console.error('Error creating check run:', error);
+        }
 
         await runDocsAgentAsync({
           installationToken: authDetails.token,
@@ -113,6 +116,7 @@ export async function handlePullRequestWebhook(
           apiKey: apiKey.key,
           context: context,
           organizationId: apiKey.organizationId,
+          checkRunKey,
         });
         break;
       }

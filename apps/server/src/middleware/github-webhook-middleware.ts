@@ -35,8 +35,8 @@ function getOrSetApp() {
       await handleIssueCommentWebhook(payload, octokit);
     });
 
-    githubApp.webhooks.on('installation', async ({ payload }) => {
-      await handleInstallationWebhook(payload);
+    githubApp.webhooks.on('installation', async ({ payload, octokit }) => {
+      await handleInstallationWebhook(payload, octokit);
     });
     githubApp.webhooks.on('push', async ({ payload, octokit }) => {
       await handlePushWebhook(payload, octokit);

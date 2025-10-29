@@ -1,10 +1,12 @@
 import {
   createGithubIntegration,
   getGithubIntegrationByInstallationId,
+  getGithubIntegrationRequestByOrgMemberList,
+  softDeleteGithubIntegrationRequest,
   updateGithubIntegration,
 } from '@buster/database/queries';
 import type { githubIntegrations } from '@buster/database/schema';
-import type { InstallationWebhookEvents } from '@buster/github';
+import type { InstallationWebhookEvents, Octokit } from '@buster/github';
 import type { InferSelectModel } from 'drizzle-orm';
 
 type GitHubIntegration = InferSelectModel<typeof githubIntegrations>;
@@ -14,7 +16,8 @@ type GitHubIntegration = InferSelectModel<typeof githubIntegrations>;
  * Processes different actions: created, deleted, suspend, unsuspend
  */
 export async function handleInstallationWebhook(
-  payload: InstallationWebhookEvents
+  payload: InstallationWebhookEvents,
+  octokit: Octokit
 ): Promise<GitHubIntegration> {
   const { action, installation } = payload;
 
@@ -28,6 +31,7 @@ export async function handleInstallationWebhook(
       return await handleInstallationCreatedWebhook({
         installation,
         repositories: payload.repositories,
+        octokit,
       });
     }
 
@@ -108,8 +112,9 @@ export async function handleInstallationWebhook(
 async function handleInstallationCreatedWebhook(params: {
   installation: InstallationWebhookEvents['installation'];
   repositories?: InstallationWebhookEvents['repositories'];
+  octokit: Octokit;
 }): Promise<GitHubIntegration> {
-  const { installation, repositories } = params;
+  const { installation, repositories, octokit } = params;
 
   let githubOrgName = 'Unknown Account';
   if (installation.account) {
@@ -123,7 +128,7 @@ async function handleInstallationCreatedWebhook(params: {
   // Check if integration already exists. The setup callback will create the row with user/org data.
   // We need to wait for the row to be created before adding the installation metadata.
   let existing: GitHubIntegration | undefined;
-  const maxRetries = 3;
+  const maxRetries = 5;
   const baseBackoffMs = 300;
   const maxJitterMs = 200;
 
@@ -144,10 +149,59 @@ async function handleInstallationCreatedWebhook(params: {
     }
   }
 
+  // If no integration found after retries, check for pending requests
   if (!existing) {
-    const errorMsg = `Failed to find GitHub integration for installation ${installation.id} after ${maxRetries} attempts`;
-    console.error(errorMsg);
-    throw new Error(errorMsg);
+    console.info(
+      `No integration found for installation ${installation.id}, checking for pending requests`
+    );
+
+    let orgMembers: string[] = [];
+    if (
+      installation.account &&
+      'type' in installation.account &&
+      installation.account.type === 'Organization'
+    ) {
+      const membersResponse = await octokit.rest.orgs.listMembers({
+        org: installation.account.login,
+        per_page: 100,
+      });
+      orgMembers = membersResponse.data.map((member) => member.login);
+    } else {
+      orgMembers = [githubOrgName];
+    }
+
+    // Look for pending request by GitHub login
+    const pendingRequest = await getGithubIntegrationRequestByOrgMemberList(orgMembers);
+
+    if (!pendingRequest) {
+      throw new Error('Unable to match installation with a pending request');
+    }
+
+    // Create integration from pending request
+    console.info(
+      `Creating integration from pending request for ${githubOrgName}, org ${pendingRequest.organizationId}`
+    );
+
+    const newIntegration = await createGithubIntegration({
+      installationId: installation.id.toString(),
+      appId: installation.app_id?.toString() ?? '0',
+      githubOrgId: installation.account?.id.toString() ?? '0',
+      githubOrgName,
+      organizationId: pendingRequest.organizationId,
+      userId: pendingRequest.userId,
+      permissions: installation.permissions ?? {},
+      accessibleRepositories: repositories ?? [],
+      status: 'active',
+    });
+
+    if (!newIntegration) {
+      throw new Error(`Failed to create integration for installation ${installation.id}`);
+    }
+
+    // Soft delete the pending request since it's now fulfilled
+    await softDeleteGithubIntegrationRequest(pendingRequest.id);
+
+    return newIntegration;
   }
 
   if (existing.deletedAt === null) {

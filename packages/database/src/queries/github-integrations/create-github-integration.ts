@@ -1,5 +1,6 @@
 import { db } from '../../connection';
 import { githubIntegrations } from '../../schema';
+import { GithubRepository } from '../../schema-types';
 
 /**
  * Create a new GitHub integration
@@ -11,7 +12,9 @@ export async function createGithubIntegration(data: {
   githubOrgId: string;
   installationId: string;
   githubOrgName?: string;
-  status?: 'pending' | 'active' | 'suspended' | 'revoked';
+  accessibleRepositories?: GithubRepository[];
+  permissions?: Record<string, string>;
+  status: 'pending' | 'active' | 'suspended' | 'revoked';
 }) {
   const [integration] = await db
     .insert(githubIntegrations)
@@ -22,11 +25,19 @@ export async function createGithubIntegration(data: {
       githubOrgId: data.githubOrgId,
       installationId: data.installationId,
       githubOrgName: data.githubOrgName,
-      status: data.status || 'pending',
+      accessibleRepositories: data.accessibleRepositories ?? [],
+      permissions: data.permissions ?? {},
+      status: data.status,
       createdAt: new Date().toISOString(),
     })
-    .onConflictDoNothing({
+    .onConflictDoUpdate({
       target: [githubIntegrations.organizationId, githubIntegrations.installationId],
+      set: {
+        accessibleRepositories: data.accessibleRepositories ?? [],
+        permissions: data.permissions ?? {},
+        status: data.status,
+        updatedAt: new Date().toISOString(),
+      },
     })
     .returning();
 

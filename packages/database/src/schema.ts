@@ -1728,6 +1728,42 @@ export const githubIntegrations = pgTable(
   ]
 );
 
+// GitHub integration requests table (for installations pending approval)
+export const githubIntegrationRequests = pgTable(
+  'github_integration_requests',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    userId: uuid('user_id').notNull(),
+    githubLogin: varchar('github_login', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'github_integration_requests_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'github_integration_requests_user_id_fkey',
+    }).onDelete('cascade'),
+    uniqueIndex('github_integration_requests_org_user_key').on(table.organizationId, table.userId),
+    index('idx_github_integration_requests_org_id').using(
+      'btree',
+      table.organizationId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_github_integration_requests_github_login').using(
+      'btree',
+      table.githubLogin.asc().nullsLast().op('text_ops')
+    ),
+  ]
+);
+
 // Slack message tracking table (optional)
 export const slackMessageTracking = pgTable(
   'slack_message_tracking',

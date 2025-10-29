@@ -140,6 +140,7 @@ export const GithubInstallationCallbackSchema = z
     installation_id: z.string().optional(),
     // Should be 'install', 'update', or 'request' but there are no docs on query params and it's better to not throw erros for validation on this.
     setup_action: z.string().optional(),
+    code: z.string().optional(), // GitHub sends this for user authorization
     error: z.string().optional(), // GitHub sends this when user cancels
     error_description: z.string().optional(),
   })
