@@ -49,14 +49,12 @@ steps:
       target:
         type: description
         elementDescriptor: the Charts checkbox in the Filters dropdown menu
-  - id: 5c68dc50-7b1a-45f2-9d1a-f54bcc931370
+  - id: 75227dbe-f766-47e7-999f-08c6d1795e35
     type: PRESET_ACTION
     command:
-      id: ffc45eb7-49de-4926-90dc-5853bd4aa361
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the search textbox in the search modal
+      id: 3029dd1a-dbe8-4d57-8ea4-e54fc50d8175
+      type: KEY_DOWN
+      value: Escape
   - id: 86a299e8-0125-4c6f-83b0-d9c30b322adb
     type: PRESET_ACTION
     command:

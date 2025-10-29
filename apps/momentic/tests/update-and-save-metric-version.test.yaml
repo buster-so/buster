@@ -68,15 +68,12 @@ steps:
       relativePosition:
         x: 0
         y: 0
-  - id: 4f5d3741-8d31-49a4-a903-7a2848fc0eee
+  - id: 6955b4b9-8a82-4dc1-bdd4-c31d85d16202
     type: PRESET_ACTION
     command:
-      id: 607ca374-9538-4d41-a580-8c8654ec95f0
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the search modal overlay (background overlay covering page to
-          dismiss the dialog)
+      id: f821798e-d229-4682-9ed9-f9429ce37973
+      type: KEY_DOWN
+      value: Escape
   - id: ee8c8438-3b9d-4f31-9781-6a5aef38244f
     type: PRESET_ACTION
     command:
