@@ -54,11 +54,12 @@ steps:
   - id: bd3dc745-3b25-41b5-99c5-77156a7130aa
     type: PRESET_ACTION
     command:
-      id: a4aeefe8-117f-49cb-866b-a57e7d6ade4d
+      id: 85e7faf8-00d7-4bce-a26e-714f3ec79ed9
       type: CLICK
       target:
         type: description
-        elementDescriptor: the modal dialog overlay (backdrop) behind the search modal
+        elementDescriptor: the modal overlay backdrop behind the search dialog
+          (clickable dialog overlay)
   - id: ee8c8438-3b9d-4f31-9781-6a5aef38244f
     type: PRESET_ACTION
     command:
