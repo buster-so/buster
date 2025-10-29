@@ -1,6 +1,8 @@
-import type { User } from '@buster/database/queries';
 import { createApiKey, getUserOrganizationId } from '@buster/database/queries';
-import type { CreateApiKeyRequest, CreateApiKeyResponse } from '@buster/server-shared/api';
+import type { CreateApiKeyResponse } from '@buster/server-shared/api';
+import { CreateApiKeyRequestSchema } from '@buster/server-shared/api';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { sign } from 'jsonwebtoken';
 
@@ -8,13 +10,8 @@ const createExpiresAt = () => {
   return Math.floor(Date.now() / 1000) + 365 * 5 * 24 * 60 * 60; // 5 years from now
 };
 
-/**
- * Handler for POST /api/v2/api_keys - Create a new API key
- */
-export async function createApiKeyHandler(
-  _request: CreateApiKeyRequest,
-  user: User
-): Promise<CreateApiKeyResponse> {
+const app = new Hono().post('/', zValidator('json', CreateApiKeyRequestSchema), async (c) => {
+  const user = c.get('busterUser');
   const jwtSecret = process.env.JWT_SECRET;
 
   if (!jwtSecret) {
@@ -48,7 +45,11 @@ export async function createApiKeyHandler(
     organizationId: userOrg.organizationId,
   });
 
-  return {
+  const response: CreateApiKeyResponse = {
     api_key: apiKey,
   };
-}
+
+  return c.json(response);
+});
+
+export default app;

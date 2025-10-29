@@ -1,14 +1,16 @@
-import type { User } from '@buster/database/queries';
 import { listApiKeys } from '@buster/database/queries';
 import type { GetApiKeysResponse } from '@buster/server-shared/api';
+import { Hono } from 'hono';
 
-/**
- * Handler for GET /api/v2/api_keys - List all API keys for the authenticated user
- */
-export async function listApiKeysHandler(user: User): Promise<GetApiKeysResponse> {
+const app = new Hono().get('/', async (c) => {
+  const user = c.get('busterUser');
   const apiKeys = await listApiKeys(user.id);
 
-  return {
+  const response: GetApiKeysResponse = {
     api_keys: apiKeys,
   };
-}
+
+  return c.json(response);
+});
+
+export default app;

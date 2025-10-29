@@ -1,17 +1,27 @@
-import type { User } from '@buster/database/queries';
 import { getApiKey } from '@buster/database/queries';
 import type { GetApiKeyResponse } from '@buster/server-shared/api';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { z } from 'zod';
 
-/**
- * Handler for GET /api/v2/api_keys/:id - Get a single API key
- */
-export async function getApiKeyHandler(apiKeyId: string, user: User): Promise<GetApiKeyResponse> {
-  const apiKey = await getApiKey(apiKeyId, user.id);
+const ApiKeyIdParamSchema = z.object({
+  id: z.string().uuid().describe('API key ID'),
+});
+
+const app = new Hono().get('/:id', zValidator('param', ApiKeyIdParamSchema), async (c) => {
+  const params = c.req.valid('param');
+  const user = c.get('busterUser');
+
+  const apiKey = await getApiKey(params.id, user.id);
 
   if (!apiKey) {
     throw new HTTPException(404, { message: 'API key not found' });
   }
 
-  return apiKey;
-}
+  const response: GetApiKeyResponse = apiKey;
+  return c.json(response);
+});
+
+export default app;
+

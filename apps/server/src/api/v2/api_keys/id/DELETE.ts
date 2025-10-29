@@ -1,23 +1,31 @@
-import type { User } from '@buster/database/queries';
 import { deleteApiKey } from '@buster/database/queries';
 import type { DeleteApiKeyResponse } from '@buster/server-shared/api';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { z } from 'zod';
 
-/**
- * Handler for DELETE /api/v2/api_keys/:id - Delete an API key
- */
-export async function deleteApiKeyHandler(
-  apiKeyId: string,
-  user: User
-): Promise<DeleteApiKeyResponse> {
-  const success = await deleteApiKey(apiKeyId, user.id);
+const ApiKeyIdParamSchema = z.object({
+  id: z.string().uuid().describe('API key ID'),
+});
+
+const app = new Hono().delete('/:id', zValidator('param', ApiKeyIdParamSchema), async (c) => {
+  const params = c.req.valid('param');
+  const user = c.get('busterUser');
+
+  const success = await deleteApiKey(params.id, user.id);
 
   if (!success) {
     throw new HTTPException(404, { message: 'API key not found' });
   }
 
-  return {
+  const response: DeleteApiKeyResponse = {
     success: true,
     message: 'API key deleted successfully',
   };
-}
+
+  return c.json(response);
+});
+
+export default app;
+

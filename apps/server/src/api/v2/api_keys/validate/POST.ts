@@ -1,11 +1,18 @@
 import { isApiKeyValid } from '@buster/database/queries';
-import type { ValidateApiKeyRequest, ValidateApiKeyResponse } from '@buster/server-shared/api';
+import type { ValidateApiKeyResponse } from '@buster/server-shared/api';
+import { ValidateApiKeyRequestSchema } from '@buster/server-shared/api';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
 
-/**
- * Handler for POST /api/v2/api_keys/validate - Validate an API key (no auth required)
- */
-export async function validateApiKeyHandler(
-  request: ValidateApiKeyRequest
-): Promise<ValidateApiKeyResponse> {
-  return await isApiKeyValid(request.api_key);
-}
+const app = new Hono().post(
+  '/validate',
+  zValidator('json', ValidateApiKeyRequestSchema),
+  async (c) => {
+    const request = c.req.valid('json');
+    const response: ValidateApiKeyResponse = await isApiKeyValid(request.api_key);
+    return c.json(response);
+  }
+);
+
+export default app;
+
