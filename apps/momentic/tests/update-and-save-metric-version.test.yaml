@@ -51,15 +51,20 @@ steps:
       target:
         type: description
         elementDescriptor: the Charts checkbox item in the filters dropdown menu
+  - id: e4a9142c-a7b9-40b6-8c7f-33cd433b5059
+    type: PRESET_ACTION
+    command:
+      id: 11a8b225-df84-4f1e-8428-c1dc62967c8d
+      type: WAIT
+      delay: 1
   - id: bd3dc745-3b25-41b5-99c5-77156a7130aa
     type: PRESET_ACTION
     command:
-      id: 85e7faf8-00d7-4bce-a26e-714f3ec79ed9
+      id: 5d141521-7a14-456f-930a-ac6df3b3983d
       type: CLICK
       target:
         type: description
-        elementDescriptor: the modal overlay backdrop behind the search dialog
-          (clickable dialog overlay)
+        elementDescriptor: the modal backdrop (dialog-overlay) behind the search modal
   - id: ee8c8438-3b9d-4f31-9781-6a5aef38244f
     type: PRESET_ACTION
     command:
