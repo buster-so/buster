@@ -69,50 +69,48 @@ export const GetGitHubIntegrationResponseSchema = z.object({
 export type GetGitHubIntegrationResponse = z.infer<typeof GetGitHubIntegrationResponseSchema>;
 
 // GitHub Check Run Response Schemas
-export const CheckRunResponseSchema = z.object({
-  check_run: z
-    .object({
-      id: z.number(),
-      node_id: z.string(),
-      head_sha: z.string(),
-      external_id: z.string().nullable(),
-      url: z.string(),
-      html_url: z.string().nullable(),
-      details_url: z.string().nullable(),
-      status: z.enum(['queued', 'in_progress', 'completed']),
-      conclusion: z
-        .enum([
-          'action_required',
-          'cancelled',
-          'failure',
-          'neutral',
-          'success',
-          'skipped',
-          'stale',
-          'timed_out',
-        ])
-        .nullable(),
-      started_at: z.string().nullable(),
-      completed_at: z.string().nullable(),
-      name: z.string(),
-      check_suite: z
-        .object({
-          id: z.number(),
-        })
-        .passthrough()
-        .optional(),
-      app: z
-        .object({
-          id: z.number(),
-          slug: z.string(),
-          name: z.string(),
-        })
-        .passthrough()
-        .optional(),
-      pull_requests: z.array(z.unknown()).optional(),
-    })
-    .passthrough(),
-});
+export const CheckRunResponseSchema = z
+  .object({
+    id: z.number(),
+    node_id: z.string(),
+    head_sha: z.string(),
+    external_id: z.string().nullable(),
+    url: z.string(),
+    html_url: z.string().nullable(),
+    details_url: z.string().nullable(),
+    status: z.enum(['queued', 'in_progress', 'completed']),
+    conclusion: z
+      .enum([
+        'action_required',
+        'cancelled',
+        'failure',
+        'neutral',
+        'success',
+        'skipped',
+        'stale',
+        'timed_out',
+      ])
+      .nullable(),
+    started_at: z.string().nullable(),
+    completed_at: z.string().nullable(),
+    name: z.string(),
+    check_suite: z
+      .object({
+        id: z.number(),
+      })
+      .passthrough()
+      .optional(),
+    app: z
+      .object({
+        id: z.number(),
+        slug: z.string(),
+        name: z.string(),
+      })
+      .passthrough()
+      .optional(),
+    pull_requests: z.array(z.unknown()).optional(),
+  })
+  .passthrough();
 
 export type CheckRunResponse = z.infer<typeof CheckRunResponseSchema>;
 

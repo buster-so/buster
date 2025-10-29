@@ -33,6 +33,10 @@ export const CheckRunCreateSchema = z.object({
   owner: z.string().describe('Repository owner (username or org name)'),
   repo: z.string().describe('Repository name'),
   name: z.string().describe('Name of the check run'),
+  status: z
+    .enum(['queued', 'in_progress', 'completed'])
+    .optional()
+    .describe('Status of the check run'),
   head_sha: z.string().describe('SHA of the commit to create the check run for'),
   external_id: z.string().optional().describe('External ID for the check run'),
   started_at: z
@@ -125,7 +129,20 @@ export type CheckRunUpdateRequest = z.infer<typeof CheckRunUpdateSchema>;
 export const CheckRunGetSchema = z.object({
   owner: z.string().describe('Repository owner (username or org name)'),
   repo: z.string().describe('Repository name'),
-  check_run_id: z.number().int().describe('The ID of the check run to retrieve'),
+  check_run_id: z.coerce.number().int().describe('The ID of the check run to retrieve'),
 });
 
 export type CheckRunGetRequest = z.infer<typeof CheckRunGetSchema>;
+
+export const GithubInstallationCallbackSchema = z
+  .object({
+    state: z.string().optional(),
+    installation_id: z.string().optional(),
+    // Should be 'install', 'update', or 'request' but there are no docs on query params and it's better to not throw erros for validation on this.
+    setup_action: z.string().optional(),
+    error: z.string().optional(), // GitHub sends this when user cancels
+    error_description: z.string().optional(),
+  })
+  .passthrough();
+
+export type GithubInstallationCallbackRequest = z.infer<typeof GithubInstallationCallbackSchema>;

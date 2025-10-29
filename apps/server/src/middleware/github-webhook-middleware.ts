@@ -66,7 +66,6 @@ export function githubWebhookMiddleware(): MiddlewareHandler {
         });
       }
 
-      console.info('await githubApp.webhooks.verifyAndReceive');
       await githubApp.webhooks.verifyAndReceive({
         id,
         name,

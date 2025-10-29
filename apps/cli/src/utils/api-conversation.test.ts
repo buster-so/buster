@@ -28,7 +28,7 @@ const createMockSdk = (): BusterSDK => ({
     update: vi.fn(),
     getRawMessages: vi.fn(),
   },
-  checkRuns: {
+  checkRun: {
     create: vi.fn(),
     update: vi.fn(),
     get: vi.fn(),

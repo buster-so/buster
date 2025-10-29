@@ -36,6 +36,7 @@ export async function createCheckRunHandler(
     repo: requestData.repo,
     name: requestData.name,
     head_sha: requestData.head_sha,
+    status: requestData.status || 'queued',
     ...(requestData.external_id && { external_id: requestData.external_id }),
     ...(requestData.started_at && { started_at: requestData.started_at }),
   });

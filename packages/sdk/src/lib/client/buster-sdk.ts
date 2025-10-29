@@ -48,7 +48,7 @@ export interface BusterSDK {
     ) => Promise<UpdateMessageResponse>;
     getRawMessages: (chatId: string) => Promise<GetRawMessagesResponse>;
   };
-  checkRuns: {
+  checkRun: {
     create: (request: CheckRunCreateRequest) => Promise<CreateCheckRunResponse>;
     get: (request: CheckRunGetRequest) => Promise<GetCheckRunResponse>;
     update: (request: CheckRunUpdateRequest) => Promise<UpdateCheckRunResponse>;
@@ -66,7 +66,7 @@ export function createBusterSDK(config: Partial<SDKConfig>): BusterSDK {
       isApiKeyValid: (apiKey?: string) => isApiKeyValid(validatedConfig, apiKey),
     },
     deploy: (request) => deploy(validatedConfig, request),
-    checkRuns: {
+    checkRun: {
       create: (request) =>
         post<CreateCheckRunResponse>(validatedConfig, '/github/check-run', request),
       get: (request) => {
@@ -75,6 +75,7 @@ export function createBusterSDK(config: Partial<SDKConfig>): BusterSDK {
           repo: request.repo,
           check_run_id: String(request.check_run_id),
         };
+
         return get<GetCheckRunResponse>(validatedConfig, '/github/check-run', queryParams);
       },
       update: (request) =>

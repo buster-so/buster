@@ -25,6 +25,9 @@ export async function createGithubIntegration(data: {
       status: data.status || 'pending',
       createdAt: new Date().toISOString(),
     })
+    .onConflictDoNothing({
+      target: [githubIntegrations.organizationId, githubIntegrations.installationId],
+    })
     .returning();
 
   return integration;

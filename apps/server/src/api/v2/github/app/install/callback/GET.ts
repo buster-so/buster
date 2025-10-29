@@ -1,21 +1,12 @@
+import { createGithubIntegration, updateGithubIntegration } from '@buster/database/queries';
+import { createInstallationOctokit } from '@buster/github';
 import {
-  createGithubIntegration,
-  getGithubIntegrationByInstallationId,
-  updateGithubIntegration,
-} from '@buster/database/queries';
+  type GithubInstallationCallbackRequest,
+  GithubInstallationCallbackSchema,
+} from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { z } from 'zod';
 import { retrieveInstallationState } from '../../../helpers/installation-state';
-
-// Define request schemas
-const GithubInstallationCallbackSchema = z.object({
-  state: z.string().optional(),
-  installation_id: z.string().optional(),
-  setup_action: z.enum(['install', 'update']).optional(),
-  error: z.string().optional(), // GitHub sends this when user cancels
-  error_description: z.string().optional(),
-});
 
 const app = new Hono().get(
   '/',
@@ -23,6 +14,7 @@ const app = new Hono().get(
   async (c) => {
     const query = c.req.valid('query');
     console.info('GitHub auth callback received', { query });
+
     const result = await githubInstallationCallbackHandler({
       state: query.state,
       installation_id: query.installation_id,
@@ -36,17 +28,9 @@ const app = new Hono().get(
 
 export default app;
 
-interface CompleteInstallationRequest {
-  state?: string | undefined;
-  installation_id?: string | undefined;
-  setup_action?: 'install' | 'update' | undefined;
-  error?: string | undefined;
-  error_description?: string | undefined;
-}
-
-interface AuthCallbackResult {
+type AuthCallbackResult = {
   redirectUrl: string;
-}
+};
 
 /**
  * Complete the GitHub App installation after user returns from GitHub
@@ -54,105 +38,96 @@ interface AuthCallbackResult {
  * Returns a redirect URL to send the user to the appropriate page
  */
 export async function githubInstallationCallbackHandler(
-  request: CompleteInstallationRequest
+  request: GithubInstallationCallbackRequest
 ): Promise<AuthCallbackResult> {
   // Get base URL from environment
   const baseUrl = process.env.BUSTER_URL || '';
-  const installationId = `${request.installation_id}`;
-
-  // Handle user cancellation
-  if (request.error === 'access_denied') {
-    console.info('GitHub App installation cancelled by user');
-    return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=cancelled`,
-    };
-  }
-
-  // Handle other errors from GitHub
-  if (request.error) {
-    const errorMessage = request.error_description || request.error;
-    console.error('GitHub returned error:', errorMessage);
-    return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=${encodeURIComponent(errorMessage)}`,
-    };
-  }
-
-  // Check for required parameters
-  if (!request.installation_id) {
-    return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=missing_installation_id`,
-    };
-  }
-
-  console.info(`Completing GitHub installation: installation_id=${request.installation_id}`);
-
-  // Retrieve the state to get user/org context
-  // Note: If state is not provided, this might be a direct installation from GitHub
-  if (!request.state) {
-    return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=missing_state`,
-    };
-  }
-
-  const stateData = await retrieveInstallationState(request.state);
-
-  if (!stateData) {
-    return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=invalid_state`,
-    };
-  }
 
   try {
-    // Check if integration already exists
-    const existing = await getGithubIntegrationByInstallationId(installationId);
+    // Check if state and installation_id were provided
+    if (request.state && request.installation_id) {
+      const installationId = `${request.installation_id}`;
 
-    if (existing && existing.deletedAt === null) {
-      console.info(`GitHub integration already exists for installation ${installationId}`);
+      const stateData = await retrieveInstallationState(request.state);
+      if (!stateData) {
+        return {
+          redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=invalid_state`,
+        };
+      }
 
-      // Update existing integration to ensure it's active
-      const updated = await updateGithubIntegration(existing.id, {
-        status: 'active',
+      // Create the GitHub integration will not fail on conflict. This makes an update, install, or request all safe
+      const integration = await createGithubIntegration({
+        installationId: installationId,
+        appId: process.env.GITHUB_APP_ID ?? '0',
+        githubOrgId: 'unknown',
+        githubOrgName: 'pending_webhook_update',
+        organizationId: stateData.organizationId,
+        userId: stateData.userId,
+        status: 'pending',
       });
 
-      if (!updated) {
-        throw new Error(`Failed to update integration for installation ${installationId}`);
+      // If integration was successfully created, get installation details and update
+      // Webhook will update but grabbing details now makes the experience better for the user
+      if (integration && request.setup_action === 'install') {
+        try {
+          const octokit = await createInstallationOctokit(installationId);
+
+          const installationDetailsPromise = octokit.rest.apps.getInstallation({
+            installation_id: Number.parseInt(installationId, 10),
+          });
+          const repositoryDetailsPromise = octokit.rest.apps.listReposAccessibleToInstallation();
+
+          const [installationDetails, repositoryDetails] = await Promise.all([
+            installationDetailsPromise,
+            repositoryDetailsPromise,
+          ]);
+
+          // Extract account information - account can be User or Organization
+          const account = installationDetails.data.account;
+          const accountLogin =
+            account && 'login' in account
+              ? account.login
+              : account && 'name' in account
+                ? account.name
+                : 'unknown';
+          const accountId = account?.id?.toString() || 'unknown';
+
+          await updateGithubIntegration(integration.id, {
+            githubOrgName: accountLogin,
+            githubOrgId: accountId,
+            permissions: installationDetails.data.permissions as Record<string, string>,
+            accessibleRepositories: repositoryDetails.data.repositories,
+            status: 'active',
+          });
+        } catch (error) {
+          console.error('Failed to fetch or update installation details:', error);
+          // Don't fail the whole flow if we can't get details - webhook will update later
+        }
       }
 
       return {
         redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
       };
-    } else if (existing) {
+    }
+
+    // If state and installation_id aren't provided, check for errors
+    if (request.error) {
+      const errorMessage = request.error_description || request.error;
+      console.error('GitHub returned error:', errorMessage);
       return {
-        redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
+        redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=${encodeURIComponent(errorMessage)}`,
       };
     }
 
-    // Create new integration
-    const integration = await createGithubIntegration({
-      installationId: installationId,
-      appId: process.env.GITHUB_APP_ID ?? '0',
-      githubOrgId: 'unknown',
-      githubOrgName: 'pending_webhook_update',
-      organizationId: stateData.organizationId,
-      userId: stateData.userId,
-      status: 'pending',
-    });
-
-    if (!integration) {
-      throw new Error(`Failed to create integration for installation ${installationId}`);
-    }
-
-    console.info(`GitHub App installed successfully for org ${stateData.organizationId}`);
-
+    // No state/installation_id and no error - just return to integrations page
     return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=success`,
+      redirectUrl: `${baseUrl}/app/settings/integrations?status=failure`,
     };
   } catch (error) {
-    console.error('Failed to complete installation:', error);
-
-    const errorMessage = error instanceof Error ? error.message : 'installation_failed';
+    // Catch any unexpected errors and return failure status
+    console.error('Error in GitHub installation callback:', error);
     return {
-      redirectUrl: `${baseUrl}/app/settings/integrations?status=error&error=${encodeURIComponent(errorMessage)}`,
+      redirectUrl: `${baseUrl}/app/settings/integrations?status=failure`,
     };
   }
 }

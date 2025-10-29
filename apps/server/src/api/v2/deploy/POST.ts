@@ -227,7 +227,6 @@ async function handleAutomationDeployment(
   console.info('[handleAutomationDeployment] Automation deployment request received', {
     userId,
     organizationId,
-    automationCount: automation.length,
   });
 
   try {
@@ -281,14 +280,12 @@ async function handleAutomationDeployment(
             });
           }
         } else {
-          // Exhaustive check - should never happen due to schema validation
           const _exhaustive: never = trigger;
           throw new Error(`Unknown event type: ${_exhaustive}`);
         }
       }
     }
 
-    console.info('[handleAutomationDeployment] Flattened tasks:', flattenedTasks);
     // Deploy automation tasks to the database
     const result = await deployAutomationTasks({
       organizationId,

@@ -67,6 +67,7 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
     organizationId,
   } = runDocsAgentParamsSchema.parse(params);
 
+  console.info('running docs agent async');
   const sandboxSnapshotBaseName = 'buster-data-engineer';
   const sandboxContext = context || {};
 

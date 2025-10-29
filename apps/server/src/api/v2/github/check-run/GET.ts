@@ -54,7 +54,7 @@ const app = new Hono().get(
 
     try {
       const checkRun = await getCheckRunHandler(userOrg.organizationId, queryData);
-      return c.json({ check_run: checkRun });
+      return c.json(checkRun);
     } catch (error) {
       console.error('Failed to get check run:', error);
       return c.json(

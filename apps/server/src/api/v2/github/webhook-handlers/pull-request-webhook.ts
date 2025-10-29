@@ -1,9 +1,14 @@
 import { getAgentTasksForEvent, getApiKeyForInstallationId } from '@buster/database/queries';
 import type { AgentEventTrigger, AgentName } from '@buster/database/schema-types';
-import type { Octokit, PullRequestWebhookEvent } from '@buster/github';
+import {
+  generateNewInstallationToken,
+  type Octokit,
+  type PullRequestWebhookEvent,
+} from '@buster/github';
 import { type GithubContext, runDocsAgentAsync } from '@buster/sandbox';
 import { AuthDetailsAppInstallationResponseSchema } from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';
+import { createCheckRunHandler } from '../check-run/POST';
 
 /**
  * Handle GitHub App pull_request webhook callback
@@ -13,7 +18,10 @@ export async function handlePullRequestWebhook(
   payload: PullRequestWebhookEvent,
   octokit: Octokit
 ): Promise<void> {
-  const repo = payload.repository.full_name;
+  const repoFullName = payload.repository.full_name;
+  const owner = payload.repository.owner.login;
+  const headSha = payload.pull_request.head.sha;
+  const repo = payload.repository.name;
   const repoUrl = payload.repository.html_url;
   const branch = payload.pull_request.head.ref;
   const action = payload.action;
@@ -61,7 +69,7 @@ export async function handlePullRequestWebhook(
   const automationTasks = await getAgentTasksForEvent({
     organizationId: apiKey.organizationId,
     eventTrigger,
-    repository: repo,
+    repository: repoFullName,
     branch,
   });
 
@@ -88,8 +96,18 @@ export async function handlePullRequestWebhook(
     console.info(`Running agent task ${task.agentName} for event ${eventTrigger}`);
     switch (task.agentName) {
       case 'documentation_agent': {
+        // TODO: pass check run id to the agent once we confirm it works
+        await createCheckRunHandler(apiKey.organizationId, {
+          owner,
+          repo,
+          name: 'Buster Documentation Agent',
+          head_sha: headSha,
+          external_id: task.id,
+          status: 'queued',
+        });
+
         await runDocsAgentAsync({
-          installationToken: authDetails.installationId.toString(),
+          installationToken: authDetails.token,
           repoUrl,
           branch,
           apiKey: apiKey.key,
