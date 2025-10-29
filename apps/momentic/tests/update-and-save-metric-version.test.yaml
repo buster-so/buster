@@ -151,7 +151,7 @@ steps:
       target:
         type: description
         elementDescriptor: The title above the metric
-      value: momentic-test-metric
+      value: momentic-test-metric-swag
   - id: 77ee7abc-2ddb-4c05-955f-4b61884fd52b
     type: PRESET_ACTION
     command:
@@ -160,6 +160,12 @@ steps:
       target:
         type: description
         elementDescriptor: the metric view chart content panel (metric-view-chart-content)
+  - id: feafdea7-9b78-4620-b6f6-850f700d65b3
+    type: PRESET_ACTION
+    command:
+      id: 99d42264-12a6-4b90-989b-2c5c77b0ddcb
+      type: WAIT
+      delay: 2
   - id: df94543c-3fb2-4862-ab45-fb68dfc09639
     type: PRESET_ACTION
     command:

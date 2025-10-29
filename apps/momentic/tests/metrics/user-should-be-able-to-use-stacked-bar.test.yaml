@@ -86,20 +86,3 @@ steps:
       id: 2d93234c-f119-47c6-92fb-cb2e8b46a35a
       type: WAIT
       delay: 1
-afterSteps:
-  - id: e37dd2b1-ac2e-4112-820f-66f3b11d19e9
-    type: PRESET_ACTION
-    command:
-      id: 92620cbd-0f4a-4fb5-91b7-92df614179d9
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the grouped column chart icon
-  - id: c12e98f0-7a17-4853-ae7d-a086f615d2ca
-    type: PRESET_ACTION
-    command:
-      id: 5084ca86-7234-44f4-8e08-48760591a996
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the save button at the bottom of the chart
