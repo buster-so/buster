@@ -37,7 +37,7 @@ export const InvitePeopleModal: React.FC<{
     return {
       title: 'Invite others to join your workspace',
       description:
-        'You can share the link below with others you’d like to join your workspace. You can also input their email to send them an invite.',
+        'Please input the emails of the users you would like to invite to your workspace.',
     };
   }, []);
 

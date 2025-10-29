@@ -44,7 +44,7 @@ export const EditorKit = ({
   // Editing
   ...SlashKit,
   ...AutoformatKit,
-  ...CursorOverlayKit,
+  // ...CursorOverlayKit,
   ...EmojiKit,
   ...ExitBreakKit,
   TrailingBlockPlugin,
