@@ -18,7 +18,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
           <div className="sidebar-scroll-area flex flex-1 flex-col overflow-y-auto scrollbar scrollbar-thin">
             {/* Top scroll indicator - appears when scrolled down */}
             <div className="sidebar-scroll-indicator-top" />
-            <div className="flex flex-col space-y-4.5 px-3.5 pb-3">
+            <div className="flex flex-col space-y-0.5 px-3.5 pb-3">
               {content.map((item) => (
                 <ContentSelector key={item.id} content={item} useCollapsible={useCollapsible} />
               ))}
