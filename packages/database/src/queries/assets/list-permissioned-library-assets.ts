@@ -1,40 +1,33 @@
-import {
-  and,
-  count,
-  desc,
-  eq,
-  exists,
-  gte,
-  inArray,
-  isNull,
-  lte,
-  ne,
-  not,
-  or,
-  type SQL,
-  sql,
-} from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, lte, not, type SQL, sql } from 'drizzle-orm';
 import { db } from '../../connection';
+import { users } from '../../schema';
 import {
-  assetPermissions,
-  chats,
-  dashboardFiles,
-  metricFiles,
-  reportFiles,
-  users,
-} from '../../schema';
-import {
-  createPaginatedResponse,
-  type LibraryAssetListItem,
-  type LibraryAssetType,
-  type ListPermissionedLibraryAssetsInput,
-  ListPermissionedLibraryAssetsInputSchema,
-  type ListPermissionedLibraryAssetsResponse,
+  type AssetListItem,
+  type AssetType,
+  type ListPermissionedAssetsInput,
+  ListPermissionedAssetsInputSchema,
+  type ListPermissionedAssetsResponse,
 } from '../../schema-types';
+import {
+  libraryChildChatsFromCollections,
+  libraryChildDashboardsFromChats,
+  libraryChildDashboardsFromCollections,
+  libraryChildMetricsFromChats,
+  libraryChildMetricsFromCollections,
+  libraryChildMetricsFromDashboards,
+  libraryChildMetricsFromReports,
+  libraryChildReportsFromChats,
+  libraryChildReportsFromCollections,
+  libraryPermissionedChats,
+  libraryPermissionedCollections,
+  libraryPermissionedDashboardFiles,
+  libraryPermissionedMetricFiles,
+  libraryPermissionedReportFiles,
+} from '../asset-permissions/asset-permission-subqueries';
 
 export async function listPermissionedLibraryAssets(
-  input: ListPermissionedLibraryAssetsInput
-): Promise<ListPermissionedLibraryAssetsResponse> {
+  input: ListPermissionedAssetsInput
+): Promise<ListPermissionedAssetsResponse> {
   const {
     organizationId,
     userId,
@@ -44,161 +37,40 @@ export async function listPermissionedLibraryAssets(
     endDate,
     includeCreatedBy,
     excludeCreatedBy,
+    ordering,
+    orderingDirection,
+    groupBy,
+    query,
     page,
     page_size,
-  } = ListPermissionedLibraryAssetsInputSchema.parse(input);
+    includeAssetChildren,
+    pinCollections,
+  } = ListPermissionedAssetsInputSchema.parse(input);
 
   const offset = (page - 1) * page_size;
+  const limit = page_size + 1;
+  // Build the union query using library-aware subqueries
+  // These subqueries already include library filtering, so no separate join is needed
+  const baseUnion = libraryPermissionedReportFiles(organizationId, userId)
+    .union(libraryPermissionedMetricFiles(organizationId, userId))
+    .union(libraryPermissionedDashboardFiles(organizationId, userId))
+    .union(libraryPermissionedChats(organizationId, userId))
+    .union(libraryPermissionedCollections(organizationId, userId));
 
-  const permissionedReportFiles = db
-    .select({
-      assetId: reportFiles.id,
-      assetType: sql`'report_file'::asset_type_enum`.as('assetType'),
-      name: reportFiles.name,
-      createdAt: reportFiles.createdAt,
-      updatedAt: reportFiles.updatedAt,
-      createdBy: reportFiles.createdBy,
-      organizationId: reportFiles.organizationId,
-    })
-    .from(reportFiles)
-    .where(
-      and(
-        eq(reportFiles.organizationId, organizationId),
-        eq(reportFiles.savedToLibrary, true),
-        isNull(reportFiles.deletedAt),
-        or(
-          ne(reportFiles.workspaceSharing, 'none'),
-          exists(
-            db
-              .select({ value: sql`1` })
-              .from(assetPermissions)
-              .where(
-                and(
-                  eq(assetPermissions.assetId, reportFiles.id),
-                  eq(assetPermissions.assetType, 'report_file'),
-                  eq(assetPermissions.identityId, userId),
-                  eq(assetPermissions.identityType, 'user'),
-                  isNull(assetPermissions.deletedAt)
-                )
-              )
-          )
-        )
-      )
-    );
+  const allPermissionedAssets = includeAssetChildren
+    ? baseUnion
+        .union(libraryChildMetricsFromDashboards(organizationId, userId))
+        .union(libraryChildMetricsFromReports(organizationId, userId))
+        .union(libraryChildMetricsFromChats(organizationId, userId))
+        .union(libraryChildDashboardsFromChats(organizationId, userId))
+        .union(libraryChildReportsFromChats(organizationId, userId))
+        .union(libraryChildMetricsFromCollections(organizationId, userId))
+        .union(libraryChildDashboardsFromCollections(organizationId, userId))
+        .union(libraryChildReportsFromCollections(organizationId, userId))
+        .union(libraryChildChatsFromCollections(organizationId, userId))
+    : baseUnion;
 
-  const permissionedMetricFiles = db
-    .select({
-      assetId: metricFiles.id,
-      assetType: sql`'metric_file'::asset_type_enum`.as('assetType'),
-      name: metricFiles.name,
-      createdAt: metricFiles.createdAt,
-      updatedAt: metricFiles.updatedAt,
-      createdBy: metricFiles.createdBy,
-      organizationId: metricFiles.organizationId,
-    })
-    .from(metricFiles)
-    .where(
-      and(
-        eq(metricFiles.organizationId, organizationId),
-        eq(metricFiles.savedToLibrary, true),
-        isNull(metricFiles.deletedAt),
-        or(
-          ne(metricFiles.workspaceSharing, 'none'),
-          exists(
-            db
-              .select({ value: sql`1` })
-              .from(assetPermissions)
-              .where(
-                and(
-                  eq(assetPermissions.assetId, metricFiles.id),
-                  eq(assetPermissions.assetType, 'metric_file'),
-                  eq(assetPermissions.identityId, userId),
-                  eq(assetPermissions.identityType, 'user'),
-                  isNull(assetPermissions.deletedAt)
-                )
-              )
-          )
-        )
-      )
-    );
-
-  const permissionedDashboardFiles = db
-    .select({
-      assetId: dashboardFiles.id,
-      assetType: sql`'dashboard_file'::asset_type_enum`.as('assetType'),
-      name: dashboardFiles.name,
-      createdAt: dashboardFiles.createdAt,
-      updatedAt: dashboardFiles.updatedAt,
-      createdBy: dashboardFiles.createdBy,
-      organizationId: dashboardFiles.organizationId,
-    })
-    .from(dashboardFiles)
-    .where(
-      and(
-        eq(dashboardFiles.organizationId, organizationId),
-        eq(dashboardFiles.savedToLibrary, true),
-        isNull(dashboardFiles.deletedAt),
-        or(
-          ne(dashboardFiles.workspaceSharing, 'none'),
-          exists(
-            db
-              .select({ value: sql`1` })
-              .from(assetPermissions)
-              .where(
-                and(
-                  eq(assetPermissions.assetId, dashboardFiles.id),
-                  eq(assetPermissions.assetType, 'dashboard_file'),
-                  eq(assetPermissions.identityId, userId),
-                  eq(assetPermissions.identityType, 'user'),
-                  isNull(assetPermissions.deletedAt)
-                )
-              )
-          )
-        )
-      )
-    );
-
-  const permissionedChats = db
-    .select({
-      assetId: chats.id,
-      assetType: sql`'chat'::asset_type_enum`.as('assetType'),
-      name: chats.title,
-      createdAt: chats.createdAt,
-      updatedAt: chats.updatedAt,
-      createdBy: chats.createdBy,
-      organizationId: chats.organizationId,
-    })
-    .from(chats)
-    .where(
-      and(
-        eq(chats.organizationId, organizationId),
-        eq(chats.savedToLibrary, true),
-        isNull(chats.deletedAt),
-        or(
-          ne(chats.workspaceSharing, 'none'),
-          exists(
-            db
-              .select({ value: sql`1` })
-              .from(assetPermissions)
-              .where(
-                and(
-                  eq(assetPermissions.assetId, chats.id),
-                  eq(assetPermissions.assetType, 'chat'),
-                  eq(assetPermissions.identityId, userId),
-                  eq(assetPermissions.identityType, 'user'),
-                  isNull(assetPermissions.deletedAt)
-                )
-              )
-          )
-        )
-      )
-    );
-
-  const permissionedAssets = permissionedReportFiles
-    .union(permissionedMetricFiles)
-    .union(permissionedDashboardFiles)
-    .union(permissionedChats)
-    .as('permissioned_assets');
+  const permissionedAssets = allPermissionedAssets.as('permissioned_assets');
 
   const filters: SQL[] = [];
 
@@ -226,6 +98,10 @@ export async function listPermissionedLibraryAssets(
     filters.push(not(inArray(permissionedAssets.createdBy, excludeCreatedBy)));
   }
 
+  if (query) {
+    filters.push(ilike(permissionedAssets.name, `%${query}%`));
+  }
+
   const whereCondition =
     filters.length === 0 ? undefined : filters.length === 1 ? filters[0] : and(...filters);
 
@@ -235,31 +111,76 @@ export async function listPermissionedLibraryAssets(
       assetType: permissionedAssets.assetType,
       name: permissionedAssets.name,
       updatedAt: permissionedAssets.updatedAt,
+      updatedAtDate: sql<string>`DATE(${permissionedAssets.updatedAt})`.as('updated_at_date'),
       createdAt: permissionedAssets.createdAt,
+      createdAtDate: sql<string>`DATE(${permissionedAssets.createdAt})`.as('created_at_date'),
       createdBy: permissionedAssets.createdBy,
       createdByName: users.name,
       createdByEmail: users.email,
       createdByAvatarUrl: users.avatarUrl,
+      screenshotBucketKey: permissionedAssets.screenshotBucketKey,
+      organizationId: permissionedAssets.organizationId,
     })
     .from(permissionedAssets)
     .innerJoin(users, eq(permissionedAssets.createdBy, users.id));
 
   const filteredAssetQuery = whereCondition ? baseAssetQuery.where(whereCondition) : baseAssetQuery;
 
+  // Determine ordering direction (default to desc for backward compatibility)
+  const direction = orderingDirection === 'asc' ? asc : desc;
+
+  const orderingClauses: SQL[] = [];
+  // Do groupBy clause first, then do ordering
+  if (groupBy === 'asset_type') {
+    // Custom order: collection (0), chat (1), report (2), dashboard (3), metric (4)
+    orderingClauses.push(
+      asc(sql`CASE ${permissionedAssets.assetType}
+        WHEN 'collection' THEN 0
+        WHEN 'chat' THEN 1
+        WHEN 'report_file' THEN 2
+        WHEN 'dashboard_file' THEN 3
+        WHEN 'metric_file' THEN 4
+        ELSE 5
+      END`)
+    );
+  } else if (groupBy === 'owner') {
+    orderingClauses.push(direction(permissionedAssets.createdBy));
+  } else if (groupBy === 'created_at') {
+    orderingClauses.push(direction(permissionedAssets.createdAt));
+  } else if (groupBy === 'updated_at') {
+    orderingClauses.push(direction(permissionedAssets.updatedAt));
+  } else if (groupBy !== 'none' && groupBy !== undefined) {
+    const _exhaustiveCheck: never = groupBy;
+    throw new Error(`Invalid groupBy: ${_exhaustiveCheck}`);
+  }
+
+  if (orderingClauses.length === 0 && pinCollections) {
+    // Order collections first (0), then other assets (1)
+    orderingClauses.push(
+      asc(sql`CASE WHEN ${permissionedAssets.assetType} = 'collection' THEN 0 ELSE 1 END`)
+    );
+  }
+
+  if (ordering === 'updated_at' || ordering === 'none' || ordering === undefined) {
+    orderingClauses.push(direction(permissionedAssets.updatedAt));
+  } else if (ordering === 'created_at') {
+    orderingClauses.push(direction(permissionedAssets.createdAt));
+  } else {
+    const _exhaustiveCheck: never = ordering;
+    throw new Error(`Invalid ordering: ${_exhaustiveCheck}`);
+  }
+
+  // Apply ordering and execute query
   const assetsResult = await filteredAssetQuery
-    .orderBy(desc(permissionedAssets.createdAt))
-    .limit(page_size)
+    .orderBy(...orderingClauses)
+    .limit(limit)
     .offset(offset);
 
-  const baseCountQuery = db.select({ total: count() }).from(permissionedAssets);
-  const countResult = await (whereCondition
-    ? baseCountQuery.where(whereCondition)
-    : baseCountQuery);
-  const totalValue = countResult[0]?.total ?? 0;
+  const hasMore = assetsResult.length > page_size;
 
-  const libraryAssets: LibraryAssetListItem[] = assetsResult.map((asset) => ({
+  const libraryAssets: AssetListItem[] = assetsResult.map((asset) => ({
     asset_id: asset.assetId,
-    asset_type: asset.assetType as LibraryAssetType,
+    asset_type: asset.assetType as AssetType,
     name: asset.name ?? '',
     created_at: asset.createdAt,
     updated_at: asset.updatedAt,
@@ -267,12 +188,86 @@ export async function listPermissionedLibraryAssets(
     created_by_name: asset.createdByName,
     created_by_email: asset.createdByEmail,
     created_by_avatar_url: asset.createdByAvatarUrl,
+    screenshot_url: asset.screenshotBucketKey,
   }));
 
-  return createPaginatedResponse({
+  if (hasMore) {
+    // Remove the last asset if there is more than the page size
+    libraryAssets.pop();
+  }
+
+  // Handle groupBy
+  if (groupBy && groupBy !== 'none') {
+    const groups: Record<string, AssetListItem[]> = {};
+
+    for (let i = 0; i < libraryAssets.length; i++) {
+      const asset = libraryAssets[i];
+      const resultAsset = assetsResult[i];
+      if (!asset || !resultAsset) {
+        continue;
+      }
+
+      let groupKey: string;
+
+      if (groupBy === 'asset_type') {
+        groupKey = asset.asset_type;
+      } else if (groupBy === 'owner') {
+        groupKey = asset.created_by;
+      } else if (groupBy === 'created_at') {
+        // Use database-computed date (YYYY-MM-DD) for consistent day-based grouping
+        groupKey = resultAsset.createdAtDate;
+      } else if (groupBy === 'updated_at') {
+        // Use database-computed date (YYYY-MM-DD) for consistent day-based grouping
+        groupKey = resultAsset.updatedAtDate;
+      } else {
+        groupKey = 'ungrouped';
+      }
+
+      const groupArray = groups[groupKey] ?? [];
+      groupArray.push(asset);
+      groups[groupKey] = groupArray;
+    }
+
+    return {
+      groups,
+      pagination: {
+        page,
+        page_size,
+        has_more: hasMore,
+      },
+    };
+  }
+
+  if (pinCollections) {
+    const groups: Record<string, AssetListItem[]> = { collections: [], assets: [] };
+    for (let i = 0; i < libraryAssets.length; i++) {
+      const asset = libraryAssets[i];
+      if (!asset) {
+        continue;
+      }
+      if (asset.asset_type === 'collection') {
+        groups.collections?.push(asset);
+      } else {
+        groups.assets?.push(asset);
+      }
+    }
+
+    return {
+      groups,
+      pagination: {
+        page,
+        page_size,
+        has_more: hasMore,
+      },
+    };
+  }
+
+  return {
     data: libraryAssets,
-    page,
-    page_size,
-    total: totalValue,
-  });
+    pagination: {
+      page,
+      page_size,
+      has_more: hasMore,
+    },
+  };
 }

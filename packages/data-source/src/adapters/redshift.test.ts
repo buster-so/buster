@@ -8,15 +8,17 @@ import { RedshiftAdapter } from './redshift';
 vi.mock('pg-cursor');
 
 // Create mock client instance
-const mockClient = {
-  connect: vi.fn().mockResolvedValue(undefined),
-  query: vi.fn(),
-  end: vi.fn().mockResolvedValue(undefined),
-};
+let mockClientInstance: any;
+let mockClientConstructorArgs: any;
 
 // Mock pg module (Redshift uses PostgreSQL client)
 vi.mock('pg', () => ({
-  Client: vi.fn(() => mockClient),
+  Client: class {
+    constructor(config: any) {
+      mockClientConstructorArgs = config;
+      Object.assign(this, mockClientInstance);
+    }
+  },
 }));
 
 describe('RedshiftAdapter', () => {
@@ -24,6 +26,11 @@ describe('RedshiftAdapter', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockClientInstance = {
+      connect: vi.fn().mockResolvedValue(undefined),
+      query: vi.fn(),
+      end: vi.fn().mockResolvedValue(undefined),
+    };
     adapter = new RedshiftAdapter();
   });
 
@@ -40,7 +47,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(Client).toHaveBeenCalledWith({
+      expect(mockClientConstructorArgs).toEqual({
         host: 'cluster.region.redshift.amazonaws.com',
         port: 5439,
         database: 'testdb',
@@ -49,7 +56,7 @@ describe('RedshiftAdapter', () => {
         ssl: true,
         connectionTimeoutMillis: 60000,
       });
-      expect(mockClient.connect).toHaveBeenCalled();
+      expect(mockClientInstance.connect).toHaveBeenCalled();
     });
 
     it('should use default port when not specified', async () => {
@@ -63,7 +70,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(Client).toHaveBeenCalledWith(
+      expect(mockClientConstructorArgs).toEqual(
         expect.objectContaining({
           port: 5439,
         })
@@ -81,7 +88,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(Client).toHaveBeenCalledWith(
+      expect(mockClientConstructorArgs).toEqual(
         expect.objectContaining({
           ssl: true,
         })
@@ -100,7 +107,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(Client).toHaveBeenCalledWith(
+      expect(mockClientConstructorArgs).toEqual(
         expect.objectContaining({
           ssl: false,
         })
@@ -124,7 +131,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(Client).toHaveBeenCalledWith(
+      expect(mockClientConstructorArgs).toEqual(
         expect.objectContaining({
           ssl: sslOptions,
         })
@@ -154,7 +161,7 @@ describe('RedshiftAdapter', () => {
         password: 'testpass',
       };
 
-      mockClient.connect.mockRejectedValueOnce(new Error('Connection failed'));
+      mockClientInstance.connect.mockRejectedValueOnce(new Error('Connection failed'));
 
       await expect(adapter.initialize(credentials)).rejects.toThrow(
         'Failed to initialize Redshift client: Connection failed'
@@ -174,7 +181,7 @@ describe('RedshiftAdapter', () => {
     beforeEach(async () => {
       await adapter.initialize(credentials);
       // Reset mock for query tests
-      mockClient.query.mockClear();
+      mockClientInstance.query.mockClear();
     });
 
     it('should execute simple query without parameters', async () => {
@@ -188,14 +195,14 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock the actual query
-      mockClient.query.mockResolvedValueOnce(mockResult);
+      mockClientInstance.query.mockResolvedValueOnce(mockResult);
 
       const result = await adapter.query('SELECT * FROM users');
 
-      expect(mockClient.query).toHaveBeenCalledWith('SET statement_timeout = 60000');
-      expect(mockClient.query).toHaveBeenCalledWith('SELECT * FROM users', undefined);
+      expect(mockClientInstance.query).toHaveBeenCalledWith('SET statement_timeout = 60000');
+      expect(mockClientInstance.query).toHaveBeenCalledWith('SELECT * FROM users', undefined);
 
       expect(result).toEqual({
         rows: [{ id: 1, name: 'Test' }],
@@ -216,13 +223,16 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock the actual query
-      mockClient.query.mockResolvedValueOnce(mockResult);
+      mockClientInstance.query.mockResolvedValueOnce(mockResult);
 
       const result = await adapter.query('SELECT * FROM users WHERE id = $1', [1]);
 
-      expect(mockClient.query).toHaveBeenCalledWith('SELECT * FROM users WHERE id = $1', [1]);
+      expect(mockClientInstance.query).toHaveBeenCalledWith(
+        'SELECT * FROM users WHERE id = $1',
+        [1]
+      );
       expect(result.rows).toEqual([{ id: 1, name: 'Test' }]);
     });
 
@@ -239,9 +249,9 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock cursor creation
-      mockClient.query.mockReturnValueOnce(mockCursor);
+      mockClientInstance.query.mockReturnValueOnce(mockCursor);
 
       const result = await adapter.query('SELECT * FROM users', [], 10);
 
@@ -262,9 +272,9 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock cursor creation
-      mockClient.query.mockReturnValueOnce(mockCursor);
+      mockClientInstance.query.mockReturnValueOnce(mockCursor);
 
       const result = await adapter.query('SELECT * FROM users', [], 10);
 
@@ -280,20 +290,20 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock the actual query
-      mockClient.query.mockResolvedValueOnce(mockResult);
+      mockClientInstance.query.mockResolvedValueOnce(mockResult);
 
       await adapter.query('SELECT 1', [], undefined, 5000);
 
-      expect(mockClient.query).toHaveBeenCalledWith('SET statement_timeout = 5000');
+      expect(mockClientInstance.query).toHaveBeenCalledWith('SET statement_timeout = 5000');
     });
 
     it('should handle query errors', async () => {
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock the actual query to fail
-      mockClient.query.mockRejectedValueOnce(new Error('Query failed'));
+      mockClientInstance.query.mockRejectedValueOnce(new Error('Query failed'));
 
       await expect(adapter.query('SELECT * FROM invalid_table')).rejects.toThrow(
         'Redshift query failed: Query failed'
@@ -316,9 +326,9 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock the actual query
-      mockClient.query.mockResolvedValueOnce(mockResult);
+      mockClientInstance.query.mockResolvedValueOnce(mockResult);
 
       const result = await adapter.query('SELECT * FROM users WHERE 1=0');
 
@@ -335,9 +345,9 @@ describe('RedshiftAdapter', () => {
       };
 
       // Mock the SET statement_timeout call
-      mockClient.query.mockResolvedValueOnce({});
+      mockClientInstance.query.mockResolvedValueOnce({});
       // Mock the actual query
-      mockClient.query.mockResolvedValueOnce(mockResult);
+      mockClientInstance.query.mockResolvedValueOnce(mockResult);
 
       const result = await adapter.query('SELECT 1 as id');
 
@@ -357,12 +367,12 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      mockClient.query.mockResolvedValueOnce({ rows: [{ result: 1 }] });
+      mockClientInstance.query.mockResolvedValueOnce({ rows: [{ result: 1 }] });
 
       const result = await adapter.testConnection();
 
       expect(result).toBe(true);
-      expect(mockClient.query).toHaveBeenCalledWith('SELECT 1 as test');
+      expect(mockClientInstance.query).toHaveBeenCalledWith('SELECT 1 as test');
     });
 
     it('should return false when test connection fails', async () => {
@@ -376,7 +386,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      mockClient.query.mockRejectedValueOnce(new Error('Connection test failed'));
+      mockClientInstance.query.mockRejectedValueOnce(new Error('Connection test failed'));
 
       const result = await adapter.testConnection();
 
@@ -395,7 +405,7 @@ describe('RedshiftAdapter', () => {
       await adapter.initialize(credentials);
       await adapter.close();
 
-      expect(mockClient.end).toHaveBeenCalled();
+      expect(mockClientInstance.end).toHaveBeenCalled();
     });
 
     it('should handle close errors gracefully', async () => {
@@ -409,7 +419,7 @@ describe('RedshiftAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      mockClient.end.mockRejectedValueOnce(new Error('Close failed'));
+      mockClientInstance.end.mockRejectedValueOnce(new Error('Close failed'));
 
       // Should not throw
       await adapter.close();

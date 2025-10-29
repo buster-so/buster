@@ -1,6 +1,6 @@
+import type { BusterCollection } from '@buster/server-shared/collections';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
-import type { BusterCollection } from '@/api/asset_interfaces';
 import { useDeleteCollection, useUpdateCollection } from '@/api/buster_rest/collections';
 import { ShareCollectionButton } from '@/components/features/buttons/ShareMenuCollectionButton';
 import { FavoriteStar, useFavoriteStar } from '@/components/features/favorites';
@@ -10,12 +10,7 @@ import {
   createBreadcrumbItems,
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
-import {
-  createDropdownItem,
-  createDropdownItems,
-  Dropdown,
-  type IDropdownItems,
-} from '@/components/ui/dropdown';
+import { createDropdownItems, Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
 import { Dots, Pencil, Plus, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';

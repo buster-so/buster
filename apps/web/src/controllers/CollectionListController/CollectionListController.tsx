@@ -9,7 +9,7 @@ import { CollectionsListContent } from './CollectionsListContent';
 export const CollectionListController: React.FC = () => {
   const [openNewCollectionModal, setOpenNewCollectionModal] = useState(false);
   const [collectionListFilters, setCollectionListFilters] = useState<
-    Omit<Parameters<typeof collectionsGetList>[0], 'page_token' | 'page_size'>
+    Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>
   >({});
 
   const { data: collectionsList, isFetched: isCollectionListFetched } =
@@ -23,7 +23,7 @@ export const CollectionListController: React.FC = () => {
         <CollectionListHeader
           setOpenNewCollectionModal={setOpenNewCollectionModal}
           isCollectionListFetched={isCollectionListFetched}
-          collectionsList={collectionsList}
+          collectionsList={collectionsList?.data || []}
           collectionListFilters={collectionListFilters}
           setCollectionListFilters={setCollectionListFilters}
         />
@@ -32,7 +32,7 @@ export const CollectionListController: React.FC = () => {
       <CollectionsListContent
         openNewCollectionModal={openNewCollectionModal}
         isCollectionListFetched={isCollectionListFetched}
-        collectionsList={collectionsList}
+        collectionsList={collectionsList?.data || []}
         setOpenNewCollectionModal={setOpenNewCollectionModal}
       />
     </AppPageLayout>

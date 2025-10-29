@@ -1,5 +1,8 @@
+import type {
+  BusterCollection,
+  BusterCollectionItemAsset,
+} from '@buster/server-shared/collections';
 import React, { useMemo, useState } from 'react';
-import type { BusterCollection, BusterCollectionItemAsset } from '@/api/asset_interfaces';
 import { AddToCollectionModal } from '@/components/features/collections/AddToCollectionModal';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Avatar } from '@/components/ui/avatar';

@@ -1,6 +1,6 @@
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import React, { useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollection } from '@/api/buster_rest/collections';
 import type { collectionsGetList } from '@/api/buster_rest/collections/requests';
 import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
@@ -11,10 +11,7 @@ import { AppSegmented } from '@/components/ui/segmented';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
-type CollectionListFilters = Omit<
-  Parameters<typeof collectionsGetList>[0],
-  'page_token' | 'page_size'
->;
+type CollectionListFilters = Omit<Parameters<typeof collectionsGetList>[0], 'page' | 'page_size'>;
 type SetCollectionListFilters = (filters: CollectionListFilters) => void;
 
 export const CollectionListHeader: React.FC<{

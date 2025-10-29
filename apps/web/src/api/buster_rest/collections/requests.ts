@@ -1,76 +1,47 @@
-import type { AddAndRemoveFromCollectionResponse } from '@buster/server-shared/collections';
 import type {
-  ShareAssetType,
+  AddAndRemoveFromCollectionResponse,
+  AddAssetToCollectionRequestBody,
+  BusterCollection,
+  CreateCollectionRequestBody,
+  DeleteCollectionRequestBody,
+  GetCollectionsRequestQuery,
+  GetCollectionsResponse,
+  GetIndividualCollectionRequestParams,
+  UpdateCollectionRequestBody,
+} from '@buster/server-shared/collections';
+import type {
   ShareDeleteRequest,
   SharePostRequest,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
-import type { BusterCollection, BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import mainApi from '@/api/buster_rest/instances';
 
-export const collectionsGetList = async (params: {
-  /** Current page number (1-based indexing) */
-  page_token: number;
-  /** Number of items to display per page */
-  page_size: number;
-  /** When true, returns only collections shared with the current user */
-  shared_with_me?: boolean;
-  /** When true, returns only collections owned by the current user */
-  owned_by_me?: boolean;
-}) => {
+export const collectionsGetList = async (params: GetCollectionsRequestQuery) => {
   return await mainApi
-    .get<BusterCollectionListItem[]>('/collections', { params })
+    .get<GetCollectionsResponse>('/collections', { params })
     .then((res) => res.data);
 };
 
 export const collectionsGetCollection = async ({
   id,
   ...params
-}: {
-  /** Unique identifier of the collection to retrieve */
-  id: string;
-  /** Password for the collection */
-  password?: string;
-}) => {
+}: GetIndividualCollectionRequestParams) => {
   return await mainApi
     .get<BusterCollection>(`/collections/${id}`, { params })
     .then((res) => res.data);
 };
 
-export const collectionsCreateCollection = async (params: {
-  /** Name of the new collection */
-  name: string;
-  /** Description detailing the purpose or contents of the collection */
-  description: string;
-}) => {
+export const collectionsCreateCollection = async (params: CreateCollectionRequestBody) => {
   return await mainApi.post<BusterCollection>('/collections', params).then((res) => res.data);
 };
 
-export const collectionsUpdateCollection = async (params: {
-  /** Unique identifier of the collection to update */
-  id: string;
-  /** Optional new name for the collection */
-  name?: string;
-  /** Optional array of assets to be associated with the collection */
-  assets?: {
-    /** Type of the asset being added */
-    type: ShareAssetType;
-    /** Unique identifier of the asset */
-    id: string;
-  }[];
-  /** Share request parameters */
-  share_with?: string[];
-  share_type?: string;
-}) => {
+export const collectionsUpdateCollection = async (params: UpdateCollectionRequestBody) => {
   return await mainApi
     .put<BusterCollection>(`/collections/${params.id}`, params)
     .then((res) => res.data);
 };
 
-export const collectionsDeleteCollection = async (data: {
-  /** Array of collection IDs to be deleted */
-  ids: string[];
-}) => {
+export const collectionsDeleteCollection = async (data: DeleteCollectionRequestBody) => {
   return await mainApi
     .delete<BusterCollection>('/collections', {
       data,
@@ -107,11 +78,7 @@ export const addAssetToCollection = async ({
   assets,
 }: {
   id: string;
-  assets: {
-    type: ShareAssetType;
-    id: string;
-  }[];
-}) => {
+} & AddAssetToCollectionRequestBody) => {
   return mainApi
     .post<AddAndRemoveFromCollectionResponse>(`/collections/${id}/assets`, { assets })
     .then((res) => res.data);

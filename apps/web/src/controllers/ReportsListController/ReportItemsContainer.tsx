@@ -32,7 +32,7 @@ const columns: BusterListColumn<ReportListItem>[] = [
     dataIndex: 'is_shared',
     title: 'Sharing',
     width: 65,
-    render: (_v, record) => getShareStatus({ is_shared: record.is_shared }),
+    render: (v) => getShareStatus({ is_shared: v }),
   },
   {
     dataIndex: 'created_by_name',

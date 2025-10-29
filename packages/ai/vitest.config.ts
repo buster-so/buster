@@ -27,6 +27,15 @@ export default defineConfig(async (env) => {
       ...base.test,
       // Increase timeout for streaming tests
       testTimeout: 30000,
+      // Use forks instead of threads because tests use process.chdir()
+      // which is not supported in worker threads
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          maxForks: process.env.CI ? 2 : undefined,
+          minForks: 1,
+        },
+      },
     },
   };
 });

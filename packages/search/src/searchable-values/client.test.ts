@@ -9,16 +9,27 @@ import {
 } from './client';
 import type { SearchableValue, TurbopufferQuery } from './types';
 
+// Mock Turbopuffer instance that can be configured per-test
+let mockTurbopufferInstance: any;
+
 // Mock the Turbopuffer module
 vi.mock('@turbopuffer/turbopuffer', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      namespace: vi.fn().mockImplementation((name: string) => ({
-        query: vi.fn(),
-        write: vi.fn(),
-        exists: vi.fn(),
-      })),
-    })),
+    default: class {
+      constructor(config: any) {
+        if (mockTurbopufferInstance) {
+          Object.assign(this, mockTurbopufferInstance);
+        } else {
+          // Default mock implementation
+          this.namespace = vi.fn().mockImplementation((name: string) => ({
+            query: vi.fn().mockResolvedValue({ rows: [] }),
+            write: vi.fn().mockResolvedValue({}),
+            exists: vi.fn().mockResolvedValue(true),
+          }));
+        }
+      }
+      namespace: any;
+    },
   };
 });
 
@@ -28,6 +39,7 @@ describe('Turbopuffer Client', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockTurbopufferInstance = null; // Reset mock instance
     process.env = { ...originalEnv, TURBOPUFFER_API_KEY: 'test-api-key' };
   });
 
@@ -49,14 +61,13 @@ describe('Turbopuffer Client', () => {
 
   describe('createNamespaceIfNotExists', () => {
     it('should handle namespace creation', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         exists: vi.fn().mockResolvedValue(true),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       await createNamespaceIfNotExists(mockDataSourceId);
 
@@ -64,28 +75,26 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should handle namespace not found gracefully', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         exists: vi.fn().mockResolvedValue(false),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       // Should not throw for namespace not found
       await expect(createNamespaceIfNotExists(mockDataSourceId)).resolves.toBeUndefined();
     });
 
     it('should throw TurbopufferError for other errors', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         exists: vi.fn().mockRejectedValue(new Error('network error')),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       // Function now retries 3 times before giving up
       await expect(createNamespaceIfNotExists(mockDataSourceId)).rejects.toThrow();
@@ -101,7 +110,6 @@ describe('Turbopuffer Client', () => {
 
   describe('queryExistingKeys', () => {
     it('should query and return unique keys', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockResponse = {
         rows: [
           {
@@ -129,9 +137,9 @@ describe('Turbopuffer Client', () => {
         query: vi.fn().mockResolvedValue(mockResponse),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const query: TurbopufferQuery = {
         database: 'db1',
@@ -152,14 +160,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should handle empty results', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         query: vi.fn().mockResolvedValue({ rows: [] }),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const query: TurbopufferQuery = {};
 
@@ -168,14 +175,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should apply all filters correctly', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         query: vi.fn().mockResolvedValue({ rows: [] }),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const query: TurbopufferQuery = {
         database: 'db1',
@@ -204,14 +210,13 @@ describe('Turbopuffer Client', () => {
 
   describe('upsertSearchableValues', () => {
     it('should upsert values successfully', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi.fn().mockResolvedValue(undefined),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const values: SearchableValue[] = [
         {
@@ -279,14 +284,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should handle invalid embeddings', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi.fn().mockResolvedValue(undefined),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const values: SearchableValue[] = [
         {
@@ -306,14 +310,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should batch large upserts', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi.fn().mockResolvedValue(undefined),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       // Create 250 values (should result in 3 batches with batch size 100)
       const values: SearchableValue[] = Array.from({ length: 250 }, (_, i) => ({
@@ -332,7 +335,6 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should handle batch errors gracefully', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi
           .fn()
@@ -341,9 +343,9 @@ describe('Turbopuffer Client', () => {
           .mockResolvedValueOnce(undefined), // Third batch succeeds
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const values: SearchableValue[] = Array.from({ length: 250 }, (_, i) => ({
         database: 'db1',
@@ -364,14 +366,13 @@ describe('Turbopuffer Client', () => {
 
   describe('deleteSearchableValues', () => {
     it('should delete values successfully', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi.fn().mockResolvedValue(undefined),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const keys = ['db1:public:users:name:John', 'db1:public:users:email:john@example.com'];
 
@@ -389,14 +390,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should batch large deletes', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi.fn().mockResolvedValue(undefined),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const keys = Array.from({ length: 250 }, (_, i) => `db1:public:users:name:User${i}`);
 
@@ -409,7 +409,6 @@ describe('Turbopuffer Client', () => {
 
   describe('getAllSearchableValues', () => {
     it('should retrieve all values', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockResponse = {
         rows: [
           {
@@ -429,9 +428,9 @@ describe('Turbopuffer Client', () => {
         query: vi.fn().mockResolvedValue(mockResponse),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const values = await getAllSearchableValues({ dataSourceId: mockDataSourceId });
 
@@ -453,14 +452,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should respect limit parameter', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         query: vi.fn().mockResolvedValue({ rows: [] }),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       await getAllSearchableValues({ dataSourceId: mockDataSourceId, limit: 500 });
 
@@ -473,7 +471,6 @@ describe('Turbopuffer Client', () => {
 
   describe('Retry Logic', () => {
     it('should retry on network errors', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         query: vi
           .fn()
@@ -481,9 +478,9 @@ describe('Turbopuffer Client', () => {
           .mockResolvedValueOnce({ rows: [] }),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const query: TurbopufferQuery = {};
 
@@ -494,7 +491,6 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should retry on rate limit errors', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         query: vi
           .fn()
@@ -502,9 +498,9 @@ describe('Turbopuffer Client', () => {
           .mockResolvedValueOnce({ rows: [] }),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const query: TurbopufferQuery = {};
 
@@ -515,14 +511,13 @@ describe('Turbopuffer Client', () => {
     });
 
     it('should not retry non-retryable errors', async () => {
-      const Turbopuffer = (await import('@turbopuffer/turbopuffer')).default;
       const mockNamespace = {
         write: vi.fn().mockRejectedValue(new Error('Invalid data')),
       };
 
-      (Turbopuffer as any).mockImplementation(() => ({
+      mockTurbopufferInstance = {
         namespace: vi.fn().mockReturnValue(mockNamespace),
-      }));
+      };
 
       const values: SearchableValue[] = [
         {

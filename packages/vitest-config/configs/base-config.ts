@@ -1,5 +1,5 @@
 import { loadEnv } from 'vite';
-import type { Plugin, ViteUserConfig } from 'vitest/config';
+import type { Plugin } from 'vitest/config';
 import { defineConfig } from 'vitest/config';
 
 export const baseConfig = defineConfig(async () => {
@@ -13,13 +13,18 @@ export const baseConfig = defineConfig(async () => {
       globals: true,
       testTimeout: 1000 * 60 * 2, // 2 minutes
       env: loadEnv('', process.cwd(), ''),
-      pool: 'forks',
+      // Use threads for better performance - only use forks if you need process isolation
+      pool: 'threads',
       poolOptions: {
-        forks: {
-          maxForks: process.env.CI ? 1 : 8,
-          minForks: process.env.CI ? 1 : 8,
+        threads: {
+          // Let Vitest decide based on CPU cores (defaults to # of CPUs)
+          // In CI: use fewer workers to avoid resource contention
+          maxThreads: process.env.CI ? 2 : undefined,
+          minThreads: process.env.CI ? 1 : 1,
+          // Isolate each test file in its own environment
+          isolate: true,
         },
       },
     },
-  } satisfies ViteUserConfig;
+  };
 });

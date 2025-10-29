@@ -4,11 +4,37 @@ import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { R2Config } from '../types';
 import { createR2Provider } from './r2-provider';
 
-vi.mock('@aws-sdk/client-s3');
+// Mock instance and constructor args
+let mockS3ClientInstance: { send: Mock };
+let mockS3ClientConstructorArgs: any;
+
+vi.mock('@aws-sdk/client-s3', () => ({
+  S3Client: class {
+    constructor(config: any) {
+      mockS3ClientConstructorArgs = config;
+      Object.assign(this, mockS3ClientInstance);
+    }
+  },
+  PutObjectCommand: class {
+    constructor(public input: any) {}
+  },
+  GetObjectCommand: class {
+    constructor(public input: any) {}
+  },
+  DeleteObjectCommand: class {
+    constructor(public input: any) {}
+  },
+  HeadObjectCommand: class {
+    constructor(public input: any) {}
+  },
+  ListObjectsV2Command: class {
+    constructor(public input: any) {}
+  },
+}));
+
 vi.mock('@aws-sdk/s3-request-presigner');
 
 describe('R2 Provider', () => {
-  let mockS3Client: { send: Mock };
   const mockConfig: R2Config = {
     provider: 'r2',
     accountId: 'test-account-id',
@@ -19,17 +45,16 @@ describe('R2 Provider', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockS3Client = {
+    mockS3ClientInstance = {
       send: vi.fn(),
     };
-    (S3Client as unknown as Mock).mockReturnValue(mockS3Client);
   });
 
   describe('createR2Provider', () => {
     it('should create S3 client with R2 endpoint configuration', () => {
       createR2Provider(mockConfig);
 
-      expect(S3Client).toHaveBeenCalledWith({
+      expect(mockS3ClientConstructorArgs).toEqual({
         region: 'auto',
         endpoint: 'https://test-account-id.r2.cloudflarestorage.com',
         credentials: {
@@ -46,7 +71,7 @@ describe('R2 Provider', () => {
   describe('upload', () => {
     it('should upload data successfully', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({ ETag: '"test-etag"' });
+      mockS3ClientInstance.send.mockResolvedValue({ ETag: '"test-etag"' });
 
       const result = await provider.upload('test-key.txt', 'test data');
 
@@ -56,12 +81,12 @@ describe('R2 Provider', () => {
         size: 9,
         etag: '"test-etag"',
       });
-      expect(mockS3Client.send).toHaveBeenCalledTimes(1);
+      expect(mockS3ClientInstance.send).toHaveBeenCalledTimes(1);
     });
 
     it('should handle upload with Buffer', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({});
+      mockS3ClientInstance.send.mockResolvedValue({});
 
       const buffer = Buffer.from('test data');
       const result = await provider.upload('test-key.txt', buffer);
@@ -72,7 +97,7 @@ describe('R2 Provider', () => {
 
     it('should handle upload with options', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({});
+      mockS3ClientInstance.send.mockResolvedValue({});
 
       const result = await provider.upload('test-key.txt', 'test data', {
         contentType: 'text/plain',
@@ -81,12 +106,12 @@ describe('R2 Provider', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(mockS3Client.send).toHaveBeenCalledTimes(1);
+      expect(mockS3ClientInstance.send).toHaveBeenCalledTimes(1);
     });
 
     it('should handle upload errors', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockRejectedValue(new Error('R2 upload failed'));
+      mockS3ClientInstance.send.mockRejectedValue(new Error('R2 upload failed'));
 
       const result = await provider.upload('test-key.txt', 'test data');
 
@@ -106,7 +131,7 @@ describe('R2 Provider', () => {
           yield new Uint8Array([116, 101, 115, 116]); // 'test'
         },
       };
-      mockS3Client.send.mockResolvedValue({
+      mockS3ClientInstance.send.mockResolvedValue({
         Body: mockBody,
         ContentType: 'application/octet-stream',
       });
@@ -123,7 +148,7 @@ describe('R2 Provider', () => {
 
     it('should handle missing body', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({ Body: null });
+      mockS3ClientInstance.send.mockResolvedValue({ Body: null });
 
       const result = await provider.download('test-key.txt');
 
@@ -135,7 +160,7 @@ describe('R2 Provider', () => {
 
     it('should handle download errors', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockRejectedValue(new Error('R2 download failed'));
+      mockS3ClientInstance.send.mockRejectedValue(new Error('R2 download failed'));
 
       const result = await provider.download('test-key.txt');
 
@@ -154,7 +179,7 @@ describe('R2 Provider', () => {
       const url = await provider.getSignedUrl('test-key.txt', 7200);
 
       expect(url).toBe('https://r2-signed-url.com');
-      expect(getSignedUrl).toHaveBeenCalledWith(mockS3Client, expect.anything(), {
+      expect(getSignedUrl).toHaveBeenCalledWith(expect.any(Object), expect.anything(), {
         expiresIn: 7200,
       });
     });
@@ -163,17 +188,17 @@ describe('R2 Provider', () => {
   describe('delete', () => {
     it('should delete object successfully', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({});
+      mockS3ClientInstance.send.mockResolvedValue({});
 
       const result = await provider.delete('test-key.txt');
 
       expect(result).toBe(true);
-      expect(mockS3Client.send).toHaveBeenCalledTimes(1);
+      expect(mockS3ClientInstance.send).toHaveBeenCalledTimes(1);
     });
 
     it('should handle delete errors gracefully', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockRejectedValue(new Error('R2 delete failed'));
+      mockS3ClientInstance.send.mockRejectedValue(new Error('R2 delete failed'));
 
       const result = await provider.delete('test-key.txt');
 
@@ -184,7 +209,7 @@ describe('R2 Provider', () => {
   describe('exists', () => {
     it('should return true when object exists', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({});
+      mockS3ClientInstance.send.mockResolvedValue({});
 
       const result = await provider.exists('test-key.txt');
 
@@ -193,7 +218,7 @@ describe('R2 Provider', () => {
 
     it('should return false when object does not exist', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockRejectedValue(new Error('Not found'));
+      mockS3ClientInstance.send.mockRejectedValue(new Error('Not found'));
 
       const result = await provider.exists('test-key.txt');
 
@@ -205,7 +230,7 @@ describe('R2 Provider', () => {
     it('should list objects successfully', async () => {
       const provider = createR2Provider(mockConfig);
       const mockDate = new Date('2024-01-01');
-      mockS3Client.send.mockResolvedValue({
+      mockS3ClientInstance.send.mockResolvedValue({
         Contents: [
           {
             Key: 'prefix/file1.txt',
@@ -239,19 +264,19 @@ describe('R2 Provider', () => {
 
     it('should handle list with pagination options', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({ Contents: [] });
+      mockS3ClientInstance.send.mockResolvedValue({ Contents: [] });
 
       await provider.list('prefix/', {
         maxKeys: 20,
         continuationToken: 'next-page-token',
       });
 
-      expect(mockS3Client.send).toHaveBeenCalledTimes(1);
+      expect(mockS3ClientInstance.send).toHaveBeenCalledTimes(1);
     });
 
     it('should handle empty list response', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockResolvedValue({ Contents: null });
+      mockS3ClientInstance.send.mockResolvedValue({ Contents: null });
 
       const result = await provider.list('prefix/');
 
@@ -260,7 +285,7 @@ describe('R2 Provider', () => {
 
     it('should handle list errors', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockRejectedValue(new Error('R2 list failed'));
+      mockS3ClientInstance.send.mockRejectedValue(new Error('R2 list failed'));
 
       const result = await provider.list('prefix/');
 
@@ -273,7 +298,7 @@ describe('R2 Provider', () => {
       const provider = createR2Provider(mockConfig);
 
       // Mock successful upload
-      mockS3Client.send.mockResolvedValueOnce({ ETag: '"test"' });
+      mockS3ClientInstance.send.mockResolvedValueOnce({ ETag: '"test"' });
 
       // Mock successful download
       const mockBody = {
@@ -281,10 +306,10 @@ describe('R2 Provider', () => {
           yield new Uint8Array([116, 101, 115, 116]); // 'test'
         },
       };
-      mockS3Client.send.mockResolvedValueOnce({ Body: mockBody });
+      mockS3ClientInstance.send.mockResolvedValueOnce({ Body: mockBody });
 
       // Mock successful delete
-      mockS3Client.send.mockResolvedValueOnce({});
+      mockS3ClientInstance.send.mockResolvedValueOnce({});
 
       const result = await provider.testConnection();
 
@@ -294,12 +319,12 @@ describe('R2 Provider', () => {
         canWrite: true,
         canDelete: true,
       });
-      expect(mockS3Client.send).toHaveBeenCalledTimes(3);
+      expect(mockS3ClientInstance.send).toHaveBeenCalledTimes(3);
     });
 
     it('should detect write permission failure', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockRejectedValueOnce(new Error('Access denied'));
+      mockS3ClientInstance.send.mockRejectedValueOnce(new Error('Access denied'));
 
       const result = await provider.testConnection();
 
@@ -316,10 +341,10 @@ describe('R2 Provider', () => {
       const provider = createR2Provider(mockConfig);
 
       // Mock successful upload
-      mockS3Client.send.mockResolvedValueOnce({ ETag: '"test"' });
+      mockS3ClientInstance.send.mockResolvedValueOnce({ ETag: '"test"' });
 
       // Mock failed download
-      mockS3Client.send.mockRejectedValueOnce(new Error('Read denied'));
+      mockS3ClientInstance.send.mockRejectedValueOnce(new Error('Read denied'));
 
       const result = await provider.testConnection();
 
@@ -336,7 +361,7 @@ describe('R2 Provider', () => {
       const provider = createR2Provider(mockConfig);
 
       // Mock successful upload
-      mockS3Client.send.mockResolvedValueOnce({ ETag: '"test"' });
+      mockS3ClientInstance.send.mockResolvedValueOnce({ ETag: '"test"' });
 
       // Mock successful download
       const mockBody = {
@@ -344,10 +369,10 @@ describe('R2 Provider', () => {
           yield new Uint8Array([116, 101, 115, 116]); // 'test'
         },
       };
-      mockS3Client.send.mockResolvedValueOnce({ Body: mockBody });
+      mockS3ClientInstance.send.mockResolvedValueOnce({ Body: mockBody });
 
       // Mock failed delete
-      mockS3Client.send.mockRejectedValueOnce(new Error('Delete denied'));
+      mockS3ClientInstance.send.mockRejectedValueOnce(new Error('Delete denied'));
 
       const result = await provider.testConnection();
 
@@ -362,7 +387,7 @@ describe('R2 Provider', () => {
 
     it('should handle unexpected errors', async () => {
       const provider = createR2Provider(mockConfig);
-      mockS3Client.send.mockImplementation(() => {
+      mockS3ClientInstance.send.mockImplementation(() => {
         throw new Error('Network error');
       });
 

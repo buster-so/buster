@@ -14,6 +14,8 @@ export type AppPageLayoutProps = {
   mainClassName?: string;
   contentContainerId?: string;
   id?: string;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
+  scrollContainerStyle?: React.CSSProperties;
 };
 
 /**
@@ -36,6 +38,8 @@ export const AppPageLayout: React.FC<React.PropsWithChildren<AppPageLayoutProps>
   headerClassName = '',
   mainClassName = '',
   contentContainerId,
+  scrollContainerRef,
+  scrollContainerStyle,
 }) => {
   const isGhostBorder = headerBorderVariant === 'ghost';
 
@@ -64,6 +68,8 @@ export const AppPageLayout: React.FC<React.PropsWithChildren<AppPageLayoutProps>
         className={cn(isGhostBorder && 'scroll-shadow-container', mainClassName)}
         scrollable={scrollable}
         id={contentContainerId}
+        viewportRef={scrollContainerRef}
+        scrollContainerStyle={scrollContainerStyle}
       >
         <div
           data-testid="scroll-shadow-bar"

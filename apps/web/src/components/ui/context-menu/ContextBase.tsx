@@ -82,19 +82,23 @@ const ContextMenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Item> & {
     inset?: boolean;
     truncate?: boolean;
+    icon?: React.ReactNode;
   }
->(({ className, inset, truncate, ...props }, ref) => (
+>(({ className, inset, truncate, icon, children, ...props }, ref) => (
   <ContextMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'focus:bg-item-hover focus:text-foreground relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+      'focus:bg-item-hover focus:text-foreground relative flex cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1.5 transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0',
       inset && 'pl-8',
       truncate && 'overflow-hidden',
       'group',
       className
     )}
     {...props}
-  />
+  >
+    {icon && <span className="text-icon-color">{icon}</span>}
+    {children}
+  </ContextMenuPrimitive.Item>
 ));
 ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 

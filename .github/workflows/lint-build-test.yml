@@ -88,6 +88,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
 
       - name: Lint all packages
         run: pnpm turbo lint
@@ -106,6 +107,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
 
       - name: Build all packages
         run: pnpm turbo build --filter='!@buster-app/api-legacy'
@@ -175,6 +177,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
 
       - name: Run all unit tests
         run: pnpm turbo test:unit
@@ -190,6 +193,7 @@ jobs:
       # E2E-specific overrides
       DATABASE_POOL_SIZE: 100
       SQLX_POOL_SIZE: 100
+      IS_E2E_TEST: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -198,6 +202,7 @@ jobs:
         uses: ./.github/actions/setup-node-env
         with:
           cache-key: lint-build-test
+          stickydisk-key: ${{ github.repository }}-turbo-cache-lint-build-test
           install-supabase: 'true'
 
       - name: Mount binary cache sticky disk
@@ -282,6 +287,13 @@ jobs:
           pnpm dlx momentic install-browsers --all
           pnpm dlx momentic run --api-key $MOMENTIC_API_KEY  --exclude "llm-call-tests/*" --upload-results
 
+      # - name: Sleep for 30 minutes (for SSH inspection)
+      #   if: always()
+      #   run: |
+      #     echo "😴 Sleeping for 30 minutes to allow SSH inspection..."
+      #     echo "Services are still running. You can SSH into the instance now."
+      #     sleep 1800
+      #     echo "✅ Sleep complete"
 
       - name: Stop services
         if: always()

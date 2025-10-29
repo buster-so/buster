@@ -636,6 +636,11 @@ export const WithSubMenuAndHundredItems: Story = {
       {
         label: 'Option 1',
         value: '1',
+        onScrollToBottom: () => {
+          console.info(
+            '🎯 Submenu scrolled to bottom! This fires only when entering the 10px zone.'
+          );
+        },
         items: Array.from({ length: 100 }).map((_, index) => ({
           label: `Sub Option ${index}`,
           value: `1-${index + 1}`,
@@ -643,5 +648,136 @@ export const WithSubMenuAndHundredItems: Story = {
         })),
       },
     ],
+  },
+};
+
+// Example with onScrollToBottom on main dropdown
+export const WithScrollToBottomCallback: Story = {
+  args: {
+    children: <Button>Scroll to Bottom Test</Button>,
+    menuHeader: 'Search items...',
+    onScrollToBottom: () => {
+      console.info(
+        '🎯 Main dropdown scrolled to bottom! This fires only when entering the 10px zone.'
+      );
+    },
+    items: Array.from({ length: 100 }).map((_, index) => ({
+      label: `Item ${index + 1}`,
+      value: `item-${index + 1}`,
+      secondaryLabel: `Description for item ${index + 1}`,
+    })),
+  },
+};
+
+// Example with searchable nested menu
+export const WithSearchableNestedMenu: Story = {
+  render: () => {
+    const [selectedOwners, setSelectedOwners] = React.useState<Set<string>>(new Set(['owner-2']));
+    const [selectedAssetTypes, setSelectedAssetTypes] = React.useState<Set<string>>(
+      new Set(['report_file'])
+    );
+
+    // Mock owner data similar to FilterDropdown
+    const mockOwners = Array.from({ length: 50 }).map((_, index) => ({
+      id: `owner-${index + 1}`,
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+    }));
+
+    const handleOwnerSelect = (ownerId: string) => {
+      setSelectedOwners((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(ownerId)) {
+          newSet.delete(ownerId);
+        } else {
+          newSet.add(ownerId);
+        }
+        return newSet;
+      });
+    };
+
+    const handleAssetTypeSelect = (assetType: string) => {
+      setSelectedAssetTypes((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(assetType)) {
+          newSet.delete(assetType);
+        } else {
+          newSet.add(assetType);
+        }
+        return newSet;
+      });
+    };
+
+    const items: IDropdownItems = [
+      {
+        label: 'Asset Type',
+        value: 'asset-type',
+        icon: <Storage />,
+        selectType: 'multiple',
+        items: [
+          {
+            label: 'Chats',
+            value: 'chat',
+            selected: selectedAssetTypes.has('chat'),
+            onClick: () => handleAssetTypeSelect('chat'),
+          },
+          {
+            label: 'Reports',
+            value: 'report_file',
+            selected: selectedAssetTypes.has('report_file'),
+            onClick: () => handleAssetTypeSelect('report_file'),
+          },
+          {
+            label: 'Dashboards',
+            value: 'dashboard_file',
+            selected: selectedAssetTypes.has('dashboard_file'),
+            onClick: () => handleAssetTypeSelect('dashboard_file'),
+          },
+          {
+            label: 'Collections',
+            value: 'collection',
+            selected: selectedAssetTypes.has('collection'),
+            onClick: () => handleAssetTypeSelect('collection'),
+          },
+        ],
+      },
+      {
+        label: 'Owner',
+        value: 'owner',
+        icon: <PaintRoller />,
+        selectType: 'multiple',
+        menuHeader: 'Search owners by name or email',
+        onScrollToBottom: () => {
+          console.info('Scrolled to bottom');
+        },
+        onSearch: (search) => {
+          console.info('Searching owners:', search);
+        },
+        items: mockOwners.map((owner) => ({
+          label: owner.name,
+          value: owner.id,
+          searchLabel: `${owner.name} ${owner.email}`,
+          secondaryLabel: owner.email,
+          selected: selectedOwners.has(owner.id),
+          onClick: () => handleOwnerSelect(owner.id),
+        })),
+      },
+      {
+        label: 'Priority',
+        value: 'priority',
+        icon: <Star />,
+        selectType: 'multiple',
+        menuHeader: 'Search priorities',
+        items: [
+          { label: 'High', value: 'high', searchLabel: 'High priority' },
+          { label: 'Medium', value: 'medium', searchLabel: 'Medium priority' },
+          { label: 'Low', value: 'low', searchLabel: 'Low priority' },
+        ],
+      },
+    ];
+
+    return (
+      <Dropdown items={items} menuHeader="Filters..." children={<Button>Open Filters</Button>} />
+    );
   },
 };
