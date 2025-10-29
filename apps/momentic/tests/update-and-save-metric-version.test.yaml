@@ -60,15 +60,23 @@ steps:
   - id: bd3dc745-3b25-41b5-99c5-77156a7130aa
     type: PRESET_ACTION
     command:
-      id: b55cc1e1-7869-41d9-8c35-632ebd7a13d3
+      id: 67e1f065-de52-4d86-afc6-4e5508f991e4
       type: CLICK
       target:
         type: description
-        elementDescriptor: anything. literally just click the page. ANYWHERE THAT IS NOT
-          THE DROPDOWN!
+        elementDescriptor: the Asset type menu item in the Filters menu
       relativePosition:
         x: 0
         y: 0
+  - id: 4f5d3741-8d31-49a4-a903-7a2848fc0eee
+    type: PRESET_ACTION
+    command:
+      id: 607ca374-9538-4d41-a580-8c8654ec95f0
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the search modal overlay (background overlay covering page to
+          dismiss the dialog)
   - id: ee8c8438-3b9d-4f31-9781-6a5aef38244f
     type: PRESET_ACTION
     command:
