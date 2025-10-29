@@ -28,6 +28,7 @@ export const SearchInput: React.FC<
             onValueChange={onChangeValue}
             autoFocus={debouncedAutoFocus}
             tabIndex={0}
+            data-testid="search-input"
           />
           {filterContent}
         </div>
