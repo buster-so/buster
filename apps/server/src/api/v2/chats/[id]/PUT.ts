@@ -52,14 +52,8 @@ export async function updateChatHandler(
   }
 
   // Update the chat title
-  await updateChat(
-    chatId,
-    {
-      title,
-      updatedBy: user.id,
-    },
-    title ? 'user' : 'agent'
-  );
+  const updatedByType = title && title !== chat.title ? 'user' : 'agent';
+  await updateChat(chatId, { title, updatedBy: user.id }, updatedByType);
 
   console.info(`Successfully updated chat ${chatId} with title: ${title}`);
 

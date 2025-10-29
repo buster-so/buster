@@ -24,4 +24,3 @@ const app = new Hono().get('/:id', zValidator('param', ApiKeyIdParamSchema), asy
 });
 
 export default app;
-
