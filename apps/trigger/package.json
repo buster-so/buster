@@ -47,7 +47,7 @@
     "@duckdb/node-api": "1.4.1-r.1",
     "@duckdb/node-bindings": "1.4.1-r.1",
     "@supabase/supabase-js": "catalog:",
-    "@trigger.dev/sdk": "catalog:",
+    "@trigger.dev/sdk": "4.0.5",
     "@types/js-yaml": "catalog:",
     "ai": "catalog:",
     "dayjs": "catalog:",
@@ -57,6 +57,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "catalog:"
+    "@trigger.dev/build": "4.0.5"
   }
 }

@@ -108,7 +108,7 @@ describe('chat-helpers', () => {
         id: 'asset-123',
         file_type: 'metric_file',
         file_name: 'Test Metric',
-        version_number: 1,
+        version_number: 3,
         filter_version_id: null,
         metadata: [
           {
@@ -154,7 +154,7 @@ describe('chat-helpers', () => {
         id: 'dashboard-123',
         file_type: 'dashboard_file',
         file_name: 'Test Dashboard',
-        version_number: 1,
+        version_number: 2,
         filter_version_id: null,
         metadata: [
           {
@@ -233,7 +233,7 @@ describe('chat-helpers', () => {
         id: 'asset-123',
         file_type: 'metric_file',
         file_name: 'Test Metric',
-        version_number: 1,
+        version_number: 3,
       });
 
       // Verify chat title was updated
@@ -279,7 +279,7 @@ describe('chat-helpers', () => {
         id: 'dashboard-123',
         file_type: 'dashboard_file',
         file_name: 'Test Dashboard',
-        version_number: 1,
+        version_number: 2,
       });
 
       // Verify chat title was updated
