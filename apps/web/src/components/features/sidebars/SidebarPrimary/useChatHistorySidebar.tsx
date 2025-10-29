@@ -24,6 +24,7 @@ export const useChatHistorySidebar = ({
         id: c.id,
         label: c.name,
         link: {
+          preload: false,
           to: `/app/chats/$chatId`,
           params: {
             chatId: c.id,
