@@ -1,9 +1,9 @@
 import type { AssetType } from '@buster/server-shared/assets';
-import type { BusterCollection, BusterCollectionListItem } from '@buster/server-shared/collections';
+import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
 import type { GetMetricResponse } from '@buster/server-shared/metrics';
 import type { GetReportResponse } from '@buster/server-shared/reports';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces/chat';
 import { useGetAsset } from '@/api/buster_rest/assets/useGetAsset';
 import {
@@ -56,7 +56,7 @@ export const useAddToLibraryCollection = ({
   });
   const collectionsList = collectionsListResponse?.data || defaultCollectionsList;
 
-  const { data: collectionsForAsset = [] } = useGetAsset(
+  const { data: assetResult } = useGetAsset(
     {
       type: assetType,
       assetId,
@@ -64,27 +64,32 @@ export const useAddToLibraryCollection = ({
     },
     {
       select: (v) => {
-        if (assetType === 'collection') {
-          return [];
+        if (
+          assetType === 'dashboard_file' ||
+          assetType === 'report_file' ||
+          assetType === 'metric_file' ||
+          assetType === 'chat'
+        ) {
+          const dashboard = v as
+            | GetDashboardResponse
+            | GetReportResponse
+            | GetMetricResponse
+            | IBusterChat;
+          return {
+            added_to_library: dashboard.added_to_library,
+            collections: dashboard.collections,
+          };
         }
-        if (assetType === 'dashboard_file') {
-          const dashboard = v as GetDashboardResponse;
-          return dashboard.collections;
-        }
-        if (assetType === 'report_file') {
-          const report = v as GetReportResponse;
-          return report.collections;
-        }
-        if (assetType === 'metric_file') {
-          const metric = v as GetMetricResponse;
-          return metric.collections;
-        }
-        const _exhaustiveCheck: 'chat' = assetType;
-        const chat = v as IBusterChat;
-        return chat.collections;
+        const _exhaustiveCheck: 'collection' = assetType;
+        return {
+          added_to_library: false,
+          collections: [],
+        };
       },
     }
   );
+  const collectionsForAsset = assetResult?.collections || [];
+  const addedToLibrary = assetResult?.added_to_library || false;
 
   const selectedCollections = useMemo(() => {
     const selectedCollectionIds = new Set<string>([]);
@@ -133,7 +138,12 @@ export const useAddToLibraryCollection = ({
             link: {
               to: '/app/library',
             },
-            onClick: () => {},
+            selected: addedToLibrary,
+            onClick: () => {
+              const payload = [{ assetId, assetType }];
+              if (addedToLibrary) removeAssetsFromLibrary(payload);
+              else addAssetsToLibrary(payload);
+            },
           },
           ...collections,
         ],
@@ -165,6 +175,7 @@ export const useAddToLibraryCollection = ({
       },
     ]);
   }, [
+    addedToLibrary,
     collectionsList,
     selectedCollections,
     addAssetToCollection,
