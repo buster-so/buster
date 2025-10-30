@@ -37,20 +37,18 @@ export const BusterCollectionItemAssetSchema = z.object({
     name: z.string(),
     avatar_url: z.string().nullable(),
   }),
+  screenshot_url: z.string().nullable(),
 });
 
 export const BusterCollectionSchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    type: z.string(),
-    last_opened: z.string(),
     created_at: z.string(),
     assets: z.array(BusterCollectionItemAssetSchema).nullable(),
     created_by: z.string(),
     deleted_at: z.string().nullable(),
     permission: ShareRoleSchema,
-    sharing_key: z.string(),
     updated_at: z.string(),
     updated_by: z.string(),
   })
@@ -59,4 +57,9 @@ export const BusterCollectionSchema = z
 export type BusterCollection = z.infer<typeof BusterCollectionSchema>;
 export type BusterCollectionItemAsset = z.infer<typeof BusterCollectionItemAssetSchema>;
 
-export type GetCollectionResponse = BusterCollection;
+export const DeleteCollectionsResponseSchema = z.object({
+  success_ids: z.array(z.string()),
+  failure_ids: z.array(z.string()),
+});
+
+export type DeleteCollectionsResponse = z.infer<typeof DeleteCollectionsResponseSchema>;

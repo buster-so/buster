@@ -3,6 +3,7 @@ import type { AssetListItem, GroupedAssetsKeys } from '@buster/database/schema-t
 import { getAssetScreenshotSignedUrl } from '@buster/search';
 import { type AssetGetResponse, GetAssetsRequestQuerySchema } from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
+import { convertScreenshotUrl } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -48,25 +49,6 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
       pinCollections,
     });
 
-    // Helper function to convert screenshot bucket keys to signed URLs
-    const convertScreenshotUrl = async (asset: AssetListItem) => {
-      let screenshotUrl: string | null = null;
-      if (asset.screenshot_url) {
-        try {
-          screenshotUrl = await getAssetScreenshotSignedUrl({
-            key: asset.screenshot_url,
-            organizationId: userOrg.organizationId,
-          });
-        } catch (error) {
-          console.error('Failed to generate screenshot URL:', error);
-        }
-      }
-      return {
-        ...asset,
-        screenshot_url: screenshotUrl,
-      };
-    };
-
     // Handle grouped vs non-grouped responses
     let response: AssetGetResponse;
     if ('groups' in dbResponse) {
@@ -76,7 +58,9 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
         GroupedAssetsKeys,
         AssetListItem[],
       ][]) {
-        groupsWithUrls[groupKey] = await Promise.all(assets.map(convertScreenshotUrl));
+        groupsWithUrls[groupKey] = await Promise.all(
+          assets.map((asset) => convertScreenshotUrl(asset, userOrg.organizationId))
+        );
       }
       response = {
         ...dbResponse,
@@ -84,7 +68,9 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
       };
     } else {
       // Regular paginated response
-      const dataWithUrls = await Promise.all(dbResponse.data.map(convertScreenshotUrl));
+      const dataWithUrls = await Promise.all(
+        dbResponse.data.map((asset) => convertScreenshotUrl(asset, userOrg.organizationId))
+      );
       response = {
         ...dbResponse,
         data: dataWithUrls,

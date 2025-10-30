@@ -1,3 +1,4 @@
+import { getAssetScreenshotSignedUrl } from '@buster/search';
 import type { screenshots_task_keys } from '@buster-app/trigger/task-keys';
 import { runs, tasks } from '@trigger.dev/sdk';
 import type { Context } from 'hono';
@@ -90,4 +91,26 @@ export function triggerScreenshotIfNeeded<TTrigger>({
       console.error('Error triggering screenshot', { tag, key, error });
     }
   })();
+}
+
+// Helper function to convert screenshot bucket keys to signed URLs
+export async function convertScreenshotUrl<T extends { screenshot_url?: string | null }>(
+  asset: T,
+  organizationId: string
+): Promise<T> {
+  let screenshotUrl: string | null = null;
+  if (asset.screenshot_url) {
+    try {
+      screenshotUrl = await getAssetScreenshotSignedUrl({
+        key: asset.screenshot_url,
+        organizationId,
+      });
+    } catch (error) {
+      console.error('Failed to generate screenshot URL:', error);
+    }
+  }
+  return {
+    ...asset,
+    screenshot_url: screenshotUrl,
+  };
 }
