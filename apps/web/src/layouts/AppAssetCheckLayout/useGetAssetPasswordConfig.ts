@@ -1,9 +1,7 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import type { ResponseMessageFileType } from '@buster/server-shared/chats';
-import { type QueryKey, useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useGetAsset } from '@/api/buster_rest/assets/useGetAsset';
 import type { ApiError } from '@/api/errors';
-import { getAssetSelectedQuery } from './getAssetSelectedQuery';
 
 interface AssetAccess {
   hasAccess: boolean;
@@ -16,11 +14,10 @@ interface AssetAccess {
 export const getAssetAccess = (
   error: ApiError | null,
   isFetched: boolean,
-  selectedQuery: QueryKey,
   hasData: boolean
 ): AssetAccess => {
   if (error) {
-    console.error('Error in getAssetAccess', error, isFetched, selectedQuery, hasData);
+    console.error('Error in getAssetAccess', error, isFetched, hasData);
   }
 
   // 418 is password required
@@ -82,16 +79,14 @@ export const useGetAssetPasswordConfig = (
 ) => {
   const chosenVersionNumber = versionNumber || 'LATEST';
 
-  const selectedQuery = useMemo(
-    () => getAssetSelectedQuery(type, assetId, chosenVersionNumber),
-    [type, assetId, chosenVersionNumber]
+  const { error, isFetched, data } = useGetAsset(
+    {
+      type: type,
+      assetId,
+      chosenVersionNumber,
+    },
+    { select: (v) => !!v }
   );
 
-  const { error, isFetched, data } = useQuery({
-    queryKey: selectedQuery.queryKey,
-    enabled: true,
-    select: (v: unknown) => !!v,
-  });
-
-  return getAssetAccess(error, isFetched, selectedQuery.queryKey, !!data);
+  return getAssetAccess(error, isFetched, !!data);
 };

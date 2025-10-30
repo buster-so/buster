@@ -8,6 +8,16 @@ import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import type { ApiError } from '@/api/errors';
 import { getAssetSelectedQuery } from './getAssetSelectedQuery';
 
+// Type mapping for each asset type to its return type
+type AssetTypeToData = {
+  chat: IBusterChat;
+  reasoning: IBusterChat;
+  metric_file: BusterMetric;
+  dashboard_file: GetDashboardResponse;
+  report_file: GetReportResponse;
+  collection: BusterCollection;
+};
+
 // Union of all possible return types
 type AssetData =
   | IBusterChat
@@ -16,68 +26,24 @@ type AssetData =
   | GetReportResponse
   | BusterCollection;
 
-// Function overloads for each asset type
-export function useGetAssetSelected<TData>(
+// Generic function that infers the correct return type based on the asset type
+export function useGetAsset<
+  T extends AssetType | 'reasoning',
+  TData = AssetTypeToData[T & keyof AssetTypeToData]
+>(
   params: {
-    type: 'chat' | 'reasoning';
+    type: T;
     assetId: string;
     chosenVersionNumber: number | 'LATEST';
   },
-  options?: Omit<UseQueryOptions<IBusterChat, ApiError, TData>, 'queryKey' | 'queryFn'>
-): ReturnType<typeof useQuery<IBusterChat, ApiError, TData>>;
-
-export function useGetAssetSelected<TData>(
-  params: {
-    type: 'metric_file';
-    assetId: string;
-    chosenVersionNumber: number | 'LATEST';
-  },
-  options?: Omit<UseQueryOptions<BusterMetric, ApiError, TData>, 'queryKey' | 'queryFn'>
-): ReturnType<typeof useQuery<BusterMetric, ApiError, TData>>;
-
-export function useGetAssetSelected<TData>(
-  params: {
-    type: 'dashboard_file';
-    assetId: string;
-    chosenVersionNumber: number | 'LATEST';
-  },
-  options?: Omit<UseQueryOptions<GetDashboardResponse, ApiError, TData>, 'queryKey' | 'queryFn'>
-): ReturnType<typeof useQuery<GetDashboardResponse, ApiError, TData>>;
-
-export function useGetAssetSelected<TData>(
-  params: {
-    type: 'report_file';
-    assetId: string;
-    chosenVersionNumber: number | 'LATEST';
-  },
-  options?: Omit<UseQueryOptions<GetReportResponse, ApiError, TData>, 'queryKey' | 'queryFn'>
-): ReturnType<typeof useQuery<GetReportResponse, ApiError, TData>>;
-
-export function useGetAssetSelected<TData>(
-  params: {
-    type: 'collection';
-    assetId: string;
-    chosenVersionNumber: number | 'LATEST';
-  },
-  options?: Omit<UseQueryOptions<BusterCollection, ApiError, TData>, 'queryKey' | 'queryFn'>
-): ReturnType<typeof useQuery<BusterCollection, ApiError, TData>>;
-
-// Implementation signature (accepts all types)
-export function useGetAssetSelected<TData>(
-  params: {
-    type: AssetType | 'reasoning';
-    assetId: string;
-    chosenVersionNumber: number | 'LATEST';
-  },
-  options?: Record<string, unknown>
+  options?: Omit<
+    UseQueryOptions<AssetTypeToData[T & keyof AssetTypeToData], ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
-  const selectedQuery = getAssetSelectedQuery(
-    params.type,
-    params.assetId,
-    params.chosenVersionNumber
-  );
+  const selectedQuery = getAssetSelectedQuery(params.type, params.assetId, params.chosenVersionNumber);
 
-  return useQuery({
+  return useQuery<AssetTypeToData[T & keyof AssetTypeToData], ApiError, TData>({
     queryKey: selectedQuery.queryKey,
     ...options,
   });
