@@ -58,7 +58,9 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
         GroupedAssetsKeys,
         AssetListItem[],
       ][]) {
-        groupsWithUrls[groupKey] = await Promise.all(assets.map(asset => convertScreenshotUrl(asset, userOrg.organizationId)));
+        groupsWithUrls[groupKey] = await Promise.all(
+          assets.map((asset) => convertScreenshotUrl(asset, userOrg.organizationId))
+        );
       }
       response = {
         ...dbResponse,
@@ -66,7 +68,9 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
       };
     } else {
       // Regular paginated response
-      const dataWithUrls = await Promise.all(dbResponse.data.map(asset => convertScreenshotUrl(asset, userOrg.organizationId)));
+      const dataWithUrls = await Promise.all(
+        dbResponse.data.map((asset) => convertScreenshotUrl(asset, userOrg.organizationId))
+      );
       response = {
         ...dbResponse,
         data: dataWithUrls,

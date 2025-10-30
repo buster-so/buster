@@ -4,6 +4,7 @@ import type {
   BusterCollection,
   CreateCollectionRequestBody,
   DeleteCollectionRequestBody,
+  DeleteCollectionsResponse,
   GetCollectionsRequestQuery,
   GetCollectionsResponse,
   GetIndividualCollectionRequestParams,
@@ -32,18 +33,18 @@ export const collectionsGetCollection = async ({
 };
 
 export const collectionsCreateCollection = async (params: CreateCollectionRequestBody) => {
-  return await mainApi.post<BusterCollection>('/collections', params).then((res) => res.data);
+  return await mainApiV2.post<BusterCollection>('/collections', params).then((res) => res.data);
 };
 
 export const collectionsUpdateCollection = async (params: UpdateCollectionRequestBody) => {
-  return await mainApi
+  return await mainApiV2
     .put<BusterCollection>(`/collections/${params.id}`, params)
     .then((res) => res.data);
 };
 
 export const collectionsDeleteCollection = async (data: DeleteCollectionRequestBody) => {
-  return await mainApi
-    .delete<BusterCollection>('/collections', {
+  return await mainApiV2
+    .delete<DeleteCollectionsResponse>('/collections', {
       data,
     })
     .then((res) => res.data);

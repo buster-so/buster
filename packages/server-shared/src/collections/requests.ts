@@ -31,17 +31,8 @@ export const UpdateCollectionRequestBodySchema = z.object({
   id: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
-  assets: z
-    .array(
-      z.object({
-        type: ShareAssetTypeSchema,
-        id: z.string(),
-      })
-    )
-    .optional(),
-  share_with: z.array(z.string()).optional(),
-  share_type: z.string().optional(),
 });
+
 export type UpdateCollectionRequestBody = z.infer<typeof UpdateCollectionRequestBodySchema>;
 
 export const DeleteCollectionRequestBodySchema = z.object({

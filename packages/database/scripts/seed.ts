@@ -319,9 +319,7 @@ async function seed() {
             if (existingSecretId) {
               // Use existing secret ID
               secretId = existingSecretId;
-              console.log(
-                `Found existing vault secret for ${dataSource.name}: ${secretId}`
-              );
+              console.log(`Found existing vault secret for ${dataSource.name}: ${secretId}`);
 
               // Update the secret's value in case it changed
               await tx.execute(sql`
@@ -350,9 +348,7 @@ async function seed() {
 
             if (secretId) {
               // Update the data source with the correct secret ID
-              console.log(
-                `Updating data source ${dataSource.name} with secret ID: ${secretId}`
-              );
+              console.log(`Updating data source ${dataSource.name} with secret ID: ${secretId}`);
               await tx
                 .update(tables.dataSources)
                 .set({ secretId: secretId })

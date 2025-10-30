@@ -1,11 +1,7 @@
 import { and, desc, eq, exists, isNull, ne, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import {
-  assetPermissions,
-  collections,
-  users,
-} from '../../schema';
+import { assetPermissions, collections, users } from '../../schema';
 import type { CollectionListItem, InfinitePaginatedResponse } from '../../schema-types';
 import { PaginationInputSchema } from '../../schema-types';
 
@@ -63,7 +59,7 @@ export async function listCollections(
   const allFilterConditions = [
     isNull(collections.deletedAt),
     eq(collections.organizationId, organizationId),
-    permissionedFilterCondition
+    permissionedFilterCondition,
   ];
 
   if (shared_with_me) {
@@ -95,34 +91,31 @@ export async function listCollections(
     .limit(limit)
     .offset(offset);
 
-    if (results.length > page_size) {
-      hasMore = true;
-      results.pop();
-    }
+  if (results.length > page_size) {
+    hasMore = true;
+    results.pop();
+  }
 
   // Transform results to CollectionListItem format
-  const collectionItems: CollectionListItem[] = results.map(
-    (collection) =>
-      ({
-        id: collection.id,
-        name: collection.name,
-        description: collection.description || '',
-        updated_at: collection.updatedAt,
-        created_at: collection.createdAt,
-        created_by: collection.createdBy,
-        created_by_name: collection.userName,
-        created_by_email: collection.userEmail,
-        created_by_avatar_url: collection.userAvatarUrl,
-        is_shared: collection.createdBy !== userId,
-      })
-  );
+  const collectionItems: CollectionListItem[] = results.map((collection) => ({
+    id: collection.id,
+    name: collection.name,
+    description: collection.description || '',
+    updated_at: collection.updatedAt,
+    created_at: collection.createdAt,
+    created_by: collection.createdBy,
+    created_by_name: collection.userName,
+    created_by_email: collection.userEmail,
+    created_by_avatar_url: collection.userAvatarUrl,
+    is_shared: collection.createdBy !== userId,
+  }));
 
   return {
     data: collectionItems,
     pagination: {
       page,
       page_size,
-      has_more: hasMore
+      has_more: hasMore,
     },
   };
 }

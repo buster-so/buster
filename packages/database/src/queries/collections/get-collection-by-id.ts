@@ -71,99 +71,97 @@ export async function getCollectionById(
   return collection;
 }
 
-
 export async function getCollectionAssets(collectionId: string): Promise<CollectionAsset[]> {
-
   const metricsPromise = db
-  .select({
-    id: metricFiles.id,
-    name: metricFiles.name,
-    createdAt: metricFiles.createdAt,
-    updatedAt: metricFiles.updatedAt,
-    assetType: collectionsToAssets.assetType,
-    userEmail: users.email,
-    userName: users.name,
-    screenshotUrl: metricFiles.screenshotBucketKey,
-  })
-  .from(collectionsToAssets)
-  .innerJoin(metricFiles, eq(metricFiles.id, collectionsToAssets.assetId))
-  .leftJoin(users, eq(users.id, metricFiles.createdBy))
-  .where(
-    and(
-      eq(collectionsToAssets.collectionId, collectionId),
-      eq(collectionsToAssets.assetType, 'metric_file'),
-      isNull(collectionsToAssets.deletedAt),
-      isNull(metricFiles.deletedAt)
-    )
-  );
+    .select({
+      id: metricFiles.id,
+      name: metricFiles.name,
+      createdAt: metricFiles.createdAt,
+      updatedAt: metricFiles.updatedAt,
+      assetType: collectionsToAssets.assetType,
+      userEmail: users.email,
+      userName: users.name,
+      screenshotUrl: metricFiles.screenshotBucketKey,
+    })
+    .from(collectionsToAssets)
+    .innerJoin(metricFiles, eq(metricFiles.id, collectionsToAssets.assetId))
+    .leftJoin(users, eq(users.id, metricFiles.createdBy))
+    .where(
+      and(
+        eq(collectionsToAssets.collectionId, collectionId),
+        eq(collectionsToAssets.assetType, 'metric_file'),
+        isNull(collectionsToAssets.deletedAt),
+        isNull(metricFiles.deletedAt)
+      )
+    );
 
-  const dashboardPromise =     db
-  .select({
-    id: dashboardFiles.id,
-    name: dashboardFiles.name,
-    createdAt: dashboardFiles.createdAt,
-    updatedAt: dashboardFiles.updatedAt,
-    assetType: collectionsToAssets.assetType,
-    userEmail: users.email,
-    userName: users.name,
-    screenshotUrl: dashboardFiles.screenshotBucketKey,
-  })
-  .from(collectionsToAssets)
-  .innerJoin(dashboardFiles, eq(dashboardFiles.id, collectionsToAssets.assetId))
-  .leftJoin(users, eq(users.id, dashboardFiles.createdBy))
-  .where(
-    and(
-      eq(collectionsToAssets.collectionId, collectionId),
-      eq(collectionsToAssets.assetType, 'dashboard_file'),
-      isNull(collectionsToAssets.deletedAt),
-      isNull(dashboardFiles.deletedAt)
-    )
-  );
+  const dashboardPromise = db
+    .select({
+      id: dashboardFiles.id,
+      name: dashboardFiles.name,
+      createdAt: dashboardFiles.createdAt,
+      updatedAt: dashboardFiles.updatedAt,
+      assetType: collectionsToAssets.assetType,
+      userEmail: users.email,
+      userName: users.name,
+      screenshotUrl: dashboardFiles.screenshotBucketKey,
+    })
+    .from(collectionsToAssets)
+    .innerJoin(dashboardFiles, eq(dashboardFiles.id, collectionsToAssets.assetId))
+    .leftJoin(users, eq(users.id, dashboardFiles.createdBy))
+    .where(
+      and(
+        eq(collectionsToAssets.collectionId, collectionId),
+        eq(collectionsToAssets.assetType, 'dashboard_file'),
+        isNull(collectionsToAssets.deletedAt),
+        isNull(dashboardFiles.deletedAt)
+      )
+    );
 
   const chatPromise = db
-  .select({
-    id: chats.id,
-    name: chats.title,
-    createdAt: chats.createdAt,
-    updatedAt: chats.updatedAt,
-    assetType: collectionsToAssets.assetType,
-    userEmail: users.email,
-    userName: users.name,
-    screenshotUrl: chats.screenshotBucketKey,
-  })
-  .from(collectionsToAssets)
-  .innerJoin(chats, eq(chats.id, collectionsToAssets.assetId))
-  .leftJoin(users, eq(users.id, chats.createdBy))
-  .where(
-    and(
-      eq(collectionsToAssets.collectionId, collectionId),
-      eq(collectionsToAssets.assetType, 'chat'),
-      isNull(collectionsToAssets.deletedAt),
-      isNull(chats.deletedAt)
-    )
-  )
+    .select({
+      id: chats.id,
+      name: chats.title,
+      createdAt: chats.createdAt,
+      updatedAt: chats.updatedAt,
+      assetType: collectionsToAssets.assetType,
+      userEmail: users.email,
+      userName: users.name,
+      screenshotUrl: chats.screenshotBucketKey,
+    })
+    .from(collectionsToAssets)
+    .innerJoin(chats, eq(chats.id, collectionsToAssets.assetId))
+    .leftJoin(users, eq(users.id, chats.createdBy))
+    .where(
+      and(
+        eq(collectionsToAssets.collectionId, collectionId),
+        eq(collectionsToAssets.assetType, 'chat'),
+        isNull(collectionsToAssets.deletedAt),
+        isNull(chats.deletedAt)
+      )
+    );
   const reportPromise = db
-  .select({
-    id: reportFiles.id,
-    name: reportFiles.name,
-    createdAt: reportFiles.createdAt,
-    updatedAt: reportFiles.updatedAt,
-    assetType: collectionsToAssets.assetType,
-    userEmail: users.email,
-    userName: users.name,
-    screenshotUrl: reportFiles.screenshotBucketKey,
-  })
-  .from(collectionsToAssets)
-  .innerJoin(reportFiles, eq(reportFiles.id, collectionsToAssets.assetId))
-  .leftJoin(users, eq(users.id, reportFiles.createdBy))
-  .where(
-    and(
-      eq(collectionsToAssets.collectionId, collectionId),
-      eq(collectionsToAssets.assetType, 'report_file'),
-      isNull(collectionsToAssets.deletedAt),
-      isNull(reportFiles.deletedAt)
-    )
-  )
+    .select({
+      id: reportFiles.id,
+      name: reportFiles.name,
+      createdAt: reportFiles.createdAt,
+      updatedAt: reportFiles.updatedAt,
+      assetType: collectionsToAssets.assetType,
+      userEmail: users.email,
+      userName: users.name,
+      screenshotUrl: reportFiles.screenshotBucketKey,
+    })
+    .from(collectionsToAssets)
+    .innerJoin(reportFiles, eq(reportFiles.id, collectionsToAssets.assetId))
+    .leftJoin(users, eq(users.id, reportFiles.createdBy))
+    .where(
+      and(
+        eq(collectionsToAssets.collectionId, collectionId),
+        eq(collectionsToAssets.assetType, 'report_file'),
+        isNull(collectionsToAssets.deletedAt),
+        isNull(reportFiles.deletedAt)
+      )
+    );
   // Fetch all associated assets in parallel
   const [metricAssets, dashboardAssets, chatAssets, reportAssets] = await Promise.all([
     metricsPromise,

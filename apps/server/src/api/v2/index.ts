@@ -4,6 +4,7 @@ import healthcheckRoutes from '../healthcheck';
 import apiKeysRoutes from './api_keys';
 import authRoutes from './auth';
 import chatsRoutes from './chats';
+import collectionsRoutes from './collections';
 import dashboardRoutes from './dashboards';
 import { dataSources } from './data-sources';
 import datasetsRoutes from './datasets';
@@ -29,7 +30,6 @@ import supportRoutes from './support';
 import titleRoutes from './title';
 import { tools } from './tools';
 import userRoutes from './users';
-import collectionsRoutes from './collections';
 
 const app = new Hono()
   .route('/api_keys', apiKeysRoutes)
@@ -62,5 +62,5 @@ const app = new Hono()
   .route('/dashboards', dashboardRoutes)
   .route('/sharing', sharingRoutes)
   .route('/collections', collectionsRoutes);
-  
+
 export default app;

@@ -56,3 +56,10 @@ export const BusterCollectionSchema = z
 
 export type BusterCollection = z.infer<typeof BusterCollectionSchema>;
 export type BusterCollectionItemAsset = z.infer<typeof BusterCollectionItemAssetSchema>;
+
+export const DeleteCollectionsResponseSchema = z.object({
+  success_ids: z.array(z.string()),
+  failure_ids: z.array(z.string()),
+});
+
+export type DeleteCollectionsResponse = z.infer<typeof DeleteCollectionsResponseSchema>;

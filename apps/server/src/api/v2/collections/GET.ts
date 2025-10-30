@@ -6,14 +6,18 @@ import {
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
-const app = new Hono().get('/', zValidator('query', GetCollectionsRequestQuerySchema), async (c) => {
-  const query = c.req.valid('query');
-  const user = c.get('busterUser');
+const app = new Hono().get(
+  '/',
+  zValidator('query', GetCollectionsRequestQuerySchema),
+  async (c) => {
+    const query = c.req.valid('query');
+    const user = c.get('busterUser');
 
-  const response: GetCollectionsResponse = await listCollectionsHandler(query, user);
+    const response: GetCollectionsResponse = await listCollectionsHandler(query, user);
 
-  return c.json(response);
-});
+    return c.json(response);
+  }
+);
 
 export default app;
 
@@ -55,4 +59,3 @@ async function listCollectionsHandler(
     owned_by_me,
   });
 }
-

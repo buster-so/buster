@@ -14,4 +14,3 @@ export const CollectionListItemSchema = z.object({
 });
 
 export type CollectionListItem = z.infer<typeof CollectionListItemSchema>;
-

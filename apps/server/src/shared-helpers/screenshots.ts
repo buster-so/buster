@@ -1,5 +1,5 @@
-import type { screenshots_task_keys } from '@buster-app/trigger/task-keys';
 import { getAssetScreenshotSignedUrl } from '@buster/search';
+import type { screenshots_task_keys } from '@buster-app/trigger/task-keys';
 import { runs, tasks } from '@trigger.dev/sdk';
 import type { Context } from 'hono';
 
@@ -92,7 +92,6 @@ export function triggerScreenshotIfNeeded<TTrigger>({
     }
   })();
 }
-
 
 // Helper function to convert screenshot bucket keys to signed URLs
 export async function convertScreenshotUrl<T extends { screenshot_url?: string | null }>(
