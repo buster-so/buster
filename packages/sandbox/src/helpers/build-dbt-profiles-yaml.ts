@@ -194,15 +194,32 @@ export function buildOutput(
   }
 }
 
-/** buildProfilesYaml: returns YAML string */
+/** buildProfilesYaml: returns YAML string and optional private key content */
 export function buildProfilesYaml(args: {
   profileName: string; // must match dbt_project.yml 'profile'
   target: string;
   creds: Credentials;
-}): string {
-  const { profileName, target, creds } = args;
+  privateKeyPath?: string; // path where private key will be written in sandbox
+}): { yaml: string; privateKeyContent?: string } {
+  const { profileName, target, creds, privateKeyPath } = args;
 
-  const output = buildOutput(creds);
+  let privateKeyContent: string | undefined;
+  let output = buildOutput(creds);
+
+  // If Snowflake with key_pair auth, handle private key file
+  if (
+    creds.type === DataSourceType.Snowflake &&
+    creds.auth_method === 'key_pair' &&
+    creds.private_key
+  ) {
+    privateKeyContent = creds.private_key;
+    // Update output to use the file path instead of content
+    output = {
+      ...output,
+      private_key_path: privateKeyPath ?? '/workspace/.keys/snowflake_private.key',
+    } as SnowflakeOutput;
+  }
+
   const root = {
     [profileName]: {
       target,
@@ -212,5 +229,8 @@ export function buildProfilesYaml(args: {
     },
   };
 
-  return yamlDump(root, { noRefs: true, lineWidth: 120 });
+  return {
+    yaml: yamlDump(root, { noRefs: true, lineWidth: 120 }),
+    privateKeyContent,
+  };
 }

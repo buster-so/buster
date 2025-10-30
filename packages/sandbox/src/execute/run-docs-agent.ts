@@ -123,11 +123,20 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
     try {
-      const profileYaml = buildProfilesYaml({
+      const privateKeyPath = `${workspacePath}/.keys/snowflake_private.key`;
+      const { yaml: profileYaml, privateKeyContent } = buildProfilesYaml({
         profileName,
         target: 'buster',
         creds: credentials,
+        privateKeyPath,
       });
+
+      // Write private key file if present
+      if (privateKeyContent) {
+        const keysPath = `${workspacePath}/.keys`;
+        await sandbox.fs.createFolder(keysPath, '700');
+        await sandbox.fs.uploadFile(Buffer.from(privateKeyContent), privateKeyPath);
+      }
 
       // Create profiles directory and file
       await sandbox.fs.createFolder(profilesPath, '755');
@@ -276,11 +285,20 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
     try {
-      const profileYaml = buildProfilesYaml({
+      const privateKeyPath = `${workspacePath}/.keys/snowflake_private.key`;
+      const { yaml: profileYaml, privateKeyContent } = buildProfilesYaml({
         profileName,
         target: 'buster',
         creds: credentials,
+        privateKeyPath,
       });
+
+      // Write private key file if present
+      if (privateKeyContent) {
+        const keysPath = `${workspacePath}/.keys`;
+        await sandbox.fs.createFolder(keysPath, '700');
+        await sandbox.fs.uploadFile(Buffer.from(privateKeyContent), privateKeyPath);
+      }
 
       // Create profiles directory and file
       await sandbox.fs.createFolder(profilesPath, '755');
