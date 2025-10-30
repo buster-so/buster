@@ -6,7 +6,8 @@ import { z } from 'zod';
 // ============================================================================
 
 // Helper to allow {{TODO}} as a placeholder in any string field
-const TODO_MARKER = '{{TODO}}';
+// Exported for use in dbt schema parsing to ensure consistency
+export const TODO_MARKER = '{{TODO}}';
 const _stringWithTodo = z.union([z.string(), z.literal(TODO_MARKER)]);
 
 export const ArgumentSchema = z.object({
@@ -17,7 +18,8 @@ export const ArgumentSchema = z.object({
 
 // Support string, number, boolean, {{TODO}}, or object for dimension options
 // YAML automatically converts true/false to booleans
-const DimensionOptionSchema = z.union([
+// Exported for use in dbt schema parsing to ensure consistency between formats
+export const DimensionOptionSchema = z.union([
   z.string(),
   z.number(),
   z.boolean(),
@@ -312,6 +314,7 @@ export const DeployResponseSchema = z.object({
 // ============================================================================
 
 export type Argument = z.infer<typeof ArgumentSchema>;
+export type DimensionOption = z.infer<typeof DimensionOptionSchema>;
 export type Dimension = z.infer<typeof DimensionSchema>;
 export type Measure = z.infer<typeof MeasureSchema>;
 export type DatasetMetric = z.infer<typeof DatasetMetricSchema>;

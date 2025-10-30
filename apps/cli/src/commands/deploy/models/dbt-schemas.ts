@@ -1,4 +1,4 @@
-import { RelationshipSchema } from '@buster/server-shared';
+import { DimensionOptionSchema, RelationshipSchema, TODO_MARKER } from '@buster/server-shared';
 import { z } from 'zod';
 
 /**
@@ -7,12 +7,19 @@ import { z } from 'zod';
  * These schemas define the structure of dbt metadata YAML files,
  * including both traditional model definitions and MetricFlow semantic layer structures.
  *
+ * SHARED TYPES:
+ * - DimensionOptionSchema: Imported from @buster/server-shared for consistency
+ * - RelationshipSchema: Imported from @buster/server-shared for consistency
+ * - TODO_MARKER: Imported from @buster/server-shared for consistency
+ *
+ * These ensure that Buster and dbt YAML formats support identical types and behavior.
+ *
  * CUSTOM BUSTER EXTENSIONS:
  * This implementation adds optional custom fields to the dbt format that are
  * ignored by dbt but recognized by Buster:
  * - models.relationships: Array of relationship definitions (model-level)
  * - columns.searchable: Boolean flag for searchable dimensions (top-level)
- * - columns.options: Array of categorical options (top-level)
+ * - columns.options: Array of categorical options (top-level, uses shared DimensionOptionSchema)
  *
  * Precedence: top-level fields > config.meta fields > inference
  */
@@ -82,9 +89,11 @@ export const DbtColumnSchema = z.object({
       '[BUSTER EXTENSION] Whether dimension is searchable (takes precedence over config.meta.searchable)'
     ),
   options: z
-    .array(z.union([z.string(), z.number(), z.boolean()]))
+    .array(DimensionOptionSchema)
     .optional()
-    .describe('[BUSTER EXTENSION] Categorical options (takes precedence over config.meta.options)'),
+    .describe(
+      '[BUSTER EXTENSION] Categorical options with optional descriptions (takes precedence over config.meta.options). Supports primitives (string, number, boolean) or objects with {value, description}.'
+    ),
 });
 
 export type DbtColumn = z.infer<typeof DbtColumnSchema>;
