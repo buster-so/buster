@@ -25,6 +25,7 @@ export const BigQueryForm: React.FC<{
       service_account_key: credentials?.service_account_key || '',
       project_id: credentials?.project_id || '',
       default_dataset: credentials?.default_dataset || '',
+      location: credentials?.location || '',
       type: 'bigquery' as const,
       name: dataSource?.name || '',
     } as BigQueryCredentials & { name: string },
@@ -75,6 +76,12 @@ export const BigQueryForm: React.FC<{
             label="Dataset ID"
             placeholder="your_dataset"
           />
+        )}
+      </form.AppField>
+
+      <form.AppField name="location">
+        {(field) => (
+          <field.TextField labelClassName={labelClassName} label="Location" placeholder="US" />
         )}
       </form.AppField>
     </FormWrapper>
