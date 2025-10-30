@@ -42,6 +42,11 @@ export const SnowflakeForm: React.FC<{
         credentials?.auth_method === 'key_pair' ? credentials.private_key_passphrase || '' : '',
     } as SnowflakeCredentials & { name: string },
     onSubmit: async ({ value }) => {
+      // Helper to convert empty strings to undefined for optional fields
+      const cleanOptionalField = (val: string | undefined) => {
+        return val && val.trim() !== '' ? val : undefined;
+      };
+
       // Filter payload based on auth_method to only include relevant fields
       const {
         auth_method,
@@ -56,39 +61,35 @@ export const SnowflakeForm: React.FC<{
         name,
       } = value;
 
+      // Build base payload with undefined for empty optional fields
+      const basePayload = {
+        type,
+        name,
+        account_id,
+        username,
+        auth_method,
+        warehouse_id: cleanOptionalField(warehouse_id),
+        default_database: cleanOptionalField(default_database),
+        default_schema: cleanOptionalField(default_schema),
+        role: cleanOptionalField(role),
+        custom_host: cleanOptionalField(custom_host),
+      };
+
       let filteredValue: SnowflakeCredentials & { name: string };
 
       if (auth_method === 'key_pair') {
         // Type narrow to key_pair variant and extract only those fields
         const typedValue = value as Extract<typeof value, { auth_method: 'key_pair' }>;
         filteredValue = {
-          type,
-          name,
-          account_id,
-          username,
-          warehouse_id,
-          default_database,
-          default_schema,
-          role,
-          custom_host,
-          auth_method,
+          ...basePayload,
           private_key: typedValue.private_key,
-          private_key_passphrase: typedValue.private_key_passphrase,
+          private_key_passphrase: cleanOptionalField(typedValue.private_key_passphrase),
         } as SnowflakeCredentials & { name: string };
       } else {
         // Type narrow to password variant and extract only that field
         const typedValue = value as Extract<typeof value, { auth_method: 'password' }>;
         filteredValue = {
-          type,
-          name,
-          account_id,
-          username,
-          warehouse_id,
-          default_database,
-          default_schema,
-          role,
-          custom_host,
-          auth_method,
+          ...basePayload,
           password: typedValue.password,
         } as SnowflakeCredentials & { name: string };
       }
@@ -105,32 +106,44 @@ export const SnowflakeForm: React.FC<{
   const labelClassName = 'min-w-[175px]';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string>('');
+  const prevAuthMethodRef = useRef<'password' | 'key_pair'>(credentials?.auth_method || 'password');
 
   // Clear authentication fields when switching between auth methods
   useEffect(() => {
     const subscription = form.store.subscribe(() => {
-      const authMethod = form.getFieldValue('auth_method');
+      const currentAuthMethod = form.getFieldValue('auth_method');
+      const prevAuthMethod = prevAuthMethodRef.current;
 
-      // When switching to key_pair, clear password
-      if (authMethod === 'key_pair') {
-        const currentPassword = form.getFieldValue('password');
-        if (currentPassword) {
-          form.setFieldValue('password', '');
+      // Only react if auth method actually changed
+      if (currentAuthMethod === prevAuthMethod) {
+        return;
+      }
+
+      // When switching to key_pair, clear password and initialize key fields
+      if (currentAuthMethod === 'key_pair') {
+        form.setFieldValue('password', '');
+        // Initialize key fields if they don't exist
+        if (!form.getFieldValue('private_key')) {
+          form.setFieldValue('private_key', '');
+        }
+        if (!form.getFieldValue('private_key_passphrase')) {
+          form.setFieldValue('private_key_passphrase', '');
         }
       }
 
       // When switching to password, clear private_key and passphrase
-      if (authMethod === 'password') {
-        const currentPrivateKey = form.getFieldValue('private_key');
-        const currentPassphrase = form.getFieldValue('private_key_passphrase');
-        if (currentPrivateKey) {
-          form.setFieldValue('private_key', '');
-          setUploadedFileName('');
-        }
-        if (currentPassphrase) {
-          form.setFieldValue('private_key_passphrase', '');
+      if (currentAuthMethod === 'password') {
+        form.setFieldValue('private_key', '');
+        form.setFieldValue('private_key_passphrase', '');
+        setUploadedFileName('');
+        // Initialize password field if it doesn't exist
+        if (!form.getFieldValue('password')) {
+          form.setFieldValue('password', '');
         }
       }
+
+      // Update the ref for next comparison
+      prevAuthMethodRef.current = currentAuthMethod;
     });
 
     return () => subscription();

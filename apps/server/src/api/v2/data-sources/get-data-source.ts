@@ -8,6 +8,7 @@ import {
   type Credentials,
   CredentialsSchema,
   type GetDataSourceResponse,
+  sanitizeCredentials,
 } from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';
 
@@ -86,7 +87,7 @@ export async function getDataSourceHandler(
     });
   }
 
-  // Step 5: Build and return response
+  // Step 5: Build and return response with sanitized credentials
   return {
     id: dataSource.id,
     name: dataSource.name,
@@ -98,7 +99,7 @@ export async function getDataSourceHandler(
     deletedAt: dataSource.deletedAt,
     onboardingStatus: dataSource.onboardingStatus as 'notStarted',
     onboardingError: dataSource.onboardingError,
-    credentials,
+    credentials: sanitizeCredentials(credentials),
     datasets: dataSource.datasets,
   };
 }
