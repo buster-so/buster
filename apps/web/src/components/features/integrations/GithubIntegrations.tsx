@@ -13,19 +13,6 @@ import LinkSlash from '@/components/ui/icons/NucleoIconOutlined/link-slash';
 import { Text } from '@/components/ui/typography';
 import { SettingCardContent, SettingsCards } from '../settings';
 
-// const githubIntegration: GetGitHubIntegrationResponse = {
-//   connected: true,
-//   status: 'active',
-//   integration: {
-//     id: '123',
-//     github_org_name: 'Test Org',
-//     github_org_id: '123',
-//     installation_id: '123',
-//     installed_at: '2021-01-01',
-//     last_used_at: '2021-01-01',
-//   },
-// };
-
 export const GithubIntegrations = React.memo(() => {
   const { data: githubIntegration } = useGetGitHubIntegration();
 

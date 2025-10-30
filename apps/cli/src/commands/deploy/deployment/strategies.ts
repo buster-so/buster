@@ -29,6 +29,21 @@ export function createDryRunDeployer(verbose = false): DeployFunction {
       for (const doc of request.docs) {
         console.info(`    - ${doc.name} (${doc.type})`);
       }
+      if (request.automation) {
+        console.info(`  Automation:`);
+        for (const agentConfig of request.automation) {
+          console.info(`    - ${agentConfig.agent}:`);
+          for (const trigger of agentConfig.on) {
+            const repo = trigger.repository ? ` (${trigger.repository})` : '';
+            const types =
+              trigger.event === 'pull_request' && trigger.types
+                ? ` [${trigger.types.join(', ')}]`
+                : '';
+            const branches = trigger.branches ? ` on branches: ${trigger.branches.join(', ')}` : '';
+            console.info(`      - ${trigger.event}${repo}${types}${branches}`);
+          }
+        }
+      }
     }
 
     // Simulate successful deployment for all items
@@ -38,6 +53,15 @@ export function createDryRunDeployer(verbose = false): DeployFunction {
       schema: model.schema,
       database: model.database,
     }));
+
+    // Calculate automation stats
+    const automationResult = request.automation
+      ? {
+          configured: true,
+          agentCount: request.automation.length,
+          triggerCount: request.automation.reduce((sum, agent) => sum + agent.on.length, 0),
+        }
+      : { configured: false };
 
     return {
       models: {
@@ -66,6 +90,7 @@ export function createDryRunDeployer(verbose = false): DeployFunction {
           failedCount: 0,
         },
       },
+      automation: automationResult,
     };
   };
 }
@@ -176,6 +201,11 @@ export function createValidationDeployer(): DeployFunction {
           failedCount: docFailures.length,
         },
       },
+      automation: {
+        configured: false,
+        agentCount: 0,
+        triggerCount: 0,
+      },
     };
   };
 }
@@ -264,6 +294,11 @@ export function createRetryableDeployer(
           deletedCount: 0,
           failedCount: request.docs.length,
         },
+      },
+      automation: {
+        configured: false,
+        agentCount: 0,
+        triggerCount: 0,
       },
     };
   };

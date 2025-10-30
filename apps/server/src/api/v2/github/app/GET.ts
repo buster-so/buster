@@ -1,4 +1,7 @@
-import { getActiveGithubIntegration, type User } from '@buster/database/queries';
+import {
+  getGithubIntegrationByOrganizationId,
+  getGithubIntegrationRequestByOrganizationId,
+} from '@buster/database/queries';
 import type { GetGitHubIntegrationResponse } from '@buster/server-shared/github';
 import type { UserOrganizationRole } from '@buster/server-shared/organization';
 import { Hono } from 'hono';
@@ -22,25 +25,39 @@ async function getIntegrationHandler(userOrg: {
 }): Promise<GetGitHubIntegrationResponse> {
   try {
     // Get active GitHub integration for the organization
-    const integration = await getActiveGithubIntegration(userOrg.organizationId);
+    const integration = await getGithubIntegrationByOrganizationId(userOrg.organizationId);
 
-    if (!integration) {
+    if (integration) {
+      // Return non-sensitive integration data
       return {
-        connected: false,
+        connected: true,
+        status: integration.status,
+        integration: {
+          id: integration.id,
+          github_org_name: integration.githubOrgName || '',
+          github_org_id: integration.githubOrgId,
+          installation_id: integration.installationId,
+          installed_at: integration.createdAt,
+          status: integration.status,
+        },
       };
     }
 
-    // Return non-sensitive integration data
+    // Check for pending request if no integration found
+    const pendingRequest = await getGithubIntegrationRequestByOrganizationId(
+      userOrg.organizationId
+    );
+
+    if (pendingRequest) {
+      return {
+        connected: false,
+        status: 'pending',
+      };
+    }
+
+    // No integration or pending request found
     return {
-      connected: true,
-      integration: {
-        id: integration.id,
-        github_org_name: integration.githubOrgName || '',
-        github_org_id: integration.githubOrgId,
-        installation_id: integration.installationId,
-        installed_at: integration.createdAt,
-        last_used_at: integration.lastUsedAt,
-      },
+      connected: false,
     };
   } catch (error) {
     console.error('Failed to get GitHub integration:', error);

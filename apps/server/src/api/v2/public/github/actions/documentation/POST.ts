@@ -1,4 +1,8 @@
-import { createChat, createMessage, getActiveGithubIntegration } from '@buster/database/queries';
+import {
+  createChat,
+  createMessage,
+  getGithubIntegrationByOrganizationId,
+} from '@buster/database/queries';
 import { generateNewInstallationToken } from '@buster/github';
 import { type GithubContext, runDocsAgentAsync, runDocsAgentSync } from '@buster/sandbox';
 import { GithubActionDocumentationPostSchema } from '@buster/server-shared/github';
@@ -61,7 +65,7 @@ const app = new Hono().post(
     const branchName = context.head_branch;
 
     // Get the Github App installation token for the organization
-    const installationResult = await getActiveGithubIntegration(apiKey.organizationId);
+    const installationResult = await getGithubIntegrationByOrganizationId(apiKey.organizationId);
 
     if (!installationResult?.installationId) {
       return c.json({ error: 'No active GitHub integration found' }, 404);

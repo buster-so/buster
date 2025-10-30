@@ -511,6 +511,11 @@ describe('processDeploymentResponse', () => {
           failedCount: 0,
         },
       },
+      automation: {
+        configured: false,
+        agentCount: 0,
+        triggerCount: 0,
+      },
     };
 
     const modelFileMap = new Map([
@@ -592,6 +597,11 @@ describe('processDeploymentResponse', () => {
           deletedCount: 1,
           failedCount: 2,
         },
+      },
+      automation: {
+        configured: false,
+        agentCount: 0,
+        triggerCount: 0,
       },
     };
 

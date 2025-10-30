@@ -42,6 +42,7 @@ const runDocsAgentParamsSchema = z.object({
   messageId: z.string().optional().describe('Message ID for the buster CLI'),
   context: githubContextSchema.optional().describe('GitHub context with optional properties'),
   organizationId: z.string().uuid().describe('Organization ID for the data source'),
+  checkRunKey: z.string().optional().describe('GitHub check run key for the buster CLI'),
 });
 
 export interface DocsAgentResult {
@@ -65,8 +66,10 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
     messageId,
     context,
     organizationId,
+    checkRunKey,
   } = runDocsAgentParamsSchema.parse(params);
 
+  console.info('running docs agent async');
   const sandboxSnapshotBaseName = 'buster-data-engineer';
   const sandboxContext = context || {};
 
@@ -165,6 +168,9 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
   }
   if (messageId) {
     cliArgs.push(`--messageId "${messageId}"`);
+  }
+  if (checkRunKey) {
+    cliArgs.push(`--checkRunKey "${checkRunKey}"`);
   }
   if (Object.keys(sandboxContext).length > 0) {
     // Create context directory and file

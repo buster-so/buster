@@ -1,4 +1,4 @@
-import type { deploy } from '@buster/server-shared';
+import type { AutomationConfig, deploy } from '@buster/server-shared';
 
 type DeployDoc = deploy.DeployDoc;
 type UnifiedDeployRequest = deploy.UnifiedDeployRequest;
@@ -46,6 +46,7 @@ export function prepareDeploymentRequest(
     deleteAbsentModels,
     deleteAbsentDocs,
     logsWriteback,
+    automation: [],
   };
 }
 

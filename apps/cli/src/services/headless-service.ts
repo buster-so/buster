@@ -27,6 +27,12 @@ export const HeadlessServiceParamsSchema = z.object({
     .optional()
     .describe('Path to context file to include as system message'),
   sdk: z.custom<BusterSDK>().optional().describe('Optional SDK instance for API operations'),
+  checkRunKey: z
+    .string()
+    .optional()
+    .describe(
+      'GitHub check run ID along with the owner and repo in the format of "checkRunId@owner/repo"'
+    ),
 });
 
 export type HeadlessServiceParams = z.infer<typeof HeadlessServiceParamsSchema>;
@@ -45,6 +51,7 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
     isInResearchMode,
     contextFilePath,
     sdk: providedSdk,
+    checkRunKey,
   } = validated;
 
   // Use provided chatId or generate new one
@@ -65,6 +72,40 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       } catch (error) {
         debugLogger.warn('No SDK available - running without API integration:', error);
       }
+    }
+
+    let confirmedCheckRunId: number | undefined;
+    let checkRunOwner: string | undefined;
+    let checkRunRepo: string | undefined;
+    if (sdk && checkRunKey) {
+      const [checkRunId, repositoryKey] = checkRunKey.split('@');
+      if (repositoryKey) {
+        const [owner, repo] = repositoryKey.split('/');
+        if (owner && repo) {
+          checkRunOwner = owner;
+          checkRunRepo = repo;
+        }
+      }
+      try {
+        const checkRun = await sdk.checkRun.get({
+          owner: checkRunOwner ?? '',
+          repo: checkRunRepo ?? '',
+          check_run_id: Number(checkRunId) ?? 0,
+        });
+        confirmedCheckRunId = checkRun.id;
+      } catch (error) {
+        debugLogger.error('Error getting check run. Skipping all check run updates:', error);
+      }
+    }
+
+    if (sdk && confirmedCheckRunId) {
+      await sdk.checkRun.update({
+        owner: checkRunOwner ?? '',
+        repo: checkRunRepo ?? '',
+        check_run_id: confirmedCheckRunId,
+        status: 'in_progress',
+        started_at: new Date().toISOString(),
+      });
     }
 
     // Load existing conversation from API or local files
@@ -110,8 +151,8 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       await saveModelMessages(chatId, workingDirectory, updatedMessages);
     }
 
-    // Run agent with SDK
-    await runChatAgent({
+    // Run agent with SDK and capture final messages
+    const finalMessages = await runChatAgent({
       chatId,
       messageId,
       workingDirectory,
@@ -121,6 +162,56 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
       messages: updatedMessages, // Pass all messages including new user message
       sdk: sdk || undefined, // Pass SDK to chat agent
     });
+
+    if (sdk && confirmedCheckRunId) {
+      // Extract the last assistant message for the check run output
+      const outputText = (() => {
+        for (let i = finalMessages.length - 1; i >= 0; i--) {
+          const message = finalMessages[i];
+          if (message && message.role === 'assistant') {
+            const contents = message.content;
+
+            // Handle string content
+            if (typeof contents === 'string') {
+              return contents;
+            }
+
+            // Handle array content - find the last text block
+            if (Array.isArray(contents)) {
+              for (let j = contents.length - 1; j >= 0; j--) {
+                const contentPart = contents[j];
+                if (
+                  contentPart &&
+                  typeof contentPart === 'object' &&
+                  'type' in contentPart &&
+                  contentPart.type === 'text' &&
+                  'text' in contentPart &&
+                  typeof contentPart.text === 'string'
+                ) {
+                  return contentPart.text;
+                }
+              }
+            }
+          }
+        }
+        // No assistant message found
+        return 'Successfully completed the agent task.';
+      })().slice(0, 65535); // GitHub has a 65535 character limit for check run output
+
+      await sdk.checkRun.update({
+        owner: checkRunOwner ?? '',
+        repo: checkRunRepo ?? '',
+        check_run_id: confirmedCheckRunId,
+        status: 'completed',
+        conclusion: 'success',
+        output: {
+          title: 'Buster Documentation Agent',
+          summary: 'Reviewing Pull Request changes to keep DBT model documentation up to date.',
+          text: outputText,
+        },
+        completed_at: new Date().toISOString(),
+      });
+    }
 
     return chatId;
   } catch (error) {
@@ -151,6 +242,26 @@ export async function runHeadlessAgent(params: HeadlessServiceParams): Promise<s
         } else {
           console.warn('Failed to save error to database:', updateError);
         }
+      }
+    }
+
+    if (sdk && checkRunKey) {
+      try {
+        await sdk.checkRun.update({
+          owner: checkRunKey.split('@')[1]?.split('/')[0] ?? '',
+          repo: checkRunKey.split('@')[1]?.split('/')[1] ?? '',
+          check_run_id: Number(checkRunKey.split('@')[0]) ?? 0,
+          status: 'completed',
+          conclusion: 'failure',
+          output: {
+            title: 'Buster Documentation Agent',
+            summary: 'Buster Documentation Agent failed',
+            text: `${errorMessage}`,
+          },
+          completed_at: new Date().toISOString(),
+        });
+      } catch (error) {
+        debugLogger.error('Error updating check run to failure status:', error);
       }
     }
 

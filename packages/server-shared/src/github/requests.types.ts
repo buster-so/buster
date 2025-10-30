@@ -1,60 +1,5 @@
 import { z } from 'zod';
 
-// GitHub App Installation Webhook Payload
-// Received when a GitHub App is installed, deleted, suspended, or unsuspended
-export const InstallationCallbackSchema = z.object({
-  action: z.enum(['created', 'deleted', 'suspend', 'unsuspend', 'new_permissions_accepted']),
-  installation: z.object({
-    id: z.number(), // GitHub installation ID
-    account: z.object({
-      login: z.string(), // GitHub org/user name
-      id: z.number(), // GitHub org/user ID
-      type: z.enum(['User', 'Organization']).optional(),
-      avatar_url: z.string().optional(),
-      html_url: z.string().optional(),
-    }),
-    repository_selection: z.enum(['all', 'selected']).optional(),
-    created_at: z.string().optional(),
-    updated_at: z.string().optional(),
-    permissions: z.record(z.string()).optional(),
-    events: z.array(z.string()).optional(),
-  }),
-  // Optional fields that may be present in webhook
-  repositories: z
-    .array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-        full_name: z.string(),
-        private: z.boolean(),
-      })
-    )
-    .optional(),
-  sender: z
-    .object({
-      login: z.string(),
-      id: z.number(),
-      type: z.string(),
-    })
-    .optional(),
-});
-
-export type InstallationCallbackRequest = z.infer<typeof InstallationCallbackSchema>;
-
-// Request to get an installation access token
-export const GetInstallationTokenRequestSchema = z.object({
-  installationId: z.string(), // We store as string in our DB
-});
-
-export type GetInstallationTokenRequest = z.infer<typeof GetInstallationTokenRequestSchema>;
-
-// Request to refresh an installation's token
-export const RefreshInstallationTokenRequestSchema = z.object({
-  organizationId: z.string().uuid(),
-});
-
-export type RefreshInstallationTokenRequest = z.infer<typeof RefreshInstallationTokenRequestSchema>;
-
 // GitHub Action Documentation Request Schemas
 export const GithubActionDocumentationPostSchema = z.object({
   // Could be multiple different events
@@ -82,3 +27,123 @@ export type GithubActionDocumentationGetParams = z.infer<
 export type GithubActionDocumentationGetQuery = z.infer<
   typeof GithubActionDocumentationGetQuerySchema
 >;
+
+// GitHub Check Run Request Schemas
+export const CheckRunCreateSchema = z.object({
+  owner: z.string().describe('Repository owner (username or org name)'),
+  repo: z.string().describe('Repository name'),
+  name: z.string().describe('Name of the check run'),
+  status: z
+    .enum(['queued', 'in_progress', 'completed'])
+    .optional()
+    .describe('Status of the check run'),
+  head_sha: z.string().describe('SHA of the commit to create the check run for'),
+  external_id: z.string().optional().describe('External ID for the check run'),
+  started_at: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp when the check run began'),
+});
+
+export type CheckRunCreateRequest = z.infer<typeof CheckRunCreateSchema>;
+
+export const CheckRunUpdateSchema = z.object({
+  owner: z.string().describe('Repository owner (username or org name)'),
+  repo: z.string().describe('Repository name'),
+  check_run_id: z.number().int().describe('The ID of the check run to update'),
+  name: z.string().optional().describe('Name of the check run'),
+  details_url: z.string().url().optional().describe('URL to view more details'),
+  external_id: z.string().optional().describe('External ID for the check run'),
+  started_at: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp when the check run began'),
+  status: z
+    .enum(['queued', 'in_progress', 'completed'])
+    .optional()
+    .describe('Status of the check run'),
+  conclusion: z
+    .enum([
+      'action_required',
+      'cancelled',
+      'failure',
+      'neutral',
+      'success',
+      'skipped',
+      'stale',
+      'timed_out',
+    ])
+    .optional()
+    .describe('Conclusion of the check run (required if status is completed)'),
+  completed_at: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp when the check run completed'),
+  output: z
+    .object({
+      title: z.string().describe('Title of the check run output'),
+      summary: z.string().describe('Summary of the check run output'),
+      text: z.string().optional().describe('Details of the check run output'),
+      annotations: z
+        .array(
+          z.object({
+            path: z.string(),
+            start_line: z.number().int(),
+            end_line: z.number().int(),
+            annotation_level: z.enum(['notice', 'warning', 'failure']),
+            message: z.string(),
+            title: z.string().optional(),
+            raw_details: z.string().optional(),
+          })
+        )
+        .optional(),
+      images: z
+        .array(
+          z.object({
+            alt: z.string(),
+            image_url: z.string().url(),
+            caption: z.string().optional(),
+          })
+        )
+        .optional(),
+    })
+    .optional()
+    .describe('Output details for the check run'),
+  actions: z
+    .array(
+      z.object({
+        label: z.string(),
+        description: z.string(),
+        identifier: z.string(),
+      })
+    )
+    .optional()
+    .describe('Actions the user can perform'),
+});
+
+export type CheckRunUpdateRequest = z.infer<typeof CheckRunUpdateSchema>;
+
+export const CheckRunGetSchema = z.object({
+  owner: z.string().describe('Repository owner (username or org name)'),
+  repo: z.string().describe('Repository name'),
+  check_run_id: z.coerce.number().int().describe('The ID of the check run to retrieve'),
+});
+
+export type CheckRunGetRequest = z.infer<typeof CheckRunGetSchema>;
+
+export const GithubInstallationCallbackSchema = z
+  .object({
+    state: z.string().optional(),
+    installation_id: z.string().optional(),
+    // Should be 'install', 'update', or 'request' but there are no docs on query params and it's better to not throw erros for validation on this.
+    setup_action: z.string().optional(),
+    code: z.string().optional(), // GitHub sends this for user authorization
+    error: z.string().optional(), // GitHub sends this when user cancels
+    error_description: z.string().optional(),
+  })
+  .passthrough();
+
+export type GithubInstallationCallbackRequest = z.infer<typeof GithubInstallationCallbackSchema>;

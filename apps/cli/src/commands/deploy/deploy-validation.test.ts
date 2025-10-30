@@ -100,6 +100,8 @@ describe('Deploy Handler Validation', () => {
     dryRun: true,
     verbose: false,
     debug: false,
+    skipModels: false,
+    skipAutomation: false,
   };
 
   beforeEach(() => {
@@ -250,6 +252,8 @@ describe('Deploy Handler Validation', () => {
     const verboseOptions: DeployOptions = {
       ...mockOptions,
       verbose: true,
+      skipModels: false,
+      skipAutomation: false,
     };
 
     vi.mocked(discoverModelFiles).mockResolvedValue(['/test/model1.yml', '/test/model2.yml']);

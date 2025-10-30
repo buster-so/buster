@@ -1,5 +1,7 @@
 // Export all deploy schemas and types
 export {
+  type AutomationDeployResult,
+  AutomationDeployResultSchema,
   type DeployDoc,
   DeployDocSchema,
   // Types
