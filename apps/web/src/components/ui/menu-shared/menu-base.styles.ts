@@ -162,7 +162,7 @@ export const dropdownSeparatorClass = cn(
  * Separator styling for context menu
  * Simpler than dropdown
  */
-export const contextMenuSeparatorClass = cn('bg-border -mx-1 my-1 h-[0.5px]');
+export const contextMenuSeparatorClass = dropdownSeparatorClass;
 
 /**
  * Shortcut text styling (shared)

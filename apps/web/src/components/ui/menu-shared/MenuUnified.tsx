@@ -44,7 +44,13 @@ import { MenuHeaderSearch } from './MenuHeaderSearch';
 import { menuScrollableContentClass } from './menu-base.styles';
 import { useScrollToBottom } from './menu-hooks';
 import type { MenuItem, MenuItems } from './menu-items.types';
-import { hasValue, menuItemKey, separateSelectedItems } from './menu-utils';
+import {
+  hasValue,
+  isDivider,
+  isReactElement,
+  menuItemKey,
+  separateSelectedItems,
+} from './menu-utils';
 
 /**
  * Type representing the shared shape of both dropdown and context menu primitives
@@ -201,7 +207,7 @@ export const MenuUnified = <
       </Trigger>
       <Content
         className={cn(
-          variant === 'dropdown' ? 'max-w-62 min-w-62' : 'max-w-72 min-w-44',
+          variant === 'dropdown' ? 'max-w-62 min-w-62' : 'max-w-72 min-w-62',
           className
         )}
         align={variant === 'dropdown' ? align : undefined}
@@ -237,6 +243,90 @@ interface MenuContentRendererProps<
 > extends Omit<UnifiedMenuProps<T, TRouter, TOptions, TFrom>, 'variant' | 'children'> {
   variant: 'dropdown' | 'context';
   primitives: MenuPrimitives;
+}
+
+/**
+ * Helper to render a list of menu items (handles dividers, React elements, and regular items)
+ * Module-level so it can be reused in both MenuContentRenderer and MenuItemRenderer
+ */
+function renderMenuItemsList<
+  T = string,
+  TRouter extends RegisteredRouter = RegisteredRouter,
+  TOptions = unknown,
+  TFrom extends string = string,
+>({
+  items,
+  keyPrefix = '',
+  primitives,
+  variant,
+  hotkeyIndexRef,
+  useHotkeyIndex = true,
+  selectType,
+  onSelect,
+  onSelectItem,
+  closeOnSelect,
+  showIndex,
+  emptyStateText,
+}: {
+  items: MenuItems<T, TRouter, TOptions, TFrom>;
+  keyPrefix?: string;
+  primitives: MenuPrimitives;
+  variant: 'dropdown' | 'context';
+  hotkeyIndexRef?: { current: number };
+  useHotkeyIndex?: boolean;
+  selectType: 'single' | 'multiple' | 'none' | 'single-selectable-link';
+  onSelect?: (value: T) => void;
+  onSelectItem: (index: number) => void;
+  closeOnSelect: boolean;
+  showIndex: boolean;
+  emptyStateText?: string | React.ReactNode;
+}) {
+  return items.map((item, index) => {
+    // Handle dividers
+    if (isDivider<T, TRouter, TOptions, TFrom>(item)) {
+      return (
+        <primitives.Separator
+          key={menuItemKey<T, TRouter, TOptions, TFrom>(item, index) + keyPrefix}
+        />
+      );
+    }
+
+    // Handle React elements
+    if (isReactElement(item)) {
+      return <div key={`react-${keyPrefix}-${index}`}>{item}</div>;
+    }
+
+    // Handle regular menu items
+    if (
+      useHotkeyIndex &&
+      hotkeyIndexRef &&
+      hasValue<T, TRouter, TOptions, TFrom>(item) &&
+      !item.items
+    ) {
+      hotkeyIndexRef.current++;
+    }
+
+    const itemIndex = useHotkeyIndex && hotkeyIndexRef ? hotkeyIndexRef.current : index;
+    const itemSelectType = (item as MenuItem<T, TRouter, TOptions, TFrom>).selectType ?? selectType;
+    const itemCloseOnSelect =
+      (item as MenuItem<T, TRouter, TOptions, TFrom>).closeOnSelect ?? closeOnSelect;
+
+    return (
+      <MenuItemRenderer<T, TRouter, TOptions, TFrom>
+        key={menuItemKey<T, TRouter, TOptions, TFrom>(item, index) + keyPrefix}
+        variant={variant}
+        item={item as MenuItem<T, TRouter, TOptions, TFrom>}
+        index={itemIndex}
+        selectType={itemSelectType}
+        onSelect={onSelect}
+        onSelectItem={onSelectItem}
+        closeOnSelect={itemCloseOnSelect}
+        showIndex={showIndex}
+        emptyStateText={emptyStateText}
+        primitives={primitives}
+      />
+    );
+  });
 }
 
 /**
@@ -296,7 +386,7 @@ function MenuContentRenderer<
     };
   }, [selectType, filteredItems]);
 
-  let hotkeyIndex = -1;
+  const hotkeyIndexRef = { current: -1 };
   const dropdownItems = selectType === 'multiple' ? unselectedItems : filteredItems;
 
   const onSelectItem = useMemoizedFn((index: number) => {
@@ -319,8 +409,6 @@ function MenuContentRenderer<
       }
     }
   });
-
-  console.log(!hasShownItem, showEmptyState, emptyStateText);
 
   return (
     <>
@@ -346,60 +434,34 @@ function MenuContentRenderer<
       >
         {hasShownItem ? (
           <>
-            {selectedItems.map((item, index) => {
-              if (hasValue<T, TRouter, TOptions, TFrom>(item) && !item.items) {
-                hotkeyIndex++;
-              }
-              return (
-                <MenuItemRenderer<T, TRouter, TOptions, TFrom>
-                  key={menuItemKey<T, TRouter, TOptions, TFrom>(item, index)}
-                  variant={variant}
-                  item={item as MenuItem<T, TRouter, TOptions, TFrom>}
-                  index={hotkeyIndex}
-                  selectType={
-                    (item as MenuItem<T, TRouter, TOptions, TFrom>).selectType ||
-                    selectType ||
-                    'none'
-                  }
-                  onSelect={onSelect}
-                  onSelectItem={onSelectItem}
-                  closeOnSelect={
-                    (item as MenuItem<T, TRouter, TOptions, TFrom>).closeOnSelect ?? true
-                  }
-                  showIndex={showIndex || false}
-                  emptyStateText={emptyStateText}
-                  primitives={primitives}
-                />
-              );
+            {renderMenuItemsList({
+              items: selectedItems,
+              keyPrefix: '-selected',
+              primitives,
+              variant,
+              hotkeyIndexRef,
+              selectType: selectType || 'none',
+              onSelect,
+              onSelectItem,
+              closeOnSelect: true,
+              showIndex: showIndex || false,
+              emptyStateText,
             })}
 
             {selectedItems.length > 0 && <primitives.Separator />}
 
-            {dropdownItems.map((item, index) => {
-              if (hasValue<T, TRouter, TOptions, TFrom>(item) && !item.items) {
-                hotkeyIndex++;
-              }
-              return (
-                <MenuItemRenderer<T, TRouter, TOptions, TFrom>
-                  key={menuItemKey<T, TRouter, TOptions, TFrom>(item, index)}
-                  variant={variant}
-                  item={item as MenuItem<T, TRouter, TOptions, TFrom>}
-                  index={hotkeyIndex}
-                  selectType={
-                    (item as MenuItem<T, TRouter, TOptions, TFrom>).selectType ||
-                    selectType ||
-                    'none'
-                  }
-                  onSelect={onSelect}
-                  onSelectItem={onSelectItem}
-                  closeOnSelect={
-                    (item as MenuItem<T, TRouter, TOptions, TFrom>).closeOnSelect ?? true
-                  }
-                  showIndex={showIndex || false}
-                  emptyStateText={emptyStateText}
-                  primitives={primitives}
-                />
-              );
+            {renderMenuItemsList({
+              items: dropdownItems,
+              keyPrefix: '-dropdown',
+              primitives,
+              variant,
+              hotkeyIndexRef,
+              selectType: selectType || 'none',
+              onSelect,
+              onSelectItem,
+              closeOnSelect: true,
+              showIndex: showIndex || false,
+              emptyStateText,
             })}
           </>
         ) : (
@@ -540,23 +602,18 @@ function MenuItemRenderer<
             className={cn('sub-menu', menuScrollableContentClass, className)}
           >
             {/* Render sub items recursively */}
-            {items?.map((subItem, subIndex) => (
-              <MenuItemRenderer<T, TRouter, TOptions, TFrom>
-                key={menuItemKey<T, TRouter, TOptions, TFrom>(
-                  subItem as unknown as MenuItems<T, TRouter, TOptions, TFrom>[number],
-                  subIndex
-                )}
-                variant={variant}
-                item={subItem as unknown as MenuItem<T, TRouter, TOptions, TFrom>}
-                index={subIndex}
-                selectType={selectType}
-                onSelect={onSelect}
-                onSelectItem={onSelectItem}
-                closeOnSelect={closeOnSelect}
-                showIndex={showIndex}
-                primitives={primitives}
-              />
-            ))}
+            {renderMenuItemsList({
+              items: (items as unknown as MenuItems<T, TRouter, TOptions, TFrom>) || [],
+              keyPrefix: '-submenu',
+              primitives,
+              variant,
+              useHotkeyIndex: false,
+              selectType,
+              onSelect,
+              onSelectItem,
+              closeOnSelect,
+              showIndex,
+            })}
           </primitives.SubContent>
         </primitives.Portal>
       </primitives.Sub>
