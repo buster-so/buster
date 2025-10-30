@@ -8,7 +8,6 @@ import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { cn } from '@/lib/classMerge';
 import type { ILinkProps } from '@/types/routes';
-import { Checkbox } from '../checkbox/Checkbox';
 import {
   ContextMenuCheckboxItem,
   ContextMenuCheckboxItemMultiple,
@@ -39,7 +38,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '../dropdown/DropdownBase';
-import { Check3 as Check } from '../icons/NucleoIconOutlined';
 import { CircleSpinnerLoader } from '../loaders/CircleSpinnerLoader';
 import { MenuHeaderSearch } from './MenuHeaderSearch';
 import { menuScrollableContentClass } from './menu-base.styles';
@@ -63,7 +61,9 @@ type MenuPrimitives = {
   Portal: typeof DropdownMenuPortal | typeof ContextMenuPortal;
   Item: typeof DropdownMenuItem | typeof ContextMenuItem;
   CheckboxSingle: typeof DropdownMenuCheckboxItemSingle | typeof ContextMenuCheckboxItem;
-  CheckboxMultiple: typeof DropdownMenuCheckboxItemMultiple | typeof ContextMenuCheckboxItem;
+  CheckboxMultiple:
+    | typeof DropdownMenuCheckboxItemMultiple
+    | typeof ContextMenuCheckboxItemMultiple;
   Separator: typeof DropdownMenuSeparator | typeof ContextMenuSeparator;
   Shortcut: typeof DropdownMenuShortcut | typeof ContextMenuShortcut;
   Sub: typeof DropdownMenuSub | typeof ContextMenuSub;
@@ -543,8 +543,7 @@ function MenuItemRenderer<
     if (onSelect && value !== undefined) onSelect(value);
   });
 
-  const enabledHotKeys = variant === 'dropdown' && showIndex && !disabled && !!onSelectItem;
-
+  const enabledHotKeys = showIndex && !disabled && !!onSelectItem;
   useHotkeys(`${index}`, onClickItem, {
     enabled: enabledHotKeys,
   });
@@ -627,31 +626,10 @@ function MenuItemRenderer<
         checked={selected}
         disabled={disabled}
         onClick={onClickItem}
-        index={variant === 'dropdown' && showIndex ? index : undefined}
+        index={showIndex ? index : undefined}
         closeOnSelect={closeOnSelect}
       >
         {renderContent()}
-        {variant === 'dropdown' && (
-          <span className="absolute right-2 flex h-3.5 w-fit items-center justify-center space-x-1">
-            {selected && (
-              <div className="text-icon-color flex items-center justify-center text-sm">
-                <Check />
-              </div>
-            )}
-            {showIndex && index !== undefined && (
-              <span className="text-gray-dark ml-auto w-2 text-center">{index}</span>
-            )}
-          </span>
-        )}
-        {variant === 'context' && (
-          <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-            {selected && (
-              <div className="flex h-4 w-4 items-center justify-center">
-                <Check />
-              </div>
-            )}
-          </span>
-        )}
       </primitives.CheckboxSingle>
     );
   }
@@ -665,14 +643,6 @@ function MenuItemRenderer<
         closeOnSelect={closeOnSelect}
         dataTestId={`menu-checkbox-${value}`}
       >
-        <span
-          className={cn(
-            'absolute left-2 flex h-3.5 w-3.5 items-center justify-center opacity-0 group-hover:opacity-100',
-            selected && 'opacity-100'
-          )}
-        >
-          <Checkbox size="default" checked={selected} />
-        </span>
         {renderContent()}
       </primitives.CheckboxMultiple>
     );

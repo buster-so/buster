@@ -100,18 +100,43 @@ const ContextMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.CheckboxItem> & {
     truncate?: boolean;
+    closeOnSelect?: boolean;
+    selectType?: boolean;
+    index?: number;
   }
->(({ className, children, checked, truncate, ...props }, ref) => (
-  <ContextMenuPrimitive.CheckboxItem
-    ref={ref}
-    className={cn(menuCheckboxSingleClass, truncate && 'overflow-hidden', className)}
-    checked={checked}
-    {...props}
-  >
-    {children}
-    <MenuCheckIndicatorSingle ItemIndicator={ContextMenuPrimitive.ItemIndicator} />
-  </ContextMenuPrimitive.CheckboxItem>
-));
+>(
+  (
+    {
+      className,
+      children,
+      onClick,
+      checked,
+      truncate,
+      closeOnSelect = true,
+      selectType,
+      index,
+      ...props
+    },
+    ref
+  ) => (
+    <ContextMenuPrimitive.CheckboxItem
+      ref={ref}
+      className={cn(menuCheckboxSingleClass, truncate && 'overflow-hidden', className)}
+      checked={checked}
+      onClick={(e) => {
+        if (closeOnSelect) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+        onClick?.(e);
+      }}
+      {...props}
+    >
+      {children}
+      <MenuCheckIndicatorSingle ItemIndicator={ContextMenuPrimitive.ItemIndicator} index={index} />
+    </ContextMenuPrimitive.CheckboxItem>
+  )
+);
 ContextMenuCheckboxItem.displayName = ContextMenuPrimitive.CheckboxItem.displayName;
 
 const ContextMenuCheckboxItemMultiple = React.forwardRef<

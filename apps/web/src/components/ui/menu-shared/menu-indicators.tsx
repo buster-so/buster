@@ -32,7 +32,11 @@ export function MenuCheckIndicatorSingle({ ItemIndicator, index }: MenuCheckIndi
           <Check />
         </div>
       </ItemIndicator>
-      {index !== undefined && <span className={menuIndicatorIndexClass}>{index}</span>}
+      {index !== undefined && (
+        <span data-testid="menu-indicator-index" className={menuIndicatorIndexClass}>
+          {index}
+        </span>
+      )}
     </span>
   );
 }
