@@ -234,14 +234,19 @@ export async function getDashboardHandler(
   const metrics = await getMetricsInAncestorAssetFromMetricIds(metricIds, user);
 
   // Get the extra dashboard info concurrently
-  const [individualPermissions, workspaceMemberCount, collections, publicEnabledBy, addedToLibrary] =
-    await Promise.all([
-      getUsersWithAssetPermissions({ assetId: dashboardId, assetType: 'dashboard_file' }),
-      getOrganizationMemberCount(dashboardFile.organizationId),
-      getCollectionsAssociatedWithDashboard(dashboardId, user.id),
-      getPubliclyEnabledByUser(dashboardFile.publiclyEnabledBy),
-      checkAssetInLibrary({ userId: user.id, assetId: dashboardId, assetType: 'dashboard_file' }),
-    ]);
+  const [
+    individualPermissions,
+    workspaceMemberCount,
+    collections,
+    publicEnabledBy,
+    addedToLibrary,
+  ] = await Promise.all([
+    getUsersWithAssetPermissions({ assetId: dashboardId, assetType: 'dashboard_file' }),
+    getOrganizationMemberCount(dashboardFile.organizationId),
+    getCollectionsAssociatedWithDashboard(dashboardId, user.id),
+    getPubliclyEnabledByUser(dashboardFile.publiclyEnabledBy),
+    checkAssetInLibrary({ userId: user.id, assetId: dashboardId, assetType: 'dashboard_file' }),
+  ]);
 
   // Build the response
   const response: GetDashboardResponse = {

@@ -189,6 +189,7 @@ describe('ShareConfigSchema', () => {
       permission: 'owner',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const result = ShareConfigSchema.safeParse(validConfig);
@@ -213,6 +214,7 @@ describe('ShareConfigSchema', () => {
       permission: 'can_view',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const result = ShareConfigSchema.safeParse(configWithNullPermissions);
@@ -238,6 +240,7 @@ describe('ShareConfigSchema', () => {
       permission: 'full_access',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const result = ShareConfigSchema.safeParse(configWithEmptyPermissions);
@@ -263,6 +266,7 @@ describe('ShareConfigSchema', () => {
         permission,
         workspace_sharing: null,
         workspace_member_count: null,
+        added_to_library: false,
       };
 
       const result = ShareConfigSchema.safeParse(config);
@@ -346,6 +350,7 @@ describe('ShareConfigSchema', () => {
       permission: 'owner',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const result = ShareConfigSchema.safeParse(configWithInvalidIndividual);
@@ -379,6 +384,7 @@ describe('ShareConfigSchema', () => {
       permission: 'full_access',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const result = ShareConfigSchema.safeParse(complexConfig);
@@ -403,6 +409,7 @@ describe('ShareConfigSchema', () => {
       permission: 'owner',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const privateConfig = {
@@ -414,6 +421,7 @@ describe('ShareConfigSchema', () => {
       permission: 'owner',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const publicResult = ShareConfigSchema.safeParse(publicConfig);

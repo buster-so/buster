@@ -28,6 +28,7 @@ vi.mock('@buster/database/queries', () => ({
   getUsersWithAssetPermissions: vi.fn(),
   getOrganizationMemberCount: vi.fn(),
   getCollectionsAssociatedWithDashboard: vi.fn(),
+  checkAssetInLibrary: vi.fn(),
 }));
 
 vi.mock('../../../../shared-helpers/get-publicly-enabled-by-user', () => ({

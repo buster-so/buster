@@ -2,6 +2,7 @@ import { checkPermission } from '@buster/access-controls';
 import type { Chat, Message } from '@buster/database/queries';
 // Import mocked functions
 import {
+  checkAssetInLibrary,
   createChat,
   createMessage,
   getChatWithDetails,
@@ -12,6 +13,7 @@ import {
 } from '@buster/database/queries';
 import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getPubliclyEnabledByUser } from '../../../../shared-helpers/get-publicly-enabled-by-user';
 import { initializeChat } from './chat-service';
 
 const mockUser = {
@@ -97,11 +99,17 @@ vi.mock('@buster/database/queries', () => ({
   getUsersWithAssetPermissions: vi.fn(),
   getOrganizationMemberCount: vi.fn(),
   getCollectionsAssociatedWithChat: vi.fn(),
+  checkAssetInLibrary: vi.fn(),
 }));
 
 // Mock access-controls
 vi.mock('@buster/access-controls', () => ({
   checkPermission: vi.fn(),
+}));
+
+// Mock shared helpers
+vi.mock('../../../../shared-helpers/get-publicly-enabled-by-user', () => ({
+  getPubliclyEnabledByUser: vi.fn(),
 }));
 
 describe('chat-service', () => {
@@ -110,6 +118,8 @@ describe('chat-service', () => {
   const mockGetUsersWithAssetPermissions = getUsersWithAssetPermissions as any;
   const mockGetMessagesForChatWithUserDetails = getMessagesForChatWithUserDetails as any;
   const mockGetCollectionsAssociatedWithChat = getCollectionsAssociatedWithChat as any;
+  const mockCheckAssetInLibrary = checkAssetInLibrary as any;
+  const mockGetPubliclyEnabledByUser = getPubliclyEnabledByUser as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -123,6 +133,8 @@ describe('chat-service', () => {
     mockGetUsersWithAssetPermissions.mockResolvedValue([]);
     mockGetMessagesForChatWithUserDetails.mockResolvedValue([]);
     mockGetCollectionsAssociatedWithChat.mockResolvedValue([]);
+    mockCheckAssetInLibrary.mockResolvedValue(false);
+    mockGetPubliclyEnabledByUser.mockResolvedValue(null);
   });
 
   describe('initializeChat', () => {

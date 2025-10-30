@@ -89,6 +89,7 @@ describe('chat-helpers', () => {
     workspace_member_count: 0,
     individual_permissions: [],
     screenshot_taken_at: null,
+    added_to_library: false,
   });
 
   const mockMetricAssetMessage: Message = {

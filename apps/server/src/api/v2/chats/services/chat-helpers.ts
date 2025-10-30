@@ -174,17 +174,22 @@ export async function buildChatWithMessages(
   }
 
   const userId = user?.id || chat.createdBy;
-  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount, collections, addedToLibrary] =
-    await Promise.all([
-      getPubliclyEnabledByUser(chat.publiclyEnabledBy),
-      getUsersWithAssetPermissions({
-        assetId: chat.id,
-        assetType: 'chat',
-      }),
-      getOrganizationMemberCount(chat.organizationId),
-      getCollectionsAssociatedWithChat(chat.id, userId),
-      checkAssetInLibrary({ userId, assetId: chat.id, assetType: 'chat' }),
-    ]);
+  const [
+    publiclyEnabledBy,
+    individualPermissions,
+    workspaceMemberCount,
+    collections,
+    addedToLibrary,
+  ] = await Promise.all([
+    getPubliclyEnabledByUser(chat.publiclyEnabledBy),
+    getUsersWithAssetPermissions({
+      assetId: chat.id,
+      assetType: 'chat',
+    }),
+    getOrganizationMemberCount(chat.organizationId),
+    getCollectionsAssociatedWithChat(chat.id, userId),
+    checkAssetInLibrary({ userId, assetId: chat.id, assetType: 'chat' }),
+  ]);
 
   // Ensure message_ids array has no duplicates
   const uniqueMessageIds = [...new Set(messageIds)];
