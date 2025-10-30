@@ -33,12 +33,14 @@ export const DeleteChatsRequestSchema = z.array(z.string());
 
 export type DeleteChatsRequest = z.infer<typeof DeleteChatsRequestSchema>;
 
-// Request for updating a chat
-export const UpdateChatRequestSchema = z.object({
-  id: z.string(),
-  title: z.string().optional(),
-  is_favorited: z.boolean().optional(),
+export const UpdateChatParamsSchema = z.object({
+  id: z.string().describe('Chat ID to update'),
 });
+export const UpdateChatRequestSchema = z.object({
+  title: z.string().optional(),
+});
+
+export type UpdateChatParams = z.infer<typeof UpdateChatParamsSchema>;
 
 export type UpdateChatRequest = z.infer<typeof UpdateChatRequestSchema>;
 

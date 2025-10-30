@@ -1,4 +1,4 @@
-import { updateChat, updateMessage } from '@buster/database/queries';
+import { getChatById, updateChat, updateMessage } from '@buster/database/queries';
 import type { ModelMessage } from 'ai';
 import { generateObject } from 'ai';
 import { wrapTraced } from 'braintrust';
@@ -94,9 +94,11 @@ async function updateDatabaseRecords(
 
   if (chatId) {
     updatePromises.push(
-      updateChat(chatId, {
-        title,
-      })
+      updateChat(
+        chatId,
+        { title },
+        'agent' // Mark that the agent set the title
+      )
     );
   }
 
@@ -116,6 +118,15 @@ export async function runGenerateChatTitleStep({
   chatId,
   messageId,
 }: GenerateChatTitleParams): Promise<void> {
+  // Check if the chat title was set by a user - if so, don't override it
+  if (chatId) {
+    const chat = await getChatById(chatId);
+    if (chat?.updatedByType === 'user') {
+      console.info('[GenerateChatTitle] Skipping title generation - chat title was set by user');
+      return;
+    }
+  }
+
   let title = 'New Analysis';
 
   try {
