@@ -676,11 +676,7 @@ export const WithFooterContent: Story = {
     ),
   },
   render: (args) => (
-    <ContextMenu
-      items={args.items}
-      disabled={args.disabled}
-      footerContent={args.footerContent}
-    >
+    <ContextMenu items={args.items} disabled={args.disabled} footerContent={args.footerContent}>
       <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
         Right-click here to open context menu!
       </div>

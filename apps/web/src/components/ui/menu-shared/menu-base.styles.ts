@@ -2,12 +2,11 @@ import { cn } from '@/lib/classMerge';
 
 /**
  * Shared styling utilities for Dropdown and ContextMenu components
- * This ensures visual consistency across both menu systems
+ * Both menu systems use IDENTICAL styles
  */
 
 /**
  * Base animation and layout classes for menu content
- * Used by both dropdown and context menu content containers
  */
 export const baseContentClass = cn(
   // Animation classes
@@ -25,72 +24,48 @@ export const baseContentClass = cn(
 );
 
 /**
- * Dropdown-specific content padding
- * Dropdowns use min-width instead of padding
+ * Dropdown content styling - adds min-width to base content
  */
 export const dropdownContentClass = cn(baseContentClass, 'min-w-48');
 
 /**
- * Context menu-specific content padding
- * Context menus use padding instead of min-width
+ * Context menu content styling - uses base content without additional styling
  */
-export const contextMenuContentClass = cn(baseContentClass, 'p-1');
+export const contextMenuContentClass = baseContentClass;
 
 /**
- * Base classes for menu items (used by SubTrigger and regular items)
- * Common across both systems
+ * Shared menu item styling
+ * Used by both dropdown and context menu - IDENTICAL appearance and spacing
  */
-export const baseItemClass = cn(
+export const menuItemClass = cn(
+  // Base structure
   'relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 outline-none select-none',
   'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-  '[&_svg]:pointer-events-none [&_svg]:shrink-0'
-);
-
-/**
- * Dropdown item styling with custom margin/spacing rules
- * Includes the special dropdown-item class with first/last/adjacent selectors
- */
-export const dropdownItemClass = cn(
-  baseItemClass,
+  '[&_svg]:pointer-events-none [&_svg]:shrink-0',
+  // Visual styles
   'gap-2 text-base',
-  'focus:bg-item-select focus:text-foreground',
+  'focus:bg-item-hover focus:text-foreground',
+  'transition-colors',
+  'group',
+  // Spacing model
   'dropdown-item mx-1',
   '[&.dropdown-item:first-child]:mt-1!',
   '[&.dropdown-item:has(+.dropdown-separator)]:mb-1',
   '[&.dropdown-item:has(~.dropdown-separator)]:mt-1',
-  '[&.dropdown-item:last-child]:mb-1!',
-  'group'
+  '[&.dropdown-item:last-child]:mb-1!'
 );
 
 /**
- * Context menu item styling
- * Simpler than dropdown, uses different focus color and gap
+ * Shared checkbox item styling (single select)
+ * Used by both dropdown and context menu - IDENTICAL
  */
-export const contextMenuItemClass = cn(
-  baseItemClass,
-  'gap-1.5 text-sm',
-  'focus:bg-item-hover focus:text-foreground',
-  'transition-colors',
-  'group'
-);
-
-/**
- * Base checkbox/selectable item class
- * Used by both single and multiple selection variants
- */
-export const baseSelectableItemClass = cn(
+export const menuCheckboxSingleClass = cn(
   'relative flex cursor-pointer items-center rounded-sm py-1.5 outline-none select-none',
   'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-  'focus:bg-item-hover focus:text-foreground'
-);
-
-/**
- * Dropdown checkbox item (single select) styling
- */
-export const dropdownCheckboxSingleClass = cn(
-  baseSelectableItemClass,
+  'focus:bg-item-hover focus:text-foreground',
+  'data-[state=checked]:bg-item-hover',
   'gap-1.5 text-base',
-  'data-[state=checked]:bg-item-select',
+  'transition-colors',
   'pr-6 pl-2',
   'mx-1 dropdown-item',
   '[&.dropdown-item:has(+.dropdown-separator)]:mb-1',
@@ -100,11 +75,15 @@ export const dropdownCheckboxSingleClass = cn(
 );
 
 /**
- * Dropdown checkbox item (multiple select) styling
+ * Shared checkbox item styling (multiple select)
  */
-export const dropdownCheckboxMultipleClass = cn(
-  baseSelectableItemClass,
+export const menuCheckboxMultipleClass = cn(
+  'relative flex cursor-pointer items-center rounded-sm py-1.5 outline-none select-none',
+  'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+  'focus:bg-item-hover focus:text-foreground',
+  'data-[state=checked]:bg-item-hover',
   'gap-1.5 text-base',
+  'transition-colors',
   'group pr-2 pl-7',
   'mx-1 dropdown-item',
   '[&.dropdown-item:has(+.dropdown-separator)]:mb-1',
@@ -114,20 +93,28 @@ export const dropdownCheckboxMultipleClass = cn(
 );
 
 /**
- * Context menu checkbox item styling
+ * Shared radio item styling
+ * Used by both dropdown and context menu - IDENTICAL
  */
-export const contextMenuCheckboxClass = cn(
-  baseSelectableItemClass,
-  'gap-1.5 text-sm',
-  'data-[state=checked]:bg-item-hover',
-  'pr-6 pl-2',
-  'transition-colors'
+export const menuRadioClass = cn(
+  'relative flex cursor-pointer items-center rounded-sm py-1.5 outline-none select-none',
+  'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+  'focus:bg-item-hover focus:text-foreground',
+  'gap-1.5 text-base',
+  'transition-colors',
+  'pr-2 pl-8',
+  'mx-1 dropdown-item',
+  '[&.dropdown-item:has(+.dropdown-separator)]:mb-1',
+  '[&.dropdown-item:has(~.dropdown-separator)]:mt-1',
+  '[&.dropdown-item:first-child]:mt-1!',
+  '[&.dropdown-item:last-child]:mb-1!'
 );
 
 /**
- * SubTrigger styling for dropdown
+ * Shared SubTrigger styling
+ * Used by both dropdown and context menu - IDENTICAL
  */
-export const dropdownSubTriggerClass = cn(
+export const menuSubTriggerClass = cn(
   'focus:bg-item-hover data-[state=open]:bg-item-hover',
   'flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-base outline-none select-none',
   '[&_svg]:pointer-events-none [&_svg]:shrink-0',
@@ -139,55 +126,69 @@ export const dropdownSubTriggerClass = cn(
 );
 
 /**
- * SubTrigger styling for context menu
+ * Shared separator styling
+ * Used by both dropdown and context menu - IDENTICAL
  */
-export const contextMenuSubTriggerClass = cn(
-  'focus:bg-item-hover data-[state=open]:bg-item-hover',
-  'flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none',
-  '[&_svg]:pointer-events-none [&_svg]:shrink-0'
-);
-
-/**
- * Separator styling for dropdown
- * Includes complex hiding rules for adjacent/first/last separators
- */
-export const dropdownSeparatorClass = cn(
-  'bg-border dropdown-separator -mx-1 my-1 h-[0.5px]',
+export const menuSeparatorClass = cn(
+  'bg-border -mx-1 my-1 h-[0.5px]',
+  'dropdown-separator',
   '[&.dropdown-separator:first-child]:hidden',
   '[&.dropdown-separator:has(+.dropdown-separator)]:hidden',
   '[&.dropdown-separator:last-child]:hidden'
 );
 
 /**
- * Separator styling for context menu
- * Simpler than dropdown
- */
-export const contextMenuSeparatorClass = dropdownSeparatorClass;
-
-/**
- * Shortcut text styling (shared)
+ * Shared shortcut text styling
  */
 export const shortcutClass = cn('ml-auto text-xs tracking-widest opacity-60');
 
 /**
- * Label styling for dropdown
+ * Shared indicator wrapper styling (right side, for check icons)
  */
-export const dropdownLabelClass = cn('text-gray-dark px-2 py-1.5 text-base');
+export const menuIndicatorRightClass = cn(
+  'absolute right-2 flex h-3.5 w-fit items-center justify-center space-x-1'
+);
 
 /**
- * Label styling for context menu
+ * Shared indicator wrapper styling (left side, for checkboxes)
  */
-export const contextMenuLabelClass = cn('text-gray-dark px-2 py-1.5 text-sm');
+export const menuIndicatorLeftCheckboxClass = cn(
+  'absolute left-2 flex h-3.5 w-3.5 items-center justify-center opacity-0 group-hover:opacity-100'
+);
 
 /**
- * Caret icon size for dropdown SubTrigger
+ * Shared indicator wrapper styling (left side, for radio buttons)
  */
-export const dropdownSubTriggerCaretClass = cn('text-2xs text-icon-color ml-auto');
+export const menuIndicatorLeftRadioClass = cn(
+  'absolute left-2 flex h-3.5 w-3.5 items-center justify-center'
+);
 
 /**
- * Caret icon size for context menu SubTrigger
+ * Shared indicator icon styling
  */
-export const contextMenuSubTriggerCaretClass = cn('text-3xs text-icon-color ml-auto');
+export const menuIndicatorIconClass = cn(
+  'text-icon-color flex items-center justify-center text-sm'
+);
+
+/**
+ * Shared indicator index number styling
+ */
+export const menuIndicatorIndexClass = cn('text-gray-dark ml-auto w-2 text-center');
+
+/**
+ * Shared inset padding (used by SubTrigger, Label, etc.)
+ */
+export const menuInsetClass = 'pl-8';
+
+/**
+ * Shared label styling
+ */
+export const menuLabelClass = cn('text-gray-dark px-2 py-1.5 text-base');
+
+/**
+ * Shared caret icon size for SubTrigger
+ */
+export const menuSubTriggerCaretClass = cn('text-2xs text-icon-color ml-auto');
 
 /**
  * Scrollable content area with max-height

@@ -11,6 +11,7 @@ import type { ILinkProps } from '@/types/routes';
 import { Checkbox } from '../checkbox/Checkbox';
 import {
   ContextMenuCheckboxItem,
+  ContextMenuCheckboxItemMultiple,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuLink,
@@ -188,7 +189,7 @@ export const MenuUnified = <
       Portal: ContextMenuPortal,
       Item: ContextMenuItem,
       CheckboxSingle: ContextMenuCheckboxItem,
-      CheckboxMultiple: ContextMenuCheckboxItem,
+      CheckboxMultiple: ContextMenuCheckboxItemMultiple,
       Separator: ContextMenuSeparator,
       Shortcut: ContextMenuShortcut,
       Sub: ContextMenuSub,

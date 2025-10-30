@@ -1,20 +1,22 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import * as React from 'react';
 import { cn } from '@/lib/classMerge';
-import { Checkbox } from '../checkbox/Checkbox';
 import { CaretRight } from '../icons/NucleoIconFilled';
-import { Check3 as Check } from '../icons/NucleoIconOutlined';
 import {
-  dropdownCheckboxMultipleClass,
-  dropdownCheckboxSingleClass,
   dropdownContentClass,
-  dropdownItemClass,
-  dropdownLabelClass,
-  dropdownSeparatorClass,
-  dropdownSubTriggerCaretClass,
-  dropdownSubTriggerClass,
+  menuCheckboxMultipleClass,
+  menuCheckboxSingleClass,
+  menuItemClass,
+  menuLabelClass,
+  menuSeparatorClass,
+  menuSubTriggerCaretClass,
+  menuSubTriggerClass,
   shortcutClass,
 } from '../menu-shared';
+import {
+  MenuCheckIndicatorMultiple,
+  MenuCheckIndicatorSingle,
+} from '../menu-shared/menu-indicators';
 import type { IDropdownItem } from './dropdown-items.types';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
@@ -35,11 +37,11 @@ const DropdownMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
-    className={cn(dropdownSubTriggerClass, inset && 'pl-8', className)}
+    className={cn(menuSubTriggerClass, inset && 'pl-8', className)}
     {...props}
   >
     {children}
-    <div className={dropdownSubTriggerCaretClass}>
+    <div className={menuSubTriggerCaretClass}>
       <CaretRight />
     </div>
   </DropdownMenuPrimitive.SubTrigger>
@@ -88,7 +90,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, closeOnSelect = true, onClick, inset, selectType, truncate, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(dropdownItemClass, inset && 'pl-8', truncate && 'overflow-hidden', className)}
+    className={cn(menuItemClass, inset && 'pl-8', truncate && 'overflow-hidden', className)}
     //some weird bug in a nested menu required this
     onMouseDown={(e) => {
       if (!closeOnSelect) {
@@ -122,7 +124,7 @@ const DropdownMenuCheckboxItemSingle = React.forwardRef<
   ) => (
     <DropdownMenuPrimitive.CheckboxItem
       ref={ref}
-      className={cn(dropdownCheckboxSingleClass, className)}
+      className={cn(menuCheckboxSingleClass, className)}
       checked={checked}
       onClick={(e) => {
         if (closeOnSelect) {
@@ -134,16 +136,7 @@ const DropdownMenuCheckboxItemSingle = React.forwardRef<
       {...props}
     >
       {children}
-      <span className="absolute right-2 flex h-3.5 w-fit items-center justify-center space-x-1">
-        <DropdownMenuPrimitive.ItemIndicator>
-          <div className="text-icon-color flex items-center justify-center text-sm">
-            <Check />
-          </div>
-        </DropdownMenuPrimitive.ItemIndicator>
-        {index !== undefined && (
-          <span className="text-gray-dark ml-auto w-2 text-center">{index}</span>
-        )}
-      </span>
+      <MenuCheckIndicatorSingle ItemIndicator={DropdownMenuPrimitive.ItemIndicator} index={index} />
     </DropdownMenuPrimitive.CheckboxItem>
   )
 );
@@ -173,7 +166,7 @@ const DropdownMenuCheckboxItemMultiple = React.forwardRef<
     return (
       <DropdownMenuPrimitive.CheckboxItem
         ref={ref}
-        className={cn(dropdownCheckboxMultipleClass, className)}
+        className={cn(menuCheckboxMultipleClass, className)}
         checked={checked}
         onClick={(e) => {
           if (closeOnSelect) {
@@ -185,14 +178,7 @@ const DropdownMenuCheckboxItemMultiple = React.forwardRef<
         data-testid={dataTestId}
         {...props}
       >
-        <span
-          className={cn(
-            'absolute left-2 flex h-3.5 w-3.5 items-center justify-center opacity-0 group-hover:opacity-100',
-            checked && 'opacity-100'
-          )}
-        >
-          <Checkbox size="default" checked={checked} />
-        </span>
+        <MenuCheckIndicatorMultiple checked={checked} />
         {children}
       </DropdownMenuPrimitive.CheckboxItem>
     );
@@ -208,7 +194,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn(dropdownLabelClass, inset && 'pl-8', className)}
+    className={cn(menuLabelClass, inset && 'pl-8', className)}
     {...props}
   />
 ));
@@ -220,7 +206,7 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn(dropdownSeparatorClass, className)}
+    className={cn(menuSeparatorClass, className)}
     {...props}
   />
 ));

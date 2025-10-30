@@ -1,18 +1,24 @@
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import * as React from 'react';
-import { Check, ShapeCircle as Circle } from '@/components/ui/icons';
 import { CaretRight } from '@/components/ui/icons/NucleoIconFilled';
 import { cn } from '@/lib/utils';
 import {
-  contextMenuCheckboxClass,
   contextMenuContentClass,
-  contextMenuItemClass,
-  contextMenuLabelClass,
-  contextMenuSeparatorClass,
-  contextMenuSubTriggerCaretClass,
-  contextMenuSubTriggerClass,
+  menuCheckboxMultipleClass,
+  menuCheckboxSingleClass,
+  menuItemClass,
+  menuLabelClass,
+  menuRadioClass,
+  menuSeparatorClass,
+  menuSubTriggerCaretClass,
+  menuSubTriggerClass,
   shortcutClass,
 } from '../menu-shared';
+import {
+  MenuCheckIndicatorMultiple,
+  MenuCheckIndicatorSingle,
+  MenuRadioIndicator,
+} from '../menu-shared/menu-indicators';
 
 const ContextMenuRoot = ContextMenuPrimitive.Root;
 
@@ -34,11 +40,11 @@ const ContextMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
   <ContextMenuPrimitive.SubTrigger
     ref={ref}
-    className={cn(contextMenuSubTriggerClass, inset && 'pl-8', className)}
+    className={cn(menuSubTriggerClass, inset && 'pl-8', className)}
     {...props}
   >
     {children}
-    <div className={contextMenuSubTriggerCaretClass}>
+    <div className={menuSubTriggerCaretClass}>
       <CaretRight />
     </div>
   </ContextMenuPrimitive.SubTrigger>
@@ -81,7 +87,7 @@ const ContextMenuItem = React.forwardRef<
 >(({ className, inset, truncate, icon, children, ...props }, ref) => (
   <ContextMenuPrimitive.Item
     ref={ref}
-    className={cn(contextMenuItemClass, inset && 'pl-8', truncate && 'overflow-hidden', className)}
+    className={cn(menuItemClass, inset && 'pl-8', truncate && 'overflow-hidden', className)}
     {...props}
   >
     {icon && <span className="text-icon-color">{icon}</span>}
@@ -98,41 +104,66 @@ const ContextMenuCheckboxItem = React.forwardRef<
 >(({ className, children, checked, truncate, ...props }, ref) => (
   <ContextMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(contextMenuCheckboxClass, truncate && 'overflow-hidden', className)}
+    className={cn(menuCheckboxSingleClass, truncate && 'overflow-hidden', className)}
     checked={checked}
     {...props}
   >
-    <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-      <ContextMenuPrimitive.ItemIndicator>
-        <div className="flex h-4 w-4 items-center justify-center">
-          <Check />
-        </div>
-      </ContextMenuPrimitive.ItemIndicator>
-    </span>
     {children}
+    <MenuCheckIndicatorSingle ItemIndicator={ContextMenuPrimitive.ItemIndicator} />
   </ContextMenuPrimitive.CheckboxItem>
 ));
 ContextMenuCheckboxItem.displayName = ContextMenuPrimitive.CheckboxItem.displayName;
+
+const ContextMenuCheckboxItemMultiple = React.forwardRef<
+  React.ElementRef<typeof ContextMenuPrimitive.CheckboxItem>,
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.CheckboxItem> & {
+    closeOnSelect?: boolean;
+    selectType?: boolean;
+    dataTestId?: string;
+  }
+>(
+  (
+    {
+      className,
+      children,
+      onClick,
+      checked = false,
+      closeOnSelect = true,
+      selectType,
+      dataTestId,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <ContextMenuPrimitive.CheckboxItem
+        ref={ref}
+        className={cn(menuCheckboxMultipleClass, className)}
+        checked={checked}
+        onClick={(e) => {
+          if (closeOnSelect) {
+            e.stopPropagation();
+            e.preventDefault();
+          }
+          onClick?.(e);
+        }}
+        data-testid={dataTestId}
+        {...props}
+      >
+        <MenuCheckIndicatorMultiple checked={checked} />
+        {children}
+      </ContextMenuPrimitive.CheckboxItem>
+    );
+  }
+);
+ContextMenuCheckboxItemMultiple.displayName = 'ContextMenuCheckboxItemMultiple';
 
 const ContextMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.RadioItem>
 >(({ className, children, ...props }, ref) => (
-  <ContextMenuPrimitive.RadioItem
-    ref={ref}
-    className={cn(
-      'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center rounded-sm py-1.5 pr-2 pl-8 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className
-    )}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <ContextMenuPrimitive.ItemIndicator>
-        <div className="fill-content h-2 w-2">
-          <Circle />
-        </div>
-      </ContextMenuPrimitive.ItemIndicator>
-    </span>
+  <ContextMenuPrimitive.RadioItem ref={ref} className={cn(menuRadioClass, className)} {...props}>
+    <MenuRadioIndicator ItemIndicator={ContextMenuPrimitive.ItemIndicator} />
     {children}
   </ContextMenuPrimitive.RadioItem>
 ));
@@ -146,7 +177,7 @@ const ContextMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <ContextMenuPrimitive.Label
     ref={ref}
-    className={cn(contextMenuLabelClass, inset && 'pl-8', className)}
+    className={cn(menuLabelClass, inset && 'pl-8', className)}
     {...props}
   />
 ));
@@ -158,7 +189,7 @@ const ContextMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ContextMenuPrimitive.Separator
     ref={ref}
-    className={cn(contextMenuSeparatorClass, className)}
+    className={cn(menuSeparatorClass, className)}
     {...props}
   />
 ));
@@ -181,6 +212,7 @@ export {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuCheckboxItem,
+  ContextMenuCheckboxItemMultiple,
   ContextMenuRadioItem,
   ContextMenuLabel,
   ContextMenuSeparator,

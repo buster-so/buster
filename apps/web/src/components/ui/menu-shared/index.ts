@@ -8,6 +8,7 @@ export * from './MenuLink';
 export * from './MenuUnified';
 export * from './menu-base.styles';
 export * from './menu-hooks';
+export * from './menu-indicators';
 export * from './menu-items.types';
 export * from './menu-utils';
 export * from './useMenuSearch';
