@@ -1,4 +1,7 @@
 import type { BusterCollection } from '@buster/server-shared/collections';
+import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
+import type { GetMetricResponse } from '@buster/server-shared/metrics';
+import type { GetReportResponse } from '@buster/server-shared/reports';
 import type { ShareAssetType } from '@buster/server-shared/share';
 import {
   type QueryClient,
@@ -9,6 +12,8 @@ import {
 } from '@tanstack/react-query';
 import { create } from 'mutative';
 import { useMemo } from 'react';
+import type { IBusterChat } from '@/api/asset_interfaces/chat';
+import { getAssetSelectedQuery } from '@/api/buster_rest/assets/getAssetSelectedQuery';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { libraryQueryKeys } from '@/api/query_keys/library';
 import { searchQueryKeys } from '@/api/query_keys/search';
@@ -277,6 +282,59 @@ export const useAddAssetToCollection = (useInvalidate = true) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: addAssetToCollection,
+    onMutate: (variables) => {
+      console.log('variables', variables);
+      variables.assets.forEach((asset) => {
+        const queryKey = getAssetSelectedQuery(asset.type, asset.id, 'LATEST');
+        queryClient.setQueryData(queryKey.queryKey, (previousData) => {
+          if (!previousData) return previousData;
+          return create(previousData, (draft) => {
+            if (asset.type === 'collection') {
+              return draft;
+            }
+            if (asset.type === 'dashboard_file') {
+              return create(draft, (draft) => {
+                const _draft = draft as GetDashboardResponse;
+                _draft.collections = [
+                  ...(_draft.collections || []),
+                  { id: variables.id, name: '' },
+                ];
+              });
+            }
+            if (asset.type === 'report_file') {
+              return create(draft, (draft) => {
+                const _draft = draft as GetReportResponse;
+                _draft.collections = [
+                  ...(_draft.collections || []),
+                  { id: variables.id, name: '' },
+                ];
+              });
+            }
+            if (asset.type === 'metric_file') {
+              return create(draft, (draft) => {
+                const _draft = draft as GetMetricResponse;
+                _draft.collections = [
+                  ...(_draft.collections || []),
+                  { id: variables.id, name: '' },
+                ];
+              });
+            }
+            if (asset.type === 'chat') {
+              return create(draft, (draft) => {
+                const _draft = draft as IBusterChat;
+                _draft.collections = [
+                  ...(_draft.collections || []),
+                  { id: variables.id, name: '' },
+                ];
+              });
+            }
+
+            const _exhaustiveCheck: never = asset.type;
+            return draft;
+          });
+        });
+      });
+    },
     onSuccess: (_, variables) => {
       if (useInvalidate) {
         const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
@@ -298,6 +356,44 @@ export const useRemoveAssetFromCollection = (useInvalidate = true) => {
   return useMutation({
     mutationFn: removeAssetFromCollection,
     onMutate: (variables) => {
+      variables.assets.forEach((asset) => {
+        const queryKey = getAssetSelectedQuery(asset.type, asset.id, 'LATEST');
+        queryClient.setQueryData(queryKey.queryKey, (previousData) => {
+          if (!previousData) return previousData;
+          return create(previousData, (draft) => {
+            if (asset.type === 'collection') {
+              return draft;
+            }
+            if (asset.type === 'dashboard_file') {
+              return create(draft, (draft) => {
+                const _draft = draft as GetDashboardResponse;
+                _draft.collections = _draft.collections?.filter((c) => c.id !== variables.id) || [];
+              });
+            }
+            if (asset.type === 'report_file') {
+              return create(draft, (draft) => {
+                const _draft = draft as GetReportResponse;
+                _draft.collections = _draft.collections?.filter((c) => c.id !== variables.id) || [];
+              });
+            }
+            if (asset.type === 'metric_file') {
+              return create(draft, (draft) => {
+                const _draft = draft as GetMetricResponse;
+                _draft.collections = _draft.collections?.filter((c) => c.id !== variables.id) || [];
+              });
+            }
+            if (asset.type === 'chat') {
+              return create(draft, (draft) => {
+                const _draft = draft as IBusterChat;
+                _draft.collections = _draft.collections?.filter((c) => c.id !== variables.id) || [];
+              });
+            }
+            const _exhaustiveCheck: never = asset.type;
+            return draft;
+          });
+        });
+      });
+
       const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
       const previousData = queryClient.getQueryData<BusterCollection>(queryKey);
       if (!previousData) return;

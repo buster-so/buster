@@ -1,7 +1,16 @@
 import type { AssetType } from '@buster/server-shared/assets';
-import type { BusterCollectionListItem } from '@buster/server-shared/collections';
-import { useMemo, useState } from 'react';
-import { useAddAssetToCollection, useGetCollectionsList } from '@/api/buster_rest/collections';
+import type { BusterCollection, BusterCollectionListItem } from '@buster/server-shared/collections';
+import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
+import type { GetMetricResponse } from '@buster/server-shared/metrics';
+import type { GetReportResponse } from '@buster/server-shared/reports';
+import { useCallback, useMemo, useState } from 'react';
+import type { IBusterChat } from '@/api/asset_interfaces/chat';
+import { useGetAsset } from '@/api/buster_rest/assets/useGetAsset';
+import {
+  useAddAssetToCollection,
+  useGetCollectionsList,
+  useRemoveAssetFromCollection,
+} from '@/api/buster_rest/collections';
 import { useLibraryAssetsInfiniteManual } from '@/api/buster_rest/library';
 import { Button } from '@/components/ui/buttons';
 import {
@@ -10,7 +19,7 @@ import {
   type IDropdownItems,
 } from '@/components/ui/dropdown';
 import { Plus } from '@/components/ui/icons';
-import { getAssetSelectedQuery } from '@/layouts/AppAssetCheckLayout/getAssetSelectedQuery';
+import { useWhyDidYouUpdate } from '@/hooks/useWhyDidYouUpdate';
 import { ASSET_ICONS } from '../icons/assetIcons';
 import { NewCollectionModal } from '../modals/NewCollectionModal';
 
@@ -34,11 +43,50 @@ export const useAddToLibraryCollection = ({
 
   const { data: collectionsListResponse } = useGetCollectionsList();
   const { mutateAsync: addAssetToCollection } = useAddAssetToCollection();
+  const { mutateAsync: removeAssetFromCollection } = useRemoveAssetFromCollection();
   const { allResults, fetchNextPage, isFetchingNextPage } = useLibraryAssetsInfiniteManual({
     page_size: 25,
     assetTypes: allAssetsExceptCollection,
   });
   const collectionsList = collectionsListResponse?.data || defaultCollectionsList;
+
+  const { data: collectionsForAsset = [] } = useGetAsset(
+    {
+      type: assetType,
+      assetId,
+      chosenVersionNumber: 'LATEST',
+    },
+    {
+      select: (v) => {
+        if (assetType === 'collection') {
+          return [];
+        }
+        if (assetType === 'dashboard_file') {
+          const dashboard = v as GetDashboardResponse;
+          return dashboard.collections;
+        }
+        if (assetType === 'report_file') {
+          const report = v as GetReportResponse;
+          return report.collections;
+        }
+        if (assetType === 'metric_file') {
+          const metric = v as GetMetricResponse;
+          return metric.collections;
+        }
+        const _exhaustiveCheck: 'chat' = assetType;
+        const chat = v as IBusterChat;
+        return chat.collections;
+      },
+    }
+  );
+
+  const selectedCollections = useMemo(() => {
+    const selectedCollectionIds = new Set<string>([]);
+    collectionsForAsset.forEach((collection) => {
+      selectedCollectionIds.add(collection.id);
+    });
+    return selectedCollectionIds;
+  }, [collectionsForAsset.length]);
 
   const dropdownItems: IDropdownItems = useMemo(() => {
     const collections = collectionsList.map((collection) =>
@@ -46,9 +94,19 @@ export const useAddToLibraryCollection = ({
         label: collection.name,
         value: collection.id,
         icon: <ASSET_ICONS.collections />,
+        selected: selectedCollections.has(collection.id),
         link: {
           to: '/app/collections/$collectionId',
           params: { collectionId: collection.id },
+        },
+        onClick: () => {
+          const isSelected = selectedCollections.has(collection.id);
+          const payload = {
+            id: collection.id,
+            assets: [{ id: assetId, type: assetType }],
+          };
+          if (isSelected) removeAssetFromCollection(payload);
+          else addAssetToCollection(payload);
         },
       })
     );
@@ -101,6 +159,7 @@ export const useAddToLibraryCollection = ({
     ]);
   }, [
     collectionsList,
+    selectedCollections,
     addAssetToCollection,
     openCollectionModal,
     setOpenCollectionModal,
