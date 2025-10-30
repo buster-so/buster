@@ -187,6 +187,10 @@ export const useDeleteCollection = () => {
         queryKey: collectionQueryKeys.collectionsGetList().queryKey,
         refetchType: 'all',
       });
+      queryClient.invalidateQueries({
+        queryKey: libraryQueryKeys.libraryGetListInfinite({}).queryKey.slice(0, 2),
+        refetchType: 'all',
+      });
     },
   });
 };
