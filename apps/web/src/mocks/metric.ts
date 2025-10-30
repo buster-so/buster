@@ -136,6 +136,7 @@ export const createMockMetric = (id: string): BusterMetric => {
     data_source_id: generatePredictableUUID(id, 'source'),
     time_frame: '1d',
     type: 'metric_file',
+    added_to_library: false,
     chart_config: chart_config,
     error: null,
     data_metadata: dataMetadata,

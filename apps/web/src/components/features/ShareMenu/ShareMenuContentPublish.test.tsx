@@ -287,6 +287,7 @@ describe('ShareMenuContentPublish Component', () => {
       workspace_sharing: null,
       public_enabled_by: null,
       workspace_member_count: null,
+      added_to_library: false,
     },
   };
 

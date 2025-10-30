@@ -25,6 +25,7 @@ export const getShareAssetConfig = (
     public_password,
     workspace_sharing,
     workspace_member_count,
+    added_to_library,
   } = message;
 
   return {
@@ -36,5 +37,6 @@ export const getShareAssetConfig = (
     public_password,
     workspace_sharing,
     workspace_member_count,
+    added_to_library,
   };
 };

@@ -11,7 +11,7 @@ import { getAssetAccess } from './useGetAssetPasswordConfig';
 describe('getAssetAccess', () => {
   it('should return password required state when error status is 418', () => {
     const error = { status: 418 } as ApiError;
-    const result = getAssetAccess(error, true, ['test'], false);
+    const result = getAssetAccess(error, true, false);
 
     expect(result).toEqual({
       hasAccess: false,
@@ -24,7 +24,7 @@ describe('getAssetAccess', () => {
 
   it('should return deleted state when error status is 410', () => {
     const error = { status: 410 } as ApiError;
-    const result = getAssetAccess(error, true, ['test'], false);
+    const result = getAssetAccess(error, true, false);
 
     expect(result).toEqual({
       hasAccess: false,
@@ -37,7 +37,7 @@ describe('getAssetAccess', () => {
 
   it('should return no access state when error status is 403', () => {
     const error = { status: 403 } as ApiError;
-    const result = getAssetAccess(error, true, ['test'], false);
+    const result = getAssetAccess(error, true, false);
 
     expect(result).toEqual({
       hasAccess: false,
@@ -50,7 +50,7 @@ describe('getAssetAccess', () => {
 
   it('should return no access state when error has any other numeric status', () => {
     const error = { status: 500 } as ApiError;
-    const result = getAssetAccess(error, true, ['test'], false);
+    const result = getAssetAccess(error, true, false);
 
     expect(result).toEqual({
       hasAccess: false,
@@ -62,7 +62,7 @@ describe('getAssetAccess', () => {
   });
 
   it('should return has access state when no data and is fetched with no error', () => {
-    const result = getAssetAccess(null, true, ['test'], false);
+    const result = getAssetAccess(null, true, false);
 
     expect(result).toEqual({
       hasAccess: true,
@@ -74,7 +74,7 @@ describe('getAssetAccess', () => {
   });
 
   it('should return has access state when no error and has data', () => {
-    const result = getAssetAccess(null, true, ['test'], true);
+    const result = getAssetAccess(null, true, true);
 
     expect(result).toEqual({
       hasAccess: true,
@@ -86,7 +86,7 @@ describe('getAssetAccess', () => {
   });
 
   it('should return has access state when not fetched and no error', () => {
-    const result = getAssetAccess(null, false, ['test'], false);
+    const result = getAssetAccess(null, false, false);
 
     expect(result).toEqual({
       hasAccess: true,
@@ -98,7 +98,7 @@ describe('getAssetAccess', () => {
   });
 });
 
-describe('getAssetSelectedQuery', () => {
+describe('getSelectedQuery', () => {
   it('should return metric query for metric_file type', () => {
     const result = getAssetSelectedQuery('metric_file', 'test-id', 'LATEST');
     const expected = metricsQueryKeys.metricsGetMetric('test-id', 'LATEST');

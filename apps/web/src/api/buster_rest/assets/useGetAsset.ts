@@ -29,7 +29,7 @@ type AssetData =
 // Generic function that infers the correct return type based on the asset type
 export function useGetAsset<
   T extends AssetType | 'reasoning',
-  TData = AssetTypeToData[T & keyof AssetTypeToData]
+  TData = AssetTypeToData[T & keyof AssetTypeToData],
 >(
   params: {
     type: T;
@@ -41,7 +41,11 @@ export function useGetAsset<
     'queryKey' | 'queryFn'
   >
 ) {
-  const selectedQuery = getAssetSelectedQuery(params.type, params.assetId, params.chosenVersionNumber);
+  const selectedQuery = getAssetSelectedQuery(
+    params.type,
+    params.assetId,
+    params.chosenVersionNumber
+  );
 
   return useQuery<AssetTypeToData[T & keyof AssetTypeToData], ApiError, TData>({
     queryKey: selectedQuery.queryKey,

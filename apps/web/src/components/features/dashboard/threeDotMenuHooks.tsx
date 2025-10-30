@@ -1,35 +1,18 @@
 import type { GetDashboardResponse } from '@buster/server-shared/dashboards';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useCallback, useMemo } from 'react';
-import type { BusterDashboard, BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
-import {
-  useAddDashboardToCollection,
-  useDeleteDashboards,
-  useGetDashboard,
-  useRemoveDashboardFromCollection,
-} from '@/api/buster_rest/dashboards';
+import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
+import { useDeleteDashboards, useGetDashboard } from '@/api/buster_rest/dashboards';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { DASHBOARD_TITLE_INPUT_ID } from '@/controllers/DashboardController/DashboardViewDashboardController/DashboardEditTitle';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { onOpenDashboardContentModal } from '../../../context/Dashboards/dashboard-content-store';
 import { ensureElementExists } from '../../../lib/element';
 import { canEdit, getIsEffectiveOwner } from '../../../lib/share';
 import type { IDropdownItem, IDropdownItems } from '../../ui/dropdown';
 import { createDropdownItem, DropdownContent } from '../../ui/dropdown';
-import {
-  ArrowUpRight,
-  Filter,
-  History,
-  PenSparkle,
-  Plus,
-  ShareRight,
-  Star,
-  Trash,
-} from '../../ui/icons';
+import { ArrowUpRight, Filter, History, PenSparkle, ShareRight, Star, Trash } from '../../ui/icons';
 import Pencil from '../../ui/icons/NucleoIconOutlined/pencil';
-import { useSaveToCollectionsDropdownContent } from '../dropdowns/SaveToCollectionsDropdown';
 import { useFavoriteStar } from '../favorites/useFavoriteStar';
 import { ASSET_ICONS } from '../icons/assetIcons';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
@@ -75,67 +58,6 @@ export const useDashboardVersionHistorySelectMenu = ({
     }),
     [versionHistoryItems]
   );
-};
-
-export const useCollectionSelectMenu = ({
-  dashboardId,
-  dashboardVersionNumber,
-}: {
-  dashboardId: string;
-  dashboardVersionNumber: number | undefined;
-}) => {
-  const { mutateAsync: saveDashboardToCollection } = useAddDashboardToCollection();
-  const { mutateAsync: removeDashboardFromCollection } = useRemoveDashboardFromCollection();
-  const { data: selectedCollections } = useGetDashboard(
-    { id: dashboardId, versionNumber: dashboardVersionNumber },
-    {
-      select: useCallback(
-        (x: BusterDashboardResponse) => x.collections?.map((collection) => collection.id),
-        []
-      ),
-    }
-  );
-  const { openInfoMessage } = useBusterNotifications();
-
-  const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
-    await saveDashboardToCollection({ dashboardIds: [dashboardId], collectionIds });
-    openInfoMessage('Dashboard saved to collections');
-  });
-
-  const onRemoveFromCollection = useMemoizedFn(async (collectionId: string) => {
-    await removeDashboardFromCollection({
-      dashboardIds: [dashboardId],
-      collectionIds: [collectionId],
-    });
-    openInfoMessage('Dashboard removed from collections');
-  });
-
-  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
-    onSaveToCollection,
-    onRemoveFromCollection,
-    selectedCollections: selectedCollections || [],
-  });
-
-  const collectionSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
-  const collectionDropdownItem: IDropdownItem = useMemo(
-    () =>
-      createDropdownItem({
-        label: 'Add to collection',
-        value: 'add-to-collection',
-        icon: <ASSET_ICONS.collectionAdd />,
-        items: [
-          <React.Fragment key="collection-sub-menu">
-            {collectionSubMenu} {ModalComponent}
-          </React.Fragment>,
-        ],
-      }),
-    [collectionSubMenu]
-  );
-
-  return collectionDropdownItem;
 };
 
 export const useFavoriteDashboardSelectMenu = ({

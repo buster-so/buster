@@ -6,9 +6,9 @@ import { Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
 import { Dots } from '@/components/ui/icons';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 import { canEdit, canFilter, getIsEffectiveOwner } from '@/lib/share';
+import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
 import {
   useAddContentToDashboardSelectMenu,
-  useCollectionSelectMenu,
   useDashboardVersionHistorySelectMenu,
   useDeleteDashboardSelectMenu,
   useEditDashboardWithAI,
@@ -34,7 +34,10 @@ export const DashboardThreeDotMenu = React.memo(
       dashboardVersionNumber,
     });
     const chatId = useGetChatId();
-    const collectionSelectMenu = useCollectionSelectMenu({ dashboardId, dashboardVersionNumber });
+    const addToLibraryCollectionMenu = useAddToLibraryCollection({
+      assetId: dashboardId,
+      assetType: 'dashboard_file',
+    });
     const openFullScreenDashboard = useOpenFullScreenDashboard({ dashboardId });
     const favoriteDashboard = useFavoriteDashboardSelectMenu({
       dashboardId,
@@ -64,7 +67,7 @@ export const DashboardThreeDotMenu = React.memo(
           editDashboardWithAI,
           { type: 'divider' },
           isEffectiveOwner && !isViewingOldVersion && shareMenu,
-          collectionSelectMenu,
+          ...(!isViewingOldVersion ? addToLibraryCollectionMenu : []),
           favoriteDashboard,
           { type: 'divider' },
           isEditor && !isViewingOldVersion && addContentToDashboardMenu,
@@ -79,7 +82,7 @@ export const DashboardThreeDotMenu = React.memo(
         filterDashboardMenu,
         addContentToDashboardMenu,
         shareMenu,
-        collectionSelectMenu,
+        addToLibraryCollectionMenu,
         favoriteDashboard,
         versionHistoryItems,
         renameDashboardMenu,

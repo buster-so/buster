@@ -183,5 +183,6 @@ export const MOCK_CHAT = (chatIndex = 0): BusterChat => {
     individual_permissions: [],
     screenshot_taken_at: null,
     collections: [],
+    added_to_library: false,
   };
 };

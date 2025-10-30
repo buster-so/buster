@@ -40,7 +40,7 @@ const ContentRight: React.FC<{
   collection: BusterCollection;
   layout: 'grid' | 'list';
   setOpenAddTypeModal: (open: boolean) => void;
-}> = React.memo(({ collection, setOpenAddTypeModal, layout }) => {
+}> = React.memo(({ collection, setOpenAddTypeModal }) => {
   const collectionTitle = collection?.name;
   const navigate = useNavigate();
 
