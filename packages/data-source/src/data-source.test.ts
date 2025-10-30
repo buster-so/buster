@@ -1,9 +1,9 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DatabaseAdapter } from './adapters/base';
 import type { DataSourceConfig } from './data-source';
 import { DataSource, QueryRouter } from './data-source';
 import type { DataSourceIntrospector } from './introspection/base';
-import { DataSourceType } from './types/credentials';
 
 // Mock the adapter factory
 vi.mock('./adapters/factory', () => ({

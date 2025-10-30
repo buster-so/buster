@@ -1,6 +1,6 @@
+import { DataSourceType, type DataSourceTypeValue } from '@buster/database/schema-types';
 import { z } from 'zod';
 import type { DatabaseAdapter } from '../../adapters/base';
-import { DataSourceType } from '../../types/credentials';
 
 // Filters for introspection operations
 export const IntrospectionFiltersSchema = z.object({
@@ -78,4 +78,4 @@ export type TableSampler = (
 ) => Promise<TableSample>;
 
 // Dialect type for factory routing
-export type IntrospectionDialect = DataSourceType;
+export type IntrospectionDialect = DataSourceTypeValue;

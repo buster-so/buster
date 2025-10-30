@@ -1,6 +1,10 @@
+import type {
+  Credentials,
+  MySQLCredentials,
+  PostgreSQLCredentials,
+} from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Credentials, MySQLCredentials, PostgreSQLCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import type { AdapterQueryResult } from './base';
 import { BaseAdapter } from './base';
 

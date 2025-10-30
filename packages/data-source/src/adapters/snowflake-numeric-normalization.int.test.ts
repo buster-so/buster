@@ -1,5 +1,5 @@
+import { DataSourceType, type SnowflakeCredentials } from '@buster/database/schema-types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DataSourceType, type SnowflakeCredentials } from '../types/credentials';
 import { SnowflakeAdapter } from './snowflake';
 
 // Helper to determine if tests should run

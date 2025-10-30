@@ -11,6 +11,7 @@ export {
   getSupportedTypes,
   isSupported,
 } from './adapters/factory';
+export { MotherDuckAdapter } from './adapters/motherduck';
 export { MySQLAdapter } from './adapters/mysql';
 export { PostgreSQLAdapter } from './adapters/postgresql';
 export { RedshiftAdapter } from './adapters/redshift';
@@ -61,17 +62,6 @@ export type {
 } from './introspection/types';
 // Storage abstraction layer
 export * from './storage';
-export type {
-  BigQueryCredentials,
-  Credentials,
-  MySQLCredentials,
-  PostgreSQLCredentials,
-  RedshiftCredentials,
-  SnowflakeCredentials,
-  SQLServerCredentials,
-} from './types/credentials';
-// Type definitions
-export { DataSourceType } from './types/credentials';
 // Introspection types
 export type {
   ClusteringInfo,

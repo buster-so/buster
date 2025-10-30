@@ -41,11 +41,3 @@ steps:
   - id: 811ac890-555e-452f-9c2d-0452a50b93c8
     type: MODULE
     moduleId: 782571e2-3c8e-49fe-a59e-0685924c5a43
-  - id: dd1f65e1-62a6-4903-89c7-f9fa43ca061d
-    type: PRESET_ACTION
-    command:
-      id: 77dac8f0-36ba-4a68-941d-cd20e5b52a57
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: Reports in the left side navigation panel

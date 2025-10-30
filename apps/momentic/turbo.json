@@ -5,6 +5,10 @@
     "momentic": {
       "cache": false,
       "persistent": true
+    },
+    "momentic:run": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

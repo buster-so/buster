@@ -1,5 +1,5 @@
+import type { Credentials } from '@buster/database/schema-types';
 import type { DataSourceIntrospector } from '../introspection/base';
-import type { Credentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 
 /**

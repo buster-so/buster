@@ -9,6 +9,7 @@ export * from './chats';
 // Export common types as namespace to avoid conflicts with metrics re-exports
 export * as common from './common';
 export * from './dashboards';
+export * from './data-sources';
 export * from './datasets';
 // Export deploy module as namespace to avoid conflicts with datasets
 export * as deploy from './deploy';

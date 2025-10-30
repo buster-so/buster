@@ -17,22 +17,43 @@ steps:
   - id: cbc160a7-92b0-4154-a318-7840a1566c44
     type: MODULE
     moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
-  - id: 4f1e9740-ce75-4906-87cb-4bc356bc9bfe
+  - id: a3e52bf0-e7cf-4cb3-a6b9-8af8c528693a
     type: PRESET_ACTION
     command:
-      id: 14e30e64-1edd-49dd-b2af-bda5de7030c0
+      id: e78366ca-ad55-4305-b7cd-a27e77219d9e
       type: CLICK
       target:
         type: description
-        elementDescriptor: Reports on the left side navigation panel
-  - id: 8feed9dd-09a8-4c2c-b684-e9540f2081a1
+        elementDescriptor: the search button in the left sidebar header
+          (data-testid=search-button)
+  - id: 035fcde2-fde2-4c76-a9e1-4768c40de47e
     type: PRESET_ACTION
     command:
-      id: 4e43c0b0-a91a-4e55-bf0b-4d74782f486b
+      id: 914a9ce4-82dd-408d-ad1d-3a0567ca6197
+      clearContent: true
+      type: TYPE
+      target:
+        type: description
+        elementDescriptor: the Search... text input in the search modal
+      value: report
+  - id: 0704bdbd-37ba-4198-a766-b0052ad5c778
+    type: PRESET_ACTION
+    command:
+      id: 466d0ba2-b0bb-41dc-ae6d-81bc4a8cf52a
       type: CLICK
       target:
         type: description
-        elementDescriptor: the bottom report title in the list of reports
+        elementDescriptor: the 'Total Customer Count' search suggestion in the search
+          modal best-matches list
+  - id: 95d1a0d7-8deb-4a5c-8ebb-65b5e75120aa
+    type: PRESET_ACTION
+    command:
+      id: fc06f4fb-0ba6-4c94-955d-b2b4de531260
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the report file label "Total Customers" (Version 1) in the
+          chat response of the 'Total Customer Count' conversation
   - id: 5c331e38-5313-4386-a268-ca5e6d274b32
     type: PRESET_ACTION
     command:

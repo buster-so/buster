@@ -71,8 +71,11 @@ export type ListPermissionedAssetsInput = z.infer<typeof ListPermissionedAssetsI
 export const ListPermissionedLibraryAssetsInputSchema = ListPermissionedAssetsInputSchema;
 export type ListPermissionedLibraryAssetsInput = ListPermissionedAssetsInput;
 
+export const GroupedAssetsKeysSchema = AssetTypeSchema.or(z.literal('assets'));
+export type GroupedAssetsKeys = z.infer<typeof GroupedAssetsKeysSchema>;
+
 export const GroupedAssetsResponseSchema = z.object({
-  groups: z.record(z.string(), AssetListItemSchema.array()),
+  groups: z.record(GroupedAssetsKeysSchema, AssetListItemSchema.array()),
   pagination: InfinitePaginationSchema,
 });
 

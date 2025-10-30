@@ -1,9 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type DataSource,
-  type SnowflakeCredentials,
-  SnowflakeCredentialsSchema,
-} from '@/api/asset_interfaces/datasources';
+import type { SnowflakeCredentials } from '@/api/asset_interfaces/datasources';
 import {
   type createSnowflakeDataSource,
   useCreateSnowflakeDataSource,
@@ -15,7 +12,7 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const SnowflakeForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
 }> = ({ dataSource }) => {
   const { mutateAsync: createDataSource } = useCreateSnowflakeDataSource();
   const { mutateAsync: updateDataSource } = useUpdateSnowflakeDataSource();
@@ -35,7 +32,7 @@ export const SnowflakeForm: React.FC<{
       role: credentials?.role || '',
       type: 'snowflake' as const,
       name: dataSource?.name || '',
-    } as Parameters<typeof createSnowflakeDataSource>[0],
+    } as SnowflakeCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -43,11 +40,6 @@ export const SnowflakeForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: SnowflakeCredentialsSchema,
-      onSubmit: SnowflakeCredentialsSchema,
     },
   });
 

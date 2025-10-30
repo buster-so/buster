@@ -1,4 +1,5 @@
 import type { Command } from 'cmdk';
+import type { ButtonProps } from '../../buttons';
 
 export type SearchItem<M = unknown, T extends string = string> = {
   icon?: React.ReactNode;
@@ -12,6 +13,7 @@ export type SearchItem<M = unknown, T extends string = string> = {
   loading?: boolean;
   disabled?: boolean;
   type: 'item';
+  selected?: boolean | ((itemId: T) => boolean);
 };
 
 export type SearchItemGroup<M = unknown, T extends string = string> = {
@@ -31,6 +33,8 @@ export type SearchItems<M = unknown, T extends string = string> =
   | SearchItemGroup<M, T>
   | SearchItemSeperator;
 
+export type SearchMode = 'select-single' | 'select-multiple' | 'navigate';
+
 export type SearchModalContentProps<M = unknown, T extends string = string> = {
   open: boolean; //is modal open
   value: string;
@@ -48,6 +52,13 @@ export type SearchModalContentProps<M = unknown, T extends string = string> = {
   secondaryContent?: React.ReactNode | null;
   openSecondaryContent?: boolean; //if undefined it will close and open with the secondary content
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
+  mode: SearchMode;
+  //TODO: type this a little better
+  footerConfig?: {
+    secondaryButton?: ButtonProps;
+    primaryButton?: ButtonProps;
+    tertiaryButton?: ButtonProps;
+  };
 } & Pick<React.ComponentProps<typeof Command>, 'filter' | 'shouldFilter'>;
 
 export type SearchModalProps<M = unknown, T extends string = string> = SearchModalContentProps<

@@ -5,6 +5,7 @@ import {
   ChatCreateHandlerRequestSchema,
   type ChatCreateRequest,
   ChatCreateRequestSchema,
+  type ChatWithMessages,
   ChatWithMessagesSchema,
 } from './chat.types';
 
@@ -138,6 +139,7 @@ describe('ChatWithMessagesSchema', () => {
       workspace_sharing: 'full_access',
       workspace_member_count: 0,
       screenshot_taken_at: '2024-01-01T00:00:00Z',
+      collections: [],
     };
 
     const result = ChatWithMessagesSchema.safeParse(validChat);
@@ -174,6 +176,7 @@ describe('ChatWithMessagesSchema', () => {
       public_password: null,
       permission: 'owner',
       screenshot_taken_at: null,
+      collections: [],
       // Optional fields omitted
     };
 
@@ -213,6 +216,7 @@ describe('ChatWithMessagesSchema', () => {
       workspace_sharing: 'full_access',
       workspace_member_count: 0,
       screenshot_taken_at: null,
+      collections: [],
     };
 
     const result = ChatWithMessagesSchema.safeParse(chatWithInvalidPermissions);
@@ -221,11 +225,12 @@ describe('ChatWithMessagesSchema', () => {
   });
 
   it('should handle datetime validation for public_expiry_date', () => {
-    const chatWithValidDate = {
+    const chatWithValidDate: ChatWithMessages = {
       id: 'chat-date',
       title: 'Date Test Chat',
       is_favorited: false,
       message_ids: [],
+      collections: [],
       messages: {},
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',

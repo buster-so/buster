@@ -44,6 +44,7 @@ interface UseSpeechRecognitionReturn {
   listening: boolean;
   transcript: string;
   browserSupportsSpeechRecognition: boolean;
+  isAvailable: boolean;
   error: string | null;
   hasPermission: boolean;
 }
@@ -54,6 +55,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(false);
   const finalTranscriptRef = useRef('');
   const { isEdge, isFirefox } = useBrowserDetection();
 
@@ -63,6 +65,11 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
     !isFirefox &&
     typeof window !== 'undefined' &&
     (window.SpeechRecognition || window.webkitSpeechRecognition);
+
+  // Initialize availability based on browser support
+  useEffect(() => {
+    setIsAvailable(Boolean(browserSupportsSpeechRecognition));
+  }, [browserSupportsSpeechRecognition]);
 
   // Check microphone permission
   useEffect(() => {
@@ -128,14 +135,27 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error:', event.error);
       let message = '';
+      let shouldDisableFeature = false;
+
       if (event.error.includes('language-not-supported')) {
         message = 'Browser does not support dictation';
+        shouldDisableFeature = true;
+      } else if (event.error === 'network') {
+        message = 'Speech recognition requires internet connection';
+        shouldDisableFeature = true;
+      } else if (event.error === 'not-allowed') {
+        message = 'Microphone permission denied';
       } else {
         message = event.error;
       }
 
       openErrorNotification({ message });
       setError(message);
+
+      // Disable the feature for fatal errors
+      if (shouldDisableFeature) {
+        setIsAvailable(false);
+      }
 
       // Stop recognition and listening state
       recognition.stop();
@@ -184,6 +204,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
     error,
     transcript,
     browserSupportsSpeechRecognition: Boolean(browserSupportsSpeechRecognition),
+    isAvailable,
     hasPermission,
   };
 }

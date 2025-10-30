@@ -11,5 +11,7 @@ export const TextSearchResultSchema = z.object({
   createdBy: z.string().uuid(),
   createdByName: z.string(),
   createdByAvatarUrl: z.string().nullable(),
-  addedToLibrary: z.boolean().optional(),
+  addedToLibrary: z.boolean().default(false).optional(),
+  //this will only show up IF collectionId is passed in the request query.
+  inCollection: z.boolean().optional(),
 });

@@ -1,9 +1,9 @@
+import type { SQLServerCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { afterEach, describe, expect } from 'vitest';
 import type { DataSourceConfig } from '../data-source';
 import { DataSource } from '../data-source';
 import { skipIfNoCredentials, TEST_TIMEOUT, testConfig } from '../setup';
-import type { SQLServerCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 
 function createSQLServerCredentials(): SQLServerCredentials {
   if (

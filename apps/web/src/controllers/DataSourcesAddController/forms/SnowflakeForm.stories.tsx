@@ -1,15 +1,19 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { SnowflakeForm } from './SnowflakeForm';
 
 // Sample DataSource for the story
-const sampleDataSource: DataSource = {
+const sampleDataSource: GetDataSourceResponse = {
   id: 'snowflake-123',
   name: 'Sample Snowflake DB',
-  type: DataSourceTypes.snowflake,
-  created_at: '2024-07-18T21:19:49.721159Z',
-  updated_at: '2024-07-18T21:19:49.721160Z',
-  created_by: {
+  type: 'snowflake',
+  organizationId: 'org-123',
+  createdAt: '2024-07-18T21:19:49.721159Z',
+  updatedAt: '2024-07-18T21:19:49.721160Z',
+  deletedAt: null,
+  onboardingStatus: 'completed',
+  onboardingError: null,
+  createdBy: {
     id: 'user-123',
     name: 'Test User',
     email: 'test@example.com',
@@ -24,7 +28,7 @@ const sampleDataSource: DataSource = {
     default_database: 'SNOWFLAKE_SAMPLE_DATA',
     default_schema: 'PUBLIC',
   },
-  data_sets: [],
+  datasets: [],
 };
 
 const meta: Meta<typeof SnowflakeForm> = {

@@ -1,9 +1,17 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
-import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
+import {
+  useDeleteChat,
+  useDuplicateChat,
+  useGetChat,
+  useRemoveChatFromCollections,
+  useSaveChatToCollections,
+} from '@/api/buster_rest/chats';
+import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
 import { useFavoriteStar } from '@/components/features/favorites';
-import { createDropdownItem } from '@/components/ui/dropdown';
+import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
+import { createDropdownItem, DropdownContent, type IDropdownItem } from '@/components/ui/dropdown';
 import { ArrowRight, DuplicatePlus, Pencil, ShareRight, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -37,6 +45,58 @@ export const useShareMenuSelectMenu = ({ chatId = '' }: { chatId: string | undef
     }),
     [chatId, shareAssetConfig, isEffectiveOwner]
   );
+};
+
+export const useAddToCollectionSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
+  const { mutateAsync: saveChatToCollections } = useSaveChatToCollections();
+  const { mutateAsync: removeChatFromCollections } = useRemoveChatFromCollections();
+  const { data: selectedCollections } = useGetChat(
+    { id: chatId },
+    { select: useCallback((x: IBusterChat) => x.collections?.map((x) => x.id), []) }
+  );
+  const { openInfoMessage } = useBusterNotifications();
+
+  const onSaveToCollection = async (collectionIds: string[]) => {
+    await saveChatToCollections({
+      chatIds: [chatId],
+      collectionIds,
+    });
+    openInfoMessage('Chat added to collection');
+  };
+
+  const onRemoveFromCollection = async (collectionId: string) => {
+    await removeChatFromCollections({
+      chatIds: [chatId],
+      collectionIds: [collectionId],
+    });
+    openInfoMessage('Chat removed from collection');
+  };
+
+  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
+    onSaveToCollection,
+    onRemoveFromCollection,
+    selectedCollections: selectedCollections || [],
+  });
+
+  const CollectionSubMenu = useMemo(() => {
+    return <DropdownContent {...dropdownProps} />;
+  }, [dropdownProps]);
+
+  const collectionDropdownItem: IDropdownItem = useMemo(
+    () => ({
+      label: 'Add to collection',
+      value: 'add-to-collection',
+      icon: <ASSET_ICONS.collectionAdd />,
+      items: [
+        <React.Fragment key="collection-sub-menu">
+          {CollectionSubMenu} {ModalComponent}
+        </React.Fragment>,
+      ],
+    }),
+    [CollectionSubMenu, ModalComponent]
+  );
+
+  return collectionDropdownItem;
 };
 
 export const useRenameChatTitle = () => {

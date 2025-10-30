@@ -1,14 +1,14 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import type { DataSourceConfig } from '../data-source';
-import { DataSource } from '../data-source';
-import { hasCredentials, TEST_TIMEOUT, testConfig } from '../setup';
 import type {
   BigQueryCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   SnowflakeCredentials,
-} from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
+} from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
+import { afterEach, describe, expect, it } from 'vitest';
+import type { DataSourceConfig } from '../data-source';
+import { DataSource } from '../data-source';
+import { hasCredentials, TEST_TIMEOUT, testConfig } from '../setup';
 
 // Helper functions to create credentials for each data source type
 function createPostgreSQLCredentials(): PostgreSQLCredentials {

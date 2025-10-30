@@ -1,9 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type DataSource,
-  type MySQLCredentials,
-  MySQLCredentialsSchema,
-} from '@/api/asset_interfaces/datasources';
+import type { MySQLCredentials } from '@/api/asset_interfaces/datasources';
 import {
   type createMySQLDataSource,
   useCreateMySQLDataSource,
@@ -15,7 +12,7 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const MySqlForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
 }> = ({ dataSource }) => {
   const { mutateAsync: createDataSource } = useCreateMySQLDataSource();
   const { mutateAsync: updateDataSource } = useUpdateMySQLDataSource();
@@ -32,8 +29,8 @@ export const MySqlForm: React.FC<{
       password: credentials?.password || '',
       default_database: credentials?.default_database || '',
       type: 'mysql' as const,
-      name: dataSource?.name || credentials?.name || '',
-    } as Parameters<typeof createMySQLDataSource>[0],
+      name: dataSource?.name || '',
+    } as MySQLCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -41,11 +38,6 @@ export const MySqlForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: MySQLCredentialsSchema,
-      onSubmit: MySQLCredentialsSchema,
     },
   });
 

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { AssetTypeSchema } from '../assets/asset-types.types';
-import type { AssetPermissionRoleSchema } from '../share';
 import { ShareConfigSchema } from '../share';
 import { ChatMessageSchema } from './chat-message.types';
 
@@ -31,6 +30,12 @@ export const ChatWithMessagesSchema = z.object({
   created_by_name: z.string(),
   created_by_avatar: z.string().nullable(),
   screenshot_taken_at: z.string().nullable(),
+  collections: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+    })
+  ),
   ...ShareConfigSchema.shape,
 });
 

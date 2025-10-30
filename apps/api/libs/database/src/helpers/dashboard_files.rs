@@ -34,8 +34,8 @@ pub async fn fetch_dashboard_file(id: &Uuid) -> Result<Option<DashboardFile>> {
     // Ensure all rows have IDs (for backwards compatibility)
     if let Some(ref mut dashboard_file) = result {
         for (index, row) in dashboard_file.content.rows.iter_mut().enumerate() {
-            if row.id == 0 {
-                row.id = (index as u32) + 1;
+            if row.id.is_zero() {
+                row.id = ((index as u32) + 1).into();
             }
         }
     }
@@ -61,8 +61,8 @@ async fn fetch_dashboard(id: &Uuid) -> Result<Option<DashboardFile>> {
     // Ensure all rows have IDs (for backwards compatibility)
     if let Some(ref mut dashboard_file) = result {
         for (index, row) in dashboard_file.content.rows.iter_mut().enumerate() {
-            if row.id == 0 {
-                row.id = (index as u32) + 1;
+            if row.id.is_zero() {
+                row.id = ((index as u32) + 1).into();
             }
         }
     }
@@ -220,8 +220,8 @@ pub async fn fetch_dashboard_files_with_permissions(
     // Ensure all rows have IDs (for backwards compatibility)
     for dashboard_file in &mut dashboard_files {
         for (index, row) in dashboard_file.content.rows.iter_mut().enumerate() {
-            if row.id == 0 {
-                row.id = (index as u32) + 1;
+            if row.id.is_zero() {
+                row.id = ((index as u32) + 1).into();
             }
         }
     }

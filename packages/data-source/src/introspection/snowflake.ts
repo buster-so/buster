@@ -1,5 +1,5 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from '../adapters/base';
-import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,
@@ -68,8 +68,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
 
       this.cache.databases = { data: databases, lastFetched: new Date() };
       return databases;
-    } catch (error) {
-      console.warn('Failed to fetch databases:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -119,8 +118,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               created: this.parseDate(row.CREATED) || new Date(),
               lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
             }));
-          } catch (error) {
-            console.warn(`Could not access schemas in database ${db.name}:`, error);
+          } catch (_error) {
             return [];
           }
         });
@@ -135,8 +133,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       }
 
       return schemas;
-    } catch (error) {
-      console.warn('Failed to fetch schemas:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -231,8 +228,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               created: this.parseDate(row.CREATED) || new Date(),
               lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
             }));
-          } catch (error) {
-            console.warn(`Could not access tables in database ${db.name}:`, error);
+          } catch (_error) {
             return [];
           }
         });
@@ -247,8 +243,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       }
 
       return tables;
-    } catch (error) {
-      console.warn('Failed to fetch tables:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -390,8 +385,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               scale: this.parseNumber(row.NUMERIC_SCALE) ?? 0,
               comment: this.getString(row.COMMENT) || '',
             }));
-          } catch (error) {
-            console.warn(`Could not access columns in database ${db.name}:`, error);
+          } catch (_error) {
             return [];
           }
         });
@@ -406,8 +400,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       }
 
       return columns;
-    } catch (error) {
-      console.warn('Failed to fetch columns:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -487,8 +480,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               definition: this.getString(row.VIEW_DEFINITION) || '',
               comment: this.getString(row.COMMENT) || '',
             }));
-          } catch (error) {
-            console.warn(`Could not access views in database ${db.name}:`, error);
+          } catch (_error) {
             return [];
           }
         });
@@ -503,8 +495,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       }
 
       return views;
-    } catch (error) {
-      console.warn('Failed to fetch views:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -595,9 +586,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           });
         }
       }
-    } catch (error) {
-      console.warn(`Could not get statistics for table ${table}:`, error);
-
+    } catch (_error) {
       // Fallback: create empty statistics for each column
       for (const column of columns) {
         columnStatistics.push({
@@ -935,13 +924,7 @@ ORDER BY s.column_name`;
                   column.sampleValues = stat.sampleValues ?? '';
                 }
               }
-            } catch (error) {
-              // Log warning but don't fail the entire introspection
-              console.warn(
-                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
-                error
-              );
-            }
+            } catch (_error) {}
           })
         );
       })

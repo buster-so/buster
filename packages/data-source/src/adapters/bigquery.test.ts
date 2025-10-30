@@ -1,6 +1,6 @@
+import type { BigQueryCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { BigQueryCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { BigQueryAdapter } from './bigquery';
 
 // Create mock BigQuery instance
@@ -428,6 +428,7 @@ describe('BigQueryAdapter', () => {
       expect(mockBigQueryInstance.createQueryJob).toHaveBeenCalledWith({
         query: 'SELECT 1 as test',
         useLegacySql: false,
+        jobTimeoutMs: 10000, // 10 second timeout for connection test
       });
     });
 

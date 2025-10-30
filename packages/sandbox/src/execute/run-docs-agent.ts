@@ -1,5 +1,5 @@
-import type { Credentials } from '@buster/data-source';
 import { getDataSourceCredentials, getOrganizationDataSource } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { Sandbox } from '@daytonaio/sdk';
 import { z } from 'zod';
 import { buildProfilesYaml } from '../helpers/build-dbt-profiles-yaml';

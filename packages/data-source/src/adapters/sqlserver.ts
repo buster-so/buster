@@ -1,7 +1,11 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type SQLServerCredentials,
+} from '@buster/database/schema-types';
 import sql from 'mssql';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SQLServerIntrospector } from '../introspection/sqlserver';
-import { type Credentials, DataSourceType, type SQLServerCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';
@@ -26,7 +30,7 @@ export class SQLServerAdapter extends BaseAdapter {
 
     try {
       const config: sql.config = {
-        server: sqlServerCredentials.server,
+        server: sqlServerCredentials.host,
         port: sqlServerCredentials.port,
         database: sqlServerCredentials.default_database,
         user: sqlServerCredentials.username,
@@ -230,10 +234,7 @@ export class SQLServerAdapter extends BaseAdapter {
     if (this.pool) {
       try {
         await this.pool.close();
-      } catch (error) {
-        // Log error but don't throw - connection is being closed anyway
-        console.error('Error closing SQL Server connection:', error);
-      }
+      } catch (_error) {}
       this.pool = undefined;
     }
     this.connected = false;
@@ -277,8 +278,7 @@ export class SQLServerAdapter extends BaseAdapter {
 
       const firstRow = result.recordset[0] as { count?: number } | undefined;
       return !!firstRow && (firstRow.count ?? 0) > 0;
-    } catch (error) {
-      console.error('Error checking table existence:', error);
+    } catch (_error) {
       return false;
     }
   }
@@ -321,7 +321,6 @@ export class SQLServerAdapter extends BaseAdapter {
     try {
       const request = this.pool.request();
       await request.query(createTableSQL);
-      console.info(`Table ${schema}.${tableName} created successfully`);
     } catch (error) {
       throw new Error(
         `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -395,8 +394,6 @@ export class SQLServerAdapter extends BaseAdapter {
         .input('confidenceScore', sql.NVarChar, record.confidenceScore)
         .input('assumptions', sql.NVarChar, JSON.stringify(record.assumptions))
         .query(insertSQL);
-
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw new Error(
         `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`

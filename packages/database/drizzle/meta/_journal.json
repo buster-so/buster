@@ -869,6 +869,13 @@
       "when": 1761241260579,
       "tag": "0124_premium_killer_shrike",
       "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1761794891825,
+      "tag": "0125_add_col_to_chats_for_title_update",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
+import type { DataSourceListItem, GetDataSourceResponse } from '@buster/server-shared';
 import { queryOptions } from '@tanstack/react-query';
-import type { DataSource, DataSourceListItem } from '@/api/asset_interfaces/datasources';
 
 export const datasourceGetList = queryOptions<DataSourceListItem[]>({
   queryKey: ['datasources', 'list'] as const,
@@ -9,7 +9,7 @@ export const datasourceGetList = queryOptions<DataSourceListItem[]>({
 });
 
 export const datasourceGet = (id: string) =>
-  queryOptions<DataSource>({
+  queryOptions<GetDataSourceResponse>({
     queryKey: ['datasources', 'get', id] as const,
     staleTime: 10 * 1000, // 10 seconds
   });

@@ -84,6 +84,7 @@ describe('POST /chats', () => {
     workspace_member_count: 0,
     individual_permissions: [],
     screenshot_taken_at: null,
+    collections: [],
   };
 
   beforeEach(() => {

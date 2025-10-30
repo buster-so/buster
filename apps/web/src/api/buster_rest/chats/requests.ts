@@ -9,6 +9,7 @@ import type {
   ShareChatResponse,
   UpdateChatMessageFeedbackRequest,
   UpdateChatMessageFeedbackResponse,
+  UpdateChatParams,
   UpdateChatRequest,
   UpdateChatResponse,
 } from '@buster/server-shared/chats';
@@ -44,8 +45,8 @@ export const deleteChat = async (data: DeleteChatsRequest): Promise<void> => {
 export const updateChat = async ({
   id,
   ...data
-}: UpdateChatRequest): Promise<UpdateChatResponse> => {
-  return mainApi.put<UpdateChatResponse>(`${CHATS_BASE}/${id}`, data).then((res) => res.data);
+}: UpdateChatRequest & UpdateChatParams): Promise<UpdateChatResponse> => {
+  return mainApiV2.put<UpdateChatResponse>(`${CHATS_BASE}/${id}`, data).then((res) => res.data);
 };
 
 export const updateChatMessageFeedback = async ({

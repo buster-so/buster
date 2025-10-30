@@ -33,6 +33,7 @@ import { Route as EmbedDashboardDashboardIdRouteImport } from './routes/embed/da
 import { Route as EmbedChatChatIdRouteImport } from './routes/embed/chat.$chatId'
 import { Route as AppSettingsRestricted_layoutRouteImport } from './routes/app/_settings/_restricted_layout'
 import { Route as AppSettingsPermissionsRouteImport } from './routes/app/_settings/_permissions'
+import { Route as AppAppSharedWithMeRouteImport } from './routes/app/_app/shared-with-me'
 import { Route as AppAppNewUserRouteImport } from './routes/app/_app/new-user'
 import { Route as AppAppHomeRouteImport } from './routes/app/_app/home'
 import { Route as AppAppAssetRouteImport } from './routes/app/_app/_asset'
@@ -46,7 +47,6 @@ import { Route as AppAppLibraryIndexRouteImport } from './routes/app/_app/librar
 import { Route as AppAppHomeIndexRouteImport } from './routes/app/_app/home/index'
 import { Route as AppAppDatasetsIndexRouteImport } from './routes/app/_app/datasets.index'
 import { Route as AppAppDashboardsIndexRouteImport } from './routes/app/_app/dashboards.index'
-import { Route as AppAppCollectionsIndexRouteImport } from './routes/app/_app/collections.index'
 import { Route as AppAppChatsIndexRouteImport } from './routes/app/_app/chats.index'
 import { Route as ScreenshotsReportsReportIdContentRouteImport } from './routes/screenshots/reports.$reportId.content'
 import { Route as ScreenshotsMetricsMetricIdContentRouteImport } from './routes/screenshots/metrics.$metricId.content'
@@ -317,6 +317,11 @@ const AppSettingsPermissionsRoute = AppSettingsPermissionsRouteImport.update({
   id: '/_permissions',
   getParentRoute: () => AppSettingsRoute,
 } as any)
+const AppAppSharedWithMeRoute = AppAppSharedWithMeRouteImport.update({
+  id: '/shared-with-me',
+  path: '/shared-with-me',
+  getParentRoute: () => AppAppRoute,
+} as any)
 const AppAppNewUserRoute = AppAppNewUserRouteImport.update({
   id: '/new-user',
   path: '/new-user',
@@ -380,11 +385,6 @@ const AppAppDatasetsIndexRoute = AppAppDatasetsIndexRouteImport.update({
 const AppAppDashboardsIndexRoute = AppAppDashboardsIndexRouteImport.update({
   id: '/dashboards/',
   path: '/dashboards/',
-  getParentRoute: () => AppAppRoute,
-} as any)
-const AppAppCollectionsIndexRoute = AppAppCollectionsIndexRouteImport.update({
-  id: '/collections/',
-  path: '/collections/',
   getParentRoute: () => AppAppRoute,
 } as any)
 const AppAppChatsIndexRoute = AppAppChatsIndexRouteImport.update({
@@ -1236,6 +1236,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/home': typeof AppAppHomeRouteWithChildren
   '/app/new-user': typeof AppAppNewUserRouteWithChildren
+  '/app/shared-with-me': typeof AppAppSharedWithMeRoute
   '/embed/chat/$chatId': typeof EmbedChatChatIdRouteWithChildren
   '/embed/dashboard/$dashboardId': typeof EmbedDashboardDashboardIdRoute
   '/embed/metric/$metricId': typeof EmbedMetricMetricIdRoute
@@ -1247,7 +1248,6 @@ export interface FileRoutesByFullPath {
   '/screenshots/metrics/$metricId/content': typeof ScreenshotsMetricsMetricIdContentRoute
   '/screenshots/reports/$reportId/content': typeof ScreenshotsReportsReportIdContentRoute
   '/app/chats': typeof AppAppChatsIndexRoute
-  '/app/collections': typeof AppAppCollectionsIndexRoute
   '/app/dashboards': typeof AppAppDashboardsIndexRoute
   '/app/datasets': typeof AppAppDatasetsIndexRoute
   '/app/home/': typeof AppAppHomeIndexRoute
@@ -1377,6 +1377,7 @@ export interface FileRoutesByTo {
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/info/getting-started': typeof InfoGettingStartedRoute
+  '/app/shared-with-me': typeof AppAppSharedWithMeRoute
   '/embed/dashboard/$dashboardId': typeof EmbedDashboardDashboardIdRoute
   '/embed/metric/$metricId': typeof EmbedMetricMetricIdRoute
   '/embed/report/$reportId': typeof EmbedReportReportIdRoute
@@ -1387,7 +1388,6 @@ export interface FileRoutesByTo {
   '/screenshots/metrics/$metricId/content': typeof ScreenshotsMetricsMetricIdContentRoute
   '/screenshots/reports/$reportId/content': typeof ScreenshotsReportsReportIdContentRoute
   '/app/chats': typeof AppAppChatsIndexRoute
-  '/app/collections': typeof AppAppCollectionsIndexRoute
   '/app/dashboards': typeof AppAppDashboardsIndexRoute
   '/app/datasets': typeof AppAppDatasetsIndexRoute
   '/app/home': typeof AppAppHomeIndexRoute
@@ -1502,6 +1502,7 @@ export interface FileRoutesById {
   '/app/_app/_asset': typeof AppAppAssetRouteWithChildren
   '/app/_app/home': typeof AppAppHomeRouteWithChildren
   '/app/_app/new-user': typeof AppAppNewUserRouteWithChildren
+  '/app/_app/shared-with-me': typeof AppAppSharedWithMeRoute
   '/app/_settings/_permissions': typeof AppSettingsPermissionsRouteWithChildren
   '/app/_settings/_restricted_layout': typeof AppSettingsRestricted_layoutRouteWithChildren
   '/embed/chat/$chatId': typeof EmbedChatChatIdRouteWithChildren
@@ -1516,7 +1517,6 @@ export interface FileRoutesById {
   '/screenshots/metrics/$metricId/content': typeof ScreenshotsMetricsMetricIdContentRoute
   '/screenshots/reports/$reportId/content': typeof ScreenshotsReportsReportIdContentRoute
   '/app/_app/chats/': typeof AppAppChatsIndexRoute
-  '/app/_app/collections/': typeof AppAppCollectionsIndexRoute
   '/app/_app/dashboards/': typeof AppAppDashboardsIndexRoute
   '/app/_app/datasets/': typeof AppAppDatasetsIndexRoute
   '/app/_app/home/': typeof AppAppHomeIndexRoute
@@ -1666,6 +1666,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/home'
     | '/app/new-user'
+    | '/app/shared-with-me'
     | '/embed/chat/$chatId'
     | '/embed/dashboard/$dashboardId'
     | '/embed/metric/$metricId'
@@ -1677,7 +1678,6 @@ export interface FileRouteTypes {
     | '/screenshots/metrics/$metricId/content'
     | '/screenshots/reports/$reportId/content'
     | '/app/chats'
-    | '/app/collections'
     | '/app/dashboards'
     | '/app/datasets'
     | '/app/home/'
@@ -1807,6 +1807,7 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/reset-password'
     | '/info/getting-started'
+    | '/app/shared-with-me'
     | '/embed/dashboard/$dashboardId'
     | '/embed/metric/$metricId'
     | '/embed/report/$reportId'
@@ -1817,7 +1818,6 @@ export interface FileRouteTypes {
     | '/screenshots/metrics/$metricId/content'
     | '/screenshots/reports/$reportId/content'
     | '/app/chats'
-    | '/app/collections'
     | '/app/dashboards'
     | '/app/datasets'
     | '/app/home'
@@ -1931,6 +1931,7 @@ export interface FileRouteTypes {
     | '/app/_app/_asset'
     | '/app/_app/home'
     | '/app/_app/new-user'
+    | '/app/_app/shared-with-me'
     | '/app/_settings/_permissions'
     | '/app/_settings/_restricted_layout'
     | '/embed/chat/$chatId'
@@ -1945,7 +1946,6 @@ export interface FileRouteTypes {
     | '/screenshots/metrics/$metricId/content'
     | '/screenshots/reports/$reportId/content'
     | '/app/_app/chats/'
-    | '/app/_app/collections/'
     | '/app/_app/dashboards/'
     | '/app/_app/datasets/'
     | '/app/_app/home/'
@@ -2244,6 +2244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsPermissionsRouteImport
       parentRoute: typeof AppSettingsRoute
     }
+    '/app/_app/shared-with-me': {
+      id: '/app/_app/shared-with-me'
+      path: '/shared-with-me'
+      fullPath: '/app/shared-with-me'
+      preLoaderRoute: typeof AppAppSharedWithMeRouteImport
+      parentRoute: typeof AppAppRoute
+    }
     '/app/_app/new-user': {
       id: '/app/_app/new-user'
       path: '/new-user'
@@ -2333,13 +2340,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboards'
       fullPath: '/app/dashboards'
       preLoaderRoute: typeof AppAppDashboardsIndexRouteImport
-      parentRoute: typeof AppAppRoute
-    }
-    '/app/_app/collections/': {
-      id: '/app/_app/collections/'
-      path: '/collections'
-      fullPath: '/app/collections'
-      preLoaderRoute: typeof AppAppCollectionsIndexRouteImport
       parentRoute: typeof AppAppRoute
     }
     '/app/_app/chats/': {
@@ -3730,9 +3730,9 @@ interface AppAppRouteChildren {
   AppAppAssetRoute: typeof AppAppAssetRouteWithChildren
   AppAppHomeRoute: typeof AppAppHomeRouteWithChildren
   AppAppNewUserRoute: typeof AppAppNewUserRouteWithChildren
+  AppAppSharedWithMeRoute: typeof AppAppSharedWithMeRoute
   AppAppDatasetsDatasetIdRoute: typeof AppAppDatasetsDatasetIdRouteWithChildren
   AppAppChatsIndexRoute: typeof AppAppChatsIndexRoute
-  AppAppCollectionsIndexRoute: typeof AppAppCollectionsIndexRoute
   AppAppDashboardsIndexRoute: typeof AppAppDashboardsIndexRoute
   AppAppDatasetsIndexRoute: typeof AppAppDatasetsIndexRoute
   AppAppLibraryIndexRoute: typeof AppAppLibraryIndexRoute
@@ -3745,9 +3745,9 @@ const AppAppRouteChildren: AppAppRouteChildren = {
   AppAppAssetRoute: AppAppAssetRouteWithChildren,
   AppAppHomeRoute: AppAppHomeRouteWithChildren,
   AppAppNewUserRoute: AppAppNewUserRouteWithChildren,
+  AppAppSharedWithMeRoute: AppAppSharedWithMeRoute,
   AppAppDatasetsDatasetIdRoute: AppAppDatasetsDatasetIdRouteWithChildren,
   AppAppChatsIndexRoute: AppAppChatsIndexRoute,
-  AppAppCollectionsIndexRoute: AppAppCollectionsIndexRoute,
   AppAppDashboardsIndexRoute: AppAppDashboardsIndexRoute,
   AppAppDatasetsIndexRoute: AppAppDatasetsIndexRoute,
   AppAppLibraryIndexRoute: AppAppLibraryIndexRoute,

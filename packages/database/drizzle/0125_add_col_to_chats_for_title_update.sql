@@ -1,0 +1,2 @@
+CREATE TYPE "public"."chat_updated_by_type_enum" AS ENUM('user', 'agent');--> statement-breakpoint
+ALTER TABLE "chats" ADD COLUMN "updated_by_type" "chat_updated_by_type_enum" DEFAULT 'agent' NOT NULL;

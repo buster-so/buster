@@ -1,4 +1,3 @@
-import type { Credentials } from '@buster/data-source';
 import { checkCacheExists, executeMetricQuery, setCachedMetricData } from '@buster/data-source';
 import {
   extractSqlFromMetricContent,
@@ -6,6 +5,7 @@ import {
   getMetricWithDataSource,
   getUserOrganizationId,
 } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
 
 /**

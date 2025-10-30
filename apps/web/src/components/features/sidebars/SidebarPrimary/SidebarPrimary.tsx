@@ -1,43 +1,32 @@
-import type { AssetType } from '@buster/server-shared/assets';
 import { Link, useNavigate } from '@tanstack/react-router';
 import React, { lazy, Suspense, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import {
-  useIsAnonymousUser,
-  useIsUserAdmin,
-  useIsUserRegistered,
-  useRestrictNewUserInvitations,
-} from '@/api/buster_rest/users/useGetUserInfo';
+import { useIsUserAdmin, useIsUserRegistered } from '@/api/buster_rest/users/useGetUserInfo';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
-import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { Button } from '@/components/ui/buttons';
-import { Flag, House4, Magnifier, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
+import { Magnifier } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
+import Compose2 from '@/components/ui/icons/NucleoIconOutlined/compose-2';
+import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
 import {
   COLLAPSED_HIDDEN,
   COLLAPSED_JUSTIFY_CENTER,
   COLLAPSED_VISIBLE,
-  type ISidebarGroup,
-  type ISidebarItem,
   type ISidebarList,
   type SidebarProps,
 } from '@/components/ui/sidebar';
-import {
-  createSidebarGroup,
-  createSidebarItem,
-  createSidebarItems,
-  createSidebarList,
-} from '@/components/ui/sidebar/create-sidebar-item';
+import { createSidebarList } from '@/components/ui/sidebar/create-sidebar-item';
 import { Sidebar } from '@/components/ui/sidebar/SidebarComponent';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
-import { toggleContactSupportModal } from '@/context/GlobalStore/useContactSupportModalStore';
-import { toggleInviteModal } from '@/context/GlobalStore/useInviteModalStore';
 import { cn } from '@/lib/classMerge';
 import { LazyErrorBoundary } from '../../global/LazyErrorBoundary';
 import { toggleGlobalSearch } from '../../search/GlobalSearchModal';
 import { SidebarUserFooter } from '../SidebarUserFooter';
+import { useAdminToolSidebar } from './useAdminToolSidebar';
+import { useChatHistorySidebar } from './useChatHistorySidebar';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
+import { useSharedWithMeSidebar } from './useSharedWithMeSidebar';
 
 const LazyGlobalModals = lazy(() => import('./PrimaryGlobalModals'));
 
@@ -45,184 +34,84 @@ const topItems: ISidebarList = createSidebarList({
   id: 'top-items',
   items: [
     {
-      label: 'Home',
-      icon: <House4 />,
+      label: 'New chat',
+      icon: <Compose2 />,
       link: { to: '/app/home', preload: 'viewport', preloadDelay: 1000 },
       id: '/app/home',
     },
     {
-      label: 'Chat history',
-      icon: <ASSET_ICONS.chats />,
-      link: {
-        to: '/app/chats',
-        preload: 'viewport',
-        preloadDelay: 2000,
-        activeOptions: {
-          exact: true,
-        },
-      },
-      id: '/app/chats/',
+      label: 'Library',
+      icon: <FolderContent />,
+      link: { to: '/app/library', preload: 'intent' },
+      id: '/app/library/',
     },
   ],
 });
 
-const yourStuff: ISidebarGroup = createSidebarGroup({
-  label: 'Your stuff',
-  id: 'your-stuff',
-  items: createSidebarItems(
-    [
-      {
-        label: 'Metrics',
-        assetType: 'metric_file' satisfies AssetType,
-        icon: <ASSET_ICONS.metrics />,
-        link: { to: '/app/metrics' },
-        id: '/app/metrics',
-      },
-      {
-        label: 'Dashboards',
-        assetType: 'dashboard_file' satisfies AssetType,
-        icon: <ASSET_ICONS.dashboards />,
-        link: { to: '/app/dashboards' },
-        id: '/app/dashboards/',
-      },
-      {
-        label: 'Collections',
-        assetType: 'collection' satisfies AssetType,
-        icon: <ASSET_ICONS.collections />,
-        link: { to: '/app/collections' },
-        id: '/app/collections/',
-      },
-      {
-        label: 'Reports',
-        assetType: 'report_file' satisfies AssetType,
-        icon: <ASSET_ICONS.reports />,
-        link: { to: '/app/reports' },
-        id: '/app/reports/',
-      },
-    ].map(({ assetType, ...item }) => ({
-      ...item,
-      link: {
-        ...item.link,
-        activeOptions: { exact: true },
-      },
-      //  active: selectedAssetType === assetType,
-    }))
-  ),
-});
-
-const adminTools: ISidebarGroup = createSidebarGroup({
-  label: 'Admin tools',
-  id: 'admin-tools',
-  items: createSidebarItems([
-    {
-      label: 'Logs',
-      icon: <UnorderedList2 />,
-      link: { to: '/app/logs', preload: 'viewport', preloadDelay: 1000 },
-      id: '/app/logs/',
-      collapsedTooltip: 'Logs',
-    },
-    {
-      label: 'Datasets',
-      icon: <Table />,
-      link: { to: '/app/datasets' },
-      id: '/app/datasets/',
-      collapsedTooltip: 'Datasets',
-    },
-  ]),
-});
-
-const tryGroup = (showInvitePeople: boolean): ISidebarGroup => ({
-  label: 'Try',
-  id: 'try',
-  items: [
-    createSidebarItem({
-      label: 'Invite people',
-      icon: <Plus />,
-      id: 'invite-people',
-      onClick: () => toggleInviteModal(),
-      show: showInvitePeople,
-    }),
-    createSidebarItem({
-      label: 'Leave feedback',
-      icon: <Flag />,
-      id: 'leave-feedback',
-      onClick: () => toggleContactSupportModal('feedback'),
-    }),
-  ].reduce((acc, { show, ...item }) => {
-    if (show !== false) acc.push(item);
-    return acc;
-  }, [] as ISidebarItem[]),
-});
-
-const makeSidebarItems = ({
-  isUserRegistered,
-  isAdmin,
-  favoritesDropdownItems,
-  tryGroupMemoized,
-}: {
-  isUserRegistered: boolean;
-  isAdmin: boolean;
-  favoritesDropdownItems: ISidebarGroup | null;
-  tryGroupMemoized: ISidebarGroup;
-}) => {
-  if (!isUserRegistered) return [];
-
-  const items = [topItems];
-
-  if (isAdmin) {
-    items.push(adminTools);
-  }
-
-  items.push(yourStuff);
-
-  if (favoritesDropdownItems) {
-    items.push(favoritesDropdownItems);
-  }
-
-  items.push(tryGroupMemoized);
-
-  return items;
+export type SidebarPrimaryProps = {
+  defaultOpenChatHistory: boolean;
+  defaultOpenFavorites: boolean;
+  defaultOpenAdminTools: boolean;
 };
 
-export const SidebarPrimary = React.memo(() => {
-  const isAdmin = useIsUserAdmin();
-  const restrictNewUserInvitations = useRestrictNewUserInvitations();
-  const isUserRegistered = useIsUserRegistered();
+export const SidebarPrimary = React.memo(
+  ({
+    defaultOpenChatHistory,
+    defaultOpenFavorites,
+    defaultOpenAdminTools,
+  }: SidebarPrimaryProps) => {
+    const isAdmin = useIsUserAdmin();
+    const isUserRegistered = useIsUserRegistered();
 
-  const favoritesDropdownItems = useFavoriteSidebarPanel();
+    const favoritesDropdownItems = useFavoriteSidebarPanel({ defaultOpenFavorites });
+    const chatHistoryItems = useChatHistorySidebar({ defaultOpenChatHistory });
+    const adminToolsItems = useAdminToolSidebar({ defaultOpenAdminTools });
+    const sharedWithMeItems = useSharedWithMeSidebar();
 
-  const tryGroupMemoized = useMemo(
-    () => tryGroup(!restrictNewUserInvitations),
-    [restrictNewUserInvitations]
-  );
+    const sidebarItems: SidebarProps['content'] = useMemo(() => {
+      if (!isUserRegistered) return [];
 
-  const sidebarItems: SidebarProps['content'] = makeSidebarItems({
-    isUserRegistered,
-    isAdmin,
-    favoritesDropdownItems,
-    tryGroupMemoized,
-  });
+      const items = [topItems];
 
-  return (
-    <>
-      <Sidebar
-        content={sidebarItems}
-        header={useMemo(
-          () => <SidebarPrimaryHeader hideActions={!isUserRegistered} />,
-          [isUserRegistered]
-        )}
-        footer={useMemo(() => <SidebarUserFooter />, [])}
-        useCollapsible={isUserRegistered}
-      />
+      if (sharedWithMeItems) items.push(sharedWithMeItems);
 
-      <LazyErrorBoundary>
-        <Suspense fallback={null}>
-          <LazyGlobalModals />
-        </Suspense>
-      </LazyErrorBoundary>
-    </>
-  );
-});
+      if (chatHistoryItems) items.push(chatHistoryItems);
+
+      if (favoritesDropdownItems) items.push(favoritesDropdownItems);
+
+      if (isAdmin) items.push(adminToolsItems);
+
+      return items;
+    }, [
+      isAdmin,
+      adminToolsItems,
+      chatHistoryItems,
+      favoritesDropdownItems,
+      sharedWithMeItems,
+      isUserRegistered,
+    ]);
+
+    return (
+      <>
+        <Sidebar
+          content={sidebarItems}
+          header={useMemo(
+            () => <SidebarPrimaryHeader hideActions={!isUserRegistered} />,
+            [isUserRegistered]
+          )}
+          footer={useMemo(() => <SidebarUserFooter />, [])}
+          useCollapsible={isUserRegistered}
+        />
+
+        <LazyErrorBoundary>
+          <Suspense fallback={null}>
+            <LazyGlobalModals />
+          </Suspense>
+        </LazyErrorBoundary>
+      </>
+    );
+  }
+);
 
 SidebarPrimary.displayName = 'SidebarPrimary';
 
@@ -253,13 +142,19 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
               variant="ghost"
               rounding={'large'}
               prefix={<Magnifier />}
+              data-testid="search-button"
               onClick={() => toggleGlobalSearch(true)}
             />
           </Tooltip>
 
           <Tooltip title="Start a chat" shortcuts={['C']}>
             <Link to={'/app/home'}>
-              <Button size="tall" rounding={'large'} prefix={<PencilSquareIcon />} />
+              <Button
+                size="tall"
+                data-testid="start-chat-button"
+                rounding={'large'}
+                prefix={<PencilSquareIcon />}
+              />
             </Link>
           </Tooltip>
         </div>

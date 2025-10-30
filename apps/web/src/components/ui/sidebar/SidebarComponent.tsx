@@ -1,46 +1,40 @@
 import React from 'react';
-import {
-  useAppSplitterAnimateWidth,
-  useAppSplitterSizesInPixels,
-} from '@/components/ui/layouts/AppSplitter/AppSplitterProvider';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { COLLAPSED_SIDEBAR_WIDTH, DEFAULT_SIDEBAR_WIDTH } from './config';
 import type { ISidebarGroup, ISidebarList, SidebarProps } from './interfaces';
 import { SidebarCollapsible } from './SidebarCollapsible';
+import { SidebarContextProvider } from './SidebarContext';
 import { SidebarFooter } from './SidebarFooter';
 import { SidebarItem } from './SidebarItem';
+import './sidebar-module.css';
 
 export const Sidebar: React.FC<SidebarProps> = React.memo(
   ({ header, content, footer, useCollapsible = true, onCollapseClick }) => {
-    const animateWidth = useAppSplitterAnimateWidth();
-    const getSizesInPixels = useAppSplitterSizesInPixels();
-
-    const onCollapseClickPreflight = useMemoizedFn(() => {
-      const sizes = getSizesInPixels();
-      const parsedCollapsedWidth = parseInt(COLLAPSED_SIDEBAR_WIDTH, 10) + 6; //6 for a little buffer
-      const parsedCurrentSize = sizes[0];
-      const isCollapsed = parsedCurrentSize <= parsedCollapsedWidth;
-      onCollapseClick?.(isCollapsed);
-      const targetWidth = !isCollapsed ? COLLAPSED_SIDEBAR_WIDTH : DEFAULT_SIDEBAR_WIDTH;
-      animateWidth(targetWidth, 'left', 200);
-    });
-
     return (
-      <div className="@container flex h-full flex-col overflow-hidden px-3.5 pt-4.5">
-        <div className="flex flex-col space-y-4.5">
-          <div className="mb-5">{header}</div>
-          <div className="flex flex-grow flex-col space-y-4.5 overflow-y-auto pb-3">
-            {content.map((item) => (
-              <ContentSelector key={item.id} content={item} useCollapsible={useCollapsible} />
-            ))}
+      <SidebarContextProvider onCollapseClick={onCollapseClick}>
+        <div className="@container flex h-full flex-col overflow-hidden">
+          {/* Header */}
+          <div className="mb-5 mt-4.5 px-3.5">{header}</div>
+
+          {/* Scrollable Content */}
+          <div className="sidebar-scroll-area flex flex-1 flex-col overflow-y-auto scrollbar scrollbar-thin">
+            {/* Top scroll indicator - appears when scrolled down */}
+            <div className="sidebar-scroll-indicator-top" />
+            <div className="flex flex-col space-y-0.5 px-3.5 pb-3">
+              {content.map((item) => (
+                <ContentSelector key={item.id} content={item} useCollapsible={useCollapsible} />
+              ))}
+            </div>
+            {/* Bottom scroll indicator - appears when content is scrollable */}
+            <div className="sidebar-scroll-indicator-bottom" />
           </div>
+
+          {/* Footer - always at bottom */}
+          {(footer || useCollapsible) && (
+            <div className="px-3.5">
+              <SidebarFooter useCollapsible={useCollapsible}>{footer}</SidebarFooter>
+            </div>
+          )}
         </div>
-        {(footer || useCollapsible) && (
-          <SidebarFooter useCollapsible={useCollapsible} onCollapseClick={onCollapseClickPreflight}>
-            {footer}
-          </SidebarFooter>
-        )}
-      </div>
+      </SidebarContextProvider>
     );
   }
 );
@@ -54,7 +48,6 @@ const ContentSelector: React.FC<{
   if (isSidebarGroup(content)) {
     return <SidebarCollapsible {...content} useCollapsible={useCollapsible} />;
   }
-
   return <SidebarList {...content} />;
 });
 ContentSelector.displayName = 'ContentSelector';

@@ -16,22 +16,60 @@ steps:
   - id: f88fb988-6893-4a09-8366-ea89c38d9367
     type: MODULE
     moduleId: defc36e9-b0a7-4bfe-940f-7901493d5e5e
-  - id: 292ed32d-c649-4321-bd7b-29516169fb74
+  - id: 9b27580a-a7ba-4a2c-8943-3a2a39460d2b
     type: PRESET_ACTION
     command:
-      id: b2d94baa-b0ba-4555-8846-f0d87c47b237
+      id: d132e865-64ad-43e2-90c4-c39bba7e8b89
       type: CLICK
       target:
         type: description
-        elementDescriptor: the metrics link in the left sidebar
-  - id: 925aa181-3576-41ba-87e4-fd59595e4a69
+        elementDescriptor: the search button (magnifier icon) in the left sidebar header
+  - id: 1930eb5c-7061-40c2-a6ea-7c9f5ab278df
     type: PRESET_ACTION
     command:
-      id: b9a4f4d3-83e2-4a28-8d7f-45a84ad0e289
+      id: 01a85e5c-84af-45a5-9858-db17abbee878
       type: CLICK
       target:
         type: description
-        elementDescriptor: the div with text 'Monthly Order Volume'
+        elementDescriptor: the filters icon button in the search modal header
+  - id: 4614e70c-f9b6-459f-b183-38248951e788
+    type: PRESET_ACTION
+    command:
+      id: be58f663-6532-4134-b667-a18789bcb7fd
+      type: HOVER
+      target:
+        type: description
+        elementDescriptor: the 'Asset type' menu item in the Filters menu (menu item
+          with right caret)
+  - id: 85211453-a804-4901-aa35-aa30b09add1a
+    type: PRESET_ACTION
+    command:
+      id: 6c2760dc-a01e-4069-807b-c16ad89c6669
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the Charts checkbox in the Filters dropdown menu
+  - id: 75227dbe-f766-47e7-999f-08c6d1795e35
+    type: PRESET_ACTION
+    command:
+      id: 3029dd1a-dbe8-4d57-8ea4-e54fc50d8175
+      type: KEY_DOWN
+      value: Escape
+  - id: 86a299e8-0125-4c6f-83b0-d9c30b322adb
+    type: PRESET_ACTION
+    command:
+      id: 5fdcf56b-e498-400c-b5ad-3cee864c4e6b
+      type: WAIT
+      delay: 2
+  - id: 1380d80d-06dc-4de1-a5ea-3474f936437e
+    type: PRESET_ACTION
+    command:
+      id: 213065f4-d578-4d25-83d3-ec246ada33f6
+      type: CLICK
+      target:
+        type: description
+        elementDescriptor: the search suggestion option in the search modal. Do not
+          click on anything in the Actions group.
   - id: 05169d64-25d9-4afc-9bf1-2c9d0a89a3c8
     type: PRESET_ACTION
     command:
@@ -40,44 +78,9 @@ steps:
       target:
         type: description
         elementDescriptor: the edit chart button
-  - id: da101b4c-f999-4136-9aa9-fc24ca6e98b6
+  - id: 8323698c-491b-4188-8726-d08cbeddea1d
     type: PRESET_ACTION
     command:
-      id: 0bb103d6-31ad-4b02-83fe-f117a27ead56
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the stacked bar chart-type button in the Chart type selector
-          (data-testid select-chart-type-stackedBar)
-  - id: 4eb57c88-4bff-4a3e-9004-a4a73fe558c2
-    type: PRESET_ACTION
-    command:
-      id: 72d5dd39-fe1e-4ab8-85b1-f11400c1ac6d
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the Save button in the page bottom action bar next to Reset
-  - id: e5dcec3e-c0ba-412a-af68-c2d65c6af47b
-    type: PRESET_ACTION
-    command:
-      id: 4cc134c4-5f29-4afd-bcd3-3075a0574f7f
-      type: AI_ASSERTION
-      assertion: We should see a stacked bar chart. The xaxis whould be labeled Orders
-        and the yaxis should have Month in it.
-afterSteps:
-  - id: e37dd2b1-ac2e-4112-820f-66f3b11d19e9
-    type: PRESET_ACTION
-    command:
-      id: 92620cbd-0f4a-4fb5-91b7-92df614179d9
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the grouped column chart icon
-  - id: c12e98f0-7a17-4853-ae7d-a086f615d2ca
-    type: PRESET_ACTION
-    command:
-      id: 5084ca86-7234-44f4-8e08-48760591a996
-      type: CLICK
-      target:
-        type: description
-        elementDescriptor: the save button at the bottom of the chart
+      id: 2d93234c-f119-47c6-92fb-cb2e8b46a35a
+      type: WAIT
+      delay: 1

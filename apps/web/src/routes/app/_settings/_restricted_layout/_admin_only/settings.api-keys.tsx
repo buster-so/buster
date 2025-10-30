@@ -12,5 +12,6 @@ export const Route = createFileRoute(
       { name: 'og:description', content: 'Manage your API keys and integrations' },
     ],
   }),
+  loader: async () => {},
   component: ApiKeyController,
 });

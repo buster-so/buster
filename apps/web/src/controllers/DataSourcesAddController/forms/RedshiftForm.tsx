@@ -1,9 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type DataSource,
-  type RedshiftCredentials,
-  RedshiftCredentialsSchema,
-} from '@/api/asset_interfaces/datasources';
+import type { RedshiftCredentials } from '@/api/asset_interfaces/datasources';
 import {
   type createRedshiftDataSource,
   useCreateRedshiftDataSource,
@@ -15,7 +12,7 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const RedshiftForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
 }> = ({ dataSource }) => {
   const { mutateAsync: createDataSource } = useCreateRedshiftDataSource();
   const { mutateAsync: updateDataSource } = useUpdateRedshiftDataSource();
@@ -33,8 +30,8 @@ export const RedshiftForm: React.FC<{
       default_database: credentials?.default_database || '',
       default_schema: credentials?.default_schema || '',
       type: 'redshift' as const,
-      name: dataSource?.name || credentials?.name || '',
-    } satisfies Parameters<typeof createRedshiftDataSource>[0],
+      name: dataSource?.name || '',
+    } as RedshiftCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -42,11 +39,6 @@ export const RedshiftForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: RedshiftCredentialsSchema,
-      onSubmit: RedshiftCredentialsSchema,
     },
   });
 

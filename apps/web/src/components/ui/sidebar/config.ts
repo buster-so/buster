@@ -1,5 +1,6 @@
 export const DEFAULT_SIDEBAR_WIDTH = '230px';
 export const COLLAPSED_SIDEBAR_WIDTH = `${28 * 2}px`; //56px
+export const COLLAPSED_SIDEBAR_WIDTH_NUMBER = 90;
 
 //Classes
 export const COLLAPSED_HIDDEN = 'hidden @[90px]:flex!';
