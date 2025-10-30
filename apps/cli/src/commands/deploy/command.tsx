@@ -19,6 +19,8 @@ export function createDeployCommand(): Command {
     .option('--verbose', 'Show detailed output')
     .option('--debug', 'Enable debug mode with detailed SQL logging')
     .option('--interactive', 'Use interactive UI mode')
+    .option('--skip-automation', 'Skip automation deployment')
+    .option('--skip-models', 'Skip model deployment')
     .action(async (options) => {
       try {
         // Parse and validate options
@@ -27,6 +29,8 @@ export function createDeployCommand(): Command {
           dryRun: options.dryRun || false,
           verbose: options.verbose || false,
           debug: options.debug || false,
+          skipModels: options.skipModels || false,
+          skipAutomation: options.skipAutomation || false,
         });
 
         // Use interactive UI mode only if explicitly requested

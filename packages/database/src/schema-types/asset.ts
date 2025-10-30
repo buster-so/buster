@@ -22,6 +22,18 @@ export const AssetPermissionRoleSchema = z.enum([
 
 export type AssetPermissionRole = z.infer<typeof AssetPermissionRoleSchema>;
 
+export const AgentNameSchema = z.enum(['documentation_agent', 'upstream_conflict_agent']);
+export type AgentName = z.infer<typeof AgentNameSchema>;
+
+export const AgentEventTriggerSchema = z.enum([
+  'pull_request.opened',
+  'pull_request.synchronize',
+  'pull_request.reopened',
+  'issue_comment.created',
+  'push',
+]);
+export type AgentEventTrigger = z.infer<typeof AgentEventTriggerSchema>;
+
 export const AncestorSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),

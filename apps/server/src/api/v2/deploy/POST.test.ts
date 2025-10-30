@@ -104,9 +104,6 @@ describe('deployHandler', () => {
       );
     });
 
-    // Removed test case for null organizationId as the actual function
-    // returns null when there's no organization, not an object with null organizationId
-
     it('should throw 403 if user lacks sufficient permissions', async () => {
       mockGetUserOrganizationId.mockResolvedValue({
         organizationId: 'org-123',

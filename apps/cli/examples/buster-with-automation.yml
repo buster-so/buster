@@ -1,0 +1,61 @@
+# Example buster.yml with automation configuration
+
+# Optional: Logs writeback configuration
+logs:
+  database: analytics
+  schema: logs
+  table_name: buster_query_logs
+
+# Projects configuration
+projects:
+  - name: main
+    data_source: my_postgres
+    database: production
+    schema: public
+    include:
+      - models/**/*.yml
+      - semantic/**/*.yaml
+    exclude:
+      - models/draft/**
+      - models/legacy/**
+
+# Optional: CI/CD Agent Automation Configuration
+automation:
+  # Documentation agent - runs on PRs and pushes to staging
+  - agent: documentation-agent
+    on:
+      # Trigger on pull request events
+      - event: pull_request
+        # Optional: specific repository (defaults to current if omitted)
+        repository: buster-so/adventure-works
+        # Optional: PR event types to trigger on
+        types: [opened, reopened, synchronize]
+        # Optional: branch filters
+        branches:
+          - staging
+          - main
+      
+      # Trigger on push events to main
+      - event: push
+        # Note: push events don't support 'types'
+        branches:
+          - main
+
+  # Upstream conflict detection agent
+  - agent: upstream-conflict-detection-agent
+    on:
+      - event: pull_request
+        # Repository is optional - will default to current repo
+        types: [opened, reopened]
+        branches:
+          - staging
+        # Special: Track upstream repositories for conflict detection
+        upstream_repositories:
+          - repository: buster-so/buster
+            branches:
+              - staging
+              - main
+          - repository: buster-so/core
+            branches:
+              - production
+

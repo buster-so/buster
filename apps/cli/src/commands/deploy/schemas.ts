@@ -98,6 +98,8 @@ export const DeployOptionsSchema = z.object({
   dryRun: z.boolean().default(false),
   verbose: z.boolean().default(false),
   debug: z.boolean().default(false),
+  skipModels: z.boolean().default(false),
+  skipAutomation: z.boolean().default(false),
 });
 
 // ============================================================================
@@ -131,6 +133,9 @@ export const TodoFileSchema = z.object({
 
 // Use DocDeployResultSchema from server-shared instead of duplicating
 
+// Get AutomationDeployResultSchema from deploy namespace
+const AutomationDeployResultSchema = deploy.AutomationDeployResultSchema;
+
 export const CLIDeploymentResultSchema = z.object({
   success: z.array(CLIDeploymentItemSchema).default([]),
   updated: z.array(CLIDeploymentItemSchema).default([]),
@@ -139,6 +144,7 @@ export const CLIDeploymentResultSchema = z.object({
   excluded: z.array(DeploymentExcludedSchema).default([]),
   todos: z.array(TodoFileSchema).default([]), // New field for TODO files
   docs: DocDeployResultSchema.optional(), // Track doc deployment results
+  automation: AutomationDeployResultSchema.optional(), // Track automation deployment results
 });
 
 // ============================================================================

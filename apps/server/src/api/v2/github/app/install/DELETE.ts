@@ -1,5 +1,5 @@
 import {
-  getActiveGithubIntegration,
+  getGithubIntegrationByOrganizationId,
   getUserOrganizationId,
   softDeleteGithubIntegration,
   type User,
@@ -30,7 +30,7 @@ export async function deleteGithubIntegrationHandler(user: User): Promise<void> 
   }
 
   // Get the active GitHub integration
-  const integration = await getActiveGithubIntegration(userOrg.organizationId);
+  const integration = await getGithubIntegrationByOrganizationId(userOrg.organizationId);
 
   if (!integration) {
     throw new HTTPException(404, {

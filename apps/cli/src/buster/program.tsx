@@ -14,6 +14,7 @@ interface RootOptions {
   research?: boolean;
   contextFilePath?: string;
   debug?: boolean;
+  checkRunKey?: string;
 }
 
 export const program = commander
@@ -26,7 +27,8 @@ export const program = commander
   .option('--messageId <id>', 'Message ID for tracking (used with --prompt)')
   .option('--research', 'Run agent in research mode (read-only, no file modifications)')
   .option('--contextFilePath <path>', 'Path to context file to include as system message')
-  .option('--debug', 'Enable debug logging to ~/.buster/logs/debug.log');
+  .option('--debug', 'Enable debug logging to ~/.buster/logs/debug.log')
+  .option('--checkRunKey <id>', 'GitHub check run ID to update (only valid with --prompt)');
 
 setupPreActionHook(program);
 
@@ -42,6 +44,12 @@ program.action(async (options: RootOptions) => {
     process.chdir(options.cwd);
   }
 
+  // Validate --check-run is only used with --prompt
+  if (options.checkRunKey && !options.prompt) {
+    console.error('Error: --checkRunKey can only be used with --prompt (headless mode)');
+    process.exit(1);
+  }
+
   // Check if running in headless mode
   if (options.prompt) {
     try {
@@ -52,6 +60,7 @@ program.action(async (options: RootOptions) => {
         ...(options.messageId && { messageId: options.messageId }),
         ...(options.research && { isInResearchMode: options.research }),
         ...(options.contextFilePath && { contextFilePath: options.contextFilePath }),
+        ...(options.checkRunKey && { checkRunKey: options.checkRunKey }),
       });
       console.log(chatId);
       process.exit(0);

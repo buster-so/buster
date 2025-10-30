@@ -876,6 +876,13 @@
       "when": 1761794891825,
       "tag": "0125_add_col_to_chats_for_title_update",
       "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1761835268055,
+      "tag": "0126_zippy_bulldozer",
+      "breakpoints": true
     }
   ]
 }

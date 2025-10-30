@@ -155,8 +155,33 @@ export async function loadBusterConfig(
     throw new Error(`Failed to parse buster.yml at ${configFile}`);
   }
 
-  // Loaded configuration successfully
+  if (config.automation && config.automation.length > 0) {
+    let repositoryName: string | undefined;
+    for (const agent of config.automation) {
+      if (agent.on.length > 0) {
+        for (const trigger of agent.on) {
+          if (trigger.repository) {
+            repositoryName = trigger.repository;
+          } else if (!trigger.repository && repositoryName) {
+            trigger.repository = repositoryName;
+          } else {
+            const baseDir = await getConfigBaseDir(configFile);
+            const findGitRepoName = await getGitRepositoryName(baseDir);
+            if (findGitRepoName) {
+              repositoryName = findGitRepoName;
+              trigger.repository = findGitRepoName;
+            } else {
+              throw new Error(
+                `No repository name set in ${configFile} and could not be determined from the directory structure`
+              );
+            }
+          }
+        }
+      }
+    }
+  }
 
+  // Loaded configuration successfully
   // Return both the config and its path
   return {
     config,
@@ -228,4 +253,82 @@ export function resolveModelPaths(modelPaths: string[], baseDir: string): string
     // Otherwise, resolve relative to base directory
     return resolve(baseDir, path);
   });
+}
+
+/**
+ * Get the git repository name from a directory
+ * Traverses up the directory tree to find .git directory
+ * Parses the repository name from the git config
+ * @returns The repository name or undefined if not found
+ */
+export async function getGitRepositoryName(startDir: string): Promise<string | undefined> {
+  let currentDir = resolve(startDir);
+
+  // Traverse up until we find .git or reach root
+  while (true) {
+    const gitDir = join(currentDir, '.git');
+
+    if (existsSync(gitDir)) {
+      // Found .git directory, try to read config
+      const configPath = join(gitDir, 'config');
+
+      if (!existsSync(configPath)) {
+        return undefined;
+      }
+
+      try {
+        const configContent = await readFile(configPath, 'utf-8');
+
+        // Parse git config to find remote origin URL
+        // Look for url = ... under [remote "origin"]
+        const urlMatch = configContent.match(/\[remote "origin"\][\s\S]*?url\s*=\s*(.+)/);
+
+        if (!urlMatch || !urlMatch[1]) {
+          return undefined;
+        }
+
+        const url = urlMatch[1].trim();
+
+        // Extract repository name with owner from URL
+        // Handle both SSH (git@github.com:owner/repo.git) and HTTPS (https://github.com/owner/repo.git) formats
+        let repoName: string | undefined;
+
+        // SSH format: git@github.com:owner/repo.git
+        if (url.includes('@') && url.includes(':')) {
+          const parts = url.split(':');
+          if (parts.length >= 2) {
+            // Get everything after the colon (owner/repo.git)
+            repoName = parts.slice(1).join(':');
+          }
+        }
+        // HTTPS format: https://github.com/owner/repo.git
+        else if (url.includes('://')) {
+          const parts = url.split('/');
+          if (parts.length >= 2) {
+            // Get the last two parts (owner/repo.git)
+            repoName = parts.slice(-2).join('/');
+          }
+        }
+
+        // Remove .git suffix if present
+        if (repoName?.endsWith('.git')) {
+          repoName = repoName.slice(0, -4);
+        }
+
+        return repoName;
+      } catch {
+        return undefined;
+      }
+    }
+
+    // Move up one directory
+    const parentDir = resolve(currentDir, '..');
+
+    // If we've reached the root, stop
+    if (parentDir === currentDir) {
+      return undefined;
+    }
+
+    currentDir = parentDir;
+  }
 }

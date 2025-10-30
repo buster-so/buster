@@ -56,11 +56,12 @@ export interface ChatServiceCallbacks {
  * Runs the analytics engineer agent in the CLI without sandbox
  * The agent runs locally but uses the proxy model to route LLM calls through the server
  * Messages are emitted via callback for immediate UI updates and saved to disk for persistence
+ * Returns the final accumulated messages from the agent execution
  */
 export async function runChatAgent(
   params: ChatServiceParams,
   callbacks: ChatServiceCallbacks = {}
-): Promise<void> {
+): Promise<ModelMessage[]> {
   const validated = ChatServiceParamsSchema.parse(params);
   const {
     chatId,
@@ -239,7 +240,11 @@ export async function runChatAgent(
       streamCallbacks.onAbort = onAbort;
     }
 
-    await processAgentStream(stream.fullStream, previousMessages, streamCallbacks);
+    const finalMessages = await processAgentStream(
+      stream.fullStream,
+      previousMessages,
+      streamCallbacks
+    );
 
     // Mark message as completed when agent finishes
     if (sdk && messageId) {
@@ -251,6 +256,8 @@ export async function runChatAgent(
         debugLogger.warn('Failed to mark message as completed:', error);
       }
     }
+
+    return finalMessages;
   } catch (error) {
     // Handle all errors and notify via callback
     debugLogger.error('Error in chat agent execution:', error);
