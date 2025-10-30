@@ -11,7 +11,7 @@ export type AssetGridViewListProps = {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   groups: undefined | Record<string, LibraryAssetListItem[]>;
   emptyContent: React.ReactNode;
-  ContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>>;
+  ContextMenu: React.ComponentType<React.PropsWithChildren<LibraryAssetListItem>>;
   groupBy: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined;
   type: 'library' | 'shared-with-me';
 };

@@ -1,6 +1,7 @@
 import type { GroupedAssets, LibraryAssetListItem } from '@buster/server-shared/library';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';
@@ -27,6 +28,10 @@ export const AssetGridViewList = React.memo(
   }: AssetGridViewListProps) => {
     // Calculate number of columns based on viewport width
     const [columns, setColumns] = React.useState(3);
+    const [selectedItem, setSelectedItem] = useState<LibraryAssetListItem>(() => {
+      // Initialize with first item or empty object
+      return items[0] || ({} as LibraryAssetListItem);
+    });
     const hasItems = items.length > 0;
     const hasGroups = groups !== undefined;
     const isInitialLoading = isInitialLoadingProp && !hasItems;
@@ -49,49 +54,58 @@ export const AssetGridViewList = React.memo(
       return () => window.removeEventListener('resize', updateColumns);
     }, []);
 
+    const handleContextMenu = useCallback((item: LibraryAssetListItem) => {
+      // Use flushSync to update state synchronously before menu opens
+      flushSync(() => {
+        setSelectedItem(item);
+      });
+    }, []);
+
     return (
-      <ScrollArea
-        key={hasGroups ? 'grouped' : 'ungrouped'}
-        viewportRef={scrollContainerRef}
-        className={'h-full '}
-        viewportClassName={cn(
-          'pb-12 relative',
-          'pt-10 sm:px-[max(84px,calc(10%-150px))] px-[max(24px,calc(50%-350px))]',
-          className
-        )}
-      >
-        {prelistContent}
+      <ContextMenu {...selectedItem}>
+        <ScrollArea
+          key={hasGroups ? 'grouped' : 'ungrouped'}
+          viewportRef={scrollContainerRef}
+          className={'h-full '}
+          viewportClassName={cn(
+            'pb-12 relative',
+            'pt-10 sm:px-[max(84px,calc(10%-150px))] px-[max(24px,calc(50%-350px))]',
+            className
+          )}
+        >
+          {prelistContent}
 
-        {!isInitialLoading &&
-          hasItems &&
-          (hasGroups ? (
-            <AssetGridGroupedView
-              groups={groups}
-              columns={columns}
-              scrollContainerRef={scrollContainerRef}
-              groupBy={groupBy}
-              items={items}
-              hasPrelistContent={!!prelistContent}
-              ContextMenu={ContextMenu}
-              type={type}
-            />
-          ) : (
-            <AssetGridUngroupedView
-              items={items}
-              columns={columns}
-              scrollContainerRef={scrollContainerRef}
-              hasPrelistContent={!!prelistContent}
-              ContextMenu={ContextMenu}
-              type={type}
-            />
-          ))}
+          {!isInitialLoading &&
+            hasItems &&
+            (hasGroups ? (
+              <AssetGridGroupedView
+                groups={groups}
+                columns={columns}
+                scrollContainerRef={scrollContainerRef}
+                groupBy={groupBy}
+                items={items}
+                hasPrelistContent={!!prelistContent}
+                onContextMenu={handleContextMenu}
+                type={type}
+              />
+            ) : (
+              <AssetGridUngroupedView
+                items={items}
+                columns={columns}
+                scrollContainerRef={scrollContainerRef}
+                hasPrelistContent={!!prelistContent}
+                onContextMenu={handleContextMenu}
+                type={type}
+              />
+            ))}
 
-        {!isInitialLoading && !hasItems && emptyContent}
+          {!isInitialLoading && !hasItems && emptyContent}
 
-        {isFetchingNextPage && (
-          <div className="text-text-tertiary text-center py-4">Loading more...</div>
-        )}
-      </ScrollArea>
+          {isFetchingNextPage && (
+            <div className="text-text-tertiary text-center py-4">Loading more...</div>
+          )}
+        </ScrollArea>
+      </ContextMenu>
     );
   }
 );
@@ -115,7 +129,7 @@ const AssetGridGroupedView = ({
   columns,
   scrollContainerRef,
   groupBy,
-  ContextMenu,
+  onContextMenu,
   items,
   hasPrelistContent,
   type,
@@ -126,7 +140,7 @@ const AssetGridGroupedView = ({
   groupBy: AssetGridViewListProps['groupBy'];
   items: LibraryAssetListItem[];
   hasPrelistContent: boolean;
-  ContextMenu: AssetGridViewListProps['ContextMenu'];
+  onContextMenu: (item: LibraryAssetListItem) => void;
   type: AssetGridViewListProps['type'];
 }) => {
   const _mounted = useMounted();
@@ -138,7 +152,7 @@ const AssetGridGroupedView = ({
         columns={columns}
         scrollContainerRef={scrollContainerRef}
         hasPrelistContent={hasPrelistContent}
-        ContextMenu={ContextMenu}
+        onContextMenu={onContextMenu}
         type={type}
       />
     );
@@ -260,7 +274,7 @@ const AssetGridGroupedView = ({
               style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
             >
               {item.items.map((asset) => (
-                <AssetGridItem key={asset.asset_id} {...asset} />
+                <AssetGridItem key={asset.asset_id} {...asset} onContextMenu={onContextMenu} />
               ))}
             </div>
           </div>
@@ -275,14 +289,14 @@ const AssetGridUngroupedView = ({
   columns,
   scrollContainerRef,
   hasPrelistContent,
-  ContextMenu,
+  onContextMenu,
   type,
 }: {
   items: LibraryAssetListItem[];
   columns: number;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   hasPrelistContent: boolean;
-  ContextMenu: AssetGridViewListProps['ContextMenu'];
+  onContextMenu: (item: LibraryAssetListItem) => void;
   type: AssetGridViewListProps['type'];
 }) => {
   // Calculate rows needed for grid
@@ -333,7 +347,7 @@ const AssetGridUngroupedView = ({
                 style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
               >
                 {slicedItems.map((asset) => (
-                  <AssetGridItem key={asset.asset_id} {...asset} />
+                  <AssetGridItem key={asset.asset_id} {...asset} onContextMenu={onContextMenu} />
                 ))}
               </div>
             </div>
