@@ -31,9 +31,16 @@ export async function performTextSearch(
 
   // Get user's organization
   const userOrg = await getUserOrganizationId(userId);
-
   if (!userOrg) {
-    throw new Error('User is not associated with an organization');
+    // If user is not associated with an organization, return an empty response
+    return {
+      data: [],
+      pagination: {
+        page: searchRequest.page,
+        page_size: searchRequest.page_size,
+        has_more: false,
+      },
+    };
   }
 
   const trimmedQuery = searchRequest.query?.trim();
