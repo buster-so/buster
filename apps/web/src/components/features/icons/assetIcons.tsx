@@ -9,6 +9,7 @@ import {
   SquareChart,
   Table,
 } from '@/components/ui/icons';
+import FoldersFilled from '@/components/ui/icons/NucleoIconFilled/folders';
 import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
 import Folders from '@/components/ui/icons/NucleoIconOutlined/folders';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
@@ -30,6 +31,7 @@ export const ASSET_ICONS = {
   report: FileContent,
   report_file: FileContent,
   library: Folders,
+  libraryAdded: FoldersFilled,
 };
 
 export const assetTypeToIcon = (assetType: ShareAssetType | keyof GroupedAssets) => {

@@ -42,6 +42,7 @@ const ContentRight: React.FC<{
   setOpenAddTypeModal: (open: boolean) => void;
 }> = React.memo(({ collection, setOpenAddTypeModal }) => {
   const collectionTitle = collection?.name;
+  const isAddedToLibrary = collection?.added_to_library || false;
   const navigate = useNavigate();
 
   const isEditor = canEdit(collection.permission);
@@ -81,6 +82,7 @@ const ContentRight: React.FC<{
         isEditor={isEditor}
         collection={collection}
         setOpenAddTypeModal={setOpenAddTypeModal}
+        isAddedToLibrary={isAddedToLibrary}
       />
     </div>
   );
