@@ -143,8 +143,6 @@ export const MetricThreeDotMenuDropdown = React.memo(
       ]
     );
 
-    console.log(items);
-
     return (
       <Dropdown items={items} side="left" align="start" contentClassName="max-h-fit" modal>
         {children}
@@ -203,26 +201,23 @@ const useDashboardSelectMenu = ({
     selectedDashboards: dashboards?.map((x) => x.id) || [],
   });
 
-  const dashboardSubMenu = useMemo(() => {
-    return (
-      <DropdownContent
-        menuHeader={menuHeader}
-        selectType={selectType}
-        items={items}
-        footerContent={footerContent}
-      />
-    );
-  }, [items, footerContent, menuHeader, selectType]);
-
   const dashboardDropdownItem: IDropdownItem = useMemo(
     () => ({
       label: 'Add to dashboard',
       value: 'add-to-dashboard',
       closeOnSelect: false,
       icon: <ASSET_ICONS.dashboardAdd />,
-      items: [<React.Fragment key="dashboard-sub-menu">{dashboardSubMenu}</React.Fragment>],
+      items: [
+        <DropdownContent
+          menuHeader={menuHeader}
+          selectType={selectType}
+          items={items}
+          footerContent={footerContent}
+          key="dashboard-sub-menu"
+        />,
+      ],
     }),
-    [dashboardSubMenu]
+    [menuHeader, selectType, items, footerContent]
   );
 
   return dashboardDropdownItem;
@@ -252,18 +247,14 @@ const useStatusSelectMenu = ({
     onChangeStatus,
   });
 
-  const statusSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
   const statusDropdownItem: IDropdownItem = useMemo(
     () => ({
       label: 'Status',
       value: 'status',
       icon: <StatusBadgeIndicator status={metricStatus || 'notRequested'} />,
-      items: [<React.Fragment key="status-sub-menu">{statusSubMenu}</React.Fragment>],
+      items: [<DropdownContent {...dropdownProps} key="status-sub-menu" />],
     }),
-    [statusSubMenu, metricStatus]
+    [dropdownProps, metricStatus]
   );
 
   return statusDropdownItem;

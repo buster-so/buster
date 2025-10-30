@@ -71,7 +71,7 @@ export const SelectAxisItemContainer = React.memo(
             title={<SelectAxisItemLabel id={id} columnLabelFormat={columnLabelFormat} />}
             onDelete={onDelete}
           >
-            <DropdownContent id={id} zoneId={zoneId} />
+            <AxisDropdownContent id={id} zoneId={zoneId} />
           </CollapseDelete>
         </div>
       );
@@ -80,7 +80,7 @@ export const SelectAxisItemContainer = React.memo(
 );
 SelectAxisItemContainer.displayName = 'SelectAxisItemContainer';
 
-const DropdownContent: React.FC<{ id: string; zoneId: SelectAxisContainerId }> = ({
+const AxisDropdownContent: React.FC<{ id: string; zoneId: SelectAxisContainerId }> = ({
   id,
   zoneId,
 }) => {

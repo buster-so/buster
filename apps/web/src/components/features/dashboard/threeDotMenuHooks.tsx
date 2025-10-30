@@ -51,9 +51,11 @@ export const useDashboardVersionHistorySelectMenu = ({
       icon: <History />,
       selectType: 'none',
       items: [
-        <React.Fragment key="version-history-sub-menu">
-          <DropdownContent items={versionHistoryItems} selectType="single-selectable-link" />
-        </React.Fragment>,
+        <DropdownContent
+          key="version-history-sub-menu"
+          items={versionHistoryItems}
+          selectType="single-selectable-link"
+        />,
       ],
     }),
     [versionHistoryItems]

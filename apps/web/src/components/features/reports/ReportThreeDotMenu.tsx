@@ -201,9 +201,11 @@ const useVersionHistorySelectMenu = ({ reportId }: { reportId: string }): IDropd
       value: 'version-history',
       icon: <History />,
       items: [
-        <React.Fragment key="version-history-sub-menu">
-          <DropdownContent items={reverseVersionHistoryItems} selectType="single" />
-        </React.Fragment>,
+        <DropdownContent
+          key="version-history-sub-menu"
+          items={reverseVersionHistoryItems}
+          selectType="single"
+        />,
       ],
     }),
     [reverseVersionHistoryItems]
@@ -223,17 +225,13 @@ const useReportVerificationSelectMenu = (): IDropdownItem => {
     onChangeStatus,
   });
 
-  const statusSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
   return useMemo(
     () => ({
       label: 'Request verification',
       value: 'request-verification',
-      items: [<React.Fragment key="status-sub-menu">{statusSubMenu}</React.Fragment>],
+      items: [<DropdownContent key="status-sub-menu" {...dropdownProps} />],
     }),
-    [statusSubMenu]
+    [dropdownProps]
   );
 };
 
