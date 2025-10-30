@@ -208,6 +208,6 @@ export function createProxyModel(config: ProxyModelConfig): LanguageModelV2 {
 export function proxyModel(config: ProxyModelConfig) {
   return wrapLanguageModel({
     model: createProxyModel(config),
-    middleware: BraintrustMiddleware({ debug: true }),
+    middleware: BraintrustMiddleware({ debug: false }),
   });
 }

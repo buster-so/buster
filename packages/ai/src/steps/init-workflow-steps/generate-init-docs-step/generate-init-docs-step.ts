@@ -1,3 +1,5 @@
+//TODO: need to pass in data source information.
+
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { ModelMessage } from 'ai';

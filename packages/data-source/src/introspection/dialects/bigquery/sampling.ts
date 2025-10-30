@@ -83,6 +83,32 @@ export async function getTableSample(
         samplingMethod: 'VIEW_LIMIT',
       };
     }
+    // Handle empty tables
+    if (table.rowCount === 0) {
+      // Query to get column schemas without data
+      const query = `SELECT * FROM ${qualifiedTable} LIMIT 0`;
+      const result = await adapter.query(query);
+
+      const columnSchemas: ColumnSchema[] = result.fields.map((field) => ({
+        name: field.name,
+        type: field.type,
+        nullable: field.nullable,
+        length: field.length,
+        precision: field.precision,
+        scale: field.scale,
+      }));
+
+      return {
+        tableId: `${table.database}.${table.schema}.${table.name}`,
+        rowCount: 0,
+        sampleSize: 0,
+        sampleData: [],
+        columnSchemas,
+        sampledAt: startTime,
+        samplingMethod: 'EMPTY_TABLE',
+      };
+    }
+
     // For small tables, just fetch all rows
     if (table.rowCount <= sampleSize) {
       const query = `SELECT * FROM ${qualifiedTable} LIMIT ${sampleSize}`;

@@ -349,12 +349,12 @@ export class DuckDBManager {
       for (let i = 0; i < data.length; i += optimalBatchSize) {
         const batch = data.slice(i, Math.min(i + optimalBatchSize, data.length));
 
-        // Build multi-row VALUES clause
+        // Build multi-row VALUES clause with type-aware formatting
         const valueRows = batch
           .map((row) => {
-            const values = columns.map((col) => {
-              const value = row[col];
-              return this.formatValueForSQL(value);
+            const values = definitions.map((def) => {
+              const value = row[def.name];
+              return this.formatValueForSQL(value, def.type);
             });
             return `(${values.join(', ')})`;
           })
@@ -380,9 +380,9 @@ export class DuckDBManager {
             const smallBatch = batch.slice(j, Math.min(j + smallerBatchSize, batch.length));
             const smallValueRows = smallBatch
               .map((row) => {
-                const values = columns.map((col) => {
-                  const value = row[col];
-                  return this.formatValueForSQL(value);
+                const values = definitions.map((def) => {
+                  const value = row[def.name];
+                  return this.formatValueForSQL(value, def.type);
                 });
                 return `(${values.join(', ')})`;
               })
@@ -421,16 +421,60 @@ export class DuckDBManager {
   }
 
   /**
-   * Format a value for use in SQL VALUES clause
+   * Format a value for use in SQL VALUES clause with type-aware conversion
+   * Handles BigQuery's JSON-encoded values (like "50" for numeric 50) and double-encoded strings
    */
-  private formatValueForSQL(value: unknown): string {
+  private formatValueForSQL(value: unknown, targetType?: DuckDBColumnType): string {
     if (value === null || value === undefined) {
       return 'NULL';
     }
 
+    // Handle string values that might be JSON-encoded (possibly multiple times)
     if (typeof value === 'string') {
-      // Escape single quotes and wrap in quotes
-      return `'${value.replace(/'/g, "''")}'`;
+      let unwrapped = value.trim();
+
+      // Try to unwrap JSON-encoded strings recursively
+      // This handles cases like "\"146.63\"" -> "146.63" -> 146.63
+      while (unwrapped.startsWith('"') && unwrapped.endsWith('"') && unwrapped.length > 2) {
+        try {
+          // Try JSON.parse to properly handle escaped quotes
+          const parsed = JSON.parse(unwrapped);
+          if (typeof parsed === 'string') {
+            unwrapped = parsed.trim();
+          } else {
+            // If it parsed to a non-string, use it directly
+            return this.formatValueForSQL(parsed, targetType);
+          }
+        } catch {
+          // If JSON.parse fails, manually strip quotes
+          unwrapped = unwrapped.slice(1, -1);
+        }
+      }
+
+      // For numeric target types, try to convert unwrapped value
+      if (
+        targetType &&
+        (targetType === DuckDBColumnType.BIGINT ||
+          targetType === DuckDBColumnType.INTEGER ||
+          targetType === DuckDBColumnType.DOUBLE ||
+          targetType === DuckDBColumnType.DECIMAL)
+      ) {
+        const numValue = Number(unwrapped);
+        if (!Number.isNaN(numValue) && unwrapped !== '') {
+          return numValue.toString();
+        }
+      }
+
+      // For boolean target types, try to parse boolean strings
+      if (targetType === DuckDBColumnType.BOOLEAN) {
+        const lower = unwrapped.toLowerCase();
+        if (lower === 'true' || lower === '1') return 'TRUE';
+        if (lower === 'false' || lower === '0') return 'FALSE';
+      }
+
+      // Default: escape single quotes and wrap in quotes
+      // Use the unwrapped value to avoid double-escaping
+      return `'${unwrapped.replace(/'/g, "''")}'`;
     }
 
     if (typeof value === 'number') {

@@ -40,10 +40,7 @@ export function createRunSqlTool(context: RunSqlContext) {
     description: `Use this to run SQL queries against a data source via API.
     This tool executes queries remotely and returns results with metadata.
     You must use the <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names.
-    Results are limited to 5000 rows for performance.
-    
-    The data source(s) you are connected to is:
-    - buster (POSTGRESQL): cc3ef3bc-44ec-4a43-8dc4-681cae5c996a`,
+    Results are limited to 5000 rows for performance.`,
     inputSchema: RunSqlInputSchema,
     outputSchema: RunSqlOutputSchema,
     execute: createRunSqlExecute(context),

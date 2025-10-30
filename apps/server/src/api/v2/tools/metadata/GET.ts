@@ -1,4 +1,9 @@
-import { type Credentials, createAdapter, DataSourceType } from '@buster/data-source';
+import {
+  type BigQueryCredentials,
+  type Credentials,
+  createAdapter,
+  DataSourceType,
+} from '@buster/data-source';
 import { getDataSourceCredentials } from '@buster/database/queries';
 import type {
   ApiKeyContext,
@@ -185,24 +190,44 @@ function isCredentials(value: unknown): value is Credentials {
 /**
  * Quick metadata lookup from warehouse information schema
  * Returns table size, row count, and type without full sampling
+ *
+ * Note: For BigQuery views, rowCount and sizeBytes will be null since these
+ * metrics are not available in INFORMATION_SCHEMA.TABLE_STORAGE for views.
  */
 async function getQuickTableMetadata(
   dataSourceId: string,
   database: string,
   schema: string,
   tableName: string
-): Promise<{ rowCount: number; sizeBytes?: number; type: string }> {
+): Promise<{ rowCount: number | null; sizeBytes?: number | null; type: string }> {
   let adapter = null;
 
   try {
+    console.info('[getQuickTableMetadata] Starting metadata lookup', {
+      dataSourceId,
+      database,
+      schema,
+      tableName,
+    });
+
     // Fetch credentials
     const credentials = await getDataSourceCredentials({ dataSourceId });
     if (!isCredentials(credentials)) {
+      console.error('[getQuickTableMetadata] Invalid credentials', { dataSourceId });
       throw new Error('Invalid credentials returned from vault');
     }
 
+    console.info('[getQuickTableMetadata] Credentials fetched successfully', {
+      dataSourceId,
+      type: credentials.type,
+    });
+
     // Create adapter
     adapter = await createAdapter(credentials);
+    console.info('[getQuickTableMetadata] Adapter created successfully', {
+      dataSourceId,
+      type: credentials.type,
+    });
 
     // Query information schema based on database type
     // This is fast and doesn't require sampling
@@ -242,18 +267,45 @@ async function getQuickTableMetadata(
         params = [schema, tableName];
         break;
 
-      case DataSourceType.BigQuery:
+      case DataSourceType.BigQuery: {
+        // BigQuery: INFORMATION_SCHEMA is at the region level, not dataset level
+        // Query TABLES (includes views) and LEFT JOIN with TABLE_STORAGE (tables/materialized views only)
+        // This mirrors the PostgreSQL approach where we get all table types but metrics only for tables
+        // Documentation: https://cloud.google.com/bigquery/docs/information-schema-table-storage
+
+        const bigqueryCredentials = credentials as BigQueryCredentials;
+        const location = bigqueryCredentials.location || 'us'; // Default to US multi-region
+
+        // Use region-qualified INFORMATION_SCHEMA
+        // Format: region-{location}.INFORMATION_SCHEMA.*
+        const regionQualifier = `region-${location}`;
+
+        console.info('[getQuickTableMetadata] Using BigQuery region-qualified INFORMATION_SCHEMA', {
+          dataSourceId,
+          location,
+          regionQualifier,
+          schema,
+          tableName,
+        });
+
+        // Query TABLES and LEFT JOIN with TABLE_STORAGE to get metrics when available
+        // For views: table_type will be present, but row_count and size_bytes will be NULL
         query = `
           SELECT
-            row_count,
-            size_bytes,
-            table_type
-          FROM \`${database}.${schema}.INFORMATION_SCHEMA.TABLES\`
-          WHERE table_name = ?
+            ts.total_rows as row_count,
+            ts.total_logical_bytes as size_bytes,
+            t.table_type
+          FROM \`${regionQualifier}.INFORMATION_SCHEMA.TABLES\` t
+          LEFT JOIN \`${regionQualifier}.INFORMATION_SCHEMA.TABLE_STORAGE\` ts
+            ON ts.table_schema = t.table_schema
+            AND ts.table_name = t.table_name
+          WHERE t.table_schema = ?
+            AND t.table_name = ?
           LIMIT 1
         `;
-        params = [tableName];
+        params = [schema, tableName]; // Filter by schema (dataset) and table name
         break;
+      }
 
       case DataSourceType.MySQL:
         query = `
@@ -274,9 +326,29 @@ async function getQuickTableMetadata(
         return { rowCount: 100000, type: 'TABLE' };
     }
 
+    console.info('[getQuickTableMetadata] Executing query', {
+      dataSourceId,
+      database,
+      schema,
+      tableName,
+      query: query.trim(),
+      params,
+    });
+
     const result = await adapter.query(query, params as (string | number)[]);
 
+    console.info('[getQuickTableMetadata] Query executed successfully', {
+      dataSourceId,
+      rowsReturned: result.rows?.length || 0,
+    });
+
     if (!result.rows || result.rows.length === 0) {
+      console.warn('[getQuickTableMetadata] Table not found', {
+        dataSourceId,
+        database,
+        schema,
+        tableName,
+      });
       throw new HTTPException(404, {
         message: `Table not found: ${database}.${schema}.${tableName}`,
       });
@@ -284,19 +356,79 @@ async function getQuickTableMetadata(
 
     const row = result.rows[0] as Record<string, unknown>;
 
-    const rowCount = typeof row.row_count === 'number' ? row.row_count : 100000;
-    const sizeBytes = typeof row.size_bytes === 'number' ? row.size_bytes : undefined;
+    console.info('[getQuickTableMetadata] Raw row data', {
+      dataSourceId,
+      row,
+      rowCountType: typeof row.row_count,
+      rowCountValue: row.row_count,
+      sizeBytesType: typeof row.size_bytes,
+      sizeBytesValue: row.size_bytes,
+      tableTypeType: typeof row.table_type,
+      tableTypeValue: row.table_type,
+    });
+
     const tableType = typeof row.table_type === 'string' ? row.table_type : 'TABLE';
+
+    // Handle row_count: can be number, null (for BigQuery views), or missing
+    let rowCount: number | null;
+    if (typeof row.row_count === 'number') {
+      rowCount = row.row_count;
+    } else if (row.row_count === null && tableType.toUpperCase().includes('VIEW')) {
+      // For views (BigQuery), row_count is null - use default for sampling
+      rowCount = null;
+      console.info('[getQuickTableMetadata] View detected, row_count is null', {
+        dataSourceId,
+        tableType,
+      });
+    } else {
+      // Fallback for unknown cases
+      rowCount = 100000;
+    }
+
+    // Handle size_bytes: can be number, null (for BigQuery views), or missing
+    let sizeBytes: number | null | undefined;
+    if (typeof row.size_bytes === 'number') {
+      sizeBytes = row.size_bytes;
+    } else if (row.size_bytes === null && tableType.toUpperCase().includes('VIEW')) {
+      // For views (BigQuery), size_bytes is null
+      sizeBytes = null;
+    } else {
+      // Undefined for other databases that don't provide this metric
+      sizeBytes = undefined;
+    }
+
+    console.info('[getQuickTableMetadata] Metadata extracted successfully', {
+      dataSourceId,
+      rowCount,
+      sizeBytes,
+      tableType,
+    });
 
     return {
       rowCount,
       ...(sizeBytes !== undefined && { sizeBytes }),
       type: tableType,
     };
+  } catch (error) {
+    // Log the error with full context before rethrowing
+    console.error('[getQuickTableMetadata] Error during metadata lookup', {
+      dataSourceId,
+      database,
+      schema,
+      tableName,
+      error,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      errorStack: error instanceof Error ? error.stack : undefined,
+      errorName: error instanceof Error ? error.constructor.name : typeof error,
+    });
+    throw error;
   } finally {
     if (adapter) {
-      await adapter.close().catch(() => {
-        // Ignore cleanup errors
+      await adapter.close().catch((closeError) => {
+        console.warn('[getQuickTableMetadata] Error closing adapter', {
+          dataSourceId,
+          closeError,
+        });
       });
     }
   }
@@ -325,6 +457,14 @@ export async function getMetadataHandler(
   const { organizationId } = apiKeyContext;
   const { dataSourceId, database, schema, name } = request;
 
+  console.info('[getMetadataHandler] Starting metadata retrieval', {
+    organizationId,
+    dataSourceId,
+    database,
+    schema,
+    name,
+  });
+
   // Validate identifiers for SQL injection protection
   validateIdentifier(database, 'database');
   validateIdentifier(schema, 'schema');
@@ -336,8 +476,16 @@ export async function getMetadataHandler(
     const quickMetadata = await getQuickTableMetadata(dataSourceId, database, schema, name);
 
     // Determine sample size based on actual row count
-    // Use up to 100k samples for large tables, scale down for smaller ones
-    const sampleSize = Math.min(100000, Math.max(10000, Math.floor(quickMetadata.rowCount * 0.1)));
+    // For views or tables without row count info, use a default sample size
+    const effectiveRowCount = quickMetadata.rowCount ?? 100000;
+    const sampleSize = Math.min(100000, Math.max(10000, Math.floor(effectiveRowCount * 0.1)));
+
+    console.info('[getMetadataHandler] Calculated sample size', {
+      dataSourceId,
+      originalRowCount: quickMetadata.rowCount,
+      effectiveRowCount,
+      sampleSize,
+    });
 
     // Map table type to enum
     const tableType: 'TABLE' | 'VIEW' | 'MATERIALIZED_VIEW' | 'EXTERNAL_TABLE' | 'TEMPORARY_TABLE' =
@@ -352,14 +500,28 @@ export async function getMetadataHandler(
               : 'TABLE';
 
     // Calculate optimal machine size based on table statistics
+    // Use effective row count for sizing calculation (views will use default)
     const sizingInfo = calculateSizingInfo(
-      quickMetadata.rowCount,
-      quickMetadata.sizeBytes,
+      effectiveRowCount,
+      quickMetadata.sizeBytes ?? undefined,
       sampleSize
     );
 
     // Trigger the get-table-statistics task with idempotency and optimal machine sizing
     // If the same table is requested within 5 minutes, return existing task
+    console.info('[getMetadataHandler] Triggering get-table-statistics task', {
+      dataSourceId,
+      database,
+      schema,
+      name,
+      sampleSize,
+      machinePreset: sizingInfo.machinePreset,
+      rowCount: quickMetadata.rowCount,
+      effectiveRowCount,
+      sizeBytes: quickMetadata.sizeBytes,
+      tableType,
+    });
+
     const handle = await tasks.trigger(
       'get-table-statistics',
       {
@@ -368,8 +530,8 @@ export async function getMetadataHandler(
           name,
           schema,
           database,
-          rowCount: quickMetadata.rowCount,
-          sizeBytes: quickMetadata.sizeBytes,
+          rowCount: effectiveRowCount, // Use effective row count for trigger task
+          sizeBytes: quickMetadata.sizeBytes ?? undefined,
           type: tableType,
         },
         sampleSize,
@@ -380,6 +542,11 @@ export async function getMetadataHandler(
         machine: sizingInfo.machinePreset, // Use calculated machine size for optimal performance
       }
     );
+
+    console.info('[getMetadataHandler] Task triggered successfully', {
+      dataSourceId,
+      runId: handle.id,
+    });
 
     // Poll for task completion with timeout
     const startTime = Date.now();
@@ -407,7 +574,19 @@ export async function getMetadataHandler(
     }
 
     // Check task status
+    console.info('[getMetadataHandler] Task completed', {
+      dataSourceId,
+      runId: run.id,
+      status: run.status,
+    });
+
     if (run.status === 'FAILED' || run.status === 'CANCELED') {
+      console.error('[getMetadataHandler] Task failed or was canceled', {
+        dataSourceId,
+        runId: run.id,
+        status: run.status,
+        output: run.output,
+      });
       throw new HTTPException(500, {
         message: `Metadata collection task ${run.status.toLowerCase()}`,
       });
@@ -415,6 +594,10 @@ export async function getMetadataHandler(
 
     // Check if task completed successfully
     if (!run.output) {
+      console.error('[getMetadataHandler] Task completed but has no output', {
+        dataSourceId,
+        runId: run.id,
+      });
       throw new HTTPException(500, {
         message: 'Metadata collection task did not return any output',
       });
@@ -423,20 +606,34 @@ export async function getMetadataHandler(
     const output = run.output as GetTableStatisticsOutput;
 
     if (!output.success) {
+      console.error('[getMetadataHandler] Task output indicates failure', {
+        dataSourceId,
+        runId: run.id,
+        error: output.error,
+      });
       throw new HTTPException(500, {
         message: output.error || 'Metadata collection failed',
       });
     }
 
     // Transform GetTableStatisticsOutput to DatasetMetadata format
+    // Note: Convert null to undefined for sizeBytes (views don't have size metrics)
     const metadata = {
       rowCount: output.totalRows,
-      sizeBytes: quickMetadata.sizeBytes,
+      sizeBytes: quickMetadata.sizeBytes ?? undefined, // Convert null to undefined
       sampleSize: output.actualSamples,
       samplingMethod: output.samplingMethod,
       columnProfiles: output.columnProfiles || [],
       introspectedAt: new Date().toISOString(),
     };
+
+    console.info('[getMetadataHandler] Metadata retrieval successful', {
+      dataSourceId,
+      runId: run.id,
+      rowCount: metadata.rowCount,
+      sampleSize: metadata.sampleSize,
+      columnCount: metadata.columnProfiles.length,
+    });
 
     return {
       metadata,
@@ -444,8 +641,32 @@ export async function getMetadataHandler(
   } catch (error) {
     // Re-throw HTTPException as-is
     if (error instanceof HTTPException) {
+      console.warn('[getMetadataHandler] HTTP exception occurred', {
+        dataSourceId,
+        database,
+        schema,
+        name,
+        status: error.status,
+        message: error.message,
+      });
       throw error;
     }
+
+    // Log the actual error with full context before wrapping it
+    console.error('[getMetadataHandler] Unexpected error during metadata retrieval', {
+      dataSourceId,
+      database,
+      schema,
+      name,
+      error,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      errorStack: error instanceof Error ? error.stack : undefined,
+      errorName: error instanceof Error ? error.constructor.name : typeof error,
+      errorDetails:
+        error instanceof Error
+          ? JSON.stringify(error, Object.getOwnPropertyNames(error))
+          : String(error),
+    });
 
     throw new HTTPException(500, {
       message: 'An unexpected error occurred during metadata retrieval',

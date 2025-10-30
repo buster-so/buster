@@ -1,4 +1,5 @@
  # Task: Document the {{model_path}} model
+ DataSourceId: 1cc380df-710c-4cbc-b8a6-cc8fc47ef1dc (redo warehouse)
 
   ## Objective
   Document a dbt model to capture the deep understanding an experienced analyst or data engineer would have after working with it for months. Your documentation should transfer the "cached knowledge" - the distributions, patterns, nuances, gotchas, and context that make someone effective with the data.
@@ -180,19 +181,19 @@ Only use SQL for questions that **cannot** be answered by the column-level metad
   ### Column-Level Understanding
   Column descriptions capture what an experienced person would know about working with each field.
 
-  **Business meaning**: Start with what this column represents in business terms. Not just "customer identifier" but what it identifies and how it's used.
+  **Business meaning**: Start with what this column represents in business terms. Not just "customer identifier" but what it identifies and how it's used in the business context.
 
-  **Usage guidance**: When and how should someone use this field? If it's a foreign key, mention it. If it's part of a composite key, note that. If there are filtering considerations or join patterns, explain them.
+  **Usage guidance**: When and how should someone use this field for analysis? If it's part of a composite key, note that. If there are filtering or grouping considerations, explain them. DO NOT mention joins or foreign key relationships - those belong exclusively in the relationships section.
 
   **Data characteristics**: Describe what the data actually looks like. What's the distribution? Where do values concentrate? What's the null rate? What ranges exist? Use proportions to show patterns: "Highly skewed toward later stages" or "Split between intermediate (54%) and basic (44%)" or "No nulls - all customers assigned."
 
   **Patterns & insights**: What did profiling reveal? Standardization (only 6 distinct values)? Correlation (perfectly correlated with location)? Concentration (80% in one category)? These insights help readers understand the data's behavior.
 
-  **Related context**: How does this column relate to others? Is it part of a composite key? Does it correlate with other fields? Are there dependencies to understand?
+  **Related context**: How does this column relate to others within the same model? Is it part of a composite key? Does it correlate with other fields? Are there dependencies to understand?
 
   **Gotchas**: What edge cases, legitimate nulls, data quality issues, or non-obvious behaviors exist? What mistakes might someone make without knowing these details?
 
-  Structure your column descriptions as flowing narrative text, not rigid sections. Hit the points that matter for that specific column. Some columns need more context than others - use judgment.
+  Structure your column descriptions using labeled sections (see template). Include only sections relevant to that column - not all columns need all sections. Adapt to what matters for each specific field.
 
   One important note: Don't repeat information that's already in structured fields. The data_type field shows the type - you don't need to say "this is a VARCHAR" in the description. The options field lists values - you don't need to enumerate them in the description text (though you can reference patterns in the distribution).
 
@@ -329,11 +330,13 @@ Only use SQL for questions that **cannot** be answered by the column-level metad
       
       columns:
         - name: column_name
-          description: |
-            [Narrative description covering: business meaning, usage guidance, data 
-            characteristics, patterns/insights, related context, gotchas. Flow naturally 
-            through what matters for this column. Don't force rigid sections - adapt to 
-            what this column needs. Don't repeat info from data_type or options fields.]
+          description: >
+            Business meaning: [What this column represents in domain terms]
+            Usage: [When/how to use - filtering patterns, grouping, composite key role. DO NOT mention joins - that's in relationships]
+            Distribution: [Where values concentrate - percentages, null rates, ranges]
+            Patterns: [Standardization, correlation, segmentation observed in data]
+            Gotchas: [Edge cases, legitimate nulls, quality issues, non-obvious behaviors]
+            [Omit sections not relevant to this specific column - adapt to what matters]
           data_type: VARCHAR(50)
           options:  # For categoricals ≤30 values
             - value: option1
@@ -344,17 +347,16 @@ Only use SQL for questions that **cannot** be answered by the column-level metad
   ```
 
   ### Column Description Flow
-  Column descriptions should flow naturally, not follow a rigid template. Cover what matters for that specific column. Some columns need heavy context, others need less. Use judgment.
+  Column descriptions use a structured format with labeled sections. Include only sections relevant to that specific column - omit what doesn't apply. Some columns need all sections, others need just a few. Use judgment.
 
-  Generally touch on:
-  - What it is (business meaning)
-  - How to use it (when relevant - join keys for FKs, filtering guidance, etc.)
-  - What the data looks like (distributions, concentration, null patterns)
-  - What profiling revealed (patterns, correlations, standardizations)
-  - Related context (composite keys, dependencies)
-  - Things to watch out for (edge cases, gotchas, legitimate nulls)
+  Standard sections:
+  - **Business meaning**: What this column represents in domain terms
+  - **Usage**: When/how to use (filtering, grouping, composite key role. DO NOT mention joins - that's in relationships)
+  - **Distribution**: Where values concentrate (percentages, null rates, ranges)
+  - **Patterns**: What profiling revealed (standardization, correlation, segmentation)
+  - **Gotchas**: Edge cases, legitimate nulls, quality issues, non-obvious behaviors
 
-  But don't force every column into the same structure. Write what that column needs.
+  Not every column needs every section. Adapt to what matters for that specific field.
 
   ## Workflow
 
@@ -411,7 +413,7 @@ Only use SQL for questions that **cannot** be answered by the column-level metad
 
   **Relationships**: For each connection, document business purpose, join mechanics, coverage, and cardinality patterns. This is where all join information lives.
 
-  **Columns**: Write narrative descriptions that cover what matters for each field. Business meaning, usage, characteristics, patterns, gotchas.
+  **Columns**: Use structured, labeled sections. Include only relevant sections for each field - Business meaning, Usage, Distribution, Patterns, Gotchas. Omit what doesn't apply.
 
   **Metadata**: Populate data_type from metadata. Add options for appropriate categoricals. Flag searchable for categorical text with business meaning.
 
