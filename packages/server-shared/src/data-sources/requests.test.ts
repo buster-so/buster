@@ -170,7 +170,35 @@ describe('Data Source Request Schemas', () => {
   });
 
   describe('SnowflakeCredentialsSchema', () => {
-    it('should validate valid snowflake credentials', () => {
+    it('should validate valid snowflake credentials with password auth', () => {
+      const data = {
+        type: 'snowflake',
+        auth_method: 'password',
+        account_id: 'abc123',
+        warehouse_id: 'COMPUTE_WH',
+        username: 'admin',
+        password: 'secret',
+        default_database: 'MYDB',
+      };
+      expect(SnowflakeCredentialsSchema.safeParse(data).success).toBe(true);
+    });
+
+    it('should validate snowflake with password auth and optional fields', () => {
+      const data = {
+        type: 'snowflake',
+        auth_method: 'password',
+        account_id: 'abc123',
+        warehouse_id: 'COMPUTE_WH',
+        username: 'admin',
+        password: 'secret',
+        default_database: 'MYDB',
+        default_schema: 'PUBLIC',
+        role: 'SYSADMIN',
+      };
+      expect(SnowflakeCredentialsSchema.safeParse(data).success).toBe(true);
+    });
+
+    it('should validate snowflake credentials without auth_method (backward compatibility)', () => {
       const data = {
         type: 'snowflake',
         account_id: 'abc123',
@@ -182,16 +210,31 @@ describe('Data Source Request Schemas', () => {
       expect(SnowflakeCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
-    it('should validate snowflake with optional fields', () => {
+    it('should validate snowflake with key_pair auth', () => {
       const data = {
         type: 'snowflake',
+        auth_method: 'key_pair',
         account_id: 'abc123',
         warehouse_id: 'COMPUTE_WH',
         username: 'admin',
-        password: 'secret',
+        private_key:
+          '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj\n-----END PRIVATE KEY-----',
         default_database: 'MYDB',
-        default_schema: 'PUBLIC',
-        role: 'SYSADMIN',
+      };
+      expect(SnowflakeCredentialsSchema.safeParse(data).success).toBe(true);
+    });
+
+    it('should validate snowflake with key_pair auth and passphrase', () => {
+      const data = {
+        type: 'snowflake',
+        auth_method: 'key_pair',
+        account_id: 'abc123',
+        warehouse_id: 'COMPUTE_WH',
+        username: 'admin',
+        private_key:
+          '-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj\n-----END ENCRYPTED PRIVATE KEY-----',
+        private_key_passphrase: 'my-passphrase',
+        default_database: 'MYDB',
       };
       expect(SnowflakeCredentialsSchema.safeParse(data).success).toBe(true);
     });

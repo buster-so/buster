@@ -123,11 +123,21 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
     try {
-      const profileYaml = buildProfilesYaml({
+      const keysBasePath = `${workspacePath}/.keys`;
+      const { yaml: profileYaml, keyFiles } = buildProfilesYaml({
         profileName,
         target: 'buster',
         creds: credentials,
+        keysBasePath,
       });
+
+      // Write key files if any are present
+      if (keyFiles.length > 0) {
+        await sandbox.fs.createFolder(keysBasePath, '700');
+        for (const keyFile of keyFiles) {
+          await sandbox.fs.uploadFile(Buffer.from(keyFile.content), keyFile.path);
+        }
+      }
 
       // Create profiles directory and file
       await sandbox.fs.createFolder(profilesPath, '755');
@@ -276,11 +286,21 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
     try {
-      const profileYaml = buildProfilesYaml({
+      const keysBasePath = `${workspacePath}/.keys`;
+      const { yaml: profileYaml, keyFiles } = buildProfilesYaml({
         profileName,
         target: 'buster',
         creds: credentials,
+        keysBasePath,
       });
+
+      // Write key files if any are present
+      if (keyFiles.length > 0) {
+        await sandbox.fs.createFolder(keysBasePath, '700');
+        for (const keyFile of keyFiles) {
+          await sandbox.fs.uploadFile(Buffer.from(keyFile.content), keyFile.path);
+        }
+      }
 
       // Create profiles directory and file
       await sandbox.fs.createFolder(profilesPath, '755');

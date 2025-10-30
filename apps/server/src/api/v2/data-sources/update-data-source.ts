@@ -19,6 +19,7 @@ import {
   type Credentials,
   CredentialsSchema,
   type DataSourceType,
+  sanitizeCredentials,
   type UpdateDataSourceRequest,
   type UpdateDataSourceResponse,
 } from '@buster/server-shared';
@@ -109,7 +110,7 @@ export async function updateDataSourceHandler(
 
   // Step 4: Determine what's being updated
   const isUpdatingName = request.name !== undefined;
-  const isUpdatingCredentials = request.type !== undefined;
+  const isUpdatingCredentials = 'type' in request;
 
   // If nothing to update
   if (!isUpdatingName && !isUpdatingCredentials) {
@@ -134,7 +135,7 @@ export async function updateDataSourceHandler(
       deletedAt: existingDataSource.deletedAt,
       onboardingStatus: existingDataSource.onboardingStatus as 'notStarted',
       onboardingError: existingDataSource.onboardingError,
-      credentials,
+      credentials: sanitizeCredentials(credentials),
       datasets: existingDataSource.datasets,
     };
   }
@@ -151,8 +152,13 @@ export async function updateDataSourceHandler(
     const validationResult = CredentialsSchema.safeParse(credentialFields);
 
     if (!validationResult.success) {
+      console.error('[updateDataSource] Credential validation failed', {
+        errors: validationResult.error.errors,
+        credentialFields,
+      });
       throw new HTTPException(400, {
         message: 'Invalid or incomplete credentials for the specified type',
+        cause: validationResult.error.errors,
       });
     }
 
@@ -253,7 +259,7 @@ export async function updateDataSourceHandler(
 
   const credentials = CredentialsSchema.parse(JSON.parse(secret.secret));
 
-  // Step 10: Return response
+  // Step 10: Return response with sanitized credentials
   return {
     id: updatedDataSource.id,
     name: updatedDataSource.name,
@@ -265,7 +271,7 @@ export async function updateDataSourceHandler(
     deletedAt: updatedDataSource.deletedAt,
     onboardingStatus: updatedDataSource.onboardingStatus as 'notStarted',
     onboardingError: updatedDataSource.onboardingError,
-    credentials,
+    credentials: sanitizeCredentials(credentials),
     datasets: updatedDataSource.datasets,
   };
 }

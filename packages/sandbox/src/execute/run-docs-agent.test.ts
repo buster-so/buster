@@ -151,7 +151,10 @@ describe('run-docs-agent', () => {
 
       // Mock profiles YAML builder
       const { buildProfilesYaml } = await import('../helpers/build-dbt-profiles-yaml');
-      vi.mocked(buildProfilesYaml).mockReturnValue('mock-profiles-yaml-content');
+      vi.mocked(buildProfilesYaml).mockReturnValue({
+        yaml: 'mock-profiles-yaml-content',
+        keyFiles: [],
+      });
     });
 
     it('should successfully run docs agent with all parameters', async () => {
@@ -185,10 +188,14 @@ describe('run-docs-agent', () => {
 
       // Verify profiles YAML creation
       expect(mockSandbox.fs.createFolder).toHaveBeenCalledWith('/workspace/profiles', '755');
-      expect(mockSandbox.fs.uploadFile).toHaveBeenCalledWith(
-        Buffer.from('mock-profiles-yaml-content'),
-        '/workspace/profiles/profiles.yml'
+
+      // Find the specific call for profiles.yml upload
+      const uploadCalls = vi.mocked(mockSandbox.fs.uploadFile).mock.calls;
+      const profilesUploadCall = uploadCalls.find(
+        (call) => call[1] === '/workspace/profiles/profiles.yml'
       );
+      expect(profilesUploadCall).toBeDefined();
+      expect(profilesUploadCall![0]).toEqual(Buffer.from('mock-profiles-yaml-content'));
 
       // Verify session creation and commands
       expect(mockSandbox.process.createSession).toHaveBeenCalledWith('buster-docs-agent-session');
@@ -287,7 +294,10 @@ describe('run-docs-agent', () => {
 
       // Mock profiles YAML builder
       const { buildProfilesYaml } = await import('../helpers/build-dbt-profiles-yaml');
-      vi.mocked(buildProfilesYaml).mockReturnValue('mock-profiles-yaml-content');
+      vi.mocked(buildProfilesYaml).mockReturnValue({
+        yaml: 'mock-profiles-yaml-content',
+        keyFiles: [],
+      });
     });
 
     it('should successfully run docs agent synchronously', async () => {
@@ -321,10 +331,14 @@ describe('run-docs-agent', () => {
 
       // Verify profiles YAML creation
       expect(mockSandbox.fs.createFolder).toHaveBeenCalledWith('/workspace/profiles', '755');
-      expect(mockSandbox.fs.uploadFile).toHaveBeenCalledWith(
-        Buffer.from('mock-profiles-yaml-content'),
-        '/workspace/profiles/profiles.yml'
+
+      // Find the specific call for profiles.yml upload
+      const uploadCalls = vi.mocked(mockSandbox.fs.uploadFile).mock.calls;
+      const profilesUploadCall = uploadCalls.find(
+        (call) => call[1] === '/workspace/profiles/profiles.yml'
       );
+      expect(profilesUploadCall).toBeDefined();
+      expect(profilesUploadCall![0]).toEqual(Buffer.from('mock-profiles-yaml-content'));
     });
 
     it('should create context file in sync mode', async () => {

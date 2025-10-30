@@ -2,6 +2,7 @@ import type { PaginatedResponse } from '@buster/database/schema-types';
 import { PaginationSchema } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { CredentialsSchema } from './requests';
+import { SanitizedCredentialsSchema } from './sanitize-credentials';
 
 /**
  * Creator information included in data source response
@@ -47,10 +48,13 @@ const BaseDataSourceSchema = z.object({
 export const CreateDataSourceResponseSchema = BaseDataSourceSchema;
 
 /**
- * Get data source response schema (includes credentials and datasets)
+ * Get data source response schema (includes sanitized credentials and datasets)
+ * Note: Credentials in responses have sensitive fields redacted for security
  */
 export const GetDataSourceResponseSchema = BaseDataSourceSchema.extend({
-  credentials: CredentialsSchema.describe('Data source credentials'),
+  credentials: SanitizedCredentialsSchema.describe(
+    'Data source credentials (sensitive fields redacted)'
+  ),
   datasets: z.array(DatasetSummarySchema).describe('Associated datasets'),
 });
 

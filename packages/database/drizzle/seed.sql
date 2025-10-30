@@ -26,7 +26,7 @@ COPY public.organizations (id, name, domain, created_at, updated_at, deleted_at,
 bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce	Buster	buster.so	2024-11-05 15:41:13.864677+00	2024-11-05 15:41:13.8647+00	\N	f
 \.
 
-select vault.create_secret('{"type":"postgres","host":"aws-0-us-east-1.pooler.supabase.com","port":5432,"username":"postgres.fjbidcbjvmpesoonimhl","password":"S8Jrts05EqxsfA3q","database":"postgres","schema":"sem","jump_host":null,"ssh_username":null,"ssh_private_key":null}', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
+select vault.create_secret('{"type":"postgres","host":"aws-0-us-east-1.pooler.supabase.com","port":5432,"username":"postgres.fjbidcbjvmpesoonimhl","password":"S8Jrts05EqxsfA3q","default_database":"postgres","defualt_schema":"sem","jump_host":null,"ssh_username":null,"ssh_private_key":null}', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
 
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
