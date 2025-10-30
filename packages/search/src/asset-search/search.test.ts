@@ -343,12 +343,19 @@ describe('search.ts - Unit Tests', () => {
       await performTextSearch(mockUserId, searchRequestWithNullQuery);
     });
 
-    it('should throw error when user has no organization', async () => {
+    it('should return empty response when user has no organization', async () => {
       (getUserOrganizationId as Mock).mockResolvedValue(null);
 
-      await expect(performTextSearch(mockUserId, basicSearchRequest)).rejects.toThrow(
-        'User is not associated with an organization'
-      );
+      const result = await performTextSearch(mockUserId, basicSearchRequest);
+
+      expect(result).toEqual({
+        data: [],
+        pagination: {
+          page: basicSearchRequest.page,
+          page_size: basicSearchRequest.page_size,
+          has_more: false,
+        },
+      });
 
       expect(searchText).not.toHaveBeenCalled();
     });
