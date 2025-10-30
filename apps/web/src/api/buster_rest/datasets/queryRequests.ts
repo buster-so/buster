@@ -1,3 +1,4 @@
+import type { ListDatasetsQuery } from '@buster/server-shared';
 import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { datasetQueryKeys } from '@/api/query_keys/datasets';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -14,7 +15,7 @@ import {
 const options = datasetQueryKeys.datasetsListQueryOptions();
 const baseDatasetQueryKey = options.queryKey;
 
-export const useGetDatasets = (params?: Parameters<typeof getDatasets>[0]) => {
+export const useGetDatasets = (params?: ListDatasetsQuery) => {
   const queryFn = () => {
     return getDatasets(params);
   };

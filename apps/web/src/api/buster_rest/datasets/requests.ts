@@ -1,25 +1,8 @@
-import type { BusterDataset, ListDatasetsResponse } from '@buster/server-shared';
+import type { BusterDataset, ListDatasetsQuery, ListDatasetsResponse } from '@buster/server-shared';
 import type { DataResult } from '@buster/server-shared/metrics';
 import { mainApi, mainApiV2 } from '../instances';
 
-export const getDatasets = async (params?: {
-  /** Current page number */
-  page?: number;
-  /** Number of items to display per page */
-  page_size?: number;
-  /** Search term to filter datasets */
-  search?: string;
-  /** When true, returns admin view of datasets */
-  admin_view?: boolean;
-  /** When true, returns only imported datasets */
-  imported?: boolean;
-  /** When true, returns only enabled datasets */
-  enabled?: boolean;
-  /** Filter by permission group ID */
-  permission_group_id?: string;
-  /** Filter by owner */
-  belongs_to?: string;
-}): Promise<ListDatasetsResponse> => {
+export const getDatasets = async (params?: ListDatasetsQuery): Promise<ListDatasetsResponse> => {
   const { page = 1, page_size = 1000, ...allParams } = params || {};
   return mainApiV2
     .get<ListDatasetsResponse>('/datasets', { params: { page, page_size, ...allParams } })
