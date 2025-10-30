@@ -126,7 +126,7 @@ describe('deployHandler', () => {
       mockGetDataSourceByName.mockResolvedValue({
         id: 'ds-123',
         name: 'test_datasource',
-        type: 'postgresql',
+        type: 'postgres',
         organizationId: 'org-123',
       });
 
@@ -148,7 +148,7 @@ describe('deployHandler', () => {
       mockGetDataSourceByName.mockResolvedValue({
         id: 'ds-123',
         name: 'test_datasource',
-        type: 'postgresql',
+        type: 'postgres',
         organizationId: 'org-123',
       });
 
@@ -174,7 +174,7 @@ describe('deployHandler', () => {
       mockGetDataSourceByName.mockResolvedValue({
         id: 'ds-123',
         name: 'test_datasource',
-        type: 'postgresql',
+        type: 'postgres',
         organizationId: 'org-123',
       });
 
@@ -209,7 +209,7 @@ describe('deployHandler', () => {
       mockGetDataSourceByName.mockResolvedValue({
         id: 'ds-123',
         name: 'test_datasource',
-        type: 'postgresql',
+        type: 'postgres',
         organizationId: 'org-123',
       });
 
@@ -247,7 +247,7 @@ describe('deployHandler', () => {
       mockGetDataSourceByName.mockResolvedValue({
         id: 'ds-123',
         name: 'test_datasource',
-        type: 'postgresql',
+        type: 'postgres',
         organizationId: 'org-123',
       });
 
@@ -304,14 +304,14 @@ describe('deployHandler', () => {
         .mockResolvedValueOnce({
           id: 'ds-123',
           name: 'ds1',
-          type: 'postgresql',
+          type: 'postgres',
           organizationId: 'org-123',
         })
         .mockResolvedValueOnce(null) // missing_ds
         .mockResolvedValueOnce({
           id: 'ds-123',
           name: 'ds1',
-          type: 'postgresql',
+          type: 'postgres',
           organizationId: 'org-123',
         });
 

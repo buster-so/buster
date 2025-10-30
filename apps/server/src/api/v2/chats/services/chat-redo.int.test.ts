@@ -67,7 +67,7 @@ describe('Chat Message Redo Integration Tests', () => {
       id: testDataSourceId,
       organizationId: testOrgId,
       name: 'Test Data Source',
-      type: 'postgresql',
+      type: 'postgres',
       secretId: '00000000-0000-0000-0000-000000000099', // dummy secret ID
       createdBy: testUserId,
       updatedBy: testUserId,

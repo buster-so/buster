@@ -28,6 +28,7 @@ import {
   ChatUpdatedByTypeSchema,
   type DashboardYml,
   DataSourceOnboardingStatusSchema,
+  DataSourceTypeSchema,
   DatasetTypeSchema,
   DocsTypeSchema,
   GithubIntegrationStatusSchema,
@@ -53,6 +54,8 @@ import {
   WorkspaceSharingSchema,
 } from './schema-types';
 import type { DatasetMetadata } from './schema-types/dataset-metadata';
+
+export const dataSourceTypeEnum = pgEnum('data_source_type_enum', DataSourceTypeSchema.options);
 
 export const agentNameEnum = pgEnum('agent_name_enum', AgentNameSchema.options);
 export const agentEventTriggerEnum = pgEnum(
@@ -283,7 +286,7 @@ export const dataSources = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: text().notNull(),
-    type: text().notNull(),
+    type: dataSourceTypeEnum('type').notNull(),
     secretId: uuid('secret_id').notNull(),
     onboardingStatus: dataSourceOnboardingStatusEnum('onboarding_status')
       .default('notStarted')

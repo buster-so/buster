@@ -1,3 +1,4 @@
+import type { ListDatasetsQuery } from '@buster/server-shared';
 import type React from 'react';
 import { lazy, useMemo, useState } from 'react';
 import { useGetDatasets } from '@/api/buster_rest/datasets';
@@ -17,11 +18,13 @@ export const DatasetsListController: React.FC<Record<string, never>> = () => {
   const [datasetFilter, setDatasetFilter] = useState<'all' | 'published' | 'drafts'>('all');
   const [openDatasetModal, setOpenDatasetModal] = useState<boolean>(false);
 
-  const datasetsParams: Parameters<typeof useGetDatasets>[0] = useMemo(() => {
+  const datasetsParams: ListDatasetsQuery = useMemo(() => {
     if (datasetFilter === 'drafts') {
       return {
         enabled: false,
         admin_view: isAdmin,
+        page: 1,
+        page_size: 1000,
       };
     }
 
@@ -29,11 +32,15 @@ export const DatasetsListController: React.FC<Record<string, never>> = () => {
       return {
         enabled: true,
         admin_view: isAdmin,
+        page: 1,
+        page_size: 1000,
       };
     }
 
     return {
       admin_view: isAdmin,
+      page: 1,
+      page_size: 1000,
     };
   }, [datasetFilter]);
 

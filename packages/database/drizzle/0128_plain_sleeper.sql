@@ -1,0 +1,2 @@
+CREATE TYPE "public"."data_source_type_enum" AS ENUM('snowflake', 'bigquery', 'postgres', 'mysql', 'sqlserver', 'redshift', 'motherduck');--> statement-breakpoint
+ALTER TABLE "data_sources" ALTER COLUMN "type" SET DATA TYPE "public"."data_source_type_enum" USING "type"::"public"."data_source_type_enum";
