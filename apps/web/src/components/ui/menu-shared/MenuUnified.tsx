@@ -1,8 +1,7 @@
 import type { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import { Link, type RegisteredRouter } from '@tanstack/react-router';
-import type React from 'react';
-import { useEffect, useMemo } from 'react';
+import React, { Children, useEffect, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -200,11 +199,12 @@ export const MenuUnified = <
   }, [variant]);
 
   const { Root, Trigger, Content } = primitives;
+  const isDropdownVariant = variant === 'dropdown';
 
   return (
     <Root open={open} defaultOpen={open} onOpenChange={onOpenChange} dir={dir} modal={modal}>
-      <Trigger asChild disabled={disabled}>
-        {children}
+      <Trigger asChild={isDropdownVariant} disabled={disabled}>
+        {isDropdownVariant ? <span className="dropdown-trigger">{children}</span> : children}
       </Trigger>
       <Content
         className={cn(
