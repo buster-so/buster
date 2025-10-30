@@ -1,10 +1,8 @@
-import type { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
 import type { RegisteredRouter } from '@tanstack/react-router';
-import type { MenuDivider, MenuItem, MenuItems } from '../menu-shared';
+import type { MenuDivider, MenuItem, MenuItems, UnifiedMenuProps } from '../menu-shared';
 
 /**
- * Re-export shared types with legacy names for backward compatibility
- * @deprecated Use MenuItem from menu-shared instead
+ * Context menu item type - type alias for MenuItem
  */
 export type ContextMenuItem<
   T = string,
@@ -14,14 +12,12 @@ export type ContextMenuItem<
 > = MenuItem<T, TRouter, TOptions, TFrom>;
 
 /**
- * Re-export shared divider type with legacy name for backward compatibility
- * @deprecated Use MenuDivider from menu-shared instead
+ * Context menu divider type - type alias for MenuDivider
  */
 export type ContextMenuDivider = MenuDivider;
 
 /**
- * Re-export shared items array type with legacy name for backward compatibility
- * @deprecated Use MenuItems from menu-shared instead
+ * Context menu items array type - type alias for MenuItems
  */
 export type ContextMenuItems<
   T = string,
@@ -30,8 +26,21 @@ export type ContextMenuItems<
   TFrom extends string = string,
 > = MenuItems<T, TRouter, TOptions, TFrom>;
 
-export interface ContextMenuProps extends ContextMenuPropsRadix {
-  items: ContextMenuItems;
-  className?: string;
-  disabled?: boolean;
+/**
+ * ContextMenu component props - derived from UnifiedMenuProps
+ * This is a thin wrapper around MenuUnified with variant="context"
+ */
+export interface ContextMenuProps<
+  T = string,
+  TRouter extends RegisteredRouter = RegisteredRouter,
+  TOptions = unknown,
+  TFrom extends string = string,
+> extends Omit<
+    UnifiedMenuProps<T, TRouter, TOptions, TFrom>,
+    'variant' | 'items' | 'children' | 'align' | 'side' | 'sideOffset'
+  > {
+  /** Context menu items - type alias for MenuItems for backward compatibility */
+  items: ContextMenuItems<T, TRouter, TOptions, TFrom>;
+  /** Trigger element */
+  children: React.ReactNode;
 }

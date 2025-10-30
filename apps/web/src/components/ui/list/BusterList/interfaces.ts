@@ -11,7 +11,7 @@ export interface BusterListProps<T = unknown> {
   emptyState?: undefined | React.ReactNode | string;
   showHeader?: boolean;
   selectedRowKeys?: string[];
-  contextMenu?: ContextMenuProps;
+  contextMenu?: Omit<ContextMenuProps, 'children'>;
   showSelectAll?: boolean;
   useRowClickSelectChange?: boolean;
   rowClassName?: string;

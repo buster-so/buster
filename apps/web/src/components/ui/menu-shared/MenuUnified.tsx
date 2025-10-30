@@ -197,7 +197,7 @@ export const MenuUnified = <
   return (
     <Root open={open} defaultOpen={open} onOpenChange={onOpenChange} dir={dir} modal={modal}>
       <Trigger asChild disabled={disabled}>
-        <span className={variant === 'dropdown' ? 'dropdown-trigger' : undefined}>{children}</span>
+        {children}
       </Trigger>
       <Content
         className={cn(

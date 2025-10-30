@@ -114,19 +114,22 @@ const generateSampleRows = (count: number): BusterListRowItem<SampleData>[] => {
 // Generate sample rows
 const sampleRows: BusterListRowItem<SampleData>[] = generateSampleRows(5);
 
-const sampleContextMenu: ContextMenuProps = {
+const sampleContextMenu: Omit<ContextMenuProps, 'children'> = {
   items: [
     {
       label: 'View Details',
       onClick: () => alert(`View`),
+      value: 'view',
     },
     {
       label: 'Edit',
       onClick: () => alert(`Edit`),
+      value: 'edit',
     },
     {
       label: 'Delete',
       onClick: () => alert(`Delete`),
+      value: 'delete',
     },
   ],
 };
