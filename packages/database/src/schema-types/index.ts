@@ -3,6 +3,7 @@
 // Export asset-related types
 export * from './asset';
 export * from './chat';
+export * from './collections';
 // Export credential-related types and schemas
 export * from './credentials';
 // Export dashboards types

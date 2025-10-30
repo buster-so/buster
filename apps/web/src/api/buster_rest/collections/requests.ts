@@ -14,10 +14,10 @@ import type {
   SharePostRequest,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
-import mainApi from '@/api/buster_rest/instances';
+import { mainApi, mainApiV2 } from '../instances';
 
 export const collectionsGetList = async (params: GetCollectionsRequestQuery) => {
-  return await mainApi
+  return await mainApiV2
     .get<GetCollectionsResponse>('/collections', { params })
     .then((res) => res.data);
 };
@@ -26,7 +26,7 @@ export const collectionsGetCollection = async ({
   id,
   ...params
 }: GetIndividualCollectionRequestParams) => {
-  return await mainApi
+  return await mainApiV2
     .get<BusterCollection>(`/collections/${id}`, { params })
     .then((res) => res.data);
 };
