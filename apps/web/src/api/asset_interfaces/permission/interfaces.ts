@@ -95,30 +95,30 @@ export interface BusterPermissionListGroup {
   member_count?: number;
 }
 
-export interface BusterPermissionGroup {
-  id: string;
-  name: string;
-  dataset_count: number;
-  member_count: number;
-  team_count: number;
-  created_by: {
-    name: string;
-    id: string;
-  };
-  updated_at: string;
-  datasets: BusterDatasetListItem[];
-  deleted_at: string | null;
-  organization_id: string;
-  teams: {
-    id: string;
-    member_count: number;
-    name: string;
-    team_role: UserOrganizationRole;
-  }[];
-  updated_by: string;
-  user_count: number;
-  users: BusterPermissionListUser[];
-}
+// export interface BusterPermissionGroup {
+//   id: string;
+//   name: string;
+//   dataset_count: number;
+//   member_count: number;
+//   team_count: number;
+//   created_by: {
+//     name: string;
+//     id: string;
+//   };
+//   updated_at: string;
+//   datasets: BusterDatasetListItem[];
+//   deleted_at: string | null;
+//   organization_id: string;
+//   teams: {
+//     id: string;
+//     member_count: number;
+//     name: string;
+//     team_role: UserOrganizationRole;
+//   }[];
+//   updated_by: string;
+//   user_count: number;
+//   users: BusterPermissionListUser[];
+// }
 
 export interface BusterPermissionListUser {
   id: string;
@@ -214,27 +214,27 @@ export interface BusterPermissionListGroup {
   member_count?: number;
 }
 
-export interface BusterPermissionGroup {
-  id: string;
-  name: string;
-  dataset_count: number;
-  member_count: number;
-  team_count: number;
-  created_by: {
-    name: string;
-    id: string;
-  };
-  updated_at: string;
-  datasets: BusterDatasetListItem[];
-  deleted_at: string | null;
-  organization_id: string;
-  teams: {
-    id: string;
-    member_count: number;
-    name: string;
-    team_role: UserOrganizationRole;
-  }[];
-  updated_by: string;
-  user_count: number;
-  users: BusterPermissionListUser[];
-}
+// export interface BusterPermissionGroup {
+//   id: string;
+//   name: string;
+//   dataset_count: number;
+//   member_count: number;
+//   team_count: number;
+//   created_by: {
+//     name: string;
+//     id: string;
+//   };
+//   updated_at: string;
+//   datasets: BusterDatasetListItem[];
+//   deleted_at: string | null;
+//   organization_id: string;
+//   teams: {
+//     id: string;
+//     member_count: number;
+//     name: string;
+//     team_role: UserOrganizationRole;
+//   }[];
+//   updated_by: string;
+//   user_count: number;
+//   users: BusterPermissionListUser[];
+// }

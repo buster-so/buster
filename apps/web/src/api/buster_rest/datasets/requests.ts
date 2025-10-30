@@ -1,5 +1,5 @@
+import type { BusterDataset, ListDatasetsResponse } from '@buster/server-shared';
 import type { DataResult } from '@buster/server-shared/metrics';
-import type { BusterDataset, BusterDatasetListItem } from '../../asset_interfaces';
 import { mainApi, mainApiV2 } from '../instances';
 
 export const getDatasets = async (params?: {
@@ -19,17 +19,17 @@ export const getDatasets = async (params?: {
   permission_group_id?: string;
   /** Filter by owner */
   belongs_to?: string;
-}): Promise<BusterDatasetListItem[]> => {
-  const { page = 0, page_size = 1000, ...allParams } = params || {};
-  return mainApi
-    .get<BusterDatasetListItem[]>('/datasets', { params: { page, page_size, ...allParams } })
+}): Promise<ListDatasetsResponse> => {
+  const { page = 1, page_size = 1000, ...allParams } = params || {};
+  return mainApiV2
+    .get<ListDatasetsResponse>('/datasets', { params: { page, page_size, ...allParams } })
     .then((res) => res.data);
 };
 
 const GET_DATASET_URL = (datasetId: string) => `/datasets/${datasetId}`;
 
 export const getDatasetMetadata = async (datasetId: string): Promise<BusterDataset> => {
-  return await mainApi.get<BusterDataset>(GET_DATASET_URL(datasetId)).then((res) => res.data);
+  return await mainApiV2.get<BusterDataset>(GET_DATASET_URL(datasetId)).then((res) => res.data);
 };
 
 export const getDatasetDataSample = async (datasetId: string) => {

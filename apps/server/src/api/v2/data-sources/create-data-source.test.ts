@@ -69,7 +69,7 @@ describe('createDataSourceHandler', () => {
   const mockDataSource = {
     id: 'ds-123',
     name: 'My MotherDuck DB',
-    type: 'motherduck',
+    type: 'motherduck' as const,
     organizationId: 'org-123',
     createdBy: 'user-123',
     updatedBy: 'user-123',
