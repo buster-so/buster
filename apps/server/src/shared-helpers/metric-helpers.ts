@@ -1,5 +1,6 @@
 import { checkPermission } from '@buster/access-controls';
 import {
+  checkAssetInLibrary,
   getAssetsAssociatedWithMetric,
   getMetricFileById,
   getOrganizationMemberCount,
@@ -213,12 +214,13 @@ export async function buildMetricResponse(
   const fileYaml = yaml.dump(resolvedContent);
 
   // Get the extra metric info concurrently
-  const [individualPermissions, workspaceMemberCount, associatedAssets, publicEnabledBy] =
+  const [individualPermissions, workspaceMemberCount, associatedAssets, publicEnabledBy, addedToLibrary] =
     await Promise.all([
       getUsersWithAssetPermissions({ assetId: metricFile.id, assetType: 'metric_file' }),
       getOrganizationMemberCount(metricFile.organizationId),
       getAssetsAssociatedWithMetric(metricFile.id, userId),
       getPubliclyEnabledByUser(metricFile.publiclyEnabledBy),
+      checkAssetInLibrary({ userId, assetId: metricFile.id, assetType: 'metric_file' }),
     ]);
 
   const { dashboards, collections } = associatedAssets;
@@ -271,6 +273,7 @@ export async function buildMetricResponse(
     public_password: metricFile.publicPassword,
     workspace_sharing: metricFile.workspaceSharing,
     workspace_member_count: workspaceMemberCount,
+    added_to_library: addedToLibrary,
   };
 
   return response;
