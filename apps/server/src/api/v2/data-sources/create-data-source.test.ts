@@ -216,9 +216,9 @@ describe('createDataSourceHandler', () => {
       const bigqueryRequest = {
         name: 'My BigQuery',
         type: 'bigquery' as const,
-        credentials_json: '{"type":"service_account"}',
-        default_project_id: 'my-project',
-        default_dataset_id: 'my-dataset',
+        service_account_key: '{"type":"service_account"}',
+        project_id: 'my-project',
+        default_dataset: 'my-dataset',
       };
 
       await expect(createDataSourceHandler(mockUser, bigqueryRequest)).rejects.toThrow();
@@ -292,29 +292,11 @@ describe('createDataSourceHandler', () => {
       expect(MotherDuckAdapter).toHaveBeenCalled();
     });
 
-    it('should throw error for unimplemented Databricks adapter', async () => {
-      const databricksRequest = {
-        name: 'My Databricks',
-        type: 'databricks' as const,
-        host: 'workspace.cloud.databricks.com',
-        api_key: 'dapi123',
-        warehouse_id: 'warehouse-id',
-        default_catalog: 'main',
-      };
-
-      await expect(createDataSourceHandler(mockUser, databricksRequest)).rejects.toThrow(
-        HTTPException
-      );
-
-      try {
-        await createDataSourceHandler(mockUser, databricksRequest);
-      } catch (error) {
-        expect(error).toBeInstanceOf(HTTPException);
-        expect((error as HTTPException).status).toBe(400);
-        expect((error as HTTPException).message).toContain(
-          'Databricks adapter not yet implemented'
-        );
-      }
-    });
+    // Note: Databricks test removed - when Databricks support is added, it should be added to:
+    // 1. packages/database/src/queries/vault/credentials/schemas.ts (DatabricksCredentialsSchema in CredentialsSchema union)
+    // 2. packages/server-shared/src/data-sources/requests.ts (add to imports and use in CreateDataSourceRequestSchema)
+    // 3. packages/data-source/src/adapters/databricks.ts (new adapter implementation)
+    // 4. apps/server/src/api/v2/data-sources/create-data-source.ts (add case to getAdapterForType)
+    // Then add test here similar to other adapter types
   });
 });

@@ -1,5 +1,4 @@
-import type { Credentials } from '@buster/data-source';
-import { DataSourceType } from '@buster/data-source';
+import { type Credentials, DataSourceType } from '@buster/database/schema-types';
 import { dump as yamlDump } from 'js-yaml';
 
 // Outputs (exact dbt "outputs" object per adapter)
@@ -151,7 +150,7 @@ export function buildOutput(
     case DataSourceType.SQLServer:
       return {
         type: 'sqlserver',
-        server: creds.server,
+        server: creds.host,
         port: creds.port ?? 1433,
         user: creds.username,
         password: creds.password,

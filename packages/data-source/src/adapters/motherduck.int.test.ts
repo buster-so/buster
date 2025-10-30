@@ -3,8 +3,8 @@
  * Tests against real MotherDuck instance with sample_data database
  */
 
+import { DataSourceType, type MotherDuckCredentials } from '@buster/database/schema-types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DataSourceType, type MotherDuckCredentials } from '../types/credentials';
 import { MotherDuckAdapter } from './motherduck';
 
 // Check if MotherDuck test credentials are available

@@ -4,6 +4,7 @@ import { AthenaIcon } from '../../ui/icons/customIcons/athena';
 import { BigQueryIcon } from '../../ui/icons/customIcons/bigquery';
 import { DataBricks } from '../../ui/icons/customIcons/databricks';
 import { MariaDB } from '../../ui/icons/customIcons/mariadb';
+import { MotherDuckIcon } from '../../ui/icons/customIcons/motherduck';
 import { MySQLIcon } from '../../ui/icons/customIcons/mysql';
 import { PostgresIcon } from '../../ui/icons/customIcons/postgres';
 import { RedshiftIcon } from '../../ui/icons/customIcons/redshift';
@@ -22,6 +23,7 @@ const IconRecord: Record<DataSourceTypes, React.FC<Parameters<typeof PostgresIco
   [DataSourceTypes.mariadb]: MariaDB,
   [DataSourceTypes.sqlserver]: SqlServer,
   [DataSourceTypes.databricks]: DataBricks,
+  [DataSourceTypes.motherduck]: MotherDuckIcon,
   [DataSourceTypes.supabase]: SupabaseIcon,
   [DataSourceTypes.athena]: AthenaIcon,
   [DataSourceTypes.other]: RedUsersIcons,

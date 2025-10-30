@@ -1,8 +1,12 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type RedshiftCredentials,
+} from '@buster/database/schema-types';
 import { Client, type ClientConfig } from 'pg';
 import Cursor from 'pg-cursor';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { RedshiftIntrospector } from '../introspection/redshift';
-import { type Credentials, DataSourceType, type RedshiftCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';

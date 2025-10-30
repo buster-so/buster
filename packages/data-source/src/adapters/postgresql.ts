@@ -1,8 +1,12 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type PostgreSQLCredentials,
+} from '@buster/database/schema-types';
 import { Client, type ClientConfig } from 'pg';
 import Cursor from 'pg-cursor';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { PostgreSQLIntrospector } from '../introspection/postgresql';
-import { type Credentials, DataSourceType, type PostgreSQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';

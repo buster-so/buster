@@ -1,4 +1,9 @@
 import {
+  type BigQueryCredentials,
+  type Credentials,
+  DataSourceType,
+} from '@buster/database/schema-types';
+import {
   BigQuery,
   type BigQueryOptions,
   type Query,
@@ -7,7 +12,6 @@ import {
 import type bigquery from '@google-cloud/bigquery/build/src/types';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { BigQueryIntrospector } from '../introspection/bigquery';
-import { type BigQueryCredentials, type Credentials, DataSourceType } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { fixBigQueryTableReferences } from './helpers/bigquery-sql-fixer';
@@ -24,6 +28,16 @@ export class BigQueryAdapter extends BaseAdapter {
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.BigQuery);
     const bigqueryCredentials = credentials as BigQueryCredentials;
+
+    // Debug: Log what credential fields we received (without exposing sensitive data)
+    console.info('[BigQueryAdapter] Initializing with credentials:', {
+      hasProjectId: !!bigqueryCredentials.project_id,
+      hasServiceAccountKey: !!bigqueryCredentials.service_account_key,
+      serviceAccountKeyType: typeof bigqueryCredentials.service_account_key,
+      hasKeyFilePath: !!bigqueryCredentials.key_file_path,
+      location: bigqueryCredentials.location,
+      credentialKeys: Object.keys(bigqueryCredentials),
+    });
 
     try {
       const options: BigQueryOptions = {
@@ -48,6 +62,8 @@ export class BigQueryAdapter extends BaseAdapter {
       } else if (bigqueryCredentials.key_file_path) {
         options.keyFilename = bigqueryCredentials.key_file_path;
       }
+      // If no explicit credentials provided, BigQuery SDK will use Application Default Credentials (ADC)
+      // This allows authentication via GOOGLE_APPLICATION_CREDENTIALS env var or GCP metadata service
 
       // Set location - default to US if not specified
       options.location = bigqueryCredentials.location || 'US';
@@ -206,18 +222,25 @@ export class BigQueryAdapter extends BaseAdapter {
   async testConnection(): Promise<boolean> {
     try {
       if (!this.client) {
+        console.error('[BigQueryAdapter] testConnection failed: Client not initialized');
         return false;
       }
 
-      // Test connection by running a simple query
+      // Test connection by running a simple query with 10 second timeout
       const [job] = await this.client.createQueryJob({
         query: 'SELECT 1 as test',
         useLegacySql: false,
+        jobTimeoutMs: 10000, // 10 second timeout for connection test
       });
 
       await job.getQueryResults();
       return true;
-    } catch {
+    } catch (error) {
+      console.error('[BigQueryAdapter] testConnection failed:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return false;
     }
   }

@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import {
-  BigqueryCredentialsSchema,
+  BigQueryCredentialsSchema,
   CreateDataSourceRequestSchema,
   DatabricksCredentialsSchema,
   ListDataSourcesQuerySchema,
   MotherDuckCredentialsSchema,
-  MySqlCredentialsSchema,
-  PostgresCredentialsSchema,
+  MySQLCredentialsSchema,
+  PostgreSQLCredentialsSchema,
   RedshiftCredentialsSchema,
   SnowflakeCredentialsSchema,
-  SqlServerCredentialsSchema,
+  SQLServerCredentialsSchema,
   UpdateDataSourceRequestSchema,
 } from './requests';
 
 describe('Data Source Request Schemas', () => {
-  describe('PostgresCredentialsSchema', () => {
+  describe('PostgreSQLCredentialsSchema', () => {
     it('should validate valid postgres credentials with all fields', () => {
       const data = {
         type: 'postgres',
@@ -24,11 +24,13 @@ describe('Data Source Request Schemas', () => {
         password: 'secret',
         default_database: 'mydb',
         default_schema: 'public',
+        ssl: true,
+        connection_timeout: 30000,
       };
-      expect(PostgresCredentialsSchema.safeParse(data).success).toBe(true);
+      expect(PostgreSQLCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
-    it('should validate postgres credentials with SSH tunnel', () => {
+    it('should validate postgres credentials with SSL object', () => {
       const data = {
         type: 'postgres',
         host: 'remote.db.com',
@@ -36,23 +38,35 @@ describe('Data Source Request Schemas', () => {
         username: 'admin',
         password: 'secret',
         default_database: 'mydb',
-        jump_host: 'bastion.example.com',
-        ssh_username: 'ubuntu',
-        ssh_private_key: '-----BEGIN RSA PRIVATE KEY-----...',
+        ssl: {
+          rejectUnauthorized: false,
+          ca: '-----BEGIN CERTIFICATE-----...',
+        },
       };
-      expect(PostgresCredentialsSchema.safeParse(data).success).toBe(true);
+      expect(PostgreSQLCredentialsSchema.safeParse(data).success).toBe(true);
+    });
+
+    it('should validate postgres credentials without optional port', () => {
+      const data = {
+        type: 'postgres',
+        host: 'localhost',
+        username: 'admin',
+        password: 'secret',
+        default_database: 'mydb',
+      };
+      expect(PostgreSQLCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
     it('should reject postgres credentials with missing required fields', () => {
       const data = {
         type: 'postgres',
         host: 'localhost',
-        // missing port, username, password, database
+        // missing username, password, database
       };
-      const result = PostgresCredentialsSchema.safeParse(data);
+      const result = PostgreSQLCredentialsSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.length).toBeGreaterThanOrEqual(4);
+        expect(result.error.issues.length).toBeGreaterThanOrEqual(3);
       }
     });
 
@@ -65,7 +79,7 @@ describe('Data Source Request Schemas', () => {
         password: 'secret',
         default_database: 'mydb',
       };
-      expect(PostgresCredentialsSchema.safeParse(data).success).toBe(false);
+      expect(PostgreSQLCredentialsSchema.safeParse(data).success).toBe(false);
     });
 
     it('should reject zero port number', () => {
@@ -77,11 +91,11 @@ describe('Data Source Request Schemas', () => {
         password: 'secret',
         default_database: 'mydb',
       };
-      expect(PostgresCredentialsSchema.safeParse(data).success).toBe(false);
+      expect(PostgreSQLCredentialsSchema.safeParse(data).success).toBe(false);
     });
   });
 
-  describe('MySqlCredentialsSchema', () => {
+  describe('MySQLCredentialsSchema', () => {
     it('should validate valid mysql credentials', () => {
       const data = {
         type: 'mysql',
@@ -91,7 +105,7 @@ describe('Data Source Request Schemas', () => {
         password: 'secret',
         default_database: 'mydb',
       };
-      expect(MySqlCredentialsSchema.safeParse(data).success).toBe(true);
+      expect(MySQLCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
     it('should validate mysql credentials with schema', () => {
@@ -104,7 +118,7 @@ describe('Data Source Request Schemas', () => {
         default_database: 'mydb',
         default_schema: 'public',
       };
-      expect(MySqlCredentialsSchema.safeParse(data).success).toBe(true);
+      expect(MySQLCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
     it('should reject mysql with missing required fields', () => {
@@ -112,44 +126,46 @@ describe('Data Source Request Schemas', () => {
         type: 'mysql',
         host: 'localhost',
       };
-      const result = MySqlCredentialsSchema.safeParse(data);
+      const result = MySQLCredentialsSchema.safeParse(data);
       expect(result.success).toBe(false);
     });
   });
 
-  describe('BigqueryCredentialsSchema', () => {
-    it('should validate valid bigquery credentials', () => {
+  describe('BigQueryCredentialsSchema', () => {
+    it('should validate valid bigquery credentials with service account key', () => {
       const data = {
         type: 'bigquery',
-        credentials_json: '{"type":"service_account","project_id":"my-project"}',
-        default_project_id: 'my-project',
-        default_dataset_id: 'my_dataset',
+        project_id: 'my-project',
+        service_account_key: '{"type":"service_account","project_id":"my-project"}',
+        default_dataset: 'my_dataset',
       };
-      expect(BigqueryCredentialsSchema.safeParse(data).success).toBe(true);
+      expect(BigQueryCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
-    it('should reject invalid JSON in credentials_json', () => {
+    it('should validate bigquery credentials with key file path', () => {
       const data = {
         type: 'bigquery',
-        credentials_json: 'not-valid-json',
-        default_project_id: 'my-project',
-        default_dataset_id: 'my_dataset',
+        project_id: 'my-project',
+        key_file_path: '/path/to/service-account.json',
+        default_dataset: 'my_dataset',
       };
-      const result = BigqueryCredentialsSchema.safeParse(data);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toContain('valid JSON');
-      }
+      expect(BigQueryCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
-    it('should reject empty credentials_json', () => {
+    it('should validate bigquery with only project_id', () => {
       const data = {
         type: 'bigquery',
-        credentials_json: '',
-        default_project_id: 'my-project',
-        default_dataset_id: 'my_dataset',
+        project_id: 'my-project',
       };
-      expect(BigqueryCredentialsSchema.safeParse(data).success).toBe(false);
+      expect(BigQueryCredentialsSchema.safeParse(data).success).toBe(true);
+    });
+
+    it('should reject missing project_id', () => {
+      const data = {
+        type: 'bigquery',
+        service_account_key: '{"type":"service_account"}',
+      };
+      expect(BigQueryCredentialsSchema.safeParse(data).success).toBe(false);
     });
   });
 
@@ -214,7 +230,7 @@ describe('Data Source Request Schemas', () => {
     });
   });
 
-  describe('SqlServerCredentialsSchema', () => {
+  describe('SQLServerCredentialsSchema', () => {
     it('should validate valid sql server credentials', () => {
       const data = {
         type: 'sqlserver',
@@ -224,7 +240,7 @@ describe('Data Source Request Schemas', () => {
         password: 'secret',
         default_database: 'master',
       };
-      expect(SqlServerCredentialsSchema.safeParse(data).success).toBe(true);
+      expect(SQLServerCredentialsSchema.safeParse(data).success).toBe(true);
     });
 
     it('should reject sql server with invalid port', () => {
@@ -236,7 +252,7 @@ describe('Data Source Request Schemas', () => {
         password: 'secret',
         default_database: 'master',
       };
-      expect(SqlServerCredentialsSchema.safeParse(data).success).toBe(false);
+      expect(SQLServerCredentialsSchema.safeParse(data).success).toBe(false);
     });
   });
 
@@ -329,9 +345,9 @@ describe('Data Source Request Schemas', () => {
       const data = {
         name: 'My BigQuery',
         type: 'bigquery',
-        credentials_json: '{"type":"service_account"}',
-        default_project_id: 'my-project',
-        default_dataset_id: 'my_dataset',
+        project_id: 'my-project',
+        service_account_key: '{"type":"service_account"}',
+        default_dataset: 'my_dataset',
       };
       expect(CreateDataSourceRequestSchema.safeParse(data).success).toBe(true);
     });
@@ -428,22 +444,22 @@ describe('Data Source Request Schemas', () => {
     it('should use default values for pagination', () => {
       const data = {};
       const result = ListDataSourcesQuerySchema.parse(data);
-      expect(result.page).toBe(0);
-      expect(result.pageSize).toBe(25);
+      expect(result.page).toBe(1);
+      expect(result.page_size).toBe(25);
     });
 
     it('should validate custom pagination values', () => {
-      const data = { page: '2', pageSize: '50' };
+      const data = { page: '2', page_size: '50' };
       const result = ListDataSourcesQuerySchema.parse(data);
       expect(result.page).toBe(2);
-      expect(result.pageSize).toBe(50);
+      expect(result.page_size).toBe(50);
     });
 
     it('should coerce string numbers to integers', () => {
-      const data = { page: '1', pageSize: '10' };
+      const data = { page: '1', page_size: '10' };
       const result = ListDataSourcesQuerySchema.parse(data);
       expect(result.page).toBe(1);
-      expect(result.pageSize).toBe(10);
+      expect(result.page_size).toBe(10);
     });
 
     it('should reject negative page number', () => {
@@ -451,13 +467,13 @@ describe('Data Source Request Schemas', () => {
       expect(ListDataSourcesQuerySchema.safeParse(data).success).toBe(false);
     });
 
-    it('should reject pageSize above max', () => {
-      const data = { pageSize: '101' };
+    it('should reject page_size above max', () => {
+      const data = { page_size: '101' };
       expect(ListDataSourcesQuerySchema.safeParse(data).success).toBe(false);
     });
 
-    it('should reject pageSize below min', () => {
-      const data = { pageSize: '0' };
+    it('should reject page_size below min', () => {
+      const data = { page_size: '0' };
       expect(ListDataSourcesQuerySchema.safeParse(data).success).toBe(false);
     });
   });

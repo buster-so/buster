@@ -1,7 +1,11 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type MySQLCredentials,
+} from '@buster/database/schema-types';
 import mysql from 'mysql2/promise';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { MySQLIntrospector } from '../introspection/mysql';
-import { type Credentials, DataSourceType, type MySQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';

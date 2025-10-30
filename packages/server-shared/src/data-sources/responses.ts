@@ -1,3 +1,5 @@
+import type { PaginatedResponse } from '@buster/database/schema-types';
+import { PaginationSchema } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { CredentialsSchema } from './requests';
 
@@ -63,14 +65,11 @@ export const DataSourceListItemSchema = z.object({
 });
 
 /**
- * Paginated list response schema
+ * List data sources response schema (paginated)
  */
 export const ListDataSourcesResponseSchema = z.object({
-  items: z.array(DataSourceListItemSchema).describe('Data source items'),
-  total: z.number().int().describe('Total number of items'),
-  page: z.number().int().describe('Current page number'),
-  pageSize: z.number().int().describe('Items per page'),
-  hasMore: z.boolean().describe('Whether more pages exist'),
+  data: z.array(DataSourceListItemSchema).describe('Array of data source list items'),
+  pagination: PaginationSchema.describe('Pagination metadata'),
 });
 
 /**
@@ -85,5 +84,5 @@ export type DatasetSummary = z.infer<typeof DatasetSummarySchema>;
 export type CreateDataSourceResponse = z.infer<typeof CreateDataSourceResponseSchema>;
 export type GetDataSourceResponse = z.infer<typeof GetDataSourceResponseSchema>;
 export type DataSourceListItem = z.infer<typeof DataSourceListItemSchema>;
-export type ListDataSourcesResponse = z.infer<typeof ListDataSourcesResponseSchema>;
+export type ListDataSourcesResponse = PaginatedResponse<DataSourceListItem>;
 export type UpdateDataSourceResponse = z.infer<typeof UpdateDataSourceResponseSchema>;

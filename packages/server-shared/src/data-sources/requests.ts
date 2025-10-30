@@ -1,74 +1,36 @@
+import {
+  BigQueryCredentialsSchema,
+  MotherDuckCredentialsSchema,
+  MySQLCredentialsSchema,
+  PostgreSQLCredentialsSchema,
+  RedshiftCredentialsSchema,
+  SnowflakeCredentialsSchema,
+  SQLServerCredentialsSchema,
+  CredentialsSchema as VaultCredentialsSchema,
+} from '@buster/database/schema-types';
 import { z } from 'zod';
 
 /**
- * PostgreSQL credentials schema
+ * API Request Schemas for Data Source Management
+ *
+ * Note: These schemas are imported directly from the vault credential schemas in @buster/database
+ * to ensure consistency between the API layer and storage layer.
  */
-export const PostgresCredentialsSchema = z.object({
-  type: z.literal('postgres').describe('Data source type'),
-  host: z.string().min(1).describe('Database host'),
-  port: z.number().int().positive().describe('Database port'),
-  username: z.string().min(1).describe('Database username'),
-  password: z.string().min(1).describe('Database password'),
-  default_database: z.string().min(1).describe('Default database name'),
-  default_schema: z.string().optional().describe('Default schema name'),
-  jump_host: z.string().optional().describe('SSH jump host for tunneling'),
-  ssh_username: z.string().optional().describe('SSH username'),
-  ssh_private_key: z.string().optional().describe('SSH private key'),
-});
 
-/**
- * MySQL credentials schema
- */
-export const MySqlCredentialsSchema = z.object({
-  type: z.literal('mysql').describe('Data source type'),
-  host: z.string().min(1).describe('Database host'),
-  port: z.number().int().positive().describe('Database port'),
-  username: z.string().min(1).describe('Database username'),
-  password: z.string().min(1).describe('Database password'),
-  default_database: z.string().min(1).describe('Default database name'),
-  default_schema: z.string().optional().describe('Default schema name'),
-});
-
-/**
- * BigQuery credentials schema with JSON validation
- */
-export const BigqueryCredentialsSchema = z.object({
-  type: z.literal('bigquery').describe('Data source type'),
-  credentials_json: z
-    .string()
-    .min(1)
-    .refine(
-      (val) => {
-        try {
-          JSON.parse(val);
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      { message: 'credentials_json must be valid JSON' }
-    )
-    .describe('Service account JSON key'),
-  default_project_id: z.string().min(1).describe('Default GCP project ID'),
-  default_dataset_id: z.string().min(1).describe('Default dataset ID'),
-});
-
-/**
- * Snowflake credentials schema
- */
-export const SnowflakeCredentialsSchema = z.object({
-  type: z.literal('snowflake').describe('Data source type'),
-  account_id: z.string().min(1).describe('Snowflake account identifier'),
-  warehouse_id: z.string().min(1).describe('Warehouse ID'),
-  username: z.string().min(1).describe('Snowflake username'),
-  password: z.string().min(1).describe('Snowflake password'),
-  default_database: z.string().min(1).describe('Default database name'),
-  default_schema: z.string().optional().describe('Default schema name'),
-  role: z.string().optional().describe('Snowflake role'),
-});
+// Re-export vault credential schemas for API use
+export {
+  BigQueryCredentialsSchema,
+  MotherDuckCredentialsSchema,
+  MySQLCredentialsSchema,
+  PostgreSQLCredentialsSchema,
+  RedshiftCredentialsSchema,
+  SnowflakeCredentialsSchema,
+  SQLServerCredentialsSchema,
+};
 
 /**
  * Databricks credentials schema
+ * Note: Databricks is not yet in the vault schemas, keeping local definition
  */
 export const DatabricksCredentialsSchema = z.object({
   type: z.literal('databricks').describe('Data source type'),
@@ -80,64 +42,12 @@ export const DatabricksCredentialsSchema = z.object({
 });
 
 /**
- * SQL Server credentials schema
- */
-export const SqlServerCredentialsSchema = z.object({
-  type: z.literal('sqlserver').describe('Data source type'),
-  host: z.string().min(1).describe('SQL Server host'),
-  port: z.number().int().positive().describe('SQL Server port'),
-  username: z.string().min(1).describe('SQL Server username'),
-  password: z.string().min(1).describe('SQL Server password'),
-  default_database: z.string().min(1).describe('Default database name'),
-});
-
-/**
- * Redshift credentials schema
- */
-export const RedshiftCredentialsSchema = z.object({
-  type: z.literal('redshift').describe('Data source type'),
-  host: z.string().min(1).describe('Redshift cluster endpoint'),
-  port: z.number().int().positive().describe('Redshift port'),
-  username: z.string().min(1).describe('Redshift username'),
-  password: z.string().min(1).describe('Redshift password'),
-  default_database: z.string().min(1).describe('Default database name'),
-  default_schema: z.string().optional().describe('Default schema name'),
-});
-
-/**
- * MotherDuck credentials schema for data source creation
- * Matches the MotherDuckCredentials interface from @buster/data-source
- */
-export const MotherDuckCredentialsSchema = z.object({
-  type: z.literal('motherduck').describe('Data source type'),
-  token: z.string().min(1).describe('MotherDuck access token'),
-  default_database: z.string().min(1).describe('Default database name to connect to'),
-  saas_mode: z
-    .boolean()
-    .optional()
-    .describe('Enable SaaS mode for server-side security isolation (defaults to true)'),
-  attach_mode: z
-    .enum(['single', 'multi'])
-    .optional()
-    .describe('Database attachment mode: single or multi'),
-  connection_timeout: z.number().optional().describe('Connection timeout in milliseconds'),
-  query_timeout: z.number().optional().describe('Query timeout in milliseconds'),
-});
-
-/**
  * Discriminated union of all credential types
- * Uses 'type' field as the discriminator for type-safe credential handling
+ * Uses vault credentials as the source of truth
+ * Note: Databricks is defined above but not yet included in the union
+ * because it's missing the adapter implementation
  */
-export const CredentialsSchema = z.discriminatedUnion('type', [
-  PostgresCredentialsSchema,
-  MySqlCredentialsSchema,
-  BigqueryCredentialsSchema,
-  SnowflakeCredentialsSchema,
-  DatabricksCredentialsSchema,
-  SqlServerCredentialsSchema,
-  RedshiftCredentialsSchema,
-  MotherDuckCredentialsSchema,
-]);
+export const CredentialsSchema = VaultCredentialsSchema;
 
 /**
  * Create data source request schema
@@ -159,50 +69,64 @@ export const UpdateDataSourceRequestSchema = z.object({
   name: z.string().min(1).optional().describe('Updated data source name'),
   // Credentials are optional and when provided, must match one of the valid types
   type: z.string().optional().describe('Data source type (if updating credentials)'),
-  // Postgres fields
+  // Postgres/MySQL/Redshift fields
   host: z.string().min(1).optional(),
   port: z.number().int().positive().optional(),
   username: z.string().min(1).optional(),
   password: z.string().min(1).optional(),
   default_database: z.string().min(1).optional(),
   default_schema: z.string().optional(),
-  jump_host: z.string().optional(),
-  ssh_username: z.string().optional(),
-  ssh_private_key: z.string().optional(),
+  database: z.string().optional(),
+  schema: z.string().optional(),
+  ssl: z.union([z.boolean(), z.record(z.unknown())]).optional(),
   // BigQuery fields
-  credentials_json: z.string().optional(),
-  default_project_id: z.string().optional(),
-  default_dataset_id: z.string().optional(),
+  service_account_key: z.union([z.string(), z.record(z.unknown())]).optional(),
+  project_id: z.string().optional(),
+  default_dataset: z.string().optional(),
+  key_file_path: z.string().optional(),
+  location: z.string().optional(),
   // Snowflake fields
   account_id: z.string().optional(),
   warehouse_id: z.string().optional(),
   role: z.string().optional(),
+  custom_host: z.string().optional(),
   // Databricks fields
   api_key: z.string().optional(),
   default_catalog: z.string().optional(),
+  // SQL Server fields
+  domain: z.string().optional(),
+  instance: z.string().optional(),
+  encrypt: z.boolean().optional(),
+  trust_server_certificate: z.boolean().optional(),
+  request_timeout: z.number().optional(),
+  // Redshift fields
+  cluster_identifier: z.string().optional(),
   // MotherDuck fields
   token: z.string().optional(),
   saas_mode: z.boolean().optional(),
-  attach_mode: z.enum(['single', 'multi']).optional(),
+  attach_mode: z.enum(['multi', 'single']).optional(),
+  // Shared timeout fields
   connection_timeout: z.number().optional(),
   query_timeout: z.number().optional(),
+  // MySQL specific
+  charset: z.string().optional(),
 });
 
 /**
  * Query parameters for list endpoint with pagination
  */
 export const ListDataSourcesQuerySchema = z.object({
-  page: z.coerce.number().int().min(0).default(0).describe('Page number (0-indexed)'),
-  pageSize: z.coerce.number().int().min(1).max(100).default(25).describe('Items per page'),
+  page: z.coerce.number().int().min(1).default(1).describe('Page number (1-indexed)'),
+  page_size: z.coerce.number().int().min(1).max(100).default(25).describe('Items per page'),
 });
 
-// Export inferred types
-export type PostgresCredentials = z.infer<typeof PostgresCredentialsSchema>;
-export type MySqlCredentials = z.infer<typeof MySqlCredentialsSchema>;
-export type BigqueryCredentials = z.infer<typeof BigqueryCredentialsSchema>;
+// Export inferred types from vault schemas
+export type PostgreSQLCredentials = z.infer<typeof PostgreSQLCredentialsSchema>;
+export type MySQLCredentials = z.infer<typeof MySQLCredentialsSchema>;
+export type BigQueryCredentials = z.infer<typeof BigQueryCredentialsSchema>;
 export type SnowflakeCredentials = z.infer<typeof SnowflakeCredentialsSchema>;
 export type DatabricksCredentials = z.infer<typeof DatabricksCredentialsSchema>;
-export type SqlServerCredentials = z.infer<typeof SqlServerCredentialsSchema>;
+export type SQLServerCredentials = z.infer<typeof SQLServerCredentialsSchema>;
 export type RedshiftCredentials = z.infer<typeof RedshiftCredentialsSchema>;
 export type MotherDuckCredentials = z.infer<typeof MotherDuckCredentialsSchema>;
 export type Credentials = z.infer<typeof CredentialsSchema>;

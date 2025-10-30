@@ -1,5 +1,5 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from '../adapters/base';
-import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,

@@ -5,6 +5,7 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import {
   createBigQueryDataSource,
   createDatabricksDataSource,
+  createMotherDuckDataSource,
   createMySQLDataSource,
   createPostgresDataSource,
   createRedshiftDataSource,
@@ -15,6 +16,7 @@ import {
   listDatasources,
   updateBigQueryDataSource,
   updateDatabricksDataSource,
+  updateMotherDuckDataSource,
   updateMySQLDataSource,
   updatePostgresDataSource,
   updateRedshiftDataSource,
@@ -286,6 +288,33 @@ export const useUpdateSQLServerDataSource = () => {
   });
 };
 
+export const useCreateMotherDuckDataSource = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createMotherDuckDataSource,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: datasourceQueryKeys.datasourceGetList.queryKey,
+      });
+    },
+  });
+};
+
+export const useUpdateMotherDuckDataSource = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateMotherDuckDataSource,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: datasourceQueryKeys.datasourceGetList.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: datasourceQueryKeys.datasourceGet(variables.id).queryKey,
+      });
+    },
+  });
+};
+
 // Union type for create datasource parameters
 type CreateDatasourceParams =
   | PostgresCreateParams
@@ -317,7 +346,7 @@ export const useCreateDatasource = () => {
 
   return {
     mutateAsync: async (credentials: CreateDatasourceParams) => {
-      switch (credentials.type) {
+      switch (credentials.type as string) {
         case DataSourceTypes.postgres:
           return createPostgres.mutateAsync(credentials as PostgresCreateParams);
         case DataSourceTypes.mysql:

@@ -1,6 +1,7 @@
+import type { DataSourceListItem } from '@buster/server-shared';
 import { Link } from '@tanstack/react-router';
 import React from 'react';
-import type { DataSourceListItem } from '@/api/asset_interfaces';
+import type { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';
 import { useIsUserAdmin } from '@/api/buster_rest/users/useGetUserInfo';
 import { AppDataSourceIcon } from '@/components/features/icons/dataSourceIcons';
@@ -70,7 +71,7 @@ const DataSourceItems: React.FC<{
 const ListItem: React.FC<{
   source: DataSourceListItem;
 }> = React.memo(({ source }) => {
-  const { mutateAsync: onDeleteDataSource, isPending: isDeleting } = useDeleteDatasource();
+  const { mutateAsync: onDeleteDataSource } = useDeleteDatasource();
 
   const dropdownItems: IDropdownItems = [
     {
@@ -98,16 +99,11 @@ const ListItem: React.FC<{
         )}
       >
         <div className="flex items-center space-x-4">
-          <AppDataSourceIcon type={source.type} size={24} />
+          <AppDataSourceIcon type={source.type as DataSourceTypes} size={24} />
           <Text variant="secondary">{source.name}</Text>
         </div>
 
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
+        <div>
           <Dropdown items={dropdownItems} align="end" side="bottom">
             <Button
               variant="ghost"

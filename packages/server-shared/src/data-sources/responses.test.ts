@@ -237,9 +237,9 @@ describe('Data Source Response Schemas', () => {
         onboardingError: null,
         credentials: {
           type: 'bigquery',
-          credentials_json: '{"type":"service_account"}',
-          default_project_id: 'my-project',
-          default_dataset_id: 'my_dataset',
+          project_id: 'my-project',
+          service_account_key: '{"type":"service_account"}',
+          default_dataset: 'my_dataset',
         },
         datasets: [],
       };
@@ -326,7 +326,7 @@ describe('Data Source Response Schemas', () => {
   describe('ListDataSourcesResponseSchema', () => {
     it('should validate paginated list response', () => {
       const data = {
-        items: [
+        data: [
           {
             id: '123e4567-e89b-12d3-a456-426614174000',
             name: 'DB 1',
@@ -340,28 +340,32 @@ describe('Data Source Response Schemas', () => {
             updatedAt: '2025-01-02T00:00:00Z',
           },
         ],
-        total: 2,
-        page: 1,
-        pageSize: 25,
-        hasMore: false,
+        pagination: {
+          total: 2,
+          page: 1,
+          page_size: 25,
+          total_pages: 1,
+        },
       };
       expect(ListDataSourcesResponseSchema.safeParse(data).success).toBe(true);
     });
 
     it('should validate empty list', () => {
       const data = {
-        items: [],
-        total: 0,
-        page: 0,
-        pageSize: 25,
-        hasMore: false,
+        data: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          page_size: 25,
+          total_pages: 0,
+        },
       };
       expect(ListDataSourcesResponseSchema.safeParse(data).success).toBe(true);
     });
 
-    it('should validate list with hasMore true', () => {
+    it('should validate list with multiple pages', () => {
       const data = {
-        items: [
+        data: [
           {
             id: '123e4567-e89b-12d3-a456-426614174000',
             name: 'DB 1',
@@ -369,17 +373,19 @@ describe('Data Source Response Schemas', () => {
             updatedAt: '2025-01-01T00:00:00Z',
           },
         ],
-        total: 100,
-        page: 0,
-        pageSize: 25,
-        hasMore: true,
+        pagination: {
+          total: 100,
+          page: 1,
+          page_size: 25,
+          total_pages: 4,
+        },
       };
       expect(ListDataSourcesResponseSchema.safeParse(data).success).toBe(true);
     });
 
-    it('should reject missing pagination fields', () => {
+    it('should reject missing pagination field', () => {
       const data = {
-        items: [
+        data: [
           {
             id: '123e4567-e89b-12d3-a456-426614174000',
             name: 'DB 1',
@@ -387,14 +393,13 @@ describe('Data Source Response Schemas', () => {
             updatedAt: '2025-01-01T00:00:00Z',
           },
         ],
-        total: 1,
       };
       expect(ListDataSourcesResponseSchema.safeParse(data).success).toBe(false);
     });
 
     it('should reject invalid item in array', () => {
       const data = {
-        items: [
+        data: [
           {
             id: 'not-a-uuid',
             name: 'DB 1',
@@ -402,10 +407,12 @@ describe('Data Source Response Schemas', () => {
             updatedAt: '2025-01-01T00:00:00Z',
           },
         ],
-        total: 1,
-        page: 0,
-        pageSize: 25,
-        hasMore: false,
+        pagination: {
+          total: 1,
+          page: 1,
+          page_size: 25,
+          total_pages: 1,
+        },
       };
       expect(ListDataSourcesResponseSchema.safeParse(data).success).toBe(false);
     });

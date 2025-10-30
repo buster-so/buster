@@ -6,9 +6,13 @@ import type {
   CreateMetricsState,
 } from './create-metrics-tool';
 
-vi.mock('@buster/database/queries', () => ({
-  updateMessageEntries: vi.fn(),
-}));
+vi.mock('@buster/database/queries', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    updateMessageEntries: vi.fn(),
+  };
+});
 
 vi.mock('../../../../utils/streaming/optimistic-json-parser', () => ({
   OptimisticJsonParser: {

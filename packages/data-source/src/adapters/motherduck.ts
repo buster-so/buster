@@ -3,11 +3,15 @@
  * Uses @duckdb/node-api for Node.js integration
  */
 
+import {
+  type Credentials,
+  DataSourceType,
+  type MotherDuckCredentials,
+} from '@buster/database/schema-types';
 import { TIMEOUT_CONFIG } from '../config/timeouts';
 import { classifyError, QueryTimeoutError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { MotherDuckIntrospector } from '../introspection/motherduck';
-import { type Credentials, DataSourceType, type MotherDuckCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';
@@ -39,9 +43,9 @@ interface DuckDBResult {
  * Connects to MotherDuck cloud databases using the DuckDB Node Neo client
  */
 export class MotherDuckAdapter extends BaseAdapter {
-  private database?: DuckDBInstance;
-  private connection?: DuckDBConnection;
-  private introspector?: MotherDuckIntrospector;
+  private database: DuckDBInstance | undefined;
+  private connection: DuckDBConnection | undefined;
+  private introspector: MotherDuckIntrospector | undefined;
 
   /**
    * Initialize the MotherDuck adapter with credentials
@@ -56,13 +60,15 @@ export class MotherDuckAdapter extends BaseAdapter {
       const connectionString = this.buildConnectionString(mdCredentials);
 
       // Import DuckDB dynamically (to avoid bundling issues)
-      const { DuckDBInstance } = await import('@duckdb/node-api');
+      const { DuckDBInstance: DuckDBClass } = await import('@duckdb/node-api');
 
       // Create DuckDB instance with MotherDuck connection string
-      const db = await DuckDBInstance.create(connectionString);
+      const db = await DuckDBClass.create(connectionString);
+      // Type assertion: DuckDB Node Neo API returns instance conforming to our interface
       this.database = db as unknown as DuckDBInstance;
 
       // Create connection
+      // Type assertion: DuckDB connection matches our interface definition
       this.connection = (await db.connect()) as unknown as DuckDBConnection;
 
       this.credentials = credentials;
@@ -226,7 +232,7 @@ export class MotherDuckAdapter extends BaseAdapter {
         if (this.connection.close) {
           await this.connection.close();
         }
-        // @ts-expect-error - TypeScript doesn't allow assigning undefined to optional properties
+        // Clear reference
         this.connection = undefined;
       }
 
@@ -235,7 +241,7 @@ export class MotherDuckAdapter extends BaseAdapter {
         if (this.database.close) {
           await this.database.close();
         }
-        // @ts-expect-error - TypeScript doesn't allow assigning undefined to optional properties
+        // Clear reference
         this.database = undefined;
       }
     } catch (_error) {}

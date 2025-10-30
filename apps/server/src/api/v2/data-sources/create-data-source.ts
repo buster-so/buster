@@ -50,9 +50,6 @@ function getAdapterForType(type: DataSourceType): DataSourceAdapter {
       return new RedshiftAdapter();
     case 'motherduck':
       return new MotherDuckAdapter();
-    case 'databricks':
-      // TODO: Add Databricks adapter when available
-      throw new Error('Databricks adapter not yet implemented');
     default: {
       // Exhaustive check: This will cause a TypeScript error if a new type is added
       // to DataSourceType but not handled in the switch statement

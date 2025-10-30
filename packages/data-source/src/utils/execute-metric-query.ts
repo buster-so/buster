@@ -1,7 +1,7 @@
+import type { Credentials } from '@buster/database/schema-types';
 import type { DataMetadata } from '@buster/server-shared/metrics';
 import { z } from 'zod';
 import { DataSource } from '../data-source';
-import type { Credentials } from '../types/credentials';
 import { createMetadataFromResults } from './create-metadata-from-results';
 import { checkQueryIsReadOnly } from './sql-validation';
 

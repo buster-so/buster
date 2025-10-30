@@ -40,7 +40,12 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noConsole": "warn",
+        "noConsole": {
+          "level": "warn",
+          "options": {
+            "allow": ["info", "error", "warn", "debug"]
+          }
+        },
         "noTemplateCurlyInString": "off"
       },
       "complexity": {

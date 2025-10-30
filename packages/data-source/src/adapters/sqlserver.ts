@@ -1,7 +1,11 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type SQLServerCredentials,
+} from '@buster/database/schema-types';
 import sql from 'mssql';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SQLServerIntrospector } from '../introspection/sqlserver';
-import { type Credentials, DataSourceType, type SQLServerCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';
@@ -26,7 +30,7 @@ export class SQLServerAdapter extends BaseAdapter {
 
     try {
       const config: sql.config = {
-        server: sqlServerCredentials.server,
+        server: sqlServerCredentials.host,
         port: sqlServerCredentials.port,
         database: sqlServerCredentials.default_database,
         user: sqlServerCredentials.username,

@@ -1,3 +1,4 @@
+// Export vault query functions
 export {
   type GetDataSourceCredentialsInput,
   GetDataSourceCredentialsInputSchema,

@@ -62,18 +62,6 @@ export type {
 } from './introspection/types';
 // Storage abstraction layer
 export * from './storage';
-export type {
-  BigQueryCredentials,
-  Credentials,
-  MotherDuckCredentials,
-  MySQLCredentials,
-  PostgreSQLCredentials,
-  RedshiftCredentials,
-  SnowflakeCredentials,
-  SQLServerCredentials,
-} from './types/credentials';
-// Type definitions
-export { DataSourceType } from './types/credentials';
 // Introspection types
 export type {
   ClusteringInfo,

@@ -1,7 +1,7 @@
+import type { Credentials, DataSourceTypeValue } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from './adapters/base';
 import { createAdapter } from './adapters/factory';
 import type { DataSourceIntrospector } from './introspection/base';
-import type { Credentials, DataSourceType } from './types/credentials';
 import type {
   Column,
   Database,
@@ -21,7 +21,7 @@ export interface DataSourceConfig {
   name: string;
 
   /** Type of data source */
-  type: DataSourceType;
+  type: DataSourceTypeValue;
 
   /** Credentials for connecting to the data source */
   credentials: Credentials;
@@ -363,7 +363,7 @@ export class DataSource {
   /**
    * Get data sources by type
    */
-  getDataSourcesByType(type: DataSourceType): DataSourceConfig[] {
+  getDataSourcesByType(type: DataSourceTypeValue): DataSourceConfig[] {
     return Array.from(this.dataSources.values()).filter((ds) => ds.type === type);
   }
 

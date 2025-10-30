@@ -28,7 +28,7 @@ export async function listDataSourcesHandler(
   const result = await listDataSources({
     organizationId: userOrg.organizationId,
     page: query.page,
-    pageSize: query.pageSize,
+    page_size: query.page_size,
   });
 
   // Step 3: Return response

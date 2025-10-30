@@ -1,4 +1,8 @@
-import { type Credentials, DataSourceType } from '../types/credentials';
+import {
+  type Credentials,
+  DataSourceType,
+  type DataSourceTypeValue,
+} from '@buster/database/schema-types';
 import type { DatabaseAdapter } from './base';
 import { BigQueryAdapter } from './bigquery';
 import { MotherDuckAdapter } from './motherduck';
@@ -67,13 +71,13 @@ export function createAdapterInstance(credentials: Credentials): DatabaseAdapter
 /**
  * Get supported data source types
  */
-export function getSupportedTypes(): DataSourceType[] {
+export function getSupportedTypes(): DataSourceTypeValue[] {
   return Object.values(DataSourceType);
 }
 
 /**
  * Check if a data source type is supported
  */
-export function isSupported(type: DataSourceType): boolean {
+export function isSupported(type: DataSourceTypeValue): boolean {
   return Object.values(DataSourceType).includes(type);
 }

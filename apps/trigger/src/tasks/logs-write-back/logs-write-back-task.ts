@@ -1,7 +1,8 @@
-import { type Credentials, createAdapter, toCredentials } from '@buster/data-source';
+import { createAdapter, toCredentials } from '@buster/data-source';
 import { getDb } from '@buster/database/connection';
 import { getDataSourceCredentials, getLogsWriteBackConfig } from '@buster/database/queries';
 import { chats, dataSources, messages, users } from '@buster/database/schema';
+import type { Credentials } from '@buster/database/schema-types';
 import {
   type LogsWritebackTaskInput,
   LogsWritebackTaskInputSchema,

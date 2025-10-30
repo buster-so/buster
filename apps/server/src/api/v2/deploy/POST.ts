@@ -1,4 +1,4 @@
-import { type Credentials, createAdapter, toCredentials } from '@buster/data-source';
+import { createAdapter, toCredentials } from '@buster/data-source';
 import { db } from '@buster/database/connection';
 import type { User } from '@buster/database/queries';
 import {
@@ -11,6 +11,7 @@ import {
   upsertLogsWriteBackConfig,
 } from '@buster/database/queries';
 import { dataSources } from '@buster/database/schema';
+import type { Credentials } from '@buster/database/schema-types';
 import type { deploy } from '@buster/server-shared';
 import { and, eq, isNull } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';

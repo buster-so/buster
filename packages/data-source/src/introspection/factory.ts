@@ -1,5 +1,5 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from '../adapters/base';
-import { DataSourceType } from '../types/credentials';
 import { getTableSample as getBigQueryTableSample } from './dialects/bigquery/sampling';
 import { getStructuralMetadata as getBigQueryStructuralMetadata } from './dialects/bigquery/structural';
 import { getTableSample as getMySQLTableSample } from './dialects/mysql/sampling';

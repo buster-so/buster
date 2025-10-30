@@ -1,9 +1,13 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type SnowflakeCredentials,
+} from '@buster/database/schema-types';
 import snowflake from 'snowflake-sdk';
 import { TIMEOUT_CONFIG } from '../config/timeouts';
 import { classifyError, QueryTimeoutError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SnowflakeIntrospector } from '../introspection/snowflake';
-import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';

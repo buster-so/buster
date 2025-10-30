@@ -14,6 +14,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "[ \"$SKIP_ENV_CHECK\" = \"true\" ] || tsx scripts/validate-env.ts",
+    "dev": "tsc --watch",
     "build": "tsc",
     "build:dry-run": "tsc",
     "lint": "biome check --write",

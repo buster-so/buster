@@ -1,5 +1,5 @@
-import type { MotherDuckCredentials } from '@buster/data-source';
-import { DataSourceType } from '@buster/data-source';
+import type { MotherDuckCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { load as yamlLoad } from 'js-yaml';
 import { describe, expect, it } from 'vitest';
 import { buildOutput, buildProfilesYaml } from './build-dbt-profiles-yaml';

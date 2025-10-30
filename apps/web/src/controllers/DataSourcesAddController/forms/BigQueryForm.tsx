@@ -1,9 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type BigQueryCredentials,
-  BigQueryCredentialsSchema,
-  type DataSource,
-} from '@/api/asset_interfaces/datasources';
+import type { BigQueryCredentials } from '@/api/asset_interfaces/datasources';
 import {
   type createBigQueryDataSource,
   useCreateBigQueryDataSource,
@@ -14,23 +11,23 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const BigQueryForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
 }> = ({ dataSource }) => {
   const { mutateAsync: createDataSource } = useCreateBigQueryDataSource();
   const { mutateAsync: updateDataSource } = useUpdateBigQueryDataSource();
-  const credentials = dataSource?.credentials as BigQueryCredentials;
+  const credentials = dataSource?.credentials as unknown as BigQueryCredentials;
 
   const flow = dataSource?.id ? 'update' : 'create';
   const dataSourceFormSubmit = useDataSourceFormSuccess();
 
   const form = useAppForm({
     defaultValues: {
-      service_role_key: credentials?.service_role_key || '',
-      default_project_id: credentials?.default_project_id || '',
-      default_dataset_id: credentials?.default_dataset_id || '',
+      service_account_key: credentials?.service_account_key || '',
+      project_id: credentials?.project_id || '',
+      default_dataset: credentials?.default_dataset || '',
       type: 'bigquery' as const,
-      name: dataSource?.name || credentials?.name || '',
-    } satisfies Parameters<typeof createBigQueryDataSource>[0],
+      name: dataSource?.name || '',
+    } as BigQueryCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -38,11 +35,6 @@ export const BigQueryForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: BigQueryCredentialsSchema,
-      onSubmit: BigQueryCredentialsSchema,
     },
   });
 
@@ -56,17 +48,17 @@ export const BigQueryForm: React.FC<{
         )}
       </form.AppField>
 
-      <form.AppField name="service_role_key">
+      <form.AppField name="service_account_key">
         {(field) => (
           <field.TextField
             labelClassName={labelClassName}
-            label="Service Account Key"
+            label="Service Account Key JSON"
             placeholder="Paste your service account key JSON here"
           />
         )}
       </form.AppField>
 
-      <form.AppField name="default_project_id">
+      <form.AppField name="project_id">
         {(field) => (
           <field.TextField
             labelClassName={labelClassName}
@@ -76,7 +68,7 @@ export const BigQueryForm: React.FC<{
         )}
       </form.AppField>
 
-      <form.AppField name="default_dataset_id">
+      <form.AppField name="default_dataset">
         {(field) => (
           <field.TextField
             labelClassName={labelClassName}
