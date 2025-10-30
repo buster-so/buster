@@ -249,7 +249,7 @@ export const DropdownContent = <T,>({
       )}
 
       <div
-        className={cn('max-h-[395px] overflow-y-auto', className)}
+        className={cn('max-h-[395px] overflow-y-auto scrollbar-thin', className)}
         onScroll={handleScroll}
         onWheel={(e) => {
           //this is need to prevent bug when it is inside a dialog or modal
@@ -311,12 +311,27 @@ export const DropdownContent = <T,>({
         )}
       </div>
 
-      {footerContent && (
-        <div className={cn(hasShownItem && 'border-t', 'p-1', footerClassName)}>
-          {footerContent}
-        </div>
-      )}
+      <DropdownFooter
+        footerContent={footerContent}
+        footerClassName={footerClassName}
+        hasShownItem={hasShownItem}
+      />
     </>
+  );
+};
+
+const DropdownFooter = ({
+  footerContent,
+  footerClassName,
+  hasShownItem,
+}: {
+  footerContent?: React.ReactNode;
+  footerClassName?: string;
+  hasShownItem: boolean;
+}) => {
+  if (!footerContent) return null;
+  return (
+    <div className={cn(hasShownItem && 'border-t', 'p-1', footerClassName)}>{footerContent}</div>
   );
 };
 
@@ -405,6 +420,11 @@ const DropdownItem = <
   emptyStateText: emptyStateTextChild,
   onSearch,
   onScrollToBottom,
+  isFetchingNextPage,
+  footerContent,
+  footerClassName,
+  linkTarget,
+  searchLabel: _searchLabel,
 }: IDropdownItem<T, TRouter, TOptions, TFrom> & {
   onSelect?: (value: T) => void;
   onSelectItem: (index: number) => void;
@@ -446,6 +466,7 @@ const DropdownItem = <
             className="ml-auto opacity-0 group-hover:opacity-50 hover:opacity-100"
             link={isSelectable ? link : null}
             linkIcon={linkIcon}
+            linkTarget={linkTarget}
           />
         )}
       </>
@@ -488,7 +509,10 @@ const DropdownItem = <
           menuHeader,
           onSearch,
           onScrollToBottom,
+          isFetchingNextPage,
         }}
+        footerContent={footerContent}
+        footerClassName={footerClassName}
       >
         {renderContent()}
       </DropdownSubMenuWrapper>
@@ -550,7 +574,10 @@ interface DropdownSubMenuWrapperProps<T> {
     menuHeader?: string | React.ReactNode;
     onSearch?: (search: string) => void;
     onScrollToBottom?: () => void;
+    isFetchingNextPage?: boolean;
   };
+  footerContent?: React.ReactNode;
+  footerClassName?: string;
 }
 
 const DropdownSubMenuWrapper = <T,>({
@@ -564,6 +591,8 @@ const DropdownSubMenuWrapper = <T,>({
   className,
   parentItem,
   emptyStateText,
+  footerContent,
+  footerClassName,
 }: DropdownSubMenuWrapperProps<T>) => {
   const subContentRef = React.useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -609,6 +638,8 @@ const DropdownSubMenuWrapper = <T,>({
             menuHeader={parentItem?.menuHeader}
             onSearch={parentItem?.onSearch}
             onScrollToBottom={parentItem?.onScrollToBottom}
+            footerContent={footerContent}
+            footerClassName={footerClassName}
           />
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
@@ -627,6 +658,8 @@ interface DropdownSubMenuContentProps<T> {
   menuHeader?: string | React.ReactNode;
   onSearch?: (search: string) => void;
   onScrollToBottom?: () => void;
+  footerContent?: React.ReactNode;
+  footerClassName?: string;
 }
 
 const DropdownSubMenuContent = <T,>({
@@ -640,6 +673,8 @@ const DropdownSubMenuContent = <T,>({
   onSearch,
   onScrollToBottom,
   emptyStateText,
+  footerContent,
+  footerClassName,
 }: DropdownSubMenuContentProps<T>) => {
   // When onSearch is provided, parent handles filtering - don't filter locally
   const shouldUseLocalFiltering = !onSearch;
@@ -693,9 +728,8 @@ const DropdownSubMenuContent = <T,>({
           <div className="bg-border h-[0.5px] w-full" />
         </div>
       )}
-
       <div
-        className="max-h-[395px] overflow-y-auto"
+        className="max-h-[395px] overflow-y-auto scrollbar-thin"
         onScroll={handleScroll}
         onWheel={(e) => {
           e.stopPropagation();
@@ -721,6 +755,11 @@ const DropdownSubMenuContent = <T,>({
           </DropdownMenuItem>
         )}
       </div>
+      <DropdownFooter
+        footerContent={footerContent}
+        footerClassName={footerClassName}
+        hasShownItem={hasShownItem}
+      />
     </>
   );
 };

@@ -2,7 +2,6 @@ import type { GroupedAssets } from '@buster/server-shared/library';
 import type { ShareAssetType } from '@buster/server-shared/share';
 import {
   FileContent,
-  Folder5,
   FolderPlus,
   Grid,
   GridPlus,
@@ -10,6 +9,8 @@ import {
   SquareChart,
   Table,
 } from '@/components/ui/icons';
+import FolderContent from '@/components/ui/icons/NucleoIconOutlined/folder-content';
+import Folders from '@/components/ui/icons/NucleoIconOutlined/folders';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import SquareChartPlus from '@/components/ui/icons/NucleoIconOutlined/square-chart-plus';
 
@@ -21,13 +22,14 @@ export const ASSET_ICONS = {
   dashboards: Grid,
   dashboard: Grid,
   dashboard_file: Grid,
-  collections: Folder5,
+  collections: FolderContent,
   dashboardAdd: GridPlus,
   collectionAdd: FolderPlus,
   table: Table,
   reports: FileContent,
   report: FileContent,
   report_file: FileContent,
+  library: Folders,
 };
 
 export const assetTypeToIcon = (assetType: ShareAssetType | keyof GroupedAssets) => {
