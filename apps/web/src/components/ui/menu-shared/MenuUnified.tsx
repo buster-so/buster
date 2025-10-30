@@ -1,7 +1,6 @@
-import type { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import { Link, type RegisteredRouter } from '@tanstack/react-router';
-import React, { Children, useEffect, useMemo } from 'react';
+import type React from 'react';
+import { Children, useEffect, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';

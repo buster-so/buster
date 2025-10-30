@@ -1,31 +1,15 @@
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import { useDeleteLibraryAssets } from '@/api/buster_rest/library';
-import {
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuRoot,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+import { ContextMenu } from '@/components/ui/context-menu';
 import { Trash } from '@/components/ui/icons';
+import { useLibraryItemDropdown } from './useLibraryItemDropdown';
 
 export const LibraryItemContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>> = ({
   children,
   asset_id,
   asset_type,
 }) => {
-  const { mutateAsync: onDeleteLibraryAsset, isPending } = useDeleteLibraryAssets();
+  const items = useLibraryItemDropdown({ asset_id, asset_type });
 
-  return (
-    <ContextMenuRoot modal={false}>
-      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="p-1 border rounded">
-        <ContextMenuItem
-          icon={<Trash />}
-          onClick={() => onDeleteLibraryAsset([{ assetId: asset_id, assetType: asset_type }])}
-        >
-          Delete
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenuRoot>
-  );
+  return <ContextMenu items={items}>{children}</ContextMenu>;
 };

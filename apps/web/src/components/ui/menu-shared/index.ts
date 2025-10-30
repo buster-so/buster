@@ -3,6 +3,7 @@
  * This module provides unified types, styles, logic, and components for both menu systems
  */
 
+export * from './create-menu-item';
 export * from './MenuHeaderSearch';
 export * from './MenuLink';
 export * from './MenuUnified';
