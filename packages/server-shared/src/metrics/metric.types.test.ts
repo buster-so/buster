@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_CHART_CONFIG } from './charts/chartConfigProps';
+import { type ChartConfigProps, DEFAULT_CHART_CONFIG } from './charts/chartConfigProps';
 import { MetricSchema } from './metric.types';
+import type { GetMetricResponse } from './responses.types';
 
 describe('MetricSchema', () => {
   it('should parse a valid metric with all required fields', () => {
@@ -49,6 +50,7 @@ describe('MetricSchema', () => {
       permission: 'owner',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
     };
 
     const result = MetricSchema.safeParse(validMetric);
@@ -114,6 +116,7 @@ describe('MetricSchema', () => {
       permission: 'can_view',
       workspace_sharing: null,
       workspace_member_count: null,
+      added_to_library: false,
       // chart_config is omitted, should get default
     };
 
@@ -159,7 +162,7 @@ describe('MetricSchema', () => {
       data_source_id: 'source-1',
       dataset_name: 'Custom Data',
       error: null,
-      chart_config: customChartConfig,
+      chart_config: customChartConfig as ChartConfigProps,
       data_metadata: {
         row_count: 500,
         column_count: 4,
@@ -195,7 +198,8 @@ describe('MetricSchema', () => {
       permission: 'can_edit',
       workspace_sharing: null,
       workspace_member_count: null,
-    };
+      added_to_library: false,
+    } as GetMetricResponse;
 
     const result = MetricSchema.safeParse(metricWithCustomConfig);
 
@@ -283,7 +287,8 @@ describe('MetricSchema', () => {
       permission: 'can_edit',
       workspace_sharing: null,
       workspace_member_count: null,
-    };
+      added_to_library: false,
+    } as GetMetricResponse;
 
     const result = MetricSchema.safeParse(metricWithPartialConfig);
 
@@ -328,9 +333,7 @@ describe('MetricSchema', () => {
       description: null, // nullable
       file_name: 'null_test.yaml',
       time_frame: 'yearly',
-      dataset_id: 'dataset-null',
       data_source_id: 'source-null',
-      dataset_name: null, // nullable
       error: null, // nullable
       data_metadata: {
         row_count: 0,
@@ -358,7 +361,8 @@ describe('MetricSchema', () => {
       permission: 'can_view',
       workspace_sharing: null,
       workspace_member_count: null,
-    };
+      added_to_library: false,
+    } satisfies GetMetricResponse;
 
     const result = MetricSchema.safeParse(metricWithNulls);
     expect(result.success).toBe(true);

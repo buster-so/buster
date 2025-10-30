@@ -7,6 +7,7 @@ import type { ModelMessage } from '@buster/ai';
 import { db } from '@buster/database/connection';
 import type { Chat, Message } from '@buster/database/queries';
 import {
+  checkAssetInLibrary,
   createAssetPermission,
   createMessage,
   generateAssetMessages,
@@ -172,16 +173,23 @@ export async function buildChatWithMessages(
     messageMap[msg.message.id] = chatMessage;
   }
 
-  const [publiclyEnabledBy, individualPermissions, workspaceMemberCount, collections] =
-    await Promise.all([
-      getPubliclyEnabledByUser(chat.publiclyEnabledBy),
-      getUsersWithAssetPermissions({
-        assetId: chat.id,
-        assetType: 'chat',
-      }),
-      getOrganizationMemberCount(chat.organizationId),
-      getCollectionsAssociatedWithChat(chat.id, user?.id || chat.createdBy),
-    ]);
+  const userId = user?.id || chat.createdBy;
+  const [
+    publiclyEnabledBy,
+    individualPermissions,
+    workspaceMemberCount,
+    collections,
+    addedToLibrary,
+  ] = await Promise.all([
+    getPubliclyEnabledByUser(chat.publiclyEnabledBy),
+    getUsersWithAssetPermissions({
+      assetId: chat.id,
+      assetType: 'chat',
+    }),
+    getOrganizationMemberCount(chat.organizationId),
+    getCollectionsAssociatedWithChat(chat.id, userId),
+    checkAssetInLibrary({ userId, assetId: chat.id, assetType: 'chat' }),
+  ]);
 
   // Ensure message_ids array has no duplicates
   const uniqueMessageIds = [...new Set(messageIds)];
@@ -212,6 +220,7 @@ export async function buildChatWithMessages(
     workspace_sharing: chat.workspaceSharing || 'none',
     workspace_member_count: workspaceMemberCount,
     screenshot_taken_at: chat.screenshotTakenAt || null,
+    added_to_library: addedToLibrary,
   };
 }
 

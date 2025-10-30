@@ -5,8 +5,8 @@ import { useGetChat } from '@/api/buster_rest/chats';
 import { Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
+import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
 import {
-  useAddToCollectionSelectMenu,
   useDeleteChatSelectMenu,
   useDuplicateChatSelectMenu,
   useFavoriteChatSelectMenu,
@@ -27,7 +27,10 @@ export const ChatContainerHeaderDropdown: React.FC<{
   );
   const shareMenu = useShareMenuSelectMenu({ chatId });
   const renameChatTitle = useRenameChatTitle();
-  const addToCollectionMenu = useAddToCollectionSelectMenu({ chatId });
+  const addToLibraryCollectionMenu = useAddToLibraryCollection({
+    assetId: chatId || '',
+    assetType: 'chat',
+  });
   const favoriteChat = useFavoriteChatSelectMenu({ chatId });
   const openInNewTab = useOpenInNewTabSelectMenu({ chatId });
   const duplicateChat = useDuplicateChatSelectMenu({ chatId });
@@ -40,7 +43,7 @@ export const ChatContainerHeaderDropdown: React.FC<{
     return [
       isOwnerEffective && shareMenu,
       isOwnerEffective && renameChatTitle,
-      addToCollectionMenu,
+      ...(canEditChat ? addToLibraryCollectionMenu : []),
       favoriteChat,
       openInNewTab,
       { type: 'divider' },
@@ -53,7 +56,7 @@ export const ChatContainerHeaderDropdown: React.FC<{
     canEditChat,
     shareMenu,
     renameChatTitle,
-    addToCollectionMenu,
+    addToLibraryCollectionMenu,
     favoriteChat,
     openInNewTab,
     duplicateChat,

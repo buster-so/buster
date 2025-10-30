@@ -40,6 +40,7 @@ import { useIsChatMode } from '@/context/Chats/useMode';
 import { useMetricEditToggle } from '@/layouts/AssetContainer/MetricAssetContainer';
 import { canEdit, getIsEffectiveOwner, getIsOwner } from '@/lib/share';
 import { ASSET_ICONS } from '../icons/assetIcons';
+import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
 import {
   useFavoriteMetricSelectMenu,
   useMetricDrilldownItem,
@@ -64,7 +65,10 @@ export const MetricThreeDotMenuDropdown = React.memo(
     const openFullScreenMetric = useOpenChartItem({ metricId, metricVersionNumber: versionNumber });
     const dashboardSelectMenu = useDashboardSelectMenu({ metricId, versionNumber });
     const versionHistoryItems = useMetricVersionHistorySelectMenu({ metricId });
-    const collectionSelectMenu = useCollectionSelectMenu({ metricId, versionNumber });
+    const addToLibraryCollectionMenu = useAddToLibraryCollection({
+      assetId: metricId,
+      assetType: 'metric_file',
+    });
     const statusSelectMenu = useStatusSelectMenu({ metricId, versionNumber });
     const favoriteMetric = useFavoriteMetricSelectMenu({ metricId, versionNumber });
     const editChartMenu = useEditChartSelectMenu();
@@ -98,7 +102,7 @@ export const MetricThreeDotMenuDropdown = React.memo(
           editWithAI,
           { type: 'divider' },
           isOwnerEffective && !isViewingOldVersion && shareMenu,
-          !isViewingOldVersion && collectionSelectMenu,
+          ...(!isViewingOldVersion ? addToLibraryCollectionMenu : []),
           !isViewingOldVersion && favoriteMetric,
           { type: 'divider' },
           isEditor && !isViewingOldVersion && editChartMenu,
@@ -131,7 +135,7 @@ export const MetricThreeDotMenuDropdown = React.memo(
         versionHistoryItems,
         favoriteMetric,
         statusSelectMenu,
-        collectionSelectMenu,
+        addToLibraryCollectionMenu,
         editChartMenu,
         resultsViewMenu,
         sqlEditorMenu,
@@ -197,87 +201,26 @@ const useDashboardSelectMenu = ({
     selectedDashboards: dashboards?.map((x) => x.id) || [],
   });
 
-  const dashboardSubMenu = useMemo(() => {
-    return (
-      <DropdownContent
-        menuHeader={menuHeader}
-        selectType={selectType}
-        items={items}
-        footerContent={footerContent}
-      />
-    );
-  }, [items, footerContent, menuHeader, selectType]);
-
   const dashboardDropdownItem: IDropdownItem = useMemo(
     () => ({
       label: 'Add to dashboard',
       value: 'add-to-dashboard',
       closeOnSelect: false,
       icon: <ASSET_ICONS.dashboardAdd />,
-      items: [<React.Fragment key="dashboard-sub-menu">{dashboardSubMenu}</React.Fragment>],
+      items: [
+        <DropdownContent
+          menuHeader={menuHeader}
+          selectType={selectType}
+          items={items}
+          footerContent={footerContent}
+          key="dashboard-sub-menu"
+        />,
+      ],
     }),
-    [dashboardSubMenu]
+    [menuHeader, selectType, items, footerContent]
   );
 
   return dashboardDropdownItem;
-};
-
-const useCollectionSelectMenu = ({
-  metricId,
-  versionNumber,
-}: {
-  metricId: string;
-  versionNumber: number | undefined;
-}) => {
-  const { mutateAsync: saveMetricToCollection } = useSaveMetricToCollections();
-  const { mutateAsync: removeMetricFromCollection } = useRemoveMetricFromCollection();
-  const { data: selectedCollections } = useGetMetric(
-    { id: metricId, versionNumber },
-    { select: useCallback((x: BusterMetric) => x.collections?.map((x) => x.id), []) }
-  );
-  const { openInfoMessage } = useBusterNotifications();
-
-  const onSaveToCollection = async (collectionIds: string[]) => {
-    await saveMetricToCollection({
-      metricIds: [metricId],
-      collectionIds,
-    });
-    openInfoMessage('Metrics saved to collections');
-  };
-
-  const onRemoveFromCollection = async (collectionId: string) => {
-    await removeMetricFromCollection({
-      metricIds: [metricId],
-      collectionIds: [collectionId],
-    });
-    openInfoMessage('Metrics removed from collections');
-  };
-
-  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
-    onSaveToCollection,
-    onRemoveFromCollection,
-    selectedCollections: selectedCollections || [],
-  });
-
-  const CollectionSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
-  const collectionDropdownItem: IDropdownItem = useMemo(
-    () => ({
-      label: 'Add to collection',
-      value: 'add-to-collection',
-      icon: <ASSET_ICONS.collectionAdd />,
-      items: [
-        <React.Fragment key="collection-sub-menu">
-          {CollectionSubMenu} {ModalComponent}
-        </React.Fragment>,
-      ],
-    }),
-    [CollectionSubMenu, ModalComponent]
-  );
-
-  return collectionDropdownItem;
 };
 
 const useStatusSelectMenu = ({
@@ -304,18 +247,14 @@ const useStatusSelectMenu = ({
     onChangeStatus,
   });
 
-  const statusSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
   const statusDropdownItem: IDropdownItem = useMemo(
     () => ({
       label: 'Status',
       value: 'status',
       icon: <StatusBadgeIndicator status={metricStatus || 'notRequested'} />,
-      items: [<React.Fragment key="status-sub-menu">{statusSubMenu}</React.Fragment>],
+      items: [<DropdownContent {...dropdownProps} key="status-sub-menu" />],
     }),
-    [statusSubMenu, metricStatus]
+    [dropdownProps, metricStatus]
   );
 
   return statusDropdownItem;

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useGetCollection } from '@/api/buster_rest/collections';
 import { CollectionSearchModal } from '@/components/features/search/CollectionSearchModal/CollectionSearchModal';
 import { useCollectionSearchStore } from '@/components/features/search/CollectionSearchModal/collection-search-store';

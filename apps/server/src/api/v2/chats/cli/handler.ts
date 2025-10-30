@@ -10,12 +10,6 @@ export async function createCliChatHandler(
   request: CliChatCreateRequest,
   user: User
 ): Promise<CliChatCreateResponse> {
-  // Placeholder - just acknowledge the request
-  console.log('CLI chat request received:', {
-    userId: user.id,
-    prompt: request.prompt,
-    chatId: request.chat_id,
-  });
   // Return a minimal response
   return {
     id: 'temp-id',
@@ -39,5 +33,6 @@ export async function createCliChatHandler(
     message_ids: [],
     is_favorited: false,
     screenshot_taken_at: null,
+    added_to_library: false,
   };
 }

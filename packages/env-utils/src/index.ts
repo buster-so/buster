@@ -64,7 +64,6 @@ export function validateEnv(
     skipInDocker = true,
   } = options;
 
-  // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
   console.info('🔍 Validating environment variables...');
 
   // Skip validation in certain environments
@@ -73,7 +72,6 @@ export function validateEnv(
     (skipInCI && process.env.CI) ||
     (skipInProduction && process.env.NODE_ENV === 'production')
   ) {
-    // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
     console.info('🐳 Docker/CI/Production build detected - skipping environment validation');
     return { hasErrors: false, missingVariables: [] };
   }
@@ -82,31 +80,24 @@ export function validateEnv(
 
   for (const [envKey, value] of Object.entries(requiredVars)) {
     if (!value) {
-      // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
       console.error(`❌ Missing required environment variable: ${envKey}`);
       missingVariables.push(envKey);
     } else {
       if (logPublicVars && envKey.includes('_PUBLIC_')) {
-        // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
         console.info(`✅ ${envKey} is set with value: ${value}`);
       } else {
-        // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
         console.info(`✅ ${envKey} is set`);
       }
     }
   }
 
   if (missingVariables.length > 0) {
-    // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
     console.error('');
-    // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
     console.error('❌ Build cannot continue with missing environment variables.');
-    // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
     console.error(
       'Please check your .env file at the project root and ensure all required variables are set.'
     );
   } else {
-    // biome-ignore lint/suspicious/noConsole: Build-time validation utility needs console output
     console.info('✅ All required environment variables are present');
   }
 

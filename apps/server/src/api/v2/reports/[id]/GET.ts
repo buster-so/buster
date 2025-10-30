@@ -1,5 +1,6 @@
 import { checkPermission } from '@buster/access-controls';
 import {
+  checkAssetInLibrary,
   getMetricIdsInReport,
   getReportFileById,
   getUserOrganizationId,
@@ -57,12 +58,16 @@ export async function getReportHandler(
     });
   }
 
-  const metrics = await getMetricsInAncestorAssetFromMetricIds(metricIds, user);
+  const [metrics, addedToLibrary] = await Promise.all([
+    getMetricsInAncestorAssetFromMetricIds(metricIds, user),
+    checkAssetInLibrary({ userId: user.id, assetId: reportId, assetType: 'report_file' }),
+  ]);
 
   const response: GetReportResponse = {
     ...report,
     permission: permission.effectiveRole,
     metrics,
+    added_to_library: addedToLibrary,
   };
 
   return response;

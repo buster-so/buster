@@ -1,5 +1,6 @@
 import { checkPermission } from '@buster/access-controls';
 import {
+  checkAssetInLibrary,
   getCollectionsAssociatedWithDashboard,
   getDashboardById,
   getOrganizationMemberCount,
@@ -233,13 +234,19 @@ export async function getDashboardHandler(
   const metrics = await getMetricsInAncestorAssetFromMetricIds(metricIds, user);
 
   // Get the extra dashboard info concurrently
-  const [individualPermissions, workspaceMemberCount, collections, publicEnabledBy] =
-    await Promise.all([
-      getUsersWithAssetPermissions({ assetId: dashboardId, assetType: 'dashboard_file' }),
-      getOrganizationMemberCount(dashboardFile.organizationId),
-      getCollectionsAssociatedWithDashboard(dashboardId, user.id),
-      getPubliclyEnabledByUser(dashboardFile.publiclyEnabledBy),
-    ]);
+  const [
+    individualPermissions,
+    workspaceMemberCount,
+    collections,
+    publicEnabledBy,
+    addedToLibrary,
+  ] = await Promise.all([
+    getUsersWithAssetPermissions({ assetId: dashboardId, assetType: 'dashboard_file' }),
+    getOrganizationMemberCount(dashboardFile.organizationId),
+    getCollectionsAssociatedWithDashboard(dashboardId, user.id),
+    getPubliclyEnabledByUser(dashboardFile.publiclyEnabledBy),
+    checkAssetInLibrary({ userId: user.id, assetId: dashboardId, assetType: 'dashboard_file' }),
+  ]);
 
   // Build the response
   const response: GetDashboardResponse = {
@@ -269,6 +276,7 @@ export async function getDashboardHandler(
     permission: effectiveRole,
     workspace_sharing: dashboardFile.workspaceSharing,
     workspace_member_count: workspaceMemberCount,
+    added_to_library: addedToLibrary,
   };
 
   return response;

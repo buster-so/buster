@@ -117,6 +117,7 @@ refresh_interval: 300`,
     versions: [],
     workspace_sharing: 'none',
     workspace_member_count: 20,
+    added_to_library: false,
   };
 
   return { dashboard, response };

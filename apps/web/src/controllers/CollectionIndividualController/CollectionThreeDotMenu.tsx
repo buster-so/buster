@@ -2,7 +2,10 @@ import type { BusterCollection } from '@buster/server-shared/collections';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
 import { useDeleteCollection } from '@/api/buster_rest/collections';
+import { useDeleteLibraryAssets, usePostLibraryAssets } from '@/api/buster_rest/library';
 import { useFavoriteStar } from '@/components/features/favorites';
+import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
+import { useAddToLibraryCollection } from '@/components/features/library/useAddToLibraryCollection';
 import { ShareMenuContent } from '@/components/features/ShareMenu';
 import { Button } from '@/components/ui/buttons';
 import {
@@ -24,96 +27,114 @@ export const CollectionThreeDotDropdown: React.FC<{
   isEffectiveOwner: boolean;
   collection: BusterCollection;
   setOpenAddTypeModal: (open: boolean) => void;
-}> = React.memo(({ id, name, isEditor, collection, isEffectiveOwner, setOpenAddTypeModal }) => {
-  const navigate = useNavigate();
-  const { mutateAsync: deleteCollection, isPending: isDeletingCollection } = useDeleteCollection();
-  const { isFavorited, onFavoriteClick } = useFavoriteStar({
-    id,
-    type: 'collection',
-    name: name || '',
-  });
-  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  isAddedToLibrary: boolean;
+}> = React.memo(
+  ({ id, name, isEditor, collection, isEffectiveOwner, setOpenAddTypeModal, isAddedToLibrary }) => {
+    const navigate = useNavigate();
+    const { mutateAsync: deleteCollection, isPending: isDeletingCollection } =
+      useDeleteCollection();
+    const { isFavorited, onFavoriteClick } = useFavoriteStar({
+      id,
+      type: 'collection',
+      name: name || '',
+    });
+    const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+    const { mutateAsync: addToLibrary } = usePostLibraryAssets();
+    const { mutateAsync: deleteLibrary } = useDeleteLibraryAssets();
 
-  const items: IDropdownItems = useMemo(
-    () =>
-      createDropdownItems(
-        [
-          {
-            value: 'share',
-            label: 'Share',
-            icon: <ShareRight />,
-            hidden: !isEffectiveOwner,
-            items: [
-              <ShareMenuContent
-                key={id}
-                shareAssetConfig={collection}
-                assetId={id}
-                assetType={'collection'}
-              />,
-            ],
-          },
-
-          {
-            value: 'favorite',
-            label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-            icon: isFavorited ? <StarFilled /> : <Star />,
-            onClick: () => onFavoriteClick(),
-            closeOnSelect: false,
-          },
-          isEditor && {
-            value: 'add-to-collection',
-            label: 'Add assets',
-            icon: <SquareChartPlus />,
-            onClick: () => setOpenAddTypeModal(true),
-          },
-          (isEffectiveOwner || isEditor) && createDropdownDivider(),
-          {
-            value: 'delete',
-            label: 'Delete collection',
-            icon: <Trash />,
-            onClick: async () => {
-              try {
-                await deleteCollection(
-                  { id },
-                  {
-                    onSuccess: (d) => {
-                      if (d) navigate({ to: '/app/library' });
-                    },
-                  }
-                );
-              } catch (error) {
-                //
-              }
+    const items: IDropdownItems = useMemo(
+      () =>
+        createDropdownItems(
+          [
+            {
+              value: 'share',
+              label: 'Share',
+              icon: <ShareRight />,
+              hidden: !isEffectiveOwner,
+              items: [
+                <ShareMenuContent
+                  key={id}
+                  shareAssetConfig={collection}
+                  assetId={id}
+                  assetType={'collection'}
+                />,
+              ],
             },
-            disabled: isDeletingCollection,
-            hidden: !isEffectiveOwner,
-          },
-          {
-            value: 'rename',
-            label: 'Rename collection',
-            icon: <Pencil />,
-            onClick: () => {
-              setIsRenameModalOpen(true);
+            {
+              value: 'add-to-library',
+              label: isAddedToLibrary ? 'Remove from library' : 'Add to library',
+              icon: isAddedToLibrary ? <ASSET_ICONS.libraryAdded /> : <ASSET_ICONS.library />,
+              onClick: () => {
+                if (isAddedToLibrary) {
+                  deleteLibrary([{ assetId: id, assetType: 'collection' }]);
+                } else {
+                  addToLibrary([{ assetId: id, assetType: 'collection' }]);
+                }
+              },
+              closeOnSelect: false,
             },
-            hidden: !isEditor,
-          },
-        ].filter((x) => x && !(x as { hidden?: boolean }).hidden)
-      ),
-    [id, deleteCollection, isFavorited, onFavoriteClick, setIsRenameModalOpen]
-  );
+            {
+              value: 'favorite',
+              label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
+              icon: isFavorited ? <StarFilled /> : <Star />,
+              onClick: () => onFavoriteClick(),
+              closeOnSelect: false,
+            },
+            isEditor && {
+              value: 'add-to-collection',
+              label: 'Add assets',
+              icon: <SquareChartPlus />,
+              onClick: () => setOpenAddTypeModal(true),
+            },
+            (isEffectiveOwner || isEditor) && createDropdownDivider(),
+            {
+              value: 'delete',
+              label: 'Delete collection',
+              icon: <Trash />,
+              onClick: async () => {
+                try {
+                  await deleteCollection(
+                    { id },
+                    {
+                      onSuccess: (d) => {
+                        if (d) navigate({ to: '/app/library' });
+                      },
+                    }
+                  );
+                } catch (error) {
+                  //
+                }
+              },
+              disabled: isDeletingCollection,
+              hidden: !isEffectiveOwner,
+            },
+            {
+              value: 'rename',
+              label: 'Rename collection',
+              icon: <Pencil />,
+              onClick: () => {
+                setIsRenameModalOpen(true);
+              },
+              hidden: !isEditor,
+            },
+          ].filter((x) => x && !(x as { hidden?: boolean }).hidden)
+        ),
+      [id, deleteCollection, isFavorited, onFavoriteClick, setIsRenameModalOpen, isAddedToLibrary]
+    );
 
-  return (
-    <>
-      <Dropdown items={items} align="end" side="bottom">
-        <Button variant="ghost" prefix={<Dots />} data-testid="collection-three-dot-dropdown" />
-      </Dropdown>
-      <RenameCollectionModal
-        collectionId={id}
-        currentName={name}
-        open={isRenameModalOpen}
-        onClose={() => setIsRenameModalOpen(false)}
-      />
-    </>
-  );
-});
+    return (
+      <>
+        <Dropdown items={items} align="end" side="bottom">
+          <Button variant="ghost" prefix={<Dots />} data-testid="collection-three-dot-dropdown" />
+        </Dropdown>
+        <RenameCollectionModal
+          collectionId={id}
+          currentName={name}
+          open={isRenameModalOpen}
+          onClose={() => setIsRenameModalOpen(false)}
+        />
+      </>
+    );
+  }
+);
 CollectionThreeDotDropdown.displayName = 'CollectionThreeDotDropdown';

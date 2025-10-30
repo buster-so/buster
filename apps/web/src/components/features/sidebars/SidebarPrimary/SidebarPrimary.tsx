@@ -75,11 +75,11 @@ export const SidebarPrimary = React.memo(
 
       if (sharedWithMeItems) items.push(sharedWithMeItems);
 
-      if (chatHistoryItems) items.push(chatHistoryItems);
-
       if (favoritesDropdownItems) items.push(favoritesDropdownItems);
 
       if (isAdmin) items.push(adminToolsItems);
+
+      if (chatHistoryItems) items.push(chatHistoryItems);
 
       return items;
     }, [
