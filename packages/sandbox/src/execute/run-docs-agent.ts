@@ -1,5 +1,5 @@
-import type { Credentials } from '@buster/data-source';
 import { getDataSourceCredentials, getOrganizationDataSource } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { Sandbox } from '@daytonaio/sdk';
 import { z } from 'zod';
 import { buildProfilesYaml } from '../helpers/build-dbt-profiles-yaml';
@@ -42,6 +42,7 @@ const runDocsAgentParamsSchema = z.object({
   messageId: z.string().optional().describe('Message ID for the buster CLI'),
   context: githubContextSchema.optional().describe('GitHub context with optional properties'),
   organizationId: z.string().uuid().describe('Organization ID for the data source'),
+  checkRunKey: z.string().optional().describe('GitHub check run key for the buster CLI'),
 });
 
 export interface DocsAgentResult {
@@ -65,8 +66,10 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
     messageId,
     context,
     organizationId,
+    checkRunKey,
   } = runDocsAgentParamsSchema.parse(params);
 
+  console.info('running docs agent async');
   const sandboxSnapshotBaseName = 'buster-data-engineer';
   const sandboxContext = context || {};
 
@@ -120,11 +123,21 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
     try {
-      const profileYaml = buildProfilesYaml({
+      const keysBasePath = `${workspacePath}/.keys`;
+      const { yaml: profileYaml, keyFiles } = buildProfilesYaml({
         profileName,
         target: 'buster',
         creds: credentials,
+        keysBasePath,
       });
+
+      // Write key files if any are present
+      if (keyFiles.length > 0) {
+        await sandbox.fs.createFolder(keysBasePath, '700');
+        for (const keyFile of keyFiles) {
+          await sandbox.fs.uploadFile(Buffer.from(keyFile.content), keyFile.path);
+        }
+      }
 
       // Create profiles directory and file
       await sandbox.fs.createFolder(profilesPath, '755');
@@ -165,6 +178,9 @@ export async function runDocsAgentAsync(params: RunDocsAgentParams): Promise<Doc
   }
   if (messageId) {
     cliArgs.push(`--messageId "${messageId}"`);
+  }
+  if (checkRunKey) {
+    cliArgs.push(`--checkRunKey "${checkRunKey}"`);
   }
   if (Object.keys(sandboxContext).length > 0) {
     // Create context directory and file
@@ -270,11 +286,21 @@ export async function runDocsAgentSync(params: RunDocsAgentParams) {
   // Only build and write profiles YAML if projectFilePath exists
   if (projectFilePath) {
     try {
-      const profileYaml = buildProfilesYaml({
+      const keysBasePath = `${workspacePath}/.keys`;
+      const { yaml: profileYaml, keyFiles } = buildProfilesYaml({
         profileName,
         target: 'buster',
         creds: credentials,
+        keysBasePath,
       });
+
+      // Write key files if any are present
+      if (keyFiles.length > 0) {
+        await sandbox.fs.createFolder(keysBasePath, '700');
+        for (const keyFile of keyFiles) {
+          await sandbox.fs.uploadFile(Buffer.from(keyFile.content), keyFile.path);
+        }
+      }
 
       // Create profiles directory and file
       await sandbox.fs.createFolder(profilesPath, '755');

@@ -60,6 +60,14 @@ describe('processSyncJob', () => {
     maxValues: 1000,
   };
 
+  const mockCredentials = {
+    type: 'postgres' as const,
+    host: 'localhost',
+    username: 'test',
+    password: 'test',
+    default_database: 'test_db',
+  };
+
   const mockAdapter = {
     testConnection: vi.fn(),
     close: vi.fn(),
@@ -74,7 +82,7 @@ describe('processSyncJob', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset all mock implementations to default behavior
-    vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+    vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
     vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
     // Removed markSyncJobCompleted and markSyncJobFailed mocks as they're no longer used
     mockAdapter.testConnection.mockResolvedValue(undefined);
@@ -89,7 +97,6 @@ describe('processSyncJob', () => {
   describe('successful sync workflow', () => {
     it('should complete full sync workflow with new values', async () => {
       // Setup mocks for successful flow
-      const mockCredentials = { type: 'postgresql', host: 'localhost' };
       const mockDistinctValues = ['Apple Inc.', 'Google LLC', 'Microsoft Corp'];
       const mockEmbeddings = [
         [0.1, 0.2, 0.3], // Google LLC embedding
@@ -184,7 +191,7 @@ describe('processSyncJob', () => {
 
     it('should handle case when no values need syncing (empty column)', async () => {
       // Setup mocks for empty column
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       mockAdapter.query.mockResolvedValue({
         rows: [],
@@ -226,7 +233,7 @@ describe('processSyncJob', () => {
         list: vi.fn(),
       } as any;
 
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({
@@ -275,7 +282,7 @@ describe('processSyncJob', () => {
         list: vi.fn(),
       } as any;
 
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({
@@ -325,7 +332,7 @@ describe('processSyncJob', () => {
 
     it('should handle database connection errors', async () => {
       // Setup mock to fail connection
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       mockAdapter.testConnection.mockRejectedValue(new Error('Connection timeout'));
 
@@ -344,7 +351,7 @@ describe('processSyncJob', () => {
 
     it('should handle query execution errors', async () => {
       // Setup mock to fail query
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       mockAdapter.query.mockRejectedValue(new Error('Table not found'));
 
@@ -376,7 +383,7 @@ describe('processSyncJob', () => {
         list: vi.fn(),
       } as any;
 
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({
@@ -421,7 +428,7 @@ describe('processSyncJob', () => {
         list: vi.fn(),
       } as any;
 
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({
@@ -452,7 +459,7 @@ describe('processSyncJob', () => {
 
     it('should handle disconnect errors gracefully', async () => {
       // Setup mocks with disconnect failure
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       mockAdapter.query.mockResolvedValue({
         rows: [],
@@ -486,7 +493,7 @@ describe('processSyncJob', () => {
         list: vi.fn(),
       } as any;
 
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({
@@ -533,7 +540,7 @@ describe('processSyncJob', () => {
         list: vi.fn(),
       } as any;
 
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({
@@ -597,7 +604,7 @@ describe('processSyncJob', () => {
       } as any;
 
       // Setup mocks
-      vi.mocked(getDataSourceCredentials).mockResolvedValue({ type: 'postgresql' });
+      vi.mocked(getDataSourceCredentials).mockResolvedValue(mockCredentials);
       vi.mocked(createAdapter).mockResolvedValue(mockAdapter as any);
       vi.mocked(getDefaultProvider).mockReturnValue(mockStorageProvider);
       mockAdapter.query.mockResolvedValue({

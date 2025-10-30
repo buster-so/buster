@@ -33,6 +33,10 @@ export function normalizeRowValues(row: Record<string, unknown>): Record<string,
         normalized[key] = value;
       }
     }
+    // Convert BigInt to number for JSON serialization compatibility
+    else if (typeof value === 'bigint') {
+      normalized[key] = Number(value);
+    }
     // Already correct type - pass through unchanged
     else {
       normalized[key] = value;

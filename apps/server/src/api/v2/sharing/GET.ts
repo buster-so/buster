@@ -20,14 +20,26 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
     groupBy,
     query,
     includeAssetChildren,
+    pinCollections,
   } = c.req.valid('query');
   const user = c.get('busterUser');
 
   // Get user's organization
   const userOrg = await getUserOrganizationId(user.id);
-  if (!userOrg?.organizationId) {
-    throw new HTTPException(403, { message: 'User not associated with any organization' });
+
+  if (!userOrg) {
+    // If user is not associated with an organization, return an empty response
+    const output: AssetGetResponse = {
+      data: [],
+      pagination: {
+        page,
+        page_size,
+        has_more: false,
+      },
+    };
+    return c.json(output);
   }
+
   try {
     const dbResponse = await listPermissionedSharedAssets({
       userId: user.id,
@@ -44,6 +56,7 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
       groupBy,
       query,
       includeAssetChildren,
+      pinCollections,
     });
 
     // Helper function to convert screenshot bucket keys to signed URLs

@@ -1,21 +1,26 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { SnowflakeForm } from './SnowflakeForm';
 
 // Sample DataSource for the story
-const sampleDataSource: DataSource = {
+const sampleDataSource: GetDataSourceResponse = {
   id: 'snowflake-123',
   name: 'Sample Snowflake DB',
-  type: DataSourceTypes.snowflake,
-  created_at: '2024-07-18T21:19:49.721159Z',
-  updated_at: '2024-07-18T21:19:49.721160Z',
-  created_by: {
+  type: 'snowflake',
+  organizationId: 'org-123',
+  createdAt: '2024-07-18T21:19:49.721159Z',
+  updatedAt: '2024-07-18T21:19:49.721160Z',
+  deletedAt: null,
+  onboardingStatus: 'completed',
+  onboardingError: null,
+  createdBy: {
     id: 'user-123',
     name: 'Test User',
     email: 'test@example.com',
   },
   credentials: {
     type: 'snowflake',
+    auth_method: 'password',
     account_id: 'XYZ12345',
     warehouse_id: 'COMPUTE_WH',
     username: 'SNOWUSER',
@@ -24,7 +29,7 @@ const sampleDataSource: DataSource = {
     default_database: 'SNOWFLAKE_SAMPLE_DATA',
     default_schema: 'PUBLIC',
   },
-  data_sets: [],
+  datasets: [],
 };
 
 const meta: Meta<typeof SnowflakeForm> = {
@@ -53,5 +58,29 @@ export const NewDataSource: Story = {
 export const ExistingDataSource: Story = {
   args: {
     dataSource: sampleDataSource,
+  },
+};
+
+// Sample DataSource with Key Pair authentication
+const keyPairDataSource: GetDataSourceResponse = {
+  ...sampleDataSource,
+  credentials: {
+    type: 'snowflake',
+    auth_method: 'key_pair',
+    account_id: 'XYZ12345',
+    warehouse_id: 'COMPUTE_WH',
+    username: 'SNOWUSER',
+    private_key:
+      '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...\n-----END PRIVATE KEY-----',
+    private_key_passphrase: '',
+    role: 'ACCOUNTADMIN',
+    default_database: 'SNOWFLAKE_SAMPLE_DATA',
+    default_schema: 'PUBLIC',
+  },
+};
+
+export const ExistingDataSourceWithKeyPair: Story = {
+  args: {
+    dataSource: keyPairDataSource,
   },
 };

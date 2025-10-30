@@ -1,6 +1,6 @@
+import type { RedshiftCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { RedshiftCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { RedshiftAdapter } from './redshift';
 
 // Check if Redshift test credentials are available

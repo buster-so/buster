@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import type {
   BigQueryCredentials,
   Credentials,
@@ -7,8 +6,9 @@ import type {
   RedshiftCredentials,
   SnowflakeCredentials,
   SQLServerCredentials,
-} from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
+} from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
+import { describe, expect, it } from 'vitest';
 import { createAdapterInstance, getSupportedTypes, isSupported } from './factory';
 
 // Type for testing unsupported data source types

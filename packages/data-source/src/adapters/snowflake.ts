@@ -1,9 +1,14 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type SnowflakeCredentials,
+  SnowflakeCredentialsSchema,
+} from '@buster/database/schema-types';
 import snowflake from 'snowflake-sdk';
 import { TIMEOUT_CONFIG } from '../config/timeouts';
 import { classifyError, QueryTimeoutError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SnowflakeIntrospector } from '../introspection/snowflake';
-import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';
@@ -49,7 +54,9 @@ export class SnowflakeAdapter extends BaseAdapter {
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.Snowflake);
-    const snowflakeCredentials = credentials as SnowflakeCredentials;
+
+    // Parse credentials through schema to apply preprocessing (e.g., default auth_method)
+    const snowflakeCredentials = SnowflakeCredentialsSchema.parse(credentials);
 
     try {
       // Create a unique key for this credential set
@@ -70,7 +77,6 @@ export class SnowflakeAdapter extends BaseAdapter {
           this.connected = true;
           this.lastActivity = now;
           warmConnectionLastUsed = now;
-          console.info('Reusing warm Snowflake connection');
           return;
         }
         // Connection is stale, destroy it
@@ -99,10 +105,31 @@ export class SnowflakeAdapter extends BaseAdapter {
     const connectionOptions: snowflake.ConnectionOptions = {
       account: credentials.account_id, // Always required by SDK
       username: credentials.username,
-      password: credentials.password,
-      warehouse: credentials.warehouse_id,
-      database: credentials.default_database,
     };
+
+    // Add optional warehouse and database only if provided
+    if (credentials.warehouse_id) {
+      connectionOptions.warehouse = credentials.warehouse_id;
+    }
+
+    if (credentials.default_database) {
+      connectionOptions.database = credentials.default_database;
+    }
+
+    // Authentication-specific configuration
+    if (credentials.auth_method === 'password') {
+      // Password authentication
+      connectionOptions.password = credentials.password;
+    } else if (credentials.auth_method === 'key_pair') {
+      // Key-pair authentication using JWT
+      connectionOptions.authenticator = 'SNOWFLAKE_JWT';
+      connectionOptions.privateKey = credentials.private_key;
+
+      // Add passphrase if provided for encrypted keys
+      if (credentials.private_key_passphrase) {
+        connectionOptions.privateKeyPass = credentials.private_key_passphrase;
+      }
+    }
 
     // Use custom_host if provided via accessUrl
     if (credentials.custom_host) {
@@ -162,7 +189,6 @@ export class SnowflakeAdapter extends BaseAdapter {
     return new Promise((resolve) => {
       connection.destroy((err: SnowflakeError | undefined) => {
         if (err) {
-          console.error('Error destroying connection:', err);
         }
         resolve();
       });
@@ -327,7 +353,6 @@ export class SnowflakeAdapter extends BaseAdapter {
       this.connection === warmConnection &&
       Date.now() - this.lastActivity < CONNECTION_REUSE_TIME
     ) {
-      console.info('Keeping Snowflake connection warm for reuse');
     } else if (this.connection) {
       // Connection is too old or not the warm connection, destroy it
       await this.destroyConnection(this.connection);
@@ -424,7 +449,6 @@ export class SnowflakeAdapter extends BaseAdapter {
 
     try {
       await this.query(insertSQL, params);
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw classifyError(error);
     }
@@ -495,14 +519,11 @@ export class SnowflakeAdapter extends BaseAdapter {
         await new Promise<void>((resolve) => {
           warmConnection?.destroy((err: SnowflakeError | undefined) => {
             if (err) {
-              console.error('Error destroying warm connection:', err);
             }
             resolve();
           });
         });
-      } catch (error) {
-        console.error('Failed to destroy warm connection:', error);
-      }
+      } catch (_error) {}
       warmConnection = null;
       warmConnectionCredentials = null;
     }

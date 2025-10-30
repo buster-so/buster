@@ -13,7 +13,6 @@ import type {
   SearchTextResponse,
 } from '@buster/server-shared';
 import { getAssetScreenshotSignedUrl } from './get-asset-screenshot';
-import { processSearchResultText } from './text-processing-helpers';
 
 /**
  * Perform text search and enhance results with asset ancestors
@@ -32,9 +31,16 @@ export async function performTextSearch(
 
   // Get user's organization
   const userOrg = await getUserOrganizationId(userId);
-
   if (!userOrg) {
-    throw new Error('User is not associated with an organization');
+    // If user is not associated with an organization, return an empty response
+    return {
+      data: [],
+      pagination: {
+        page: searchRequest.page,
+        page_size: searchRequest.page_size,
+        has_more: false,
+      },
+    };
   }
 
   const trimmedQuery = searchRequest.query?.trim();
@@ -63,6 +69,7 @@ export async function performTextSearch(
     page_size: searchRequest.page_size,
     filters,
     includeAddedToLibrary: searchRequest.includeAddedToLibrary,
+    collectionId: searchRequest.collectionId,
   });
   const searchDuration = performance.now() - searchStart;
 

@@ -1,5 +1,5 @@
 import type { RegisteredRouter } from '@tanstack/react-router';
-import type { DropdownDivider, IDropdownItem } from './dropdown-items.types';
+import type { DropdownDivider, IDropdownItem, IDropdownItems } from './dropdown-items.types';
 
 /**
  * Creates a dropdown typesafe item object for use in dropdown menus. Mostly used for link safety
@@ -30,8 +30,6 @@ export function createDropdownItems<
   TRouter extends RegisteredRouter,
   TOptions,
   TFrom extends string = string,
->(
-  items: IDropdownItem<T, TRouter, TOptions, TFrom>[]
-): IDropdownItem<T, TRouter, TOptions, TFrom>[] {
+>(items: IDropdownItems<T, TRouter, TOptions, TFrom>): IDropdownItems<T, TRouter, TOptions, TFrom> {
   return items;
 }

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  dateSpansIntoPreviousYears,
   extractDateForFormatting,
   formatDate,
   numberDateFallback,
@@ -328,5 +329,35 @@ describe('extractDateForFormatting', () => {
     expect(dayjs.isDayjs(result)).toBe(true);
     // Day 1 (Monday) starting from current mock date (2024-01-15 which is Monday)
     expect((result as dayjs.Dayjs).format('YYYY-MM-DD')).toBe('2024-01-15');
+  });
+});
+
+describe('dateSpansIntoPreviousYears', () => {
+  beforeEach(() => {
+    // Mock the current date to ensure consistent test results
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-01-15T00:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should return true for a date from last year', () => {
+    const lastYearDate = '2020-06-15';
+    const result = dateSpansIntoPreviousYears(lastYearDate);
+    expect(result).toBe(true);
+  });
+
+  it('should return false for a date from the current year', () => {
+    const currentYearDate = '2024-03-20';
+    const result = dateSpansIntoPreviousYears(currentYearDate);
+    expect(result).toBe(false);
+  });
+
+  it('should return true for a date from 2 years ago', () => {
+    const twoYearsAgoDate = new Date('2022-12-25');
+    const result = dateSpansIntoPreviousYears(twoYearsAgoDate);
+    expect(result).toBe(true);
   });
 });

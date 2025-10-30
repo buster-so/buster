@@ -10,7 +10,7 @@ export const Route = createFileRoute('/embed/chat/$chatId')({
 function RouteComponent() {
   return (
     <div className="h-full w-full p-2 max-h-[100vh]" data-testid="embed-chat-container">
-      <div className="h-full w-full border rounded bg-background">
+      <div className="h-full w-full border rounded bg-background overflow-hidden">
         {chatLayoutServerContext.component()}
       </div>
     </div>

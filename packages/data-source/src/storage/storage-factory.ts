@@ -98,8 +98,7 @@ export async function getProviderForOrganization(organizationId: string): Promis
         return createStorageProvider(config);
       }
     }
-  } catch (error) {
-    console.error('Error getting customer storage integration:', error);
+  } catch (_error) {
     // Fall back to default storage
   }
 
@@ -116,11 +115,8 @@ export async function testStorageCredentials(config: StorageConfig): Promise<boo
     const result = await provider.testConnection();
     return result.success;
   } catch (error) {
-    console.error('Credential test failed:', error);
     // Log more details about the error
     if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
     }
     return false;
   }

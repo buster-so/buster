@@ -204,10 +204,22 @@ describe('Asset Queries', () => {
         id: '623e4567-e89b-12d3-a456-426614174000',
         name: 'Annual Report 2024',
         content: '# Annual Report\n\nThis is the annual report content.',
+        versionHistory: {
+          '1': {
+            content: 'Initial version',
+            updated_at: '2024-01-01',
+            version_number: 1,
+          },
+          '3': {
+            content: 'Latest version',
+            updated_at: '2024-03-01',
+            version_number: 3,
+          },
+        },
         createdBy: '623e4567-e89b-12d3-a456-426614174001',
       };
 
-      // Mock getAssetDetails (internal function call)
+      // Mock getAssetDetailsById (internal function call)
       const selectMock = {
         select: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
@@ -292,6 +304,13 @@ describe('Asset Queries', () => {
         id: 'c23e4567-e89b-12d3-a456-426614174000',
         name: 'Test Report',
         content: 'Test content',
+        versionHistory: {
+          '2': {
+            content: 'Version 2',
+            updated_at: '2024-02-01',
+            version_number: 2,
+          },
+        },
         createdBy: 'd23e4567-e89b-12d3-a456-426614174000',
       };
 

@@ -20,9 +20,12 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import {
+  AgentEventTriggerSchema,
+  AgentNameSchema,
   AssetPermissionRoleSchema,
   AssetTypeSchema,
   ChatTypeSchema,
+  ChatUpdatedByTypeSchema,
   type DashboardYml,
   DataSourceOnboardingStatusSchema,
   DatasetTypeSchema,
@@ -50,6 +53,12 @@ import {
   WorkspaceSharingSchema,
 } from './schema-types';
 import type { DatasetMetadata } from './schema-types/dataset-metadata';
+
+export const agentNameEnum = pgEnum('agent_name_enum', AgentNameSchema.options);
+export const agentEventTriggerEnum = pgEnum(
+  'agent_event_trigger_enum',
+  AgentEventTriggerSchema.options
+);
 
 export const assetPermissionRoleEnum = pgEnum(
   'asset_permission_role_enum',
@@ -114,6 +123,11 @@ export const messageAnalysisModeEnum = pgEnum(
 );
 
 export const chatTypeEnum = pgEnum('chat_type_enum', ChatTypeSchema.options);
+
+export const chatUpdatedByTypeEnum = pgEnum(
+  'chat_updated_by_type_enum',
+  ChatUpdatedByTypeSchema.options
+);
 
 export const apiKeys = pgTable(
   'api_keys',
@@ -877,6 +891,7 @@ export const chats = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     title: text().notNull(),
+    updatedByType: chatUpdatedByTypeEnum('updated_by_type').default('agent').notNull(),
     chatType: chatTypeEnum('chat_type').default('analyst').notNull(),
     organizationId: uuid('organization_id').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
@@ -1679,29 +1694,13 @@ export const githubIntegrations = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     organizationId: uuid('organization_id').notNull(),
     userId: uuid('user_id').notNull(),
-
     installationId: varchar('installation_id', { length: 255 }).notNull(),
     appId: varchar('app_id', { length: 255 }),
-
     githubOrgId: varchar('github_org_id', { length: 255 }).notNull(),
     githubOrgName: varchar('github_org_name', { length: 255 }),
-
-    tokenVaultKey: varchar('token_vault_key', { length: 255 }).unique(),
-    webhookSecretVaultKey: varchar('webhook_secret_vault_key', { length: 255 }),
-
-    repositoryPermissions: jsonb('repository_permissions').default({}),
-
+    permissions: jsonb('permissions').default({}),
+    accessibleRepositories: jsonb('accessible_repositories').default([]),
     status: githubIntegrationStatusEnum().default('pending').notNull(),
-    installedAt: timestamp('installed_at', {
-      withTimezone: true,
-      mode: 'string',
-    }),
-    lastUsedAt: timestamp('last_used_at', {
-      withTimezone: true,
-      mode: 'string',
-    }),
-
-    // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -1733,9 +1732,41 @@ export const githubIntegrations = pgTable(
       'btree',
       table.installationId.asc().nullsLast().op('text_ops')
     ),
-    index('idx_github_integrations_github_org_id').using(
+  ]
+);
+
+// GitHub integration requests table (for installations pending approval)
+export const githubIntegrationRequests = pgTable(
+  'github_integration_requests',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    userId: uuid('user_id').notNull(),
+    githubLogin: varchar('github_login', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'github_integration_requests_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'github_integration_requests_user_id_fkey',
+    }).onDelete('cascade'),
+    uniqueIndex('github_integration_requests_org_user_key').on(table.organizationId, table.userId),
+    index('idx_github_integration_requests_org_id').using(
       'btree',
-      table.githubOrgId.asc().nullsLast().op('text_ops')
+      table.organizationId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_github_integration_requests_github_login').using(
+      'btree',
+      table.githubLogin.asc().nullsLast().op('text_ops')
     ),
   ]
 );
@@ -2026,5 +2057,58 @@ export const userLibrary = pgTable(
       columns: [table.userId, table.assetType, table.assetId],
       name: 'user_library_pkey',
     }),
+  ]
+);
+
+export const agentAutomationTasks = pgTable(
+  'agent_automation_tasks',
+  {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    integrationId: uuid('integration_id').notNull(),
+    agentName: agentNameEnum('agent_name').notNull(),
+    eventTrigger: agentEventTriggerEnum('event_trigger').notNull(),
+    repository: text('repository').notNull(),
+    branches: text('branches').array().notNull().default(['*']),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'automation_tasks_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.integrationId],
+      foreignColumns: [githubIntegrations.id],
+      name: 'automation_tasks_integration_id_fkey',
+    }).onDelete('cascade'),
+    uniqueIndex('agent_automation_tasks_unique_active')
+      .on(table.organizationId, table.integrationId, table.agentName, table.eventTrigger)
+      .where(isNull(table.deletedAt)),
+  ]
+);
+
+export const agentUpstreamRepositories = pgTable(
+  'agent_upstream_repositories',
+  {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    agentAutomationTaskId: uuid('agent_automation_task_id').notNull(),
+    repository: text('repository').notNull(),
+    upstreamRepository: text('upstream_repository').notNull(),
+    branches: text('branches').array().notNull().default(['*']),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.agentAutomationTaskId],
+      foreignColumns: [agentAutomationTasks.id],
+      name: 'automation_task_repositories_task_id_fkey',
+    }).onDelete('cascade'),
   ]
 );

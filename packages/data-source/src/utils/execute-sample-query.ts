@@ -2,9 +2,9 @@ import type { common } from '@buster/server-shared';
 
 type DataResult = common.DataResult;
 
+import type { Credentials } from '@buster/database/schema-types';
 import { z } from 'zod';
 import { DataSource } from '../data-source';
-import type { Credentials } from '../types/credentials';
 import { checkQueryIsReadOnly } from './sql-validation';
 
 /**
@@ -137,9 +137,6 @@ export async function executeSampleQuery(
         if (isTimeout && attempt < retryDelays.length) {
           // Wait before retry
           const delay = retryDelays[attempt] || 3000;
-          console.warn(
-            `[execute-sample-query] Query timeout on attempt ${attempt + 1}. Retrying in ${delay}ms...`
-          );
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue;
         }

@@ -1,10 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type DataSource,
-  type DataSourceTypes,
-  type PostgresCredentials,
-  PostgresCredentialsSchema,
-} from '@/api/asset_interfaces/datasources';
+import type { DataSourceTypes, PostgreSQLCredentials } from '@/api/asset_interfaces/datasources';
 import {
   useCreatePostgresDataSource,
   useUpdatePostgresDataSource,
@@ -15,12 +11,12 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const PostgresForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
   type?: DataSourceTypes;
 }> = ({ dataSource, type }) => {
   const { mutateAsync: createDataSource } = useCreatePostgresDataSource();
   const { mutateAsync: updateDataSource } = useUpdatePostgresDataSource();
-  const credentials = dataSource?.credentials as PostgresCredentials | undefined;
+  const credentials = dataSource?.credentials as PostgreSQLCredentials | undefined;
 
   const flow = dataSource?.id ? 'update' : 'create';
   const dataSourceFormSubmit = useDataSourceFormSuccess();
@@ -34,8 +30,8 @@ export const PostgresForm: React.FC<{
       default_database: credentials?.default_database,
       default_schema: credentials?.default_schema,
       type: credentials?.type || type || 'postgres',
-      name: dataSource?.name || credentials?.name,
-    } as PostgresCredentials,
+      name: dataSource?.name,
+    } as PostgreSQLCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -43,11 +39,6 @@ export const PostgresForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: PostgresCredentialsSchema,
-      onSubmit: PostgresCredentialsSchema,
     },
   });
 

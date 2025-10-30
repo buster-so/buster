@@ -1,15 +1,11 @@
-import type { Credentials } from '@buster/data-source';
-import {
-  createAdapter,
-  DataSourceType,
-  getDynamicSampleSize,
-  getStructuralMetadata,
-} from '@buster/data-source';
+import { createAdapter, getDynamicSampleSize, getStructuralMetadata } from '@buster/data-source';
 import {
   getDataSourceCredentials,
   getDataSourceWithDetails,
   upsertDataset,
 } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { getTableStatisticsTask } from './get-table-statistics-task';
 import {

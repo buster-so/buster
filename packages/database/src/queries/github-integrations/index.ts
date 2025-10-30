@@ -1,9 +1,15 @@
 export { createGithubIntegration } from './create-github-integration';
-export { getActiveGithubIntegration } from './get-active-github-integration';
+export { createGithubIntegrationRequest } from './create-github-integration-request';
 export {
   getApiKeyForInstallationId,
   getGithubIntegrationByInstallationId,
-} from './get-github-integration-by-installation-id';
-export { markGithubIntegrationAsFailed } from './mark-github-integration-as-failed';
+  getGithubIntegrationByOrganizationId,
+} from './get-github-integration';
+export {
+  getAllGithubIntegrationRequests,
+  getGithubIntegrationRequestByOrganizationId,
+  getGithubIntegrationRequestByOrgMemberList,
+} from './get-github-integration-request';
 export { softDeleteGithubIntegration } from './soft-delete-github-integration';
+export { softDeleteGithubIntegrationRequest } from './soft-delete-github-integration-request';
 export { updateGithubIntegration } from './update-github-integration';

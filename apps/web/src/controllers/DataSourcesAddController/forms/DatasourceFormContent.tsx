@@ -1,12 +1,10 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import React from 'react';
-import {
-  DatabaseNames,
-  type DataSource,
-  type DataSourceTypes,
-} from '@/api/asset_interfaces/datasources';
+import { DatabaseNames, type DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { Text } from '@/components/ui/typography';
 import { BigQueryForm } from './BigQueryForm';
-import { DataBricksForm } from './DataBricksForm';
+// import { DataBricksForm } from './DataBricksForm'; // Disabled: Databricks adapter not yet implemented
+import { MotherDuckForm } from './MotherDuckForm';
 import { MySqlForm } from './MySqlForm';
 import { PostgresForm } from './PostgresForm';
 import { RedshiftForm } from './RedshiftForm';
@@ -16,7 +14,7 @@ import { SqlServerForm } from './SqlServerForm';
 const FormRecord: Record<
   DataSourceTypes,
   React.FC<{
-    dataSource?: DataSource;
+    dataSource?: GetDataSourceResponse;
     type?: DataSourceTypes;
   }>
 > = {
@@ -27,14 +25,15 @@ const FormRecord: Record<
   redshift: RedshiftForm,
   mariadb: MySqlForm,
   sqlserver: SqlServerForm,
-  databricks: DataBricksForm,
+  databricks: () => null, // Disabled: Databricks adapter not yet implemented
+  motherduck: MotherDuckForm,
   supabase: PostgresForm,
   athena: () => null,
   other: () => null,
 };
 
 export const DataSourceFormContent: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
   type: DataSourceTypes;
 }> = React.memo(({ dataSource, type }) => {
   const SelectedForm = FormRecord[type];

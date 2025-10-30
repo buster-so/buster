@@ -44,6 +44,8 @@ describe('transformers', () => {
         docs: [],
         deleteAbsentModels: true,
         deleteAbsentDocs: true,
+        automation: [],
+        logsWriteback: undefined,
       });
     });
 

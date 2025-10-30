@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/buttons';
 import { StatusCard } from '@/components/ui/card/StatusCard';
 import {
+  createDropdownItem,
   createDropdownItems,
   Dropdown,
   type IDropdownItem,
@@ -227,29 +228,27 @@ const SlackSharingPermissions = React.memo(() => {
   const selectedOption: SlackSharingPermission =
     slackIntegration?.integration?.default_sharing_permissions || 'noSharing';
 
-  const sharingOptions: IDropdownItem<SlackSharingPermission>[] = (
-    createDropdownItems([
-      {
-        label: 'Workspace',
-        value: 'shareWithWorkspace' satisfies SlackSharingPermission,
-        secondaryLabel:
-          'All workspace members will have access to any chat created from any channel.',
-      },
-      // {
-      //   label: 'Channel',
-      //   value: 'shareWithChannel',
-      //   secondaryLabel: 'All channel members will have access to any chat created from that channel.'
-      // },
-      {
-        label: 'None',
-        value: 'noSharing' satisfies SlackSharingPermission,
-        secondaryLabel: 'Only the user who sent the request will have access to their chat.',
-      },
-    ]) satisfies IDropdownItem<SlackSharingPermission>[]
-  ).map((option) => ({
-    ...option,
-    selected: option.value === selectedOption,
-  }));
+  const sharingOptions: IDropdownItem<SlackSharingPermission>[] = [
+    createDropdownItem({
+      label: 'Workspace',
+      value: 'shareWithWorkspace' satisfies SlackSharingPermission,
+      secondaryLabel:
+        'All workspace members will have access to any chat created from any channel.',
+      selected: 'shareWithWorkspace' === selectedOption,
+    }),
+    // {
+    //   label: 'Channel',
+    //   value: 'shareWithChannel',
+    //   secondaryLabel: 'All channel members will have access to any chat created from that channel.',
+    //   selected: 'shareWithChannel' === selectedOption,
+    // },
+    createDropdownItem({
+      label: 'None',
+      value: 'noSharing' satisfies SlackSharingPermission,
+      secondaryLabel: 'Only the user who sent the request will have access to their chat.',
+      selected: 'noSharing' === selectedOption,
+    }),
+  ] as IDropdownItem<SlackSharingPermission>[];
 
   const selectedLabel = sharingOptions.find((option) => option.selected)?.label || 'Select option';
 

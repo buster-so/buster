@@ -1,7 +1,7 @@
+import type { PostgreSQLCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { Client } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PostgreSQLCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { PostgreSQLAdapter } from './postgresql';
 
 // Create mock client instance

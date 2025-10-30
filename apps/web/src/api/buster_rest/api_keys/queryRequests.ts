@@ -1,11 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiKeysQueryKeys } from '@/api/query_keys/api_keys';
 import { createApiKey, deleteApiKey, getApiKey, getApiKeys } from './requests';
 
 export const useGetApiKeys = () => {
   return useQuery({
-    queryKey: ['api_keys'],
+    ...apiKeysQueryKeys.list,
     queryFn: getApiKeys,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const prefetchApiKeys = async (queryClient: QueryClient) => {
+  await queryClient.prefetchQuery({
+    ...apiKeysQueryKeys.list,
+    queryFn: getApiKeys,
   });
 };
 
@@ -15,7 +23,7 @@ export const useCreateApiKey = () => {
   return useMutation({
     mutationFn: createApiKey,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['api_keys'] });
+      queryClient.invalidateQueries({ ...apiKeysQueryKeys.list });
     },
   });
 };
@@ -26,14 +34,14 @@ export const useDeleteApiKey = () => {
   return useMutation({
     mutationFn: deleteApiKey,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['api_keys'] });
+      queryClient.invalidateQueries({ ...apiKeysQueryKeys.list });
     },
   });
 };
 
 export const useGetApiKey = (id: string) => {
   return useQuery({
-    queryKey: ['api_key', id],
+    ...apiKeysQueryKeys.get(id),
     queryFn: () => getApiKey(id),
   });
 };

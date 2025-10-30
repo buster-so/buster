@@ -1,4 +1,4 @@
-import { type Credentials, DataSourceType } from '../types/credentials';
+import { type Credentials, DataSourceType } from '@buster/database/schema-types';
 
 /**
  * Type guard to validate if an unknown object is valid Credentials

@@ -83,6 +83,10 @@ const DoneToolStateSchema = z.object({
     .number()
     .optional()
     .describe('Sequence number for the final execute message update'),
+  finalReasoningMessageSet: z
+    .boolean()
+    .optional()
+    .describe('Tracks if finalReasoningMessage has already been set to prevent overwriting'),
 });
 
 export type DoneToolInput = z.infer<typeof DoneToolInputSchema>;
@@ -100,6 +104,7 @@ export function createDoneTool(context: DoneToolContext) {
     isFinalizing: false,
     latestSequenceNumber: undefined,
     finalSequenceNumber: undefined,
+    finalReasoningMessageSet: false,
   };
 
   const execute = createDoneToolExecute(context, state);

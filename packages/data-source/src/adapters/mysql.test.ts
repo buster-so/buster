@@ -1,7 +1,7 @@
+import type { MySQLCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import mysql from 'mysql2/promise';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MySQLCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { MySQLAdapter } from './mysql';
 
 // Mock mysql2/promise module

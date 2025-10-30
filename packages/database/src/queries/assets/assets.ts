@@ -23,17 +23,6 @@ export const GenerateAssetMessagesInputSchema = z.object({
 export type GenerateAssetMessagesInput = z.infer<typeof GenerateAssetMessagesInputSchema>;
 
 /**
- * Asset details type
- */
-interface AssetDetails {
-  id: string;
-  name: string;
-  //TODO: Dallin let's make a type for this. It should not just be a jsonb object.
-  content?: unknown;
-  createdBy: string;
-}
-
-/**
  * Dashboard content schema for parsing
  */
 const DashboardContentSchema = z.object({
@@ -66,70 +55,17 @@ function extractMetricIds(content: unknown): string[] {
 }
 
 /**
- * Get asset details based on type
- */
-async function getAssetDetails(
-  assetId: string,
-  assetType: DatabaseAssetType
-): Promise<AssetDetails | null> {
-  if (assetType === 'metric_file') {
-    const [metric] = await db
-      .select({
-        id: metricFiles.id,
-        name: metricFiles.name,
-        content: metricFiles.content,
-        createdBy: metricFiles.createdBy,
-      })
-      .from(metricFiles)
-      .where(and(eq(metricFiles.id, assetId), isNull(metricFiles.deletedAt)))
-      .limit(1);
-
-    return metric || null;
-  }
-  if (assetType === 'dashboard_file') {
-    const [dashboard] = await db
-      .select({
-        id: dashboardFiles.id,
-        name: dashboardFiles.name,
-        content: dashboardFiles.content,
-        createdBy: dashboardFiles.createdBy,
-      })
-      .from(dashboardFiles)
-      .where(and(eq(dashboardFiles.id, assetId), isNull(dashboardFiles.deletedAt)))
-      .limit(1);
-
-    return dashboard || null;
-  }
-
-  if (assetType === 'report_file') {
-    const [report] = await db
-      .select({
-        id: reportFiles.id,
-        name: reportFiles.name,
-        content: reportFiles.content,
-        createdBy: reportFiles.createdBy,
-      })
-      .from(reportFiles)
-      .where(and(eq(reportFiles.id, assetId), isNull(reportFiles.deletedAt)))
-      .limit(1);
-
-    return report || null;
-  }
-
-  const _exhaustiveCheck: never = assetType;
-
-  return null;
-}
-
-/**
  * Generate initial messages for an asset-based chat
  * This matches the Rust implementation exactly
  */
 export async function generateAssetMessages(input: GenerateAssetMessagesInput): Promise<Message[]> {
   const validated = GenerateAssetMessagesInputSchema.parse(input);
 
-  // Get asset details
-  const asset = await getAssetDetails(validated.assetId, validated.assetType);
+  // Get asset details with version number
+  const asset = await getAssetDetailsById({
+    assetId: validated.assetId,
+    assetType: validated.assetType,
+  });
   if (!asset) {
     throw new Error(`Asset not found: ${validated.assetId}`);
   }
@@ -164,38 +100,38 @@ export async function generateAssetMessages(input: GenerateAssetMessagesInput): 
     asset_type: validated.assetType,
     yml_content: JSON.stringify(asset.content), // Using JSON since we don't have YAML serializer
     created_at: new Date().toISOString(),
-    version_number: 1,
+    version_number: asset.versionNumber,
     updated_at: new Date().toISOString(),
   };
 
-  // If it's a dashboard, fetch associated metrics
+  // If it's a dashboard, fetch associated metrics with their version numbers
   if (validated.assetType === 'dashboard_file') {
     const metricIds = extractMetricIds(asset.content);
 
     if (metricIds.length > 0) {
-      // Fetch all metrics associated with the dashboard
-      const metrics = await db
-        .select({
-          id: metricFiles.id,
-          name: metricFiles.name,
-          content: metricFiles.content,
-          createdBy: metricFiles.createdBy,
-          createdAt: metricFiles.createdAt,
-          updatedAt: metricFiles.updatedAt,
-        })
-        .from(metricFiles)
-        .where(and(inArray(metricFiles.id, metricIds), isNull(metricFiles.deletedAt)));
+      // Fetch all metrics with their version numbers in parallel
+      const metricsWithVersions = await Promise.all(
+        metricIds.map((metricId) =>
+          getAssetDetailsById({
+            assetId: metricId,
+            assetType: 'metric_file',
+          })
+        )
+      );
+
+      // Filter out any metrics that weren't found (null results)
+      const validMetrics = metricsWithVersions.filter((m) => m !== null);
 
       // Format metric data for inclusion
-      additionalFiles = metrics.map((metric) => ({
+      additionalFiles = validMetrics.map((metric) => ({
         id: metric.id,
         name: metric.name,
         file_type: 'metric_file',
         asset_type: 'metric_file',
         yml_content: JSON.stringify(metric.content),
-        created_at: metric.createdAt,
-        version_number: 1,
-        updated_at: metric.updatedAt,
+        created_at: new Date().toISOString(),
+        version_number: metric.versionNumber,
+        updated_at: new Date().toISOString(),
       }));
 
       messageText = `Successfully imported 1 dashboard file with ${additionalFiles.length} additional context files.`;
@@ -230,7 +166,7 @@ export async function generateAssetMessages(input: GenerateAssetMessagesInput): 
       id: fileMessageId,
       file_type: validated.assetType,
       file_name: asset.name,
-      version_number: 1,
+      version_number: asset.versionNumber,
       filter_version_id: null,
       metadata: [
         {
@@ -264,7 +200,7 @@ export async function generateAssetMessages(input: GenerateAssetMessagesInput): 
       messageId: message.id,
       fileId: validated.assetId,
       fileType: validated.assetType,
-      version: 1,
+      version: asset.versionNumber,
     });
 
     return [message];

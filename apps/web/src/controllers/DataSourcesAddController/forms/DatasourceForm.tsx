@@ -1,5 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import type { DataSource } from '@/api/asset_interfaces/datasources';
+import type { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { useDeleteDatasource, useGetDatasource } from '@/api/buster_rest/data_source';
 import { AppDataSourceIcon } from '@/components/features/icons/dataSourceIcons';
 import { Dropdown, type IDropdownItems } from '@/components/ui/dropdown';
@@ -20,17 +21,17 @@ export const DatasourceForm: React.FC<{ datasourceId: string }> = ({ datasourceI
     <div className="flex flex-col space-y-3">
       <DataSourceFormHeader dataSource={dataSource} />
       <DataSourceFormStatus dataSource={dataSource} />
-      <DataSourceFormContent dataSource={dataSource} type={dataSource?.type} />
+      <DataSourceFormContent dataSource={dataSource} type={dataSource?.type as DataSourceTypes} />
     </div>
   );
 };
 
-const DataSourceFormHeader: React.FC<{ dataSource: DataSource }> = ({ dataSource }) => {
+const DataSourceFormHeader: React.FC<{ dataSource: GetDataSourceResponse }> = ({ dataSource }) => {
   return (
     <div className="flex justify-between space-x-2">
       <div className="flex items-center space-x-4">
         <div className="text-icon-color text-4xl">
-          <AppDataSourceIcon size={32} type={dataSource.type} />
+          <AppDataSourceIcon size={32} type={dataSource.type as DataSourceTypes} />
         </div>
 
         <div className="flex flex-col space-y-1">
@@ -38,7 +39,7 @@ const DataSourceFormHeader: React.FC<{ dataSource: DataSource }> = ({ dataSource
           <Text variant="secondary">
             Last updated{' '}
             {formatDate({
-              date: dataSource.updated_at || dataSource.created_at,
+              date: dataSource.updatedAt || dataSource.createdAt,
               format: 'LLL',
             })}
           </Text>
@@ -48,7 +49,7 @@ const DataSourceFormHeader: React.FC<{ dataSource: DataSource }> = ({ dataSource
   );
 };
 
-const DataSourceFormStatus: React.FC<{ dataSource: DataSource }> = ({ dataSource }) => {
+const DataSourceFormStatus: React.FC<{ dataSource: GetDataSourceResponse }> = ({ dataSource }) => {
   const { mutateAsync: onDeleteDataSource } = useDeleteDatasource();
 
   const dropdownItems: IDropdownItems = [
@@ -67,7 +68,7 @@ const DataSourceFormStatus: React.FC<{ dataSource: DataSource }> = ({ dataSource
       <div className="flex flex-col">
         <Text>Connection status</Text>
         <Text variant="secondary">{`Connected on ${formatDate({
-          date: dataSource.created_at,
+          date: dataSource.createdAt,
           format: 'LL',
         })}`}</Text>
       </div>

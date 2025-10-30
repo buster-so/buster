@@ -1,5 +1,5 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from '../../../adapters/base';
-import { DataSourceType } from '../../../types/credentials';
 import type { QueryParameter } from '../../../types/query';
 import type { IntrospectionFilters, StructuralMetadata, TableMetadata } from '../../types';
 import { formatRowCount, getString, parseDate, parseNumber, validateFilters } from '../../utils';
@@ -120,7 +120,6 @@ export async function getStructuralMetadata(
       filters,
     };
   } catch (error) {
-    console.error('Failed to fetch Redshift structural metadata:', error);
     throw new Error(
       `Failed to fetch structural metadata: ${error instanceof Error ? error.message : 'Unknown error'}`
     );

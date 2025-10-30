@@ -1,5 +1,5 @@
 import { checkQueryIsReadOnly } from '@buster/access-controls';
-import type { DataSource } from '@buster/data-source';
+import type { DataSource } from '@buster/database/queries';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getDataSource } from '../../../utils/get-data-source';
 import type { SuperExecuteSqlContext, SuperExecuteSqlState } from './super-execute-sql';

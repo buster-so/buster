@@ -869,6 +869,27 @@
       "when": 1761241260579,
       "tag": "0124_premium_killer_shrike",
       "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1761794891825,
+      "tag": "0125_add_col_to_chats_for_title_update",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1761835268055,
+      "tag": "0126_zippy_bulldozer",
+      "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1761839715423,
+      "tag": "0127_snowflake_keypair_migration",
+      "breakpoints": true
     }
   ]
 }

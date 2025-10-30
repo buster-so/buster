@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   BigQueryCredentials,
   MySQLCredentials,
@@ -6,7 +5,8 @@ import type {
   RedshiftCredentials,
   SnowflakeCredentials,
   SQLServerCredentials,
-} from '../types/credentials';
+} from '@buster/database/schema-types';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BigQueryAdapter } from './bigquery';
 import { MySQLAdapter } from './mysql';
 import { PostgreSQLAdapter } from './postgresql';

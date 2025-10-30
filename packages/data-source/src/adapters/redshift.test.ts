@@ -1,7 +1,7 @@
+import type { RedshiftCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { Client } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { RedshiftCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { RedshiftAdapter } from './redshift';
 
 // Mock pg-cursor

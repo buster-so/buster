@@ -196,7 +196,8 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
 
     if (finalResponse !== undefined && finalResponse !== '') {
       // Mark final reasoning now (after assets have been handled above) and before text streams
-      if (context.messageId) {
+      // Only set it ONCE - the first time we detect non-empty finalResponse
+      if (context.messageId && !doneToolState.finalReasoningMessageSet) {
         try {
           const timeString = formatElapsedTime(context.workflowStartTime, Date.now(), {
             includeDecimals: false,
@@ -205,6 +206,9 @@ export function createDoneToolDelta(context: DoneToolContext, doneToolState: Don
           await updateMessage(context.messageId, {
             finalReasoningMessage: `Reasoned for ${timeString}`,
           });
+
+          // Mark that we've set it to prevent overwriting on subsequent deltas
+          doneToolState.finalReasoningMessageSet = true;
 
           // Update chat's most_recent fields with the first asset that was returned
           if (doneToolState.addedAssets && doneToolState.addedAssets.length > 0 && context.chatId) {

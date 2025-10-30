@@ -64,15 +64,42 @@ export async function deployHandler(options: DeployOptions): Promise<CLIDeployme
       console.info('  Table:', busterConfig.logs.table_name || 'buster_query_logs');
     }
 
-    // 4. Process all projects in parallel
-    const projectResults = await Promise.all(
-      busterConfig.projects.map((project) =>
-        processProject(project, configBaseDir, deploy, options, busterConfig.logs)
-      )
-    );
+    const deploymentResults: CLIDeploymentResult[] = [];
+
+    if (options.skipModels) {
+      console.info('Skipping model deployment due to --skip-models flag');
+    } else {
+      const projectResults = await Promise.all(
+        busterConfig.projects.map((project) =>
+          processProject(project, configBaseDir, deploy, options, busterConfig.logs)
+        )
+      );
+      deploymentResults.push(...projectResults);
+    }
+
+    if (options.skipAutomation) {
+      console.info('Skipping automation deployment due to --skip-automation flag');
+    } else {
+      if (busterConfig.automation) {
+        const deployResponse = await deploy({
+          docs: [],
+          automation: busterConfig.automation,
+          models: [],
+          deleteAbsentDocs: false,
+          deleteAbsentModels: false,
+        });
+
+        const automationDeployResponse = processDeploymentResponse(
+          deployResponse,
+          new Map(),
+          new Map()
+        );
+        deploymentResults.push(automationDeployResponse);
+      }
+    }
 
     // 5. Merge results from all projects (pure function)
-    const finalResult = mergeDeploymentResults(projectResults);
+    const finalResult = mergeDeploymentResults(deploymentResults);
 
     // 6. Display summary
     const summary = formatDeploymentSummary(finalResult, options.verbose, options.dryRun);

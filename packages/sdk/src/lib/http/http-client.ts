@@ -129,4 +129,7 @@ export const post = <T>(config: SDKConfig, path: string, body?: unknown) =>
 export const put = <T>(config: SDKConfig, path: string, body?: unknown) =>
   request<T>(config, 'PUT', path, { body });
 
+export const patch = <T>(config: SDKConfig, path: string, body?: unknown) =>
+  request<T>(config, 'PATCH', path, { body });
+
 export const del = <T>(config: SDKConfig, path: string) => request<T>(config, 'DELETE', path);

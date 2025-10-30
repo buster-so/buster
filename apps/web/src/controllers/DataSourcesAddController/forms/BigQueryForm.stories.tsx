@@ -1,26 +1,30 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { BigQueryForm } from './BigQueryForm';
 
 // Sample DataSource for the story
-const sampleDataSource: DataSource = {
+const sampleDataSource: GetDataSourceResponse = {
   id: 'bigquery-123',
   name: 'Sample BigQuery DB',
-  type: DataSourceTypes.bigquery,
-  created_at: '2024-07-18T21:19:49.721159Z',
-  updated_at: '2024-07-18T21:19:49.721160Z',
-  created_by: {
+  type: 'bigquery',
+  organizationId: 'org-123',
+  createdAt: '2024-07-18T21:19:49.721159Z',
+  updatedAt: '2024-07-18T21:19:49.721160Z',
+  deletedAt: null,
+  onboardingStatus: 'completed',
+  onboardingError: null,
+  createdBy: {
     id: 'user-123',
     name: 'Test User',
     email: 'test@example.com',
   },
   credentials: {
     type: 'bigquery',
-    service_role_key: '{"type":"service_account","project_id":"example-project"}',
-    default_project_id: 'example-project',
-    default_dataset_id: 'example_dataset',
+    project_id: 'example-project',
+    service_account_key: '{"type":"service_account","project_id":"example-project"}',
+    default_dataset: 'example_dataset',
   },
-  data_sets: [],
+  datasets: [],
 };
 
 const meta: Meta<typeof BigQueryForm> = {

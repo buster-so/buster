@@ -18,18 +18,26 @@ vi.mock('@buster/database/connection', () => ({
   deleteSecret: vi.fn(),
 }));
 
-vi.mock('@buster/database/queries', () => ({
-  getUserOrganizationId: vi.fn(),
-}));
+vi.mock('@buster/database/queries', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    getUserOrganizationId: vi.fn(),
+  };
+});
 
-vi.mock('@buster/database/schema', () => ({
-  organizations: {},
-  datasets: {},
-  datasetsToPermissionGroups: {},
-  permissionGroups: {},
-  users: {},
-  slackIntegrations: {},
-}));
+vi.mock('@buster/database/schema', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    organizations: {},
+    datasets: {},
+    datasetsToPermissionGroups: {},
+    permissionGroups: {},
+    users: {},
+    slackIntegrations: {},
+  };
+});
 
 import * as accessControls from '@buster/access-controls';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

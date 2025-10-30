@@ -1,7 +1,7 @@
+import type { SnowflakeCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import snowflake from 'snowflake-sdk';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SnowflakeCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { SnowflakeAdapter } from './snowflake';
 
 // Get mocked snowflake-sdk
@@ -71,11 +71,9 @@ describe('SnowflakeAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(mockedSnowflake.createConnection).toHaveBeenCalledWith(
-        expect.objectContaining({
-          warehouse: undefined,
-        })
-      );
+      const callArgs = mockedSnowflake.createConnection.mock.calls[0][0];
+      expect(callArgs).not.toHaveProperty('warehouse');
+      expect(callArgs).toHaveProperty('database', 'TESTDB');
     });
 
     it('should use no default database when not specified', async () => {
@@ -89,11 +87,9 @@ describe('SnowflakeAdapter', () => {
 
       await adapter.initialize(credentials);
 
-      expect(mockedSnowflake.createConnection).toHaveBeenCalledWith(
-        expect.objectContaining({
-          database: undefined,
-        })
-      );
+      const callArgs = mockedSnowflake.createConnection.mock.calls[0][0];
+      expect(callArgs).not.toHaveProperty('database');
+      expect(callArgs).toHaveProperty('warehouse', 'COMPUTE_WH');
     });
 
     it('should handle connection errors gracefully', async () => {
@@ -666,6 +662,197 @@ describe('SnowflakeAdapter', () => {
       expect(stats).toHaveProperty('credentialKey');
       expect(stats).toHaveProperty('lastActivity');
       expect(stats).toHaveProperty('isWarmConnection');
+    });
+  });
+
+  describe('key-pair authentication', () => {
+    const validPrivateKey = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj
+MzEfYyjiWA4R4/M2bS1+fWIcPm15j6imydbDVJHKf5Hk6qT7XK2M3mJQ8WJQhQzI
+-----END PRIVATE KEY-----`;
+
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      await SnowflakeAdapter.cleanup();
+
+      adapter = new SnowflakeAdapter();
+      mockConnection = {
+        connect: vi.fn((cb) => cb()),
+        execute: vi.fn(),
+        destroy: vi.fn((cb) => cb()),
+        isUp: vi.fn().mockReturnValue(false),
+      };
+
+      mockedSnowflake.createConnection = vi.fn().mockReturnValue(mockConnection);
+      mockedSnowflake.configure = vi.fn();
+    });
+
+    it('should initialize with key-pair credentials', async () => {
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount.us-east-1',
+        username: 'testuser',
+        private_key: validPrivateKey,
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+      };
+
+      await adapter.initialize(credentials);
+
+      expect(mockedSnowflake.createConnection).toHaveBeenCalledWith({
+        account: 'testaccount.us-east-1',
+        username: 'testuser',
+        warehouse: 'COMPUTE_WH',
+        database: 'TESTDB',
+        authenticator: 'SNOWFLAKE_JWT',
+        privateKey: validPrivateKey,
+      });
+      expect(mockConnection.connect).toHaveBeenCalled();
+    });
+
+    it('should include passphrase for encrypted private keys', async () => {
+      const encryptedKey = `-----BEGIN ENCRYPTED PRIVATE KEY-----
+MIIFLTBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQITo1O0b8YrS0CAggA
+-----END ENCRYPTED PRIVATE KEY-----`;
+
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount',
+        username: 'testuser',
+        private_key: encryptedKey,
+        private_key_passphrase: 'my-secret-passphrase',
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+      };
+
+      await adapter.initialize(credentials);
+
+      expect(mockedSnowflake.createConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authenticator: 'SNOWFLAKE_JWT',
+          privateKey: encryptedKey,
+          privateKeyPass: 'my-secret-passphrase',
+        })
+      );
+    });
+
+    it('should not include privateKeyPass when passphrase is not provided', async () => {
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount',
+        username: 'testuser',
+        private_key: validPrivateKey,
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+      };
+
+      await adapter.initialize(credentials);
+
+      const callArgs = mockedSnowflake.createConnection.mock.calls[0][0];
+      expect(callArgs).not.toHaveProperty('privateKeyPass');
+      expect(callArgs).not.toHaveProperty('password');
+    });
+
+    it('should handle key-pair connection with optional fields', async () => {
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount',
+        username: 'testuser',
+        private_key: validPrivateKey,
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+        default_schema: 'PUBLIC',
+        role: 'ADMIN',
+        custom_host: 'custom.snowflakecomputing.com:443',
+      };
+
+      await adapter.initialize(credentials);
+
+      expect(mockedSnowflake.createConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authenticator: 'SNOWFLAKE_JWT',
+          privateKey: validPrivateKey,
+          schema: 'PUBLIC',
+          role: 'ADMIN',
+          accessUrl: 'https://custom.snowflakecomputing.com:443',
+        })
+      );
+    });
+
+    it('should handle RSA private key format', async () => {
+      const rsaKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj
+-----END RSA PRIVATE KEY-----`;
+
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount',
+        username: 'testuser',
+        private_key: rsaKey,
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+      };
+
+      await adapter.initialize(credentials);
+
+      expect(mockedSnowflake.createConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authenticator: 'SNOWFLAKE_JWT',
+          privateKey: rsaKey,
+        })
+      );
+    });
+
+    it('should test connection successfully with key-pair auth', async () => {
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount',
+        username: 'testuser',
+        private_key: validPrivateKey,
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+      };
+
+      await adapter.initialize(credentials);
+
+      mockConnection.execute.mockImplementation(({ complete }) => {
+        complete(
+          null,
+          {
+            getColumns: () => [],
+          },
+          [{ TEST: 1 }]
+        );
+      });
+
+      const result = await adapter.testConnection();
+
+      expect(result).toBe(true);
+    });
+
+    it('should handle connection errors with key-pair auth', async () => {
+      const credentials: SnowflakeCredentials = {
+        type: DataSourceType.Snowflake,
+        auth_method: 'key_pair',
+        account_id: 'testaccount',
+        username: 'testuser',
+        private_key: validPrivateKey,
+        warehouse_id: 'COMPUTE_WH',
+        default_database: 'TESTDB',
+      };
+
+      mockConnection.connect.mockImplementation((cb) => cb(new Error('Invalid key pair')));
+
+      await expect(adapter.initialize(credentials)).rejects.toThrow(
+        'Configuration error: Failed to connect to Snowflake: Invalid key pair'
+      );
     });
   });
 });

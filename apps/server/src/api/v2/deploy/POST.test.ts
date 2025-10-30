@@ -5,15 +5,19 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { deployHandler } from './POST';
 
 // Mock all database functions
-vi.mock('@buster/database/queries', () => ({
-  getUserOrganizationId: vi.fn(),
-  getDataSourceByName: vi.fn(),
-  upsertDataset: vi.fn(),
-  upsertDoc: vi.fn(),
-  deleteLogsWriteBackConfig: vi.fn(),
-  getDataSourceCredentials: vi.fn(),
-  upsertLogsWriteBackConfig: vi.fn(),
-}));
+vi.mock('@buster/database/queries', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    getUserOrganizationId: vi.fn(),
+    getDataSourceByName: vi.fn(),
+    upsertDataset: vi.fn(),
+    upsertDoc: vi.fn(),
+    deleteLogsWriteBackConfig: vi.fn(),
+    getDataSourceCredentials: vi.fn(),
+    upsertLogsWriteBackConfig: vi.fn(),
+  };
+});
 
 vi.mock('@buster/database/connection', () => ({
   db: {
@@ -99,9 +103,6 @@ describe('deployHandler', () => {
         })
       );
     });
-
-    // Removed test case for null organizationId as the actual function
-    // returns null when there's no organization, not an object with null organizationId
 
     it('should throw 403 if user lacks sufficient permissions', async () => {
       mockGetUserOrganizationId.mockResolvedValue({

@@ -1,6 +1,5 @@
 import type { User as BusterUser } from '@buster/database/queries';
 import type { ApiKeyContext } from '@buster/server-shared';
-import type { InstallationCallbackRequest } from '@buster/server-shared/github';
 import type { UserOrganizationRole } from '@buster/server-shared/organization';
 import type { User } from '@supabase/supabase-js';
 

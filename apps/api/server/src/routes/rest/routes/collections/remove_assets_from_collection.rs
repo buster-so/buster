@@ -68,6 +68,7 @@ pub async fn remove_assets_from_collection(
             "dashboard_file" => Some(AssetToRemove::Dashboard(asset.id)),
             "metric_file" => Some(AssetToRemove::Metric(asset.id)),
             "report_file" => Some(AssetToRemove::Report(asset.id)),
+            "chat" => Some(AssetToRemove::Chat(asset.id)),
             _ => None,
         }
     }).collect();
@@ -79,9 +80,10 @@ pub async fn remove_assets_from_collection(
                     AssetType::DashboardFile => "dashboard_file",
                     AssetType::MetricFile => "metric_file",
                     AssetType::ReportFile => "report_file",
+                    AssetType::Chat => "chat",
                     _ => "unknown",
                 };
-                
+
                 FailedAsset {
                     id,
                     type_: type_str.to_string(),

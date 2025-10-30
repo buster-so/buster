@@ -1,30 +1,32 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { MySqlForm } from './MySqlForm';
 
 // Sample DataSource for the story
-const sampleDataSource: DataSource = {
+const sampleDataSource: GetDataSourceResponse = {
   id: 'mysql-123',
   name: 'Sample MySQL DB',
-  type: DataSourceTypes.mysql,
-  created_at: '2024-07-18T21:19:49.721159Z',
-  updated_at: '2024-07-18T21:19:49.721160Z',
-  created_by: {
+  type: 'mysql',
+  organizationId: 'org-123',
+  createdAt: '2024-07-18T21:19:49.721159Z',
+  updatedAt: '2024-07-18T21:19:49.721160Z',
+  deletedAt: null,
+  onboardingStatus: 'completed',
+  onboardingError: null,
+  createdBy: {
     id: 'user-123',
     name: 'Test User',
     email: 'test@example.com',
   },
   credentials: {
-    name: 'Sample MySQL DB',
     type: 'mysql',
     host: 'mysql.example.com',
     port: 3306,
     username: 'root',
-    // Additional properties needed by the form but not in the interface
     password: 'Password123',
     default_database: 'myapp',
-  } as any,
-  data_sets: [],
+  },
+  datasets: [],
 };
 
 const meta: Meta<typeof MySqlForm> = {

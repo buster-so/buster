@@ -168,7 +168,7 @@ describe('credentials', () => {
 
       expect(creds).toEqual({
         apiKey: 'saved-key',
-        apiUrl: 'https://override.buster.so',
+        apiUrl: 'https://saved.buster.so',
       });
     });
 

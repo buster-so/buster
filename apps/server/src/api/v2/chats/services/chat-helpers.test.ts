@@ -79,6 +79,7 @@ describe('chat-helpers', () => {
     created_by_id: 'user-123',
     created_by_name: 'Test User',
     created_by_avatar: null,
+    collections: [],
     publicly_accessible: false,
     public_expiry_date: null,
     public_enabled_by: null,
@@ -108,7 +109,7 @@ describe('chat-helpers', () => {
         id: 'asset-123',
         file_type: 'metric_file',
         file_name: 'Test Metric',
-        version_number: 1,
+        version_number: 3,
         filter_version_id: null,
         metadata: [
           {
@@ -154,7 +155,7 @@ describe('chat-helpers', () => {
         id: 'dashboard-123',
         file_type: 'dashboard_file',
         file_name: 'Test Dashboard',
-        version_number: 1,
+        version_number: 2,
         filter_version_id: null,
         metadata: [
           {
@@ -233,7 +234,7 @@ describe('chat-helpers', () => {
         id: 'asset-123',
         file_type: 'metric_file',
         file_name: 'Test Metric',
-        version_number: 1,
+        version_number: 3,
       });
 
       // Verify chat title was updated
@@ -279,7 +280,7 @@ describe('chat-helpers', () => {
         id: 'dashboard-123',
         file_type: 'dashboard_file',
         file_name: 'Test Dashboard',
-        version_number: 1,
+        version_number: 2,
       });
 
       // Verify chat title was updated

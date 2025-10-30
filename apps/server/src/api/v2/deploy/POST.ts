@@ -1,8 +1,9 @@
-import { type Credentials, createAdapter, toCredentials } from '@buster/data-source';
+import { createAdapter, toCredentials } from '@buster/data-source';
 import { db } from '@buster/database/connection';
 import type { User } from '@buster/database/queries';
 import {
   deleteLogsWriteBackConfig,
+  deployAutomationTasks,
   getDataSourceByName,
   getDataSourceCredentials,
   getUserOrganizationId,
@@ -11,6 +12,7 @@ import {
   upsertLogsWriteBackConfig,
 } from '@buster/database/queries';
 import { dataSources } from '@buster/database/schema';
+import type { AgentEventTrigger, AgentName, Credentials } from '@buster/database/schema-types';
 import type { deploy } from '@buster/server-shared';
 import { and, eq, isNull } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
@@ -20,10 +22,10 @@ type UnifiedDeployResponse = deploy.UnifiedDeployResponse;
 type ModelDeployResult = deploy.ModelDeployResult;
 type DocDeployResult = deploy.DocDeployResult;
 type LogsWritebackResult = deploy.LogsWritebackResult;
+type AutomationDeployResult = deploy.AutomationDeployResult;
 
 /**
- * Deploy handler for unified model and doc deployment
- * Orchestrates deployment using simple database operations
+ * Unified deploy handler for models, docs, and automation
  */
 export async function deployHandler(
   request: UnifiedDeployRequest,
@@ -45,7 +47,7 @@ export async function deployHandler(
   }
 
   try {
-    // Use a transaction to ensure atomicity
+    // Use a transaction to ensure atomicity for models and docs
     const result = await db.transaction(async (tx) => {
       const modelResult: ModelDeployResult = {
         success: [],
@@ -124,7 +126,7 @@ export async function deployHandler(
             modelResult.summary.successCount++;
           }
         } catch (error) {
-          console.error(`Failed to deploy model ${model.name}:`, error);
+          console.error(`[deployHandler] Failed to deploy model ${model.name}:`, error);
           modelResult.failures.push({
             name: model.name,
             errors: [error instanceof Error ? error.message : 'Unknown error'],
@@ -149,7 +151,7 @@ export async function deployHandler(
           docResult.created.push(doc.name);
           docResult.summary.createdCount++;
         } catch (error) {
-          console.error(`Failed to deploy doc ${doc.name}:`, error);
+          console.error(`[deployHandler] Failed to deploy doc ${doc.name}:`, error);
           docResult.failed.push({
             name: doc.name,
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -180,7 +182,17 @@ export async function deployHandler(
       };
     });
 
-    return result;
+    // Handle automation deployment (outside transaction)
+    const automationResult = await handleAutomationDeployment(
+      request.automation,
+      userOrg.organizationId,
+      user.id
+    );
+
+    return {
+      ...result,
+      automation: automationResult,
+    };
   } catch (error) {
     console.error('[deployHandler] Deployment failed:', error);
 
@@ -193,6 +205,118 @@ export async function deployHandler(
     throw new HTTPException(500, {
       message: error instanceof Error ? error.message : 'Deployment failed',
     });
+  }
+}
+
+/**
+ * Handle automation deployment
+ */
+async function handleAutomationDeployment(
+  automation: deploy.UnifiedDeployRequest['automation'],
+  organizationId: string,
+  userId: string
+): Promise<AutomationDeployResult> {
+  if (!automation || automation.length === 0) {
+    return {
+      configured: false,
+      agentCount: 0,
+      triggerCount: 0,
+    };
+  }
+
+  console.info('[handleAutomationDeployment] Automation deployment request received', {
+    userId,
+    organizationId,
+  });
+
+  try {
+    // Flatten the automation config into individual tasks
+    const flattenedTasks: Array<{
+      agentName: AgentName;
+      eventTrigger: AgentEventTrigger;
+      repository: string;
+      branches: string[];
+    }> = [];
+
+    for (const agent of automation) {
+      const agentName = agent.agent as AgentName;
+
+      for (const trigger of agent.on) {
+        const repository = trigger.repository ?? '';
+        const branches = trigger.branches ?? ['*'];
+
+        if (trigger.event === 'push') {
+          // For push events, create a single task with 'push' event trigger
+          flattenedTasks.push({
+            agentName,
+            eventTrigger: 'push',
+            repository,
+            branches,
+          });
+        } else if (trigger.event === 'pull_request') {
+          // For pull_request events, iterate over types and create one task per type
+          // Default to all PR opened events if not provided
+          const types = trigger.types ?? ['opened'];
+
+          for (const type of types) {
+            let eventTrigger: AgentEventTrigger;
+            if (type === 'opened') {
+              eventTrigger = 'pull_request.opened';
+            } else if (type === 'synchronize') {
+              eventTrigger = 'pull_request.synchronize';
+            } else if (type === 'reopened') {
+              eventTrigger = 'pull_request.reopened';
+            } else {
+              // Exhaustive check - should never happen due to schema validation
+              const _exhaustive: never = type;
+              throw new Error(`Unknown pull_request type: ${_exhaustive}`);
+            }
+
+            flattenedTasks.push({
+              agentName,
+              eventTrigger,
+              repository,
+              branches,
+            });
+          }
+        } else {
+          const _exhaustive: never = trigger;
+          throw new Error(`Unknown event type: ${_exhaustive}`);
+        }
+      }
+    }
+
+    // Deploy automation tasks to the database
+    const result = await deployAutomationTasks({
+      organizationId,
+      tasks: flattenedTasks,
+    });
+
+    console.info('[handleAutomationDeployment] Automation deployment successful', {
+      userId,
+      organizationId,
+      ...result,
+    });
+
+    return {
+      configured: true,
+      agentCount: automation.length,
+      triggerCount: flattenedTasks.length,
+    };
+  } catch (error) {
+    console.error('[handleAutomationDeployment] Automation deployment failed', {
+      userId,
+      organizationId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    return {
+      configured: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Unknown Error while handling deployment of automation tasks',
+    };
   }
 }
 

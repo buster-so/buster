@@ -1,9 +1,9 @@
+import type { BigQueryCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { afterEach, describe, expect } from 'vitest';
 import type { DataSourceConfig } from '../data-source';
 import { DataSource } from '../data-source';
 import { skipIfNoCredentials, TEST_TIMEOUT, testConfig } from '../setup';
-import type { BigQueryCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 
 function createBigQueryCredentials(): BigQueryCredentials {
   if (!testConfig.bigquery.project_id) {

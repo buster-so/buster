@@ -127,7 +127,7 @@ export async function getCredentials(): Promise<Credentials | null> {
     // Apply env overrides if present
     return {
       apiKey: saved.apiKey,
-      apiUrl: normalizeUrl(envApiUrl || saved.apiUrl),
+      apiUrl: normalizeUrl(saved.apiUrl),
     };
   }
 

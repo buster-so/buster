@@ -1,12 +1,12 @@
 import { randomBytes } from 'node:crypto';
 import { type AssetPermissionCheck, checkPermission } from '@buster/access-controls';
-import type { Credentials } from '@buster/data-source';
 import {
   createAdapter,
   getCachedMetricData,
   getProviderForOrganization,
 } from '@buster/data-source';
 import { getDataSourceCredentials, getMetricForExport } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
 import { logger, schemaTask } from '@trigger.dev/sdk';
 import { convertToCSV } from './csv-helpers';

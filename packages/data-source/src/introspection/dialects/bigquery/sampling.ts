@@ -191,8 +191,7 @@ export async function getTableSample(
         sampledAt: startTime,
         samplingMethod: 'RANDOM_LIMIT',
       };
-    } catch (fallbackError) {
-      console.error(fallbackError);
+    } catch (_fallbackError) {
       throw new Error(
         `Failed to sample table ${qualifiedTable}: ${
           error instanceof Error ? error.message : 'Unknown error'

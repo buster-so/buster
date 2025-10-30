@@ -52,8 +52,9 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/node": "^22.18.1",
     "@biomejs/biome": "2.2.6",
+    "@rolldown/binding-darwin-arm64": "1.0.0-beta.45",
+    "@types/node": "^22.18.1",
     "tsx": "catalog:",
     "turbo": "^2.5.8",
     "vitest": "catalog:"
@@ -61,7 +62,7 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.19.0",
+  "packageManager": "pnpm@10.20.0",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
@@ -71,6 +72,10 @@
       "allowedVersions": {
         "shiki": "3"
       }
+    },
+    "overrides": {
+      "vite": "npm:rolldown-vite@latest",
+      "parse5": "7.3.0"
     }
   }
 }

@@ -1,8 +1,8 @@
+import type { MySQLCredentials, PostgreSQLCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { DataSourceConfig } from './data-source';
 import { DataSource, QueryRouter } from './data-source';
-import type { MySQLCredentials, PostgreSQLCredentials } from './types/credentials';
-import { DataSourceType } from './types/credentials';
 
 // Test timeout - 5 seconds
 const TEST_TIMEOUT = 5000;

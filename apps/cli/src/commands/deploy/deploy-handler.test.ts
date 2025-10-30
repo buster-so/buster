@@ -90,6 +90,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       await deployHandler(options);
@@ -162,6 +164,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       await deployHandler(options);
@@ -253,6 +257,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       await deployHandler(options);
@@ -334,6 +340,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       // Should throw error because models key is not supported
@@ -406,6 +414,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       await deployHandler(options);
@@ -439,6 +449,8 @@ describe('deploy-handler', () => {
         dryRun: false,
         verbose: true,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       const result = validateDeployOptions(options);
@@ -453,6 +465,8 @@ describe('deploy-handler', () => {
         dryRun: false,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       const result = validateDeployOptions(options);
@@ -467,6 +481,8 @@ describe('deploy-handler', () => {
         dryRun: false,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       const result = validateDeployOptions(options);
@@ -560,6 +576,8 @@ describe('deploy-handler', () => {
           dryRun: true,
           verbose: true,
           debug: false,
+          skipModels: false,
+          skipAutomation: false,
         });
         expect.fail('Should have thrown DeploymentValidationError');
       } catch (error) {
@@ -665,6 +683,8 @@ describe('deploy-handler', () => {
           dryRun: true,
           verbose: false,
           debug: false,
+          skipModels: false,
+          skipAutomation: false,
         })
       ).rejects.toThrow('Cannot deploy');
 
@@ -681,6 +701,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       await expect(deployHandler(options)).rejects.toThrow('No buster.yml found');
@@ -729,6 +751,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       // Should throw validation error for invalid files
@@ -774,6 +798,8 @@ describe('deploy-handler', () => {
         dryRun: true,
         verbose: false,
         debug: false,
+        skipModels: false,
+        skipAutomation: false,
       };
 
       const result = await deployHandler(options);

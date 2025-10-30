@@ -25,6 +25,7 @@ export function useBrowserDetection(): BrowserInfo {
     const isChrome = userAgent.includes('chrome') && !isEdge;
     const isSafari = userAgent.includes('safari') && !isChrome && !isEdge;
     const isFirefox = userAgent.includes('firefox');
+    console.log('userAgent', userAgent);
 
     let browserName = 'unknown';
     if (isEdge) browserName = 'edge';

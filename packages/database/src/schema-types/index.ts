@@ -3,6 +3,8 @@
 // Export asset-related types
 export * from './asset';
 export * from './chat';
+// Export credential-related types and schemas
+export * from './credentials';
 // Export dashboards types
 export * from './dashboards';
 // Export data-source-related types
@@ -29,5 +31,7 @@ export * from './stored-values';
 export * from './table';
 // Export user-related types
 export * from './user';
+// Export private key validation utilities
+export * from './validate-private-key';
 // Export verification-related types
 export * from './verification';

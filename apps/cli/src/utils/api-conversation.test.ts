@@ -28,6 +28,11 @@ const createMockSdk = (): BusterSDK => ({
     update: vi.fn(),
     getRawMessages: vi.fn(),
   },
+  checkRun: {
+    create: vi.fn(),
+    update: vi.fn(),
+    get: vi.fn(),
+  },
 });
 
 describe('loadConversationFromApi', () => {

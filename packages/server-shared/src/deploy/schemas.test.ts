@@ -462,6 +462,9 @@ describe('UnifiedDeployResponseSchema', () => {
           failedCount: 0,
         },
       },
+      automation: {
+        configured: false,
+      },
     };
 
     const parseResult = UnifiedDeployResponseSchema.safeParse(response);
@@ -585,6 +588,9 @@ describe('Schema integration', () => {
           deletedCount: 0,
           failedCount: 0,
         },
+      },
+      automation: {
+        configured: false,
       },
     };
 

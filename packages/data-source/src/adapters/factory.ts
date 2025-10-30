@@ -1,6 +1,11 @@
-import { type Credentials, DataSourceType } from '../types/credentials';
+import {
+  type Credentials,
+  DataSourceType,
+  type DataSourceTypeValue,
+} from '@buster/database/schema-types';
 import type { DatabaseAdapter } from './base';
 import { BigQueryAdapter } from './bigquery';
+import { MotherDuckAdapter } from './motherduck';
 import { MySQLAdapter } from './mysql';
 import { PostgreSQLAdapter } from './postgresql';
 import { RedshiftAdapter } from './redshift';
@@ -49,6 +54,10 @@ export function createAdapterInstance(credentials: Credentials): DatabaseAdapter
       adapter = new RedshiftAdapter();
       break;
 
+    case DataSourceType.MotherDuck:
+      adapter = new MotherDuckAdapter();
+      break;
+
     default: {
       // Use never type for exhaustive checking
       const exhaustiveCheck: never = credentials;
@@ -62,13 +71,13 @@ export function createAdapterInstance(credentials: Credentials): DatabaseAdapter
 /**
  * Get supported data source types
  */
-export function getSupportedTypes(): DataSourceType[] {
+export function getSupportedTypes(): DataSourceTypeValue[] {
   return Object.values(DataSourceType);
 }
 
 /**
  * Check if a data source type is supported
  */
-export function isSupported(type: DataSourceType): boolean {
+export function isSupported(type: DataSourceTypeValue): boolean {
   return Object.values(DataSourceType).includes(type);
 }
