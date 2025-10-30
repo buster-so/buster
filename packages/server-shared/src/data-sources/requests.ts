@@ -61,56 +61,21 @@ export const CreateDataSourceRequestSchema = z
 
 /**
  * Update data source request schema
- * All fields are optional to allow partial updates
- * Note: Since discriminated unions don't support .partial(), we make the entire
- * credentials optional instead
+ * Supports flexible partial updates:
+ * 1. Name only: { name: "New Name" }
+ * 2. Partial credentials: { type: "postgres", password: "new-pass" }
+ * 3. Full credentials: { name?: "New Name", ...completeCredentials }
+ * 4. Empty object: {} (no-op update)
+ *
+ * All fields are optional to allow partial updates.
+ * The server-side logic validates that the update is valid for the existing data source.
  */
-export const UpdateDataSourceRequestSchema = z.object({
-  name: z.string().min(1).optional().describe('Updated data source name'),
-  // Credentials are optional and when provided, must match one of the valid types
-  type: z.string().optional().describe('Data source type (if updating credentials)'),
-  // Postgres/MySQL/Redshift fields
-  host: z.string().min(1).optional(),
-  port: z.number().int().positive().optional(),
-  username: z.string().min(1).optional(),
-  password: z.string().min(1).optional(),
-  default_database: z.string().min(1).optional(),
-  default_schema: z.string().optional(),
-  database: z.string().optional(),
-  schema: z.string().optional(),
-  ssl: z.union([z.boolean(), z.record(z.unknown())]).optional(),
-  // BigQuery fields
-  service_account_key: z.union([z.string(), z.record(z.unknown())]).optional(),
-  project_id: z.string().optional(),
-  default_dataset: z.string().optional(),
-  key_file_path: z.string().optional(),
-  location: z.string().optional(),
-  // Snowflake fields
-  account_id: z.string().optional(),
-  warehouse_id: z.string().optional(),
-  role: z.string().optional(),
-  custom_host: z.string().optional(),
-  // Databricks fields
-  api_key: z.string().optional(),
-  default_catalog: z.string().optional(),
-  // SQL Server fields
-  domain: z.string().optional(),
-  instance: z.string().optional(),
-  encrypt: z.boolean().optional(),
-  trust_server_certificate: z.boolean().optional(),
-  request_timeout: z.number().optional(),
-  // Redshift fields
-  cluster_identifier: z.string().optional(),
-  // MotherDuck fields
-  token: z.string().optional(),
-  saas_mode: z.boolean().optional(),
-  attach_mode: z.enum(['multi', 'single']).optional(),
-  // Shared timeout fields
-  connection_timeout: z.number().optional(),
-  query_timeout: z.number().optional(),
-  // MySQL specific
-  charset: z.string().optional(),
-});
+export const UpdateDataSourceRequestSchema = z
+  .object({
+    name: z.string().min(1).describe('Updated data source name'),
+  })
+  .partial()
+  .passthrough();
 
 /**
  * Query parameters for list endpoint with pagination

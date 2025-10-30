@@ -20,6 +20,7 @@ const sampleDataSource: GetDataSourceResponse = {
   },
   credentials: {
     type: 'snowflake',
+    auth_method: 'password',
     account_id: 'XYZ12345',
     warehouse_id: 'COMPUTE_WH',
     username: 'SNOWUSER',
@@ -57,5 +58,29 @@ export const NewDataSource: Story = {
 export const ExistingDataSource: Story = {
   args: {
     dataSource: sampleDataSource,
+  },
+};
+
+// Sample DataSource with Key Pair authentication
+const keyPairDataSource: GetDataSourceResponse = {
+  ...sampleDataSource,
+  credentials: {
+    type: 'snowflake',
+    auth_method: 'key_pair',
+    account_id: 'XYZ12345',
+    warehouse_id: 'COMPUTE_WH',
+    username: 'SNOWUSER',
+    private_key:
+      '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...\n-----END PRIVATE KEY-----',
+    private_key_passphrase: '',
+    role: 'ACCOUNTADMIN',
+    default_database: 'SNOWFLAKE_SAMPLE_DATA',
+    default_schema: 'PUBLIC',
+  },
+};
+
+export const ExistingDataSourceWithKeyPair: Story = {
+  args: {
+    dataSource: keyPairDataSource,
   },
 };

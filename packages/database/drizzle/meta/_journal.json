@@ -883,6 +883,13 @@
       "when": 1761835268055,
       "tag": "0126_zippy_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1761839715423,
+      "tag": "0127_snowflake_keypair_migration",
+      "breakpoints": true
     }
   ]
 }

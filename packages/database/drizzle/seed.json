@@ -19005,8 +19005,8 @@
         "port": 5432,
         "username": "postgres.fjbidcbjvmpesoonimhl",
         "password": "S8Jrts05EqxsfA3q",
-        "database": "postgres",
-        "schema": "sem",
+        "default_database": "postgres",
+        "default_schema": "sem",
         "jump_host": null,
         "ssh_username": null,
         "ssh_private_key": null
