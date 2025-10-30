@@ -28,6 +28,11 @@ export {
 } from './assets';
 export { bulkUpdateLibraryField } from './bulk-update-asset-library-field';
 export {
+  type CheckAssetInLibraryInput,
+  CheckAssetInLibraryInputSchema,
+  checkAssetInLibrary,
+} from './check-asset-in-library';
+export {
   type GetAssetLatestVersionInput,
   GetAssetLatestVersionInputSchema,
   getAssetLatestVersion,

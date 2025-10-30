@@ -32,6 +32,8 @@ export type IDropdownItem<
   onSearch?: (search: string) => void;
   onScrollToBottom?: () => void;
   isFetchingNextPage?: boolean;
+  footerContent?: React.ReactNode;
+  footerClassName?: string;
 };
 
 export interface DropdownDivider {

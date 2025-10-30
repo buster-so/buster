@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useGetMetric } from '@/api/buster_rest/metrics';
 import { CreateChatButton } from '@/components/features/AssetLayout/CreateChatButton';
-import { SaveMetricToCollectionButton } from '@/components/features/buttons/SaveMetricToCollectionButton';
 import { SaveMetricToDashboardButton } from '@/components/features/buttons/SaveMetricToDashboardButton';
 import { ShareMetricButton } from '@/components/features/buttons/ShareMetricButton';
 import { ClosePageButton } from '@/components/features/chat/ClosePageButton';
@@ -76,21 +75,6 @@ const EditChartButton = React.memo(() => {
   );
 });
 EditChartButton.displayName = 'EditChartButton';
-
-const SaveToCollectionButton = React.memo(
-  ({
-    metricId,
-    metricVersionNumber,
-  }: {
-    metricId: string;
-    metricVersionNumber: number | undefined;
-  }) => {
-    return (
-      <SaveMetricToCollectionButton metricId={metricId} metricVersionNumber={metricVersionNumber} />
-    );
-  }
-);
-SaveToCollectionButton.displayName = 'SaveToCollectionButton';
 
 const SaveToDashboardButton = React.memo(
   ({

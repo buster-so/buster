@@ -231,6 +231,7 @@ describe('createDataSourceHandler', () => {
       const snowflakeRequest = {
         name: 'My Snowflake',
         type: 'snowflake' as const,
+        auth_method: 'password' as const,
         account_id: 'myaccount',
         warehouse_id: 'warehouse',
         username: 'user',

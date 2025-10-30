@@ -36,6 +36,7 @@ const mockShareConfig: ShareConfig = {
   permission: 'owner',
   workspace_sharing: 'none',
   workspace_member_count: 20,
+  added_to_library: false,
 };
 
 export const MetricShare: Story = {

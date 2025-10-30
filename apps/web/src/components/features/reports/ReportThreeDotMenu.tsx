@@ -25,19 +25,18 @@ import { Dots, History, PenSparkle, Star } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import {
   ArrowUpRight,
-  Download4,
   DuplicatePlus,
   Redo,
   Refresh,
   Undo,
 } from '@/components/ui/icons/NucleoIconOutlined';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useGetChatId } from '@/context/Chats/useGetChatId';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { useIsMac } from '@/hooks/usePlatform';
 import { useEditorContext } from '@/layouts/AssetContainer/ReportAssetContainer';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
+import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
 import { useShareMenuSelectMenu } from './threeDotMenuHooks';
 
 export const ReportThreeDotMenu = React.memo(
@@ -53,23 +52,30 @@ export const ReportThreeDotMenu = React.memo(
     const openReport = useOpenReport({ reportId });
     const editWithAI = useEditWithAI({ reportId });
     const shareMenu = useShareMenuSelectMenu({ reportId });
-    const saveToLibrary = useSaveToLibrary({ reportId });
     const favoriteItem = useFavoriteReportSelectMenu({ reportId });
     const versionHistory = useVersionHistorySelectMenu({ reportId });
     const undoRedo = useUndoRedo();
-    // const duplicateReport = useDuplicateReportSelectMenu({ reportId }); TODO: EITHER Implement backend or remove feature
-    // const verificationItem = useReportVerificationSelectMenu(); // Hidden - not supported yet
     const refreshReportItem = useRefreshReportSelectMenu({ reportId });
-    // const { dropdownItem: downloadPdfItem, exportPdfContainer } = useDownloadPdfSelectMenu({
-    //   reportId,
-    // });
-    const { data: permission } = useGetReport(
-      { id: reportId },
-      { select: useCallback((x: GetReportResponse) => x.permission, []) }
-    );
 
-    const isEffectiveOwner = getIsEffectiveOwner(permission);
-    const isEditor = canEdit(permission);
+    const { data: reportData } = useGetReport(
+      { id: reportId },
+      {
+        select: useCallback(
+          (x: GetReportResponse) => ({
+            permission: x.permission,
+            collections: x.collections,
+          }),
+          []
+        ),
+      }
+    );
+    const saveToLibrary = useAddToLibraryCollection({
+      assetId: reportId,
+      assetType: 'report_file',
+    });
+
+    const isEffectiveOwner = getIsEffectiveOwner(reportData?.permission);
+    const isEditor = canEdit(reportData?.permission);
 
     const items: IDropdownItems = useMemo(() => {
       return [
@@ -77,7 +83,7 @@ export const ReportThreeDotMenu = React.memo(
         editWithAI,
         { type: 'divider' },
         isEffectiveOwner && !isViewingOldVersion && shareMenu,
-        saveToLibrary,
+        ...saveToLibrary,
         favoriteItem,
         ...(isEditor ? [{ type: 'divider' }, ...undoRedo] : []),
         ...(isEditor ? [{ type: 'divider' }, versionHistory] : []),
@@ -105,12 +111,9 @@ export const ReportThreeDotMenu = React.memo(
     ]);
 
     return (
-      <>
-        <Dropdown items={items} side="bottom" align="end" contentClassName="max-h-fit" modal>
-          <Button prefix={<Dots />} variant="ghost" data-testid="three-dot-menu-button" />
-        </Dropdown>
-        {/* {exportPdfContainer} */}
-      </>
+      <Dropdown items={items} side="bottom" align="end" contentClassName="max-h-fit" modal>
+        <Button prefix={<Dots />} variant="ghost" data-testid="three-dot-menu-button" />
+      </Dropdown>
     );
   }
 );
@@ -140,57 +143,6 @@ const useEditWithAI = ({ reportId }: { reportId: string }): IDropdownItem => {
         loading,
       }),
     [reportId, onCreateFileClick, loading, isEditor]
-  );
-};
-
-const useSaveToLibrary = ({ reportId }: { reportId: string }): IDropdownItem => {
-  const { mutateAsync: saveReportToCollection } = useAddReportToCollection();
-  const { mutateAsync: removeReportFromCollection } = useRemoveReportFromCollection();
-
-  const { data: selectedCollections } = useGetReport(
-    { id: reportId },
-    { select: useCallback((x: ReportResponse) => x.collections?.map((x) => x.id), []) }
-  );
-  const { openInfoMessage } = useBusterNotifications();
-
-  const onSaveToCollection = useMemoizedFn(async (collectionIds: string[]) => {
-    await saveReportToCollection({
-      reportIds: [reportId],
-      collectionIds,
-    });
-    openInfoMessage('Report saved to collections');
-  });
-
-  const onRemoveFromCollection = useMemoizedFn(async (collectionId: string) => {
-    await removeReportFromCollection({
-      reportIds: [reportId],
-      collectionIds: [collectionId],
-    });
-    openInfoMessage('Report removed from collections');
-  });
-
-  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
-    onSaveToCollection,
-    onRemoveFromCollection,
-    selectedCollections: selectedCollections || [],
-  });
-
-  const CollectionSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
-  return useMemo(
-    () => ({
-      label: 'Add to collection',
-      value: 'add-to-collection',
-      icon: <ASSET_ICONS.collectionAdd />,
-      items: [
-        <React.Fragment key="collection-sub-menu">
-          {CollectionSubMenu} {ModalComponent}
-        </React.Fragment>,
-      ],
-    }),
-    [CollectionSubMenu]
   );
 };
 
@@ -249,9 +201,11 @@ const useVersionHistorySelectMenu = ({ reportId }: { reportId: string }): IDropd
       value: 'version-history',
       icon: <History />,
       items: [
-        <React.Fragment key="version-history-sub-menu">
-          <DropdownContent items={reverseVersionHistoryItems} selectType="single" />
-        </React.Fragment>,
+        <DropdownContent
+          key="version-history-sub-menu"
+          items={reverseVersionHistoryItems}
+          selectType="single"
+        />,
       ],
     }),
     [reverseVersionHistoryItems]
@@ -271,17 +225,13 @@ const useReportVerificationSelectMenu = (): IDropdownItem => {
     onChangeStatus,
   });
 
-  const statusSubMenu = useMemo(() => {
-    return <DropdownContent {...dropdownProps} />;
-  }, [dropdownProps]);
-
   return useMemo(
     () => ({
       label: 'Request verification',
       value: 'request-verification',
-      items: [<React.Fragment key="status-sub-menu">{statusSubMenu}</React.Fragment>],
+      items: [<DropdownContent key="status-sub-menu" {...dropdownProps} />],
     }),
-    [statusSubMenu]
+    [dropdownProps]
   );
 };
 

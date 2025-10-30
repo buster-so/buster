@@ -24,10 +24,13 @@ export const AssetGridCardSmall = React.memo(
     updated_at,
     created_by_avatar_url,
     created_by_name,
-  }: LibraryAssetListItem) => {
+    ContextMenu,
+  }: LibraryAssetListItem & {
+    ContextMenu: React.FC<React.PropsWithChildren>;
+  }) => {
     const Wrapper = ({ children }: { children: React.ReactNode }) => {
-      if (asset_type === 'collection') {
-        return <CollectionCardContextMenu id={asset_id}>{children}</CollectionCardContextMenu>;
+      if (ContextMenu) {
+        return <ContextMenu>{children}</ContextMenu>;
       }
 
       return <>{children}</>;
@@ -69,28 +72,3 @@ export const AssetGridCardSmall = React.memo(
 );
 
 AssetGridCardSmall.displayName = 'AssetGridCardSmall';
-
-const CollectionCardContextMenu = React.memo(
-  ({
-    id,
-    children,
-  }: Pick<BusterCollectionListItem, 'id'> & {
-    children: React.ReactNode;
-  }) => {
-    const { mutateAsync: onDeleteCollection } = useDeleteCollection();
-
-    return (
-      <ContextMenu modal={false}>
-        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="p-1 border rounded">
-          <ContextMenuItem
-            icon={<Trash />}
-            onClick={() => onDeleteCollection({ id, useConfirmModal: false })}
-          >
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-    );
-  }
-);

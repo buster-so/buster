@@ -31,5 +31,7 @@ export * from './stored-values';
 export * from './table';
 // Export user-related types
 export * from './user';
+// Export private key validation utilities
+export * from './validate-private-key';
 // Export verification-related types
 export * from './verification';

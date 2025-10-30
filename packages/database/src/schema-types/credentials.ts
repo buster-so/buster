@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PrivateKeySchema } from './validate-private-key';
 
 /**
  * Data source types supported by the query router
@@ -52,22 +53,26 @@ export const DataSourceType = {
 export type DataSourceTypeValue = z.infer<typeof DataSourceTypeSchema>;
 
 /**
- * Snowflake credentials schema that matches the Rust SnowflakeCredentials structure
+ * Base schema with fields common to all Snowflake authentication methods
  */
-export const SnowflakeCredentialsSchema = z.object({
+const SnowflakeBaseSchema = z.object({
   type: z.literal('snowflake').describe('Data source type'),
   account_id: z
     .string()
     .min(1)
     .describe('Snowflake account identifier (e.g., "ABC12345.us-central1.gcp")'),
-  warehouse_id: z.string().min(1).describe('Warehouse identifier for compute resources'),
+  warehouse_id: z
+    .string()
+    .min(1)
+    .optional()
+    .describe('Warehouse identifier for compute resources (optional, can be set later)'),
   username: z.string().min(1).describe('Username for authentication'),
-  password: z.string().min(1).describe('Password for authentication'),
   role: z.string().optional().describe('Optional role to assume after authentication'),
   default_database: z
     .string()
     .min(1)
-    .describe('Default database to use (aliased as "database" for compatibility)'),
+    .optional()
+    .describe('Default database to use (optional, can be set later)'),
   default_schema: z.string().optional().describe('Default schema to use'),
   custom_host: z
     .string()
@@ -76,6 +81,50 @@ export const SnowflakeCredentialsSchema = z.object({
       'Optional custom host for load balancers (e.g., "ridedvp-angel.yukicomputing.com:443")'
     ),
 });
+
+/**
+ * Username/password authentication schema
+ */
+const SnowflakePasswordAuthSchema = SnowflakeBaseSchema.extend({
+  auth_method: z
+    .literal('password')
+    .default('password')
+    .describe('Authentication method - username and password'),
+  password: z.string().min(1).describe('Password for authentication'),
+});
+
+/**
+ * Key-pair authentication schema
+ * Uses PEM-encoded PKCS8 private key for JWT-based authentication
+ */
+const SnowflakeKeyPairAuthSchema = SnowflakeBaseSchema.extend({
+  auth_method: z.literal('key_pair').describe('Authentication method - public/private key pair'),
+  private_key: PrivateKeySchema.describe('PEM-encoded PKCS8 private key for JWT authentication'),
+  private_key_passphrase: z
+    .string()
+    .optional()
+    .describe('Optional passphrase for encrypted private key'),
+});
+
+/**
+ * Snowflake credentials schema that supports multiple authentication methods
+ * Uses discriminated union on auth_method for type-safe authentication
+ *
+ * Backward compatibility: When auth_method is missing, defaults to 'password'
+ * if password field is present, otherwise validation will fail.
+ */
+const SnowflakeCredentialsUnion = z.discriminatedUnion('auth_method', [
+  SnowflakePasswordAuthSchema,
+  SnowflakeKeyPairAuthSchema,
+]);
+
+export const SnowflakeCredentialsSchema = z.preprocess((data) => {
+  // Backward compatibility: default to password auth when auth_method is missing
+  if (typeof data === 'object' && data !== null && !('auth_method' in data)) {
+    return { ...data, auth_method: 'password' };
+  }
+  return data;
+}, SnowflakeCredentialsUnion);
 
 export type SnowflakeCredentials = z.infer<typeof SnowflakeCredentialsSchema>;
 
@@ -221,8 +270,12 @@ export type MotherDuckCredentials = z.infer<typeof MotherDuckCredentialsSchema>;
 /**
  * Discriminated union for all supported credential types
  * Uses the 'type' field as the discriminator for type-safe narrowing
+ *
+ * Note: Snowflake has its own discriminated union on 'auth_method', but both
+ * password and key-pair variants share the same 'type: snowflake' field.
+ * We wrap the Snowflake union to maintain type compatibility.
  */
-export const CredentialsSchema = z.discriminatedUnion('type', [
+export const CredentialsSchema = z.union([
   SnowflakeCredentialsSchema,
   BigQueryCredentialsSchema,
   PostgreSQLCredentialsSchema,
@@ -237,18 +290,21 @@ export type Credentials = z.infer<typeof CredentialsSchema>;
 /**
  * Configuration options for Snowflake connection (extends base credentials with additional options)
  */
-export const SnowflakeConnectionConfigSchema = SnowflakeCredentialsSchema.extend({
-  timeout: z.number().optional().describe('Connection timeout in milliseconds (default: 60000)'),
-  clientSessionKeepAlive: z
-    .boolean()
-    .optional()
-    .describe('Whether to keep the client session alive (default: true)'),
-  validateDefaultParameters: z
-    .boolean()
-    .optional()
-    .describe('Whether to validate SSL certificates (default: true)'),
-  options: z.record(z.unknown()).optional().describe('Additional connection options'),
-});
+export const SnowflakeConnectionConfigSchema = z.intersection(
+  SnowflakeCredentialsSchema,
+  z.object({
+    timeout: z.number().optional().describe('Connection timeout in milliseconds (default: 60000)'),
+    clientSessionKeepAlive: z
+      .boolean()
+      .optional()
+      .describe('Whether to keep the client session alive (default: true)'),
+    validateDefaultParameters: z
+      .boolean()
+      .optional()
+      .describe('Whether to validate SSL certificates (default: true)'),
+    options: z.record(z.unknown()).optional().describe('Additional connection options'),
+  })
+);
 
 export type SnowflakeConnectionConfig = z.infer<typeof SnowflakeConnectionConfigSchema>;
 

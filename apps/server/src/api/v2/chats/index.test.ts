@@ -85,6 +85,7 @@ describe('POST /chats', () => {
     individual_permissions: [],
     screenshot_taken_at: null,
     collections: [],
+    added_to_library: false,
   };
 
   beforeEach(() => {

@@ -182,7 +182,7 @@ describe('Data Source Response Schemas', () => {
           host: 'localhost',
           port: 5432,
           username: 'admin',
-          password: 'secret',
+          password: '*****',
           default_database: 'mydb',
         },
         datasets: [
@@ -211,7 +211,7 @@ describe('Data Source Response Schemas', () => {
         onboardingError: null,
         credentials: {
           type: 'motherduck',
-          token: 'my-token',
+          token: '*****',
           default_database: 'my_db',
         },
         datasets: [],
@@ -238,7 +238,7 @@ describe('Data Source Response Schemas', () => {
         credentials: {
           type: 'bigquery',
           project_id: 'my-project',
-          service_account_key: '{"type":"service_account"}',
+          service_account_key: '*****',
           default_dataset: 'my_dataset',
         },
         datasets: [],
@@ -264,7 +264,7 @@ describe('Data Source Response Schemas', () => {
         onboardingError: null,
         credentials: {
           type: 'motherduck',
-          token: 'my-token',
+          token: '*****',
           default_database: 'my_db',
         },
         datasets: [],
@@ -440,7 +440,7 @@ describe('Data Source Response Schemas', () => {
           host: 'newhost.com',
           port: 5432,
           username: 'admin',
-          password: 'newsecret',
+          password: '*****',
           default_database: 'mydb',
         },
         datasets: [],
