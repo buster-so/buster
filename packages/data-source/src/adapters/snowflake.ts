@@ -2,6 +2,7 @@ import {
   type Credentials,
   DataSourceType,
   type SnowflakeCredentials,
+  SnowflakeCredentialsSchema,
 } from '@buster/database/schema-types';
 import snowflake from 'snowflake-sdk';
 import { TIMEOUT_CONFIG } from '../config/timeouts';
@@ -53,7 +54,9 @@ export class SnowflakeAdapter extends BaseAdapter {
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.Snowflake);
-    const snowflakeCredentials = credentials as SnowflakeCredentials;
+
+    // Parse credentials through schema to apply preprocessing (e.g., default auth_method)
+    const snowflakeCredentials = SnowflakeCredentialsSchema.parse(credentials);
 
     try {
       // Create a unique key for this credential set
@@ -102,10 +105,31 @@ export class SnowflakeAdapter extends BaseAdapter {
     const connectionOptions: snowflake.ConnectionOptions = {
       account: credentials.account_id, // Always required by SDK
       username: credentials.username,
-      password: credentials.password,
-      warehouse: credentials.warehouse_id,
-      database: credentials.default_database,
     };
+
+    // Add optional warehouse and database only if provided
+    if (credentials.warehouse_id) {
+      connectionOptions.warehouse = credentials.warehouse_id;
+    }
+
+    if (credentials.default_database) {
+      connectionOptions.database = credentials.default_database;
+    }
+
+    // Authentication-specific configuration
+    if (credentials.auth_method === 'password') {
+      // Password authentication
+      connectionOptions.password = credentials.password;
+    } else if (credentials.auth_method === 'key_pair') {
+      // Key-pair authentication using JWT
+      connectionOptions.authenticator = 'SNOWFLAKE_JWT';
+      connectionOptions.privateKey = credentials.private_key;
+
+      // Add passphrase if provided for encrypted keys
+      if (credentials.private_key_passphrase) {
+        connectionOptions.privateKeyPass = credentials.private_key_passphrase;
+      }
+    }
 
     // Use custom_host if provided via accessUrl
     if (credentials.custom_host) {

@@ -20,6 +20,7 @@ const sampleDataSource: GetDataSourceResponse = {
   },
   credentials: {
     type: 'snowflake',
+    auth_method: 'password',
     account_id: 'XYZ12345',
     warehouse_id: 'COMPUTE_WH',
     username: 'SNOWUSER',
