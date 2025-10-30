@@ -11,7 +11,11 @@ import {
   useGetCollectionsList,
   useRemoveAssetFromCollection,
 } from '@/api/buster_rest/collections';
-import { useLibraryAssetsInfiniteManual } from '@/api/buster_rest/library';
+import {
+  useDeleteLibraryAssets,
+  useLibraryAssetsInfiniteManual,
+  usePostLibraryAssets,
+} from '@/api/buster_rest/library';
 import { Button } from '@/components/ui/buttons';
 import {
   createDropdownItem,
@@ -44,6 +48,8 @@ export const useAddToLibraryCollection = ({
   const { data: collectionsListResponse } = useGetCollectionsList();
   const { mutateAsync: addAssetToCollection } = useAddAssetToCollection();
   const { mutateAsync: removeAssetFromCollection } = useRemoveAssetFromCollection();
+  const { mutateAsync: addAssetsToLibrary } = usePostLibraryAssets();
+  const { mutateAsync: removeAssetsFromLibrary } = useDeleteLibraryAssets();
   const { allResults, fetchNextPage, isFetchingNextPage } = useLibraryAssetsInfiniteManual({
     page_size: 25,
     assetTypes: allAssetsExceptCollection,
@@ -127,6 +133,7 @@ export const useAddToLibraryCollection = ({
             link: {
               to: '/app/library',
             },
+            onClick: () => {},
           },
           ...collections,
         ],
