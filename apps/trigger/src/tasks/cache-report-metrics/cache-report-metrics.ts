@@ -1,10 +1,10 @@
-import type { Credentials } from '@buster/data-source';
 import { checkCacheExists, executeMetricQuery, setCachedMetricData } from '@buster/data-source';
 import {
   extractSqlFromMetricContent,
   getDataSourceCredentials,
   getMetricWithDataSource,
 } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { CacheReportMetricsInputSchema, type CacheReportMetricsOutput } from './interfaces';

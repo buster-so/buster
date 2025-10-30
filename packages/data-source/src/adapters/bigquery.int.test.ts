@@ -1,6 +1,6 @@
+import type { BigQueryCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { BigQueryCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { BigQueryAdapter } from './bigquery';
 
 // Check if BigQuery test credentials are available

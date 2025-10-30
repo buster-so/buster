@@ -5,11 +5,13 @@
 
 import type { FieldMetadata } from '../base';
 import { getBigQuerySimpleType, mapBigQueryType } from './bigquery';
+import { getDuckDBSimpleType, mapDuckDBType } from './duckdb';
 import { getMySQLSimpleType, mapMySQLType } from './mysql';
 import { getPostgreSQLSimpleType, mapPostgreSQLType } from './postgresql';
 import { getSnowflakeSimpleType, mapSnowflakeType } from './snowflake';
 
 export * from './bigquery';
+export * from './duckdb';
 export * from './mysql';
 export * from './postgresql';
 export * from './snowflake';
@@ -23,7 +25,8 @@ export type DatabaseType =
   | 'mysql'
   | 'sqlserver'
   | 'snowflake'
-  | 'bigquery';
+  | 'bigquery'
+  | 'motherduck';
 
 /**
  * Simple type categories used in metadata
@@ -47,6 +50,10 @@ export function mapDatabaseType(dbType: DatabaseType, typeValue: string | number
 
     case 'snowflake':
       return mapSnowflakeType(typeValue);
+
+    case 'motherduck':
+      // MotherDuck uses DuckDB type system
+      return mapDuckDBType(typeValue);
 
     case 'sqlserver':
       // SQL Server already returns readable type names
@@ -81,6 +88,9 @@ export function getSimpleType(dbType: DatabaseType, normalizedType: string): Sim
 
     case 'snowflake':
       return getSnowflakeSimpleType(normalizedType);
+
+    case 'motherduck':
+      return getDuckDBSimpleType(normalizedType);
 
     default:
       return getGenericSimpleType(normalizedType);

@@ -3,9 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createModifyMetricsFinish } from './modify-metrics-finish';
 import type { ModifyMetricsInput, ModifyMetricsState } from './modify-metrics-tool';
 
-vi.mock('@buster/database/queries', () => ({
-  updateMessageEntries: vi.fn(),
-}));
+vi.mock('@buster/database/queries', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    updateMessageEntries: vi.fn(),
+  };
+});
 
 describe('createModifyMetricsFinish', () => {
   let state: ModifyMetricsState;

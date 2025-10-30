@@ -1,7 +1,7 @@
+import type { SQLServerCredentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import sql from 'mssql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SQLServerCredentials } from '../types/credentials';
-import { DataSourceType } from '../types/credentials';
 import { SQLServerAdapter } from './sqlserver';
 
 // Mock mssql module
@@ -55,7 +55,7 @@ describe('SQLServerAdapter', () => {
     it('should initialize with valid credentials', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         port: 1433,
         default_database: 'testdb',
         username: 'testuser',
@@ -81,7 +81,7 @@ describe('SQLServerAdapter', () => {
     it('should use default port when not specified', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -99,7 +99,7 @@ describe('SQLServerAdapter', () => {
     it('should configure encryption options', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -136,7 +136,7 @@ describe('SQLServerAdapter', () => {
     it('should handle connection errors gracefully', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -153,7 +153,7 @@ describe('SQLServerAdapter', () => {
   describe('query execution', () => {
     const credentials: SQLServerCredentials = {
       type: DataSourceType.SQLServer,
-      server: 'localhost',
+      host: 'localhost',
       default_database: 'testdb',
       username: 'testuser',
       password: 'testpass',
@@ -378,7 +378,7 @@ describe('SQLServerAdapter', () => {
   describe('parameter type mapping', () => {
     const credentials: SQLServerCredentials = {
       type: DataSourceType.SQLServer,
-      server: 'localhost',
+      host: 'localhost',
       default_database: 'testdb',
       username: 'testuser',
       password: 'testpass',
@@ -425,7 +425,7 @@ describe('SQLServerAdapter', () => {
     it('should test connection successfully', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -446,7 +446,7 @@ describe('SQLServerAdapter', () => {
     it('should return false when test connection fails', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -464,7 +464,7 @@ describe('SQLServerAdapter', () => {
     it('should close connection', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -479,7 +479,7 @@ describe('SQLServerAdapter', () => {
     it('should handle close errors gracefully', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',
@@ -498,7 +498,7 @@ describe('SQLServerAdapter', () => {
     it('should return introspector', async () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
-        server: 'localhost',
+        host: 'localhost',
         default_database: 'testdb',
         username: 'testuser',
         password: 'testpass',

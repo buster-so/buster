@@ -1,5 +1,7 @@
-import { type Credentials, createAdapter, DataSourceType } from '@buster/data-source';
+import { createAdapter } from '@buster/data-source';
 import { getDataSourceCredentials } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
+import { DataSourceType } from '@buster/database/schema-types';
 import type {
   ApiKeyContext,
   GetMetadataRequest,

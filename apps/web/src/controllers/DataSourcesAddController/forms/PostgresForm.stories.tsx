@@ -1,15 +1,19 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { PostgresForm } from './PostgresForm';
 
 // Sample DataSource for the story
-const sampleDataSource: DataSource = {
+const sampleDataSource: GetDataSourceResponse = {
   id: 'postgres-123',
   name: 'Sample Postgres DB',
-  type: DataSourceTypes.postgres,
-  created_at: '2024-07-18T21:19:49.721159Z',
-  updated_at: '2024-07-18T21:19:49.721160Z',
-  created_by: {
+  type: 'postgres',
+  organizationId: 'org-123',
+  createdAt: '2024-07-18T21:19:49.721159Z',
+  updatedAt: '2024-07-18T21:19:49.721160Z',
+  deletedAt: null,
+  onboardingStatus: 'completed',
+  onboardingError: null,
+  createdBy: {
     id: 'user-123',
     name: 'Test User',
     email: 'test@example.com',
@@ -23,7 +27,7 @@ const sampleDataSource: DataSource = {
     default_schema: 'public',
     type: 'postgres',
   },
-  data_sets: [],
+  datasets: [],
 };
 
 const meta: Meta<typeof PostgresForm> = {

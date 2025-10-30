@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { createPermissionErrorMessage, validateSqlPermissions } from '@buster/access-controls';
-import type { Credentials } from '@buster/data-source';
 import { createMetadataFromResults, executeMetricQuery } from '@buster/data-source';
 import { db } from '@buster/database/connection';
 import { updateMessageEntries } from '@buster/database/queries';
 import { assetPermissions, metricFiles } from '@buster/database/schema';
+import type { Credentials } from '@buster/database/schema-types';
 import {
   type ChartConfigProps,
   type DataMetadata,

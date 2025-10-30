@@ -1,8 +1,12 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type PostgreSQLCredentials,
+} from '@buster/database/schema-types';
 import { Client, type ClientConfig } from 'pg';
 import Cursor from 'pg-cursor';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { PostgreSQLIntrospector } from '../introspection/postgresql';
-import { type Credentials, DataSourceType, type PostgreSQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';
@@ -214,10 +218,7 @@ export class PostgreSQLAdapter extends BaseAdapter {
     if (this.client) {
       try {
         await this.client.end();
-      } catch (error) {
-        // Log error but don't throw - connection is being closed anyway
-        console.error('Error closing PostgreSQL connection:', error);
-      }
+      } catch (_error) {}
       this.client = undefined;
     }
     this.connected = false;
@@ -291,7 +292,6 @@ export class PostgreSQLAdapter extends BaseAdapter {
 
     try {
       await this.client.query(insertSQL, params);
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw new Error(
         `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`

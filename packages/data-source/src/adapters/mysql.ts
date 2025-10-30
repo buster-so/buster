@@ -1,7 +1,11 @@
+import {
+  type Credentials,
+  DataSourceType,
+  type MySQLCredentials,
+} from '@buster/database/schema-types';
 import mysql from 'mysql2/promise';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { MySQLIntrospector } from '../introspection/mysql';
-import { type Credentials, DataSourceType, type MySQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 import { normalizeRowValues } from './helpers/normalize-values';
@@ -156,10 +160,7 @@ export class MySQLAdapter extends BaseAdapter {
     if (this.connection) {
       try {
         await this.connection.end();
-      } catch (error) {
-        // Log error but don't throw - connection is being closed anyway
-        console.error('Error closing MySQL connection:', error);
-      }
+      } catch (_error) {}
       this.connection = undefined;
     }
     this.connected = false;
@@ -198,8 +199,7 @@ export class MySQLAdapter extends BaseAdapter {
       const [rows] = await this.connection.execute(sql, [database, tableName]);
       const firstRow = (rows as Array<{ count?: number }>)[0] as { count?: number } | undefined;
       return !!firstRow && (firstRow.count ?? 0) > 0;
-    } catch (error) {
-      console.error('Error checking table existence:', error);
+    } catch (_error) {
       return false;
     }
   }
@@ -236,7 +236,6 @@ export class MySQLAdapter extends BaseAdapter {
 
     try {
       await this.connection.execute(createTableSQL);
-      console.info(`Table ${database}.${tableName} created successfully`);
     } catch (error) {
       throw new Error(
         `Failed to create logs table: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -300,7 +299,6 @@ export class MySQLAdapter extends BaseAdapter {
 
     try {
       await this.connection.execute(insertSQL, params);
-      console.info(`Log record inserted for message ${record.messageId}`);
     } catch (error) {
       throw new Error(
         `Failed to insert log record: ${error instanceof Error ? error.message : 'Unknown error'}`

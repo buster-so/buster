@@ -1,4 +1,4 @@
-import { DataSourceType } from '@buster/data-source';
+import { DataSourceType } from '@buster/database/schema-types';
 import { z } from 'zod';
 
 // Re-export the introspection types from data-source package

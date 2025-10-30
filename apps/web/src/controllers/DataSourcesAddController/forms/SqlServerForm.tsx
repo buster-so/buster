@@ -1,9 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type DataSource,
-  type SQLServerCredentials,
-  SQLServerCredentialsSchema,
-} from '@/api/asset_interfaces/datasources';
+import type { SQLServerCredentials } from '@/api/asset_interfaces/datasources';
 import {
   type createSQLServerDataSource,
   useCreateSQLServerDataSource,
@@ -15,7 +12,7 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const SqlServerForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
 }> = ({ dataSource }) => {
   const { mutateAsync: createDataSource } = useCreateSQLServerDataSource();
   const { mutateAsync: updateDataSource } = useUpdateSQLServerDataSource();
@@ -31,10 +28,9 @@ export const SqlServerForm: React.FC<{
       username: credentials?.username || '',
       password: credentials?.password || '',
       default_database: credentials?.default_database || '',
-      default_schema: credentials?.default_schema || '',
       type: 'sqlserver' as const,
-      name: dataSource?.name || credentials?.name || '',
-    } as Parameters<typeof createSQLServerDataSource>[0],
+      name: dataSource?.name || '',
+    } as SQLServerCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -42,11 +38,6 @@ export const SqlServerForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: SQLServerCredentialsSchema,
-      onSubmit: SQLServerCredentialsSchema,
     },
   });
 
@@ -91,12 +82,6 @@ export const SqlServerForm: React.FC<{
             label="Database name"
             placeholder="master"
           />
-        )}
-      </form.AppField>
-
-      <form.AppField name="default_schema">
-        {(field) => (
-          <field.TextField labelClassName={labelClassName} label="Schema" placeholder="dbo" />
         )}
       </form.AppField>
     </FormWrapper>

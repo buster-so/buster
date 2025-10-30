@@ -1,5 +1,5 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from '../adapters/base';
-import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,
@@ -76,8 +76,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
 
       this.cache.databases = { data: databases, lastFetched: new Date() };
       return databases;
-    } catch (error) {
-      console.warn('Failed to fetch PostgreSQL databases:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -122,8 +121,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       }
 
       return schemas;
-    } catch (error) {
-      console.warn('Failed to fetch PostgreSQL schemas:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -195,8 +193,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       }
 
       return tables;
-    } catch (error) {
-      console.warn('Failed to fetch PostgreSQL tables:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -286,8 +283,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       }
 
       return columns;
-    } catch (error) {
-      console.warn('Failed to fetch PostgreSQL columns:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -352,8 +348,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       }
 
       return views;
-    } catch (error) {
-      console.warn('Failed to fetch PostgreSQL views:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -426,9 +421,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
           });
         }
       }
-    } catch (error) {
-      console.warn(`Could not get statistics for table ${table}:`, error);
-
+    } catch (_error) {
       // Fallback: create empty statistics for each column
       for (const column of columns) {
         columnStatistics.push({
@@ -770,13 +763,7 @@ ORDER BY s.column_name`;
                   column.sampleValues = stat.sampleValues ?? '';
                 }
               }
-            } catch (error) {
-              // Log warning but don't fail the entire introspection
-              console.warn(
-                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
-                error
-              );
-            }
+            } catch (_error) {}
           })
         );
       })

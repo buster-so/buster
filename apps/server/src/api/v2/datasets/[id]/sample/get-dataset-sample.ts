@@ -1,8 +1,8 @@
 import { AccessControlError, ensureDatasetAccess } from '@buster/access-controls';
-import type { Credentials } from '@buster/data-source';
 import { executeSampleQuery } from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import { getDataSourceById, getDataSourceCredentials } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { GetDatasetSampleResponse } from '@buster/server-shared';
 import { ModelSchema } from '@buster/server-shared';
 import { HTTPException } from 'hono/http-exception';

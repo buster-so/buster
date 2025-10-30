@@ -1,10 +1,7 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  type DataSource,
-  DataSourceSchema,
-  DataSourceTypes,
-} from '@/api/asset_interfaces/datasources';
-import mainApi from '../instances';
+import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
+import { mainApiV2 } from '../instances';
 import { getDatasource } from './requests';
 
 // Mock dependencies
@@ -13,33 +10,29 @@ vi.mock('../instances', () => ({
   default: {
     get: vi.fn(),
   },
+  mainApiV2: {
+    get: vi.fn(),
+  },
 }));
 
-// Mock the DataSourceSchema
-vi.mock('@/api/asset_interfaces/datasources', async () => {
-  const actual = await vi.importActual('@/api/asset_interfaces/datasources');
-  return {
-    ...actual,
-    DataSourceSchema: {
-      parse: vi.fn(),
-    },
-  };
-});
-
 describe('data_source requests', () => {
-  const mockDataSource = {
+  const mockDataSource: GetDataSourceResponse = {
     id: 'test-id',
     name: 'Test Database',
-    type: DataSourceTypes.postgres,
-    created_at: '2023-01-01T00:00:00.000Z',
-    updated_at: '2023-01-01T00:00:00.000Z',
-    created_by: {
+    type: 'postgres',
+    organizationId: 'org-id',
+    createdAt: '2023-01-01T00:00:00.000Z',
+    updatedAt: '2023-01-01T00:00:00.000Z',
+    deletedAt: null,
+    onboardingStatus: 'completed',
+    onboardingError: null,
+    createdBy: {
       id: 'user-id',
       name: 'Test User',
       email: 'test@example.com',
     },
     credentials: {
-      type: DataSourceTypes.postgres,
+      type: 'postgres',
       host: 'localhost',
       port: 5432,
       username: 'test_user',
@@ -47,8 +40,8 @@ describe('data_source requests', () => {
       default_database: 'test_db',
       default_schema: 'public',
     },
-    data_sets: [],
-  } satisfies DataSource;
+    datasets: [],
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -58,11 +51,11 @@ describe('data_source requests', () => {
     it('should throw an error when the API request fails', async () => {
       // Setup mock error
       const mockError = new Error('Request failed');
-      (mainApi.get as any).mockRejectedValue(mockError);
+      (mainApiV2.get as any).mockRejectedValue(mockError);
 
       // Call and expect error
       await expect(getDatasource('test-id')).rejects.toThrow('Request failed');
-      expect(mainApi.get).toHaveBeenCalledWith('/data_sources/test-id');
+      expect(mainApiV2.get).toHaveBeenCalledWith('/data-sources/test-id');
     });
   });
 });

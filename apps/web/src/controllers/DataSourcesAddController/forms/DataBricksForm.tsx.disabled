@@ -1,9 +1,6 @@
+import type { GetDataSourceResponse } from '@buster/server-shared';
 import type React from 'react';
-import {
-  type DatabricksCredentials,
-  DatabricksCredentialsSchema,
-  type DataSource,
-} from '@/api/asset_interfaces/datasources';
+import type { DatabricksCredentials } from '@/api/asset_interfaces/datasources';
 import {
   type createDatabricksDataSource,
   useCreateDatabricksDataSource,
@@ -14,7 +11,7 @@ import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const DataBricksForm: React.FC<{
-  dataSource?: DataSource;
+  dataSource?: GetDataSourceResponse;
 }> = ({ dataSource }) => {
   const { mutateAsync: createDataSource } = useCreateDatabricksDataSource();
   const { mutateAsync: updateDataSource } = useUpdateDatabricksDataSource();
@@ -31,8 +28,8 @@ export const DataBricksForm: React.FC<{
       default_catalog: credentials?.default_catalog || '',
       default_schema: credentials?.default_schema || '',
       type: 'databricks' as const,
-      name: dataSource?.name || credentials?.name || '',
-    } satisfies Parameters<typeof createDatabricksDataSource>[0],
+      name: dataSource?.name || '',
+    } as DatabricksCredentials & { name: string },
     onSubmit: async ({ value }) => {
       await dataSourceFormSubmit({
         flow,
@@ -40,11 +37,6 @@ export const DataBricksForm: React.FC<{
         onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value),
       });
-    },
-    validators: {
-      onChangeAsyncDebounceMs: 1000,
-      onChangeAsync: DatabricksCredentialsSchema,
-      onSubmit: DatabricksCredentialsSchema,
     },
   });
 

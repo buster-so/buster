@@ -10,19 +10,23 @@ import { createDoneToolDelta } from './done-tool-delta';
 import { createDoneToolStart } from './done-tool-start';
 
 // Mock database queries
-vi.mock('@buster/database/queries', () => ({
-  updateChat: vi.fn(),
-  updateMessage: vi.fn(),
-  updateMessageEntries: vi.fn().mockResolvedValue({
-    success: true,
-    sequenceNumber: 0,
-    skipped: false as const,
-  }),
-  waitForPendingUpdates: vi.fn().mockResolvedValue(undefined),
-  isMessageUpdateQueueClosed: vi.fn().mockReturnValue(false),
-  getAssetLatestVersion: vi.fn().mockResolvedValue(1),
-  closeMessageUpdateQueue: vi.fn(),
-}));
+vi.mock('@buster/database/queries', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    updateChat: vi.fn(),
+    updateMessage: vi.fn(),
+    updateMessageEntries: vi.fn().mockResolvedValue({
+      success: true,
+      sequenceNumber: 0,
+      skipped: false as const,
+    }),
+    waitForPendingUpdates: vi.fn().mockResolvedValue(undefined),
+    isMessageUpdateQueueClosed: vi.fn().mockReturnValue(false),
+    getAssetLatestVersion: vi.fn().mockResolvedValue(1),
+    closeMessageUpdateQueue: vi.fn(),
+  };
+});
 
 // Import mocked functions after the mock definition
 import {

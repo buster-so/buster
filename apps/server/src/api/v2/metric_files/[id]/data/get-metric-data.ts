@@ -1,5 +1,4 @@
 import { hasAssetPermission } from '@buster/access-controls';
-import type { Credentials } from '@buster/data-source';
 import { executeMetricQuery, getCachedMetricData, setCachedMetricData } from '@buster/data-source';
 import type { User } from '@buster/database/queries';
 import {
@@ -7,6 +6,7 @@ import {
   getDataSourceCredentials,
   getMetricWithDataSource,
 } from '@buster/database/queries';
+import type { Credentials } from '@buster/database/schema-types';
 import type { MetricDataResponse } from '@buster/server-shared/metrics';
 import { HTTPException } from 'hono/http-exception';
 

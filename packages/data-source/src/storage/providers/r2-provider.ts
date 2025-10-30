@@ -72,13 +72,6 @@ export function createR2Provider(config: R2Config): StorageProvider {
 
       // Log detailed error information for SSL/TLS issues
       if (errorMessage.includes('SSL') || errorMessage.includes('handshake')) {
-        console.error('R2 SSL Error Details:', {
-          error: errorMessage,
-          endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
-          bucket,
-          key,
-          nodeVersion: process.version,
-        });
       }
 
       return {
@@ -153,8 +146,7 @@ export function createR2Provider(config: R2Config): StorageProvider {
 
       await client.send(command);
       return true;
-    } catch (error) {
-      console.error('Error deleting from R2:', parseErrorMessage(error));
+    } catch (_error) {
       return false;
     }
   }
@@ -202,8 +194,7 @@ export function createR2Provider(config: R2Config): StorageProvider {
           return item;
         }) || []
       );
-    } catch (error) {
-      console.error('Error listing R2 objects:', parseErrorMessage(error));
+    } catch (_error) {
       return [];
     }
   }

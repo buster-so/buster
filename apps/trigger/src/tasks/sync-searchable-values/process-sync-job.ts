@@ -68,7 +68,6 @@ export const processSyncJob: ReturnType<
 
       // Step 2: Create and connect adapter
       logger.info('Creating database adapter', { dataSourceId: payload.dataSourceId });
-      // @ts-expect-error - credentials type is flexible across different database types
       adapter = await createAdapter(credentials);
       await adapter.testConnection();
 

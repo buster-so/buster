@@ -1,5 +1,5 @@
+import { DataSourceType } from '@buster/database/schema-types';
 import type { DatabaseAdapter } from '../adapters/base';
-import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,
@@ -71,8 +71,7 @@ export class MySQLIntrospector extends BaseIntrospector {
 
       this.cache.databases = { data: databases, lastFetched: new Date() };
       return databases;
-    } catch (error) {
-      console.warn('Failed to fetch MySQL databases:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -117,8 +116,7 @@ export class MySQLIntrospector extends BaseIntrospector {
       }
 
       return schemas;
-    } catch (error) {
-      console.warn('Failed to fetch MySQL schemas:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -172,16 +170,14 @@ export class MySQLIntrospector extends BaseIntrospector {
               rowCount: this.parseNumber(stats?.row_count) ?? 0,
               sizeBytes: this.parseNumber(stats?.size_bytes) ?? 0,
             };
-          } catch (error) {
-            console.warn(`Failed to get stats for table ${table.database}.${table.name}:`, error);
+          } catch (_error) {
             return table;
           }
         })
       );
 
       return tablesWithStats;
-    } catch (error) {
-      console.warn('Failed to fetch MySQL tables:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -231,8 +227,7 @@ export class MySQLIntrospector extends BaseIntrospector {
         scale: this.parseNumber(row.scale) ?? 0,
         comment: this.getString(row.comment) || '',
       }));
-    } catch (error) {
-      console.warn('Failed to fetch MySQL columns:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -262,8 +257,7 @@ export class MySQLIntrospector extends BaseIntrospector {
         database: this.getString(row.database_name) || '',
         definition: this.getString(row.definition) || '',
       }));
-    } catch (error) {
-      console.warn('Failed to fetch MySQL views:', error);
+    } catch (_error) {
       return [];
     }
   }
@@ -340,9 +334,7 @@ export class MySQLIntrospector extends BaseIntrospector {
           });
         }
       }
-    } catch (error) {
-      console.warn(`Could not get statistics for table ${table}:`, error);
-
+    } catch (_error) {
       // Fallback: create empty statistics for each column
       for (const column of columns) {
         columnStatistics.push({
@@ -687,13 +679,7 @@ ORDER BY s.column_name`;
                   column.sampleValues = stat.sampleValues ?? '';
                 }
               }
-            } catch (error) {
-              // Log warning but don't fail the entire introspection
-              console.warn(
-                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
-                error
-              );
-            }
+            } catch (_error) {}
           })
         );
       })

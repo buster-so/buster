@@ -135,8 +135,7 @@ export function createS3Provider(config: S3Config): StorageProvider {
 
       await client.send(command);
       return true;
-    } catch (error) {
-      console.error('Error deleting from S3:', parseErrorMessage(error));
+    } catch (_error) {
       return false;
     }
   }
@@ -184,8 +183,7 @@ export function createS3Provider(config: S3Config): StorageProvider {
           return item;
         }) || []
       );
-    } catch (error) {
-      console.error('Error listing S3 objects:', parseErrorMessage(error));
+    } catch (_error) {
       return [];
     }
   }
