@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/inputs';
 import { AppModal } from '@/components/ui/modal';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { inputHasText } from '@/lib/text';
+
 export const NewCollectionModal: React.FC<{
   open: boolean;
   onClose: () => void;

@@ -47,8 +47,28 @@ export const GetAssetsRequestQuerySchema = z
       }, z.boolean())
       .default(false)
       .optional(),
+    pinCollections: z
+      .preprocess((val) => {
+        if (typeof val === 'string') {
+          return val.toLowerCase() === 'true';
+        }
+        return Boolean(val);
+      }, z.boolean())
+      .optional(),
   })
-  .merge(PaginatedRequestSchema);
+  .merge(PaginatedRequestSchema)
+  .refine(
+    (data) => {
+      if (data.pinCollections === true) {
+        return data.groupBy === 'none' || data.groupBy === undefined;
+      }
+      return true;
+    },
+    {
+      message: 'Cannot set pinCollections to true if groupBy is already set',
+      path: ['pinCollections'],
+    }
+  );
 
 export type GetAssetsRequestQuery = z.infer<typeof GetAssetsRequestQuerySchema>;
 

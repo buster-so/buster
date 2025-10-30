@@ -8,6 +8,7 @@ export type IDropdownItem<
   TOptions = unknown,
   TFrom extends string = string,
 > = {
+  type?: 'item';
   label: React.ReactNode | string;
   truncate?: boolean;
   searchLabel?: string; // Used for filtering

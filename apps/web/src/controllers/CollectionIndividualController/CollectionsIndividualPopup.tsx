@@ -1,19 +1,20 @@
+import type { ShareAssetType } from '@buster/server-shared/share';
 import React from 'react';
 import { useGetCollection, useRemoveAssetFromCollection } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
 import { Trash } from '@/components/ui/icons';
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
+import { ListSelectedOptionPopupContainer } from '@/components/ui/list/BusterListNew';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 export const CollectionIndividualSelectedPopup: React.FC<{
-  selectedRowKeys: string[];
+  selectedRowKeys: Set<string>;
   collectionId: string;
-  onSelectChange: (selectedRowKeys: string[]) => void;
+  onSelectChange: (selectedRowKeys: Set<string>) => void;
 }> = React.memo(({ selectedRowKeys, onSelectChange, collectionId }) => {
-  const show = selectedRowKeys.length > 0;
+  const show = selectedRowKeys.size > 0;
 
   return (
-    <BusterListSelectedOptionPopupContainer
+    <ListSelectedOptionPopupContainer
       selectedRowKeys={selectedRowKeys}
       onSelectChange={onSelectChange}
       buttons={[
@@ -32,9 +33,9 @@ export const CollectionIndividualSelectedPopup: React.FC<{
 CollectionIndividualSelectedPopup.displayName = 'CollectionIndividualSelectedPopup';
 
 const CollectionDeleteButton: React.FC<{
-  selectedRowKeys: string[];
+  selectedRowKeys: Set<string>;
   collectionId: string;
-  onSelectChange: (selectedRowKeys: string[]) => void;
+  onSelectChange: (selectedRowKeys: Set<string>) => void;
 }> = ({ selectedRowKeys, collectionId }) => {
   const { mutateAsync: removeAssetFromCollection } = useRemoveAssetFromCollection();
   const { data: collection } = useGetCollection(collectionId);
@@ -44,11 +45,11 @@ const CollectionDeleteButton: React.FC<{
       await removeAssetFromCollection({
         id: collectionId,
         assets: (collection.assets || [])?.reduce<
-          { type: 'metric_file' | 'dashboard_file'; id: string }[]
+          { type: Exclude<ShareAssetType, 'collection'>; id: string }[]
         >((result, asset) => {
-          if (selectedRowKeys.includes(asset.id)) {
+          if (selectedRowKeys.has(asset.id)) {
             result.push({
-              type: asset.asset_type as 'metric_file' | 'dashboard_file',
+              type: asset.asset_type as Exclude<ShareAssetType, 'collection'>,
               id: asset.id,
             });
           }

@@ -1,5 +1,5 @@
 import { getUserOrganizationId, listPermissionedLibraryAssets } from '@buster/database/queries';
-import type { AssetListItem } from '@buster/database/schema-types';
+import type { AssetListItem, GroupedAssetsKeys } from '@buster/database/schema-types';
 import { getAssetScreenshotSignedUrl } from '@buster/search';
 import { type AssetGetResponse, GetAssetsRequestQuerySchema } from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
@@ -20,6 +20,7 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
     groupBy,
     query,
     includeAssetChildren,
+    pinCollections,
   } = c.req.valid('query');
   const user = c.get('busterUser');
 
@@ -44,6 +45,7 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
       groupBy,
       query,
       includeAssetChildren,
+      pinCollections,
     });
 
     // Helper function to convert screenshot bucket keys to signed URLs
@@ -69,8 +71,11 @@ const app = new Hono().get('/', zValidator('query', GetAssetsRequestQuerySchema)
     let response: AssetGetResponse;
     if ('groups' in dbResponse) {
       // Grouped response
-      const groupsWithUrls: Record<string, AssetListItem[]> = {};
-      for (const [groupKey, assets] of Object.entries(dbResponse.groups)) {
+      const groupsWithUrls: Partial<Record<GroupedAssetsKeys, AssetListItem[]>> = {};
+      for (const [groupKey, assets] of Object.entries(dbResponse.groups) as [
+        GroupedAssetsKeys,
+        AssetListItem[],
+      ][]) {
         groupsWithUrls[groupKey] = await Promise.all(assets.map(convertScreenshotUrl));
       }
       response = {

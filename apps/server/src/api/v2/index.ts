@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 
 import healthcheckRoutes from '../healthcheck';
+import apiKeysRoutes from './api_keys';
 import authRoutes from './auth';
 import chatsRoutes from './chats';
 import dashboardRoutes from './dashboards';
@@ -30,6 +31,7 @@ import { tools } from './tools';
 import userRoutes from './users';
 
 const app = new Hono()
+  .route('/api_keys', apiKeysRoutes)
   .route('/auth', authRoutes)
   .route('/users', userRoutes)
   .route('/data-sources', dataSources)

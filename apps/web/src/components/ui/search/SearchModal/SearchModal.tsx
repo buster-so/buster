@@ -16,7 +16,11 @@ const SearchModalBase = <M = unknown, T extends string = string>({
       <DialogDescription hidden>{'This modal is used to search for items'}</DialogDescription>
       <DialogContent
         showClose={false}
-        className={cn('overflow-hidden max-w-fit max-h-fit', className)}
+        className={cn(
+          'overflow-hidden max-w-fit max-h-fit',
+          '!top-[15vh] !translate-y-0',
+          className
+        )}
       >
         <SearchModalContent {...props} open={open} />
       </DialogContent>

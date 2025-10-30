@@ -141,7 +141,7 @@ function BusterListVirtuaComponent<T = unknown>({
           )}
 
           {!showEmptyState && (
-            <VList overscan={10}>
+            <VList>
               {rows.map((row, index) => (
                 <div key={row.id + index.toString()} style={{ height: itemSize(index) }}>
                   <BusterListRowComponentSelector<T>

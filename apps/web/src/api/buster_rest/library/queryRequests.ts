@@ -7,6 +7,8 @@ import { libraryQueryKeys } from '@/api/query_keys/library';
 import { useInfiniteScroll } from '@/api/query-helpers';
 import { getLibraryAssets } from './requests';
 
+const DEFAULT_PAGE_SIZE = 100;
+
 export const useGetLibraryAssets = (filters: GetLibraryAssetsRequestQuery) => {
   return useQuery({
     ...libraryQueryKeys.libraryGetList(filters),
@@ -16,18 +18,25 @@ export const useGetLibraryAssets = (filters: GetLibraryAssetsRequestQuery) => {
 
 export const useLibraryAssetsInfinite = ({
   scrollConfig,
+  mounted = true,
+  enabled = true,
+  page_size = DEFAULT_PAGE_SIZE,
   ...params
-}: Omit<GetLibraryAssetsRequestQuery, 'page'> & {
+}: Omit<GetLibraryAssetsRequestQuery, 'page' | 'page_size'> & {
+  page_size?: number;
   scrollConfig?: Parameters<typeof useInfiniteScroll>[0]['scrollConfig'];
+  mounted?: boolean;
+  enabled?: boolean;
 }) => {
   return useInfiniteScroll<LibraryAssetListItem>({
-    queryKey: ['library', 'get', 'list-infinite', params] as const,
-    staleTime: 1000 * 40, // 40 seconds
+    ...libraryQueryKeys.libraryGetListInfinite(params),
     queryFn: ({ pageParam = 1 }) => {
-      return getLibraryAssets({ ...params, page: pageParam });
+      return getLibraryAssets({ ...params, page_size, page: pageParam });
     },
     placeholderData: keepPreviousData,
     scrollConfig,
+    mounted,
+    enabled,
   });
 };
 
@@ -43,11 +52,14 @@ export const prefetchGetLibraryAssets = async (
 
 export const prefetchGetLibraryAssetsInfinite = async (
   queryClient: QueryClient,
-  filters: Omit<GetLibraryAssetsRequestQuery, 'page'>
+  filters: Omit<GetLibraryAssetsRequestQuery, 'page' | 'page_size'> & {
+    page_size?: number;
+  }
 ) => {
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ['library', 'get', 'list-infinite', filters] as const,
-    queryFn: () => getLibraryAssets({ ...filters, page: 1 }),
+    ...libraryQueryKeys.libraryGetListInfinite(filters),
+    queryFn: () =>
+      getLibraryAssets({ ...filters, page_size: filters.page_size ?? DEFAULT_PAGE_SIZE, page: 1 }),
     initialPageParam: 1,
   });
 };

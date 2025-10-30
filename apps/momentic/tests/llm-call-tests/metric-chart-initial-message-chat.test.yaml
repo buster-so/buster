@@ -2,7 +2,7 @@ fileType: momentic/test
 id: f7b5d41e-5c3d-4210-b2d8-70d294b26d85
 name: metric-chart-initial-message-chat
 description: The user should be able to ask in a chat, "How many customers do we
-  have" as an initial message and it should return a metric.
+  have. Make a single metric. Not a report, not a dashboard. Just a single metric." as an initial message and it should return a metric.
 schemaVersion: 1.0.21
 advanced:
   viewport:
@@ -32,7 +32,7 @@ steps:
       target:
         type: description
         elementDescriptor: the textbox with placeholder 'Ask Buster a question...'
-      value: How many customers do we have?
+      value: How many customers do we have. Make a single metric. Not a report, not a dashboard. Just a single metric.
   - id: 85c6ef6b-8b90-4941-9893-cfaf145ce06a
     type: PRESET_ACTION
     command:

@@ -4,18 +4,17 @@ import { Button } from '../buttons';
 import { SidebarLeft } from '../icons';
 import { AppTooltip } from '../tooltip';
 import { COLLAPSED_COLUMN } from './config';
+import { useSidebarOnCollapseClick } from './SidebarContext';
 
 interface SidebarFooterProps extends PropsWithChildren {
   className?: string;
   useCollapsible?: boolean;
-  onCollapseClick: () => void;
 }
 
 export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   children,
   className,
   useCollapsible,
-  onCollapseClick,
 }) => {
   return (
     <div
@@ -27,16 +26,15 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       data-testid="sidebar-footer"
     >
       {children}
-      {useCollapsible && <CollapseButton onClick={onCollapseClick} />}
+      {useCollapsible && <CollapseButton />}
     </div>
   );
 };
 
 SidebarFooter.displayName = 'SidebarFooter';
 
-const CollapseButton: React.FC<{
-  onClick: () => void;
-}> = React.memo(({ onClick }) => {
+const CollapseButton = React.memo(() => {
+  const onCollapseClick = useSidebarOnCollapseClick();
   return (
     <AppTooltip title="Toggle sidebar" delayDuration={350}>
       <Button
@@ -45,7 +43,7 @@ const CollapseButton: React.FC<{
         className="text-md!"
         size={'tall'}
         prefix={<SidebarLeft />}
-        onClick={onClick}
+        onClick={onCollapseClick}
       />
     </AppTooltip>
   );

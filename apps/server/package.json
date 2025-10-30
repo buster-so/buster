@@ -40,13 +40,14 @@
     "@electric-sql/client": "catalog:",
     "@hono/zod-validator": "^0.7.4",
     "@supabase/supabase-js": "catalog:",
-    "@trigger.dev/sdk": "4.0.4",
+    "@trigger.dev/sdk": "catalog:",
     "ai": "catalog:",
     "dayjs": "catalog:",
     "drizzle-orm": "catalog:",
     "hono": "catalog:",
     "hono-pino": "^0.10.3",
     "js-yaml": "catalog:",
+    "jsonwebtoken": "^9.0.2",
     "lodash-es": "catalog:",
     "pino": "^9.10.0",
     "pino-pretty": "^13.1.2",
@@ -56,6 +57,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "catalog:",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash-es": "^4.17.12"
   }
 }
