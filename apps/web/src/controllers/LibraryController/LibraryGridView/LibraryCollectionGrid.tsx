@@ -6,9 +6,9 @@ import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { AssetGridSectionContainer } from '@/components/features/list/AssetList';
 import { AssetGridCardSmall } from '@/components/features/list/AssetList/AssetGridViewList/AssetGridCardSmall';
 import {
-  ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuRoot,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { Trash } from '@/components/ui/icons';
@@ -45,7 +45,7 @@ const CollectionCardContextMenu = React.memo(
     const { mutateAsync: onDeleteCollection } = useDeleteCollection();
 
     return (
-      <ContextMenu modal={false}>
+      <ContextMenuRoot modal={false}>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
         <ContextMenuContent className="p-1 border rounded">
           <ContextMenuItem
@@ -55,7 +55,7 @@ const CollectionCardContextMenu = React.memo(
             Delete
           </ContextMenuItem>
         </ContextMenuContent>
-      </ContextMenu>
+      </ContextMenuRoot>
     );
   }
 );

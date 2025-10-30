@@ -80,7 +80,7 @@ export const AccessDropdown: React.FC<AccessDropdownProps> = React.memo(
         case 'none':
           return 'Not shared';
         default: {
-          const _exhaustiveCheck: never = value;
+          const _exhaustiveCheck: never | undefined = value;
           return value;
         }
       }

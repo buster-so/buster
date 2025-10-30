@@ -1,14 +1,14 @@
-import type { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
 import React from 'react';
 import { cn } from '@/lib/classMerge';
 import CircleSpinnerLoader from '../loaders/CircleSpinnerLoader';
+import { menuItemKey } from '../menu-shared';
 import {
   ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem as ContextMenuItemPrimitive,
   ContextMenuLink,
   ContextMenuPortal,
-  ContextMenu as ContextMenuPrimitive,
+  ContextMenuRoot,
   //   ContextMenuLabel,
   //   ContextMenuRadioGroup,
   //   ContextMenuRadioItem,
@@ -19,55 +19,28 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from './ContextBase';
-
-export interface ContextMenuItem {
-  label: React.ReactNode | string;
-  truncate?: boolean;
-  secondaryLabel?: string;
-  showIndex?: boolean;
-  shortcut?: string;
-  onClick?: () => void;
-  icon?: React.ReactNode;
-  disabled?: boolean;
-  loading?: boolean;
-  selected?: boolean; //if a boolean is provided, it will render a checkboxitem component
-  items?: ContextMenuItems;
-  link?: string;
-  linkIcon?: 'arrow-right' | 'arrow-external' | 'caret-right';
-}
-
-export interface ContextMenuDivider {
-  type: 'divider';
-}
-
-export type ContextMenuItems = (ContextMenuItem | ContextMenuDivider | React.ReactNode)[];
-
-export interface ContextMenuProps extends ContextMenuPropsRadix {
-  items: ContextMenuItems;
-  className?: string;
-  disabled?: boolean;
-}
-
-const contextMenuItemKey = (item: ContextMenuItems[number], index: number) => {
-  if ((item as ContextMenuDivider).type === 'divider') return `divider-${index}`;
-  return `item-${index}`;
-};
+import type {
+  ContextMenuDivider,
+  ContextMenuItem,
+  ContextMenuItems,
+  ContextMenuProps,
+} from './contextMenu.types';
 
 export const ContextMenu: React.FC<ContextMenuProps> = React.memo(
   ({ items, className, disabled, children, dir, modal }) => {
     return (
-      <ContextMenuPrimitive dir={dir} modal={modal}>
+      <ContextMenuRoot dir={dir} modal={modal}>
         <ContextMenuTrigger disabled={disabled} asChild>
           {children}
         </ContextMenuTrigger>
         <ContextMenuContent className={cn('max-w-72 min-w-44', className)}>
           {items.map((item, index) => (
-            <React.Fragment key={contextMenuItemKey(item, index)}>
+            <React.Fragment key={menuItemKey(item, index)}>
               <ContextMenuItemSelector item={item} index={index} />
             </React.Fragment>
           ))}
         </ContextMenuContent>
-      </ContextMenuPrimitive>
+      </ContextMenuRoot>
     );
   }
 );
@@ -162,7 +135,7 @@ const ContextSubMenuWrapper = React.memo(
         <ContextMenuPortal>
           <ContextMenuSubContent>
             {items?.map((item, index) => (
-              <React.Fragment key={contextMenuItemKey(item, index)}>
+              <React.Fragment key={menuItemKey(item, index)}>
                 <ContextMenuItemSelector item={item} index={index} />
               </React.Fragment>
             ))}

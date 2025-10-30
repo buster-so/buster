@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as React from 'react';
 import { useMemo } from 'react';
-import type { ContextMenuProps } from '../../context-menu/ContextMenu';
+import type { ContextMenuProps } from '../../context-menu';
 import { BusterList } from './index';
 import type { BusterListColumn, BusterListRowItem } from './interfaces';
 

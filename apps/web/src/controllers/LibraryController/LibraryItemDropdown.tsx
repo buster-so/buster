@@ -1,9 +1,9 @@
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import { useDeleteLibraryAssets } from '@/api/buster_rest/library';
 import {
-  ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuRoot,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { Trash } from '@/components/ui/icons';
@@ -16,7 +16,7 @@ export const LibraryItemContextMenu: React.FC<React.PropsWithChildren<LibraryAss
   const { mutateAsync: onDeleteLibraryAsset, isPending } = useDeleteLibraryAssets();
 
   return (
-    <ContextMenu modal={false}>
+    <ContextMenuRoot modal={false}>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="p-1 border rounded">
         <ContextMenuItem
@@ -26,6 +26,6 @@ export const LibraryItemContextMenu: React.FC<React.PropsWithChildren<LibraryAss
           Delete
         </ContextMenuItem>
       </ContextMenuContent>
-    </ContextMenu>
+    </ContextMenuRoot>
   );
 };
