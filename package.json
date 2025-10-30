@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",
+    "@rolldown/binding-darwin-arm64": "1.0.0-beta.45",
     "@types/node": "^22.18.1",
     "tsx": "catalog:",
     "turbo": "^2.5.8",
