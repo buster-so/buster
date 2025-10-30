@@ -260,7 +260,7 @@ const AssetGridGroupedView = ({
               style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
             >
               {item.items.map((asset) => (
-                <AssetGridItem key={asset.asset_id} {...asset} ContextMenu={ContextMenu} />
+                <AssetGridItem key={asset.asset_id} {...asset} />
               ))}
             </div>
           </div>
@@ -333,7 +333,7 @@ const AssetGridUngroupedView = ({
                 style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
               >
                 {slicedItems.map((asset) => (
-                  <AssetGridItem key={asset.asset_id} {...asset} ContextMenu={ContextMenu} />
+                  <AssetGridItem key={asset.asset_id} {...asset} />
                 ))}
               </div>
             </div>

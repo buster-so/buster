@@ -107,6 +107,7 @@ export const AssetListViewList = ({
   isFetchingNextPage,
   scrollContainerRef,
   emptyContent,
+  ContextMenu,
 }: AssetListViewListProps) => {
   const rows: BusterListRow<AssetListItem>[] = useMemo(() => {
     const allRows: BusterListRow<AssetListItem>[] = [...(prelistItems ?? [])];
