@@ -108,7 +108,7 @@ export function createDoneTool(context: DoneToolContext) {
 
   return tool({
     description:
-      "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
+      "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. REQUIRED PARAMETERS: (1) assetsToReturn - Array of assets (metrics, dashboards, reports) to return to the user. Each asset must include: assetId (UUID), assetName, assetType, and versionNumber. Return top-level assets only (e.g., if a metric is part of a dashboard, return the dashboard, not the metric). (2) finalResponse - Your final message to the user formatted in Markdown. Use bullet points or appropriate formatting. Do not include headers or the '•' bullet character.",
     inputSchema: DoneToolInputSchema,
     outputSchema: DoneToolOutputSchema,
     execute,
