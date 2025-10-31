@@ -9,6 +9,7 @@ import { canEdit, canFilter, getIsEffectiveOwner } from '@/lib/share';
 import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
 import {
   useAddContentToDashboardSelectMenu,
+  useDashboardShareMenuSelectMenu,
   useDashboardVersionHistorySelectMenu,
   useDeleteDashboardSelectMenu,
   useEditDashboardWithAI,
@@ -16,7 +17,6 @@ import {
   useFilterDashboardSelectMenu,
   useOpenFullScreenDashboard,
   useRenameDashboardSelectMenu,
-  useShareMenuSelectMenu,
 } from './threeDotMenuHooks';
 
 export const DashboardThreeDotMenu = React.memo(
@@ -48,7 +48,7 @@ export const DashboardThreeDotMenu = React.memo(
       dashboardId,
       dashboardVersionNumber,
     });
-    const shareMenu = useShareMenuSelectMenu({ dashboardId, dashboardVersionNumber });
+    const shareMenu = useDashboardShareMenuSelectMenu({ dashboardId, dashboardVersionNumber });
     const addContentToDashboardMenu = useAddContentToDashboardSelectMenu();
     const filterDashboardMenu = useFilterDashboardSelectMenu();
     const { data: permission } = useGetDashboard(

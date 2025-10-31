@@ -1,19 +1,10 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
-import {
-  useDeleteChat,
-  useDuplicateChat,
-  useGetChat,
-  useRemoveChatFromCollections,
-  useSaveChatToCollections,
-} from '@/api/buster_rest/chats';
-import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
-import { useFavoriteStar } from '@/components/features/favorites';
-import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
-import { createDropdownItem, DropdownContent, type IDropdownItem } from '@/components/ui/dropdown';
-import { ArrowRight, DuplicatePlus, Pencil, ShareRight, Star, Trash } from '@/components/ui/icons';
-import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
+import { createFavoriteMenuItem, useFavoriteStar } from '@/components/features/favorites';
+import { createDropdownItem } from '@/components/ui/dropdown';
+import { ArrowRight, DuplicatePlus, Pencil, ShareRight, Trash } from '@/components/ui/icons';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { ensureElementExists } from '@/lib/element';
 import { getIsEffectiveOwner } from '@/lib/share';
@@ -21,7 +12,7 @@ import { timeout } from '@/lib/timeout';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 import { CHAT_HEADER_TITLE_ID } from './ChatHeaderTitle';
 
-export const useShareMenuSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
+export const useChatShareMenuSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
   const { data: shareAssetConfig } = useGetChat({ id: chatId }, { select: getShareAssetConfig });
   const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);
 
@@ -86,12 +77,9 @@ export const useFavoriteChatSelectMenu = ({ chatId = '' }: { chatId: string | un
   });
 
   return useMemo(() => {
-    return createDropdownItem({
-      label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-      value: 'add-to-favorites',
-      icon: isFavorited ? <StarFilled /> : <Star />,
-      onClick: () => onFavoriteClick(),
-      closeOnSelect: false,
+    return createFavoriteMenuItem({
+      isFavorited,
+      onFavoriteClick,
     });
   }, [isFavorited, onFavoriteClick]);
 };

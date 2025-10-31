@@ -4,6 +4,7 @@ import React from 'react';
 import { fn } from 'storybook/test';
 import { Button } from '../buttons/Button';
 import { PaintRoller, Star, Storage } from '../icons';
+import { Window, WindowSettings, WindowUser } from '../icons/NucleoIconOutlined';
 import { Dropdown } from './Dropdown';
 import type { IDropdownItems } from './dropdown-items.types';
 
@@ -91,6 +92,37 @@ export const WithIconsAndShortcuts: Story = {
       },
     ],
     children: <Button>Menu with Icons</Button>,
+  },
+};
+
+// Example with dividers and shortcuts
+export const WithDividersAndShortcuts: Story = {
+  args: {
+    items: [
+      {
+        value: 'profile',
+        label: 'Profile',
+        onClick: fn(),
+        icon: <WindowUser />,
+        shortcut: '⌘P',
+      },
+      {
+        value: 'settings',
+        label: 'Settings',
+        onClick: fn(),
+        icon: <WindowSettings />,
+        shortcut: '⌘S',
+      },
+      { type: 'divider' },
+      {
+        value: 'logout',
+        label: 'Logout',
+        onClick: fn(),
+        icon: <Window />,
+        shortcut: '⌘L',
+      },
+    ],
+    children: <Button>Menu with Dividers</Button>,
   },
 };
 

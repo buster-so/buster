@@ -1,7 +1,6 @@
 import type { RegisteredRouter } from '@tanstack/react-router';
 import type React from 'react';
 import type { ILinkProps } from '@/types/routes';
-import type { ContextMenuProps } from '../../context-menu/ContextMenu';
 
 export interface BusterListProps<T = unknown> {
   columns: BusterListColumn<T>[];
@@ -11,7 +10,7 @@ export interface BusterListProps<T = unknown> {
   emptyState?: undefined | React.ReactNode | string;
   showHeader?: boolean;
   selectedRowKeys?: Set<string>;
-  contextMenu?: ContextMenuProps;
+  ContextMenu?: React.ComponentType<React.PropsWithChildren<T>>;
   showSelectAll?: boolean;
   rowClassName?: string;
   className?: string;

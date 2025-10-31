@@ -1,4 +1,4 @@
-import type { GroupedAssets } from '@buster/server-shared/library';
+import type { GroupedAssets, LibraryAssetListItem } from '@buster/server-shared/library';
 import type React from 'react';
 import { useMemo, useState } from 'react';
 import { assetTypeToIcon } from '@/components/features/icons/assetIcons';
@@ -21,10 +21,10 @@ import { assetTypeLabel } from '@/lib/assets/asset-translations';
 import { cn } from '@/lib/classMerge';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
-import type { AssetListItem, AssetListViewListProps } from '../AssetList.types';
+import type { AssetListViewListProps } from '../AssetList.types';
 import { getGroupMetadata } from '../grouping-meta-helpers';
 
-const NameComponent = (name: string, record: AssetListItem) => {
+const NameComponent = (name: string, record: LibraryAssetListItem) => {
   const Icon = assetTypeToIcon(record.asset_type || 'collection');
   const imageUrl = record.screenshot_url ?? getScreenshotSkeleton(record.asset_type);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -32,7 +32,7 @@ const NameComponent = (name: string, record: AssetListItem) => {
   return (
     <span className="flex gap-1.5 items-center w-full">
       <AppTooltip title={assetTypeLabel(record.asset_type)}>
-        <span className="text-icon-color flex-shrink-0">
+        <span className="text-icon-color shrink-0">
           <Icon />
         </span>
       </AppTooltip>
@@ -60,7 +60,7 @@ const NameComponent = (name: string, record: AssetListItem) => {
   );
 };
 
-const columns: BusterListColumn<AssetListItem>[] = [
+const columns: BusterListColumn<LibraryAssetListItem>[] = [
   {
     dataIndex: 'name',
     title: 'Name',
@@ -88,7 +88,7 @@ const columns: BusterListColumn<AssetListItem>[] = [
   },
 ];
 
-const createAssetListItem = createListItem<AssetListItem>();
+const createAssetListItem = createListItem<LibraryAssetListItem>();
 
 const RowTitle = ({ icon, title }: { icon: React.ReactNode; title: string }) => {
   return (
@@ -107,9 +107,10 @@ export const AssetListViewList = ({
   isFetchingNextPage,
   scrollContainerRef,
   emptyContent,
+  ContextMenu,
 }: AssetListViewListProps) => {
-  const rows: BusterListRow<AssetListItem>[] = useMemo(() => {
-    const allRows: BusterListRow<AssetListItem>[] = [...(prelistItems ?? [])];
+  const rows: BusterListRow<LibraryAssetListItem>[] = useMemo(() => {
+    const allRows: BusterListRow<LibraryAssetListItem>[] = [...(prelistItems ?? [])];
 
     if (
       groupBy === 'asset_type' ||
@@ -182,6 +183,7 @@ export const AssetListViewList = ({
       scrollParentRef={scrollContainerRef}
       rows={rows}
       columns={columns}
+      ContextMenu={ContextMenu}
       infiniteScrollConfig={infiniteScrollConfig}
       hideLastRowBorder={false}
       showSelectAll={true}

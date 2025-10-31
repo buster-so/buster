@@ -1,5 +1,9 @@
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
+import { fn } from 'storybook/test';
+import { Button } from '../buttons/Button';
+import { PaintRoller, Star, Storage } from '../icons';
 import {
   CircleCopy,
   File,
@@ -10,6 +14,7 @@ import {
   WindowUser,
 } from '../icons/NucleoIconOutlined';
 import { ContextMenu } from './ContextMenu';
+import type { ContextMenuItems } from './contextMenu.types';
 
 const meta: Meta<typeof ContextMenu> = {
   title: 'UI/Context/ContextMenu',
@@ -34,30 +39,78 @@ export const Basic: Story = {
   args: {
     items: [
       {
-        label: 'Edit',
-        onClick: () => alert('Edit clicked'),
-        icon: <WindowEdit />,
+        value: '1',
+        label: 'Profile',
+        onClick: fn(),
+        loading: false,
+        icon: <PaintRoller />,
       },
       {
+        value: '2',
         label: 'Settings',
-        onClick: () => alert('Settings clicked'),
-        icon: <WindowSettings />,
+        onClick: fn(),
+        shortcut: '⌘S',
       },
       {
+        value: '3',
         label: 'Logout',
-        onClick: () => alert('Logout clicked'),
-        icon: <Window />,
+        onClick: fn(),
+        items: [
+          {
+            value: '3-1',
+            label: 'Testing 123',
+          },
+          {
+            value: '3-2',
+            label: 'Testing 456',
+          },
+        ],
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with icons and shortcuts
+export const WithIconsAndShortcuts: Story = {
+  args: {
+    menuHeader: 'Menu Options',
+    items: [
+      {
+        value: '1',
+        label: 'Profile',
+        icon: '👤',
+        shortcut: '⌘P',
+        onClick: fn(),
+      },
+      {
+        value: '2',
+        label: 'Settings',
+        icon: '⚙️',
+        shortcut: '⌘S',
+        onClick: fn(),
+      },
+      {
+        value: '3',
+        label: 'Logout',
+        icon: '🚪',
+        shortcut: '⌘L',
+        onClick: fn(),
+      },
+    ],
+  },
+  render: (args) => (
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
@@ -66,88 +119,83 @@ export const WithDividersAndShortcuts: Story = {
   args: {
     items: [
       {
+        value: 'profile',
         label: 'Profile',
-        onClick: () => alert('Profile clicked'),
+        onClick: fn(),
         icon: <WindowUser />,
         shortcut: '⌘P',
       },
       {
+        value: 'settings',
         label: 'Settings',
-        onClick: () => alert('Settings clicked'),
+        onClick: fn(),
         icon: <WindowSettings />,
         shortcut: '⌘S',
       },
       { type: 'divider' },
       {
+        value: 'logout',
         label: 'Logout',
-        onClick: () => alert('Logout clicked'),
+        onClick: fn(),
         icon: <Window />,
         shortcut: '⌘L',
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
 // Example with nested items
 export const WithNestedItems: Story = {
   args: {
+    menuHeader: 'Nested Menu',
     items: [
       {
-        label: 'File',
-        icon: <File />,
+        value: '1',
+        label: 'Main Options',
         items: [
           {
-            label: 'New',
-            onClick: () => alert('New file clicked'),
+            value: '1-1',
+            label: 'Option 1',
+            onClick: fn(),
           },
           {
-            label: 'Open',
-            onClick: () => alert('Open file clicked'),
-          },
-          {
-            label: 'Save',
-            onClick: () => alert('Save file clicked'),
-            shortcut: '⌘S',
+            value: '1-2',
+            label: 'Option 2',
+            onClick: fn(),
           },
         ],
       },
       {
-        label: 'Edit',
-        icon: <WindowEdit />,
+        value: '2',
+        label: 'More Options',
         items: [
           {
-            label: 'Copy',
-            onClick: () => alert('Copy clicked'),
-            icon: <CircleCopy />,
-            shortcut: '⌘C',
+            value: '2-1',
+            label: 'Sub Option 1',
+            onClick: fn(),
           },
           {
-            label: 'Delete',
-            onClick: () => alert('Delete clicked'),
-            icon: <Window />,
-            shortcut: '⌫',
+            value: '2-2',
+            label: 'Sub Option 2',
+            onClick: fn(),
           },
         ],
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
@@ -156,31 +204,55 @@ export const WithDisabledItems: Story = {
   args: {
     items: [
       {
-        label: 'Edit',
-        onClick: () => alert('Edit clicked'),
-        icon: <WindowEdit />,
+        value: '1',
+        label: 'Available Option',
+        onClick: fn(),
       },
       {
-        label: 'Delete',
-        onClick: () => alert('Delete clicked'),
-        icon: <Window />,
+        value: '2',
+        label: 'Disabled Option',
         disabled: true,
+        onClick: fn(),
       },
       {
-        label: 'Download',
-        onClick: () => alert('Download clicked'),
-        icon: <WindowDownload />,
+        value: '3',
+        label: 'Another Available',
+        onClick: fn(),
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with custom widths
+export const CustomWidth: Story = {
+  args: {
+    menuHeader: 'Custom Width Menu',
+    items: [
+      {
+        value: '1',
+        label: 'This is a very long menu item that might need wrapping',
+        onClick: fn(),
+      },
+      {
+        value: '2',
+        label: 'Short item',
+        onClick: fn(),
+      },
+    ],
+  },
+  render: (args) => (
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
@@ -189,247 +261,721 @@ export const WithLoadingItems: Story = {
   args: {
     items: [
       {
+        value: '1',
         label: 'Normal Item',
-        onClick: () => alert('Normal clicked'),
+        onClick: fn(),
       },
       {
+        value: '2',
         label: 'Loading Item',
         loading: true,
-        onClick: () => alert('Loading clicked'),
+        onClick: fn(),
+      },
+      {
+        value: '3',
+        label: 'Another Normal',
+        onClick: fn(),
       },
       { type: 'divider' },
       {
-        label: 'Another Item',
-        onClick: () => alert('Another clicked'),
+        value: '4',
+        label: 'Option 4',
+        onClick: fn(),
+      },
+      {
+        value: '5',
+        label: 'Option 5',
+        onClick: fn(),
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
 // Example with selection
-export const WithSelection: Story = {
+export const WithSelectionSingle: Story = {
   args: {
+    selectType: 'single',
     items: [
       {
+        value: '1',
         label: 'Option 1',
-        onClick: () => alert('Option 1 clicked'),
         selected: false,
+        onClick: fn(),
       },
       {
+        value: '2',
         label: 'Option 2',
-        onClick: () => alert('Option 2 clicked'),
-        selected: true,
+        onClick: fn(),
       },
       {
-        label: 'Option 3',
-        onClick: () => alert('Option 3 clicked'),
-        selected: false,
+        value: '3',
+        label: 'Option 3 - Selected',
+        onClick: fn(),
+        selected: true,
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled} selectType={args.selectType}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
-// Example with secondary labels and truncation
-export const WithSecondaryLabels: Story = {
+export const WithSelectionMultiple: Story = {
+  render: () => {
+    const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set(['3']));
+
+    const items: ContextMenuItems = [
+      {
+        value: '1',
+        label: 'Option 1',
+        selected: selectedIds.has('1'),
+        onClick: fn(),
+      },
+      {
+        value: '2',
+        label: 'Option 2',
+        selected: selectedIds.has('2'),
+        onClick: fn(),
+      },
+      {
+        value: '3',
+        label: 'Option 3',
+        selected: selectedIds.has('3'),
+        onClick: fn(),
+      },
+      { type: 'divider' as const },
+      {
+        value: '4',
+        label: 'Option 4',
+        selected: selectedIds.has('4'),
+        onClick: fn(),
+      },
+      {
+        value: '5',
+        label: 'Option 5',
+        selected: selectedIds.has('5'),
+        onClick: fn(),
+      },
+    ];
+
+    const handleSelect = (itemId: string) => {
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(itemId)) {
+          newSet.delete(itemId);
+        } else {
+          newSet.add(itemId);
+        }
+        return newSet;
+      });
+    };
+
+    return (
+      <ContextMenu
+        selectType="multiple"
+        items={items}
+        menuHeader={'Search items...'}
+        onSelect={handleSelect}
+      >
+        <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+          Right-click here to open context menu!
+        </div>
+      </ContextMenu>
+    );
+  },
+};
+
+// Example with secondary labels
+export const WithSecondaryLabel: Story = {
   args: {
+    menuHeader: 'Items with Secondary Labels',
     items: [
       {
-        label: 'Document 1',
-        secondaryLabel: 'Last edited 2 days ago',
-        onClick: () => alert('Document 1 clicked'),
-        icon: <File />,
+        value: '1',
+        label: 'Profile Settings',
+        secondaryLabel: 'User preferences',
+        onClick: fn(),
       },
       {
-        label: 'Document with a very long name that should be truncated',
-        secondaryLabel: 'Last edited yesterday',
-        truncate: true,
-        onClick: () => alert('Document 2 clicked'),
-        icon: <File />,
+        value: '2',
+        label: 'Storage',
+        secondaryLabel: '45GB used',
+        onClick: fn(),
+        selected: true,
       },
+      { type: 'divider' },
       {
-        label: 'Document 3',
-        secondaryLabel: 'Last edited just now',
-        onClick: () => alert('Document 3 clicked'),
-        icon: <File />,
+        value: '3',
+        label: 'Subscription',
+        secondaryLabel: 'Pro Plan',
+        onClick: fn(),
+        icon: <Star />,
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with search header
+export const WithSearchHeader: Story = {
+  args: {
+    menuHeader: 'Search items...',
+    items: [
+      {
+        value: '1',
+        label: 'Profile Settings',
+        searchLabel: 'profile settings user preferences account',
+        secondaryLabel: 'User preferences',
+        onClick: fn(),
+        icon: <PaintRoller />,
+      },
+      {
+        value: '2',
+        label: 'Storage Options',
+        searchLabel: 'storage disk space memory',
+        secondaryLabel: 'Manage storage space',
+        onClick: fn(),
+        icon: <Storage />,
+      },
+      {
+        value: '3',
+        label: 'Favorites',
+        searchLabel: 'favorites starred items bookmarks',
+        secondaryLabel: 'View starred items',
+        onClick: fn(),
+        icon: <Star />,
+      },
+      { type: 'divider' },
+      {
+        value: '4',
+        label: 'Logout',
+        onClick: fn(),
+      },
+      {
+        value: '5',
+        label: 'Invite User',
+        onClick: fn(),
+      },
+    ],
+  },
+  render: (args) => (
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with long text to test truncation
+export const WithLongText: Story = {
+  args: {
+    menuHeader: 'Search items...',
+    items: [
+      ...Array.from({ length: 100 }).map(() => {
+        const label = faker.commerce.product();
+        const secondaryLabel = faker.commerce.productDescription();
+        return {
+          value: faker.string.uuid(),
+          label,
+          secondaryLabel,
+          searchLabel: `${label} ${secondaryLabel}`,
+          onClick: fn(),
+          truncate: true,
+        };
+      }),
+    ],
+  },
+  render: (args) => (
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
 // Example with links
 export const WithLinks: Story = {
   args: {
+    menuHeader: 'Navigation Links',
     items: [
       {
+        value: '1',
         label: 'Documentation',
-        link: 'https://example.com/docs',
-        linkIcon: 'arrow-external',
+        link: '/docs',
+        icon: <Storage />,
+        onClick: fn(),
       },
       {
-        label: 'Settings',
+        value: '2',
+        label: 'GitHub Repository',
+        link: 'https://github.com/example/repo',
+        icon: <Star />,
+        secondaryLabel: 'External Link',
+      },
+      { type: 'divider' },
+      {
+        value: '3',
+        label: 'Settings Page',
         link: '/settings',
-        linkIcon: 'arrow-right',
+        icon: <PaintRoller />,
       },
       {
-        label: 'Profile',
-        link: '/profile',
-        linkIcon: 'caret-right',
+        value: '4',
+        label: 'Help Center',
+        link: '/help',
+        secondaryLabel: 'Get Support',
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled} className="">
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu items={args.items} disabled={args.disabled} menuHeader={args.menuHeader}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
-// Example with custom width
-export const CustomWidth: Story = {
+export const WithManyItemsToSearch: Story = {
+  args: {
+    menuHeader: 'Search items...',
+    items: [
+      ...Array.from({ length: 100 }).map(() => {
+        const product = `${faker.commerce.productAdjective()} ${faker.commerce.product()}`;
+        return {
+          value: `${product} ${faker.string.uuid()}`,
+          label: product,
+        };
+      }),
+    ],
+    onSelect: fn(),
+  },
+  render: (args) => (
+    <ContextMenu
+      items={args.items}
+      disabled={args.disabled}
+      menuHeader={args.menuHeader}
+      onSelect={args.onSelect}
+    >
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Interactive example with links and multiple selection
+export const WithLinksAndMultipleSelection: Story = {
+  render: () => {
+    const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set(['2']));
+
+    const items: ContextMenuItems = [
+      {
+        value: '1',
+        label: 'Documentation Home',
+        link: '/docs',
+        selected: selectedIds.has('1'),
+        icon: <Storage />,
+        secondaryLabel: 'Main documentation',
+      },
+      {
+        value: '2',
+        label: 'API Reference',
+        link: '/docs/api',
+        selected: selectedIds.has('2'),
+        icon: <Star />,
+        secondaryLabel: 'API documentation',
+      },
+      { type: 'divider' as const },
+      {
+        value: '3',
+        label: 'Tutorials',
+        link: '/docs/tutorials',
+        selected: selectedIds.has('3'),
+        icon: <PaintRoller />,
+        secondaryLabel: 'Learn step by step',
+      },
+      {
+        value: '4',
+        label: 'Examples',
+        link: '/docs/examples',
+        selected: selectedIds.has('4'),
+        secondaryLabel: 'Code examples',
+      },
+    ];
+
+    const handleSelect = (itemId: string) => {
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(itemId)) {
+          newSet.delete(itemId);
+        } else {
+          newSet.add(itemId);
+        }
+        return newSet;
+      });
+    };
+
+    return (
+      <ContextMenu
+        selectType="multiple"
+        items={items}
+        menuHeader="Search documentation..."
+        onSelect={handleSelect}
+      >
+        <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+          Right-click here to open context menu!
+        </div>
+      </ContextMenu>
+    );
+  },
+};
+
+export const WithFooterContent: Story = {
   args: {
     items: [
       {
-        label: 'This is a menu item with a very long label that might need to be constrained',
-        onClick: () => alert('Long item clicked'),
+        value: '1',
+        label: 'Option 1',
+        onClick: fn(),
       },
       {
-        label: 'Short item',
-        onClick: () => alert('Short item clicked'),
+        value: '2',
+        label: 'Option 2',
+        onClick: fn(),
+      },
+      {
+        value: '3',
+        label: 'Option 3',
+        onClick: fn(),
+      },
+    ],
+    footerContent: (
+      <Button variant={'black'} block>
+        Footer Content
+      </Button>
+    ),
+  },
+  render: (args) => (
+    <ContextMenu items={args.items} disabled={args.disabled} footerContent={args.footerContent}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+export const WithFooterAndHeader: Story = {
+  args: {
+    ...WithFooterContent.args,
+    menuHeader: 'Menu...',
+  },
+  render: (args) => (
+    <ContextMenu
+      items={args.items}
+      disabled={args.disabled}
+      footerContent={args.footerContent}
+      menuHeader={args.menuHeader}
+    >
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with numbered items
+export const WithNumberedItemsNoFilter: Story = {
+  args: {
+    showIndex: true,
+    selectType: 'single',
+    onSelect: fn(),
+    items: [
+      {
+        value: 'value1',
+        label: 'First Item',
+        onClick: fn(),
+        icon: <PaintRoller />,
+      },
+      {
+        value: 'value2',
+        label: 'Second Item',
+        onClick: fn(),
+        icon: <Star />,
+      },
+      { type: 'divider' },
+      {
+        value: 'value3',
+        label: 'Third Item',
+        onClick: fn(),
+        icon: <Storage />,
+        searchLabel: 'Third Item with secondary label',
+        secondaryLabel: 'With secondary label',
+      },
+      {
+        value: 'value4',
+        label: 'Fourth Item',
+        onClick: fn(),
+        disabled: true,
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled} className="min-w-[400px]">
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
-        </div>
-      </ContextMenu>
-    </div>
+    <ContextMenu
+      items={args.items}
+      disabled={args.disabled}
+      showIndex={args.showIndex}
+      selectType={args.selectType}
+      onSelect={args.onSelect}
+    >
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
   ),
 };
 
-export const ContextMenuWithEverything: Story = {
+export const WithNumberedItemsWithFilter: Story = {
+  args: {
+    ...{ ...WithNumberedItemsNoFilter.args },
+    menuHeader: 'Search items...',
+  },
+  render: (args) => (
+    <ContextMenu
+      items={args.items}
+      disabled={args.disabled}
+      showIndex={args.showIndex}
+      selectType={args.selectType}
+      onSelect={args.onSelect}
+      menuHeader={args.menuHeader}
+    >
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+export const WithReactNodeSubMenu: Story = {
   args: {
     items: [
       {
         label: 'Option 1',
-        onClick: () => alert('Option 1 clicked'),
-        icon: <WindowUser />,
-        selected: false,
-        loading: true,
+        value: '1',
+        items: [
+          { label: 'Sub Option 1', value: '1-1' },
+          { label: 'Sub Option 2', value: '1-2' },
+        ],
       },
       {
         label: 'Option 2',
-        onClick: () => alert('Option 2 clicked'),
-        icon: <WindowSettings />,
-        selected: true,
-      },
-      {
-        label: 'Option 3',
-        onClick: () => alert('Option 3 clicked'),
-        icon: <Window />,
-        selected: false,
-      },
-      { type: 'divider' },
-      {
-        label: 'Option 4',
-        onClick: () => alert('Option 4 clicked'),
-        icon: <Window />,
-        link: 'https://example.com/docs',
-        loading: true,
-      },
-      {
-        label: 'Option 5',
-        onClick: () => alert('Option 5 clicked'),
-        icon: <Window />,
-        link: 'https://example.com/docs',
-      },
-      { type: 'divider' },
-      {
-        label: 'NESTED COMPONENT',
-        onClick: () => alert('Option 6 clicked'),
-        loading: false,
-        icon: <Window />,
+        value: '2',
         items: [
-          <div
-            key="nested-item"
-            className="flex min-h-10 min-w-10 items-center rounded bg-red-200 p-1 text-red-600"
-          >
-            This is a nested item
+          <div key="test" className="min-w-[300px] bg-red-100">
+            sasdf
           </div>,
-        ],
-      },
-      {
-        label: 'Option 7',
-        onClick: () => alert('Option 7 clicked'),
-        icon: <Window />,
-        items: [
-          {
-            label: 'Option 7.1',
-            onClick: () => alert('Option 7.1 clicked'),
-          },
-          {
-            label: 'Option 7.2',
-            onClick: () => alert('Option 7.2 clicked'),
-          },
-        ],
-      },
-      {
-        label: 'Option 8',
-        onClick: () => alert('Option 8 clicked'),
-        icon: <Window />,
-        items: [
-          {
-            label: 'Option 8.1',
-            onClick: () => alert('Option 8.1 clicked'),
-          },
-          {
-            label: 'Option 8.2',
-            onClick: () => alert('Option 8.2 clicked'),
-          },
         ],
       },
     ],
   },
   render: (args) => (
-    <div className="flex h-[200px] w-[200px] items-center justify-center rounded-md border border-dashed">
-      <ContextMenu items={args.items} disabled={args.disabled}>
-        <div className="h-full w-full bg-gray-200 p-4 text-center">
-          Right-click here to open context menu
+    <ContextMenu items={args.items} disabled={args.disabled}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+export const WithSubMenuAndHundredItems: Story = {
+  args: {
+    items: [
+      {
+        label: 'Option 1',
+        value: '1',
+        onScrollToBottom: () => {
+          console.info(
+            '🎯 Submenu scrolled to bottom! This fires only when entering the 10px zone.'
+          );
+        },
+        items: Array.from({ length: 100 }).map((_, index) => ({
+          label: `Sub Option ${index}`,
+          value: `1-${index + 1}`,
+          selected: index === 85,
+        })),
+      },
+    ],
+  },
+  render: (args) => (
+    <ContextMenu items={args.items} disabled={args.disabled}>
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with onScrollToBottom on main context menu
+export const WithScrollToBottomCallback: Story = {
+  args: {
+    menuHeader: 'Search items...',
+    onScrollToBottom: () => {
+      console.info(
+        '🎯 Main context menu scrolled to bottom! This fires only when entering the 10px zone.'
+      );
+    },
+    items: Array.from({ length: 100 }).map((_, index) => ({
+      label: `Item ${index + 1}`,
+      value: `item-${index + 1}`,
+      secondaryLabel: `Description for item ${index + 1}`,
+    })),
+  },
+  render: (args) => (
+    <ContextMenu
+      items={args.items}
+      disabled={args.disabled}
+      menuHeader={args.menuHeader}
+      onScrollToBottom={args.onScrollToBottom}
+    >
+      <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+        Right-click here to open context menu!
+      </div>
+    </ContextMenu>
+  ),
+};
+
+// Example with searchable nested menu
+export const WithSearchableNestedMenu: Story = {
+  render: () => {
+    const [selectedOwners, setSelectedOwners] = React.useState<Set<string>>(new Set(['owner-2']));
+    const [selectedAssetTypes, setSelectedAssetTypes] = React.useState<Set<string>>(
+      new Set(['report_file'])
+    );
+
+    // Mock owner data similar to FilterDropdown
+    const mockOwners = Array.from({ length: 50 }).map((_, index) => ({
+      id: `owner-${index + 1}`,
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+    }));
+
+    const handleOwnerSelect = (ownerId: string) => {
+      setSelectedOwners((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(ownerId)) {
+          newSet.delete(ownerId);
+        } else {
+          newSet.add(ownerId);
+        }
+        return newSet;
+      });
+    };
+
+    const handleAssetTypeSelect = (assetType: string) => {
+      setSelectedAssetTypes((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(assetType)) {
+          newSet.delete(assetType);
+        } else {
+          newSet.add(assetType);
+        }
+        return newSet;
+      });
+    };
+
+    const items: ContextMenuItems = [
+      {
+        label: 'Asset Type',
+        value: 'asset-type',
+        icon: <Storage />,
+        selectType: 'multiple',
+        items: [
+          {
+            label: 'Chats',
+            value: 'chat',
+            selected: selectedAssetTypes.has('chat'),
+            onClick: () => handleAssetTypeSelect('chat'),
+          },
+          {
+            label: 'Reports',
+            value: 'report_file',
+            selected: selectedAssetTypes.has('report_file'),
+            onClick: () => handleAssetTypeSelect('report_file'),
+          },
+          {
+            label: 'Dashboards',
+            value: 'dashboard_file',
+            selected: selectedAssetTypes.has('dashboard_file'),
+            onClick: () => handleAssetTypeSelect('dashboard_file'),
+          },
+          {
+            label: 'Collections',
+            value: 'collection',
+            selected: selectedAssetTypes.has('collection'),
+            onClick: () => handleAssetTypeSelect('collection'),
+          },
+        ],
+      },
+      {
+        label: 'Owner',
+        value: 'owner',
+        icon: <PaintRoller />,
+        selectType: 'multiple',
+        menuHeader: 'Search owners by name or email',
+        onScrollToBottom: () => {
+          console.info('Scrolled to bottom');
+        },
+        onSearch: (search) => {
+          console.info('Searching owners:', search);
+        },
+        items: mockOwners.map((owner) => ({
+          label: owner.name,
+          value: owner.id,
+          searchLabel: `${owner.name} ${owner.email}`,
+          secondaryLabel: owner.email,
+          selected: selectedOwners.has(owner.id),
+          onClick: () => handleOwnerSelect(owner.id),
+        })),
+      },
+      {
+        label: 'Priority',
+        value: 'priority',
+        icon: <Star />,
+        selectType: 'multiple',
+        menuHeader: 'Search priorities',
+        items: [
+          { label: 'High', value: 'high', searchLabel: 'High priority' },
+          { label: 'Medium', value: 'medium', searchLabel: 'Medium priority' },
+          { label: 'Low', value: 'low', searchLabel: 'Low priority' },
+        ],
+      },
+    ];
+
+    return (
+      <ContextMenu items={items} menuHeader="Filters...">
+        <div className="flex h-[200px] min-h-[200px] w-[200px] min-w-[200px] items-center justify-center rounded-md border border-dashed bg-gray-200 p-4 text-center">
+          Right-click here to open context menu!
         </div>
       </ContextMenu>
-    </div>
-  ),
+    );
+  },
 };

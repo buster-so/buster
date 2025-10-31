@@ -124,9 +124,9 @@ const AssetGridGroupedView = ({
   columns: number;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   groupBy: AssetGridViewListProps['groupBy'];
+  ContextMenu: AssetGridViewListProps['ContextMenu'];
   items: LibraryAssetListItem[];
   hasPrelistContent: boolean;
-  ContextMenu: AssetGridViewListProps['ContextMenu'];
   type: AssetGridViewListProps['type'];
 }) => {
   const _mounted = useMounted();

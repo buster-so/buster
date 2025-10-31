@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { useRemoveMetricsFromDashboard } from '@/api/buster_rest/dashboards';
-import { useGetMetric } from '@/api/buster_rest/metrics';
 import {
   useFavoriteMetricSelectMenu,
   useMetricDrilldownItem,
+  useMetricShareMenuSelectMenu,
   useMetricVersionHistorySelectMenu,
   useNavigateToDashboardMetricItem,
   useOpenChartItem,
@@ -30,7 +30,7 @@ export const useDashboardMetricCardThreeDotMenuItems = ({
   const removeFromDashboardItem = useRemoveFromDashboardItem({ dashboardId, metricId });
   const openChartItem = useOpenChartItem({ metricId, metricVersionNumber });
   const drilldownItem = useMetricDrilldownItem({ metricId });
-  const shareMenu = useShareMenuSelectMenu({ metricId, metricVersionNumber });
+  const shareMenu = useMetricShareMenuSelectMenu({ metricId, versionNumber: metricVersionNumber });
   const editWithAI = useEditWithAI({ metricId });
   const navigateToDashboardMetricItem = useNavigateToDashboardMetricItem({
     metricId,
@@ -101,44 +101,6 @@ const useRemoveFromDashboardItem = ({
       },
     }),
     [dashboardId, metricId, removeMetricFromDashboard, isPending]
-  );
-};
-
-const useShareMenuSelectMenu = ({
-  metricId,
-  metricVersionNumber,
-}: {
-  metricId: string;
-  metricVersionNumber: number | undefined;
-}): IDropdownItem | undefined => {
-  const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId, versionNumber: metricVersionNumber },
-    { select: getShareAssetConfig }
-  );
-  const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);
-
-  return useMemo(
-    () =>
-      isEffectiveOwner && shareAssetConfig
-        ? {
-            label: 'Share metric',
-            value: 'share-metric',
-            icon: <ShareRight />,
-            disabled: !isEffectiveOwner,
-            items:
-              isEffectiveOwner && shareAssetConfig
-                ? [
-                    <ShareMenuContent
-                      key={metricId}
-                      shareAssetConfig={shareAssetConfig}
-                      assetId={metricId}
-                      assetType={'metric_file'}
-                    />,
-                  ]
-                : undefined,
-          }
-        : undefined,
-    [metricId, shareAssetConfig, isEffectiveOwner]
   );
 };
 
