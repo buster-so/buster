@@ -148,6 +148,7 @@ export const useRenameMetricOnPage = ({
           params: (prev) => ({ ...prev, metricId }),
           search: metricVersionNumber ? { metric_version_number: metricVersionNumber } : undefined,
         });
+
         const input = await ensureElementExists(
           () => document.getElementById(METRIC_CHART_TITLE_INPUT_ID) as HTMLInputElement
         );
