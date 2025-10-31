@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import Gear from '@/components/ui/icons/NucleoIconOutlined/gear';
+import Cube from '@/components/ui/icons/NucleoIconOutlined/cube';
 import Table from '@/components/ui/icons/NucleoIconOutlined/table';
 import UnorderedList2 from '@/components/ui/icons/NucleoIconOutlined/unordered-list-2';
 import type { ISidebarGroup } from '@/components/ui/sidebar';
@@ -18,7 +18,7 @@ export const useAdminToolSidebar = ({
     const adminTools: ISidebarGroup = createSidebarGroup({
       label: 'Admin tools',
       id: ADMIN_TOOLS_SIDEBAR_ID,
-      icon: <Gear />,
+      icon: <Cube />,
       defaultOpen: defaultOpenAdminTools,
       items: createSidebarItems([
         {

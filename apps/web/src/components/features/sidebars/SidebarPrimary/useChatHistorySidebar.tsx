@@ -36,12 +36,12 @@ export const useChatHistorySidebar = ({
     items.push(
       createSidebarItem({
         id: 'all-chats',
-        label: 'See chats',
+        label: 'See all',
         link: {
           to: '/app/chats',
           preload: 'intent',
         },
-        className: 'bg-transparent! hover:underline',
+        className: 'bg-transparent! hover:underline text-text-secondary text-sm',
       })
     );
 

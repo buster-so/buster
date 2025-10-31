@@ -38,6 +38,7 @@ const topItems: ISidebarList = createSidebarList({
       icon: <Compose2 />,
       link: { to: '/app/home', preload: 'viewport', preloadDelay: 1000 },
       id: '/app/home',
+      className: 'bg-transparent!',
     },
     {
       label: 'Library',
