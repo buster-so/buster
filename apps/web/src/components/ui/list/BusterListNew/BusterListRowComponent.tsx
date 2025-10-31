@@ -14,6 +14,7 @@ type BusterLilstRowComponentProps<T = unknown> = BusterListRowItem<T> &
   > & {
     onSelectRowChange?: (v: boolean, id: string, e: React.MouseEvent) => void;
     onContextMenuClick?: (e: React.MouseEvent<HTMLDivElement>, id: string) => void;
+    onContextMenu?: (data: T | null) => void;
     checked: boolean;
     isLastChild: boolean;
   };
@@ -27,6 +28,7 @@ const BusterListRowComponentBase = <T = unknown>({
   onSelectRowChange,
   onClick,
   onContextMenuClick,
+  onContextMenu: onContextMenuCallback,
   id,
   checked,
   useRowClickSelectChange,
@@ -35,6 +37,7 @@ const BusterListRowComponentBase = <T = unknown>({
 }: BusterLilstRowComponentProps<T>) => {
   const onContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     onContextMenuClick?.(e, id);
+    onContextMenuCallback?.(data);
   };
 
   const onChange = (newChecked: boolean, e: React.MouseEvent) => {

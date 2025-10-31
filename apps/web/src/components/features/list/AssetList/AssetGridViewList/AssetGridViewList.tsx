@@ -32,6 +32,7 @@ export const AssetGridViewList = React.memo(
       // Initialize with first item or empty object
       return items[0] || ({} as LibraryAssetListItem);
     });
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const hasItems = items.length > 0;
     const hasGroups = groups !== undefined;
     const isInitialLoading = isInitialLoadingProp && !hasItems;
@@ -54,15 +55,30 @@ export const AssetGridViewList = React.memo(
       return () => window.removeEventListener('resize', updateColumns);
     }, []);
 
-    const handleContextMenu = useCallback((item: LibraryAssetListItem) => {
-      // Use flushSync to update state synchronously before menu opens
-      flushSync(() => {
-        setSelectedItem(item);
-      });
-    }, []);
+    const handleContextMenu = useCallback(
+      (item: LibraryAssetListItem) => {
+        // If menu is already open, close it first to allow repositioning
+        if (isMenuOpen) {
+          setIsMenuOpen(false);
+          // Use setTimeout to ensure menu closes before reopening
+          setTimeout(() => {
+            flushSync(() => {
+              setSelectedItem(item);
+              setIsMenuOpen(true);
+            });
+          }, 0);
+        } else {
+          // Menu is closed, just update and let natural context menu behavior open it
+          flushSync(() => {
+            setSelectedItem(item);
+          });
+        }
+      },
+      [isMenuOpen]
+    );
 
     return (
-      <ContextMenu {...selectedItem}>
+      <ContextMenu {...selectedItem} open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <ScrollArea
           key={hasGroups ? 'grouped' : 'ungrouped'}
           viewportRef={scrollContainerRef}

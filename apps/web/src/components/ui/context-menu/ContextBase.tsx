@@ -83,17 +83,32 @@ const ContextMenuItem = React.forwardRef<
     inset?: boolean;
     truncate?: boolean;
     icon?: React.ReactNode;
+    closeOnSelect?: boolean;
   }
->(({ className, inset, truncate, icon, children, ...props }, ref) => (
-  <ContextMenuPrimitive.Item
-    ref={ref}
-    className={cn(menuItemClass, inset && 'pl-8', truncate && 'overflow-hidden', className)}
-    {...props}
-  >
-    {icon && <span className="text-icon-color">{icon}</span>}
-    {children}
-  </ContextMenuPrimitive.Item>
-));
+>(
+  (
+    {
+      className,
+      inset,
+      truncate,
+      icon,
+      closeOnSelect: _closeOnSelect = true,
+      onClick,
+      children,
+      ...props
+    },
+    ref
+  ) => (
+    <ContextMenuPrimitive.Item
+      ref={ref}
+      className={cn(menuItemClass, inset && 'pl-8', truncate && 'overflow-hidden', className)}
+      {...props}
+    >
+      {icon && <span className="text-icon-color">{icon}</span>}
+      {children}
+    </ContextMenuPrimitive.Item>
+  )
+);
 ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
 const ContextMenuCheckboxItem = React.forwardRef<

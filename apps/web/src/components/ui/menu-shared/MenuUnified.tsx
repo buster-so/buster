@@ -202,8 +202,12 @@ export const MenuUnified = <
 
   return (
     <Root open={open} defaultOpen={open} onOpenChange={onOpenChange} dir={dir} modal={modal}>
-      <Trigger asChild={isDropdownVariant} disabled={disabled}>
-        {isDropdownVariant ? <span className="dropdown-trigger">{children}</span> : children}
+      <Trigger asChild disabled={disabled}>
+        {isDropdownVariant ? (
+          <span className="dropdown-trigger">{children}</span>
+        ) : (
+          <div className="flex-1 flex flex-col min-h-0">{children}</div>
+        )}
       </Trigger>
       <Content
         className={cn(
