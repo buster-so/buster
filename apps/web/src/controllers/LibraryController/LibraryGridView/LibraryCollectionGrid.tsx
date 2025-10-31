@@ -5,15 +5,9 @@ import { useDeleteCollection } from '@/api/buster_rest/collections';
 import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { AssetGridSectionContainer } from '@/components/features/list/AssetList';
 import { AssetGridCardSmall } from '@/components/features/list/AssetList/AssetGridViewList/AssetGridCardSmall';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  type ContextMenuItems,
-  ContextMenuRoot,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+import { ContextMenu, type ContextMenuItems } from '@/components/ui/context-menu';
 import { Trash } from '@/components/ui/icons';
+import { useCollectionLibraryItems } from '../useLibraryItemDropdown';
 
 export const LibraryCollectionGrid = React.memo(({ items }: { items: LibraryAssetListItem[] }) => {
   return (
@@ -44,16 +38,7 @@ const CollectionCardContextMenu = React.memo(
   }: Pick<BusterCollectionListItem, 'id'> & {
     children: React.ReactNode;
   }) => {
-    const { mutateAsync: onDeleteCollection } = useDeleteCollection();
-
-    const items: ContextMenuItems = [
-      {
-        label: 'Delete',
-        value: 'delete',
-        onClick: () => onDeleteCollection({ id, useConfirmModal: false }),
-        icon: <Trash />,
-      },
-    ];
+    const items = useCollectionLibraryItems(id);
 
     return <ContextMenu items={items}>{children}</ContextMenu>;
   }

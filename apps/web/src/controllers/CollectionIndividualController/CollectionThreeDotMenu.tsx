@@ -2,9 +2,7 @@ import type { BusterCollection } from '@buster/server-shared/collections';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
 import { useDeleteCollection } from '@/api/buster_rest/collections';
-import { useDeleteLibraryAssets, usePostLibraryAssets } from '@/api/buster_rest/library';
-import { useFavoriteStar } from '@/components/features/favorites';
-import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
+import { useFavoriteCollectionSelectMenu } from '@/components/features/collections/threeDotMenuHooks';
 import { useAddToLibraryCollection } from '@/components/features/library/useAddToLibraryCollection';
 import { ShareMenuContent } from '@/components/features/ShareMenu';
 import { Button } from '@/components/ui/buttons';
@@ -14,10 +12,10 @@ import {
   Dropdown,
   type IDropdownItems,
 } from '@/components/ui/dropdown';
-import { Dots, Pencil, Star, Trash } from '@/components/ui/icons';
-import { StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { Dots, Pencil, Trash } from '@/components/ui/icons';
 import { ShareRight } from '@/components/ui/icons/NucleoIconOutlined';
 import SquareChartPlus from '@/components/ui/icons/NucleoIconOutlined/square-chart-plus';
+import { createMenuItems } from '@/components/ui/menu-shared';
 import { RenameCollectionModal } from './RenameCollectionModal';
 
 export const CollectionThreeDotDropdown: React.FC<{
@@ -33,18 +31,13 @@ export const CollectionThreeDotDropdown: React.FC<{
     const navigate = useNavigate();
     const { mutateAsync: deleteCollection, isPending: isDeletingCollection } =
       useDeleteCollection();
-    const { isFavorited, onFavoriteClick } = useFavoriteStar({
-      id,
-      type: 'collection',
-      name: name || '',
-    });
-    const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-    const { mutateAsync: addToLibrary } = usePostLibraryAssets();
-    const { mutateAsync: deleteLibrary } = useDeleteLibraryAssets();
 
-    const items: IDropdownItems = useMemo(
+    const favoriteCollection = useFavoriteCollectionSelectMenu({ collectionId: id });
+    const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+
+    const items = useMemo(
       () =>
-        createDropdownItems(
+        createMenuItems(
           [
             {
               value: 'share',
@@ -60,26 +53,7 @@ export const CollectionThreeDotDropdown: React.FC<{
                 />,
               ],
             },
-            // {
-            //   value: 'add-to-library',
-            //   label: isAddedToLibrary ? 'Remove from library' : 'Add to library',
-            //   icon: isAddedToLibrary ? <ASSET_ICONS.libraryAdded /> : <ASSET_ICONS.library />,
-            //   onClick: () => {
-            //     if (isAddedToLibrary) {
-            //       deleteLibrary([{ assetId: id, assetType: 'collection' }]);
-            //     } else {
-            //       addToLibrary([{ assetId: id, assetType: 'collection' }]);
-            //     }
-            //   },
-            //   closeOnSelect: false,
-            // },
-            {
-              value: 'favorite',
-              label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-              icon: isFavorited ? <StarFilled /> : <Star />,
-              onClick: () => onFavoriteClick(),
-              closeOnSelect: false,
-            },
+            favoriteCollection,
             isEditor && {
               value: 'add-to-collection',
               label: 'Add assets',
@@ -119,7 +93,7 @@ export const CollectionThreeDotDropdown: React.FC<{
             },
           ].filter((x) => x && !(x as { hidden?: boolean }).hidden)
         ),
-      [id, deleteCollection, isFavorited, onFavoriteClick, setIsRenameModalOpen, isAddedToLibrary]
+      [id, favoriteCollection, setIsRenameModalOpen, isAddedToLibrary]
     );
 
     return (

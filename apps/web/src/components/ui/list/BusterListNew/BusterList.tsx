@@ -89,9 +89,8 @@ function BusterListBase<T = unknown>(
   });
 
   useImperativeHandle(ref, () => ({
-    scrollTo: (id: string) => {
+    scrollTo: (_id: string) => {
       // TODO: Implement scroll to functionality
-      console.log('Scrolling to:', id);
     },
   }));
 

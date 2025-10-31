@@ -1,12 +1,16 @@
 import type { AssetType } from '@buster/server-shared/assets';
 import { useMemo } from 'react';
+import { useDeleteCollection } from '@/api/buster_rest/collections';
 import { useDeleteLibraryAssets } from '@/api/buster_rest/library';
+import { useFavoriteChatSelectMenu } from '@/components/features/chat/threeDotMenuHooks';
+import { useFavoriteCollectionSelectMenu } from '@/components/features/collections/threeDotMenuHooks';
 import { useEditDashboardWithAI } from '@/components/features/dashboard/threeDotMenuHooks';
 import {
   useEditMetricWithAI,
   useFavoriteMetricSelectMenu,
 } from '@/components/features/metrics/threeDotMenuHooks';
 import { useEditReportWithAI } from '@/components/features/reports/threeDotMenuHooks';
+import type { ContextMenuItems } from '@/components/ui/context-menu';
 import { Trash } from '@/components/ui/icons';
 import { createMenuDivider, createMenuItem } from '@/components/ui/menu-shared';
 
@@ -57,11 +61,27 @@ export const useReportLibraryItems = (reportId: string) => {
   return useMemo(() => [editWithAI, removeFromLibrary], [editWithAI, removeFromLibrary]);
 };
 
-export const useCollectionLibraryItems = (_collectionId: string) => {
-  return useMemo(() => [], []);
+export const useCollectionLibraryItems = (collectionId: string): ContextMenuItems => {
+  const { mutateAsync: onDeleteCollection } = useDeleteCollection();
+  const favoriteCollection = useFavoriteCollectionSelectMenu({ collectionId });
+
+  return useMemo(() => {
+    return [
+      createMenuItem({
+        type: 'item',
+        value: 'delete',
+        label: 'Delete',
+        icon: <Trash />,
+        onClick: () => onDeleteCollection({ id: collectionId, useConfirmModal: false }),
+      }),
+      createMenuDivider(),
+      favoriteCollection,
+    ];
+  }, [onDeleteCollection, collectionId, favoriteCollection]);
 };
 
 export const useChatLibraryItems = (chatId: string) => {
   const removeFromLibrary = useRemoveFromLibrary({ assetId: chatId, assetType: 'chat' });
-  return useMemo(() => [removeFromLibrary], [removeFromLibrary]);
+  const favoriteChat = useFavoriteChatSelectMenu({ chatId });
+  return useMemo(() => [removeFromLibrary, favoriteChat], [removeFromLibrary, favoriteChat]);
 };
