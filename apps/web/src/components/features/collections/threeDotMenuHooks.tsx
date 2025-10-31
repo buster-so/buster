@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 import { useGetCollection } from '@/api/buster_rest/collections';
-import { ShareRight, Star } from '@/components/ui/icons';
-import { StarFilled } from '@/components/ui/icons/NucleoIconFilled';
-import { createMenuItem, type MenuItem } from '@/components/ui/menu-shared';
+import { ShareRight } from '@/components/ui/icons';
+import type { MenuItem } from '@/components/ui/menu-shared';
 import { getIsEffectiveOwner } from '@/lib/share';
-import { useFavoriteStar } from '../favorites';
+import { createFavoriteMenuItem, useFavoriteStar } from '../favorites';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 
 export const useFavoriteCollectionSelectMenu = ({
@@ -20,12 +19,9 @@ export const useFavoriteCollectionSelectMenu = ({
   });
 
   return useMemo(() => {
-    return createMenuItem({
-      value: 'favorite',
-      label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-      icon: isFavorited ? <StarFilled /> : <Star />,
-      onClick: () => onFavoriteClick(),
-      closeOnSelect: false,
+    return createFavoriteMenuItem({
+      isFavorited,
+      onFavoriteClick,
     });
   }, [isFavorited, onFavoriteClick]);
 };

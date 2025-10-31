@@ -1,13 +1,12 @@
 import type { ReportResponse } from '@buster/server-shared/reports';
 import { useMemo } from 'react';
 import { useGetReport } from '@/api/buster_rest/reports';
-import { createDropdownItem, type IDropdownItem } from '@/components/ui/dropdown';
-import { PenSparkle, ShareRight, Star } from '@/components/ui/icons';
-import { StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import type { IDropdownItem } from '@/components/ui/dropdown';
+import { PenSparkle, ShareRight } from '@/components/ui/icons';
 import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import { useFavoriteStar } from '../favorites';
+import { createFavoriteMenuItem, useFavoriteStar } from '../favorites';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 
 export const useReportShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
@@ -80,12 +79,9 @@ export const useFavoriteReportSelectMenu = ({ reportId }: { reportId: string }):
 
   return useMemo(
     () =>
-      createDropdownItem({
-        label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-        value: 'toggle-favorite',
-        icon: isFavorited ? <StarFilled /> : <Star />,
-        onClick: () => onFavoriteClick(),
-        closeOnSelect: false,
+      createFavoriteMenuItem({
+        isFavorited,
+        onFavoriteClick,
       }),
     [isFavorited, onFavoriteClick]
   );

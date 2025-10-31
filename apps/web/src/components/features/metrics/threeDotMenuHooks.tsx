@@ -18,10 +18,8 @@ import {
   PenSparkle,
   ShareRight,
   SquareChartPen,
-  Star,
   Table,
 } from '@/components/ui/icons';
-import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -29,7 +27,7 @@ import { ensureElementExists } from '@/lib/element';
 import { downloadElementToImage } from '@/lib/exportUtils';
 import { canEdit, getIsEffectiveOwner } from '../../../lib/share';
 import { FollowUpWithAssetContent } from '../assets/FollowUpWithAsset';
-import { useFavoriteStar } from '../favorites';
+import { createFavoriteMenuItem, useFavoriteStar } from '../favorites';
 import { ShareMenuContent } from '../ShareMenu';
 import { getShareAssetConfig } from '../ShareMenu/helpers';
 import { useListMetricVersionDropdownItems } from '../versionHistory/useListMetricVersionDropdownItems';
@@ -97,13 +95,9 @@ export const useFavoriteMetricSelectMenu = ({
 
   return useMemo(
     () =>
-      createMenuItem({
-        type: 'item',
-        label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-        value: 'add-to-favorites',
-        icon: isFavorited ? <StarFilled /> : <Star />,
-        onClick: () => onFavoriteClick(),
-        closeOnSelect: false,
+      createFavoriteMenuItem({
+        isFavorited,
+        onFavoriteClick,
       }),
     [isFavorited, onFavoriteClick]
   );
