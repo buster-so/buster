@@ -9,7 +9,7 @@ import {
 import {
   type BusterCollection,
   GetIndividualCollectionRequestParamsSchema,
-} from '@buster/server-shared/collections';
+} from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
 import { convertScreenshotUrl } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';

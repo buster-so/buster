@@ -1,13 +1,15 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
-import { assetSearch, collections } from '../../schema';
+import { collections } from '../../schema';
+import { WorkspaceSharingSchema } from '../../schema-types';
 
 export const UpdateCollectionInputSchema = z.object({
   collectionId: z.string().uuid(),
   name: z.string().optional(),
   description: z.string().optional(),
   userId: z.string().uuid(),
+  workspace_sharing: WorkspaceSharingSchema.optional(),
 });
 
 export type UpdateCollectionInput = z.infer<typeof UpdateCollectionInputSchema>;
@@ -29,6 +31,9 @@ export async function updateCollection(
     description?: string | null;
     updatedBy: string;
     updatedAt: string;
+    workspaceSharing?: 'none' | 'can_view' | 'can_edit' | 'full_access';
+    workspaceSharingEnabledBy?: string | null;
+    workspaceSharingEnabledAt?: string | null;
   } = {
     updatedBy: validated.userId,
     updatedAt: now,
@@ -40,6 +45,18 @@ export async function updateCollection(
 
   if (validated.description !== undefined) {
     updateData.description = validated.description;
+  }
+
+  if (validated.workspace_sharing !== undefined) {
+    updateData.workspaceSharing = validated.workspace_sharing;
+
+    if (validated.workspace_sharing !== 'none') {
+      updateData.workspaceSharingEnabledBy = validated.userId;
+      updateData.workspaceSharingEnabledAt = now;
+    } else {
+      updateData.workspaceSharingEnabledBy = null;
+      updateData.workspaceSharingEnabledAt = null;
+    }
   }
 
   // Update the collection

@@ -6,6 +6,7 @@ export * as AccessControls from './access-controls';
 export * from './assets';
 export * from './auth';
 export * from './chats';
+export * from './collections';
 // Export common types as namespace to avoid conflicts with metrics re-exports
 export * as common from './common';
 export * from './dashboards';

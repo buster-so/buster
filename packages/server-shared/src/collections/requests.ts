@@ -13,7 +13,6 @@ export type GetCollectionsRequestQuery = z.infer<typeof GetCollectionsRequestQue
 
 export const GetIndividualCollectionRequestParamsSchema = z.object({
   id: z.string(),
-  password: z.string().optional(),
 });
 
 export type GetIndividualCollectionRequestParams = z.infer<
@@ -46,7 +45,7 @@ export const ShareCollectionRequestBodySchema = z.object({
 });
 export type ShareCollectionRequestBody = z.infer<typeof ShareCollectionRequestBodySchema>;
 
-export const AddAssetToCollectionRequestBodySchema = z.object({
+export const AddOrRemoveAssetToCollectionRequestBodySchema = z.object({
   assets: z.array(
     z.object({
       type: ShareAssetTypeSchema,
@@ -54,4 +53,6 @@ export const AddAssetToCollectionRequestBodySchema = z.object({
     })
   ),
 });
-export type AddAssetToCollectionRequestBody = z.infer<typeof AddAssetToCollectionRequestBodySchema>;
+export type AddOrRemoveAssetToCollectionRequestBody = z.infer<
+  typeof AddOrRemoveAssetToCollectionRequestBodySchema
+>;
