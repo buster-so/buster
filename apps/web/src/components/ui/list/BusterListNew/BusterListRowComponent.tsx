@@ -65,6 +65,7 @@ const BusterListRowComponentBase = <T = unknown>({
           link || onClick || (onSelectRowChange && useRowClickSelectChange)
             ? 'hover:bg-item-hover cursor-pointer'
             : '',
+          'group-data-[state=open]:bg-item-hover-active',
           rowClassName
         )}
       >
