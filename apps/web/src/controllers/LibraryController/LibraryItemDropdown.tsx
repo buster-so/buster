@@ -15,76 +15,56 @@ export const LibraryItemContextMenu: React.FC<React.PropsWithChildren<LibraryAss
 }) => {
   const { asset_type } = props;
 
-  if (asset_type === 'metric_file') {
-    return <LibraryItemMetricContextMenu {...props}>{children}</LibraryItemMetricContextMenu>;
-  }
-  if (asset_type === 'dashboard_file') {
-    return <LibraryItemDashboardContextMenu {...props}>{children}</LibraryItemDashboardContextMenu>;
-  }
-  if (asset_type === 'report_file') {
-    return <LibraryItemReportContextMenu {...props}>{children}</LibraryItemReportContextMenu>;
-  }
-  if (asset_type === 'collection') {
-    return (
-      <LibraryItemCollectionContextMenu {...props}>{children}</LibraryItemCollectionContextMenu>
-    );
-  }
-  if (asset_type === 'chat') {
-    return <LibraryItemChatContextMenu {...props}>{children}</LibraryItemChatContextMenu>;
+  const selectedItemsCallback = itemsCallbackRecord[asset_type];
+
+  if (!selectedItemsCallback) {
+    return children;
   }
 
-  const _exhaustiveCheck: never = asset_type;
+  const items = selectedItemsCallback(props.asset_id);
 
-  return children;
-};
-
-const LibraryItemMetricContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>> = ({
-  children,
-  asset_id,
-}) => {
-  const items = useMetricLibraryItems(asset_id);
   return <ContextMenu items={items}>{children}</ContextMenu>;
 };
 
-const LibraryItemDashboardContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>> = ({
-  children,
-  asset_id,
-}) => {
-  const items = useDashboardLibraryItems(asset_id);
-  return <ContextMenu items={items}>{children}</ContextMenu>;
-};
+const metricItemeCallback =
+  (assetId: string): ContextMenuProps['items'] =>
+  ({ MenuContentRenderer }) => {
+    const items = useMetricLibraryItems(assetId);
+    return <MenuContentRenderer items={items} />;
+  };
 
-const LibraryItemReportContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>> = ({
-  children,
-  asset_id,
-}) => {
-  const items = useReportLibraryItems(asset_id);
-  return <ContextMenu items={items}>{children}</ContextMenu>;
-};
+const dashboardItemeCallback =
+  (assetId: string): ContextMenuProps['items'] =>
+  ({ MenuContentRenderer }) => {
+    const items = useDashboardLibraryItems(assetId);
+    return <MenuContentRenderer items={items} />;
+  };
 
-const LibraryItemCollectionContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>> = ({
-  children,
-  asset_id,
-}) => {
-  const items = useCollectionLibraryItems(asset_id);
-  return <ContextMenu items={items}>{children}</ContextMenu>;
-};
+const reportItemeCallback =
+  (assetId: string): ContextMenuProps['items'] =>
+  ({ MenuContentRenderer }) => {
+    const items = useReportLibraryItems(assetId);
+    return <MenuContentRenderer items={items} />;
+  };
 
-const LibraryItemChatContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>> = ({
-  children,
-  asset_id,
-}) => {
-  const items = useChatLibraryItems(asset_id);
-  return <ContextMenu items={items}>{children}</ContextMenu>;
-};
+const collectionItemeCallback =
+  (assetId: string): ContextMenuProps['items'] =>
+  ({ MenuContentRenderer }) => {
+    const items = useCollectionLibraryItems(assetId);
+    return <MenuContentRenderer items={items} />;
+  };
 
-const SelectedContextMenuRecord: Record<
-  AssetType,
-  React.FC<React.PropsWithChildren<LibraryAssetListItem>>
-> = {
-  metric_file: LibraryItemMetricContextMenu,
-  dashboard_file: LibraryItemDashboardContextMenu,
-  report_file: LibraryItemReportContextMenu,
-  collection: LibraryItemCollectionContextMenu,
-  chat: LibraryItemChatContextMenu,
+const chatItemeCallback =
+  (assetId: string): ContextMenuProps['items'] =>
+  ({ MenuContentRenderer }) => {
+    const items = useChatLibraryItems(assetId);
+    return <MenuContentRenderer items={items} />;
+  };
+
+const itemsCallbackRecord: Record<AssetType, (assetId: string) => ContextMenuProps['items']> = {
+  metric_file: metricItemeCallback,
+  dashboard_file: dashboardItemeCallback,
+  report_file: reportItemeCallback,
+  collection: collectionItemeCallback,
+  chat: chatItemeCallback,
 };

@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useDownloadMetricFile, useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import {
-  createDropdownItem,
   createDropdownItems,
   DropdownContent,
   type IDropdownItem,
@@ -22,6 +21,7 @@ import {
   Table,
 } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { ensureElementExists } from '@/lib/element';
@@ -93,9 +93,10 @@ export const useFavoriteMetricSelectMenu = ({
     name: name || '',
   });
 
-  const item: IDropdownItem = useMemo(
+  return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
         value: 'add-to-favorites',
         icon: isFavorited ? <StarFilled /> : <Star />,
@@ -104,8 +105,6 @@ export const useFavoriteMetricSelectMenu = ({
       }),
     [isFavorited, onFavoriteClick]
   );
-
-  return item;
 };
 
 export const useMetricDrilldownItem = ({ metricId }: { metricId: string }): IDropdownItem => {
@@ -181,7 +180,8 @@ export const useDownloadMetricDataCSV = ({
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Download as CSV',
         value: 'download-csv',
         icon: <Download4 />,
@@ -247,8 +247,9 @@ export const useOpenChartItem = ({
 }: {
   metricId: string;
   metricVersionNumber: number | undefined;
-}): IDropdownItem => {
-  return createDropdownItem({
+}) => {
+  return createMenuItem({
+    type: 'item',
     value: 'open-chart',
     label: 'Open chart',
     icon: <ArrowUpRight />,
@@ -391,7 +392,7 @@ export const useEditMetricWithAI = ({
 }: {
   metricId: string;
   versionNumber: number | undefined;
-}): IDropdownItem => {
+}) => {
   const { data: shareAssetConfig } = useGetMetric(
     { id: metricId, versionNumber },
     { select: getShareAssetConfig }
@@ -405,7 +406,8 @@ export const useEditMetricWithAI = ({
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Edit with AI',
         value: 'edit-with-ai',
         icon: <PenSparkle />,

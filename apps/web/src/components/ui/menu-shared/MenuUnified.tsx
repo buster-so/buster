@@ -1,6 +1,5 @@
 import { Link, type RegisteredRouter } from '@tanstack/react-router';
-import type React from 'react';
-import { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -84,11 +83,11 @@ export interface UnifiedMenuProps<
   /** Menu items to display */
   items:
     | MenuItems<T, TRouter, TOptions, TFrom>
-    | ((
+    | React.ComponentType<{
         MenuContentRenderer: React.ComponentType<{
           items: MenuItems<T, TRouter, TOptions, TFrom>;
-        }>
-      ) => React.ReactNode);
+        }>;
+      }>;
   /** Selection behavior */
   selectType?: 'single' | 'multiple' | 'none' | 'single-selectable-link';
   /** Header content - if string, renders search box */
@@ -206,54 +205,44 @@ export const MenuUnified = <
   const { Root, Trigger, Content } = primitives;
   const isDropdownVariant = variant === 'dropdown';
 
-  // Create a pre-configured MenuContentRenderer that only requires items prop
-  const renderContent = useMemo(() => {
-    const BoundMenuContentRenderer = ({
-      items: itemsToRender,
-    }: {
-      items: MenuItems<T, TRouter, TOptions, TFrom>;
-    }) => (
-      <MenuContentRenderer<T, TRouter, TOptions, TFrom>
-        variant={variant}
-        items={itemsToRender}
-        selectType={selectType}
-        menuHeader={menuHeader}
-        onSelect={onSelect}
-        showIndex={showIndex}
-        emptyStateText={emptyStateText}
-        footerContent={footerContent}
-        className={contentClassName}
-        footerClassName={footerClassName}
-        menuHeaderClassName={menuHeaderClassName}
-        showEmptyState={showEmptyState}
-        onScrollToBottom={onScrollToBottom}
-        primitives={primitives}
-      />
-    );
-
-    // If items is a function, call it with the bound component
-    if (typeof items === 'function') {
-      return items(BoundMenuContentRenderer);
-    }
-
-    // Otherwise render the bound component directly with items
-    return <BoundMenuContentRenderer items={items} />;
-  }, [
-    items,
-    variant,
-    selectType,
-    menuHeader,
-    onSelect,
-    showIndex,
-    emptyStateText,
-    footerContent,
-    contentClassName,
-    footerClassName,
-    menuHeaderClassName,
-    showEmptyState,
-    onScrollToBottom,
-    primitives,
-  ]);
+  // Create a pre-configured MenuContentRenderer component that only requires items prop
+  // This is memoized to avoid recreating the component on every render
+  const BoundMenuContentRenderer = useMemo(
+    () =>
+      ({ items: itemsToRender }: { items: MenuItems<T, TRouter, TOptions, TFrom> }) => (
+        <MenuContentRenderer<T, TRouter, TOptions, TFrom>
+          variant={variant}
+          items={itemsToRender}
+          selectType={selectType}
+          menuHeader={menuHeader}
+          onSelect={onSelect}
+          showIndex={showIndex}
+          emptyStateText={emptyStateText}
+          footerContent={footerContent}
+          className={contentClassName}
+          footerClassName={footerClassName}
+          menuHeaderClassName={menuHeaderClassName}
+          showEmptyState={showEmptyState}
+          onScrollToBottom={onScrollToBottom}
+          primitives={primitives}
+        />
+      ),
+    [
+      variant,
+      selectType,
+      menuHeader,
+      onSelect,
+      showIndex,
+      emptyStateText,
+      footerContent,
+      contentClassName,
+      footerClassName,
+      menuHeaderClassName,
+      showEmptyState,
+      onScrollToBottom,
+      primitives,
+    ]
+  );
 
   return (
     <Root open={open} defaultOpen={open} onOpenChange={onOpenChange} dir={dir} modal={modal}>
@@ -273,7 +262,12 @@ export const MenuUnified = <
         side={variant === 'dropdown' ? side : undefined}
         sideOffset={sideOffset}
       >
-        {renderContent}
+        {Array.isArray(items) ? (
+          <BoundMenuContentRenderer items={items} />
+        ) : (
+          // Render as component - allows hooks to be called inside
+          React.createElement(items, { MenuContentRenderer: BoundMenuContentRenderer })
+        )}
       </Content>
     </Root>
   );

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useGetReport } from '@/api/buster_rest/reports';
-import { createDropdownItem, type IDropdownItem } from '@/components/ui/dropdown';
+import type { IDropdownItem } from '@/components/ui/dropdown';
 import { PenSparkle, ShareRight } from '@/components/ui/icons';
+import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
@@ -15,7 +16,8 @@ export const useShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Share',
         value: 'share-report',
         icon: <ShareRight />,
@@ -36,7 +38,7 @@ export const useShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
   );
 };
 
-export const useEditReportWithAI = ({ reportId }: { reportId: string }): IDropdownItem => {
+export const useEditReportWithAI = ({ reportId }: { reportId: string }) => {
   const { data: shareAssetConfig } = useGetReport(
     { id: reportId },
     { select: getShareAssetConfig }
@@ -50,7 +52,8 @@ export const useEditReportWithAI = ({ reportId }: { reportId: string }): IDropdo
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Edit with AI',
         value: 'edit-with-ai',
         icon: <PenSparkle />,

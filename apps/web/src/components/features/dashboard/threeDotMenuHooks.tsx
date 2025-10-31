@@ -4,13 +4,14 @@ import React, { useCallback, useMemo } from 'react';
 import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { useDeleteDashboards, useGetDashboard } from '@/api/buster_rest/dashboards';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { DASHBOARD_TITLE_INPUT_ID } from '@/controllers/DashboardController/DashboardViewDashboardController/DashboardEditTitle';
 import { onOpenDashboardContentModal } from '../../../context/Dashboards/dashboard-content-store';
 import { ensureElementExists } from '../../../lib/element';
 import { canEdit, getIsEffectiveOwner } from '../../../lib/share';
 import type { IDropdownItem, IDropdownItems } from '../../ui/dropdown';
-import { createDropdownItem, DropdownContent } from '../../ui/dropdown';
+import { DropdownContent } from '../../ui/dropdown';
 import { ArrowUpRight, Filter, History, PenSparkle, ShareRight, Star, Trash } from '../../ui/icons';
 import Pencil from '../../ui/icons/NucleoIconOutlined/pencil';
 import { useFavoriteStar } from '../favorites/useFavoriteStar';
@@ -79,9 +80,10 @@ export const useFavoriteDashboardSelectMenu = ({
     name: title || '',
   });
 
-  const item: IDropdownItem = useMemo(
+  return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
         value: 'add-to-favorites',
         icon: isFavorited ? <StarFilled /> : <Star />,
@@ -90,8 +92,6 @@ export const useFavoriteDashboardSelectMenu = ({
       }),
     [isFavorited, onFavoriteClick]
   );
-
-  return item;
 };
 
 export const useDeleteDashboardSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
@@ -100,7 +100,8 @@ export const useDeleteDashboardSelectMenu = ({ dashboardId }: { dashboardId: str
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Delete dashboard',
         value: 'delete-dashboard',
         icon: <Trash />,
@@ -124,7 +125,8 @@ export const useRenameDashboardSelectMenu = ({
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Rename dashboard',
         value: 'rename-dashboard',
         icon: <Pencil />,
@@ -155,7 +157,8 @@ export const useRenameDashboardSelectMenu = ({
 export const useAddContentToDashboardSelectMenu = () => {
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Add existing charts',
         value: 'add-content',
         icon: <ASSET_ICONS.metircsAdd />,
@@ -168,7 +171,8 @@ export const useAddContentToDashboardSelectMenu = () => {
 export const useFilterDashboardSelectMenu = () => {
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Filter dashboard',
         value: 'filter-dashboard',
         icon: <Filter />,
@@ -185,7 +189,8 @@ export const useFilterDashboardSelectMenu = () => {
 export const useOpenFullScreenDashboard = ({ dashboardId }: { dashboardId: string }) => {
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Open in dashboard page',
         value: 'open-in-full-screen',
         icon: <ArrowUpRight />,
@@ -255,7 +260,8 @@ export const useEditDashboardWithAI = ({
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Edit with AI',
         value: 'edit-with-ai',
         icon: <PenSparkle />,
