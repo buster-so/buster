@@ -30,7 +30,8 @@ export const AssetGridCardSmall = React.memo(
           <div
             className={cn(
               'flex flex-col gap-y-2 h-21 border rounded py-2.5 px-3 justify-between',
-              'cursor-pointer hover:border-gray-dark bg-background'
+              'cursor-pointer hover:border-gray-dark bg-background',
+              'group-data-[state=open]:border-gray-dark'
             )}
           >
             <Text variant={'default'} className="line-clamp-2" size={'base'}>
