@@ -7,7 +7,6 @@ import { Text } from '@/components/ui/typography';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
-import type { AssetGridViewListProps } from '../AssetList.types';
 
 interface AssetGridItemProps extends LibraryAssetListItem {
   onContextMenu?: (item: LibraryAssetListItem) => void;

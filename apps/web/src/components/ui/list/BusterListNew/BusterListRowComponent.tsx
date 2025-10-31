@@ -4,7 +4,6 @@ import React from 'react';
 import { cn } from '@/lib/classMerge';
 import type { ILinkProps } from '@/types/routes';
 import { CheckboxColumn } from './CheckboxColumn';
-import { HEIGHT_OF_ROW } from './config';
 import type { BusterListColumn, BusterListProps, BusterListRowItem } from './interfaces';
 
 type BusterLilstRowComponentProps<T = unknown> = BusterListRowItem<T> &

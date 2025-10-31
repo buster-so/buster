@@ -60,19 +60,19 @@ export const CollectionThreeDotDropdown: React.FC<{
                 />,
               ],
             },
-            {
-              value: 'add-to-library',
-              label: isAddedToLibrary ? 'Remove from library' : 'Add to library',
-              icon: isAddedToLibrary ? <ASSET_ICONS.libraryAdded /> : <ASSET_ICONS.library />,
-              onClick: () => {
-                if (isAddedToLibrary) {
-                  deleteLibrary([{ assetId: id, assetType: 'collection' }]);
-                } else {
-                  addToLibrary([{ assetId: id, assetType: 'collection' }]);
-                }
-              },
-              closeOnSelect: false,
-            },
+            // {
+            //   value: 'add-to-library',
+            //   label: isAddedToLibrary ? 'Remove from library' : 'Add to library',
+            //   icon: isAddedToLibrary ? <ASSET_ICONS.libraryAdded /> : <ASSET_ICONS.library />,
+            //   onClick: () => {
+            //     if (isAddedToLibrary) {
+            //       deleteLibrary([{ assetId: id, assetType: 'collection' }]);
+            //     } else {
+            //       addToLibrary([{ assetId: id, assetType: 'collection' }]);
+            //     }
+            //   },
+            //   closeOnSelect: false,
+            // },
             {
               value: 'favorite',
               label: isFavorited ? 'Remove from favorites' : 'Add to favorites',

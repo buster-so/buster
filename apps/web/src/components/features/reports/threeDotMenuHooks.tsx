@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { useGetReport } from '@/api/buster_rest/reports';
-import { createDropdownItem } from '@/components/ui/dropdown';
-import { ShareRight } from '@/components/ui/icons';
-import { getIsEffectiveOwner } from '@/lib/share';
+import { createDropdownItem, type IDropdownItem } from '@/components/ui/dropdown';
+import { PenSparkle, ShareRight } from '@/components/ui/icons';
+import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
+import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 
 export const useShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
@@ -32,5 +33,31 @@ export const useShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
             : undefined,
       }),
     [reportId, shareAssetConfig, isEffectiveOwner]
+  );
+};
+
+export const useEditReportWithAI = ({ reportId }: { reportId: string }): IDropdownItem => {
+  const { data: shareAssetConfig } = useGetReport(
+    { id: reportId },
+    { select: getShareAssetConfig }
+  );
+  const isEditor = canEdit(shareAssetConfig?.permission);
+
+  const { onCreateFileClick, loading } = useStartChatFromAsset({
+    assetId: reportId,
+    assetType: 'report_file',
+  });
+
+  return useMemo(
+    () =>
+      createDropdownItem({
+        label: 'Edit with AI',
+        value: 'edit-with-ai',
+        icon: <PenSparkle />,
+        onClick: onCreateFileClick,
+        disabled: !isEditor,
+        loading,
+      }),
+    [reportId, onCreateFileClick, loading, isEditor]
   );
 };

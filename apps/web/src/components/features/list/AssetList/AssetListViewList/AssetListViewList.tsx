@@ -32,7 +32,7 @@ const NameComponent = (name: string, record: LibraryAssetListItem) => {
   return (
     <span className="flex gap-1.5 items-center w-full">
       <AppTooltip title={assetTypeLabel(record.asset_type)}>
-        <span className="text-icon-color flex-shrink-0">
+        <span className="text-icon-color shrink-0">
           <Icon />
         </span>
       </AppTooltip>
