@@ -30,7 +30,8 @@ export const AssetGridCardSmall = React.memo(
           <div
             className={cn(
               'flex flex-col gap-y-2 h-21 border rounded py-2.5 px-3 justify-between',
-              'cursor-pointer hover:border-gray-dark bg-background'
+              'cursor-pointer hover:border-gray-dark bg-background',
+              'group-data-[state=open]:border-gray-dark'
             )}
           >
             <Text variant={'default'} className="line-clamp-2" size={'base'}>
@@ -38,10 +39,10 @@ export const AssetGridCardSmall = React.memo(
             </Text>
             <div className="flex items-center space-x-1">
               <Avatar
-                image={created_by_avatar_url || undefined}
-                name={created_by_name || undefined}
+                image={created_by_avatar_url}
+                name={created_by_name}
                 size={12}
-                className="text-xs"
+                className="text-[6px]"
               />
               <Text variant={'tertiary'} size={'xs'}>
                 {formatDate({ date: updated_at, format: 'MMM D' })}

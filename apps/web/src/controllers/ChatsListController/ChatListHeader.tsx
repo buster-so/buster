@@ -4,6 +4,6 @@ import { Text } from '@/components/ui/typography';
 export const ChatListHeader: React.FC<{
   type: 'logs' | 'chats';
 }> = ({ type }) => {
-  const title = type === 'logs' ? 'Logs' : 'Chats';
+  const title = type === 'logs' ? 'Logs' : 'Chat history';
   return <Text>{title}</Text>;
 };
