@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { db } from '../../connection';
 import { dataSources } from '../../schema';
+import { DataSourceTypeSchema } from '../../schema-types';
+import { DataSourceType } from '../vault/credentials/types';
 
 const CreateDataSourceInputSchema = z.object({
   name: z.string().describe('Data source name'),
-  type: z.string().describe('Data source type (e.g., "motherduck")'),
+  type: DataSourceTypeSchema.describe('Data source type (e.g., "motherduck")'),
   organizationId: z.string().uuid().describe('Organization ID'),
   createdBy: z.string().uuid().describe('User ID who created this'),
   secretId: z.string().uuid().describe('Vault secret ID for credentials'),
@@ -15,7 +17,7 @@ type CreateDataSourceInput = z.infer<typeof CreateDataSourceInputSchema>;
 export interface CreateDataSourceResult {
   id: string;
   name: string;
-  type: string;
+  type: DataSourceType;
   organizationId: string;
   createdBy: string;
   updatedBy: string;

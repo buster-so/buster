@@ -4,27 +4,25 @@ import { users } from '../../schema';
 import {
   type AssetListItem,
   type AssetType,
-  AssetTypeSchema,
-  type GroupedAssetsKeys,
   type ListPermissionedAssetsInput,
   ListPermissionedAssetsInputSchema,
   type ListPermissionedAssetsResponse,
 } from '../../schema-types';
 import {
-  libraryChildChatsFromCollections,
+  childChatsFromCollections,
+  childDashboardsFromCollections,
+  childMetricsFromCollections,
+  childReportsFromCollections,
   libraryChildDashboardsFromChats,
-  libraryChildDashboardsFromCollections,
   libraryChildMetricsFromChats,
-  libraryChildMetricsFromCollections,
   libraryChildMetricsFromDashboards,
   libraryChildMetricsFromReports,
   libraryChildReportsFromChats,
-  libraryChildReportsFromCollections,
   libraryPermissionedChats,
-  libraryPermissionedCollections,
   libraryPermissionedDashboardFiles,
   libraryPermissionedMetricFiles,
   libraryPermissionedReportFiles,
+  permissionedCollections,
 } from '../asset-permissions/asset-permission-subqueries';
 
 export async function listPermissionedLibraryAssets(
@@ -57,7 +55,7 @@ export async function listPermissionedLibraryAssets(
     .union(libraryPermissionedMetricFiles(organizationId, userId))
     .union(libraryPermissionedDashboardFiles(organizationId, userId))
     .union(libraryPermissionedChats(organizationId, userId))
-    .union(libraryPermissionedCollections(organizationId, userId));
+    .union(permissionedCollections(organizationId, userId)); // Grab all collections regardless of library membership
 
   const allPermissionedAssets = includeAssetChildren
     ? baseUnion
@@ -66,10 +64,10 @@ export async function listPermissionedLibraryAssets(
         .union(libraryChildMetricsFromChats(organizationId, userId))
         .union(libraryChildDashboardsFromChats(organizationId, userId))
         .union(libraryChildReportsFromChats(organizationId, userId))
-        .union(libraryChildMetricsFromCollections(organizationId, userId))
-        .union(libraryChildDashboardsFromCollections(organizationId, userId))
-        .union(libraryChildReportsFromCollections(organizationId, userId))
-        .union(libraryChildChatsFromCollections(organizationId, userId))
+        .union(childMetricsFromCollections(organizationId, userId)) // Grab all collection children regardless of library membership
+        .union(childDashboardsFromCollections(organizationId, userId)) // Grab all collection children regardless of library membership
+        .union(childReportsFromCollections(organizationId, userId)) // Grab all collection children regardless of library membership
+        .union(childChatsFromCollections(organizationId, userId)) // Grab all collection children regardless of library membership
     : baseUnion;
 
   const permissionedAssets = allPermissionedAssets.as('permissioned_assets');

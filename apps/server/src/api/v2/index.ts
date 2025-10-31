@@ -4,6 +4,7 @@ import healthcheckRoutes from '../healthcheck';
 import apiKeysRoutes from './api_keys';
 import authRoutes from './auth';
 import chatsRoutes from './chats';
+import collectionsRoutes from './collections';
 import dashboardRoutes from './dashboards';
 import { dataSources } from './data-sources';
 import datasetsRoutes from './datasets';
@@ -59,6 +60,7 @@ const app = new Hono()
   .route('/search', searchRoutes)
   .route('/public', publicRoutes)
   .route('/dashboards', dashboardRoutes)
-  .route('/sharing', sharingRoutes);
+  .route('/sharing', sharingRoutes)
+  .route('/collections', collectionsRoutes);
 
 export default app;

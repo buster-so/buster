@@ -1,5 +1,6 @@
 import { db } from '@buster/database/connection';
 import { dataSources } from '@buster/database/schema';
+import type { DataSourceTypeValue } from '@buster/database/schema-types';
 import { v4 as uuidv4 } from 'uuid';
 import { createTestOrganization } from '../organizations/createTestOrganization';
 import { createTestUser } from '../users/createTestUser';
@@ -13,7 +14,7 @@ export async function createTestDataSource(params?: {
   organizationId?: string;
   createdBy?: string;
   name?: string;
-  type?: string;
+  type?: DataSourceTypeValue;
 }): Promise<{
   dataSourceId: string;
   organizationId: string;
@@ -27,7 +28,7 @@ export async function createTestDataSource(params?: {
     const organizationId = params?.organizationId || (await createTestOrganization());
     const userId = params?.createdBy || (await createTestUser());
     const secretId = uuidv4();
-    const dataSourceType = params?.type || 'postgresql';
+    const dataSourceType = params?.type || 'postgres';
     const name = params?.name || `Test Data Source ${uuidv4()}`;
 
     await db.insert(dataSources).values({

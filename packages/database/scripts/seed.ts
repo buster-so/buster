@@ -306,34 +306,49 @@ async function seed() {
         console.log('\n=== Creating vault secrets for data sources ===\n');
         for (const dataSource of dataSources) {
           try {
-            console.log(`Creating new vault secret for data source: ${dataSource.name}`);
-
-            // Always try to delete the existing secret first (if it exists)
-            try {
-              await tx.execute(sql`
-                DELETE FROM vault.secrets WHERE name = ${dataSource.id}
-              `);
-              console.log(`Deleted existing vault secret for ${dataSource.name}`);
-            } catch (_deleteError) {
-              // It's fine if the delete fails, it might not exist
-            }
-
-            // Create a new vault secret
-            const result = await tx.execute(sql`
-              SELECT vault.create_secret(
-                ${JSON.stringify(HARDCODED_VAULT_SECRET)}, 
-                ${dataSource.id}
-              ) as secret_id
+            // Check if a vault secret with this name already exists
+            const existingSecretResult = await tx.execute(sql`
+              SELECT id FROM vault.secrets WHERE name = ${dataSource.id}
             `);
 
             // @ts-expect-error biome-ignore lint/suspicious/noExplicitAny: Need dallin to check...
-            const secretId = result?.rows?.[0]?.secret_id;
+            const existingSecretId = existingSecretResult?.rows?.[0]?.id;
+
+            let secretId: string;
+
+            if (existingSecretId) {
+              // Use existing secret ID
+              secretId = existingSecretId;
+              console.log(`Found existing vault secret for ${dataSource.name}: ${secretId}`);
+
+              // Update the secret's value in case it changed
+              await tx.execute(sql`
+                SELECT vault.update_secret(
+                  ${existingSecretId}::uuid,
+                  ${JSON.stringify(HARDCODED_VAULT_SECRET)},
+                  ${dataSource.id},
+                  NULL
+                )
+              `);
+              console.log(`Updated vault secret value for ${dataSource.name}`);
+            } else {
+              // Create a new vault secret
+              console.log(`Creating new vault secret for data source: ${dataSource.name}`);
+              const result = await tx.execute(sql`
+                SELECT vault.create_secret(
+                  ${JSON.stringify(HARDCODED_VAULT_SECRET)},
+                  ${dataSource.id}
+                ) as secret_id
+              `);
+
+              // @ts-expect-error biome-ignore lint/suspicious/noExplicitAny: Need dallin to check...
+              secretId = result?.rows?.[0]?.secret_id;
+              console.log(`Created new vault secret for ${dataSource.name}: ${secretId}`);
+            }
 
             if (secretId) {
-              // Update the data source with the new secret ID
-              console.log(
-                `Updating data source ${dataSource.name} with new secret ID: ${secretId}`
-              );
+              // Update the data source with the correct secret ID
+              console.log(`Updating data source ${dataSource.name} with secret ID: ${secretId}`);
               await tx
                 .update(tables.dataSources)
                 .set({ secretId: secretId })

@@ -1,11 +1,10 @@
+import type { ListDatasetObject, ListDatasetsResponse } from '@buster/server-shared';
 import React, { useMemo, useState } from 'react';
-import type { BusterDatasetListItem } from '@/api/asset_interfaces';
 import { Avatar } from '@/components/ui/avatar';
 import { ArrowUpRight } from '@/components/ui/icons';
 import {
   BusterList,
   type BusterListColumn,
-  type BusterListRowItem,
   createListItem,
   ListEmptyStateWithButton,
 } from '@/components/ui/list';
@@ -14,7 +13,7 @@ import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { formatDate } from '@/lib/date';
 import { DatasetSelectedOptionPopup } from './DatasetSelectedPopup';
 
-const columns: BusterListColumn<BusterDatasetListItem>[] = [
+const columns: BusterListColumn<ListDatasetObject>[] = [
   {
     title: 'Title',
     dataIndex: 'name',
@@ -41,13 +40,13 @@ const columns: BusterListColumn<BusterDatasetListItem>[] = [
     title: 'Status',
     dataIndex: 'enabled',
     width: 75,
-    render: (_, record) => getStatusText(record as BusterDatasetListItem),
+    render: (_, record) => getStatusText(record as ListDatasetObject),
   },
   {
     title: 'Owner',
     dataIndex: 'owner',
     width: 60,
-    render: (_, dataset: BusterDatasetListItem) => (
+    render: (_, dataset: ListDatasetObject) => (
       <div className="flex w-full justify-start">
         <Avatar image={dataset.owner.avatar_url || undefined} name={dataset.owner.name} size={18} />
       </div>
@@ -56,14 +55,14 @@ const columns: BusterListColumn<BusterDatasetListItem>[] = [
 ];
 
 export const DatasetListContent: React.FC<{
-  datasetsList: BusterDatasetListItem[];
+  datasetsList: ListDatasetsResponse;
   isFetchedDatasets: boolean;
   isAdmin: boolean;
   setOpenNewDatasetModal: (open: boolean) => void;
 }> = React.memo(({ datasetsList, isFetchedDatasets, isAdmin, setOpenNewDatasetModal }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const createDatasetLinkItem = createListItem<BusterDatasetListItem>();
+  const createDatasetLinkItem = createListItem<ListDatasetObject>();
 
   const rows = useMemo(() => {
     return datasetsList.map((dataset) => {
@@ -119,7 +118,7 @@ export const DatasetListContent: React.FC<{
 
 DatasetListContent.displayName = 'DatasetListContent';
 
-const getStatusText = (d: BusterDatasetListItem) => {
+const getStatusText = (d: ListDatasetObject) => {
   if (d.enabled) {
     return 'Published';
   }
