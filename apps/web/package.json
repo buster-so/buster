@@ -114,7 +114,6 @@
     "@tanstack/router-plugin": "^1.134.4",
     "@tanstack/store": "^0.8.0",
     "@testing-library/jest-dom": "^6.9.1",
-    "@tiptap/core": "^3.9.0",
     "@tiptap/core": "^3.10.1",
     "@tiptap/extension-document": "^3.10.1",
     "@tiptap/extension-mention": "^3.10.1",
