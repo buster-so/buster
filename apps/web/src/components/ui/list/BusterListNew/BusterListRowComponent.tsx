@@ -14,6 +14,7 @@ type BusterLilstRowComponentProps<T = unknown> = BusterListRowItem<T> &
     onSelectRowChange?: (v: boolean, id: string, e: React.MouseEvent) => void;
     onContextMenuClick?: (e: React.MouseEvent<HTMLDivElement>, id: string) => void;
     onContextMenu?: (data: T | null) => void;
+    ContextMenu?: React.ComponentType<React.PropsWithChildren<T>>;
     checked: boolean;
     isLastChild: boolean;
   };
@@ -28,6 +29,7 @@ const BusterListRowComponentBase = <T = unknown>({
   onClick,
   onContextMenuClick,
   onContextMenu: onContextMenuCallback,
+  ContextMenu,
   id,
   checked,
   useRowClickSelectChange,
@@ -50,7 +52,7 @@ const BusterListRowComponentBase = <T = unknown>({
     onClick?.();
   };
 
-  return (
+  const rowContent = (
     <LinkWrapper link={link}>
       <div
         onClick={onContainerClick}
@@ -82,6 +84,12 @@ const BusterListRowComponentBase = <T = unknown>({
       </div>
     </LinkWrapper>
   );
+
+  if (ContextMenu && data) {
+    return <ContextMenu {...data}>{rowContent}</ContextMenu>;
+  }
+
+  return rowContent;
 };
 
 export const BusterListRowComponent = React.memo(BusterListRowComponentBase) as (<T>(
@@ -130,6 +138,7 @@ const LinkWrapper: React.FC<{
       preload={link.preload ?? false}
       preloadDelay={link.preloadDelay ?? 50}
       activeOptions={link.activeOptions}
+      className="h-full"
     >
       {children}
     </Link>

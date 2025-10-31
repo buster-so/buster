@@ -6,8 +6,10 @@ import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
 import { AssetGridSectionContainer } from '@/components/features/list/AssetList';
 import { AssetGridCardSmall } from '@/components/features/list/AssetList/AssetGridViewList/AssetGridCardSmall';
 import {
+  ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  type ContextMenuItems,
   ContextMenuRoot,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
@@ -44,18 +46,15 @@ const CollectionCardContextMenu = React.memo(
   }) => {
     const { mutateAsync: onDeleteCollection } = useDeleteCollection();
 
-    return (
-      <ContextMenuRoot modal={false}>
-        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="p-1 border rounded">
-          <ContextMenuItem
-            icon={<Trash />}
-            onClick={() => onDeleteCollection({ id, useConfirmModal: false })}
-          >
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenuRoot>
-    );
+    const items: ContextMenuItems = [
+      {
+        label: 'Delete',
+        value: 'delete',
+        onClick: () => onDeleteCollection({ id, useConfirmModal: false }),
+        icon: <Trash />,
+      },
+    ];
+
+    return <ContextMenu items={items}>{children}</ContextMenu>;
   }
 );

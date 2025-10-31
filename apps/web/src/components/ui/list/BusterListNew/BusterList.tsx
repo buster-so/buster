@@ -1,7 +1,6 @@
 import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual';
 import type React from 'react';
-import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { cn } from '@/lib/utils';
 import { BusterListHeader } from './BusterListHeader';
@@ -10,32 +9,6 @@ import { BusterListRowSection } from './BusterListRowSection';
 import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
 import type { BusterListImperativeHandle, BusterListProps } from './interfaces';
 import { useInfiniteScroll } from './useInfiniteScroll';
-
-// Conditional wrapper defined outside to prevent remounting
-function ConditionalContextMenuWrapper<T>({
-  children,
-  ContextMenu,
-  contextMenuProps,
-  open,
-  onOpenChange,
-}: {
-  children: React.ReactNode;
-  ContextMenu?: React.ComponentType<
-    React.PropsWithChildren<T & { open?: boolean; onOpenChange?: (open: boolean) => void }>
-  >;
-  contextMenuProps: T | null;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}) {
-  if (ContextMenu && contextMenuProps) {
-    return (
-      <ContextMenu {...contextMenuProps} open={open} onOpenChange={onOpenChange}>
-        {children}
-      </ContextMenu>
-    );
-  }
-  return <>{children}</>;
-}
 
 function BusterListBase<T = unknown>(
   {
@@ -136,20 +109,6 @@ function BusterListBase<T = unknown>(
     return idsPerSection;
   }, [rows]);
 
-  // Track which row was right-clicked for context menu
-  const [selectedRowData, setSelectedRowData] = useState<T | null>(() => {
-    // Initialize with first row data or null
-    const firstRow = rows.find((r) => r.type === 'row' && r.data);
-    return firstRow?.type === 'row' ? firstRow.data : null;
-  });
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleContextMenu = useCallback((data: T | null) => {
-    flushSync(() => {
-      setSelectedRowData(data);
-    });
-  }, []);
-
   useInfiniteScroll({
     scrollElementRef: internalScrollParentRef,
     infiniteScrollConfig,
@@ -171,46 +130,39 @@ function BusterListBase<T = unknown>(
           onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
         />
       )}
-      <ConditionalContextMenuWrapper<T>
-        ContextMenu={ContextMenu}
-        contextMenuProps={selectedRowData}
-        open={isMenuOpen}
-        onOpenChange={setIsMenuOpen}
+      <div
+        ref={mergedScrollRef}
+        className="overflow-y-auto overflow-x-hidden flex-1 w-full scrollbar-thin"
       >
         <div
-          ref={mergedScrollRef}
-          className="overflow-y-auto overflow-x-hidden flex-1 w-full scrollbar-thin"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
         >
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
-          >
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-              <BusterListRowSelector
-                {...virtualRow}
-                rows={rows}
-                columns={columns}
-                idsPerSection={idsPerSection}
-                selectedRowKeys={selectedRowKeys}
-                onSelectRowChange={onSelectChange ? onSelectRowChange : undefined}
-                onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
-                onContextMenu={ContextMenu ? handleContextMenu : undefined}
-                hideLastRowBorder={hideLastRowBorder}
-                key={virtualRow.key}
-              />
-            ))}
-          </div>
-
-          {infiniteScrollConfig?.loadingNewContent && (
-            <div className="flex items-center justify-center py-1.5 pointer-events-none">
-              {infiniteScrollConfig.loadingNewContent}
-            </div>
-          )}
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+            <BusterListRowSelector
+              {...virtualRow}
+              rows={rows}
+              columns={columns}
+              idsPerSection={idsPerSection}
+              selectedRowKeys={selectedRowKeys}
+              onSelectRowChange={onSelectChange ? onSelectRowChange : undefined}
+              onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
+              ContextMenu={ContextMenu}
+              hideLastRowBorder={hideLastRowBorder}
+              key={virtualRow.key}
+            />
+          ))}
         </div>
-      </ConditionalContextMenuWrapper>
+
+        {infiniteScrollConfig?.loadingNewContent && (
+          <div className="flex items-center justify-center py-1.5 pointer-events-none">
+            {infiniteScrollConfig.loadingNewContent}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -229,16 +181,20 @@ const BusterListRowSelector = <T = unknown>({
   selectedRowKeys,
   onSelectRowChange,
   onSelectSectionChange,
-  onContextMenu,
+  ContextMenu,
   ...rest
 }: VirtualItem & {
   idsPerSection: Map<string, Set<string>>;
   onSelectSectionChange: ((v: boolean, id: string) => void) | undefined;
   onSelectRowChange: ((v: boolean, id: string, e: React.MouseEvent) => void) | undefined;
-  onContextMenu: ((data: T | null) => void) | undefined;
 } & Pick<
     BusterListProps<T>,
-    'selectedRowKeys' | 'rows' | 'columns' | 'hideLastRowBorder' | 'useRowClickSelectChange'
+    | 'selectedRowKeys'
+    | 'rows'
+    | 'columns'
+    | 'hideLastRowBorder'
+    | 'useRowClickSelectChange'
+    | 'ContextMenu'
   >) => {
   const selectedRow = rows[index];
   const isSection = selectedRow.type === 'section';
@@ -266,7 +222,7 @@ const BusterListRowSelector = <T = unknown>({
           checked={!!selectedRowKeys?.has(selectedRow.id)}
           isLastChild={isLastChild}
           onSelectRowChange={onSelectRowChange}
-          onContextMenu={onContextMenu}
+          ContextMenu={ContextMenu}
         />
       )}
     </div>

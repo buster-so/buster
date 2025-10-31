@@ -1,7 +1,6 @@
 import type { GroupedAssets, LibraryAssetListItem } from '@buster/server-shared/library';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import React, { useCallback, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import React, { useRef } from 'react';
 import Grid2 from '@/components/ui/icons/NucleoIconOutlined/grid-2';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Text } from '@/components/ui/typography/Text';

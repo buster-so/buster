@@ -1,30 +1,21 @@
-import type { BusterCollectionListItem } from '@buster/server-shared/collections';
 import type { LibraryAssetListItem } from '@buster/server-shared/library';
 import { Link, type LinkProps } from '@tanstack/react-router';
 import { cn } from '@udecode/cn';
 import React from 'react';
-import { useDeleteCollection } from '@/api/buster_rest/collections';
 import { Avatar } from '@/components/ui/avatar';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu';
-import { Trash } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
 import { formatDate } from '@/lib/date';
 import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 
 export const AssetGridCardSmall = React.memo(
   ({
-    asset_id,
-    asset_type,
     name,
     updated_at,
     created_by_avatar_url,
     created_by_name,
     ContextMenu,
+    asset_id,
+    asset_type,
   }: LibraryAssetListItem & {
     ContextMenu: React.FC<React.PropsWithChildren>;
   }) => {

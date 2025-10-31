@@ -206,7 +206,7 @@ export const MenuUnified = <
         {isDropdownVariant ? (
           <span className="dropdown-trigger">{children}</span>
         ) : (
-          <div className="flex-1 flex flex-col min-h-0">{children}</div>
+          <div className="flex-1 flex flex-col min-h-0 h-full">{children}</div>
         )}
       </Trigger>
       <Content
