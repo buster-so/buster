@@ -87,16 +87,7 @@ const ContextMenuItem = React.forwardRef<
   }
 >(
   (
-    {
-      className,
-      inset,
-      truncate,
-      icon,
-      closeOnSelect: _closeOnSelect = true,
-      onClick,
-      children,
-      ...props
-    },
+    { className, inset, truncate, icon, closeOnSelect: _closeOnSelect = true, children, ...props },
     ref
   ) => (
     <ContextMenuPrimitive.Item

@@ -9,31 +9,20 @@ import { createSimpleAssetRoute } from '@/lib/routes/createSimpleAssetRoute';
 import { cn } from '@/lib/utils';
 
 interface AssetGridItemProps extends LibraryAssetListItem {
-  onContextMenu?: (item: LibraryAssetListItem) => void;
+  ContextMenu?: React.ComponentType<React.PropsWithChildren<LibraryAssetListItem>>;
 }
 
 export const AssetGridItem = React.memo((props: AssetGridItemProps) => {
-  const { asset_id, asset_type, name, updated_at, screenshot_url, onContextMenu, ...rest } = props;
+  const { asset_id, asset_type, name, updated_at, screenshot_url, ContextMenu } = props;
   const imageUrl = screenshot_url ?? getScreenshotSkeleton(asset_type);
   const link = createSimpleAssetRoute({
     asset_type,
     id: asset_id,
   }) as LinkProps;
 
-  const handleContextMenu = () => {
-    if (onContextMenu) {
-      // Don't prevent default - let Radix handle the context menu trigger
-      // Just update which item is selected
-      onContextMenu(props);
-    }
-  };
-
-  return (
+  const cardContent = (
     <Link {...link} preload={false} className="h-full">
-      <div
-        onContextMenu={handleContextMenu}
-        className="group border rounded cursor-pointer hover:bg-item-hover-active hover:border-gray-dark! overflow-hidden h-full flex flex-col"
-      >
+      <div className="group border rounded cursor-pointer hover:bg-item-hover-active hover:border-gray-dark! overflow-hidden h-full flex flex-col">
         <div
           className={cn(
             'px-2.5 flex-1 pt-1.5 bg-item-select overflow-hidden',
@@ -61,6 +50,12 @@ export const AssetGridItem = React.memo((props: AssetGridItemProps) => {
       </div>
     </Link>
   );
+
+  if (ContextMenu) {
+    return <ContextMenu {...props}>{cardContent}</ContextMenu>;
+  }
+
+  return cardContent;
 });
 
 AssetGridItem.displayName = 'AssetGridItem';
