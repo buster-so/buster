@@ -4,7 +4,6 @@ import React, { useCallback, useMemo } from 'react';
 import { useGetReport } from '@/api/buster_rest/reports';
 import { useFavoriteStar } from '@/components/features/favorites/useFavoriteStar';
 import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
-import { getShareAssetConfig, ShareMenuContent } from '@/components/features/ShareMenu';
 import { useListReportVersionDropdownItems } from '@/components/features/versionHistory/useListReportVersionDropdownItems';
 import { Button } from '@/components/ui/buttons';
 import {
@@ -31,7 +30,11 @@ import { useIsMac } from '@/hooks/usePlatform';
 import { useEditorContext } from '@/layouts/AssetContainer/ReportAssetContainer';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
-import { useEditReportWithAI, useShareMenuSelectMenu } from './threeDotMenuHooks';
+import {
+  useEditReportWithAI,
+  useFavoriteReportSelectMenu,
+  useReportShareMenuSelectMenu,
+} from './threeDotMenuHooks';
 
 export const ReportThreeDotMenu = React.memo(
   ({
@@ -45,7 +48,7 @@ export const ReportThreeDotMenu = React.memo(
     const chatId = useGetChatId();
     const openReport = useOpenReport({ reportId });
     const editWithAI = useEditReportWithAI({ reportId });
-    const shareMenu = useShareMenuSelectMenu({ reportId });
+    const shareMenu = useReportShareMenuSelectMenu({ reportId });
     const favoriteItem = useFavoriteReportSelectMenu({ reportId });
     const versionHistory = useVersionHistorySelectMenu({ reportId });
     const undoRedo = useUndoRedo();
@@ -113,29 +116,6 @@ export const ReportThreeDotMenu = React.memo(
 );
 
 ReportThreeDotMenu.displayName = 'ReportThreeDotMenu';
-
-// Favorites for report (toggle add/remove)
-const stableReportNameSelector = (state: ReportResponse) => state.name;
-const useFavoriteReportSelectMenu = ({ reportId }: { reportId: string }): IDropdownItem => {
-  const { data: name } = useGetReport({ id: reportId }, { select: stableReportNameSelector });
-  const { isFavorited, onFavoriteClick } = useFavoriteStar({
-    id: reportId,
-    type: 'report_file',
-    name: name || '',
-  });
-
-  return useMemo(
-    () =>
-      createDropdownItem({
-        label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-        value: 'toggle-favorite',
-        icon: isFavorited ? <StarFilled /> : <Star />,
-        onClick: () => onFavoriteClick(),
-        closeOnSelect: false,
-      }),
-    [isFavorited, onFavoriteClick]
-  );
-};
 
 // Version history for report
 const useVersionHistorySelectMenu = ({ reportId }: { reportId: string }): IDropdownItem => {

@@ -1,13 +1,16 @@
+import type { ReportResponse } from '@buster/server-shared/reports';
 import { useMemo } from 'react';
 import { useGetReport } from '@/api/buster_rest/reports';
-import type { IDropdownItem } from '@/components/ui/dropdown';
-import { PenSparkle, ShareRight } from '@/components/ui/icons';
+import { createDropdownItem, type IDropdownItem } from '@/components/ui/dropdown';
+import { PenSparkle, ShareRight, Star } from '@/components/ui/icons';
+import { StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
+import { useFavoriteStar } from '../favorites';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 
-export const useShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
+export const useReportShareMenuSelectMenu = ({ reportId }: { reportId: string }) => {
   const { data: shareAssetConfig } = useGetReport(
     { id: reportId },
     { select: getShareAssetConfig }
@@ -62,5 +65,28 @@ export const useEditReportWithAI = ({ reportId }: { reportId: string }) => {
         loading,
       }),
     [reportId, onCreateFileClick, loading, isEditor]
+  );
+};
+
+// Favorites for report (toggle add/remove)
+const stableReportNameSelector = (state: ReportResponse) => state.name;
+export const useFavoriteReportSelectMenu = ({ reportId }: { reportId: string }): IDropdownItem => {
+  const { data: name } = useGetReport({ id: reportId }, { select: stableReportNameSelector });
+  const { isFavorited, onFavoriteClick } = useFavoriteStar({
+    id: reportId,
+    type: 'report_file',
+    name: name || '',
+  });
+
+  return useMemo(
+    () =>
+      createDropdownItem({
+        label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
+        value: 'toggle-favorite',
+        icon: isFavorited ? <StarFilled /> : <Star />,
+        onClick: () => onFavoriteClick(),
+        closeOnSelect: false,
+      }),
+    [isFavorited, onFavoriteClick]
   );
 };

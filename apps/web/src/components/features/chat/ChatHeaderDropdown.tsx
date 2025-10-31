@@ -7,12 +7,12 @@ import { useGetChatId } from '@/context/Chats/useGetChatId';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { useAddToLibraryCollection } from '../library/useAddToLibraryCollection';
 import {
+  useChatShareMenuSelectMenu,
   useDeleteChatSelectMenu,
   useDuplicateChatSelectMenu,
   useFavoriteChatSelectMenu,
   useOpenInNewTabSelectMenu,
   useRenameChatTitle,
-  useShareMenuSelectMenu,
 } from './threeDotMenuHooks';
 
 const stablePermissionSelector = (chat: IBusterChat) => chat.permission;
@@ -25,7 +25,7 @@ export const ChatContainerHeaderDropdown: React.FC<{
     { id: chatId || '' },
     { select: stablePermissionSelector }
   );
-  const shareMenu = useShareMenuSelectMenu({ chatId });
+  const shareMenu = useChatShareMenuSelectMenu({ chatId });
   const renameChatTitle = useRenameChatTitle();
   const addToLibraryCollectionMenu = useAddToLibraryCollection({
     assetId: chatId || '',

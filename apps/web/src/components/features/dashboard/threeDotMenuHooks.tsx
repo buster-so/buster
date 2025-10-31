@@ -205,7 +205,7 @@ export const useOpenFullScreenDashboard = ({ dashboardId }: { dashboardId: strin
   );
 };
 
-export const useShareMenuSelectMenu = ({
+export const useDashboardShareMenuSelectMenu = ({
   dashboardId,
   dashboardVersionNumber,
 }: {

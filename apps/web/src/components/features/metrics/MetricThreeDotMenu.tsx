@@ -10,11 +10,8 @@ import {
   useBulkUpdateMetricVerificationStatus,
   useDeleteMetric,
   useGetMetric,
-  useRemoveMetricFromCollection,
-  useSaveMetricToCollections,
 } from '@/api/buster_rest/metrics';
 import { useIsUserAdmin } from '@/api/buster_rest/users/useGetUserInfo';
-import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
 import { useSaveToDashboardDropdownContent } from '@/components/features/dropdowns/SaveToDashboardDropdown';
 import { StatusBadgeIndicator } from '@/components/features/metrics/StatusBadgeIndicator';
 import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
@@ -22,10 +19,9 @@ import {
   useDownloadMetricDataCSV,
   useDownloadPNGSelectMenu,
   useEditMetricWithAI,
+  useMetricShareMenuSelectMenu,
   useOpenChartItem,
 } from '@/components/features/metrics/threeDotMenuHooks';
-import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
-import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
 import { Button } from '@/components/ui/buttons';
 import {
   createDropdownItem,
@@ -34,7 +30,7 @@ import {
   type IDropdownItem,
   type IDropdownItems,
 } from '@/components/ui/dropdown';
-import { Dots, ShareRight, SquareChartPen, SquareCode, Table, Trash } from '@/components/ui/icons';
+import { Dots, SquareChartPen, SquareCode, Table, Trash } from '@/components/ui/icons';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useIsChatMode } from '@/context/Chats/useMode';
 import { useMetricEditToggle } from '@/layouts/AssetContainer/MetricAssetContainer';
@@ -88,7 +84,7 @@ export const MetricThreeDotMenuDropdown = React.memo(
       metricVersionNumber: versionNumber,
     });
     const editWithAI = useEditMetricWithAI({ metricId, versionNumber });
-    const shareMenu = useShareMenuSelectMenu({ metricId, versionNumber });
+    const shareMenu = useMetricShareMenuSelectMenu({ metricId, versionNumber });
     const drilldownItem = useMetricDrilldownItem({ metricId });
 
     const isEditor = canEdit(permission);
@@ -323,40 +319,5 @@ const useDeleteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
       },
     }),
     [metricId, deleteMetric]
-  );
-};
-
-export const useShareMenuSelectMenu = ({
-  metricId,
-  versionNumber,
-}: {
-  metricId: string;
-  versionNumber: number | undefined;
-}) => {
-  const { data: shareAssetConfig } = useGetMetric(
-    { id: metricId, versionNumber },
-    { select: getShareAssetConfig }
-  );
-  const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);
-
-  return useMemo(
-    () => ({
-      label: 'Share metric',
-      value: 'share-metric',
-      icon: <ShareRight />,
-      disabled: !isEffectiveOwner,
-      items:
-        isEffectiveOwner && shareAssetConfig
-          ? [
-              <ShareMenuContent
-                key={metricId}
-                shareAssetConfig={shareAssetConfig}
-                assetId={metricId}
-                assetType={'metric_file'}
-              />,
-            ]
-          : undefined,
-    }),
-    [metricId, shareAssetConfig, isEffectiveOwner]
   );
 };

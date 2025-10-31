@@ -16,6 +16,7 @@ import {
   History,
   Image,
   PenSparkle,
+  ShareRight,
   SquareChartPen,
   Star,
   Table,
@@ -26,9 +27,10 @@ import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAs
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { ensureElementExists } from '@/lib/element';
 import { downloadElementToImage } from '@/lib/exportUtils';
-import { canEdit } from '../../../lib/share';
+import { canEdit, getIsEffectiveOwner } from '../../../lib/share';
 import { FollowUpWithAssetContent } from '../assets/FollowUpWithAsset';
 import { useFavoriteStar } from '../favorites';
+import { ShareMenuContent } from '../ShareMenu';
 import { getShareAssetConfig } from '../ShareMenu/helpers';
 import { useListMetricVersionDropdownItems } from '../versionHistory/useListMetricVersionDropdownItems';
 import { METRIC_CHART_CONTAINER_ID } from './MetricChartCard/config';
@@ -416,5 +418,40 @@ export const useEditMetricWithAI = ({
         loading,
       }),
     [metricId, onCreateFileClick, loading, isEditor]
+  );
+};
+
+export const useMetricShareMenuSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
+  const { data: shareAssetConfig } = useGetMetric(
+    { id: metricId, versionNumber },
+    { select: getShareAssetConfig }
+  );
+  const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);
+
+  return useMemo(
+    () => ({
+      label: 'Share metric',
+      value: 'share-metric',
+      icon: <ShareRight />,
+      disabled: !isEffectiveOwner,
+      items:
+        isEffectiveOwner && shareAssetConfig
+          ? [
+              <ShareMenuContent
+                key={metricId}
+                shareAssetConfig={shareAssetConfig}
+                assetId={metricId}
+                assetType={'metric_file'}
+              />,
+            ]
+          : undefined,
+    }),
+    [metricId, shareAssetConfig, isEffectiveOwner]
   );
 };

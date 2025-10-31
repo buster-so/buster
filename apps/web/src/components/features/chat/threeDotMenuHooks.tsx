@@ -1,17 +1,9 @@
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { IBusterChat } from '@/api/asset_interfaces';
-import {
-  useDeleteChat,
-  useDuplicateChat,
-  useGetChat,
-  useRemoveChatFromCollections,
-  useSaveChatToCollections,
-} from '@/api/buster_rest/chats';
-import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
+import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
 import { useFavoriteStar } from '@/components/features/favorites';
-import { ASSET_ICONS } from '@/components/features/icons/assetIcons';
-import { createDropdownItem, DropdownContent, type IDropdownItem } from '@/components/ui/dropdown';
+import { createDropdownItem } from '@/components/ui/dropdown';
 import { ArrowRight, DuplicatePlus, Pencil, ShareRight, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -21,7 +13,7 @@ import { timeout } from '@/lib/timeout';
 import { getShareAssetConfig, ShareMenuContent } from '../ShareMenu';
 import { CHAT_HEADER_TITLE_ID } from './ChatHeaderTitle';
 
-export const useShareMenuSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
+export const useChatShareMenuSelectMenu = ({ chatId = '' }: { chatId: string | undefined }) => {
   const { data: shareAssetConfig } = useGetChat({ id: chatId }, { select: getShareAssetConfig });
   const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);
 
