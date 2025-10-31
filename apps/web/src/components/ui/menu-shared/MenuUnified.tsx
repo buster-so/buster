@@ -1,6 +1,6 @@
 import { Link, type RegisteredRouter } from '@tanstack/react-router';
 import type React from 'react';
-import { Children, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
@@ -82,7 +82,13 @@ export interface UnifiedMenuProps<
   /** Whether this is a dropdown (click) or context menu (right-click) */
   variant: 'dropdown' | 'context';
   /** Menu items to display */
-  items: MenuItems<T, TRouter, TOptions, TFrom>;
+  items:
+    | MenuItems<T, TRouter, TOptions, TFrom>
+    | ((
+        MenuContentRenderer: React.ComponentType<{
+          items: MenuItems<T, TRouter, TOptions, TFrom>;
+        }>
+      ) => React.ReactNode);
   /** Selection behavior */
   selectType?: 'single' | 'multiple' | 'none' | 'single-selectable-link';
   /** Header content - if string, renders search box */
@@ -200,6 +206,55 @@ export const MenuUnified = <
   const { Root, Trigger, Content } = primitives;
   const isDropdownVariant = variant === 'dropdown';
 
+  // Create a pre-configured MenuContentRenderer that only requires items prop
+  const renderContent = useMemo(() => {
+    const BoundMenuContentRenderer = ({
+      items: itemsToRender,
+    }: {
+      items: MenuItems<T, TRouter, TOptions, TFrom>;
+    }) => (
+      <MenuContentRenderer<T, TRouter, TOptions, TFrom>
+        variant={variant}
+        items={itemsToRender}
+        selectType={selectType}
+        menuHeader={menuHeader}
+        onSelect={onSelect}
+        showIndex={showIndex}
+        emptyStateText={emptyStateText}
+        footerContent={footerContent}
+        className={contentClassName}
+        footerClassName={footerClassName}
+        menuHeaderClassName={menuHeaderClassName}
+        showEmptyState={showEmptyState}
+        onScrollToBottom={onScrollToBottom}
+        primitives={primitives}
+      />
+    );
+
+    // If items is a function, call it with the bound component
+    if (typeof items === 'function') {
+      return items(BoundMenuContentRenderer);
+    }
+
+    // Otherwise render the bound component directly with items
+    return <BoundMenuContentRenderer items={items} />;
+  }, [
+    items,
+    variant,
+    selectType,
+    menuHeader,
+    onSelect,
+    showIndex,
+    emptyStateText,
+    footerContent,
+    contentClassName,
+    footerClassName,
+    menuHeaderClassName,
+    showEmptyState,
+    onScrollToBottom,
+    primitives,
+  ]);
+
   return (
     <Root open={open} defaultOpen={open} onOpenChange={onOpenChange} dir={dir} modal={modal}>
       <Trigger asChild disabled={disabled}>
@@ -218,22 +273,7 @@ export const MenuUnified = <
         side={variant === 'dropdown' ? side : undefined}
         sideOffset={sideOffset}
       >
-        <MenuContentRenderer<T, TRouter, TOptions, TFrom>
-          variant={variant}
-          items={items}
-          selectType={selectType}
-          menuHeader={menuHeader}
-          onSelect={onSelect}
-          showIndex={showIndex}
-          emptyStateText={emptyStateText}
-          footerContent={footerContent}
-          className={contentClassName}
-          footerClassName={footerClassName}
-          menuHeaderClassName={menuHeaderClassName}
-          showEmptyState={showEmptyState}
-          onScrollToBottom={onScrollToBottom}
-          primitives={primitives}
-        />
+        {renderContent}
       </Content>
     </Root>
   );
@@ -244,8 +284,9 @@ interface MenuContentRendererProps<
   TRouter extends RegisteredRouter = RegisteredRouter,
   TOptions = unknown,
   TFrom extends string = string,
-> extends Omit<UnifiedMenuProps<T, TRouter, TOptions, TFrom>, 'variant' | 'children'> {
+> extends Omit<UnifiedMenuProps<T, TRouter, TOptions, TFrom>, 'variant' | 'children' | 'items'> {
   variant: 'dropdown' | 'context';
+  items: MenuItems<T, TRouter, TOptions, TFrom>;
   primitives: MenuPrimitives;
 }
 

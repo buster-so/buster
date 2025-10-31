@@ -15,28 +15,11 @@ export const ContextMenuBase = <
   TOptions = unknown,
   TFrom extends string = string,
 >({
-  items,
-  className,
-  disabled,
   children,
-  dir,
-  modal,
-  onSelect,
-  selectType,
   ...props
 }: ContextMenuProps<T, TRouter, TOptions, TFrom>) => {
   return (
-    <MenuUnified<T, TRouter, TOptions, TFrom>
-      variant="context"
-      items={items}
-      className={className}
-      disabled={disabled}
-      dir={dir}
-      modal={modal}
-      onSelect={onSelect}
-      selectType={selectType}
-      {...props}
-    >
+    <MenuUnified<T, TRouter, TOptions, TFrom> variant="context" {...props}>
       {children}
     </MenuUnified>
   );

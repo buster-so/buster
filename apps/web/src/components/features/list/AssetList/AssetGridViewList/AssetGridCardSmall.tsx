@@ -19,21 +19,13 @@ export const AssetGridCardSmall = React.memo(
   }: LibraryAssetListItem & {
     ContextMenu: React.FC<React.PropsWithChildren>;
   }) => {
-    const Wrapper = ({ children }: { children: React.ReactNode }) => {
-      if (ContextMenu) {
-        return <ContextMenu>{children}</ContextMenu>;
-      }
-
-      return <>{children}</>;
-    };
-
     const link = createSimpleAssetRoute({
       asset_type,
       id: asset_id,
     }) as LinkProps;
 
     return (
-      <Wrapper>
+      <Wrapper ContextMenu={ContextMenu}>
         <Link {...link}>
           <div
             className={cn(
@@ -63,3 +55,17 @@ export const AssetGridCardSmall = React.memo(
 );
 
 AssetGridCardSmall.displayName = 'AssetGridCardSmall';
+
+const Wrapper = ({
+  children,
+  ContextMenu,
+}: {
+  children: React.ReactNode;
+  ContextMenu: React.FC<React.PropsWithChildren>;
+}) => {
+  if (ContextMenu) {
+    return <ContextMenu>{children}</ContextMenu>;
+  }
+
+  return <>{children}</>;
+};

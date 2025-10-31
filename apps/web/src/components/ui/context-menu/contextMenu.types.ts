@@ -37,10 +37,14 @@ export interface ContextMenuProps<
   TFrom extends string = string,
 > extends Omit<
     UnifiedMenuProps<T, TRouter, TOptions, TFrom>,
-    'variant' | 'items' | 'children' | 'align' | 'side' | 'sideOffset'
+    'variant' | 'items' | 'children' | 'align' | 'side' | 'sideOffset' | 'open' | 'onOpenChange'
   > {
   /** Context menu items - type alias for MenuItems for backward compatibility */
   items: ContextMenuItems<T, TRouter, TOptions, TFrom>;
   /** Trigger element */
   children: React.ReactNode;
+  /** Controlled open state */
+  open?: boolean;
+  /** Open state change callback */
+  onOpenChange?: (open: boolean) => void;
 }
