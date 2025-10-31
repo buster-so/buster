@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/correctness/noConstructorReturn: for tests it seems fine */
+import type { Mock } from 'vitest';
 import { vi } from 'vitest';
 
 // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
@@ -6,7 +7,15 @@ export function createMockFunction<T extends (...args: any[]) => any>(implementa
   return vi.fn(implementation);
 }
 
-export function mockConsole() {
+export function mockConsole(): {
+  restore: () => void;
+  mocks: {
+    log: Mock;
+    error: Mock;
+    warn: Mock;
+    info: Mock;
+  };
+} {
   const originalMethods = {
     log: console.log,
     error: console.error,
