@@ -7,10 +7,7 @@ import {
   type User,
   updateCollection,
 } from '@buster/database/queries';
-import {
-  type BusterCollection,
-  UpdateCollectionRequestBodySchema,
-} from '@buster/server-shared/collections';
+import { type BusterCollection, UpdateCollectionRequestBodySchema } from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
 import { convertScreenshotUrl } from '@shared-helpers/screenshots';
 import { Hono } from 'hono';

@@ -4,10 +4,7 @@ import {
   getUserOrganizationId,
   type User,
 } from '@buster/database/queries';
-import {
-  type BusterCollection,
-  CreateCollectionRequestBodySchema,
-} from '@buster/server-shared/collections';
+import { type BusterCollection, CreateCollectionRequestBodySchema } from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';

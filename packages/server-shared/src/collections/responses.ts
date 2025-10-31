@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AssetTypeSchema } from '../assets';
 import {
   ShareAssetTypeSchema,
   ShareConfigSchema,
@@ -61,5 +62,22 @@ export const DeleteCollectionsResponseSchema = z.object({
   success_ids: z.array(z.string()),
   failure_ids: z.array(z.string()),
 });
-
 export type DeleteCollectionsResponse = z.infer<typeof DeleteCollectionsResponseSchema>;
+
+export const AddAndRemoveFromCollectionResponseSchema = z.object({
+  failed_assets: z.array(
+    z.object({
+      type: AssetTypeSchema,
+      id: z.string(),
+      error: z.string(),
+    })
+  ),
+  failed_count: z.number(),
+  message: z.string(),
+  removed_count: z.number(),
+  added_count: z.number(),
+});
+
+export type AddAndRemoveFromCollectionResponse = z.infer<
+  typeof AddAndRemoveFromCollectionResponseSchema
+>;

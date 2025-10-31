@@ -1,4 +1,10 @@
 export {
+  type AddAssetsResult,
+  type AddAssetToCollectionInput,
+  AddAssetToCollectionInputSchema,
+  addAssetsToCollection,
+} from './add-assets-to-collection';
+export {
   type CreateCollectionInput,
   CreateCollectionInputSchema,
   createCollection,
@@ -28,6 +34,12 @@ export {
   type ListCollectionsResponse,
   listCollections,
 } from './list-collections';
+export {
+  type RemoveAssetFromCollectionInput,
+  RemoveAssetFromCollectionInputSchema,
+  type RemoveAssetsResult,
+  removeAssetsFromCollection,
+} from './remove-assets-from-collection';
 export {
   type UpdateCollectionInput,
   UpdateCollectionInputSchema,

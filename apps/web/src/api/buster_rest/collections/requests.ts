@@ -1,6 +1,6 @@
 import type {
   AddAndRemoveFromCollectionResponse,
-  AddAssetToCollectionRequestBody,
+  AddOrRemoveAssetToCollectionRequestBody,
   BusterCollection,
   CreateCollectionRequestBody,
   DeleteCollectionRequestBody,
@@ -12,10 +12,12 @@ import type {
 } from '@buster/server-shared/collections';
 import type {
   ShareDeleteRequest,
+  ShareDeleteResponse,
   SharePostRequest,
+  SharePostResponse,
   ShareUpdateRequest,
 } from '@buster/server-shared/share';
-import { mainApi, mainApiV2 } from '../instances';
+import { mainApiV2 } from '../instances';
 
 export const collectionsGetList = async (params: GetCollectionsRequestQuery) => {
   return await mainApiV2
@@ -23,13 +25,8 @@ export const collectionsGetList = async (params: GetCollectionsRequestQuery) => 
     .then((res) => res.data);
 };
 
-export const collectionsGetCollection = async ({
-  id,
-  ...params
-}: GetIndividualCollectionRequestParams) => {
-  return await mainApiV2
-    .get<BusterCollection>(`/collections/${id}`, { params })
-    .then((res) => res.data);
+export const collectionsGetCollection = async ({ id }: GetIndividualCollectionRequestParams) => {
+  return await mainApiV2.get<BusterCollection>(`/collections/${id}`).then((res) => res.data);
 };
 
 export const collectionsCreateCollection = async (params: CreateCollectionRequestBody) => {
@@ -53,12 +50,14 @@ export const collectionsDeleteCollection = async (data: DeleteCollectionRequestB
 // share collections
 
 export const shareCollection = async ({ id, params }: { id: string; params: SharePostRequest }) => {
-  return mainApi.post<string>(`/collections/${id}/sharing`, params).then((res) => res.data);
+  return mainApiV2
+    .post<SharePostResponse>(`/collections/${id}/sharing`, params)
+    .then((res) => res.data);
 };
 
 export const unshareCollection = async ({ id, data }: { id: string; data: ShareDeleteRequest }) => {
-  return mainApi
-    .delete<BusterCollection>(`/collections/${id}/sharing`, { data })
+  return mainApiV2
+    .delete<ShareDeleteResponse>(`/collections/${id}/sharing`, { data })
     .then((res) => res.data);
 };
 
@@ -69,7 +68,7 @@ export const updateCollectionShare = async ({
   id: string;
   params: ShareUpdateRequest;
 }) => {
-  return mainApi
+  return mainApiV2
     .put<BusterCollection>(`/collections/${id}/sharing`, params)
     .then((res) => res.data);
 };
@@ -79,8 +78,8 @@ export const addAssetToCollection = async ({
   assets,
 }: {
   id: string;
-} & AddAssetToCollectionRequestBody) => {
-  return mainApi
+} & AddOrRemoveAssetToCollectionRequestBody) => {
+  return mainApiV2
     .post<AddAndRemoveFromCollectionResponse>(`/collections/${id}/assets`, { assets })
     .then((res) => res.data);
 };
@@ -88,8 +87,10 @@ export const addAssetToCollection = async ({
 export const removeAssetFromCollection = async ({
   id,
   assets,
-}: Parameters<typeof addAssetToCollection>[0]) => {
-  return mainApi
+}: {
+  id: string;
+} & AddOrRemoveAssetToCollectionRequestBody) => {
+  return mainApiV2
     .delete<AddAndRemoveFromCollectionResponse>(`/collections/${id}/assets`, { data: { assets } })
     .then((res) => res.data);
 };

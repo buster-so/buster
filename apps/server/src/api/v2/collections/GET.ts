@@ -2,7 +2,7 @@ import { getUserOrganizationId, listCollections, type User } from '@buster/datab
 import {
   GetCollectionsRequestQuerySchema,
   type GetCollectionsResponse,
-} from '@buster/server-shared/collections';
+} from '@buster/server-shared';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 

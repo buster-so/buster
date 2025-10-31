@@ -80,7 +80,7 @@ export const useGetCollection = <T = BusterCollection>(
   return useQuery({
     ...collectionQueryKeys.collectionsGetCollection(collectionId || ''),
     queryFn: () => {
-      return collectionsGetCollection({ id: collectionId || '', password });
+      return collectionsGetCollection({ id: collectionId || '' });
     },
     enabled: !!collectionId,
     select: params?.select,
@@ -211,12 +211,9 @@ export const useShareCollection = () => {
         });
       });
     },
-    onSuccess: (data) => {
-      const partialMatchedKey = collectionQueryKeys
-        .collectionsGetCollection(data)
-        .queryKey.slice(0, -1);
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: partialMatchedKey,
+        queryKey: collectionQueryKeys.collectionsGetCollection(variables.id).queryKey,
         refetchType: 'all',
       });
     },
@@ -238,11 +235,11 @@ export const useUnshareCollection = () => {
         });
       });
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
-        collectionQueryKeys.collectionsGetCollection(data.id).queryKey,
-        data
-      );
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: collectionQueryKeys.collectionsGetCollection(variables.id).queryKey,
+        refetchType: 'all',
+      });
     },
   });
 };
