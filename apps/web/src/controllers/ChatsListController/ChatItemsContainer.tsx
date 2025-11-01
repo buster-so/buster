@@ -1,5 +1,4 @@
 import type { ChatListItem } from '@buster/server-shared/chats';
-import type { LinkProps } from '@tanstack/react-router';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { FavoriteStar } from '@/components/features/favorites/FavoriteStar';
 import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator';

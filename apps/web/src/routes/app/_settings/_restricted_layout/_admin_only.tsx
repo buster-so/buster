@@ -7,10 +7,18 @@ export const Route = createFileRoute('/app/_settings/_restricted_layout/_admin_o
     const lastMatch = matches[matches.length - 1];
     const { queryClient } = context;
     const userData = await prefetchGetMyUserInfo(queryClient);
-    if (!userData || !userData.organizations || !checkIfUserIsAdmin(userData.organizations[0])) {
+
+    if (!userData || !userData.organizations) {
       throw redirect({
         to: '/auth/login',
         search: { next: lastMatch.pathname },
+        replace: true,
+        statusCode: 307,
+      });
+    }
+    if (!checkIfUserIsAdmin(userData.organizations[0])) {
+      throw redirect({
+        to: '/app/home',
         replace: true,
         statusCode: 307,
       });

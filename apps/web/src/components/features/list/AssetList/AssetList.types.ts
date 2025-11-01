@@ -11,7 +11,11 @@ export type AssetGridViewListProps = {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   groups: undefined | Record<string, LibraryAssetListItem[]>;
   emptyContent: React.ReactNode;
-  ContextMenu: React.FC<React.PropsWithChildren<LibraryAssetListItem>>;
+  ContextMenu: React.ComponentType<
+    React.PropsWithChildren<
+      LibraryAssetListItem & { open?: boolean; onOpenChange?: (open: boolean) => void }
+    >
+  >;
   groupBy: 'asset_type' | 'owner' | 'created_at' | 'updated_at' | 'none' | undefined;
   type: 'library' | 'shared-with-me';
 };
@@ -29,5 +33,5 @@ export type AssetListItem = Pick<
 >;
 
 export type AssetListViewListProps = AssetGridViewListProps & {
-  prelistItems?: BusterListRow<AssetListItem>[];
+  prelistItems?: BusterListRow<LibraryAssetListItem>[];
 };

@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import { useDownloadMetricFile, useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import {
-  createDropdownItem,
   createDropdownItems,
   DropdownContent,
   type IDropdownItem,
@@ -17,18 +16,19 @@ import {
   History,
   Image,
   PenSparkle,
+  ShareRight,
   SquareChartPen,
-  Star,
   Table,
 } from '@/components/ui/icons';
-import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { createMenuItem } from '@/components/ui/menu-shared';
 import { useStartChatFromAsset } from '@/context/BusterAssets/useStartChatFromAsset';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { ensureElementExists } from '@/lib/element';
 import { downloadElementToImage } from '@/lib/exportUtils';
-import { canEdit } from '../../../lib/share';
+import { canEdit, getIsEffectiveOwner } from '../../../lib/share';
 import { FollowUpWithAssetContent } from '../assets/FollowUpWithAsset';
-import { useFavoriteStar } from '../favorites';
+import { createFavoriteMenuItem, useFavoriteStar } from '../favorites';
+import { ShareMenuContent } from '../ShareMenu';
 import { getShareAssetConfig } from '../ShareMenu/helpers';
 import { useListMetricVersionDropdownItems } from '../versionHistory/useListMetricVersionDropdownItems';
 import { METRIC_CHART_CONTAINER_ID } from './MetricChartCard/config';
@@ -93,19 +93,14 @@ export const useFavoriteMetricSelectMenu = ({
     name: name || '',
   });
 
-  const item: IDropdownItem = useMemo(
+  return useMemo(
     () =>
-      createDropdownItem({
-        label: isFavorited ? 'Remove from favorites' : 'Add to favorites',
-        value: 'add-to-favorites',
-        icon: isFavorited ? <StarFilled /> : <Star />,
-        onClick: () => onFavoriteClick(),
-        closeOnSelect: false,
+      createFavoriteMenuItem({
+        isFavorited,
+        onFavoriteClick,
       }),
     [isFavorited, onFavoriteClick]
   );
-
-  return item;
 };
 
 export const useMetricDrilldownItem = ({ metricId }: { metricId: string }): IDropdownItem => {
@@ -181,7 +176,8 @@ export const useDownloadMetricDataCSV = ({
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Download as CSV',
         value: 'download-csv',
         icon: <Download4 />,
@@ -247,8 +243,9 @@ export const useOpenChartItem = ({
 }: {
   metricId: string;
   metricVersionNumber: number | undefined;
-}): IDropdownItem => {
-  return createDropdownItem({
+}) => {
+  return createMenuItem({
+    type: 'item',
     value: 'open-chart',
     label: 'Open chart',
     icon: <ArrowUpRight />,
@@ -391,7 +388,7 @@ export const useEditMetricWithAI = ({
 }: {
   metricId: string;
   versionNumber: number | undefined;
-}): IDropdownItem => {
+}) => {
   const { data: shareAssetConfig } = useGetMetric(
     { id: metricId, versionNumber },
     { select: getShareAssetConfig }
@@ -405,7 +402,8 @@ export const useEditMetricWithAI = ({
 
   return useMemo(
     () =>
-      createDropdownItem({
+      createMenuItem({
+        type: 'item',
         label: 'Edit with AI',
         value: 'edit-with-ai',
         icon: <PenSparkle />,
@@ -414,5 +412,40 @@ export const useEditMetricWithAI = ({
         loading,
       }),
     [metricId, onCreateFileClick, loading, isEditor]
+  );
+};
+
+export const useMetricShareMenuSelectMenu = ({
+  metricId,
+  versionNumber,
+}: {
+  metricId: string;
+  versionNumber: number | undefined;
+}) => {
+  const { data: shareAssetConfig } = useGetMetric(
+    { id: metricId, versionNumber },
+    { select: getShareAssetConfig }
+  );
+  const isEffectiveOwner = getIsEffectiveOwner(shareAssetConfig?.permission);
+
+  return useMemo(
+    () => ({
+      label: 'Share metric',
+      value: 'share-metric',
+      icon: <ShareRight />,
+      disabled: !isEffectiveOwner,
+      items:
+        isEffectiveOwner && shareAssetConfig
+          ? [
+              <ShareMenuContent
+                key={metricId}
+                shareAssetConfig={shareAssetConfig}
+                assetId={metricId}
+                assetType={'metric_file'}
+              />,
+            ]
+          : undefined,
+    }),
+    [metricId, shareAssetConfig, isEffectiveOwner]
   );
 };

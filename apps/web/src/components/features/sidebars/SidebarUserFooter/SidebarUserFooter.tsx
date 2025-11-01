@@ -90,6 +90,7 @@ const topItems = ({ isAdmin }: { isAdmin: boolean }) =>
         link: {
           to: '/app/settings/users',
         },
+        show: isAdmin,
       },
       { type: 'divider' },
       {

@@ -8,10 +8,10 @@ import { KEYS } from 'platejs';
 import { useEditorPlugin, usePlateState } from 'platejs/react';
 import * as React from 'react';
 import {
-  ContextMenu,
   ContextMenuContent,
   ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuRoot,
   ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuSub,
@@ -83,7 +83,7 @@ function BlockContextMenuComponent({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <ContextMenu
+    <ContextMenuRoot
       onOpenChange={(open) => {
         if (!open) {
           // prevent unselect the block selection
@@ -210,7 +210,7 @@ function BlockContextMenuComponent({ children }: { children: React.ReactNode }) 
           </ContextMenuSub>
         </ContextMenuGroup>
       </ContextMenuContent>
-    </ContextMenu>
+    </ContextMenuRoot>
   );
 }
 

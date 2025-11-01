@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as React from 'react';
 import { useMemo } from 'react';
-import type { ContextMenuProps } from '../../context-menu/ContextMenu';
+import type { ContextMenuProps } from '../../context-menu';
 import { BusterList } from './index';
 import type { BusterListColumn, BusterListRowItem } from './interfaces';
 
@@ -114,19 +114,22 @@ const generateSampleRows = (count: number): BusterListRowItem<SampleData>[] => {
 // Generate sample rows
 const sampleRows: BusterListRowItem<SampleData>[] = generateSampleRows(5);
 
-const sampleContextMenu: ContextMenuProps = {
+const sampleContextMenu: Omit<ContextMenuProps, 'children'> = {
   items: [
     {
       label: 'View Details',
       onClick: () => alert(`View`),
+      value: 'view',
     },
     {
       label: 'Edit',
       onClick: () => alert(`Edit`),
+      value: 'edit',
     },
     {
       label: 'Delete',
       onClick: () => alert(`Delete`),
+      value: 'delete',
     },
   ],
 };

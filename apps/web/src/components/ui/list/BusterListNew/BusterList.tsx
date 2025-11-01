@@ -1,9 +1,8 @@
 import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual';
-import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import type React from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { cn } from '@/lib/utils';
-import { ContextMenu } from '../../context-menu';
-import type { ContextMenuProps } from '../../context-menu/ContextMenu';
 import { BusterListHeader } from './BusterListHeader';
 import { BusterListRowComponent } from './BusterListRowComponent';
 import { BusterListRowSection } from './BusterListRowSection';
@@ -19,7 +18,7 @@ function BusterListBase<T = unknown>(
     emptyState,
     showHeader,
     selectedRowKeys,
-    contextMenu,
+    ContextMenu,
     showSelectAll,
     rowClassName,
     className,
@@ -90,9 +89,8 @@ function BusterListBase<T = unknown>(
   });
 
   useImperativeHandle(ref, () => ({
-    scrollTo: (id: string) => {
+    scrollTo: (_id: string) => {
       // TODO: Implement scroll to functionality
-      console.log('Scrolling to:', id);
     },
   }));
 
@@ -109,12 +107,6 @@ function BusterListBase<T = unknown>(
     }
     return idsPerSection;
   }, [rows]);
-
-  const [WrapperNode, wrapperNodeProps] = useMemo(() => {
-    const node = contextMenu ? ContextMenu : React.Fragment;
-    const props: ContextMenuProps = contextMenu ? contextMenu : ({} as ContextMenuProps);
-    return [node, props];
-  }, [contextMenu]);
 
   useInfiniteScroll({
     scrollElementRef: internalScrollParentRef,
@@ -137,37 +129,39 @@ function BusterListBase<T = unknown>(
           onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
         />
       )}
-      <WrapperNode {...wrapperNodeProps}>
-        <div ref={mergedScrollRef} className="overflow-y-auto overflow-x-hidden flex-1 w-full">
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
-          >
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-              <BusterListRowSelector
-                {...virtualRow}
-                rows={rows}
-                columns={columns}
-                idsPerSection={idsPerSection}
-                selectedRowKeys={selectedRowKeys}
-                onSelectRowChange={onSelectChange ? onSelectRowChange : undefined}
-                onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
-                hideLastRowBorder={hideLastRowBorder}
-                key={virtualRow.key}
-              />
-            ))}
-          </div>
-
-          {infiniteScrollConfig?.loadingNewContent && (
-            <div className="flex items-center justify-center py-1.5 pointer-events-none">
-              {infiniteScrollConfig.loadingNewContent}
-            </div>
-          )}
+      <div
+        ref={mergedScrollRef}
+        className="overflow-y-auto overflow-x-hidden flex-1 w-full scrollbar-thin"
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+            <BusterListRowSelector
+              {...virtualRow}
+              rows={rows}
+              columns={columns}
+              idsPerSection={idsPerSection}
+              selectedRowKeys={selectedRowKeys}
+              onSelectRowChange={onSelectChange ? onSelectRowChange : undefined}
+              onSelectSectionChange={onSelectChange ? onSelectSectionChange : undefined}
+              ContextMenu={ContextMenu}
+              hideLastRowBorder={hideLastRowBorder}
+              key={virtualRow.key}
+            />
+          ))}
         </div>
-      </WrapperNode>
+
+        {infiniteScrollConfig?.loadingNewContent && (
+          <div className="flex items-center justify-center py-1.5 pointer-events-none">
+            {infiniteScrollConfig.loadingNewContent}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -186,6 +180,7 @@ const BusterListRowSelector = <T = unknown>({
   selectedRowKeys,
   onSelectRowChange,
   onSelectSectionChange,
+  ContextMenu,
   ...rest
 }: VirtualItem & {
   idsPerSection: Map<string, Set<string>>;
@@ -193,7 +188,12 @@ const BusterListRowSelector = <T = unknown>({
   onSelectRowChange: ((v: boolean, id: string, e: React.MouseEvent) => void) | undefined;
 } & Pick<
     BusterListProps<T>,
-    'selectedRowKeys' | 'rows' | 'columns' | 'hideLastRowBorder' | 'useRowClickSelectChange'
+    | 'selectedRowKeys'
+    | 'rows'
+    | 'columns'
+    | 'hideLastRowBorder'
+    | 'useRowClickSelectChange'
+    | 'ContextMenu'
   >) => {
   const selectedRow = rows[index];
   const isSection = selectedRow.type === 'section';
@@ -221,6 +221,7 @@ const BusterListRowSelector = <T = unknown>({
           checked={!!selectedRowKeys?.has(selectedRow.id)}
           isLastChild={isLastChild}
           onSelectRowChange={onSelectRowChange}
+          ContextMenu={ContextMenu}
         />
       )}
     </div>
