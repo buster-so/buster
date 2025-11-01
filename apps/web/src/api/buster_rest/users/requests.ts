@@ -3,11 +3,11 @@ import type { GetSuggestedPromptsResponse, UserResponse } from '@buster/server-s
 import { mainApi, mainApiV2 } from '../instances';
 
 export const getMyUserInfo = async () => {
-  return mainApi.get<UserResponse>('/users').then((response) => response.data);
+  return mainApiV2.get<UserResponse>('/users').then((response) => response.data);
 };
 
 export const getUser = async ({ userId }: { userId: string }) => {
-  return mainApi.get<OrganizationUser>(`/users/${userId}`).then((response) => response.data);
+  return mainApiV2.get<OrganizationUser>(`/users/${userId}`).then((response) => response.data);
 };
 
 export const updateOrganizationUser = async ({

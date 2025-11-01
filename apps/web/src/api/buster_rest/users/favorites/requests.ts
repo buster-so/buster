@@ -1,9 +1,9 @@
 import type { ShareAssetType } from '@buster/server-shared/share';
 import type { UserFavoriteResponse } from '@buster/server-shared/user';
-import { mainApi } from '../../instances';
+import { mainApiV2 } from '../../instances';
 
 export const getUserFavorites = async () => {
-  return mainApi.get<UserFavoriteResponse>('/users/favorites').then((response) => response.data);
+  return mainApiV2.get<UserFavoriteResponse>('/users/favorites').then((response) => response.data);
 };
 
 export const createUserFavorite = async (
@@ -14,19 +14,19 @@ export const createUserFavorite = async (
     name: string; //just used for the UI for optimistic update
   }[]
 ) => {
-  return mainApi
+  return mainApiV2
     .post<UserFavoriteResponse>('/users/favorites', payload)
     .then((response) => response.data);
 };
 
 export const deleteUserFavorite = async (data: string[]) => {
-  return mainApi
+  return mainApiV2
     .delete<UserFavoriteResponse>('/users/favorites', { data })
     .then((response) => response.data);
 };
 
 export const updateUserFavorites = async (payload: string[]) => {
-  return mainApi
+  return mainApiV2
     .put<UserFavoriteResponse>('/users/favorites', payload)
     .then((response) => response.data);
 };
