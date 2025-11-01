@@ -1,7 +1,13 @@
 import { z } from 'zod';
 import { UserOrganizationRoleSchema } from './roles.types';
+import { UserOrganizationStatusSchema } from '@buster/database/schema-types';
 
-export const LineageUserItemTypeSchema = z.enum(['user', 'datasets', 'permissionGroups']);
+export const LineageUserItemTypeSchema = z.enum([
+  'user',
+  'datasets',
+  'permissionGroups',
+  'datasetGroups',
+]);
 
 // Zod schema for lineage item
 const LineageItemSchema = z.object({
@@ -24,7 +30,7 @@ export const OrganizationUserSchema = z.object({
   email: z.string(),
   name: z.string(),
   avatar_url: z.string().nullable(),
-  status: z.enum(['active', 'inactive']),
+  status: UserOrganizationStatusSchema,
   role: UserOrganizationRoleSchema,
   datasets: z.array(OrganizationUserDatasetSchema),
 });

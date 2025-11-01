@@ -10,6 +10,15 @@ export const UserOrganizationRoleSchema = z.enum([
 ]);
 export type UserOrganizationRole = z.infer<typeof UserOrganizationRoleSchema>;
 
+export const UserAttributesSchema = z.object({
+  organization_id: z.string(),
+  organization_role: z.custom<UserOrganizationRole>(),
+  user_email: z.string().email(),
+  user_id: z.string(),
+});
+
+export type UserAttributes = z.infer<typeof UserAttributesSchema>;
+
 // User organization status enum
 export const UserOrganizationStatusSchema = z.enum(['active', 'inactive', 'pending', 'guest']);
 export type UserOrganizationStatus = z.infer<typeof UserOrganizationStatusSchema>;

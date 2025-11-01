@@ -1,4 +1,7 @@
+export * from './favorites';
 export * from './find-user-by-email';
+export * from './get-user-by-id-with-datasets';
+export * from './get-user-info';
 export * from './get-user-organizations';
 export * from './get-user-personalization';
 export * from './update-user-shortcuts';
